@@ -58,7 +58,7 @@ async function initCaseSelect(){
     (cosRes||[]).forEach(c=>{const n=parseInt(c.folder_no)||99999;_companyFolderMap[c.id]=n;if(!window._companyNameFolderMap[c.name]||n<window._companyNameFolderMap[c.name])window._companyNameFolderMap[c.name]=n;window._allCompanies.push({name:c.name,folderNo:n,orgName:c.support_org_name||''});});
     _orgFolderMap={};(sosRes||[]).forEach(s=>{_orgFolderMap[s.name||'']=parseInt(s.folder_no)||99999;});
     let all=[],offset=0,pageSize=1000;
-    while(true){const chunk=await sb('cases?select=id,name,applicant,company,company_id,org,emp_set_idx,applicant_field,applicant_field_en&status=not.in.(完了,審査完了)&order=created_at.desc&limit='+pageSize+'&offset='+offset);if(!chunk||!chunk.length)break;all=all.concat(chunk);if(chunk.length<pageSize)break;offset+=pageSize;}
+    while(true){const chunk=await sb('cases?select=id,name,applicant,company,company_id,org,emp_set_idx,applicant_field,applicant_field_en&order=created_at.desc&limit='+pageSize+'&offset='+offset);if(!chunk||!chunk.length)break;all=all.concat(chunk);if(chunk.length<pageSize)break;offset+=pageSize;}
     _allCases=all;buildFilterOptions();filterCases();
   }catch(e){console.warn('案件取得エラー:',e);if(sel)sel.innerHTML='<option value="">取得エラー</option>';}
 }

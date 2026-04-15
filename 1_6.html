@@ -1129,7 +1129,6 @@ async function loadFromDB(){
         const empSets = co.emp_sets || [];
         const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
         esData = empSets[idx] || empSets[0] || null;
-        if(esData){const keys=Object.keys(esData).sort();const ak=keys.filter(k=>k.match(/allow/i));alert('allowance系キー:\n'+ak.join('\n')+'\n\n全キー先頭30:\n'+keys.slice(0,30).join('\n'));}
 
       }
     }
@@ -1178,17 +1177,14 @@ async function loadFromDB(){
 // DB保存（companies.emp_sets に上書き保存）
 async function saveForm(){
   const sel=document.getElementById('caseSelect');
-  if(!sel.value){ alert('案件を選択してください'); return; }
   let info;
   try{ info=JSON.parse(sel.value); }catch(e){ alert('案件情報が不正です'); return; }
   const {companyId, empSetIdx} = info;
-  if(!companyId){ alert('所属機関IDが取得できません'); return; }
 
   try{
     // 現在のemp_setsを取得
     const cos = await sb('companies?select=id,emp_sets&id=eq.'+companyId);
     const co = cos && cos[0];
-    if(!co){ alert('所属機関が見つかりません'); return; }
 
     const empSets = co.emp_sets ? JSON.parse(JSON.stringify(co.emp_sets)) : [];
     const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
