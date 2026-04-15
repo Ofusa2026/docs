@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>移行準備説明書</title>
-<link rel="stylesheet" href="ofusa_common.css?v=20260415">
+<link rel="stylesheet" href="ofusa_common.css?v=20260415b">
 <style>
 /* 書類固有スタイル */
 .underline{text-decoration:underline;}
@@ -15,7 +15,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.05</div>
+    <div class="ver">ver.20260415.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
@@ -77,7 +77,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=20260415"></script>
+<script src="ofusa_common.js?v=20260415b"></script>
 <script>
 // ===== 移行準備説明書 固有処理 =====
 
@@ -207,7 +207,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.05 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.06 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
