@@ -186,7 +186,6 @@ async function loadFromDB(){
     if(personName) s('f_name',personName);
     if(nationality) s('f_nationality',nationality);
     if(cas&&cas.applicant_field){ s('f_field',stripParens(cas.applicant_field)); }
-    if(cas&&cas.category){ s('f_category',stripParens(cas.category)); }
     s('f_orgName',coName);
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
