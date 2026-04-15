@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－２５号</title>
+<link rel="stylesheet" href="ofusa_common.css?v=20260415c">
+<style>
+@page{margin:0}
+@media print{
+  .appbar,.panel-left{display:none!important}
+  .panel-right{margin:0!important;padding:0!important}
+  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important;page-break-after:always}
+  .doc:last-child{page-break-after:auto}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="appbar">
+  <div class="appbar-title" id="docTitle">📄 参考様式第１－２５号</div>
+  <div class="ver">ver.20260415.01</div>
+  <div class="appbar-actions">
+    <div class="pn-bar">
+      <button class="pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    </div>
+    <label>文字: </label>
+    <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
+    <span id="fontSizeLabel">8.5pt</span>
+    <button class="btn btn-sm" onclick="changeFontSize(0.5)">A+</button>
+    <button id="editModeBtn" class="btn" onclick="toggleEditMode()">✏️ 直接編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="panel-left">
+    <div class="filter-section">
+      <div class="fg"><label>登録支援機関</label><select id="filterOrg" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
+      <div class="fg"><label>所属機関</label><select id="filterCompany" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
+      <div class="fg"><label>検索</label><input id="filterText" oninput="filterCases()" style="width:100%"></div>
+      <div class="fg"><label>案件選択 <span id="caseCount" class="fid"></span></label>
+        <select id="caseSelect" onchange="loadFromDB()" style="width:100%"><option value="">── 選択 ──</option></select>
+      </div>
+    </div>
+    <hr>
+    <div class="section-title">基本情報</div>
+    <div class="fg"><label>書類作成日<span class="fid">co_docDate</span></label><input id="co_docDate" oninput="p()"></div>
+    <div class="fg"><label>申請人氏名<span class="fid">co_applicant</span></label><input id="co_applicant" oninput="p()"></div>
+    <div class="fg"><label>所属機関名<span class="fid">co_name</span></label><input id="co_name" oninput="p()"></div>
+    <div class="fg"><label>作成責任者<span class="fid">co_author</span></label><input id="co_author" oninput="p()"></div>
+    <hr>
+    <div class="section-title">登録支援機関</div>
+    <div class="fg"><label>登録支援機関名<span class="fid">so_name</span></label><input id="so_name" oninput="p()"></div>
+    <div class="fg"><label>登録番号<span class="fid">so_no</span></label><input id="so_no" oninput="p()"></div>
+    <hr>
+    <div class="section-title">雇用条件</div>
+    <div class="fg"><label>契約終了日<span class="fid">co_contractEnd</span></label><input id="co_contractEnd" oninput="p()"></div>
+    <div class="fg"><label>支援委託費（月額）<span class="fid">co_supportFee</span></label><input id="co_supportFee" oninput="p()"></div>
+  </div>
+
+  <div class="panel-right" id="pageArea">
+    <div class="doc">
+      <div class="page-num-label">P1</div>
+      <div id="docContent"></div>
+    </div>
+  </div>
+</div>
+
+<script src="ofusa_common.js?v=20260415c"></script>
+<script>
+function v(id){return document.getElementById(id)?.value||'';}
+function f(id){const raw=v(id);const label=id.replace(/^co_/,'co.').replace(/^so_/,'so.');return raw?`<span class="f">${raw}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;}
+
+function p(){
+  if(_editMode) return;
+  document.getElementById('docContent').innerHTML = `
+<div style="font-size:9pt;font-weight:bold;text-align:center;margin-bottom:4mm;">参考様式第１－２５号（規則第６条第１項第１号ホ関係）</div>
+<div style="font-size:8.5pt;text-align:center;font-weight:bold;margin-bottom:6mm;">登録支援機関との支援委託契約に関する説明書</div>
+
+<div style="font-size:8pt;margin-bottom:4mm;">
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="width:35%;padding:2px 0;">申請人氏名</td>
+      <td style="padding:2px 0;">${f('co_applicant')} 殿</td>
+    </tr>
+  </table>
+</div>
+
+<div style="font-size:8pt;margin-bottom:4mm;">
+特定技能所属機関は，下記のとおり，登録支援機関に支援を委託しております。登録支援機関との間で締結した支援委託契約の内容について説明します。
+</div>
+
+<div style="margin-bottom:6mm;">
+  <div style="font-weight:bold;font-size:8pt;margin-bottom:2mm;">記</div>
+  <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+    <tr>
+      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;width:40%;font-weight:bold;">登録支援機関の名称</td>
+      <td style="border:1px solid #333;padding:4px 6px;">${f('so_name')}</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">登録支援機関の登録番号</td>
+      <td style="border:1px solid #333;padding:4px 6px;">${f('so_no')}</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">雇用契約期間の終期</td>
+      <td style="border:1px solid #333;padding:4px 6px;">${f('co_contractEnd')}</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">支援委託費（月額）</td>
+      <td style="border:1px solid #333;padding:4px 6px;">${f('co_supportFee')} 円</td>
+    </tr>
+  </table>
+</div>
+
+<div style="font-size:8pt;margin-bottom:2mm;">
+１．登録支援機関との支援委託契約の内容は，入管法その他関係法令に基づく適正なものです。<br>
+２．支援委託費は，特定技能外国人の報酬から控除しません。<br>
+３．登録支援機関が定める支援の実施に関する規程を遵守します。
+</div>
+
+<div style="text-align:right;font-size:8pt;margin-top:8mm;">
+  ${f('co_docDate')}<br>
+  <div style="margin-top:2mm;">特定技能所属機関の名称　${f('co_name')}</div>
+  <div style="margin-top:2mm;">作成責任者職氏名　　　　${f('co_author')}</div>
+  <div style="margin-top:8mm;">印</div>
+</div>
+`;
+}
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info;
+  try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName}=info;
+
+  try{
+    const [cases,cos]=await Promise.all([
+      sb('cases?select=applicant,company_id,org,emp_set_idx&id=eq.'+caseId),
+      companyId
+        ?sb('companies?select=id,name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.'+companyId)
+        :companyName
+          ?sb('companies?select=id,name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.'+encodeURIComponent(companyName))
+          :Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0];
+    const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+
+    if(cas) s('co_applicant', cas.applicant||'');
+    if(co){
+      s('co_name', co.name||'');
+      const authorStr=[co.author_title,co.author_name].filter(Boolean).join('　');
+      s('co_author', authorStr);
+      s('so_name', co.support_org_name||'');
+      s('so_no', co.support_org_no||'');
+      // emp_setsから
+      const idx=parseInt(cas?.emp_set_idx||0)||0;
+      const es=(co.emp_sets||[])[idx]||{};
+      if(es.supportFee) s('co_supportFee', es.supportFee);
+      // 契約終了日はpersonsから取得
+    }
+    if(cas){
+      const persons=await sb('persons?select=contract_end&case_id=eq.'+caseId);
+      const pd=persons&&persons[0];
+      if(pd?.contract_end){
+        const m=String(pd.contract_end).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+        if(m) s('co_contractEnd',`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`);
+      }
+    }
+    if(!v('co_docDate')){
+      const now=new Date();
+      document.getElementById('co_docDate').value=`令和${now.getFullYear()-2018}年${now.getMonth()+1}月${now.getDate()}日`;
+    }
+    p();
+    showToast('✅ データを読み込みました');
+  }catch(e){
+    showToast('⚠️ 読込エラー: '+e.message);
+    console.error(e);
+  }
+}
+
+console.log('%c OFUSA 書類作成システム %c ver.20260415.01 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+initCaseSelect();
+p();
+</script>
+</body>
+</html>

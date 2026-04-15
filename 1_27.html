@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－２７号</title>
+<link rel="stylesheet" href="ofusa_common.css?v=20260415c">
+<style>
+@page{margin:0}
+@media print{
+  .appbar,.panel-left{display:none!important}
+  .panel-right{margin:0!important;padding:0!important}
+  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important;page-break-after:always}
+  .doc:last-child{page-break-after:auto}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="appbar">
+  <div class="appbar-title" id="docTitle">📄 参考様式第１－２７号</div>
+  <div class="ver">ver.20260415.01</div>
+  <div class="appbar-actions">
+    <div class="pn-bar">
+      <button class="pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    </div>
+    <label>文字: </label>
+    <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
+    <span id="fontSizeLabel">8.5pt</span>
+    <button class="btn btn-sm" onclick="changeFontSize(0.5)">A+</button>
+    <button id="editModeBtn" class="btn" onclick="toggleEditMode()">✏️ 直接編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="panel-left">
+    <div class="filter-section">
+      <div class="fg"><label>登録支援機関</label><select id="filterOrg" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
+      <div class="fg"><label>所属機関</label><select id="filterCompany" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
+      <div class="fg"><label>検索</label><input id="filterText" oninput="filterCases()" style="width:100%"></div>
+      <div class="fg"><label>案件選択 <span id="caseCount" class="fid"></span></label>
+        <select id="caseSelect" onchange="loadFromDB()" style="width:100%"><option value="">── 選択 ──</option></select>
+      </div>
+    </div>
+    <hr>
+    <div class="section-title">基本情報</div>
+    <div class="fg"><label>書類作成日<span class="fid">co_docDate</span></label><input id="co_docDate" oninput="p()"></div>
+    <div class="fg"><label>所属機関名<span class="fid">co_name</span></label><input id="co_name" oninput="p()"></div>
+    <div class="fg"><label>作成責任者<span class="fid">co_author</span></label><input id="co_author" oninput="p()"></div>
+    <hr>
+    <div class="section-title">公的義務履行確認</div>
+    <div style="font-size:11px;color:#666;margin-bottom:8px;">各項目の履行状況を選択してください</div>
+    <div class="fg">
+      <label>社会保険料の納付</label>
+      <select id="chk_ins" onchange="p()" style="width:100%">
+        <option value="履行">履行</option>
+        <option value="未履行">未履行</option>
+        <option value="免除・猶予">免除・猶予</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>労働保険料の納付</label>
+      <select id="chk_labor" onchange="p()" style="width:100%">
+        <option value="履行">履行</option>
+        <option value="未履行">未履行</option>
+        <option value="免除・猶予">免除・猶予</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>租税の納付</label>
+      <select id="chk_tax" onchange="p()" style="width:100%">
+        <option value="履行">履行</option>
+        <option value="未履行">未履行</option>
+        <option value="免除・猶予">免除・猶予</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>法令遵守状況</label>
+      <select id="chk_law" onchange="p()" style="width:100%">
+        <option value="遵守">遵守</option>
+        <option value="違反あり">違反あり</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panel-right" id="pageArea">
+    <div class="doc">
+      <div class="page-num-label">P1</div>
+      <div id="docContent"></div>
+    </div>
+  </div>
+</div>
+
+<script src="ofusa_common.js?v=20260415c"></script>
+<script>
+function v(id){return document.getElementById(id)?.value||'';}
+function f(id){const raw=v(id);const label=id.replace(/^co_/,'co.').replace(/^chk_/,'');return raw?`<span class="f">${raw}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;}
+
+function p(){
+  if(_editMode) return;
+  const rows = [
+    {label:'社会保険料の納付状況', id:'chk_ins'},
+    {label:'労働保険料の納付状況', id:'chk_labor'},
+    {label:'租税の納付状況', id:'chk_tax'},
+    {label:'関係法令の遵守状況', id:'chk_law'},
+  ];
+  document.getElementById('docContent').innerHTML = `
+<div style="font-size:9pt;font-weight:bold;text-align:center;margin-bottom:4mm;">参考様式第１－２７号（規則第６条第１項第１号ヘ関係）</div>
+<div style="font-size:8.5pt;text-align:center;font-weight:bold;margin-bottom:6mm;">公的義務履行に関する説明書</div>
+
+<div style="font-size:8pt;margin-bottom:4mm;">
+特定技能所属機関は，特定技能外国人を受け入れるに当たり，以下のとおり公的義務を履行していることを説明します。
+</div>
+
+<div style="margin-bottom:6mm;">
+  <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+    <tr style="background:#f0f0f0;">
+      <th style="border:1px solid #333;padding:4px 6px;text-align:left;width:55%">項目</th>
+      <th style="border:1px solid #333;padding:4px 6px;text-align:center;width:45%">状況</th>
+    </tr>
+    ${rows.map(r=>`
+    <tr>
+      <td style="border:1px solid #333;padding:4px 6px;">${r.label}</td>
+      <td style="border:1px solid #333;padding:4px 6px;text-align:center;">${f(r.id)}</td>
+    </tr>`).join('')}
+  </table>
+</div>
+
+<div style="font-size:8pt;margin-bottom:4mm;">
+（注）未履行の場合は，その理由及び履行の見込みについて別紙に記載してください。
+</div>
+
+<div style="font-size:8pt;margin-bottom:2mm;">
+上記のとおり説明します。
+</div>
+
+<div style="text-align:right;font-size:8pt;margin-top:8mm;">
+  ${f('co_docDate')}<br>
+  <div style="margin-top:2mm;">特定技能所属機関の名称　${f('co_name')}</div>
+  <div style="margin-top:2mm;">作成責任者職氏名　　　　${f('co_author')}</div>
+  <div style="margin-top:8mm;">印</div>
+</div>
+`;
+}
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info;
+  try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {companyId,companyName}=info;
+
+  try{
+    const _coQuery=companyId
+      ?'companies?select=name,author_name,author_title&id=eq.'+companyId
+      :companyName
+        ?'companies?select=name,author_name,author_title&name=eq.'+encodeURIComponent(companyName)
+        :null;
+    if(!_coQuery) return;
+    const cos=await sb(_coQuery);
+    const co=cos&&cos[0];
+    if(!co) return;
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    s('co_name', co.name||'');
+    const authorStr=[co.author_title,co.author_name].filter(Boolean).join('　');
+    s('co_author', authorStr);
+    if(!v('co_docDate')){
+      const now=new Date();
+      document.getElementById('co_docDate').value=`令和${now.getFullYear()-2018}年${now.getMonth()+1}月${now.getDate()}日`;
+    }
+    p();
+    showToast('✅ データを読み込みました');
+  }catch(e){
+    showToast('⚠️ 読込エラー: '+e.message);
+    console.error(e);
+  }
+}
+
+console.log('%c OFUSA 書類作成システム %c ver.20260415.01 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+initCaseSelect();
+p();
+</script>
+</body>
+</html>

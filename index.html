@@ -53,6 +53,22 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>移行準備説明書<span class="item-sub">特定活動→特定技能１号</span></div>
     </div>
+    <div class="item" id="nav-1_23" onclick="open_doc('1_23')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－２３号<span class="item-sub">役員に関する誓約書</span></div>
+    </div>
+    <div class="item" id="nav-1_25" onclick="open_doc('1_25')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－２５号<span class="item-sub">支援委託契約に関する説明書</span></div>
+    </div>
+    <div class="item" id="nav-1_27" onclick="open_doc('1_27')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－２７号<span class="item-sub">公的義務履行に関する説明書</span></div>
+    </div>
+    <div class="item" id="nav-1_29" onclick="open_doc('1_29')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－２９号<span class="item-sub">書類省略に当たっての誓約書</span></div>
+    </div>
     <div class="divider"></div>
     <div class="section">準備中</div>
     <div class="item disabled"><span class="item-icon">📝</span><div>参考様式第１－５号<span class="item-sub">雇用契約書</span></div></div>
@@ -85,12 +101,20 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <iframe id="frame-1_6"></iframe>
     <iframe id="frame-iko"></iframe>
+    <iframe id="frame-1_23"></iframe>
+    <iframe id="frame-1_25"></iframe>
+    <iframe id="frame-1_27"></iframe>
+    <iframe id="frame-1_29"></iframe>
   </div>
 </div>
 <script>
 const docs={
   '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1776264643'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1776264643'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html'},
 };
 let cur='home';
 function open_doc(key){
