@@ -10,8 +10,7 @@
 @media print{
   .appbar,.panel-left{display:none!important}
   .panel-right{margin:0!important;padding:0!important}
-  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important;page-break-after:always}
-  .doc:last-child{page-break-after:auto}
+  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -19,11 +18,8 @@
 <body>
 <div class="appbar">
   <div class="appbar-title" id="docTitle">📄 参考様式第１－２７号</div>
-  <div class="ver">ver.20260415.01</div>
+  <div class="ver">ver.20260415.02</div>
   <div class="appbar-actions">
-    <div class="pn-bar">
-      <button class="pn-btn-page active" onclick="scrollToPage(1)">P1</button>
-    </div>
     <label>文字: </label>
     <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
     <span id="fontSizeLabel">8.5pt</span>
@@ -48,43 +44,9 @@
     </div>
     <hr>
     <div class="section-title">基本情報</div>
-    <div class="fg"><label>書類作成日<span class="fid">co_docDate</span></label><input id="co_docDate" oninput="p()"></div>
-    <div class="fg"><label>所属機関名<span class="fid">co_name</span></label><input id="co_name" oninput="p()"></div>
-    <div class="fg"><label>作成責任者<span class="fid">co_author</span></label><input id="co_author" oninput="p()"></div>
-    <hr>
-    <div class="section-title">公的義務履行確認</div>
-    <div style="font-size:11px;color:#666;margin-bottom:8px;">各項目の履行状況を選択してください</div>
-    <div class="fg">
-      <label>社会保険料の納付</label>
-      <select id="chk_ins" onchange="p()" style="width:100%">
-        <option value="履行">履行</option>
-        <option value="未履行">未履行</option>
-        <option value="免除・猶予">免除・猶予</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label>労働保険料の納付</label>
-      <select id="chk_labor" onchange="p()" style="width:100%">
-        <option value="履行">履行</option>
-        <option value="未履行">未履行</option>
-        <option value="免除・猶予">免除・猶予</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label>租税の納付</label>
-      <select id="chk_tax" onchange="p()" style="width:100%">
-        <option value="履行">履行</option>
-        <option value="未履行">未履行</option>
-        <option value="免除・猶予">免除・猶予</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label>法令遵守状況</label>
-      <select id="chk_law" onchange="p()" style="width:100%">
-        <option value="遵守">遵守</option>
-        <option value="違反あり">違反あり</option>
-      </select>
-    </div>
+    <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
+    <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
+    <div style="font-size:11px;color:#666;margin-top:8px;">※本書類はほぼ固定文です。<br>案件選択で機関名と日付が自動入力されます。</div>
   </div>
 
   <div class="panel-right" id="pageArea">
@@ -97,52 +59,54 @@
 
 <script src="ofusa_common.js?v=20260415c"></script>
 <script>
-function v(id){return document.getElementById(id)?.value||'';}
-function f(id){const raw=v(id);const label=id.replace(/^co_/,'co.').replace(/^chk_/,'');return raw?`<span class="f">${raw}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;}
+function fv(id){const v=document.getElementById(id)?.value||'';return v?`<span class="f">${v}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id}</span>`;}
+function gv(id){return document.getElementById(id)?.value||'';}
 
 function p(){
   if(_editMode) return;
-  const rows = [
-    {label:'社会保険料の納付状況', id:'chk_ins'},
-    {label:'労働保険料の納付状況', id:'chk_labor'},
-    {label:'租税の納付状況', id:'chk_tax'},
-    {label:'関係法令の遵守状況', id:'chk_law'},
-  ];
   document.getElementById('docContent').innerHTML = `
-<div style="font-size:9pt;font-weight:bold;text-align:center;margin-bottom:4mm;">参考様式第１－２７号（規則第６条第１項第１号ヘ関係）</div>
-<div style="font-size:8.5pt;text-align:center;font-weight:bold;margin-bottom:6mm;">公的義務履行に関する説明書</div>
+<div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２７号</div>
+<div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:8mm;">公的義務履行に関する説明書</div>
 
-<div style="font-size:8pt;margin-bottom:4mm;">
-特定技能所属機関は，特定技能外国人を受け入れるに当たり，以下のとおり公的義務を履行していることを説明します。
+<div style="font-size:8.5pt;line-height:1.8;">
+
+<div style="font-weight:bold;margin-bottom:2mm;">第１　労働関係法令の遵守</div>
+<div style="margin-left:4mm;margin-bottom:4mm;">労働保険料（適用事業所のみ）</div>
+
+<div style="font-weight:bold;margin-bottom:2mm;">第２　社会保険関係法令の遵守</div>
+<div style="margin-left:4mm;margin-bottom:4mm;">
+  １　健康保険・厚生年金保険の適用事業所の場合<br>
+  <div style="margin-left:4mm;">健康保険・厚生年金保険料</div>
+  ２　健康保険・厚生年金保険の適用事業所の場合ではない場合<br>
+  <div style="margin-left:4mm;">
+    （１）事業主の国民健康保険料<br>
+    （２）事業主の国民年金保険料
+  </div>
 </div>
 
-<div style="margin-bottom:6mm;">
-  <table style="width:100%;border-collapse:collapse;font-size:8pt;">
-    <tr style="background:#f0f0f0;">
-      <th style="border:1px solid #333;padding:4px 6px;text-align:left;width:55%">項目</th>
-      <th style="border:1px solid #333;padding:4px 6px;text-align:center;width:45%">状況</th>
-    </tr>
-    ${rows.map(r=>`
-    <tr>
-      <td style="border:1px solid #333;padding:4px 6px;">${r.label}</td>
-      <td style="border:1px solid #333;padding:4px 6px;text-align:center;">${f(r.id)}</td>
-    </tr>`).join('')}
-  </table>
+<div style="font-weight:bold;margin-bottom:2mm;">第３　租税関係の法令遵守</div>
+<div style="margin-left:4mm;margin-bottom:6mm;">
+  １　法人の場合<br>
+  <div style="margin-left:4mm;">
+    （１）国税（源泉所得税及び復興特別所得税、法人税、消費税及び地方消費税）<br>
+    （２）地方税（法人住民税）
+  </div>
+  ２　個人事業主の場合<br>
+  <div style="margin-left:4mm;">
+    （１）国税（源泉所得税及び復興特別所得税、消費税及び地方消費税、相続税、贈与税）<br>
+    （２）地方税（個人住民税）
+  </div>
 </div>
 
-<div style="font-size:8pt;margin-bottom:4mm;">
-（注）未履行の場合は，その理由及び履行の見込みについて別紙に記載してください。
+<div style="margin-bottom:3mm;">以上のいずれについても、滞納はありません。</div>
+<div style="margin-bottom:3mm;">なお、地方出入国在留管理局から、納付したことの証明を求められた場合には指導に従って関係書類を提出します。</div>
+<div style="margin-bottom:8mm;">また、以上の説明が虚偽であった場合には、入管法令に関し不正又は著しい不当な行為をしたものとして５年間の受入れができないこととなることも理解しています。</div>
+
 </div>
 
-<div style="font-size:8pt;margin-bottom:2mm;">
-上記のとおり説明します。
-</div>
-
-<div style="text-align:right;font-size:8pt;margin-top:8mm;">
-  ${f('co_docDate')}<br>
-  <div style="margin-top:2mm;">特定技能所属機関の名称　${f('co_name')}</div>
-  <div style="margin-top:2mm;">作成責任者職氏名　　　　${f('co_author')}</div>
-  <div style="margin-top:8mm;">印</div>
+<div style="text-align:right;font-size:8pt;">
+  <div style="margin-bottom:2mm;">${fv('f_docDate')}</div>
+  <div>特定技能所属機関名　　　　${fv('f_company')}</div>
 </div>
 `;
 }
@@ -153,34 +117,21 @@ async function loadFromDB(){
   let info;
   try{info=JSON.parse(sel.value);}catch(e){return;}
   const {companyId,companyName}=info;
-
   try{
-    const _coQuery=companyId
-      ?'companies?select=name,author_name,author_title&id=eq.'+companyId
-      :companyName
-        ?'companies?select=name,author_name,author_title&name=eq.'+encodeURIComponent(companyName)
-        :null;
-    if(!_coQuery) return;
-    const cos=await sb(_coQuery);
+    const q=companyId?`companies?select=name&id=eq.${companyId}`:companyName?`companies?select=name&name=eq.${encodeURIComponent(companyName)}`:null;
+    if(!q) return;
+    const cos=await sb(q);
     const co=cos&&cos[0];
     if(!co) return;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    s('co_name', co.name||'');
-    const authorStr=[co.author_title,co.author_name].filter(Boolean).join('　');
-    s('co_author', authorStr);
-    if(!v('co_docDate')){
-      const now=new Date();
-      document.getElementById('co_docDate').value=`令和${now.getFullYear()-2018}年${now.getMonth()+1}月${now.getDate()}日`;
-    }
+    s('f_company', co.name||'');
+    if(!gv('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p();
     showToast('✅ データを読み込みました');
-  }catch(e){
-    showToast('⚠️ 読込エラー: '+e.message);
-    console.error(e);
-  }
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.01 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.02 ','background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;','background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>

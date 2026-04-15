@@ -10,8 +10,7 @@
 @media print{
   .appbar,.panel-left{display:none!important}
   .panel-right{margin:0!important;padding:0!important}
-  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important;page-break-after:always}
-  .doc:last-child{page-break-after:auto}
+  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -19,11 +18,8 @@
 <body>
 <div class="appbar">
   <div class="appbar-title" id="docTitle">📄 参考様式第１－２５号</div>
-  <div class="ver">ver.20260415.01</div>
+  <div class="ver">ver.20260415.02</div>
   <div class="appbar-actions">
-    <div class="pn-bar">
-      <button class="pn-btn-page active" onclick="scrollToPage(1)">P1</button>
-    </div>
     <label>文字: </label>
     <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
     <span id="fontSizeLabel">8.5pt</span>
@@ -48,18 +44,18 @@
     </div>
     <hr>
     <div class="section-title">基本情報</div>
-    <div class="fg"><label>書類作成日<span class="fid">co_docDate</span></label><input id="co_docDate" oninput="p()"></div>
-    <div class="fg"><label>申請人氏名<span class="fid">co_applicant</span></label><input id="co_applicant" oninput="p()"></div>
-    <div class="fg"><label>所属機関名<span class="fid">co_name</span></label><input id="co_name" oninput="p()"></div>
-    <div class="fg"><label>作成責任者<span class="fid">co_author</span></label><input id="co_author" oninput="p()"></div>
+    <div class="fg"><label>書類作成日（＝契約年月日）<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
+    <div class="fg"><label>申請人氏名<span class="fid">f_applicant</span></label><input id="f_applicant" oninput="p()"></div>
+    <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
+    <div class="fg"><label>作成責任者役職・氏名<span class="fid">f_author</span></label><input id="f_author" oninput="p()"></div>
     <hr>
     <div class="section-title">登録支援機関</div>
-    <div class="fg"><label>登録支援機関名<span class="fid">so_name</span></label><input id="so_name" oninput="p()"></div>
-    <div class="fg"><label>登録番号<span class="fid">so_no</span></label><input id="so_no" oninput="p()"></div>
+    <div class="fg"><label>登録支援機関名<span class="fid">f_soName</span></label><input id="f_soName" oninput="p()"></div>
+    <div class="fg"><label>登録番号<span class="fid">f_soNo</span></label><input id="f_soNo" oninput="p()"></div>
     <hr>
     <div class="section-title">雇用条件</div>
-    <div class="fg"><label>契約終了日<span class="fid">co_contractEnd</span></label><input id="co_contractEnd" oninput="p()"></div>
-    <div class="fg"><label>支援委託費（月額）<span class="fid">co_supportFee</span></label><input id="co_supportFee" oninput="p()"></div>
+    <div class="fg"><label>契約終了日<span class="fid">f_contractEnd</span></label><input id="f_contractEnd" oninput="p()"></div>
+    <div class="fg"><label>委託料（１名当たりの月額）<span class="fid">f_supportFee</span></label><input id="f_supportFee" oninput="p()"></div>
   </div>
 
   <div class="panel-right" id="pageArea">
@@ -72,62 +68,65 @@
 
 <script src="ofusa_common.js?v=20260415c"></script>
 <script>
-function v(id){return document.getElementById(id)?.value||'';}
-function f(id){const raw=v(id);const label=id.replace(/^co_/,'co.').replace(/^so_/,'so.');return raw?`<span class="f">${raw}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;}
+function fv(id){const v=document.getElementById(id)?.value||'';return v?`<span class="f">${v}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id}</span>`;}
+function gv(id){return document.getElementById(id)?.value||'';}
 
 function p(){
   if(_editMode) return;
   document.getElementById('docContent').innerHTML = `
-<div style="font-size:9pt;font-weight:bold;text-align:center;margin-bottom:4mm;">参考様式第１－２５号（規則第６条第１項第１号ホ関係）</div>
-<div style="font-size:8.5pt;text-align:center;font-weight:bold;margin-bottom:6mm;">登録支援機関との支援委託契約に関する説明書</div>
+<div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２５号</div>
+<div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:4mm;">登録支援機関との支援委託契約に関する説明書</div>
 
 <div style="font-size:8pt;margin-bottom:4mm;">
-  <table style="width:100%;border-collapse:collapse;">
-    <tr>
-      <td style="width:35%;padding:2px 0;">申請人氏名</td>
-      <td style="padding:2px 0;">${f('co_applicant')} 殿</td>
-    </tr>
-  </table>
+　登録支援機関との１号特定技能外国人支援計画の全部の委託契約の概要は下記のとおりです。
 </div>
 
-<div style="font-size:8pt;margin-bottom:4mm;">
-特定技能所属機関は，下記のとおり，登録支援機関に支援を委託しております。登録支援機関との間で締結した支援委託契約の内容について説明します。
+<div style="font-weight:bold;font-size:8pt;margin-bottom:2mm;">記</div>
+
+<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:6mm;">
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;width:8%;text-align:center;background:#f0f0f0;">１</td>
+    <td style="border:1px solid #333;padding:4px 6px;width:42%;">申請人（支援対象者）</td>
+    <td style="border:1px solid #333;padding:4px 6px;">${fv('f_applicant')}</td>
+    <td style="border:1px solid #333;padding:4px 6px;width:10%;"></td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">２</td>
+    <td style="border:1px solid #333;padding:4px 6px;">契約の相手方（登録支援機関）</td>
+    <td style="border:1px solid #333;padding:4px 6px;">${fv('f_soName')}</td>
+    <td style="border:1px solid #333;padding:4px 6px;font-size:7.5pt;">（${fv('f_soNo')}）</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">３</td>
+    <td style="border:1px solid #333;padding:4px 6px;">契約年月日</td>
+    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${fv('f_docDate')}</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">４</td>
+    <td style="border:1px solid #333;padding:4px 6px;">委託する支援業務（１号特定技能外国人支援計画の全部であること）</td>
+    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">該当　・　非該当</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">５</td>
+    <td style="border:1px solid #333;padding:4px 6px;">委託料（１名当たりの月額）</td>
+    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${fv('f_supportFee')} 円</td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">６</td>
+    <td style="border:1px solid #333;padding:4px 6px;">契約期間</td>
+    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${fv('f_docDate')}から${fv('f_contractEnd')}まで</td>
+  </tr>
+</table>
+
+<div style="font-size:7.5pt;margin-bottom:4mm;line-height:1.6;">
+（注意）<br>
+１　項番１に関し、複数の申請人（同時申請に限る。）について、全ての項目の内容が同一の場合には「別紙のとおり」として別紙を添付して差し支えない。<br>
+２　項番２に関し、登録支援機関登録簿に登録された氏名又は名称を記載すること。
 </div>
 
-<div style="margin-bottom:6mm;">
-  <div style="font-weight:bold;font-size:8pt;margin-bottom:2mm;">記</div>
-  <table style="width:100%;border-collapse:collapse;font-size:8pt;">
-    <tr>
-      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;width:40%;font-weight:bold;">登録支援機関の名称</td>
-      <td style="border:1px solid #333;padding:4px 6px;">${f('so_name')}</td>
-    </tr>
-    <tr>
-      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">登録支援機関の登録番号</td>
-      <td style="border:1px solid #333;padding:4px 6px;">${f('so_no')}</td>
-    </tr>
-    <tr>
-      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">雇用契約期間の終期</td>
-      <td style="border:1px solid #333;padding:4px 6px;">${f('co_contractEnd')}</td>
-    </tr>
-    <tr>
-      <td style="border:1px solid #333;padding:4px 6px;background:#f0f0f0;font-weight:bold;">支援委託費（月額）</td>
-      <td style="border:1px solid #333;padding:4px 6px;">${f('co_supportFee')} 円</td>
-    </tr>
-  </table>
-</div>
-
-<div style="font-size:8pt;margin-bottom:2mm;">
-１．登録支援機関との支援委託契約の内容は，入管法その他関係法令に基づく適正なものです。<br>
-２．支援委託費は，特定技能外国人の報酬から控除しません。<br>
-３．登録支援機関が定める支援の実施に関する規程を遵守します。
-</div>
-
-<div style="text-align:right;font-size:8pt;margin-top:8mm;">
-  ${f('co_docDate')}<br>
-  <div style="margin-top:2mm;">特定技能所属機関の名称　${f('co_name')}</div>
-  <div style="margin-top:2mm;">作成責任者職氏名　　　　${f('co_author')}</div>
-  <div style="margin-top:8mm;">印</div>
-</div>
+<div style="text-align:right;font-size:8pt;margin-bottom:2mm;">${fv('f_docDate')}</div>
+<div style="text-align:right;font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${fv('f_company')}</div>
+<div style="text-align:right;font-size:8pt;">作成責任者　役職・氏名　　${fv('f_author')}</div>
 `;
 }
 
@@ -137,54 +136,36 @@ async function loadFromDB(){
   let info;
   try{info=JSON.parse(sel.value);}catch(e){return;}
   const {caseId,companyId,companyName}=info;
-
   try{
     const [cases,cos]=await Promise.all([
-      sb('cases?select=applicant,company_id,org,emp_set_idx&id=eq.'+caseId),
-      companyId
-        ?sb('companies?select=id,name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.'+companyId)
-        :companyName
-          ?sb('companies?select=id,name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.'+encodeURIComponent(companyName))
-          :Promise.resolve([])
+      sb('cases?select=applicant&id=eq.'+caseId),
+      companyId?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
     const cas=cases&&cases[0];
     const co=cos&&cos[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-
-    if(cas) s('co_applicant', cas.applicant||'');
+    if(cas) s('f_applicant', cas.applicant||'');
     if(co){
-      s('co_name', co.name||'');
-      const authorStr=[co.author_title,co.author_name].filter(Boolean).join('　');
-      s('co_author', authorStr);
-      s('so_name', co.support_org_name||'');
-      s('so_no', co.support_org_no||'');
-      // emp_setsから
-      const idx=parseInt(cas?.emp_set_idx||0)||0;
+      s('f_company', co.name||'');
+      s('f_author', [co.author_title,co.author_name].filter(Boolean).join('　'));
+      s('f_soName', co.support_org_name||'');
+      s('f_soNo', co.support_org_no||'');
+      const idx=parseInt(info.empSetIdx||0)||0;
       const es=(co.emp_sets||[])[idx]||{};
-      if(es.supportFee) s('co_supportFee', es.supportFee);
-      // 契約終了日はpersonsから取得
+      if(es.supportFee) s('f_supportFee', es.supportFee);
     }
-    if(cas){
-      const persons=await sb('persons?select=contract_end&case_id=eq.'+caseId);
-      const pd=persons&&persons[0];
-      if(pd?.contract_end){
-        const m=String(pd.contract_end).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
-        if(m) s('co_contractEnd',`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`);
-      }
-    }
-    if(!v('co_docDate')){
-      const now=new Date();
-      document.getElementById('co_docDate').value=`令和${now.getFullYear()-2018}年${now.getMonth()+1}月${now.getDate()}日`;
-    }
+    // 契約終了日
+    const persons=await sb('persons?select=contract_end&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd?.contract_end){const m=String(pd.contract_end).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)s('f_contractEnd',`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`);}
+    if(!gv('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p();
     showToast('✅ データを読み込みました');
-  }catch(e){
-    showToast('⚠️ 読込エラー: '+e.message);
-    console.error(e);
-  }
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.01 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.02 ','background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;','background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
