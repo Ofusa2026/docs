@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260415.02
+ * ver.20260415.03
  */
 
 // ===== Supabase =====
@@ -38,7 +38,8 @@ function changeFontSize(delta){if(_editMode){const sel=window.getSelection();if(
 
 // ===== 直接編集モード =====
 function toggleEditMode(){_editMode=!_editMode;const btn=document.getElementById('editModeBtn');const area=document.getElementById('pageArea');if(_editMode){_editLock=true;if(btn){btn.textContent='✏️ 編集中（クリックで終了）';btn.classList.add('edit-mode-on');}if(area)area.classList.add('edit-mode');enableDocEditing(true);}else{_editLock=false;if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}if(area)area.classList.remove('edit-mode');enableDocEditing(false);if(typeof p==='function')p();}}
-function enableDocEditing(on){const area=document.getElementById('pageArea');if(!area)return;area.querySelectorAll('.doc').forEach(doc=>{if(on){doc.setAttribute('contenteditable','true');doc.classList.add('doc-editable');doc.querySelectorAll('.cb-click').forEach(cb=>cb.setAttribute('contenteditable','false'));}else{doc.removeAttribute('contenteditable');doc.classList.remove('doc-editable');}});}
+function enableDocEditing(on){const area=document.getElementById('pageArea');if(!area)return;area.querySelectorAll('.doc').forEach(doc=>{if(on){doc.setAttribute('contenteditable','true');doc.classList.add('doc-editable');doc.querySelectorAll('.cb-click').forEach(cb=>cb.setAttribute('contenteditable','false'));// 変数ラベル（未入力フィールド）を空にする
+doc.querySelectorAll('.f[style*="color:#aaa"]').forEach(el=>{el.textContent='';el.style='';});}else{doc.removeAttribute('contenteditable');doc.classList.remove('doc-editable');}});}
 
 // ===== ページナビ =====
 function scrollToPage(n){const area=document.getElementById('pageArea');if(!area)return;const docs=area.querySelectorAll('.doc');if(docs[n-1])docs[n-1].scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.pn-btn-page').forEach((b,i)=>b.classList.toggle('active',i===n-1));}
