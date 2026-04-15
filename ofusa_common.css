@@ -60,3 +60,13 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
   .f{background:none!important;}
   @page{size:A4 portrait;margin:0;}
 }
+
+/* ===== 署名エリア ===== */
+.sign-field { cursor: default; }
+.sign-field-area { border-top: 1px dashed #999; margin-top: 4px; }
+.sign-field-placeholder { position:absolute; bottom:4px; left:4px; font-size:8pt; color:#bbb; font-family:sans-serif; pointer-events:none; }
+.sign-field-img { position:absolute; bottom:0; left:0; width:auto; }
+.sign-field.signed .sign-field-placeholder { display:none; }
+@media print {
+  .sign-field-placeholder { display:none; }
+}

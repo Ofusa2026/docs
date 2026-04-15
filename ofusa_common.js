@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260415.08
+ * ver.20260415.09
  */
 
 // ===== Supabase =====
@@ -144,4 +144,54 @@ function loadEditedHTML(){
     reader.readAsText(file);
   };
   input.click();
+}
+
+// ===== 署名依頼 =====
+async function sendSignRequest(){
+  const area = document.getElementById('pageArea');
+  if(!area){ showToast('⚠️ プレビューがありません'); return; }
+
+  // 署名フィールドがあるか確認
+  const signFields = area.querySelectorAll('.sign-field');
+  if(!signFields.length){ showToast('⚠️ 署名フィールドがありません'); return; }
+
+  // HTMLを取得
+  const html = area.innerHTML;
+
+  // トークン生成
+  const token = crypto.randomUUID();
+
+  // 案件ID取得
+  const sel = document.getElementById('caseSelect');
+  let caseId = '';
+  if(sel && sel.value){
+    try{ caseId = JSON.parse(sel.value).caseId || ''; }catch(e){}
+  }
+
+  // doc_type
+  const docTitle = document.getElementById('docTitle')?.textContent || 'doc';
+
+  try{
+    const res = await sb('sign_requests', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        case_id: caseId,
+        token: token,
+        doc_type: docTitle.trim(),
+        doc_content: html,
+        status: 'pending',
+        expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
+      })
+    });
+
+    // URLをクリップボードにコピー
+    const url = `https://ofusa2026.github.io/docs/sign.html?token=${token}`;
+    await navigator.clipboard.writeText(url);
+    showToast('✅ 署名依頼URLをコピーしました');
+    console.log('署名URL:', url);
+  }catch(e){
+    showToast('⚠️ 署名依頼エラー: ' + e.message);
+    console.error(e);
+  }
 }

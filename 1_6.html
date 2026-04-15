@@ -32,12 +32,13 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260415.65</div>
+    <div class="ver">ver.20260415.67</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
   </div>
 </div>
@@ -773,9 +774,12 @@ function p(){
   </div>
 
   <!-- 受取人 -->
-  <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;">
+  <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
     <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;">Penerima (tanda tangan)</span></div>
-    <div style="height:28px;"></div>
+    <div class="sign-field-area" style="height:60px;position:relative;">
+      <span class="sign-field-placeholder">← ここに署名</span>
+      <img class="sign-field-img" style="display:none;max-height:56px;">
+    </div>
   </div>
 
 </div><!-- /outer-border -->
@@ -1388,7 +1392,7 @@ function p_iko(){
 
 
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.65 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.67 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 
