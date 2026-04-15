@@ -76,6 +76,8 @@
   <div class="page-nav" id="pageNav">
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
     <button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="margin-left:8px;background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
@@ -136,6 +138,12 @@ function p(){
 <div style="margin-bottom:8px;">
   <div style="font-weight:bold;">５　申請人が特定技能外国人として業務に従事するために必要な技能試験及び日本語試験に合格していること（技能実習２号良好修了者等として試験免除となる場合を含む。）（次の（１）から（４）までのいずれかに該当していること）</div>
   <div class="indent1">${skillVal?'■':'□'}　該当（該当する番号：${f('f_skill')}　）　□　非該当</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:8.5pt;line-height:1.8;">
   <div class="indent1">
     <div>（１）試験（技能試験及び日本語試験）合格者</div>
     <div>（２）技能実習２号良好修了者</div>
@@ -173,6 +181,12 @@ function p(){
   <div class="indent1">
     <div>■　該当　□　非該当（内容：${ul('　　　　　　　　　　　　　　　　　　　')}）</div>
     <div style="font-size:9pt;margin-top:4px;">（注）次のいずれにも該当すること</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+<div style="font-size:8.5pt;line-height:1.8;">
     <div style="font-size:9pt;" class="indent1">
       ・　労働，社会保険及び租税に関する法令を遵守していること（保険料や税に滞納がないことを含む。）<br>
       ・　前科，暴力団関係等に該当しないこと<br>
@@ -181,7 +195,7 @@ function p(){
     </div>
   </div>
 </div>
-<div style="font-size:8.5pt;margin-top:8px;border-top:1px solid #333;padding-top:6px;">
+<div style="font-size:8.5pt;margin-top:8px;">
   <div>（注１）上記２から７までについて該当するものにチェックマークを付し，必要な事項を記入してください。</div>
   <div>（注２）本説明書に虚偽の記載があった場合には，入管法に関し，不正又は著しく不当な行為を行ったものとして，特定技能外国人等の受入れができないこととなることがあります。</div>
   <div>（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで在留資格「特定技能１号」への在留資格変更許可申請に係る準備のための在留資格であることから，許可がされたからといって在留資格「特定技能１号」への許可の基準に適合していることを確認するものではありません。したがって，申請人が今後「特定技能１号」への在留資格変更許可申請の審査において，入管法，法務省令，各分野固有の基準への適合性が求められることから，その手続等について関係機関に問合せを行うなど確認を十分に行った上，申請人が円滑に「特定技能１号」へ移行できるよう準備を行ってください。</div>
@@ -193,6 +207,7 @@ function p(){
 </div>`;
 
   if(_fontSize!==8.5) _applyFontSize();
+  setupPageTracker();
 }
 
 async function loadFromDB(){
