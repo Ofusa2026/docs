@@ -4,28 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－２３号</title>
-<link rel="stylesheet" href="ofusa_common.css?v=20260415c">
+<link rel="stylesheet" href="ofusa_common.css?v=1776264504">
 <style>
-@page{margin:0}
 @media print{
-  .appbar,.panel-left{display:none!important}
-  .panel-right{margin:0!important;padding:0!important}
-  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important;page-break-after:always}
-  .doc:last-child{page-break-after:auto}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:12mm 10mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
 </head>
 <body>
-<div class="appbar">
-  <div class="appbar-title" id="docTitle">📄 参考様式第１－２３号</div>
-  <div class="ver">ver.20260415.02</div>
-  <div class="appbar-actions">
-    <label>文字: </label>
-    <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
-    <span id="fontSizeLabel">8.5pt</span>
-    <button class="btn btn-sm" onclick="changeFontSize(0.5)">A+</button>
-    <button id="editModeBtn" class="btn" onclick="toggleEditMode()">✏️ 直接編集</button>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
+    <div class="ver">ver.20260415.03</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
@@ -33,84 +29,91 @@
   </div>
 </div>
 
-<div class="layout">
-  <div class="panel-left">
-    <div class="filter-section">
-      <div class="fg"><label>登録支援機関</label><select id="filterOrg" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
-      <div class="fg"><label>所属機関</label><select id="filterCompany" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
-      <div class="fg"><label>検索</label><input id="filterText" oninput="filterCases()" style="width:100%"></div>
-      <div class="fg"><label>案件選択 <span id="caseCount" class="fid"></span></label>
-        <select id="caseSelect" onchange="loadFromDB()" style="width:100%"><option value="">── 選択 ──</option></select>
-      </div>
-    </div>
-    <hr>
-    <div class="section-title">基本情報</div>
-    <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
-    <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
-    <div class="fg"><label>作成責任者役職・氏名<span class="fid">f_author</span></label><input id="f_author" placeholder="代表取締役 山田太郎" oninput="p()"></div>
-    <hr>
-    <div class="section-title">役員情報（①〜⑧）</div>
-    <div style="font-size:11px;color:#666;margin-bottom:8px;">受入業務に直接関与しない役員を入力</div>
-    <div id="officerList"></div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label>
+    <select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label>
+    <input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
-
-  <div class="panel-right" id="pageArea">
-    <div class="doc">
-      <div class="page-num-label">P1</div>
-      <div id="docContent"></div>
+  <div class="fp-inner">
+    <div class="fs">
+      <div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者役職・氏名<span class="fid">f_author</span></label><input id="f_author" placeholder="代表取締役 山田太郎" oninput="p()"></div>
+    </div>
+    <div class="fs">
+      <div class="fs-title">役員情報（①〜⑧）受入業務に直接関与しない役員</div>
+      <div id="officerList"></div>
     </div>
   </div>
 </div>
 
-<script src="ofusa_common.js?v=20260415c"></script>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+
+<script src="ofusa_common.js?v=1776264504"></script>
 <script>
 const MAX_OFF = 8;
+const NUMS = ['①','②','③','④','⑤','⑥','⑦','⑧'];
+
 function buildOfficerForm(){
-  const nums=['①','②','③','④','⑤','⑥','⑦','⑧'];
   document.getElementById('officerList').innerHTML = Array.from({length:MAX_OFF},(_,i)=>`
-    <div style="background:#f8f8f8;padding:6px 8px;border-radius:6px;margin-bottom:6px;">
-      <div style="font-size:11px;font-weight:700;color:#333;margin-bottom:4px;">役員 ${nums[i]}</div>
+    <div style="background:#f8f8f8;padding:4px 6px;border-radius:4px;margin-bottom:4px;">
+      <div style="font-size:9px;font-weight:700;color:#333;margin-bottom:2px;">役員 ${NUMS[i]}</div>
       <div class="fg"><label>ふりがな</label><input id="off${i+1}Kana" oninput="p()"></div>
       <div class="fg"><label>氏名</label><input id="off${i+1}Name" oninput="p()"></div>
     </div>`).join('');
 }
 
-function fv(id){const v=document.getElementById(id)?.value||'';return v?`<span class="f">${v}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id}</span>`;}
-function gv(id){return document.getElementById(id)?.value||'';}
-
 function p(){
   if(_editMode) return;
-  const rows=Array.from({length:MAX_OFF},(_,i)=>`
+  const w = document.getElementById('pageArea');
+  if(!w) return;
+  const rows = Array.from({length:MAX_OFF},(_,i)=>{
+    const kana = v(`off${i+1}Kana`);
+    const name = v(`off${i+1}Name`);
+    return `
     <tr>
-      <td style="border:1px solid #333;padding:3px 6px;font-size:7.5pt;">${fv(`off${i+1}Kana`)}</td>
+      <td style="border:1px solid #333;padding:3px 6px;font-size:7.5pt;">${kana?`<span class="f">${kana}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">off${i+1}Kana</span>`}</td>
     </tr>
     <tr>
-      <td style="border:1px solid #333;padding:3px 6px;">${fv(`off${i+1}Name`)}</td>
-    </tr>`).join('');
+      <td style="border:1px solid #333;padding:3px 6px;">${name?`<span class="f">${name}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">off${i+1}Name</span>`}</td>
+    </tr>`;
+  }).join('');
 
-  document.getElementById('docContent').innerHTML = `
+  w.innerHTML = `<div class="doc"><div class="page-num-label">P1</div>
 <div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２３号</div>
 <div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:6mm;">特定技能所属機関の役員に関する誓約書</div>
-
 <div style="font-size:8pt;margin-bottom:4mm;">
 　特定技能所属機関の役員のうち、下表に掲げる者は、特定技能外国人の受入れ業務の執行に直接的に関与する役員ではありません。
 </div>
-
 <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:4mm;">
-  <tr>
-    <th style="border:1px solid #333;padding:3px 6px;background:#f0f0f0;width:100%;">（ふりがな）<br>役員の氏名</th>
-  </tr>
+  <tr><th style="border:1px solid #333;padding:3px 6px;background:#f0f0f0;width:100%;text-align:left;">（ふりがな）<br>役員の氏名</th></tr>
   ${rows}
 </table>
-
 <div style="font-size:7.5pt;margin-bottom:6mm;line-height:1.6;">
 また、当該役員について、次表に掲げる出入国管理及び難民認定法（昭和26年政令第319号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）第２条第１項第４号に定められている欠格事由に該当する者ではないことを確認しました。当該役員に対して、今後、欠格事由に該当するに至ったときは、直ちに出入国在留管理庁に申告するとともに、役員の地位を退く必要があることを説明しています。
 </div>
-
-<div style="text-align:right;font-size:8pt;margin-bottom:2mm;">${fv('f_docDate')}　作成</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${fv('f_company')}</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:6mm;">作　成　責　任　者　役職・氏名　　${fv('f_author')}</div>
-
+<div style="text-align:right;font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}　作成</div>
+<div style="text-align:right;font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
+<div style="text-align:right;font-size:8pt;margin-bottom:6mm;">作　成　責　任　者　役職・氏名　　${f('f_author')}</div>
 <div style="border:1px solid #333;padding:6px;font-size:7pt;line-height:1.6;">
 <div style="font-weight:bold;margin-bottom:2mm;">○　出入国管理及び難民認定法（昭和２６年政令第３１９号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）（抄）</div>
 <div style="margin-bottom:1mm;">（特定技能雇用契約の相手方となる本邦の公私の機関の基準）</div>
@@ -123,44 +126,37 @@ function p(){
 ⑵　職業安定法第６４条から第６８条までの規定<br>
 ⑶　労働者派遣法第５８条から第６２条までの規定<br>
 ⑷　出入国管理及び難民認定法第７３条の２第１項の規定<br>
-⑸　不法就労助長罪等関係規定<br>
 ハ　精神の機能の障害により支援業務を適正に行うに当たって必要な認知、判断及び意思疎通を適切に行うことができない者<br>
 ニ　破産手続開始の決定を受けて復権を得ない者<br>
 ホ　以上に準ずる者として法務省令で定める者
 </div>
 </div>
-`;
+</div>`;
+  if(_fontSize!==8.5) _applyFontSize();
 }
 
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
-  let info;
-  try{info=JSON.parse(sel.value);}catch(e){return;}
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {caseId,companyId,companyName}=info;
   try{
     const q=companyId?`companies?select=name,author_name,author_title,officers&id=eq.${companyId}`
       :companyName?`companies?select=name,author_name,author_title,officers&name=eq.${encodeURIComponent(companyName)}`:null;
     if(!q) return;
-    const cos=await sb(q);
-    const co=cos&&cos[0];
-    if(!co) return;
-    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
-    s('f_company', co.name||'');
-    s('f_author', [co.author_title,co.author_name].filter(Boolean).join('　'));
-    if(!gv('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
-    // 役員（代表取締役を除く）
+    const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    s('f_company',co.name||'');
+    s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     const officers=(co.officers||[]).filter(o=>!(o.title&&o.title.includes('代表')));
     officers.forEach((o,i)=>{if(i>=MAX_OFF)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');});
-    p();
-    showToast('✅ データを読み込みました');
+    p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 
 buildOfficerForm();
-console.log('%c OFUSA 書類作成システム %c ver.20260415.02 ','background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;','background:#475569;color:white;padding:2px 6px;');
-initCaseSelect();
-p();
+initCaseSelect(); p();
 </script>
 </body>
 </html>

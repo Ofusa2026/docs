@@ -4,27 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－２７号</title>
-<link rel="stylesheet" href="ofusa_common.css?v=20260415c">
+<link rel="stylesheet" href="ofusa_common.css?v=1776264504">
 <style>
-@page{margin:0}
 @media print{
-  .appbar,.panel-left{display:none!important}
-  .panel-right{margin:0!important;padding:0!important}
-  .doc{padding:12mm 10mm;font-size:7.8pt;box-shadow:none!important;margin:0!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:12mm 10mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
 </head>
 <body>
-<div class="appbar">
-  <div class="appbar-title" id="docTitle">📄 参考様式第１－２７号</div>
-  <div class="ver">ver.20260415.02</div>
-  <div class="appbar-actions">
-    <label>文字: </label>
-    <button class="btn btn-sm" onclick="changeFontSize(-0.5)">A-</button>
-    <span id="fontSizeLabel">8.5pt</span>
-    <button class="btn btn-sm" onclick="changeFontSize(0.5)">A+</button>
-    <button id="editModeBtn" class="btn" onclick="toggleEditMode()">✏️ 直接編集</button>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－２７号　公的義務履行に関する説明書</div>
+    <div class="ver">ver.20260415.03</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
@@ -32,108 +29,95 @@
   </div>
 </div>
 
-<div class="layout">
-  <div class="panel-left">
-    <div class="filter-section">
-      <div class="fg"><label>登録支援機関</label><select id="filterOrg" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
-      <div class="fg"><label>所属機関</label><select id="filterCompany" onchange="filterCases()" style="width:100%"><option value="">── すべて ──</option></select></div>
-      <div class="fg"><label>検索</label><input id="filterText" oninput="filterCases()" style="width:100%"></div>
-      <div class="fg"><label>案件選択 <span id="caseCount" class="fid"></span></label>
-        <select id="caseSelect" onchange="loadFromDB()" style="width:100%"><option value="">── 選択 ──</option></select>
-      </div>
-    </div>
-    <hr>
-    <div class="section-title">基本情報</div>
-    <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
-    <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
-    <div style="font-size:11px;color:#666;margin-top:8px;">※本書類はほぼ固定文です。<br>案件選択で機関名と日付が自動入力されます。</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label>
+    <select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label>
+    <input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
-
-  <div class="panel-right" id="pageArea">
-    <div class="doc">
-      <div class="page-num-label">P1</div>
-      <div id="docContent"></div>
+  <div class="fp-inner">
+    <div class="fs">
+      <div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
     </div>
+    <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※ほぼ固定文。案件選択で機関名と日付が入力されます。</div>
   </div>
 </div>
 
-<script src="ofusa_common.js?v=20260415c"></script>
-<script>
-function fv(id){const v=document.getElementById(id)?.value||'';return v?`<span class="f">${v}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id}</span>`;}
-function gv(id){return document.getElementById(id)?.value||'';}
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
 
+<script src="ofusa_common.js?v=1776264504"></script>
+<script>
 function p(){
   if(_editMode) return;
-  document.getElementById('docContent').innerHTML = `
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`<div class="doc"><div class="page-num-label">P1</div>
 <div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２７号</div>
 <div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:8mm;">公的義務履行に関する説明書</div>
-
 <div style="font-size:8.5pt;line-height:1.8;">
-
 <div style="font-weight:bold;margin-bottom:2mm;">第１　労働関係法令の遵守</div>
 <div style="margin-left:4mm;margin-bottom:4mm;">労働保険料（適用事業所のみ）</div>
-
 <div style="font-weight:bold;margin-bottom:2mm;">第２　社会保険関係法令の遵守</div>
 <div style="margin-left:4mm;margin-bottom:4mm;">
-  １　健康保険・厚生年金保険の適用事業所の場合<br>
-  <div style="margin-left:4mm;">健康保険・厚生年金保険料</div>
-  ２　健康保険・厚生年金保険の適用事業所の場合ではない場合<br>
-  <div style="margin-left:4mm;">
-    （１）事業主の国民健康保険料<br>
-    （２）事業主の国民年金保険料
-  </div>
+１　健康保険・厚生年金保険の適用事業所の場合<br>
+<div style="margin-left:4mm;">健康保険・厚生年金保険料</div>
+２　健康保険・厚生年金保険の適用事業所の場合ではない場合<br>
+<div style="margin-left:4mm;">（１）事業主の国民健康保険料<br>（２）事業主の国民年金保険料</div>
 </div>
-
 <div style="font-weight:bold;margin-bottom:2mm;">第３　租税関係の法令遵守</div>
 <div style="margin-left:4mm;margin-bottom:6mm;">
-  １　法人の場合<br>
-  <div style="margin-left:4mm;">
-    （１）国税（源泉所得税及び復興特別所得税、法人税、消費税及び地方消費税）<br>
-    （２）地方税（法人住民税）
-  </div>
-  ２　個人事業主の場合<br>
-  <div style="margin-left:4mm;">
-    （１）国税（源泉所得税及び復興特別所得税、消費税及び地方消費税、相続税、贈与税）<br>
-    （２）地方税（個人住民税）
-  </div>
+１　法人の場合<br>
+<div style="margin-left:4mm;">（１）国税（源泉所得税及び復興特別所得税、法人税、消費税及び地方消費税）<br>（２）地方税（法人住民税）</div>
+２　個人事業主の場合<br>
+<div style="margin-left:4mm;">（１）国税（源泉所得税及び復興特別所得税、消費税及び地方消費税、相続税、贈与税）<br>（２）地方税（個人住民税）</div>
 </div>
-
 <div style="margin-bottom:3mm;">以上のいずれについても、滞納はありません。</div>
 <div style="margin-bottom:3mm;">なお、地方出入国在留管理局から、納付したことの証明を求められた場合には指導に従って関係書類を提出します。</div>
 <div style="margin-bottom:8mm;">また、以上の説明が虚偽であった場合には、入管法令に関し不正又は著しい不当な行為をしたものとして５年間の受入れができないこととなることも理解しています。</div>
-
 </div>
-
 <div style="text-align:right;font-size:8pt;">
-  <div style="margin-bottom:2mm;">${fv('f_docDate')}</div>
-  <div>特定技能所属機関名　　　　${fv('f_company')}</div>
+  <div style="margin-bottom:2mm;">${f('f_docDate')}</div>
+  <div>特定技能所属機関名　　　　${f('f_company')}</div>
 </div>
-`;
+</div>`;
+  if(_fontSize!==8.5) _applyFontSize();
 }
 
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
-  let info;
-  try{info=JSON.parse(sel.value);}catch(e){return;}
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {companyId,companyName}=info;
   try{
     const q=companyId?`companies?select=name&id=eq.${companyId}`:companyName?`companies?select=name&name=eq.${encodeURIComponent(companyName)}`:null;
     if(!q) return;
-    const cos=await sb(q);
-    const co=cos&&cos[0];
-    if(!co) return;
+    const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    s('f_company', co.name||'');
-    if(!gv('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
-    p();
-    showToast('✅ データを読み込みました');
+    s('f_company',co.name||'');
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.02 ','background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;','background:#475569;color:white;padding:2px 6px;');
-initCaseSelect();
-p();
+initCaseSelect(); p();
 </script>
 </body>
 </html>
