@@ -165,7 +165,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,category,org,nationality&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,org,nationality&id=eq.'+caseId),
       sb('persons?select=applicant_name_en,nationality,skill_eval_type&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
