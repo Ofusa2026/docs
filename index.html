@@ -83,14 +83,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         </div>
       </div>
     </div>
-    <iframe id="frame-1_6" src="1_6.html"></iframe>
-    <iframe id="frame-iko" src="iko_junbi.html"></iframe>
+    <iframe id="frame-1_6"></iframe>
+    <iframe id="frame-iko"></iframe>
   </div>
 </div>
 <script>
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html'},
 };
 let cur='home';
 function open_doc(key){
@@ -100,8 +100,15 @@ function open_doc(key){
   // コンテンツ
   document.getElementById('home-screen').style.display=key==='home'?'flex':'none';
   Object.keys(docs).forEach(k=>{
-    const f=document.getElementById(docs[k].frameId);
-    if(f) f.style.display=k===key?'block':'none';
+    const fr=document.getElementById(docs[k].frameId);
+    if(!fr) return;
+    if(k===key){
+      // 初回のみsrcをセット
+      if(!fr.src || fr.src===window.location.href) fr.src=docs[k].file;
+      fr.style.display='block';
+    } else {
+      fr.style.display='none';
+    }
   });
   cur=key;
 }
