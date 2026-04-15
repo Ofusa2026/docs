@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.23</div>
+    <div class="ver">ver.20260415.24</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -108,7 +108,7 @@ function p(){
   <div style="margin-top:8px;">上記の者を受け入れるに当たって，下記のとおりの事実に相違ありません。</div>
   <div style="text-align:center;margin:4px 0;">記</div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>１　在留期間の満了日までに「特定技能１号」への在留資格変更許可申請をすることができない事情</div>
   <div style="border:1px solid #555;padding:4px 12px;margin-top:6px;font-size:10pt;line-height:1.52;background-image:repeating-linear-gradient(to bottom, transparent, transparent calc(1.9em - 1px), #aaa calc(1.9em - 1px), #aaa 1.9em);background-size:100% 1.9em;">
     この度弊社で特定技能 1 号として雇用契約を締結することに決定したが、弊社側の<br>
@@ -120,7 +120,7 @@ function p(){
     在留中の日常生活に係る支援についても、適切に行っていきます。
   </div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>２　今次の受入れ機関において特定技能外国人として在留資格「特定技能１号」に該当する業務に従事するために同在留資格への在留資格変更許可申請を予定していること</div>
   <div class="indent1">
     <div>■　該当　□　非該当</div>
@@ -128,15 +128,15 @@ function p(){
     <div style="font-size:9pt;">（注）特定技能制度における特定産業分野及び業務区分を記載すること。</div>
   </div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>３　申請人が今次の受入れ機関との契約に基づいて在留資格「特定技能１号」で従事する予定の業務と同様のものに従事すること</div>
   <div class="indent1">■　該当　□　非該当</div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>４　申請人が特定技能外国人として就労する場合に支払われる予定の報酬と同額，かつ，日本人が従事する場合と同等額以上の報酬を受けること</div>
   <div class="indent1">■　該当　□　非該当</div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>５　申請人が特定技能外国人として業務に従事するために必要な技能試験及び日本語試験に合格していること（技能実習２号良好修了者等として試験免除となる場合を含む。）（次の（１）から（４）までのいずれかに該当していること）</div>
   <div class="indent1">${skillVal?'■':'□'}　該当（該当する番号：${f('f_skill')}　）　□　非該当</div>
 </div>
@@ -152,32 +152,32 @@ function p(){
     <div>（４）ＥＰＡ介護福祉士候補者（４年間満了）</div>
   </div>
 </div>
-<div style="margin-bottom:12px;margin-top:12px;">
+<div style="margin-bottom:24px;margin-top:24px;">
   <div>６　今次の受入れ機関又は支援委託予定先が申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を適切に行うことが見込まれること（次の（１）から（３）までのいずれかに該当していること）</div>
   <div style="font-size:9pt;margin-top:4px;">
     <div style="margin-bottom:6px;">（１）過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の受入れ又は管理を適正に行った実績があること</div>
-    <div class="indent1" style="margin-bottom:12px;">□　該当　□　非該当</div>
-    <div class="indent1" style="margin-bottom:12px;">
+    <div class="indent1" style="margin-bottom:24px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">
       ※　雇用した在留外国人の身分事項等（１名で可）<br>
       氏名：${ul('　　　　　　　　　　')}　国籍・地域：${ul('　　　　　　')}　性別：${ul('　　　')}<br>
       生年月日：${ul('　　　　　　　　')}　在留資格：${ul('　　　　　　　　')}<br>
       雇用期間：${ul('　　　　　　から　　　　　　　まで')}
     </div>
     <div style="margin-bottom:6px;">（２）今次の受入れ機関の役職員の中から，過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の生活相談に従事した経験がある者を申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行う責任者及び担当者として選任していること。</div>
-    <div class="indent1" style="margin-bottom:12px;">□　該当　□　非該当</div>
-    <div class="indent1" style="margin-bottom:12px;">
+    <div class="indent1" style="margin-bottom:24px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">
       ※　責任者氏名：${ul('　　　　　　　　')}<br>
       担当者氏名：${ul('　　　　　　　　')}
     </div>
     <div style="margin-bottom:6px;">（３）申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行うことについて，登録支援機関に委託していること</div>
-    <div class="indent1" style="margin-bottom:12px;">■　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">■　該当　□　非該当</div>
     <div class="indent1">
       登録支援機関<br>
       　名称：${ul('　'+f('f_soName')+'　')}　登録番号：${ul(f('f_soNo')+'　')}
     </div>
   </div>
 </div>
-<div style="margin-bottom:12px;">
+<div style="margin-bottom:24px;">
   <div>７　今次の受入れ機関が，申請人を適正に受け入れることが見込まれること（特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令に定める一定の欠格事由に該当しないこと等（注））</div>
   <div class="indent1">
     <div>■　該当　□　非該当（内容：${ul('　　　　　　　　　　　　　　　　　　　')}）</div>
@@ -274,7 +274,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.23 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.24 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
