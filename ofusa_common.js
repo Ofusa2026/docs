@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260415.07
+ * ver.20260415.08
  */
 
 // ===== Supabase =====
@@ -103,3 +103,45 @@ function _sortOrgs(arr){return[...arr].sort((a,b)=>{const fa=_orgFolderMap[a]||9
 function buildFilterOptions(){const orgSel=document.getElementById('filterOrg');if(!orgSel)return;const orgs=_sortOrgs([...new Set(_allCases.map(r=>r.org||'').filter(Boolean))]);const prevOrg=orgSel.value;orgSel.innerHTML='<option value="">── すべて ──</option>';orgs.forEach(o=>{const el=document.createElement('option');el.value=o;const fn=_orgFolderMap[o];el.textContent=(fn&&fn<99999?fn+'. ':'')+o;orgSel.appendChild(el);});if(prevOrg)orgSel.value=prevOrg;rebuildCompanyList(orgSel.value);}
 function rebuildCompanyList(orgV){const coSel=document.getElementById('filterCompany');if(!coSel)return;const prevCo=coSel.value;const allCos=window._allCompanies||[];const filtered=orgV?allCos.filter(c=>c.orgName===orgV):allCos;const seen={},unique=[];filtered.forEach(c=>{if(!seen[c.name]){seen[c.name]=true;unique.push(c);}});unique.sort((a,b)=>a.folderNo!==b.folderNo?a.folderNo-b.folderNo:a.name.localeCompare(b.name,'ja'));coSel.innerHTML='<option value="">── すべて ──</option>';unique.forEach(c=>{const el=document.createElement('option');el.value=c.name;el.textContent=(c.folderNo<99999?c.folderNo+'. ':'')+c.name;coSel.appendChild(el);});if(unique.some(c=>c.name===prevCo))coSel.value=prevCo;}
 function filterCases(){const orgV=(document.getElementById('filterOrg')||{}).value||'';const coV=(document.getElementById('filterCompany')||{}).value||'';const txtV=((document.getElementById('filterText')||{}).value||'').trim().toLowerCase();rebuildCompanyList(orgV);const words=txtV?txtV.split(/\s+/).filter(Boolean):[];let filtered=_allCases.filter(r=>{if(orgV&&(r.org||'')!==orgV)return false;if(coV&&(r.company||'')!==coV)return false;if(words.length){const hay=((r.name||'')+' '+(r.applicant||'')+' '+(r.company||'')+' '+(r.org||'')).toLowerCase();if(!words.every(w=>hay.includes(w)))return false;}return true;});const sel=document.getElementById('caseSelect');const cnt=document.getElementById('caseCount');const MAX=200;if(filtered.length>MAX&&!coV&&!words.length){sel.innerHTML='<option value="">← 登録支援機関・所属機関で絞り込むか、名前を入力してください</option>';sel.disabled=true;if(cnt)cnt.textContent='('+filtered.length+'件・絞り込んでください)';return;}sel.disabled=false;const prev=sel.value;sel.innerHTML='<option value="">── 選択 ──</option>';const frag=document.createDocumentFragment();filtered.forEach(r=>{const o=document.createElement('option');o.value=JSON.stringify({caseId:r.id,companyId:r.company_id,companyName:r.company||'',empSetIdx:r.emp_set_idx,applicantField:r.applicant_field||'',applicantFieldEn:r.applicant_field_en||''});o.textContent=(r.applicant||r.name||'(名前なし)')+'　('+(r.company||'')+')';frag.appendChild(o);});sel.appendChild(frag);if(cnt)cnt.textContent='('+filtered.length+'件)';if(prev)sel.value=prev;}
+
+// ===== 編集内容の保存・呼び出し =====
+function saveEditedHTML(){
+  const area = document.getElementById('pageArea');
+  if(!area){ showToast('⚠️ プレビューがありません'); return; }
+  const html = area.innerHTML;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  // ファイル名：書類名_日時.html
+  const now = new Date();
+  const ts = now.getFullYear()+('0'+(now.getMonth()+1)).slice(-2)+('0'+now.getDate()).slice(-2)+'_'+('0'+now.getHours()).slice(-2)+('0'+now.getMinutes()).slice(-2);
+  const title = document.getElementById('docTitle')?.textContent||'doc';
+  a.download = title.replace(/[📄📋\s]/g,'').replace(/[^\w　-鿿]/g,'_').slice(0,20)+'_'+ts+'.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('💾 保存しました');
+}
+
+function loadEditedHTML(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.html';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const area = document.getElementById('pageArea');
+      if(!area) return;
+      area.innerHTML = ev.target.result;
+      // 編集モードをONに
+      _editMode = true;
+      const btn = document.getElementById('editModeBtn');
+      if(btn){ btn.textContent='✏️ 編集中（クリックで終了）'; btn.classList.add('edit-mode-on'); }
+      enableDocEditing(true);
+      showToast('📂 読み込みました');
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}

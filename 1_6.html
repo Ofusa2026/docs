@@ -32,10 +32,12 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260415.64</div>
+    <div class="ver">ver.20260415.65</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
   </div>
 </div>
@@ -1386,7 +1388,7 @@ function p_iko(){
 
 
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.64 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.65 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 
