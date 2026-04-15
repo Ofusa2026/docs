@@ -166,7 +166,7 @@ async function loadFromDB(){
   try{
     const [cases,persons]=await Promise.all([
       sb('cases?select=id,name,applicant,applicant_field,category,org,nationality&id=eq.'+caseId),
-      sb('persons?select=*&case_id=eq.'+caseId)
+      sb('persons?select=applicant_name_en,nationality,skill_eval_type&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
     const pdRaw=persons&&persons[0];
@@ -190,6 +190,17 @@ async function loadFromDB(){
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
     if(!v('f_date')){ const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日'); }
+    // 技能区分を skill_eval_type から自動判定
+    const skillType = pd&&pd.skill_eval_type||'';
+    if(skillType){
+      const el=document.getElementById('f_skill');
+      if(el){
+        if(skillType.includes('実習２号')||skillType.includes('実習2号')) el.value='２';
+        else if(skillType.includes('介護福祉士養成')) el.value='３';
+        else if(skillType.includes('EPA')) el.value='４';
+        else if(skillType.includes('試験')||skillType.includes('合格')) el.value='１';
+      }
+    }
     p();
     showToast('✅ データを読み込みました');
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); }
