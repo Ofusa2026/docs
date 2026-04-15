@@ -165,13 +165,14 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,org&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,category,org,nationality&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
     const pdRaw=persons&&persons[0];
     const pd=(pdRaw&&pdRaw.data)||pdRaw;
     const personName=(pd&&(pd.applicant_name_en||pd.applicantNameEn||pd.nameEn))||(cas&&cas.applicant)||'';
+    const nationality=(pd&&pd.nationality)||(cas&&cas.nationality)||'';
     const _coQuery=companyId
       ?'companies?select=id,name&id=eq.'+companyId
       :(companyName?'companies?select=id,name&name=eq.'+encodeURIComponent(companyName):null);
@@ -180,9 +181,12 @@ async function loadFromDB(){
     const orgName=(cas&&cas.org)||'';
     let soNo='';
     if(orgName){ const sos=await sb('support_orgs?select=name,reg_no&name=eq.'+encodeURIComponent(orgName)); if(sos&&sos[0]) soNo=sos[0].reg_no||''; }
+    const stripParens=s=>s?s.replace(/[（(][^）)]*[）)]/g,'').trim():'';
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(personName) s('f_name',personName);
-    if(cas&&cas.applicant_field){ s('f_field',cas.applicant_field.replace(/[（(][^）)]*[）)]/g,'').trim()); }
+    if(nationality) s('f_nationality',nationality);
+    if(cas&&cas.applicant_field){ s('f_field',stripParens(cas.applicant_field)); }
+    if(cas&&cas.category){ s('f_category',stripParens(cas.category)); }
     s('f_orgName',coName);
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
