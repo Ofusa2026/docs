@@ -1004,7 +1004,7 @@ function setFormValues(esData){
 
   // 1. 各DBキーをフォームにマッピング
   Object.keys(esData).forEach(dbKey=>{
-    const val = esData[dbKey];
+    let val = esData[dbKey];
     if(val==null || val==='') return;
     const formKey = dbKeyToForm(dbKey);
 
@@ -1014,7 +1014,7 @@ function setFormValues(esData){
 
     // 分野・区分: 末尾の（特定技能１号）等を除去
     if(dbKey==='applicantField'||dbKey==='category'||dbKey==='applicantFieldEn'||dbKey==='categoryEn'){
-      val = val.replace(/[（(][^）)]*[）)]/g,'').trim();
+      val = String(val).replace(/[（(][^）)]*[）)]/g,'').trim();
     }
 
     // allowance動的フォーム（DBキー: allowance1Name → フォームID: es_a1Name）
