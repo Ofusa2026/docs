@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２９号　書類省略に当たっての誓約書</div>
-    <div class="ver">ver.20260415.04</div>
+    <div class="ver">ver.20260415.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -49,6 +49,7 @@
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
@@ -62,13 +63,15 @@
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  w.innerHTML=`<div class="doc"><div class="page-num-label">P1</div>
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
 <div style="text-align:right;font-size:7pt;">参考様式第１－２９号</div>
 <div style="font-size:11pt;font-weight:bold;text-align:center;margin:4mm 0;">書類省略に当たっての誓約書</div>
 <div style="font-size:8.5pt;line-height:1.9;">
 <div style="margin-bottom:4mm;">今般の申請にあたり、以下の事項を含め、出入国管理及び難民認定法令に適合していることを、誓約します。この誓約が虚偽であり、又はこの誓約に反した場合には、出入国管理及び難民認定法令に関し不正又は著しい不当な行為をしたものとして５年間の受入れができないこととなることも理解しています。</div>
 <div style="margin-bottom:2mm;">１　申請書（所属機関作成用）で申告した事項及びその他提出書類の内容に虚偽でなく、以下のいずれにも滞納がないこと</div>
-<div style="margin-left:2em;margin-bottom:3mm;">
+<div style="margin-left:2em;margin-bottom:2mm;">
 （１）労働関係法令の遵守<br>
 <div style="margin-left:2em;">労働保険料（適用事業所のみ）</div>
 （２）社会保険関係法令の遵守<br>
@@ -76,34 +79,34 @@ function p(){
 ア　健康保険・厚生年金保険の適用事業所の場合<br>
 <div style="margin-left:2em;">健康保険・厚生年金保険料</div>
 イ　健康保険・厚生年金保険の適用事業所の場合ではない場合<br>
-<div style="margin-left:2em;">
-（ア）事業主の国民健康保険料<br>
-（イ）事業主の国民年金保険料
-</div>
+<div style="margin-left:2em;">（ア）事業主の国民健康保険料<br>（イ）事業主の国民年金保険料</div>
 </div>
 （３）租税関係の法令遵守<br>
 <div style="margin-left:2em;">
 ア　法人の場合<br>
-<div style="margin-left:2em;">
+</div>
+</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:8.5pt;line-height:1.9;">
+<div style="margin-left:4em;margin-bottom:2mm;">
 （ア）国税（源泉所得税及び復興特別所得税、法人税、消費税及び地方消費税）<br>
-（イ）地方税（法人住民税）
-</div>
+（イ）地方税（法人住民税）<br>
 イ　個人事業主の場合<br>
-<div style="margin-left:2em;">
-（ア）国税（源泉所得税及び復興特別所得税、消費税及び地方消費税、相続税、贈与税）<br>
-（イ）地方税（個人住民税）
-</div>
-</div>
+<div style="margin-left:2em;">（ア）国税（源泉所得税及び復興特別所得税、消費税及び地方消費税、相続税、贈与税）<br>（イ）地方税（個人住民税）</div>
 </div>
 <div style="margin-bottom:2mm;">２　特定技能外国人の受入れ後は、出入国管理及び難民認定法第１９条の１８第２項第１号又は第３号の規定に基づき、事実に即した内容を適正に届け出ること</div>
 <div style="margin-bottom:8mm;">３　出入国在留管理局が行う、関係書類の提出指導、事情聴取、実地調査等の調査に応じること</div>
 </div>
-<div style="font-size:8pt;margin-bottom:1mm;margin-left:2em;">${f('f_docDate')}</div>
+<div style="font-size:8pt;margin-left:2em;margin-bottom:1mm;">${f('f_docDate')}</div>
 <div style="font-size:8pt;margin-left:2em;">特定技能所属機関名　　　${f('f_company')}</div>
 </div>`;
   if(_fontSize!==8.5) _applyFontSize();
+  setupPageTracker();
 }
-
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
@@ -119,7 +122,6 @@ async function loadFromDB(){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
-
 initCaseSelect(); p();
 </script>
 </body>
