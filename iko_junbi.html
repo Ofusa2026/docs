@@ -5,17 +5,23 @@
 <title>移行準備説明書</title>
 <link rel="stylesheet" href="ofusa_common.css?v=1776264504">
 <style>
-/* 書類固有スタイル */
 .underline{text-decoration:underline;}
 .indent1{padding-left:2em;}
 .indent2{padding-left:4em;}
+@media print{
+  .app-bar{display:none!important}
+  .fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:10mm 12mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.10</div>
+    <div class="ver">ver.20260415.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -82,10 +88,8 @@
 
 <script src="ofusa_common.js?v=1776264504"></script>
 <script>
-// ===== 移行準備説明書 固有処理 =====
-
 function p(){
-  if(_editMode) return; // 直接編集中はブロック
+  if(_editMode) return;
   const w=document.getElementById('pageArea');
   if(!w) return;
   const skillVal=v('f_skill');
@@ -125,9 +129,9 @@ function p(){
   <div class="indent1">■　該当　□　非該当</div>
 </div>
 <div style="margin-bottom:8px;">
-  <div style="font-weight:bold;">５　技能試験及び日本語試験に合格していること（次の（１）から（４）までのいずれかに該当していること）</div>
-  <div class="indent1">${skillVal?'■':'□'}　該当（該当する番号：${f('f_skill')}　）　${skillVal?'□':'□'}　非該当</div>
-  <div class="indent1" style="font-size:9pt;">
+  <div style="font-weight:bold;">５　申請人が特定技能外国人として業務に従事するために必要な技能試験及び日本語試験に合格していること（技能実習２号良好修了者等として試験免除となる場合を含む。）（次の（１）から（４）までのいずれかに該当していること）</div>
+  <div class="indent1">${skillVal?'■':'□'}　該当（該当する番号：${f('f_skill')}　）　□　非該当</div>
+  <div class="indent1">
     <div>（１）試験（技能試験及び日本語試験）合格者</div>
     <div>（２）技能実習２号良好修了者</div>
     <div>（３）介護福祉士養成施設卒業者</div>
@@ -135,33 +139,51 @@ function p(){
   </div>
 </div>
 <div style="margin-bottom:8px;">
-  <div style="font-weight:bold;">６　申請人の在留中の日常生活等に係る支援を適切に行うことが見込まれること（次の（１）から（３）までのいずれかに該当していること）</div>
-  <div class="indent1" style="font-size:9pt;">
-    <div style="margin-top:4px;">（１）過去２年間に外国人の受入れ又は管理を適正に行った実績があること　□　該当　□　非該当</div>
-    <div style="margin-top:4px;">（２）外国人の生活相談に従事した経験がある者を選任していること　□　該当　□　非該当</div>
-    <div style="margin-top:4px;">（３）登録支援機関に委託していること　■　該当　□　非該当</div>
-    <div class="indent1">登録支援機関　名称：${ul('　'+f('f_soName')+'　')}　登録番号：${ul(f('f_soNo')+'　')}</div>
+  <div style="font-weight:bold;">６　今次の受入れ機関又は支援委託予定先が申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を適切に行うことが見込まれること（次の（１）から（３）までのいずれかに該当していること）</div>
+  <div style="font-size:9pt;margin-top:4px;">
+    <div style="margin-bottom:6px;">（１）過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の受入れ又は管理を適正に行った実績があること</div>
+    <div class="indent1" style="margin-bottom:4px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:4px;">
+      ※　雇用した在留外国人の身分事項等（１名で可）<br>
+      氏名：${ul('　　　　　　　　　　')}　国籍・地域：${ul('　　　　　　')}　性別：${ul('　　　')}<br>
+      生年月日：${ul('　　　　　　　　')}　在留資格：${ul('　　　　　　　　')}<br>
+      雇用期間：${ul('　　　　　　から　　　　　　　まで')}
+    </div>
+    <div style="margin-bottom:6px;">（２）今次の受入れ機関の役職員の中から，過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の生活相談に従事した経験がある者を申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行う責任者及び担当者として選任していること。</div>
+    <div class="indent1" style="margin-bottom:4px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:4px;">
+      ※　責任者氏名：${ul('　　　　　　　　')}<br>
+      担当者氏名：${ul('　　　　　　　　')}
+    </div>
+    <div style="margin-bottom:6px;">（３）申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行うことについて，登録支援機関に委託していること</div>
+    <div class="indent1" style="margin-bottom:4px;">■　該当　□　非該当</div>
+    <div class="indent1">
+      ・　登録支援機関<br>
+      　名称：${ul('　'+f('f_soName')+'　')}　登録番号：${ul(f('f_soNo')+'　')}
+    </div>
   </div>
 </div>
 <div style="margin-bottom:8px;">
-  <div style="font-weight:bold;">７　今次の受入れ機関が，申請人を適正に受け入れることが見込まれること</div>
-  <div class="indent1">■　該当　□　非該当</div>
+  <div style="font-weight:bold;">７　今次の受入れ機関が，申請人を適正に受け入れることが見込まれること（特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令に定める一定の欠格事由に該当しないこと等（注））</div>
+  <div class="indent1">
+    <div>■　該当　□　非該当（内容：${ul('　　　　　　　　　　　　　　　　　　　')}）</div>
+    <div style="font-size:9pt;margin-top:4px;">（注）次のいずれにも該当すること</div>
+    <div style="font-size:9pt;" class="indent1">
+      ・　労働，社会保険及び租税に関する法令を遵守していること（保険料や税に滞納がないことを含む。）<br>
+      ・　前科，暴力団関係等に該当しないこと<br>
+      ・　技能実習法第16条第１項の規定により実習認定を取り消された者ではないこと（受入れ機関及びその役員が技能実習法第16条第１項の規定により実習認定を取り消された法人の役員であったことがないことを含む。）<br>
+      ・　受入れ機関及びその役員が５年以内に出入国又は労働に関する法令に関し不正又は著しく不当な行為をしたことがないこと
+    </div>
+  </div>
 </div>
 <div style="font-size:8.5pt;margin-top:8px;border-top:1px solid #333;padding-top:6px;">
   <div>（注１）上記２から７までについて該当するものにチェックマークを付し，必要な事項を記入してください。</div>
-  <div>（注２）本説明書に虚偽の記載があった場合には，特定技能外国人等の受入れができないこととなることがあります。</div>
-  <div>（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで「特定技能１号」への変更許可申請に係る準備のための在留資格です。</div>
+  <div>（注２）本説明書に虚偽の記載があった場合には，入管法に関し，不正又は著しく不当な行為を行ったものとして，特定技能外国人等の受入れができないこととなることがあります。</div>
+  <div>（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで在留資格「特定技能１号」への在留資格変更許可申請に係る準備のための在留資格であることから，許可がされたからといって在留資格「特定技能１号」への許可の基準に適合していることを確認するものではありません。したがって，申請人が今後「特定技能１号」への在留資格変更許可申請の審査において，入管法，法務省令，各分野固有の基準への適合性が求められることから，その手続等について関係機関に問合せを行うなど確認を十分に行った上，申請人が円滑に「特定技能１号」へ移行できるよう準備を行ってください。</div>
 </div>
 <div style="margin-top:16px;text-align:right;">
   <div>${f('f_date')}</div>
   <div>受入れ機関名　　　　　${f('f_orgName')}</div>
-</div>
-<div style="margin-top:20px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
-  <div style="font-size:9pt;">受取人（署名）</div>
-  <div class="sign-field-area" style="height:60px;position:relative;">
-    <span class="sign-field-placeholder">← ここに署名</span>
-    <img class="sign-field-img" style="display:none;max-height:56px;">
-  </div>
 </div>
 </div>`;
 
@@ -176,7 +198,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,org,nationality&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,org,nationality,emp_set_idx&id=eq.'+caseId),
       sb('persons?select=applicant_name_en,nationality,skill_eval_type&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
@@ -185,24 +207,30 @@ async function loadFromDB(){
     const personName=(pd&&(pd.applicant_name_en||pd.applicantNameEn||pd.nameEn))||(cas&&cas.applicant)||'';
     const nationality=(pd&&pd.nationality)||(cas&&cas.nationality)||'';
     const _coQuery=companyId
-      ?'companies?select=id,name&id=eq.'+companyId
-      :(companyName?'companies?select=id,name&name=eq.'+encodeURIComponent(companyName):null);
+      ?'companies?select=id,name,emp_sets&id=eq.'+companyId
+      :(companyName?'companies?select=id,name,emp_sets&name=eq.'+encodeURIComponent(companyName):null);
     let coName=companyName||'';
-    if(_coQuery){ const cos=await sb(_coQuery); if(cos&&cos[0]) coName=cos[0].name||coName; }
+    let empSets=[];
+    if(_coQuery){ const cos=await sb(_coQuery); if(cos&&cos[0]){ coName=cos[0].name||coName; empSets=cos[0].emp_sets||[]; } }
     const orgName=(cas&&cas.org)||'';
     let soNo='';
     if(orgName){ const sos=await sb('support_orgs?select=name,reg_no&name=eq.'+encodeURIComponent(orgName)); if(sos&&sos[0]) soNo=sos[0].reg_no||''; }
-    const stripParens=s=>s?s.replace(/[（(][^）)]*[）)]/g,'').trim():'';
+    const stripParens=s=>s?s.replace(/[（(][^）)]*[）)]/g,'').trim():s;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(personName) s('f_name',personName);
     if(nationality) s('f_nationality',nationality);
-    if(cas&&cas.applicant_field){ s('f_field',stripParens(cas.applicant_field)); }
+    if(cas&&cas.applicant_field) s('f_field',stripParens(cas.applicant_field));
+    // 業務区分: emp_setsから取得
+    const empSetIdx=parseInt((cas&&cas.emp_set_idx)||info.empSetIdx||0)||0;
+    const es=empSets[empSetIdx]||{};
+    const cat=es.category||es.applicantCategory||es.categoryName||'';
+    if(cat) s('f_category',stripParens(cat));
     s('f_orgName',coName);
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
     if(!v('f_date')){ const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日'); }
-    // 技能区分を skill_eval_type から自動判定
-    const skillType = pd&&pd.skill_eval_type||'';
+    // 技能区分
+    const skillType=pd&&pd.skill_eval_type||'';
     if(skillType){
       const el=document.getElementById('f_skill');
       if(el){
@@ -214,10 +242,10 @@ async function loadFromDB(){
     }
     p();
     showToast('✅ データを読み込みました');
-  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); }
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.10 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.11 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
