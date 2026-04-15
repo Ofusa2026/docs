@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260415.05
+ * ver.20260415.06
  */
 
 // ===== Supabase =====
@@ -37,7 +37,7 @@ function _applyFontSize(){let st=document.getElementById('_fontSizeStyle');if(!s
 function changeFontSize(delta){if(_editMode){const sel=window.getSelection();if(sel&&!sel.isCollapsed){const range=sel.getRangeAt(0);const newSize=delta===0?8.5:Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2;const span=document.createElement('span');span.style.fontSize=newSize+'pt';try{range.surroundContents(span);sel.removeAllRanges();}catch(e){const frag=range.extractContents();span.appendChild(frag);range.insertNode(span);}}const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=(delta===0?8.5:Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2)+'pt';return;}if(delta===0){_fontSize=8.5;}else{_fontSize=Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2;}_applyFontSize();const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';}
 
 // ===== 直接編集モード =====
-function toggleEditMode(){_editMode=!_editMode;const btn=document.getElementById('editModeBtn');const area=document.getElementById('pageArea');if(_editMode){_editLock=true;if(btn){btn.textContent='✏️ 編集中（クリックで終了）';btn.classList.add('edit-mode-on');}if(area)area.classList.add('edit-mode');enableDocEditing(true);}else{_editLock=false;if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}if(area)area.classList.remove('edit-mode');enableDocEditing(false);if(typeof p==='function')p();}}
+function toggleEditMode(){_editMode=!_editMode;const btn=document.getElementById('editModeBtn');const area=document.getElementById('pageArea');if(_editMode){_editLock=true;if(btn){btn.textContent='✏️ 編集中（クリックで終了）';btn.classList.add('edit-mode-on');}if(area)area.classList.add('edit-mode');enableDocEditing(true);}else{_editLock=false;if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}if(area)area.classList.remove('edit-mode');enableDocEditing(false);// 編集モードOFF時はp()を呼ばない（直接編集内容を維持）}}
 function enableDocEditing(on){const area=document.getElementById('pageArea');if(!area)return;area.querySelectorAll('.doc').forEach(doc=>{if(on){doc.setAttribute('contenteditable','true');doc.classList.add('doc-editable');doc.querySelectorAll('.cb-click').forEach(cb=>cb.setAttribute('contenteditable','false'));// 変数ラベル（未入力フィールド）を空にする
 doc.querySelectorAll('.f[style*="color:#aaa"]').forEach(el=>{el.textContent='';el.style='';});}else{doc.removeAttribute('contenteditable');doc.classList.remove('doc-editable');}});}
 
