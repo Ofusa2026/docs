@@ -82,6 +82,7 @@
 // ===== 移行準備説明書 固有処理 =====
 
 function p(){
+  if(_editMode) return; // 直接編集中はブロック
   const w=document.getElementById('pageArea');
   if(!w) return;
   const skillVal=v('f_skill');

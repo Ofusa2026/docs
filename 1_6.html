@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260415.56</div>
+    <div class="ver">ver.20260415.57</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -327,8 +327,8 @@
 <script src="ofusa_common.js?v=20260415"></script>
 <script>
 function p(){
+  if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
   if(_currentDoc==='iko'){ p_iko(); return; }
-  // 編集モード中でもフォームからの更新は通す（editLockは廃止）
   resetCbSeq();
   // シフト入力があれば shift_work を自動ON（手動変更は維持）
   const _shiftHasData = [1,2,3,4,5].some(i=>document.getElementById('es_shift'+i+'Start')?.value||document.getElementById('es_shift'+i+'End')?.value);
@@ -1288,6 +1288,7 @@ function switchDoc(key){
 }
 
 function p_iko(){
+  if(_editMode) return; // 直接編集中はブロック
   const w=document.getElementById('pageArea');
   if(!w) return;
   const skillVal = document.getElementById('f_skill')?.value||'';
@@ -1381,7 +1382,7 @@ function p_iko(){
 
 
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.56 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.57 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 
