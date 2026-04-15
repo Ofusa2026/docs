@@ -8,12 +8,12 @@
 .underline{text-decoration:underline;}
 .indent1{padding-left:2em;}
 .indent2{padding-left:4em;}
-.doc{padding:30mm!important;font-size:10.5pt!important;line-height:1.52!important}
+.doc{padding:30mm!important;font-size:10pt!important;line-height:1.52!important}
 @media print{
   .app-bar{display:none!important}
   .fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:30mm!important;font-size:10.5pt!important;line-height:1.52!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:30mm!important;font-size:10pt!important;line-height:1.52!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.21</div>
+    <div class="ver">ver.20260415.22</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -101,16 +101,16 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div style="text-align:right;font-size:9pt;margin-bottom:4px;">＜特定技能１号への申請予定者のための「特定活動」用＞</div>
-<div style="text-align:center;font-size:14pt;font-weight:bold;letter-spacing:8px;margin:8px 0 16px;">説　　明　　書</div>
+<div style="text-align:center;font-size:18pt;font-weight:bold;letter-spacing:8px;margin:8px 0 16px;">説　　明　　書</div>
 <div style="padding-left:2em;margin-bottom:16px;">
-  <div style="font-size:9.5pt;">国籍・地域　　　${f('f_nationality')}</div>
-  <div style="font-size:9.5pt;">氏　　　名　　　${f('f_name')}</div>
+  <div style="font-size:12pt;">国籍・地域　　　${f('f_nationality')}</div>
+  <div style="font-size:12pt;">氏　　　名　　　${f('f_name')}</div>
   <div style="margin-top:8px;">上記の者を受け入れるに当たって，下記のとおりの事実に相違ありません。</div>
   <div style="text-align:center;margin:4px 0;">記</div>
 </div>
 <div style="margin-bottom:12px;">
   <div>１　在留期間の満了日までに「特定技能１号」への在留資格変更許可申請をすることができない事情</div>
-  <div style="border:1px solid #555;padding:4px 12px;margin-top:6px;font-size:10pt;line-height:1.9;background-image:repeating-linear-gradient(to bottom, transparent, transparent calc(1.9em - 1px), #aaa calc(1.9em - 1px), #aaa 1.9em);background-size:100% 1.9em;">
+  <div style="border:1px solid #555;padding:4px 12px;margin-top:6px;font-size:10pt;line-height:1.52;background-image:repeating-linear-gradient(to bottom, transparent, transparent calc(1.9em - 1px), #aaa calc(1.9em - 1px), #aaa 1.9em);background-size:100% 1.9em;">
     この度弊社で特定技能 1 号として雇用契約を締結することに決定したが、弊社側の<br>
     特定技能 1 号申請への準備(書類準備等)が整っておらず、許可が出るまで、<br>
     2 ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得<br>
@@ -261,7 +261,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.21 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.22 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
