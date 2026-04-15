@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260415.03</div>
+    <div class="ver">ver.20260415.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -28,40 +28,32 @@
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
   </div>
 </div>
-
 <div class="main">
 <div class="fp">
   <div class="fp-case">
-    <label>登録支援機関</label>
-    <select id="filterOrg" onchange="filterCases()"></select>
-    <label>所属機関</label>
-    <select id="filterCompany" onchange="filterCases()"></select>
-    <label>検索</label>
-    <input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
     <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
-    <div class="fs">
-      <div class="fs-title">基本情報</div>
-      <div class="fg"><label>書類作成日（＝契約年月日）<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
-      <div class="fg"><label>申請人氏名<span class="fid">f_applicant</span></label><input id="f_applicant" oninput="p()"></div>
-      <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
-      <div class="fg"><label>作成責任者役職・氏名<span class="fid">f_author</span></label><input id="f_author" oninput="p()"></div>
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日（＝契約年月日）</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>申請人氏名</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者役職・氏名</label><input id="f_author" oninput="p()"></div>
     </div>
-    <div class="fs">
-      <div class="fs-title">登録支援機関</div>
-      <div class="fg"><label>登録支援機関名<span class="fid">f_soName</span></label><input id="f_soName" oninput="p()"></div>
-      <div class="fg"><label>登録番号<span class="fid">f_soNo</span></label><input id="f_soNo" oninput="p()"></div>
+    <div class="fs"><div class="fs-title">登録支援機関</div>
+      <div class="fg"><label>登録支援機関名</label><input id="f_soName" oninput="p()"></div>
+      <div class="fg"><label>登録番号</label><input id="f_soNo" oninput="p()"></div>
     </div>
-    <div class="fs">
-      <div class="fs-title">雇用条件</div>
-      <div class="fg"><label>契約終了日<span class="fid">f_contractEnd</span></label><input id="f_contractEnd" oninput="p()"></div>
-      <div class="fg"><label>委託料（１名当たりの月額）<span class="fid">f_supportFee</span></label><input id="f_supportFee" oninput="p()"></div>
+    <div class="fs"><div class="fs-title">雇用条件</div>
+      <div class="fg"><label>契約終了日</label><input id="f_contractEnd" oninput="p()"></div>
+      <div class="fg"><label>委託料（月額）</label><input id="f_supportFee" oninput="p()"></div>
     </div>
   </div>
 </div>
-
 <div class="pp">
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
@@ -74,61 +66,57 @@
   <div id="pageArea"></div>
 </div>
 </div>
-
 <script src="ofusa_common.js?v=1776264504"></script>
 <script>
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  const ul=s=>`<span style="text-decoration:underline;">${s}</span>`;
   w.innerHTML=`<div class="doc"><div class="page-num-label">P1</div>
-<div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２５号</div>
-<div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:4mm;">登録支援機関との支援委託契約に関する説明書</div>
-<div style="font-size:8pt;margin-bottom:4mm;">
-　登録支援機関との１号特定技能外国人支援計画の全部の委託契約の概要は下記のとおりです。
-</div>
-<div style="font-weight:bold;font-size:8pt;margin-bottom:2mm;">記</div>
-<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:6mm;">
+<div style="text-align:right;font-size:7pt;">参考様式第１－２５号</div>
+<div style="font-size:11pt;font-weight:bold;text-align:center;margin:4mm 0;">登録支援機関との支援委託契約に関する説明書</div>
+<div style="font-size:8pt;margin-bottom:4mm;">　登録支援機関との１号特定技能外国人支援計画の全部の委託契約の概要は下記のとおりです。</div>
+<div style="font-size:8pt;font-weight:bold;margin-bottom:2mm;">記</div>
+<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:4mm;">
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;width:6%;text-align:center;background:#f0f0f0;">１</td>
-    <td style="border:1px solid #333;padding:4px 6px;width:44%;">申請人（支援対象者）</td>
-    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${f('f_applicant')}</td>
+    <td style="border:1px solid #555;padding:3px 6px;width:5%;text-align:center;">１</td>
+    <td style="border:1px solid #555;padding:3px 6px;width:40%;">申請人（支援対象者）</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_applicant')}</td>
   </tr>
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">２</td>
-    <td style="border:1px solid #333;padding:4px 6px;">契約の相手方（登録支援機関）</td>
-    <td style="border:1px solid #333;padding:4px 6px;">${f('f_soName')}</td>
-    <td style="border:1px solid #333;padding:4px 6px;font-size:7.5pt;white-space:nowrap;">（${f('f_soNo')}）</td>
+    <td style="border:1px solid #555;padding:3px 6px;text-align:center;">２</td>
+    <td style="border:1px solid #555;padding:3px 6px;">契約の相手方（登録支援機関）</td>
+    <td style="border:1px solid #555;padding:3px 6px;">${f('f_soName')}</td>
+    <td style="border:1px solid #555;padding:3px 6px;font-size:7.5pt;white-space:nowrap;">（${f('f_soNo')}）</td>
   </tr>
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">３</td>
-    <td style="border:1px solid #333;padding:4px 6px;">契約年月日</td>
-    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${f('f_docDate')}</td>
+    <td style="border:1px solid #555;padding:3px 6px;text-align:center;">３</td>
+    <td style="border:1px solid #555;padding:3px 6px;">契約年月日</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_docDate')}</td>
   </tr>
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">４</td>
-    <td style="border:1px solid #333;padding:4px 6px;">委託する支援業務（１号特定技能外国人支援計画の全部であること）</td>
-    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">該当　・　非該当</td>
+    <td style="border:1px solid #555;padding:3px 6px;text-align:center;">４</td>
+    <td style="border:1px solid #555;padding:3px 6px;">委託する支援業務（１号特定技能外国人支援計画の全部であること）</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">該当　・　非該当</td>
   </tr>
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">５</td>
-    <td style="border:1px solid #333;padding:4px 6px;">委託料（１名当たりの月額）</td>
-    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${f('f_supportFee')} 円</td>
+    <td style="border:1px solid #555;padding:3px 6px;text-align:center;">５</td>
+    <td style="border:1px solid #555;padding:3px 6px;">委託料（１名当たりの月額）</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_supportFee')} 円</td>
   </tr>
   <tr>
-    <td style="border:1px solid #333;padding:4px 6px;text-align:center;background:#f0f0f0;">６</td>
-    <td style="border:1px solid #333;padding:4px 6px;">契約期間</td>
-    <td style="border:1px solid #333;padding:4px 6px;" colspan="2">${f('f_docDate')}から${f('f_contractEnd')}まで</td>
+    <td style="border:1px solid #555;padding:3px 6px;text-align:center;">６</td>
+    <td style="border:1px solid #555;padding:3px 6px;">契約期間</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_docDate')}から${f('f_contractEnd')}まで</td>
   </tr>
 </table>
-<div style="font-size:7.5pt;margin-bottom:4mm;line-height:1.6;">
+<div style="font-size:7.5pt;margin-bottom:4mm;line-height:1.7;">
 （注意）<br>
 １　項番１に関し、複数の申請人（同時申請に限る。）について、全ての項目の内容が同一の場合には「別紙のとおり」として別紙を添付して差し支えない。<br>
 ２　項番２に関し、登録支援機関登録簿に登録された氏名又は名称を記載すること。
 </div>
-<div style="text-align:right;font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
-<div style="text-align:right;font-size:8pt;">作成責任者　役職・氏名　　${f('f_author')}</div>
+<div style="font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}</div>
+<div style="font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
+<div style="font-size:8pt;">作成責任者　役職・氏名　　${f('f_author')}</div>
 </div>`;
   if(_fontSize!==8.5) _applyFontSize();
 }

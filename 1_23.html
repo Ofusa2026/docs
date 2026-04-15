@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260415.03</div>
+    <div class="ver">ver.20260415.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -28,33 +28,26 @@
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
   </div>
 </div>
-
 <div class="main">
 <div class="fp">
   <div class="fp-case">
-    <label>登録支援機関</label>
-    <select id="filterOrg" onchange="filterCases()"></select>
-    <label>所属機関</label>
-    <select id="filterCompany" onchange="filterCases()"></select>
-    <label>検索</label>
-    <input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
     <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
-    <div class="fs">
-      <div class="fs-title">基本情報</div>
-      <div class="fg"><label>書類作成日<span class="fid">f_docDate</span></label><input id="f_docDate" oninput="p()"></div>
-      <div class="fg"><label>所属機関名<span class="fid">f_company</span></label><input id="f_company" oninput="p()"></div>
-      <div class="fg"><label>作成責任者役職・氏名<span class="fid">f_author</span></label><input id="f_author" placeholder="代表取締役 山田太郎" oninput="p()"></div>
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者役職・氏名</label><input id="f_author" oninput="p()"></div>
     </div>
-    <div class="fs">
-      <div class="fs-title">役員情報（①〜⑧）受入業務に直接関与しない役員</div>
+    <div class="fs"><div class="fs-title">役員情報（受入業務に直接関与しない役員）</div>
       <div id="officerList"></div>
     </div>
   </div>
 </div>
-
 <div class="pp">
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
@@ -67,16 +60,13 @@
   <div id="pageArea"></div>
 </div>
 </div>
-
 <script src="ofusa_common.js?v=1776264504"></script>
 <script>
-const MAX_OFF = 8;
-const NUMS = ['①','②','③','④','⑤','⑥','⑦','⑧'];
-
+const MAX_OFF=8;
 function buildOfficerForm(){
-  document.getElementById('officerList').innerHTML = Array.from({length:MAX_OFF},(_,i)=>`
+  document.getElementById('officerList').innerHTML=Array.from({length:MAX_OFF},(_,i)=>`
     <div style="background:#f8f8f8;padding:4px 6px;border-radius:4px;margin-bottom:4px;">
-      <div style="font-size:9px;font-weight:700;color:#333;margin-bottom:2px;">役員 ${NUMS[i]}</div>
+      <div style="font-size:9px;font-weight:700;color:#333;">役員${'①②③④⑤⑥⑦⑧'[i]}</div>
       <div class="fg"><label>ふりがな</label><input id="off${i+1}Kana" oninput="p()"></div>
       <div class="fg"><label>氏名</label><input id="off${i+1}Name" oninput="p()"></div>
     </div>`).join('');
@@ -84,51 +74,70 @@ function buildOfficerForm(){
 
 function p(){
   if(_editMode) return;
-  const w = document.getElementById('pageArea');
-  if(!w) return;
-  const rows = Array.from({length:MAX_OFF},(_,i)=>{
-    const kana = v(`off${i+1}Kana`);
-    const name = v(`off${i+1}Name`);
-    return `
-    <tr>
-      <td style="border:1px solid #333;padding:3px 6px;font-size:7.5pt;">${kana?`<span class="f">${kana}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">off${i+1}Kana</span>`}</td>
-    </tr>
-    <tr>
-      <td style="border:1px solid #333;padding:3px 6px;">${name?`<span class="f">${name}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">off${i+1}Name</span>`}</td>
-    </tr>`;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const rows=Array.from({length:MAX_OFF},(_,i)=>{
+    const kana=v(`off${i+1}Kana`), name=v(`off${i+1}Name`);
+    return `<tr><td style="border:1px solid #333;padding:2px 5px;font-size:7.5pt;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Kana</span>`}</td></tr>
+<tr><td style="border:1px solid #333;padding:2px 5px;">${name||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Name</span>`}</td></tr>`;
   }).join('');
-
-  w.innerHTML = `<div class="doc"><div class="page-num-label">P1</div>
-<div style="text-align:right;font-size:7.5pt;margin-bottom:2mm;">参考様式第１－２３号</div>
-<div style="font-size:10pt;font-weight:bold;text-align:center;margin-bottom:6mm;">特定技能所属機関の役員に関する誓約書</div>
-<div style="font-size:8pt;margin-bottom:4mm;">
-　特定技能所属機関の役員のうち、下表に掲げる者は、特定技能外国人の受入れ業務の執行に直接的に関与する役員ではありません。
-</div>
-<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:4mm;">
-  <tr><th style="border:1px solid #333;padding:3px 6px;background:#f0f0f0;width:100%;text-align:left;">（ふりがな）<br>役員の氏名</th></tr>
+  w.innerHTML=`<div class="doc"><div class="page-num-label">P1</div>
+<div style="text-align:right;font-size:7pt;">参考様式第１－２３号</div>
+<div style="font-size:11pt;font-weight:bold;text-align:center;margin:4mm 0;">特定技能所属機関の役員に関する誓約書</div>
+<div style="font-size:8pt;margin-bottom:3mm;">　特定技能所属機関の役員のうち、下表に掲げる者は、特定技能外国人の受入れ業務の執行に直接的に関与する役員ではありません。</div>
+<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:3mm;">
+  <tr><th style="border:1px solid #333;padding:3px 6px;background:#f5f5f5;text-align:left;font-weight:normal;">（ふりがな）<br>役員の氏名</th></tr>
   ${rows}
 </table>
-<div style="font-size:7.5pt;margin-bottom:6mm;line-height:1.6;">
-また、当該役員について、次表に掲げる出入国管理及び難民認定法（昭和26年政令第319号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）第２条第１項第４号に定められている欠格事由に該当する者ではないことを確認しました。当該役員に対して、今後、欠格事由に該当するに至ったときは、直ちに出入国在留管理庁に申告するとともに、役員の地位を退く必要があることを説明しています。
-</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}　作成</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
-<div style="text-align:right;font-size:8pt;margin-bottom:6mm;">作　成　責　任　者　役職・氏名　　${f('f_author')}</div>
-<div style="border:1px solid #333;padding:6px;font-size:7pt;line-height:1.6;">
-<div style="font-weight:bold;margin-bottom:2mm;">○　出入国管理及び難民認定法（昭和２６年政令第３１９号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）（抄）</div>
-<div style="margin-bottom:1mm;">（特定技能雇用契約の相手方となる本邦の公私の機関の基準）</div>
+<div style="font-size:7.5pt;margin-bottom:4mm;line-height:1.7;">また、当該役員について、次表に掲げる出入国管理及び難民認定法（昭和26年政令第319号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）第２条第１項第４号に定められている欠格事由に該当する者ではないことを確認しました。当該役員に対して、今後、欠格事由に該当するに至ったときは、直ちに出入国在留管理庁に申告するとともに、役員の地位を退く必要があることを説明しています。</div>
+<div style="font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}　作成</div>
+<div style="font-size:8pt;margin-bottom:1mm;">　　　　　　　　　　　　特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
+<div style="font-size:8pt;margin-bottom:4mm;">　　　　　　　作　成　責　任　者　役職・氏名　　${f('f_author')}</div>
+<div style="border:1px solid #333;padding:5px 7px;font-size:6.5pt;line-height:1.7;">
+<div>○　出入国管理及び難民認定法（昭和２６年政令第３１９号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）（抄）</div>
+<div>（特定技能雇用契約の相手方となる本邦の公私の機関の基準）</div>
 <div style="font-weight:bold;">第２条第１項第４号</div>
-<div style="margin-left:4mm;">
-４　次のいずれにも該当しないこと。<br>
-イ　拘禁刑以上の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br>
-ロ　次に掲げる規定又はこれらの規定に基づく命令の規定により、罰金の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br>
-⑴　労働基準法第１１７条、第１１８条第１項、第１１９条、第１２０条の規定<br>
-⑵　職業安定法第６４条から第６８条までの規定<br>
-⑶　労働者派遣法第５８条から第６２条までの規定<br>
-⑷　出入国管理及び難民認定法第７３条の２第１項の規定<br>
-ハ　精神の機能の障害により支援業務を適正に行うに当たって必要な認知、判断及び意思疎通を適切に行うことができない者<br>
-ニ　破産手続開始の決定を受けて復権を得ない者<br>
-ホ　以上に準ずる者として法務省令で定める者
+<div style="margin-left:3mm;">
+４　次のいずれにも該当しないこと。<br><br>
+イ　拘禁刑以上の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br><br>
+ロ　次に掲げる規定又はこれらの規定に基づく命令の規定により、罰金の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br><br>
+⑴　労働基準法第１１７条（船員職業安定法第８９条第１項又は労働者派遣法第４４条第１項の規定により適用される場合を含む。）、第１１８条第１項（労働基準法第６条及び第５６条の規定に係る部分に限る。）、第１１９条（同法第１６条、第１７条、第１８条第１項及び第３７条の規定に係る部分に限る。）及び第１２０条（同法第１８条第７項及び第２３条から第２７条までの規定に係る部分に限る。）の規定並びにこれらの規定に係る同法第１２１条の規定<br><br>
+⑵　船員法（昭和２２年法律第１００号）第１２９条（同法第８５条第１項の規定に係る部分に限る。）、第１３０条（同法第３３条、第３４条第１項、第３５条、第４５条及び第６６条（同法第８８条の２の２第４項及び第５項並びに第８８条の３第４項において準用する場合を含む。）の規定に係る部分に限る。）及び第１３１条（第１号（同法第５３条第１項及び第２項、第５４条、第５６条並びに第５８条第１項の規定に係る部分に限る。）及び第３号に係る部分に限る。）の規定並びにこれらの規定に係る同法第１３５条第１項の規定（これらの規定が船員職業安定法第９２条第１項の規定により適用される場合を含む。）<br><br>
+⑶　職業安定法（昭和２２年法律第１４１号）第６３条、第６４条、第６５条（第１号を除く。）及び第６６条の規定並びにこれらの規定に係る同法第６７条の規定<br><br>
+⑷　船員職業安定法第１１１条から第１１５条までの規定<br><br>
+⑸　法第７１条の３、第７１条の４、第７３条の２、第７３条の４から第７４条の６の３まで、第７４条の８及び第７６条の２の規定<br><br>
+⑹　最低賃金法（昭和３４年法律第１３７号）第４０条の規定及び同条の規定に係る同法第４２条の規定<br><br>
+⑺　労働施策の総合的な推進並びに労働者の雇用の安定及び職業生活の充実等に関する法律（昭和４１年法律第１３２号）第４０条第１項（第２号に係る部分に限る。）の規定及び当該規定に係る同条第２項の規定<br><br>
+⑻　建設労働者の雇用の改善等に関する法律（昭和５１年法律第３３号）第４９条、第５０条及び第５１条（第２号及び第３号を除く。）の規定並びにこれらの規定に係る同法第５２条の規定<br><br>
+⑼　賃金の支払の確保等に関する法律（昭和５１年法律第３４号）第１８条の規定及び同条の規定に係る同法第２０条の規定<br><br>
+⑽　労働者派遣法第５８条から第６２条までの規定<br><br>
+⑾　港湾労働法（昭和６３年法律第４０号）第４８条、第４９条（第１号を除く。）及び第５１条（第２号及び第３号に係る部分に限る。）の規定並びにこれらの規定に係る同法第５２条の規定<br><br>
+⑿　中小企業における労働力の確保及び良好な雇用の機会の創出のための雇用管理の改善の促進に関する法律（平成３年法律第５７号）第１９条、第２０条及び第２１条（第３号を除く。）の規定並びにこれらの規定に係る同法第２２条の規定<br><br>
+⒀　育児休業、介護休業等育児又は家族介護を行う労働者の福祉に関する法律（平成３年法律第７６号）第６２条から第６５条までの規定<br><br>
+⒁　林業労働力の確保の促進に関する法律（平成８年法律第４５号）第３２条、第３３条及び第３４条（第３号を除く。）の規定並びにこれらの規定に係る同法第３５条の規定<br><br>
+⒂　外国人の技能実習の適正な実施及び技能実習生の保護に関する法律（平成２８年法律第８９号。以下「技能実習法」という。）第１０８条、第１０９条、第１１０条（同法第４４条の規定に係る部分に限る。）、第１１１条（第１号を除く。）及び第１１２条（第１号（同法第３５条第１項の規定に係る部分に限る。）及び第６号から第１１号までに係る部分に限る。）の規定並びにこれらの規定に係る同法第１１３条の規定<br><br>
+⒃　労働者派遣法第４４条第４項の規定により適用される労働基準法第１１８条、第１１９条及び第１２１条の規定、船員職業安定法第８９条第７項の規定により適用される船員法第１２９条から第１３１条までの規定並びに労働者派遣法第４５条第７項の規定により適用される労働安全衛生法（昭和４７年法律第５７号）第１１９条及び第１２２条の規定<br><br>
+ハ　暴力団員による不当な行為の防止等に関する法律（平成３年法律第７７号）の規定（同法第５０条（第２号に係る部分に限る。）及び第５２条の規定を除く。）により、又は刑法（明治４０年法律第４５号）第２０４条、第２０６条、第２０８条、第２０８条の２、第２２２条若しくは第２４７条の罪若しくは暴力行為等処罰に関する法律（大正１５年法律第６０号）の罪を犯したことにより、罰金の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br><br>
+ニ　健康保険法（大正１１年法律第７０号）第２０８条、第２１３条の２若しくは第２１４条第１項、船員保険法（昭和１４年法律第７３号）第１５６条、第１５９条若しくは第１６０条第１項、労働者災害補償保険法（昭和２２年法律第５０号）第５１条前段若しくは第５４条第１項（同法第５１条前段の規定に係る部分に限る。）、厚生年金保険法（昭和２９年法律第１１５号）第１０２条、第１０３条の２若しくは第１０４条第１項（同法第１０２条又は第１０３条の２の規定に係る部分に限る。）、労働保険の保険料の徴収等に関する法律（昭和４４年法律第８４号）第４６条前段若しくは第４８条第１項（同法第４６条前段の規定に係る部分に限る。）又は雇用保険法（昭和４９年法律第１１６号）第８３条若しくは第８６条（同法第８３条の規定に係る部分に限る。）の規定により、罰金の刑に処せられ、その執行を終わり、又は執行を受けることがなくなった日から起算して５年を経過しない者<br><br>
+ホ　精神の機能の障害により特定技能雇用契約の履行を適正に行うに当たっての必要な認知、判断及び意思疎通を適切に行うことができない者<br><br>
+ヘ　破産手続開始の決定を受けて復権を得ない者<br><br>
+ト　技能実習法第１６条第１項の規定により実習認定を取り消され、当該取消しの日から起算して５年を経過しない者<br><br>
+チ　技能実習法第１６条第１項の規定により実習認定を取り消された者が法人である場合（同項第３号の規定により実習認定を取り消された場合については、当該法人がロ又はニに規定する者に該当することとなったことによる場合に限る。）において、当該取消しの処分を受ける原因となった事項が発生した当時現に当該法人の役員（業務を執行する社員、取締役、執行役又はこれらに準ずる者をいい、相談役、顧問その他いかなる名称を有する者であるかを問わず、法人に対し業務を執行する社員、取締役、執行役又はこれらに準ずる者と同等以上の支配力を有するものと認められる者を含む。ヲにおいて同じ。）であった者で、当該取消しの日から起算して５年を経過しないもの<br><br>
+リ　特定技能雇用契約の締結の日前５年以内又はその締結の日以後に、次に掲げる行為その他の出入国又は労働に関する法令に関し不正又は著しく不当な行為をした者<br>
+⑴　外国人に対して暴行し、脅迫し又は監禁する行為<br>
+⑵　外国人の旅券又は在留カードを取り上げる行為<br>
+⑶　外国人に支給する手当又は報酬の一部又は全部を支払わない行為<br>
+⑷　外国人の外出その他私生活の自由を不当に制限する行為<br>
+⑸　⑴から⑷までに掲げるもののほか、外国人の人権を著しく侵害する行為<br>
+⑹　外国人に係る出入国又は労働に関する法令に関して行われた不正又は著しく不当な行為に関する事実を隠蔽する目的又はその事業活動に関し外国人に法第３章第１節若しくは第２節の規定による証明書の交付、上陸許可の証印若しくは許可、同章第４節の規定による上陸の許可若しくは法第４章第１節若しくは第２節若しくは第５章第３節の２の規定による許可を受けさせる目的で、偽造若しくは変造された文書若しくは図画若しくは虚偽の文書若しくは図画を行使し、又は提供する行為<br>
+⑺　特定技能雇用契約に基づく当該外国人の本邦における活動に関連して、保証金の徴収若しくは財産の管理又は当該特定技能雇用契約の不履行に係る違約金を定める契約その他不当に金銭その他の財産の移転を予定する契約を締結する行為<br>
+⑻　外国人若しくはその配偶者、直系若しくは同居の親族その他当該外国人と社会生活において密接な関係を有する者との間で、特定技能雇用契約に基づく当該外国人の本邦における活動に関連して、保証金の徴収その他名目のいかんを問わず金銭その他の財産の管理をする者若しくは当該特定技能雇用契約の不履行について違約金を定める契約その他の不当に金銭その他の財産の移転を予定する契約を締結した者又はこれらの行為をしようとする者からの紹介を受けて、当該外国人と当該特定技能雇用契約を締結する行為<br>
+⑼　法第１９条の１８の規定による届出をせず、又は虚偽の届出をする行為<br>
+⑽　法第１９条の２０第１項の規定による報告若しくは帳簿書類の提出若しくは提示をせず、若しくは虚偽の報告若しくは虚偽の帳簿書類の提出若しくは提示をし、又は同項の規定による質問に対して答弁をせず、若しくは虚偽の答弁をし、若しくは同項の規定による検査を拒み、妨げ、若しくは忌避する行為<br>
+⑾　法第１９条の２１第１項の規定による処分に違反する行為<br><br>
+ヌ　暴力団員による不当な行為の防止等に関する法律第２条第６号に規定する暴力団員（以下「暴力団員」という。）又は暴力団員でなくなった日から５年を経過しない者（以下「暴力団員等」という。）<br><br>
+ル　営業に関し成年者と同一の行為能力を有しない未成年者であって、その法定代理人がイからヌまで又はヲのいずれかに該当するもの<br><br>
+ヲ　法人であって、その役員のうちにイからルまでのいずれかに該当する者があるもの<br><br>
+ワ　（略）
 </div>
 </div>
 </div>`;
@@ -155,8 +164,7 @@ async function loadFromDB(){
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 
-buildOfficerForm();
-initCaseSelect(); p();
+buildOfficerForm(); initCaseSelect(); p();
 </script>
 </body>
 </html>
