@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>電子署名</title>
+<style>
+:root{--ink:#1a1a2e;--paper:#faf9f6;--accent:#c8102e;--border:#d8d4cc;--muted:#7a7570;--success:#1a7a4a;--success-light:#e6f4ed;--radius:12px;--shadow:0 2px 12px rgba(26,26,46,0.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Hiragino Sans','Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:40px;}
+.header{background:var(--ink);color:white;padding:14px 16px;position:sticky;top:0;z-index:100;}
+.header-logo{font-size:10px;font-weight:600;letter-spacing:.1em;opacity:.6;}
+.header-title{font-size:15px;font-weight:700;margin-top:2px;}
+.progress-bar{height:3px;background:var(--border);}
+.progress-fill{height:100%;background:var(--accent);transition:width .4s ease;width:0%;}
+.container{max-width:600px;margin:0 auto;padding:0 14px;}
+.step{display:none;animation:fadeUp .3s ease;}.step.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.step-indicator{display:flex;align-items:center;gap:6px;padding:16px 0 4px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s;}
+.step-dot.active{background:var(--accent);width:24px;border-radius:4px;}
+.step-dot.done{background:var(--success);}
+.step-label{font-size:12px;color:var(--muted);margin-left:4px;font-weight:600;}
+.section{margin-top:20px;}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.case-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.case-meta{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px;}
+.case-meta-item{background:var(--paper);border-radius:8px;padding:9px 11px;}
+.case-meta-key{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:2px;}
+.case-meta-value{font-size:14px;font-weight:700;}
+/* 書類プレビュー */
+.doc-preview-wrap{background:#555;border-radius:var(--radius);overflow:hidden;}
+.doc-preview-label{background:#333;color:white;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;}
+#docFrame{width:100%;height:70vh;border:none;background:white;}
+.sign-tap-notice{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px 12px;font-size:12px;color:#7a6010;margin-top:10px;}
+/* 署名キャンバス */
+.sign-area{background:white;border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;}
+.sign-area-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.sign-area-label{font-size:13px;font-weight:700;}
+.btn-clear{font-size:12px;color:var(--accent);font-weight:600;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;}
+canvas#signCanvas{display:block;width:100%;height:200px;cursor:crosshair;touch-action:none;}
+.sign-guide{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:13px;color:#bbb;pointer-events:none;transition:opacity .3s;}
+.sign-guide.hidden{opacity:0;}
+/* ボタン */
+.btn-primary{width:100%;padding:16px;background:var(--accent);color:white;border:none;border-radius:50px;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:active{transform:scale(.97);background:#a00d24;}
+.btn-primary:disabled{background:var(--border);cursor:not-allowed;transform:none;}
+.btn-back{background:none;border:1px solid var(--border);border-radius:50px;padding:11px 20px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;margin-top:10px;width:100%;}
+/* 本人確認 */
+.verify-section{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.input-group{margin-bottom:12px;}
+.input-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;display:block;}
+input[type="text"]{width:100%;padding:12px 13px;border:1px solid var(--border);border-radius:8px;font-size:16px;font-family:inherit;background:var(--paper);outline:none;transition:border-color .2s;-webkit-appearance:none;}
+input:focus{border-color:var(--accent);background:white;}
+/* 完了 */
+.complete-screen{text-align:center;padding:40px 16px;}
+.complete-icon{width:80px;height:80px;background:var(--success-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.complete-title{font-size:22px;font-weight:800;color:var(--success);margin-bottom:8px;}
+.complete-sub{font-size:14px;color:var(--muted);line-height:1.7;}
+.complete-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:24px;text-align:left;}
+.complete-card-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
+.complete-card-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--paper);}
+.complete-card-row:last-child{border-bottom:none;}
+.complete-card-key{color:var(--muted);}
+.complete-card-val{font-weight:600;}
+/* ローディング・エラー */
+.loading-screen,.error-screen{text-align:center;padding:80px 20px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-icon{font-size:48px;margin-bottom:14px;}
+.error-title{font-size:18px;font-weight:700;margin-bottom:6px;}
+.error-msg{font-size:14px;color:var(--muted);}
+.notice{background:#fffbf0;border:1px solid #f0d080;border-radius:8px;padding:11px 13px;font-size:12px;color:#7a6010;line-height:1.6;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260415.01</span></div>
+  <div class="header-title" id="headerTitle">電子署名</div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="container">
+
+  <!-- ローディング -->
+  <div id="loadingScreen" class="loading-screen step active">
+    <div class="spinner"></div>
+    <p style="font-size:14px;color:var(--muted)">読み込み中...</p>
+  </div>
+
+  <!-- エラー -->
+  <div id="errorScreen" class="error-screen step">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title" id="errorTitle">エラー</div>
+    <div class="error-msg" id="errorMsg">担当者にお問い合わせください。</div>
+  </div>
+
+  <!-- Step1: 内容確認 -->
+  <div id="step1" class="step">
+    <div class="step-indicator">
+      <div class="step-dot active"></div><div class="step-dot"></div>
+      <div class="step-dot"></div><div class="step-dot"></div>
+      <span class="step-label">内容確認</span>
+    </div>
+    <div class="section">
+      <div class="section-label">署名対象</div>
+      <div class="case-card">
+        <div class="case-meta">
+          <div class="case-meta-item"><div class="case-meta-key">氏名</div><div class="case-meta-value" id="workerName">—</div></div>
+          <div class="case-meta-item"><div class="case-meta-key">所属機関</div><div class="case-meta-value" id="companyName">—</div></div>
+          <div class="case-meta-item"><div class="case-meta-key">書類</div><div class="case-meta-value" id="docType">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="notice"><strong>ご本人様へ：</strong>書類の内容を確認し、署名してください。</div>
+    <button class="btn-primary" onclick="goStep(2)">📄 書類を確認して署名する →</button>
+  </div>
+
+  <!-- Step2: 書類確認・署名 -->
+  <div id="step2" class="step">
+    <div class="step-indicator">
+      <div class="step-dot done"></div><div class="step-dot active"></div>
+      <div class="step-dot"></div><div class="step-dot"></div>
+      <span class="step-label">書類確認・署名</span>
+    </div>
+    <div class="section">
+      <div class="section-label">書類（全体を確認してください）</div>
+      <div class="doc-preview-wrap">
+        <div class="doc-preview-label">
+          <span id="docPreviewTitle">書類</span>
+          <span style="font-size:10px;opacity:.7;">↕ スクロールして全体を確認</span>
+        </div>
+        <iframe id="docFrame"></iframe>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-label">署名（指でサインしてください）</div>
+      <div class="sign-area">
+        <div class="sign-area-header">
+          <span class="sign-area-label">✍️ 署名欄</span>
+          <button class="btn-clear" onclick="clearCanvas()">やり直す</button>
+        </div>
+        <canvas id="signCanvas"></canvas>
+        <div class="sign-guide" id="signGuide">ここに指でサイン</div>
+      </div>
+    </div>
+    <div class="notice"><strong>注意：</strong>上記の署名欄にサインしてから次へ進んでください。</div>
+    <button class="btn-primary" id="btnToStep3" onclick="goStep(3)" disabled>本人確認へ進む →</button>
+    <button class="btn-back" onclick="goStep(1)">← 戻る</button>
+  </div>
+
+  <!-- Step3: 本人確認 -->
+  <div id="step3" class="step">
+    <div class="step-indicator">
+      <div class="step-dot done"></div><div class="step-dot done"></div>
+      <div class="step-dot active"></div><div class="step-dot"></div>
+      <span class="step-label">本人確認</span>
+    </div>
+    <div class="section">
+      <div class="section-label">氏名を入力してください</div>
+      <div class="verify-section">
+        <div class="input-group">
+          <label class="input-label">氏名（ローマ字）</label>
+          <input type="text" id="inputName" placeholder="例：NGUYEN VAN AN" autocomplete="name">
+        </div>
+      </div>
+    </div>
+    <div class="notice">署名者の氏名として記録されます。</div>
+    <button class="btn-primary" id="btnSubmit" onclick="submitSign()">✅ 署名を送信する</button>
+    <button class="btn-back" onclick="goStep(2)">← 戻る</button>
+  </div>
+
+  <!-- Step4: 完了 -->
+  <div id="step4" class="step">
+    <div class="complete-screen">
+      <div class="complete-icon">✅</div>
+      <div class="complete-title">署名完了</div>
+      <div class="complete-sub">署名が完了しました。<br>ありがとうございました。</div>
+      <div class="complete-card">
+        <div class="complete-card-title">受理情報</div>
+        <div class="complete-card-row"><span class="complete-card-key">書類</span><span class="complete-card-val" id="completeDoc">—</span></div>
+        <div class="complete-card-row"><span class="complete-card-key">署名者</span><span class="complete-card-val" id="completeName">—</span></div>
+        <div class="complete-card-row"><span class="complete-card-key">日時</span><span class="complete-card-val" id="completeTime">—</span></div>
+        <div class="complete-card-row"><span class="complete-card-key">受理番号</span><span class="complete-card-val" id="completeId">—</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const SB_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
+const SB_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+async function sbFetch(path,opts={}){
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json',...(opts.headers||{})},...opts});
+  const t=await r.text();
+  if(!r.ok){const e=t?JSON.parse(t):{};throw new Error(e.message||e.hint||('HTTP '+r.status));}
+  return t?JSON.parse(t):null;
+}
+
+let signRequestId=null;
+let canvas,ctx,isDrawing=false,hasDrawn=false;
+
+// ===== 初期化 =====
+document.addEventListener('DOMContentLoaded',async()=>{
+  const p=new URLSearchParams(location.search);
+  const token=p.get('token');
+  if(!token){showError('URLが無効です','リンクを確認してください');return;}
+  await loadSignRequest(token);
+});
+
+async function loadSignRequest(token){
+  try{
+    const data=await sbFetch('sign_requests?token=eq.'+token+'&select=id,case_id,status,expires_at,doc_type,doc_content&limit=1');
+    const req=data&&data[0];
+    if(!req){showError('リンクが見つかりません','リンクを確認してください');return;}
+    if(req.expires_at&&new Date(req.expires_at)<new Date()){showError('リンクの有効期限が切れています');return;}
+    if(req.status==='signed'){showAlreadySigned();return;}
+    signRequestId=req.id;
+
+    // 書類タイトル
+    const docTitle=req.doc_type||'書類';
+    document.getElementById('docType').textContent=docTitle;
+    document.getElementById('docPreviewTitle').textContent=docTitle;
+    document.getElementById('headerTitle').textContent=docTitle+' 電子署名';
+    document.getElementById('completeDoc').textContent=docTitle;
+
+    // 案件情報
+    if(req.case_id){
+      try{
+        const cases=await sbFetch('cases?id=eq.'+req.case_id+'&select=applicant,company&limit=1');
+        const cas=cases&&cases[0];
+        if(cas){
+          document.getElementById('workerName').textContent=cas.applicant||'—';
+          document.getElementById('companyName').textContent=cas.company||'—';
+        }
+      }catch(e){console.warn('cases取得エラー:',e);}
+    }
+
+    // 書類HTMLをiframeに表示
+    if(req.doc_content){
+      const frame=document.getElementById('docFrame');
+      const blob=new Blob([req.doc_content],{type:'text/html'});
+      frame.src=URL.createObjectURL(blob);
+    }
+
+    goStep(1);
+  }catch(e){
+    console.error(e);
+    showError('読み込みエラー',e.message);
+  }
+}
+
+// ===== 署名キャンバス =====
+function initCanvas(){
+  canvas=document.getElementById('signCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr;
+  canvas.height=200*dpr;
+  ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  ctx.strokeStyle='#1a1a2e';
+  ctx.lineWidth=2.5;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  canvas.addEventListener('touchstart',onTS,{passive:false});
+  canvas.addEventListener('touchmove',onTM,{passive:false});
+  canvas.addEventListener('touchend',onTE);
+  canvas.addEventListener('mousedown',onMD);
+  canvas.addEventListener('mousemove',onMM);
+  canvas.addEventListener('mouseup',onMU);
+}
+function gp(e){const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+function sd(e){isDrawing=true;const p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);document.getElementById('signGuide').classList.add('hidden');}
+function dr(e){if(!isDrawing)return;const p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasDrawn=true;document.getElementById('btnToStep3').disabled=false;}
+function ed(){isDrawing=false;ctx.beginPath();}
+function onTS(e){e.preventDefault();sd(e);}function onTM(e){e.preventDefault();dr(e);}function onTE(){ed();}
+function onMD(e){sd(e);}function onMM(e){dr(e);}function onMU(){ed();}
+function clearCanvas(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  hasDrawn=false;
+  document.getElementById('btnToStep3').disabled=true;
+  document.getElementById('signGuide').classList.remove('hidden');
+}
+
+// ===== 送信 =====
+async function submitSign(){
+  const name=document.getElementById('inputName').value.trim();
+  if(!name){alert('氏名を入力してください');return;}
+  if(!hasDrawn){alert('署名してください');return;}
+  const btn=document.getElementById('btnSubmit');
+  btn.disabled=true;btn.textContent='処理中...';
+  const signedAt=new Date().toISOString();
+  const sigDataUrl=canvas.toDataURL('image/png');
+  try{
+    // 署名画像をdoc_contentの署名欄に埋め込む
+    const frame=document.getElementById('docFrame');
+    let signedHtml='';
+    try{
+      const frameDoc=frame.contentDocument||frame.contentWindow.document;
+      // sign-fieldに署名画像を埋め込む
+      frameDoc.querySelectorAll('.sign-field').forEach(field=>{
+        const img=field.querySelector('.sign-field-img');
+        const ph=field.querySelector('.sign-field-placeholder');
+        if(img){img.src=sigDataUrl;img.style.display='block';}
+        if(ph)ph.style.display='none';
+        field.classList.add('signed');
+      });
+      signedHtml=frameDoc.documentElement.outerHTML;
+    }catch(e){console.warn('iframe HTML取得エラー:',e);}
+
+    await sbFetch('sign_requests?id=eq.'+signRequestId,{
+      method:'PATCH',
+      headers:{'Prefer':'return=minimal'},
+      body:JSON.stringify({
+        status:'signed',
+        signed_at:signedAt,
+        signer_name:name,
+        signature_image:sigDataUrl,
+        doc_content:signedHtml||undefined,
+      })
+    });
+
+    document.getElementById('completeName').textContent=name;
+    document.getElementById('completeTime').textContent=new Date(signedAt).toLocaleString('ja-JP');
+    document.getElementById('completeId').textContent=signRequestId.slice(0,8).toUpperCase();
+    goStep(4);
+  }catch(e){
+    console.error(e);
+    alert('送信エラー: '+e.message);
+    btn.disabled=false;btn.textContent='✅ 署名を送信する';
+  }
+}
+
+// ===== ステップ管理 =====
+function goStep(n){
+  ['loadingScreen','errorScreen','step1','step2','step3','step4'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  const m={1:'step1',2:'step2',3:'step3',4:'step4'};
+  if(m[n])document.getElementById(m[n]).classList.add('active');
+  const pct={1:25,2:55,3:80,4:100};
+  document.getElementById('progressFill').style.width=(pct[n]||0)+'%';
+  if(n===2)setTimeout(initCanvas,300);
+  window.scrollTo(0,0);
+}
+function showError(t,m){
+  document.getElementById('loadingScreen').classList.remove('active');
+  document.getElementById('errorTitle').textContent=t||'エラー';
+  document.getElementById('errorMsg').textContent=m||'担当者にお問い合わせください。';
+  document.getElementById('errorScreen').classList.add('active');
+}
+function showAlreadySigned(){
+  showError('署名済みです','このリンクはすでに使用済みです。');
+  document.querySelector('.error-icon').textContent='✅';
+}
+</script>
+</body>
+</html>
