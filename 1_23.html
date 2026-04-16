@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260415.14</div>
+    <div class="ver">ver.20260415.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -82,7 +82,7 @@ function p(){
   const rows = Array.from({length:MAX_OFF},(_,i)=>{
     const kana=v(`off${i+1}Kana`), name=v(`off${i+1}Name`);
     const leftCell = i===0
-      ? `<td style="border:1px solid #333;padding:3px 6px;width:80px;vertical-align:top;text-align:left;" rowspan="${totalRows}">（ふりがな）<br>役員の氏名</td>`
+      ? `<td style="border:1px solid #333;padding:3px 6px;width:140px;vertical-align:top;text-align:left;" rowspan="${totalRows}">（ふりがな）<br>役員の氏名</td>`
       : '';
     return `<tr>${leftCell}<td style="border:1px solid #333;padding:2px 5px;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Kana</span>`}</td></tr>
 <tr><td style="border:1px solid #333;padding:2px 5px;">${name||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Name</span>`}</td></tr>`;
