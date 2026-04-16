@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260415.13</div>
+    <div class="ver">ver.20260415.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -69,6 +69,8 @@
 </div>
 <script src="ofusa_common.js?v=1776264504"></script>
 <script>
+let _itekiHatou = ''; // ''=未選択 'gaitou'=該当 'higaitou'=非該当
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -99,7 +101,7 @@ function p(){
   <tr>
     <td style="border:1px solid #555;padding:3px 6px;text-align:center;">４</td>
     <td style="border:1px solid #555;padding:3px 6px;">委託する支援業務（１号特定技能外国人支援計画の全部であること）</td>
-    <td style="border:1px solid #555;padding:3px 6px;" colspan="2">該当　・　非該当</td>
+    <td style="border:1px solid #555;padding:3px 6px;" colspan="2"><span class="cb cb-click" onclick="toggleIteki('gaitou')" id="cb_gaitou">□</span>　該当　　<span class="cb cb-click" onclick="toggleIteki('higaitou')" id="cb_higaitou">□</span>　非該当</td>
   </tr>
   <tr>
     <td style="border:1px solid #555;padding:3px 6px;text-align:center;">５</td>
@@ -158,6 +160,12 @@ async function loadFromDB(){
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 initCaseSelect(); p();
+
+function toggleIteki(val){
+  _itekiHatou = (_itekiHatou === val) ? '' : val;
+  document.getElementById('cb_gaitou').textContent  = (_itekiHatou === 'gaitou')   ? '■' : '□';
+  document.getElementById('cb_higaitou').textContent = (_itekiHatou === 'higaitou') ? '■' : '□';
+}
 
 function fitDocToPreview(){
   requestAnimationFrame(()=>{
