@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260416.02</div>
+    <div class="ver">ver.20260416.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -226,6 +226,33 @@ async function loadFromDB(){
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 initCaseSelect(); p();
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  // caseSelectに値をセットしてloadFromDB()を呼ぶ
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    // 既存のoptionを探すかなければ追加
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadFromDB==='function') loadFromDB();
+});
 </script>
 </body>
 </html>

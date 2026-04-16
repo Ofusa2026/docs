@@ -29,6 +29,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .card-title{font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:4px;}
 .card-sub{font-size:10px;color:#64748b;}
 .card.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+.case-panel{padding:8px;background:#0f172a;border-bottom:1px solid #334155;}
+.case-panel label{font-size:9px;font-weight:700;color:#64748b;display:block;margin-bottom:2px;margin-top:6px;}
+.case-panel select,.case-panel input{width:100%;padding:4px;border:1px solid #334155;border-radius:3px;font-size:11px;background:#1e293b;color:#e2e8f0;box-sizing:border-box;}
+.case-badge{display:inline-block;background:#3b82f6;color:white;border-radius:10px;padding:1px 7px;font-size:9px;margin-left:4px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -38,6 +42,16 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 </div>
 <div class="body">
   <div class="sidebar">
+    <div class="case-panel">
+      <label>🔍 登録支援機関</label>
+      <select id="idx_filterOrg" onchange="idxFilterCases()"></select>
+      <label>🏢 所属機関</label>
+      <select id="idx_filterCompany" onchange="idxFilterCases()"></select>
+      <label>🔤 検索（名前）</label>
+      <input id="idx_filterText" placeholder="名前で絞り込み" oninput="idxFilterCases()">
+      <label>👤 案件選択 <span class="case-badge" id="idx_caseCount">-</span></label>
+      <select id="idx_caseSelect" size="1" onchange="idxCaseSelected()"></select>
+    </div>
     <div class="section">書類一覧</div>
     <div class="item active" id="nav-home" onclick="open_doc('home')">
       <span class="item-icon">🏠</span>
@@ -125,14 +139,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 const docs={
   '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1776264643'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1776304017'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1776304017'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1776305576'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1776304017'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776306641'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1776307078'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1776307181'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1776310703'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1776311065'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1776311065'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1776311065'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1776311065'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776311065'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1776311065'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1776311065'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1776311065'},
 };
 let cur='home';
 function open_doc(key){
@@ -156,6 +170,83 @@ function open_doc(key){
 }
 // 初期表示
 open_doc('home');
+
+// ===== index案件選択 =====
+const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
+const IDX_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVod2xnYndweWNnbG1vcGlxeXR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzMjgwMDEsImV4cCI6MjAyODkwNDAwMX0.7g6AJKczUk3cqO7dALRFqFSXeODdwsAW4EqfCKFwh0Y';
+async function idxSb(path){
+  const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
+  return r.json();
+}
+
+let idxAllCases=[], idxSelectedCase=null;
+
+async function idxInit(){
+  try{
+    // 登録支援機関
+    const orgs=await idxSb('support_orgs?select=name&order=name');
+    const orgSel=document.getElementById('idx_filterOrg');
+    if(orgSel) orgSel.innerHTML='<option value="">— すべて —</option>'+(orgs||[]).map(o=>`<option>${o.name}</option>`).join('');
+    // 全案件
+    const cases=await idxSb('cases?select=id,name,applicant,org,company_id,emp_set_idx&order=name&limit=5000');
+    idxAllCases=cases||[];
+    idxBuildCompanyFilter();
+    idxFilterCases();
+  }catch(e){console.error('idxInit',e);}
+}
+
+function idxBuildCompanyFilter(){
+  const companies=[...new Set(idxAllCases.map(c=>c.org).filter(Boolean))].sort();
+  const sel=document.getElementById('idx_filterCompany');
+  if(sel) sel.innerHTML='<option value="">— すべて —</option>'+companies.map(c=>`<option>${c}</option>`).join('');
+}
+
+function idxFilterCases(){
+  const company=(document.getElementById('idx_filterCompany')?.value||'');
+  const text=(document.getElementById('idx_filterText')?.value||'').toLowerCase();
+  let filtered=idxAllCases;
+  if(company) filtered=filtered.filter(c=>c.org===company);
+  if(text) filtered=filtered.filter(c=>(c.applicant||'').toLowerCase().includes(text)||(c.name||'').toLowerCase().includes(text));
+  const sel=document.getElementById('idx_caseSelect');
+  if(sel) sel.innerHTML='<option value="">← 案件を選択</option>'+filtered.map(c=>`<option value='${JSON.stringify({caseId:c.id,companyId:c.company_id,companyName:c.org,empSetIdx:c.emp_set_idx||0})}'>${c.applicant||c.name||c.id}</option>`).join('');
+  const badge=document.getElementById('idx_caseCount');
+  if(badge) badge.textContent=filtered.length+'件';
+}
+
+function idxCaseSelected(){
+  const sel=document.getElementById('idx_caseSelect');
+  if(!sel||!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  idxSelectedCase=info;
+  // 表示中のiframeに送信
+  idxSendToVisible(info);
+}
+
+function idxSendToVisible(info){
+  if(!info) return;
+  Object.keys(docs).forEach(k=>{
+    const fr=document.getElementById(docs[k].frameId);
+    if(!fr||fr.style.display==='none'||!fr.src||fr.src===location.href) return;
+    try{fr.contentWindow.postMessage({type:'SELECT_CASE',info},'*');}catch(e){}
+  });
+}
+
+// 書類切替時に選択中の案件を送信
+const _origOpenDoc=open_doc;
+function open_doc(key){
+  _origOpenDoc(key);
+  if(idxSelectedCase&&key!=='home'){
+    setTimeout(()=>{
+      const fr=document.getElementById(docs[key]?.frameId);
+      if(!fr||!fr.src||fr.src===location.href) return;
+      const send=()=>fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');
+      if(fr.contentDocument?.readyState==='complete') send();
+      else fr.onload=send;
+    },100);
+  }
+}
+
+idxInit();
 </script>
 </body>
 </html>
