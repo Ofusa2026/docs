@@ -6,11 +6,11 @@
 <title>参考様式第１－２３号</title>
 <link rel="stylesheet" href="ofusa_common.css?v=1776264504">
 <style>
-.doc{padding:30mm!important;line-height:1.52!important}
+.doc{padding:15mm!important;line-height:1.52!important}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:30mm!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260415.07</div>
+    <div class="ver">ver.20260415.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -78,9 +78,13 @@ function buildOfficerForm(){
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  const rows=Array.from({length:MAX_OFF},(_,i)=>{
+  const totalRows = MAX_OFF * 2;
+  const rows = Array.from({length:MAX_OFF},(_,i)=>{
     const kana=v(`off${i+1}Kana`), name=v(`off${i+1}Name`);
-    return `<tr><td style="border:1px solid #333;padding:2px 5px;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Kana</span>`}</td></tr>
+    const leftCell = i===0
+      ? `<td style="border:1px solid #333;padding:3px 6px;width:80px;vertical-align:top;text-align:left;" rowspan="${totalRows}">（ふりがな）<br>役員の氏名</td>`
+      : '';
+    return `<tr>${leftCell}<td style="border:1px solid #333;padding:2px 5px;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Kana</span>`}</td></tr>
 <tr><td style="border:1px solid #333;padding:2px 5px;">${name||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Name</span>`}</td></tr>`;
   }).join('');
   w.innerHTML=`
@@ -90,7 +94,6 @@ function p(){
 <div style="font-size:18pt;font-weight:bold;text-align:center;margin:4mm 0;">特定技能所属機関の役員に関する誓約書</div>
 <div style="margin-bottom:24px;">　特定技能所属機関の役員のうち、下表に掲げる者は、特定技能外国人の受入れ業務の執行に直接的に関与する役員ではありません。</div>
 <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-  <tr><th style="border:1px solid #333;padding:3px 6px;background:#f5f5f5;text-align:left;font-weight:normal;">（ふりがな）<br>役員の氏名</th></tr>
   ${rows}
 </table>
 <div>また、当該役員について、次表に掲げる出入国管理及び難民認定法（昭和26年政令第319号）第２条の５の規定に基づき、特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令（平成３１年法務省令第５号）第２条第１項第４号に定められている欠格事由に</div>
