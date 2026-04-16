@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.07</div>
+    <div class="ver">ver.20260416.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -87,23 +87,21 @@ function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
 
-  // 役員行の生成（テンプレートリテラルを避けて文字列連結）
+  // 役員行の生成
   const nums='①②③④⑤';
   let offRows='';
   for(let i=0;i<MAX_OFF;i++){
     const n=i+1;
     const kanaKey='off'+n+'Kana', nameKey='off'+n+'Name', titleKey='off'+n+'Title';
     offRows+='<tr>'
-      +'<td style="width:32%;">（ふりがな）<br>（１）役員氏名</td>'
-      +'<td style="width:5%;text-align:center;">'+nums[i]+'</td>'
-      +'<td style="height:2em;">'+f(kanaKey)+'</td>'
-      +'<td style="width:8%;">役職</td>'
-      +'<td>'+f(titleKey)+'</td>'
+      +'<td rowspan="2" style="width:30%;vertical-align:middle;">（ふりがな）<br>（'+n+'）役員氏名</td>'
+      +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+nums[i]+'</td>'
+      +'<td style="height:1.8em;">'+f(kanaKey)+'</td>'
+      +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
+      +'<td rowspan="2">'+f(titleKey)+'</td>'
       +'</tr>'
       +'<tr>'
-      +'<td></td><td></td>'
-      +'<td style="height:2em;">'+f(nameKey)+'</td>'
-      +'<td></td><td></td>'
+      +'<td style="height:1.8em;">'+f(nameKey)+'</td>'
       +'</tr>';
   }
 
