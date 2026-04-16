@@ -71,6 +71,163 @@ function enableDocEditing(on){
   });
 }
 
+
+// ===== スタイル編集モード =====
+let _styleMode = false;
+let _styleTarget = null;
+
+function toggleStyleMode(){
+  _styleMode = !_styleMode;
+  const btn = document.getElementById('styleModeBtn');
+  const panel = document.getElementById('stylePanel');
+  const area = document.getElementById('pageArea');
+  if(_styleMode){
+    if(btn){btn.textContent='🎨 スタイル編集中';btn.style.background='#d97706';btn.style.color='white';}
+    if(panel) panel.style.display='flex';
+    if(area) area.querySelectorAll('.doc *').forEach(el=>{
+      el.style.cursor='pointer';
+      el.addEventListener('click',_styleClickHandler,true);
+    });
+  }else{
+    if(btn){btn.textContent='🎨 スタイル編集';btn.style.background='';btn.style.color='';}
+    if(panel) panel.style.display='none';
+    _styleTarget=null;
+    if(area) area.querySelectorAll('.doc *').forEach(el=>{
+      el.style.cursor='';
+      el.removeEventListener('click',_styleClickHandler,true);
+    });
+    // ハイライト解除
+    document.querySelectorAll('.__style-selected').forEach(el=>el.classList.remove('__style-selected'));
+  }
+}
+
+function _styleClickHandler(e){
+  if(!_styleMode) return;
+  e.preventDefault(); e.stopPropagation();
+  document.querySelectorAll('.__style-selected').forEach(el=>el.classList.remove('__style-selected'));
+  _styleTarget = e.currentTarget;
+  _styleTarget.classList.add('__style-selected');
+  _syncStylePanel(_styleTarget);
+}
+
+function _syncStylePanel(el){
+  if(!el) return;
+  const cs = window.getComputedStyle(el);
+  const s = el.style;
+  // 外枠
+  const bv = s.border||s.borderTop||'';
+  document.getElementById('sp_borderType').value = bv.includes('dashed')?'dashed':bv.includes('dotted')?'dotted':bv.includes('double')?'double':bv?'solid':'none';
+  const bm = (s.border||'').match(/\d+/); 
+  document.getElementById('sp_borderWidth').value = bm?bm[0]:'1';
+  const bc = (s.border||'').match(/#[0-9a-fA-F]{3,6}/);
+  document.getElementById('sp_borderColor').value = bc?bc[0]:'#333333';
+  // 背景色
+  document.getElementById('sp_bgColor').value = _rgbToHex(cs.backgroundColor)||'#ffffff';
+  // テキスト色
+  document.getElementById('sp_textColor').value = _rgbToHex(cs.color)||'#000000';
+  // アンダーライン
+  const td = s.textDecoration||cs.textDecoration||'';
+  document.getElementById('sp_underline').value = td.includes('double')?'double':td.includes('underline')?'underline':'none';
+  // 余白
+  document.getElementById('sp_paddingT').value = parseInt(s.paddingTop)||0;
+  document.getElementById('sp_paddingB').value = parseInt(s.paddingBottom)||0;
+  document.getElementById('sp_paddingL').value = parseInt(s.paddingLeft)||0;
+  document.getElementById('sp_paddingR').value = parseInt(s.paddingRight)||0;
+}
+
+function _rgbToHex(rgb){
+  if(!rgb||rgb==='rgba(0, 0, 0, 0)'||rgb==='transparent') return null;
+  const m=rgb.match(/\d+/g); if(!m||m.length<3) return null;
+  return '#'+[m[0],m[1],m[2]].map(x=>parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+function applyStyle(){
+  if(!_styleTarget) return;
+  const borderType = document.getElementById('sp_borderType').value;
+  const borderWidth = document.getElementById('sp_borderWidth').value;
+  const borderColor = document.getElementById('sp_borderColor').value;
+  const bgColor = document.getElementById('sp_bgColor').value;
+  const textColor = document.getElementById('sp_textColor').value;
+  const underline = document.getElementById('sp_underline').value;
+  const pt = document.getElementById('sp_paddingT').value;
+  const pb = document.getElementById('sp_paddingB').value;
+  const pl = document.getElementById('sp_paddingL').value;
+  const pr = document.getElementById('sp_paddingR').value;
+
+  _styleTarget.style.border = borderType==='none' ? 'none' : `${borderWidth}px ${borderType} ${borderColor}`;
+  _styleTarget.style.backgroundColor = bgColor==='#ffffff' ? '' : bgColor;
+  _styleTarget.style.color = textColor==='#000000' ? '' : textColor;
+  _styleTarget.style.textDecoration = underline==='none' ? '' : underline==='double' ? 'underline double' : 'underline';
+  _styleTarget.style.padding = `${pt}px ${pr}px ${pb}px ${pl}px`;
+}
+
+function clearStyle(){
+  if(!_styleTarget) return;
+  _styleTarget.style.border='';
+  _styleTarget.style.backgroundColor='';
+  _styleTarget.style.color='';
+  _styleTarget.style.textDecoration='';
+  _styleTarget.style.padding='';
+  _syncStylePanel(_styleTarget);
+}
+
+// スタイルパネルのHTML（page-navの後に挿入）
+function _injectStylePanel(){
+  if(document.getElementById('stylePanel')) return;
+  const panel = document.createElement('div');
+  panel.id='stylePanel';
+  panel.style.cssText='display:none;align-items:center;gap:8px;padding:4px 10px;background:#1e293b;border-bottom:1px solid #334155;flex-wrap:wrap;font-size:11px;font-family:sans-serif;color:#e2e8f0;';
+  panel.innerHTML=`
+    <span style="color:#f59e0b;font-weight:700;">🎨 クリックで要素を選択</span>
+    <span style="color:#64748b;">｜</span>
+    <label>外枠:
+      <select id="sp_borderType" style="background:#334155;color:#e2e8f0;border:none;padding:2px;">
+        <option value="none">なし</option>
+        <option value="solid">実線</option>
+        <option value="dashed">点線</option>
+        <option value="dotted">破線</option>
+        <option value="double">二重線</option>
+      </select>
+    </label>
+    <input id="sp_borderWidth" type="number" min="1" max="5" value="1" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;">px
+    <input id="sp_borderColor" type="color" value="#333333" style="width:28px;height:24px;border:none;cursor:pointer;">
+    <span style="color:#64748b;">｜</span>
+    <label>背景: <input id="sp_bgColor" type="color" value="#ffffff" style="width:28px;height:24px;border:none;cursor:pointer;"></label>
+    <label>文字色: <input id="sp_textColor" type="color" value="#000000" style="width:28px;height:24px;border:none;cursor:pointer;"></label>
+    <span style="color:#64748b;">｜</span>
+    <label>下線:
+      <select id="sp_underline" style="background:#334155;color:#e2e8f0;border:none;padding:2px;">
+        <option value="none">なし</option>
+        <option value="underline">実線</option>
+        <option value="double">二重線</option>
+      </select>
+    </label>
+    <span style="color:#64748b;">｜</span>
+    <label>余白(上): <input id="sp_paddingT" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
+    <label>下: <input id="sp_paddingB" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
+    <label>左: <input id="sp_paddingL" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
+    <label>右: <input id="sp_paddingR" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
+    <span style="color:#64748b;">｜</span>
+    <button onclick="applyStyle()" style="background:#059669;color:white;border:none;padding:3px 10px;border-radius:4px;cursor:pointer;">✅ 適用</button>
+    <button onclick="clearStyle()" style="background:#dc2626;color:white;border:none;padding:3px 10px;border-radius:4px;cursor:pointer;">🗑 クリア</button>
+  `;
+  // page-navの後に挿入
+  const nav = document.querySelector('.page-nav');
+  if(nav) nav.parentNode.insertBefore(panel, nav.nextSibling);
+}
+
+// .__style-selected のCSS
+function _injectStyleCSS(){
+  if(document.getElementById('__styleEditorCSS')) return;
+  const st=document.createElement('style');
+  st.id='__styleEditorCSS';
+  st.textContent='.__style-selected{outline:2px solid #f59e0b!important;outline-offset:1px!important;}';
+  document.head.appendChild(st);
+}
+
+// 初期化（DOMContentLoaded後）
+document.addEventListener('DOMContentLoaded',()=>{_injectStylePanel();_injectStyleCSS();});
+
 // ===== ページナビ =====
 function scrollToPage(n){const area=document.getElementById('pageArea');if(!area)return;const docs=area.querySelectorAll('.doc');if(docs[n-1])docs[n-1].scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.pn-btn-page').forEach((b,i)=>b.classList.toggle('active',i===n-1));}
 function setupPageTracker(){const area=document.getElementById('pageArea');if(!area)return;area.addEventListener('scroll',()=>{const docs=area.querySelectorAll('.doc');const areaTop=area.getBoundingClientRect().top;let active=0;docs.forEach((d,i)=>{if(d.getBoundingClientRect().top-areaTop<100)active=i;});document.querySelectorAll('.pn-btn-page').forEach((b,i)=>b.classList.toggle('active',i===active));});}
