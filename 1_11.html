@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.25</div>
+    <div class="ver">ver.20260416.26</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -158,30 +158,24 @@ function p(){
   </tr>
   <tr style="height:2.5em;">
     <td>日本人労働者</td>
-    <td style="text-align:right;">${f('f_jpVQ')||'0'}</td>
-    <td>名</td>
-    <td style="text-align:right;">${f('f_jpIQ')||'0'}</td>
-    <td>名</td>
+    <td colspan="2">${f('f_jpVQ')||'0'}　名</td>
+    <td colspan="2">${f('f_jpIQ')||'0'}　名</td>
   </tr>
   <tr style="height:2.5em;">
     <td>外国人労働者</td>
-    <td style="text-align:right;">${f('f_fgnVQ')||'0'}</td>
-    <td>名</td>
-    <td style="text-align:right;">${f('f_fgnIQ')||'0'}</td>
-    <td>名</td>
+    <td colspan="2">${f('f_fgnVQ')||'0'}　名</td>
+    <td colspan="2">${f('f_fgnIQ')||'0'}　名</td>
   </tr>
   <tr>
     <td rowspan="2">（２）前１年間の行方不明者数</td>
     <td>特定技能１号及び２号</td>
-    <td style="text-align:right;">0</td>
-    <td>名</td>
+    <td colspan="2">0　名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
     <td>□　該当あり<br>☑　該当なし</td>
   </tr>
   <tr>
     <td>技能実習</td>
-    <td style="text-align:right;">0</td>
-    <td>名</td>
+    <td colspan="2">0　名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
     <td>□　該当あり<br>☑　該当なし</td>
   </tr>
