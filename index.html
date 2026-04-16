@@ -179,10 +179,27 @@ open_doc('home');
 // ===== index案件選択 =====
 const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
 const IDX_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
-async function idxSb(path){
-  const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
-  const d=await r.json();
-  return Array.isArray(d)?d:[];
+async function idxSb(path, allPages=false){
+  if(!allPages){
+    const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
+    const d=await r.json();
+    return Array.isArray(d)?d:[];
+  }
+  // 全件取得（ページネーション）
+  const pageSize=1000;
+  let all=[], offset=0;
+  while(true){
+    const sep=path.includes('?')?'&':'?';
+    const r=await fetch(IDX_URL+path+sep+`limit=${pageSize}&offset=${offset}`,{
+      headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Range-Unit':'items','Range':`${offset}-${offset+pageSize-1}`}
+    });
+    const d=await r.json();
+    if(!Array.isArray(d)||d.length===0) break;
+    all=all.concat(d);
+    if(d.length<pageSize) break;
+    offset+=pageSize;
+  }
+  return all;
 }
 
 let idxAllCases=[], idxSelectedCase=null;
@@ -194,7 +211,7 @@ async function idxInit(){
     const orgSel=document.getElementById('idx_filterOrg');
     if(orgSel) orgSel.innerHTML='<option value="">— すべて —</option>'+(orgs||[]).map(o=>`<option>${o.name}</option>`).join('');
     // 全案件
-    const cases=await idxSb('cases?select=id,name,applicant,org,company_id,emp_set_idx&order=name&limit=5000');
+    const cases=await idxSb('cases?select=id,name,applicant,org,nationality,company_id,emp_set_idx&order=applicant',true);
     idxAllCases=cases||[];
     idxBuildCompanyFilter();
     idxFilterCases();
