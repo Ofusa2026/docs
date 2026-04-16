@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260415.11</div>
+    <div class="ver">ver.20260415.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -166,12 +166,14 @@ function fitDocToPreview(){
     if(!pp || !area) return;
     const ppW = pp.clientWidth - 40;
     const docW = 794;
-    const scale = ppW < docW ? ppW / docW : 1;
-    area.style.transform = `scale(${scale})`;
-    area.style.transformOrigin = 'top left';
-    area.style.width = (100 / scale) + '%';
-    // ppの高さをscale後の高さに合わせてスクロール可能にする
-    area.parentElement.style.overflowY = 'auto';
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{
+        d.style.zoom = scale;
+      });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
   });
 }
 window.addEventListener('resize', fitDocToPreview);

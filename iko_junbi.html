@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.33</div>
+    <div class="ver">ver.20260415.34</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -275,7 +275,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.33 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.34 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 
@@ -286,12 +286,14 @@ function fitDocToPreview(){
     if(!pp || !area) return;
     const ppW = pp.clientWidth - 40;
     const docW = 794;
-    const scale = ppW < docW ? ppW / docW : 1;
-    area.style.transform = `scale(${scale})`;
-    area.style.transformOrigin = 'top left';
-    area.style.width = (100 / scale) + '%';
-    // ppの高さをscale後の高さに合わせてスクロール可能にする
-    area.parentElement.style.overflowY = 'auto';
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{
+        d.style.zoom = scale;
+      });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
   });
 }
 window.addEventListener('resize', fitDocToPreview);
