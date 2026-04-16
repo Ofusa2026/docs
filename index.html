@@ -181,7 +181,8 @@ const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
 const IDX_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVod2xnYndweWNnbG1vcGlxeXR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzMjgwMDEsImV4cCI6MjAyODkwNDAwMX0.7g6AJKczUk3cqO7dALRFqFSXeODdwsAW4EqfCKFwh0Y';
 async function idxSb(path){
   const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
-  return r.json();
+  const d=await r.json();
+  return Array.isArray(d)?d:[];
 }
 
 let idxAllCases=[], idxSelectedCase=null;
