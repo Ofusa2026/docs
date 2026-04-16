@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260416.04</div>
+    <div class="ver">ver.20260416.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -62,7 +62,7 @@
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
-    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
   </div>
   <div id="pageArea"></div>
@@ -80,41 +80,41 @@ function p(){
 <div class="page-num-label">P1</div>
 <div style="font-size:16pt;font-weight:bold;text-align:center;letter-spacing:8px;margin-bottom:8mm;">委　　　任　　　状</div>
 <div style="font-size:12pt;font-weight:bold;margin-bottom:4mm;">受任者</div>
-<div style="font-size:10pt;margin-bottom:8mm;margin-left:2em;">
+<div style="font-size:9pt;margin-bottom:8mm;margin-left:2em;">
   <div>所在地：（〒144-0052）東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階</div>
   <div>電話番号：03-6424-8849</div>
   <div>代理人氏名：　大房行政書士法人　大房　明良　　　（登録番号：第16081037号）</div>
   <div style="margin-left:2em;">（事務所名称又は法人名称＋代表行政書士氏名＋行政書士登録番号）</div>
   <div>担当者氏名：　大房　明良</div>
 </div>
-<div style="font-size:9pt;margin-bottom:6mm;border:1px solid #ccc;padding:4px 8px;">
+<div style="font-size:9pt;margin-bottom:6mm;">
   （注）個人事務所の場合：事務所代表者の事務所を行政書士証票と同一に記載すること。<br>
   　　　行政書士法人の場合：法人代表者の事業所（当該事務所が従たる事務所である場合にはその旨）を行政書士証票と同一に記載すること。
 </div>
-<div style="font-size:10pt;margin-bottom:6mm;">上記のものを代理人と定め、下記の権限を委任します。</div>
-<div style="font-size:10pt;font-weight:bold;margin-bottom:3mm;">建設特定技能受け入れ計画のオンライン申請等について</div>
-<div style="font-size:10pt;margin-bottom:2mm;">${cb(appType,'new')}　新規申請に関する次の事項</div>
-<div style="font-size:10pt;margin-bottom:2mm;">${cb(appType,'change')}　変更申請に関する次の移行</div>
-<div style="font-size:10pt;margin-bottom:4mm;">${cb(appType,'notify')}　変更届け出に関する次の事項</div>
-<div style="font-size:10pt;font-weight:bold;margin-bottom:2mm;">（注）上記いずれか一つに☑選択すること。複数選択は、委任事項が不明確となるため不可。</div>
-<div style="font-size:10pt;margin-bottom:1mm;">☑建設特定技能受入計画の申請又は届出に必要な書類の作成及び収集</div>
-<div style="font-size:10pt;margin-bottom:1mm;">☑外国人就労管理システムへの入力および当該システムを利用した代理申請</div>
-<div style="font-size:10pt;margin-bottom:2mm;margin-left:2em;">（適正な就労管理及び労働環境の確保に関する事項の宣誓については、宣誓内容を精続受入れ企業に説明してその同意を得たうえで、この同意先生の代理含む）</div>
-<div style="font-size:10pt;margin-bottom:1mm;">☑申請内容の差し戻しによる補正及び追加資料の提出</div>
-<div style="font-size:10pt;margin-bottom:1mm;">☑審査長との渉外調整（申請内容等に関する照会の対応等の一切の行為）</div>
-<div style="font-size:10pt;margin-bottom:1mm;">☑申請の取下げ及び再申請</div>
-<div style="font-size:10pt;margin-bottom:3mm;">☑建設特定技能受入計画認定証の受領に関する件</div>
-<div style="font-size:10pt;font-weight:bold;margin-bottom:6mm;">（注）上記に該当する箇所に☑選択すること。複数選択可</div>
-<div style="font-size:10pt;text-align:right;margin-bottom:2mm;">以上</div>
-<div style="font-size:10pt;text-align:right;margin-bottom:6mm;">西暦　　　${f('f_docDate')}</div>
-<div style="font-size:10pt;">
+<div style="font-size:9pt;margin-bottom:6mm;">上記のものを代理人と定め、下記の権限を委任します。</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:3mm;">建設特定技能受け入れ計画のオンライン申請等について</div>
+<div style="font-size:9pt;margin-bottom:2mm;">${cb(appType,'new')}　新規申請に関する次の事項</div>
+<div style="font-size:9pt;margin-bottom:2mm;">${cb(appType,'change')}　変更申請に関する次の移行</div>
+<div style="font-size:9pt;margin-bottom:4mm;">${cb(appType,'notify')}　変更届け出に関する次の事項</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:2mm;">（注）上記いずれか一つに☑選択すること。複数選択は、委任事項が不明確となるため不可。</div>
+<div style="font-size:9pt;margin-bottom:1mm;">☑建設特定技能受入計画の申請又は届出に必要な書類の作成及び収集</div>
+<div style="font-size:9pt;margin-bottom:1mm;">☑外国人就労管理システムへの入力および当該システムを利用した代理申請</div>
+<div style="font-size:9pt;margin-bottom:2mm;margin-left:2em;">（適正な就労管理及び労働環境の確保に関する事項の宣誓については、宣誓内容を精続受入れ企業に説明してその同意を得たうえで、この同意先生の代理含む）</div>
+<div style="font-size:9pt;margin-bottom:1mm;">☑申請内容の差し戻しによる補正及び追加資料の提出</div>
+<div style="font-size:9pt;margin-bottom:1mm;">☑審査長との渉外調整（申請内容等に関する照会の対応等の一切の行為）</div>
+<div style="font-size:9pt;margin-bottom:1mm;">☑申請の取下げ及び再申請</div>
+<div style="font-size:9pt;margin-bottom:3mm;">☑建設特定技能受入計画認定証の受領に関する件</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:6mm;">（注）上記に該当する箇所に☑選択すること。複数選択可</div>
+<div style="font-size:9pt;text-align:right;margin-bottom:2mm;">以上</div>
+<div style="font-size:9pt;text-align:right;margin-bottom:6mm;">西暦　　　${f('f_docDate')}</div>
+<div style="font-size:9pt;">
   <div style="margin-bottom:2mm;">住　　所　　${f('f_addr')}</div>
   <div style="margin-bottom:2mm;">氏名又は法人名称：　${f('f_company')}</div>
   <div style="margin-bottom:2mm;">電話番号：${f('f_tel')}</div>
   <div>役職・代表者名：　${f('f_title')}　${f('f_rep')}　　㊞</div>
 </div>
 </div>`;
-  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _fontSize = (_fontSize === 8.5) ? 9 : _fontSize;
   _applyFontSize();
   _applyInjouFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
@@ -124,7 +124,7 @@ function p(){
 function _applyInjouFontSize(){
   const st=document.getElementById('_injouStyle')||document.createElement('style');
   st.id='_injouStyle'; document.head.appendChild(st);
-  const s=_fontSize/10;
+  const s=_fontSize/9;
   st.textContent=[
     `.doc [style*="font-size:16pt"]{font-size:${(16*s).toFixed(2)}pt!important}`,
     `.doc [style*="font-size:12pt"]{font-size:${(12*s).toFixed(2)}pt!important}`,
