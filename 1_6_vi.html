@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260415.71</div>
+    <div class="ver">ver.20260415.72</div>
   </div>
   <div style="display:flex;gap:4px;align-items:center;margin-left:8px;">
     <span style="font-size:10px;color:#aaa;">言語:</span>
@@ -401,7 +401,7 @@ function p(){
 <div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">Mẫu Tham Khảo 1-6</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
-<div style="text-align:center;font-size:10pt;padding-bottom:8px;">Syarat Kerja</div>
+<div style="text-align:center;font-size:10pt;padding-bottom:8px;">Điều Kiện Tuyển Dụng</div>
 
 <div style="border:1px solid #333;">
 
@@ -584,7 +584,7 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Jam lembur</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Có hay không làm việc ngoài giờ quy định</span></td>
           <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} Có&emsp;${cb(false,'overtime_no_id')} Không</span></td>
         </tr>
         <tr>
@@ -623,10 +623,10 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
         <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. Tiền lương cơ bản&emsp;${cb(true,"cb_auto_004")} Lương tháng (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Lương ngày(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Lương giờ(${ff('es_salaryHourly')}JPY)</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*Detail ditetapkan sesuai lampiran</div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
         <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. Các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ làm việc)</span></div>
         <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">${allowLineId1}${allowLineId2}</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*Detail ditetapkan sesuai lampiran</div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
       </div>
     </div>
   </div>
@@ -718,7 +718,7 @@ function p(){
           </td>
         </tr>
         <tr>
-          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;*Detail ditetapkan sesuai lampiran</td>
+          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</td>
         </tr>
       </table>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
@@ -851,42 +851,42 @@ function p(){
 
 <div class="doc">
 <div class="page-num-label">P7</div>
-<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Item yang akan dipotong saat pembayaran gaji</span></div>
+<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Các mục khấu trừ khi thanh toán tiền lương</span></div>
   <table style="width:100%;font-size:8pt;border-collapse:collapse;">
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
       <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) Tiền thuế</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) Tiền bảo hiểm xã hội</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) Tiền bảo hiểm tuyển dụng</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) Tiền ăn</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) Tiền nhà</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) Tiền khác (Tiền nước, điện, ga)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">(${f('es_deductOther1NameEn')})</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
