@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.13</div>
+    <div class="ver">ver.20260416.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -100,12 +100,12 @@ function p(){
     offRows+='<tr>'
       +leftCell
       +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+nums[i]+'</td>'
-      +'<td style="height:1.8em;">'+f(kanaKey)+'</td>'
+      +'<td style="height:3em;">'+f(kanaKey)+'</td>'
       +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
       +'<td rowspan="2">'+f(titleKey)+'</td>'
       +'</tr>'
       +'<tr>'
-      +'<td style="height:1.8em;">'+f(nameKey)+'</td>'
+      +'<td style="height:3em;">'+f(nameKey)+'</td>'
       +'</tr>';
   }
 
@@ -131,10 +131,10 @@ function p(){
     <th style="width:26.6%;">前々年度</th>
     <th style="width:26.6%;">前々々年度</th>
   </tr>
-  <tr><td>売上高</td><td>${f('f_salesY1')}円</td><td>${f('f_salesY2')}円</td><td>${f('f_salesY3')}円</td></tr>
-  <tr><td>経常損益</td><td>${f('f_plY1')}円</td><td>${f('f_plY2')}円</td><td>${f('f_plY3')}円</td></tr>
-  <tr><td>純損益</td><td>${f('f_netY1')}円</td><td>${f('f_netY2')}円</td><td>${f('f_netY3')}円</td></tr>
-  <tr><td>純資産</td><td>${f('f_assetsY1')}円</td><td>${f('f_assetsY2')}円</td><td>${f('f_assetsY3')}円</td></tr>
+  <tr style="height:3em;"><td>売上高</td><td>${f('f_salesY1')}円</td><td>${f('f_salesY2')}円</td><td>${f('f_salesY3')}円</td></tr>
+  <tr style="height:3em;"><td>経常損益</td><td>${f('f_plY1')}円</td><td>${f('f_plY2')}円</td><td>${f('f_plY3')}円</td></tr>
+  <tr style="height:3em;"><td>純損益</td><td>${f('f_netY1')}円</td><td>${f('f_netY2')}円</td><td>${f('f_netY3')}円</td></tr>
+  <tr style="height:3em;"><td>純資産</td><td>${f('f_assetsY1')}円</td><td>${f('f_assetsY2')}円</td><td>${f('f_assetsY3')}円</td></tr>
 </table>
 <div style="font-size:8pt;margin-bottom:3mm;">
 （注意）<br>
