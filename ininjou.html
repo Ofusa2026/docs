@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260416.06</div>
+    <div class="ver">ver.20260416.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -70,10 +70,12 @@
 </div>
 <script src="ofusa_common.js?v=1776264504"></script>
 <script>
+let _appType2 = 'change'; // 'new'/'change'/'notify'
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  const appType=document.getElementById('f_appType')?.value||'change';
+  const appType=_appType2;
   const cb=(val, target)=>val===target?'☑':'□';
   w.innerHTML=`
 <div class="doc">
@@ -93,9 +95,9 @@ function p(){
 </div>
 <div style="font-size:9pt;margin-bottom:6mm;">上記のものを代理人と定め、下記の権限を委任します。</div>
 <div style="font-size:9pt;font-weight:bold;margin-bottom:3mm;">建設特定技能受け入れ計画のオンライン申請等について</div>
-<div style="font-size:9pt;margin-bottom:2mm;">${cb(appType,'new')}　新規申請に関する次の事項</div>
-<div style="font-size:9pt;margin-bottom:2mm;">${cb(appType,'change')}　変更申請に関する次の移行</div>
-<div style="font-size:9pt;margin-bottom:4mm;">${cb(appType,'notify')}　変更届け出に関する次の事項</div>
+<div style="font-size:9pt;margin-bottom:2mm;${_appType2==='new'?'background:#ffff00;':''}cursor:pointer;" onclick="toggleAppType('new')"><span class="cb cb-click" id="cb_new">${_appType2==='new'?'☑':'□'}</span>　新規申請に関する次の事項</div>
+<div style="font-size:9pt;margin-bottom:2mm;${_appType2==='change'?'background:#ffff00;':''}cursor:pointer;" onclick="toggleAppType('change')"><span class="cb cb-click" id="cb_change">${_appType2==='change'?'☑':'□'}</span>　変更申請に関する次の移行</div>
+<div style="font-size:9pt;margin-bottom:4mm;${_appType2==='notify'?'background:#ffff00;':''}cursor:pointer;" onclick="toggleAppType('notify')"><span class="cb cb-click" id="cb_notify">${_appType2==='notify'?'☑':'□'}</span>　変更届け出に関する次の事項</div>
 <div style="font-size:9pt;font-weight:bold;margin-bottom:2mm;">（注）上記いずれか一つに☑選択すること。複数選択は、委任事項が不明確となるため不可。</div>
 <div style="font-size:9pt;margin-bottom:1mm;">☑建設特定技能受入計画の申請又は届出に必要な書類の作成及び収集</div>
 <div style="font-size:9pt;margin-bottom:1mm;">☑外国人就労管理システムへの入力および当該システムを利用した代理申請</div>
@@ -131,6 +133,11 @@ function _applyInjouFontSize(){
     `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
   ].join('');
 }
+function toggleAppType(val){
+  _appType2 = (_appType2 === val) ? '' : val;
+  p();
+}
+
 function fitDocToPreview(){
   requestAnimationFrame(()=>{
     const pp=document.querySelector('.pp');
