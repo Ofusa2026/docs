@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.02</div>
+    <div class="ver">ver.20260416.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -109,24 +109,7 @@ function p(){
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">１　所属役員</div>
 <table class="tbl">
   <tbody>
-    ${Array.from({length:MAX_OFF},(_,i)=>{
-      const n=i+1;
-      const kanaKey='off'+n+'Kana', nameKey='off'+n+'Name', titleKey='off'+n+'Title';
-      return `<tr>
-        <td style="width:32%;">（ふりがな）<br>（１）役員氏名</td>
-        <td style="width:5%;text-align:center;">${'①②③④⑤'[i]}</td>
-        <td style="height:2em;">${f(kanaKey)}</td>
-        <td style="width:8%;">役職</td>
-        <td>${f(titleKey)}</td>
-      </tr>
-      <tr>
-        <td style="width:32%;"></td>
-        <td style="width:5%;"></td>
-        <td style="height:2em;">${f(nameKey)}</td>
-        <td></td>
-        <td></td>
-      </tr>`;
-    }).join('')}
+    ${offRows}
   </tbody>
 </table>
 <div style="font-size:8pt;margin-bottom:3mm;">（注意）役員が複数名いる場合は、その全てについて記載すること。なお、役員を記載しきれない場合は、「別紙のとおり」と記載し、別紙を添付することとして差し支えない。</div>
