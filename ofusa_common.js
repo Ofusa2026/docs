@@ -109,23 +109,29 @@ function saveEditedHTML(){
   const area = document.getElementById('pageArea');
   if(!area){ showToast('⚠️ プレビューがありません'); return; }
   const html = area.innerHTML;
-  const blob = new Blob([html], {type:'text/html'});
+  // 入力フォームの値を収集
+  const formData = {};
+  document.querySelectorAll('.fp-inner input, .fp-inner textarea, .fp-inner select').forEach(el=>{
+    if(el.id) formData[el.id] = el.value;
+  });
+  // HTMLと入力値をまとめて保存
+  const saveData = JSON.stringify({html, formData});
+  const blob = new Blob([saveData], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  // ファイル名：書類名_日時.html
   const now = new Date();
   const ts = now.getFullYear()+('0'+(now.getMonth()+1)).slice(-2)+('0'+now.getDate()).slice(-2)+'_'+('0'+now.getHours()).slice(-2)+('0'+now.getMinutes()).slice(-2);
   const title = document.getElementById('docTitle')?.textContent||'doc';
-  a.download = title.replace(/[📄📋\s]/g,'').replace(/[^\w　-鿿]/g,'_').slice(0,20)+'_'+ts+'.html';
+  a.download = title.replace(/[📄📋\s]/g,'').replace(/[^\w　-鿿]/g,'_').slice(0,20)+'_'+ts+'.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast('💾 保存しました');
+  showToast('💾 保存しました（入力値込み）');
 }
 
 function loadEditedHTML(){
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.html';
+  input.accept = '.html,.json';
   input.onchange = e => {
     const file = e.target.files[0];
     if(!file) return;
@@ -133,7 +139,26 @@ function loadEditedHTML(){
     reader.onload = ev => {
       const area = document.getElementById('pageArea');
       if(!area) return;
-      area.innerHTML = ev.target.result;
+      const text = ev.target.result;
+      // JSONファイル（新形式：html+formData）
+      if(file.name.endsWith('.json')){
+        try{
+          const data = JSON.parse(text);
+          if(data.html) area.innerHTML = data.html;
+          // 入力フォームの値を復元
+          if(data.formData){
+            Object.entries(data.formData).forEach(([id,val])=>{
+              const el = document.getElementById(id);
+              if(el) el.value = val;
+            });
+          }
+        }catch(err){
+          area.innerHTML = text;
+        }
+      } else {
+        // 旧形式（.html）
+        area.innerHTML = text;
+      }
       // 編集モードをONに
       _editMode = true;
       const btn = document.getElementById('editModeBtn');
