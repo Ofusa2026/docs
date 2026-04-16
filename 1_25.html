@@ -6,10 +6,11 @@
 <title>参考様式第１－２５号</title>
 <link rel="stylesheet" href="ofusa_common.css?v=1776264504">
 <style>
+.doc{padding:30mm!important;line-height:1.52!important}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:12mm 10mm!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:30mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -18,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260415.04</div>
+    <div class="ver">ver.20260415.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -60,7 +61,7 @@
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
-    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9.5pt</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
   </div>
   <div id="pageArea"></div>
@@ -71,22 +72,24 @@
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  w.innerHTML=`<div class="doc"><div class="page-num-label">P1</div>
-<div style="text-align:right;font-size:7pt;">参考様式第１－２５号</div>
-<div style="font-size:11pt;font-weight:bold;text-align:center;margin:4mm 0;">登録支援機関との支援委託契約に関する説明書</div>
-<div style="font-size:8pt;margin-bottom:4mm;">　登録支援機関との１号特定技能外国人支援計画の全部の委託契約の概要は下記のとおりです。</div>
-<div style="font-size:8pt;font-weight:bold;margin-bottom:2mm;">記</div>
-<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:4mm;">
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:right;font-size:7pt;margin-bottom:2mm;">参考様式第１－２５号</div>
+<div style="font-size:18pt;font-weight:bold;text-align:center;margin:4mm 0;">登録支援機関との支援委託契約に関する説明書</div>
+<div style="margin-bottom:24px;">　登録支援機関との１号特定技能外国人支援計画の全部の委託契約の概要は下記のとおりです。</div>
+<div style="margin-bottom:24px;">記</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
   <tr>
     <td style="border:1px solid #555;padding:3px 6px;width:5%;text-align:center;">１</td>
-    <td style="border:1px solid #555;padding:3px 6px;width:40%;">申請人（支援対象者）</td>
+    <td style="border:1px solid #555;padding:3px 6px;width:42%;">申請人（支援対象者）</td>
     <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_applicant')}</td>
   </tr>
   <tr>
     <td style="border:1px solid #555;padding:3px 6px;text-align:center;">２</td>
     <td style="border:1px solid #555;padding:3px 6px;">契約の相手方（登録支援機関）</td>
     <td style="border:1px solid #555;padding:3px 6px;">${f('f_soName')}</td>
-    <td style="border:1px solid #555;padding:3px 6px;font-size:7.5pt;white-space:nowrap;">（${f('f_soNo')}）</td>
+    <td style="border:1px solid #555;padding:3px 6px;white-space:nowrap;">（${f('f_soNo')}）</td>
   </tr>
   <tr>
     <td style="border:1px solid #555;padding:3px 6px;text-align:center;">３</td>
@@ -109,18 +112,20 @@ function p(){
     <td style="border:1px solid #555;padding:3px 6px;" colspan="2">${f('f_docDate')}から${f('f_contractEnd')}まで</td>
   </tr>
 </table>
-<div style="font-size:7.5pt;margin-bottom:4mm;line-height:1.7;">
+<div style="margin-bottom:24px;font-size:9pt;">
 （注意）<br>
 １　項番１に関し、複数の申請人（同時申請に限る。）について、全ての項目の内容が同一の場合には「別紙のとおり」として別紙を添付して差し支えない。<br>
 ２　項番２に関し、登録支援機関登録簿に登録された氏名又は名称を記載すること。
 </div>
-<div style="font-size:8pt;margin-bottom:2mm;">${f('f_docDate')}</div>
-<div style="font-size:8pt;margin-bottom:1mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
-<div style="font-size:8pt;">作成責任者　役職・氏名　　${f('f_author')}</div>
+<div style="margin-bottom:4px;">${f('f_docDate')}</div>
+<div style="margin-bottom:2px;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
+<div>作成責任者　役職・氏名　　${f('f_author')}</div>
 </div>`;
-  if(_fontSize!==8.5) _applyFontSize();
+  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
 }
-
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
@@ -151,7 +156,6 @@ async function loadFromDB(){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
-
 initCaseSelect(); p();
 </script>
 </body>
