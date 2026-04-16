@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.27</div>
+    <div class="ver">ver.20260415.28</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -187,19 +187,17 @@ function p(){
 
 <div class="doc">
 <div class="page-num-label">P3</div>
-<div style="font-size:8.5pt;line-height:1.8;">
-    <div style="font-size:9pt;" class="indent1">
-      ・　労働，社会保険及び租税に関する法令を遵守していること（保険料や税に滞納がないことを含む。）<br>
-      ・　前科，暴力団関係等に該当しないこと<br>
-      ・　技能実習法第16条第１項の規定により実習認定を取り消された者ではないこと（受入れ機関及びその役員が技能実習法第16条第１項の規定により実習認定を取り消された法人の役員であったことがないことを含む。）<br>
-      ・　受入れ機関及びその役員が５年以内に出入国又は労働に関する法令に関し不正又は著しく不当な行為をしたことがないこと
-    </div>
-  <div style="margin-top:12px;">（注１）上記２から７までについて該当するものにチェックマークを付し，必要な事項を記入してください。</div>
-  <div style="margin-top:8px;">（注２）本説明書に虚偽の記載があった場合には，入管法に関し，不正又は著しく不当な行為を行ったものとして，特定技能外国人等の受入れができないこととなることがあります。</div>
-  <div style="margin-top:8px;">（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで在留資格「特定技能１号」への在留資格変更許可申請に係る準備のための在留資格であることから，許可がされたからといって在留資格「特定技能１号」への許可の基準に適合していることを確認するものではありません。したがって，申請人が今後「特定技能１号」への在留資格変更許可申請の審査において，入管法，法務省令，各分野固有の基準への適合性が求められることから，その手続等について関係機関に問合せを行うなど確認を十分に行った上，申請人が円滑に「特定技能１号」へ移行できるよう準備を行ってください。</div>
-  <div style="margin-top:8px;text-align:right;">${f('f_date')}</div>
-  <div style="text-align:right;">受入れ機関名　　　　　${f('f_orgName')}</div>
+<div class="indent1" style="margin-bottom:24px;">
+  <div>・　労働，社会保険及び租税に関する法令を遵守していること（保険料や税に滞納がないことを含む。）</div>
+  <div>・　前科，暴力団関係等に該当しないこと</div>
+  <div>・　技能実習法第16条第１項の規定により実習認定を取り消された者ではないこと（受入れ機関及びその役員が技能実習法第16条第１項の規定により実習認定を取り消された法人の役員であったことがないことを含む。）</div>
+  <div>・　受入れ機関及びその役員が５年以内に出入国又は労働に関する法令に関し不正又は著しく不当な行為をしたことがないこと</div>
 </div>
+<div style="margin-bottom:8px;">（注１）上記２から７までについて該当するものにチェックマークを付し，必要な事項を記入してください。</div>
+<div style="margin-bottom:8px;">（注２）本説明書に虚偽の記載があった場合には，入管法に関し，不正又は著しく不当な行為を行ったものとして，特定技能外国人等の受入れができないこととなることがあります。</div>
+<div style="margin-bottom:24px;">（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで在留資格「特定技能１号」への在留資格変更許可申請に係る準備のための在留資格であることから，許可がされたからといって在留資格「特定技能１号」への許可の基準に適合していることを確認するものではありません。したがって，申請人が今後「特定技能１号」への在留資格変更許可申請の審査において，入管法，法務省令，各分野固有の基準への適合性が求められることから，その手続等について関係機関に問合せを行うなど確認を十分に行った上，申請人が円滑に「特定技能１号」へ移行できるよう準備を行ってください。</div>
+<div style="text-align:right;margin-bottom:4px;">${f('f_date')}</div>
+<div style="text-align:right;">受入れ機関名　　　　　${f('f_orgName')}</div>
 </div>`;
 
   _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
@@ -274,7 +272,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.27 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.28 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
