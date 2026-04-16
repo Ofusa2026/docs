@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－１１号</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+.fp-case{display:none!important;}
+.doc{padding:15mm!important;line-height:1.4!important;min-height:auto!important}
+.tbl{width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:4mm;}
+.tbl td,.tbl th{border:1px solid #333;padding:2px 4px;vertical-align:top;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
+    <div class="ver">ver.20260416.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case"></div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者役職・氏名</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">決算状況</div>
+      <div class="fg"><label>売上高（前年度）</label><input id="f_salesY1" oninput="p()"></div>
+      <div class="fg"><label>売上高（前々年度）</label><input id="f_salesY2" oninput="p()"></div>
+      <div class="fg"><label>売上高（前々々年度）</label><input id="f_salesY3" oninput="p()"></div>
+      <div class="fg"><label>経常損益（前年度）</label><input id="f_plY1" oninput="p()"></div>
+      <div class="fg"><label>経常損益（前々年度）</label><input id="f_plY2" oninput="p()"></div>
+      <div class="fg"><label>経常損益（前々々年度）</label><input id="f_plY3" oninput="p()"></div>
+      <div class="fg"><label>純損益（前年度）</label><input id="f_netY1" oninput="p()"></div>
+      <div class="fg"><label>純損益（前々年度）</label><input id="f_netY2" oninput="p()"></div>
+      <div class="fg"><label>純損益（前々々年度）</label><input id="f_netY3" oninput="p()"></div>
+      <div class="fg"><label>純資産（前年度）</label><input id="f_assetsY1" oninput="p()"></div>
+      <div class="fg"><label>純資産（前々年度）</label><input id="f_assetsY2" oninput="p()"></div>
+      <div class="fg"><label>純資産（前々々年度）</label><input id="f_assetsY3" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">離職状況</div>
+      <div class="fg"><label>日本人自発的離職</label><input id="f_jpVQ" oninput="p()" placeholder="名"></div>
+      <div class="fg"><label>日本人非自発的離職</label><input id="f_jpIQ" oninput="p()" placeholder="名"></div>
+      <div class="fg"><label>外国人自発的離職</label><input id="f_fgnVQ" oninput="p()" placeholder="名"></div>
+      <div class="fg"><label>外国人非自発的離職</label><input id="f_fgnIQ" oninput="p()" placeholder="名"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776316942"></script>
+<script>
+const MAX_OFF=5;
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+
+  // 役員行の生成
+  const offRows=Array.from({length:MAX_OFF},(_,i)=>{
+    const n=i+1, num='①②③④⑤'[i];
+    return `<tr>
+      <td rowspan="2" style="width:32%;vertical-align:middle;">（ふりがな）<br>（${n}）役員氏名</td>
+      <td style="width:5%;text-align:center;" rowspan="2">${num}</td>
+      <td></td>
+      <td style="width:8%;">役職</td>
+      <td></td>
+    </tr>
+    <tr><td></td><td></td><td></td></tr>`;
+  }).join('');
+
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:9pt;margin-bottom:1mm;">参考様式第１－１１－１号</div>
+<div style="font-size:16pt;font-weight:bold;text-align:center;margin-bottom:4mm;">特定技能所属機関概要書</div>
+
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">１　所属役員</div>
+<table class="tbl">
+  <thead>
+    <tr>
+      <th style="width:32%;">（ふりがな）<br>（１）役員氏名</th>
+      <th style="width:5%;"></th>
+      <th></th>
+      <th style="width:8%;">役職</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>${offRows}</tbody>
+</table>
+<div style="font-size:8pt;margin-bottom:4mm;">
+（注意）役員が複数名いる場合は、その全てについて記載すること。なお、役員を記載しきれない場合は、「別紙のとおり」と記載し、別紙を添付することとして差し支えない。
+</div>
+
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">２　決算状況</div>
+<table class="tbl" style="margin-bottom:2mm;">
+  <tr>
+    <th style="width:20%;"></th>
+    <th>前年度</th>
+    <th>前々年度</th>
+    <th>前々々年度</th>
+  </tr>
+  <tr><td>売上高</td><td>${f('f_salesY1')}円</td><td>${f('f_salesY2')}円</td><td>${f('f_salesY3')}円</td></tr>
+  <tr><td>経常損益</td><td>${f('f_plY1')}円</td><td>${f('f_plY2')}円</td><td>${f('f_plY3')}円</td></tr>
+  <tr><td>純損益</td><td>${f('f_netY1')}円</td><td>${f('f_netY2')}円</td><td>${f('f_netY3')}円</td></tr>
+  <tr><td>純資産</td><td>${f('f_assetsY1')}円</td><td>${f('f_assetsY2')}円</td><td>${f('f_assetsY3')}円</td></tr>
+</table>
+<div style="font-size:8pt;margin-bottom:4mm;">
+（注意）<br>
+１　個人事業主の場合には、純資産の欄に所得税青色申告決算書の貸借対照表における元入金を記載してください。<br>
+２　前年度末において債務超過（純資産の欄がマイナス）がある場合には、中小企業診断士、税理士、公認会計士等の企業評価を行う能力があると認められる公的資格を有する第三者が改善の見通しについて評価を行った書面を添付してください。
+</div>
+
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">３　基準適合性に係る事項</div>
+<table class="tbl">
+  <tr>
+    <td rowspan="5" style="width:28%;">（１）過去１年における特定技能外国人と同種の業務に従事する労働者の離職状況</td>
+    <td rowspan="3" style="width:15%;"></td>
+    <td colspan="2" style="text-align:center;">離職理由</td>
+    <td rowspan="3"></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">自発的離職者</td>
+    <td style="text-align:center;">非自発的離職者</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;"></td>
+    <td style="text-align:center;"></td>
+  </tr>
+  <tr>
+    <td>日本人労働者</td>
+    <td>${f('f_jpVQ')||'0'}名</td>
+    <td>${f('f_jpIQ')||'0'}名</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>外国人労働者</td>
+    <td>${f('f_fgnVQ')||'0'}名</td>
+    <td>${f('f_fgnIQ')||'0'}名</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td rowspan="2">（２）前１年間の行方不明者数</td>
+    <td>特定技能１号及び２号</td>
+    <td>0名</td>
+    <td>うち責めに帰すべき事由による行方不明</td>
+    <td>□　該当あり<br>■　該当なし</td>
+  </tr>
+  <tr>
+    <td>技能実習</td>
+    <td>0名</td>
+    <td>うち責めに帰すべき事由による行方不明</td>
+    <td>□　該当あり<br>■　該当なし</td>
+  </tr>
+</table>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:8pt;margin-bottom:3mm;">
+（注意）<br>
+１　（１）の「自発的離職」とは、特定技能外国人の自己都合による転職や退職をいい、「非自発的離職」とは、特定技能所属機関の経営上の都合により、人員整理を行うために希望退職を募集したり又は退職勧奨を行った場合等をいう。<br>
+２　（１）の「外国人労働者」とは、入管法別表第１の１、２及び５の表（就労資格に限る）の在留資格をもって在留する者をいう。<br>
+３　（２）は、特定技能所属機関が雇用する特定技能外国人の過去１年間における行方不明者の発生状況について記載すること。また、特定技能所属機関の責めに帰すべき事由により行方不明者が発生している場合は「該当あり」に、特定技能所属機関の責めによらない理由で行方不明者が発生している場合は「該当なし」にチェックマークを付すこと。<br>
+４　（２）は、特定技能所属機関が、技能実習制度における実習実施者である場合は、過去１年間における技能実習生の行方不明者の発生状況についても記載すること。
+</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">４　中長期在留者の受入れ実績等（１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は記載不要。）</div>
+<table class="tbl">
+  <tr>
+    <td rowspan="4" style="width:6%;text-align:center;">(１)<br>□</td>
+    <td rowspan="4" style="width:28%;">過去２年間に中長期在留者（注）の受入れ又は管理を適正に行った実績を有すること</td>
+    <td rowspan="2" style="width:8%;">受入れ・管理人数</td>
+    <td colspan="2">受入れ期間中の法令遵守</td>
+  </tr>
+  <tr><td></td><td></td></tr>
+  <tr>
+    <td>直近１年前</td>
+    <td style="text-align:center;">　　　　　名</td>
+    <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
+  </tr>
+  <tr>
+    <td>直近２年前</td>
+    <td style="text-align:center;">　　　　　名</td>
+    <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="text-align:center;">(２)<br>□</td>
+    <td rowspan="2">支援責任者及び支援担当者が過去２年間に中長期在留者（注）の生活相談業務に従事した経験を有すること</td>
+    <td colspan="3">
+      <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+        <tr>
+          <td style="border:1px solid #333;padding:2px;width:15%;">支援責任者</td>
+          <td style="border:1px solid #333;padding:2px;">生活相談業務期間</td>
+          <td style="border:1px solid #333;padding:2px;">年　月　日〜　年　月　日</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #333;padding:2px;"></td>
+          <td style="border:1px solid #333;padding:2px;">生活相談業務に従事した機関</td>
+          <td style="border:1px solid #333;padding:2px;">機関名称：<br>所在地：</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="3">
+      <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+        <tr>
+          <td style="border:1px solid #333;padding:2px;width:15%;">支援担当者</td>
+          <td style="border:1px solid #333;padding:2px;">生活相談業務期間</td>
+          <td style="border:1px solid #333;padding:2px;">年　月　日〜　年　月　日</td>
+        </tr>
+        <tr>
+          <td style="border:1px solid #333;padding:2px;"></td>
+          <td style="border:1px solid #333;padding:2px;">生活相談業務に従事した機関</td>
+          <td style="border:1px solid #333;padding:2px;">機関名称：<br>所在地：</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">(３)<br>□</td>
+    <td colspan="4">（１）及び（２）に掲げるもののほか、これらの者と同程度に支援業務を適正に実施することができること</td>
+  </tr>
+</table>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+<div style="font-size:8pt;margin-bottom:3mm;">
+（注意）<br>
+１　本欄は（１）から（３）欄の該当するものにチェックマークを付した上、記載すること。<br>
+２　「中長期在留者」とは、入管法別表第１の１の表、２の表及び５の表（就労資格に限る。）の上欄の在留資格を有する者をいう。<br>
+３　（１）欄の「適正に行った」とは、入管法、技能実習法及び労働基準法など出入国又は労働に関する法令の規定に違反したことにより、①刑に処せられたこと、②行政処分を受けたことのほか、③技能実習法上の改善命令又は改善勧告を受けていないことをいう。適正に行っている場合は「法令遵守」に、適正に行っていない場合は「法令違反・行政指導あり」にチェックマークを付すこと。
+</div>
+<div style="font-size:8pt;margin-bottom:2mm;">
+（注意）添付書類（（１）に該当する場合）<br>
+※以下の添付書類を提出すること。ただし、監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は、添付書類の提出不要。<br>
+□　受け入れた中長期在留者リスト（参考様式第１－１１－２号）
+</div>
+<div style="font-size:8pt;margin-bottom:2mm;">
+（注意）添付書類（（２）に該当する場合）<br>
+※以下の添付書類を提出すること。<br>
+必須　□　生活相談業務を行った中長期在留者リスト（参考様式第１－１１－３号）<br>
+いずれか<br>
+※生活相談の対象者の所属機関が同一の場合<br>
+□　当該機関で生活相談業務に従事したこと及びその期間を証する書類<br>
+※生活相談の対象者の所属機関が同一でない場合<br>
+□　対象者の生活相談業務に係る契約書及びその契約に基づき報酬を受けたことを証する書類<br>
+□　その他（　　　　　　　　　　　　　　　　　）
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">５　支援体制に関する事項（１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は記載不要。）</div>
+<table class="tbl">
+  <tr>
+    <th style="width:5%;">　</th>
+    <th colspan="2">支援対象者（申請人）</th>
+    <th colspan="2">支援責任者</th>
+    <th colspan="2">支援担当者</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th>氏名</th>
+    <th>所属部署<br>役職</th>
+    <th>氏名</th>
+    <th>所属部署<br>役職</th>
+    <th>氏名</th>
+    <th>所属部署<br>役職</th>
+  </tr>
+  <tr><td style="text-align:center;">1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td style="text-align:center;">2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td style="text-align:center;">3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<div style="font-size:8pt;margin-bottom:4mm;">（注意）申請人全員について記載しきれない場合は、「別紙のとおり」と記載し、別紙を添付することとして差し支えない。</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P5</div>
+<div style="font-size:9pt;margin-bottom:8mm;">上記の記載内容は、事実と相違ありません。</div>
+<div style="text-align:right;margin-bottom:4mm;">${f('f_docDate')}</div>
+<div style="text-align:right;margin-bottom:2mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
+<div style="text-align:right;">作成責任者　役職・氏名　　${f('f_author')}</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P6</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:2mm;">別紙</div>
+<table class="tbl">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:32%;">（ふりがな）<br>（１）役員氏名</th>
+      <th rowspan="2" style="width:5%;text-align:center;">番号</th>
+      <th>ふりがな</th>
+      <th rowspan="2" style="width:8%;">役職</th>
+      <th>役職名</th>
+    </tr>
+    <tr><th>氏名</th><th></th></tr>
+  </thead>
+  <tbody>
+    ${Array.from({length:10},(_,i)=>{
+      const kanaKey='off'+(i+1)+'Kana', nameKey='off'+(i+1)+'Name', titleKey='off'+(i+1)+'Title';
+      return `<tr>
+        <td rowspan="2" style="vertical-align:middle;"></td>
+        <td rowspan="2" style="text-align:center;">${i+1}</td>
+        <td>${f(kanaKey)}</td>
+        <td rowspan="2" style="vertical-align:middle;text-align:center;">役職</td>
+        <td>${f(titleKey)}</td>
+      </tr>
+      <tr><td>${f(nameKey)}</td><td></td></tr>`;
+    }).join('')}
+  </tbody>
+</table>
+<div style="font-size:8pt;">（注意）</div>
+</div>`;
+
+  _fontSize = (_fontSize === 8.5) ? 9 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp');
+    const area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40; const docW=794;
+    if(ppW<docW){const scale=ppW/docW;area.querySelectorAll('.doc').forEach(d=>{d.style.zoom=scale;});}
+    else{area.querySelectorAll('.doc').forEach(d=>{d.style.zoom=1;});}
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel||!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName}=info;
+  try{
+    const q=companyId?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fgn_voluntary_quit,fgn_involuntary_quit,officers&id=eq.${companyId}`
+      :companyName?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fgn_voluntary_quit,fgn_involuntary_quit,officers&name=eq.${encodeURIComponent(companyName)}`:null;
+    if(!q) return;
+    const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null)e.value=val;};
+    s('f_company',co.name||'');
+    s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+    s('f_salesY1',co.sales_y1||'');s('f_salesY2',co.sales_y2||'');s('f_salesY3',co.sales_y3||'');
+    s('f_plY1',co.ordinary_pl_y1||'');s('f_plY2',co.ordinary_pl_y2||'');s('f_plY3',co.ordinary_pl_y3||'');
+    s('f_netY1',co.net_pl_y1||'');s('f_netY2',co.net_pl_y2||'');s('f_netY3',co.net_pl_y3||'');
+    s('f_assetsY1',co.net_assets_y1||'');s('f_assetsY2',co.net_assets_y2||'');s('f_assetsY3',co.net_assets_y3||'');
+    s('f_jpVQ',co.jp_voluntary_quit||'');s('f_jpIQ',co.jp_involuntary_quit||'');
+    s('f_fgnVQ',co.fgn_voluntary_quit||'');s('f_fgnIQ',co.fgn_involuntary_quit||'');
+    const officers=Array.isArray(co.officers)?co.officers:[];
+    officers.forEach((o,i)=>{if(i>=10)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');s(`off${i+1}Title`,o.title||'');});
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+
+window.addEventListener('message', function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info; if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){try{const d=JSON.parse(o.value);if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}}catch(e2){}}
+    if(!found){const opt=document.createElement('option');opt.value=JSON.stringify(info);opt.textContent='（indexから選択）';sel.appendChild(opt);sel.value=opt.value;}
+  }
+  if(typeof loadFromDB==='function') loadFromDB();
+});
+
+initCaseSelect(); p();
+</script>
+</body>
+</html>
