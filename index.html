@@ -47,8 +47,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <select id="idx_filterOrg" onchange="idxFilterCases()"></select>
       <label>🏢 所属機関</label>
       <select id="idx_filterCompany" onchange="idxFilterCases()"></select>
-      <label>🔤 検索（名前）</label>
-      <input id="idx_filterText" placeholder="名前で絞り込み" oninput="idxFilterCases()">
+      <label>🔤 検索</label>
+      <input id="idx_filterText" placeholder="案件名・申請人・所属機関・国籍" oninput="idxFilterCases()">
       <label>👤 案件選択 <span class="case-badge" id="idx_caseCount">-</span></label>
       <select id="idx_caseSelect" size="1" onchange="idxCaseSelected()"></select>
     </div>
@@ -206,7 +206,12 @@ function idxFilterCases(){
   const text=(document.getElementById('idx_filterText')?.value||'').toLowerCase();
   let filtered=idxAllCases;
   if(company) filtered=filtered.filter(c=>c.org===company);
-  if(text) filtered=filtered.filter(c=>(c.applicant||'').toLowerCase().includes(text)||(c.name||'').toLowerCase().includes(text));
+  if(text) filtered=filtered.filter(c=>
+    (c.applicant||'').toLowerCase().includes(text)||
+    (c.name||'').toLowerCase().includes(text)||
+    (c.org||'').toLowerCase().includes(text)||
+    (c.nationality||'').toLowerCase().includes(text)
+  );
   const sel=document.getElementById('idx_caseSelect');
   if(sel) sel.innerHTML='<option value="">← 案件を選択</option>'+filtered.map(c=>`<option value='${JSON.stringify({caseId:c.id,companyId:c.company_id,companyName:c.org,empSetIdx:c.emp_set_idx||0})}'>${c.applicant||c.name||c.id}</option>`).join('');
   const badge=document.getElementById('idx_caseCount');
