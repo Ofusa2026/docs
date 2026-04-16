@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 申請内容変更申出書</div>
-    <div class="ver">ver.20260416.07</div>
+    <div class="ver">ver.20260416.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -89,49 +89,50 @@ function p(){
   const autoImm = getImm(v('f_appNo'));
   const immText = autoImm || f('f_imm');
   w.innerHTML=`
+
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:6.5pt;margin-bottom:2mm;">別記第三十号の三様式（第二十一条の三，第二十条の四関係）</div>
-<div style="text-align:right;font-size:9pt;margin-bottom:4mm;">日本国政府法務省</div>
-<div style="font-size:13pt;font-weight:bold;text-align:center;letter-spacing:6px;margin-bottom:6mm;">申　請　内　容　変　更　申　出　書</div>
-<div style="font-size:9pt;margin-bottom:1mm;">${immText}<span style="margin-left:2em;">出入国在留管理局長　　殿</span></div>
-<div style="border-bottom:1px solid #333;margin-bottom:2mm;width:14em;"></div>
-<div style="margin-bottom:2em;"></div>
-<div style="font-size:9pt;margin-bottom:6mm;">　出入国管理及び難民認定法施行規則第21条の３又は第21条の４の規定に基づき，次のとおり申請内容の変更を申し出ます。</div>
-<div style="font-size:9pt;text-align:center;margin-bottom:2mm;">
-  <span style="text-decoration:underline;">${f('f_year')}年　　${f('f_month')}月　　${f('f_day')}日　に行った</span>
+<div style="font-size: 6.5pt; margin-bottom: 2mm;">別記第三十号の三様式（第二十一条の三，第二十条の四関係）</div>
+<div style="text-align: right; font-size: 9pt; margin-bottom: 4mm;">日本国政府法務省</div><div style="text-align: right; font-size: 9pt; margin-bottom: 4mm;"><br></div>
+<div style="font-size: 13pt; font-weight: bold; text-align: center; letter-spacing: 6px; margin-bottom: 6mm;">申　請　内　容　変　更　申　出　書</div>
+<div style="font-size: 9pt; margin-bottom: 1mm;">${immText}出入国在留管理局長　　殿</div>
+<div style="border-bottom: 1px solid rgb(51, 51, 51); margin-bottom: 2mm; width: 14em;"></div>
+<div style="margin-bottom: 2em;"></div>
+<div style="font-size: 9pt; margin-bottom: 6mm;">　出入国管理及び難民認定法施行規則第21条の３又は第21条の４の規定に基づき，次のとおり申請内容の変更を申し出ます。</div>
+<div style="font-size: 9pt; text-align: center; margin-bottom: 2mm;">
+  <span style="text-decoration: underline;">${f('f_year')}年　　${f('f_month')}月　　${f('f_day')}日　に行った</span>
 </div>
-<div style="font-size:9pt;margin-left:4em;margin-bottom:3mm;">1．在留資格変更許可申請</div>
-<div style="font-size:9pt;margin-left:4em;margin-bottom:3mm;">2．在留期間更新許可申請</div>
-<div style="font-size:9pt;margin-bottom:4mm;">（申請番号　　${f('f_appNo')}　　）</div>
-<div style="font-size:9pt;margin-bottom:2mm;">については，申請の内容を</div>
-<div style="border-bottom:1px solid #333;margin-bottom:2mm;min-height:16mm;"></div>
-<div style="font-size:9pt;margin-bottom:6mm;">に変更したく，申し出ます。</div>
-<div style="font-size:9pt;margin-bottom:3mm;">法定代理人（法定代理人による申出の場合に記入）</div>
-<div style="font-size:9pt;margin-bottom:2mm;white-space:nowrap;">
-  (1)氏　名　<span style="text-decoration:underline;">　　　　　　　　　　　　　　</span>　　(2)本人との関係　<span style="text-decoration:underline;">　　　　　　　　　</span>
+<div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;"><br></div><div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;">1．在留資格変更許可申請</div>
+<div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;">2．在留期間更新許可申請</div><div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;"><br></div>
+<div style="font-size: 9pt; margin-bottom: 4mm;">（申請番号　　${f('f_appNo')}　　）</div>
+<div style="font-size: 9pt; margin-bottom: 2mm;">については，申請の内容を</div>
+<div style="border-bottom: 1px solid rgb(51, 51, 51); margin-bottom: 2mm; min-height: 16mm;"></div>
+<div style="font-size: 9pt; margin-bottom: 6mm;">に変更したく，申し出ます。</div>
+<div style="font-size: 9pt; margin-bottom: 3mm;"><br></div><div style="font-size: 9pt; margin-bottom: 3mm;">法定代理人（法定代理人による申出の場合に記入）</div>
+<div style="font-size: 9pt; margin-bottom: 2mm; white-space: nowrap;">
+  (1)氏　名　<span style="text-decoration: underline;">　　　　　　　　　　　　　　</span>　　　　　　　　　　　　　　(2)本人との関係　<span style="text-decoration: underline;">　　　　　　　　　</span>
 </div>
-<div style="font-size:9pt;margin-bottom:2mm;">
-  (3)住　所　<span style="text-decoration:underline;">　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　</span>
+<div style="font-size: 9pt; margin-bottom: 2mm;">
+  (3)住　所　<span style="text-decoration: underline;">　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　</span>
 </div>
-<div style="font-size:9pt;margin-bottom:6mm;white-space:nowrap;">
-  電話番号　<span style="text-decoration:underline;">　　　　　　　　　　　</span>　　携帯電話番号　<span style="text-decoration:underline;">　　　　　　　　　　　</span>
+<div style="font-size: 9pt; margin-bottom: 6mm; white-space: nowrap;">
+  電話番号　<span style="text-decoration: underline;">　　　　　　　　　　　　　　</span>　　　　　　　　　　　　　　　携帯電話番号　<span style="text-decoration: underline;">　　　　　　　　　　　</span>
 </div>
-<div style="font-size:9pt;margin-bottom:1mm;">以上の記載内容は事実と相違ありません。</div>
-<div style="font-size:9pt;margin-bottom:2mm;">申出人（法定代理人）の署名／申出書作成年月日</div>
-<div style="font-size:9pt;text-align:right;margin-bottom:4mm;text-decoration:underline double;">年　　　　月　　　　日</div>
-<div style="font-size:8.5pt;margin-bottom:3mm;">
-  <span style="font-weight:bold;">注　意</span><br>
+<div style="font-size: 9pt; margin-bottom: 1mm;">以上の記載内容は事実と相違ありません。</div>
+<div style="font-size: 9pt; margin-bottom: 2mm;">申出人（法定代理人）の署名／申出書作成年月日</div><div style="font-size: 9pt; margin-bottom: 2mm;"><br></div>
+<div style="font-size: 9pt; text-align: right; margin-bottom: 4mm; text-decoration: underline double;">　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　年　　　　月　　　　日</div>
+<div style="font-size: 8.5pt; margin-bottom: 3mm;">
+  <span style="font-weight: bold;">注　意</span><br>
   申出書作成後申出までに記載内容に変更が生じた場合，申出人（法定代理人）が変更箇所を訂正し，署名すること。<br>
   申出書作成年月日は申出人（法定代理人）が自署すること。
 </div>
-<div style="border-top:1px solid #555;padding-top:3mm;font-size:9pt;">
-  <div style="margin-bottom:2mm;">※　取次者</div>
-  <div style="margin-bottom:2mm;white-space:nowrap;">
-    (1)氏　名　<span style="text-decoration:underline;">　　　　　　　　　　　　　　　　　</span>　　(2)住　所　<span style="text-decoration:underline;">東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階　　　</span>
+<div style="border-top: 1px solid rgb(85, 85, 85); padding-top: 3mm; font-size: 9pt;">
+  <div style="margin-bottom: 2mm;">※　取次者</div>
+  <div style="margin-bottom: 2mm; white-space: nowrap;">
+    (1)氏　名　<span style="text-decoration: underline;">　　　　　　　　　　　　　　　　　</span>　　(2)住　所　<span style="text-decoration: underline;">東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階　　　</span>
   </div>
-  <div style="white-space:nowrap;">
-    (3)所属機関等（親族等については，本人との関係）<span style="text-decoration:underline;">　大房行政書士法人　　　　　　　　　　</span>　電話番号<span style="text-decoration:underline;">　03－6424－8849　</span>
+  <div style="white-space: nowrap;">
+    (3)所属機関等（親族等については，本人との関係）<span style="text-decoration: underline;">　大房行政書士法人　　　　　</span>　電話番号<span style="text-decoration: underline;">　03－6424－8849　</span>
   </div>
 </div>
 </div>`;
