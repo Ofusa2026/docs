@@ -178,7 +178,7 @@ open_doc('home');
 
 // ===== index案件選択 =====
 const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
-const IDX_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVod2xnYndweWNnbG1vcGlxeXR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzMjgwMDEsImV4cCI6MjAyODkwNDAwMX0.7g6AJKczUk3cqO7dALRFqFSXeODdwsAW4EqfCKFwh0Y';
+const IDX_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 async function idxSb(path){
   const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
   const d=await r.json();
