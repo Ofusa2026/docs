@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.03</div>
+    <div class="ver">ver.20260416.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -296,11 +296,6 @@ function p(){
 <div style="text-align:right;margin-bottom:4mm;">${f('f_docDate')}</div>
 <div style="text-align:right;margin-bottom:2mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
 <div style="text-align:right;">作成責任者　役職・氏名　　${f('f_author')}</div>
-</div>`;
-    }).join('')}
-  </tbody>
-</table>
-<div style="font-size:8pt;">（注意）</div>
 </div>`;
 
   _fontSize = (_fontSize === 8.5) ? 9 : _fontSize;
