@@ -372,8 +372,8 @@ function p(){
     const nEn=v('es_a'+i+'NameEn');
     const nEnVal=nEn||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}NameEn</span>`;
     const nEnSpan=`<span class="f">${nEnVal}</span>`;
-    if(i<=2) allowLineId1+=`（Tunjangan　${nEnSpan}），`;
-    else allowLineId2+=`（Tunjangan　${nEnSpan}），`;
+    if(i<=2) allowLineId1+=`（　${nEnSpan}），`;
+    else allowLineId2+=`（　${nEnSpan}），`;
   }
 
   // 手当（別紙用）
@@ -387,13 +387,13 @@ function p(){
       return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id">(${ltr})（Tunjangan　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}yen/Cara perhitungan:${ph(calcEn,'CalcEn')}）</div>`;
+    annexAllow+=`<div class="id" data-key="1">(${ltr})（Trợ cấp　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}yen/Cách tính:${ph(calcEn,'CalcEn')}）</div>`;
   });
 
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">Format Referensi 1-6</span></div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">ရည်ညွှန်းပုံစံအမှတ် ၁-၆</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
 <div style="text-align:center;font-size:10pt;padding-bottom:8px;">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</div>
@@ -404,32 +404,32 @@ function p(){
   <div style="padding:8px 12px 10px;">
     <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
-      <span class="id" style="font-size:7.5pt;">Tanggal ${f('es_createD')} Bulan ${f('es_createM')} Tahun ${f('es_createY')}</span>
+      <span class="id" style="font-size:7.5pt;" data-key="3">Ngày ${f('es_createD')} tháng ${f('es_createM')} năm ${f('es_createY')}</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">Kepada Yth&nbsp;&nbsp;${f('applicantName')}</span></div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">ဦး/ဒေါ်&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
       <table style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nama organisasi afiliasi pekerja berketerampilan khusus</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="5">အထူးကျွမ်းကျင်လုပ်သား‌ဆောင်ရွက်မည့်အဖွဲ့အစည်းအမည်</td><td class="id" style="font-size:7pt;" data-key="6">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Alamat</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="7">လိပ်စာ</td><td class="id" style="font-size:7pt;" data-key="8">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nomor telepon</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">ဖုန်းနံပါတ်</td><td class="id" style="font-size:7pt;" data-key="10">${f('es_orgTel')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nama dan jabatan representatif</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">Người đại diện　Chức vụ/Tên họ</td><td class="id" style="font-size:7pt;" data-key="12">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}</td></tr>
       </table>
     </div>
   </div>
 
   <!-- Ⅰ 雇用契約期間 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;">I. Periode perjanjian kerja</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">Ⅰ. ၁။အလုပ်ခန့်သည့်ကာလ</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">1. Periode perjanjian kerja</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">1. ၁။အလုပ်ခန့်သည့်ကာလ</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">(Dari tanggal ${f('es_contractStartD')} Bulan ${f('es_contractStartM')} Tahun ${f('es_contractStartY')} hingga Tanggal ${f('es_contractEndD')} Bulan ${f('es_contractEndM')} Tahun ${f('es_contractEndY')}) Tanggal rencana masuk: Tanggal ${f('es_entryD')} Bulan ${f('es_entryM')} Tahun ${f('es_entryY')}</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">(Ngày ${f('es_contractStartD')} tháng ${f('es_contractStartM')} năm ${f('es_contractStartY')} đến Ngày ${f('es_contractEndD')} tháng ${f('es_contractEndM')} năm ${f('es_contractEndY')}) Ngày nhập cảnh dự kiến: Ngày ${f('es_entryD')} tháng ${f('es_entryM')} năm ${f('es_entryY')}</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2. Pembaruan perjanjian</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">2. ၂။စာချုပ်သက်တမ်းတိုးခြင်းရှိမရှိ</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -438,29 +438,29 @@ function p(){
             <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
           </tr>
           <tr style="font-size:7.5pt;">
-            <td class="id" style="white-space:nowrap;">${cb(rAuto,'renewal_auto_id')}&nbsp;Diperbarui secara otomatis</td>
-            <td class="id" style="white-space:nowrap;">${cb(rPos,'renewal_pos_id')}&nbsp;Dapat diperbarui</td>
-            <td class="id" style="white-space:nowrap;">${cb(rNone,'renewal_none_id')}&nbsp;Tidak diperbarui</td>
+            <td class="id" style="white-space:nowrap;" data-key="17">${cb(rAuto,'renewal_auto_id')}&nbsp;Tự động gia hạn</td>
+            <td class="id" style="white-space:nowrap;" data-key="18">${cb(rPos,'renewal_pos_id')}&nbsp;Có trường hợp gia hạn</td>
+            <td class="id" style="white-space:nowrap;" data-key="19">${cb(rNone,'renewal_none_id')}&nbsp;Không gia hạn hợp đồng</td>
           </tr>
         </table>
-        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">※ Kriteria penilaian untuk pembaruan perjanjian di atas pada pilihan "Dapat diperbarui" adalah sebagai berikut.</span></div>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">※ Tiêu chuẩn quyết định có gia hạn hợp đồng trên hay không trong trường hợp "Có trường hợp gia hạn" là như sau.</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;Volume pekerjaan pada akhir periode perjanjian</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;Kinerja dan sikap pekerja</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;Kemajuan pekerjaan yang melibatkan pekerja</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">${cb(false,'kijun_1_id')}&nbsp;Khối lượng công việc khi kết thúc thời hạn hợp đồng</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">${cb(false,'kijun_2_id')}&nbsp;Thành tích, thái độ trong công việc của người lao động</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">${cb(false,'kijun_3_id')}&nbsp;Tình trạng tiến bộ trong công việc đang thực hiện</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;Kemampuan pekerja dalam melaksanakan pekerjaan</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;Manajemen perusahaan</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;Lainnya（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">${cb(false,'kijun_4_id')}&nbsp;Năng lực thực hiện công việc của người lao động</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">${cb(false,'kijun_5_id')}&nbsp;Tình trạng kinh doanh của công ty</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">${cb(false,'kijun_6_id')}&nbsp;Khác（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Apakah ada batasan perpanjangan? (မရှိ/ရှိ (maksimal&nbsp;&nbsp;&nbsp;&nbsp;kali perpanjangan/total periode kontrak maksimal&nbsp;&nbsp;&nbsp;&nbsp;tahun))</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[Jika dibuat perjanjian kerja waktu tertentu dengan perusahaan yang sama sebagaimana diatur dalam Undang-Undang Perjanjian Kerja, dengan total periode kontrak lebih dari 5 tahun]</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">3. Có quy định mức tối đa của gia hạn hay không (Không / Có (Gia hạn tối đa&nbsp;&nbsp;&nbsp;&nbsp;lần/tổng thời hạn hợp đồng tối đa&nbsp;&nbsp;&nbsp;&nbsp;năm))</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">[Trường hợp ký kết hợp đồng lao động có thời hạn có tổng thời hạn hợp đồng vượt quá 5 năm với cùng một công ty quy định tại Luật hợp đồng lao động]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
-      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">Dengan mengajukan permohonan untuk membuat perjanjian kerja tanpa periode yang ditetapkan (perjanjian kerja waktu tidak tertentu)dengan perusahaan selama periode perjanjian ini konversi</span><br><span class="id" style="font-size:6.5pt;">ke pekerjaan berdasarkan perjanjian kerja waktu tidak tertentu akan dimulaipada keesokan hari dari tanggal terakhir periode perjanjian ini (tanggal&nbsp;&nbsp;&nbsp;bulan&nbsp;&nbsp;&nbsp;tahun&nbsp;&nbsp;&nbsp;)<br><span class="id" style="font-size:6.5pt;">Dalam hal ini, apakah ada perubahan syarat kerja dari perjanjian ini? (မရှိ/ရှိ (seperti yang ditunjukkan pada Lampiran 2))</span></span></div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">ဤစာချုပ်သက်တန်းအတွင်း ကုမ္ပဏီဖြင့် သက်တန်းကာလ အကန့်အသတ်မရှိသော အလုပ်စာချုပ်ချုပ်ဆိုသည့်အခါတွင် ,ဤစာချုပ်ပြီးဆုံးသည့်ရက်ဧ်။နောက်ရက်</span><br><span class="id" style="font-size:6.5pt;" data-key="30">dụng với hợp đồng lao động không thời hạn từ ngày hôm sau của ngày cuối cùng của thời hạn hợp đồng này (ngày&nbsp;&nbsp;&nbsp;tháng&nbsp;&nbsp;&nbsp;năm&nbsp;&nbsp;&nbsp;)<br><span class="id" style="font-size:6.5pt;">Trong trường hợp này, có hay không có thay đổi điều kiện làm việc của hợp đồng này? (Không có/Có (như trong văn bản đính kèm 2))</span></span></span></div>
     </div>
   </div>
 </div>
@@ -476,25 +476,25 @@ function p(){
       <!-- 左：直接雇用 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅱ．就業の場所</div>
-        <div style="font-size:8pt;margin-bottom:4px;">II. အလုပ်လုပ်ကိုင်ရာနေရာ</div>
-        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;">${cb(true,'hire_direct_id')} Perekrutan langsung (isi di bawah ini)</span></div>
-        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id">*Masuk ke kantor organisasi penerima</span></div>
+        <div style="font-size:8pt;margin-bottom:4px;">II. ၂။အလုပ်နေရာ</div>
+        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} Tuyển dụng trực tiếp (điền vào phần dưới)</span></div>
+        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* Vào văn phòng của tổ chức tiếp nhận</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id">Nama kantor</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">Lokasi</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id">${f('es_officeAddressEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">Kontak</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;">${f('es_officeTel')}</span></td></tr>
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">Tên công ty</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">လိပ်စာ liên lạc</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：派遣雇用 / 変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;">${cb(false,'hire_dispatch_id')} Perekrutan outsource (isi "Pernyataan အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်" terlampir)</span></div>
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;">${cb(false,'change_none_direct_id')} မရှိ kemungkinan perubahan (Jikaada perubahan, mohon tulis di bawah)</span></div>
+        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">${cb(false,'hire_dispatch_id')} Tuyển dụng phái cử (Điền vào mẫu "Bản Trình bày Rõ Điều Kiện Làm Việc")</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">${cb(false,'change_none_direct_id')} Không có khả năng thay đổi (Trường hợp có thay đổi thì điền vào phần dưới)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id">Nama kantor</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">Lokasi</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">Kontak</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">Tên công ty</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">လိပ်စာ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">လိပ်စာ liên lạc</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>
@@ -506,15 +506,15 @@ function p(){
       <!-- 左：直接雇用側 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅲ．従事すべき業務の内容</div>
-        <div style="font-size:8pt;margin-bottom:4px;">III. လုပ်ဆောင်ရမည့်လုပ်ငန်းအကြောင်းအရာ</div>
+        <div style="font-size:8pt;margin-bottom:4px;">III. ၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id">1. Bidang</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id">${f('es_applicantFieldEn')}</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. Lĩnh vực</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id">2. Kategori pekerjaan</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id">（${f('es_categoryEn')}）</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. Danh mục công việc</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_001")} မရှိ kemungkinan perubahan</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,"cb_auto_001")} Không có khả năng thay đổi</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id">1. Bidang</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id">2. Kategori pekerjaan</td><td style="padding:0 4px;vertical-align:top;" class="id">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. Lĩnh vực</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. Danh mục công việc</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
         </table>
       </div>
     </div>
@@ -535,19 +535,19 @@ function p(){
 
   <!-- Ⅳ 労働時間等 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. အလုပ်ချိန်နှင့် အခြားသော</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. ၄။အလုပ်ချိန်စသည်</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. အလုပ်စချိန်နှင့် ပြီးဆုံးချိန် စသည်</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. ၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;">(1) Jam mulai（${f('es_startTime')}）Jam selesai（${f('es_endTime')}）(Jam kerja yang ditentukan 1 hari:&nbsp;${f('es_dailyHours')}jam&nbsp;${f('es_dailyMins')}menit)</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">(1) Bắt đầu（${f('es_startTime')}）Kết thúc（${f('es_endTime')}）(Số giờ làm việc quy định cho 1 ngày: ${f('es_dailyHours')}giờ　${f('es_dailyMins')}phút)</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;">(2) [Bila sistem berikut ini diterapkan kepada pekerja]</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) (၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;">${cb(false,'flex_work_id')} Sistem jam kerja berubah: Sistem jam kerja berubah dalam satuan (${f('es_flexUnitEn')})</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;">* Jika digunakan sistem jam kerja berubah dalam satuan waktu 1 tahun, lampirkan salinan kalender tahunan dalam bahasa yang dipahami dengan baik oleh Pihak Kedua dan salinan surat kesepakatan terkait sistem jam kerja berubah yang telah diserahkan kepada Kantor Pengawasan Standar Kerja.</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;">${cb(false,'shift_work_id')} Shift kerja menggunakan kombinasi jam kerja berikut ini.</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} Chế độ thời gian làm việc biến hình: Chế độ thời gian làm việc biến hình đơn vị (${f('es_flexUnitEn')})</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* Trường hợp đang sử dụng chế độ thời gian làm việc biến hình có đơn vị là 1 năm thì sẽ kèm theo bản sao lịch trong năm có ghi cả ngôn ngữ mà bên B có thể hiểu được đầy đủ và bản sao bản hiệp định liên quan.</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} အလုပ်အဆိုင်းစနစ်ဖြင့် အောက်ပါအချိန်ဇယားအတိုင်းယူနိုင်သည်။</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;">Jam mulai(${startStr})Jam selesai(${endStr}).(Hari penerapan ${daysEnStr}),Jam kerja dalam 1 hari ${hStr}jam${minStr}menit)</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">Bắt đầu(${startStr})Kết thúc(${endStr}).(Ngày áp dụng ${daysEnStr}),Số giờ làm việc quy định cho 1 ngày ${hStr}giờ ${minStr}phút</span></div>`;
           }).join('');
         })()}
       </div>
@@ -574,17 +574,17 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Jam istirahat&emsp;(${f('es_breakTime')}menit)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Jam kerja yang ditentukan&emsp;①Mingguan(${f('es_weeklyH')}jam&nbsp;${f('es_weeklyMin')}menit)&emsp;②Bulanan(${f('es_monthlyH')}jam&nbsp;${f('es_monthlyMin')}menit)&emsp;③Tahunan(${f('es_yearlyH')}jam&nbsp;${f('es_yearlyMin')}menit)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Hari kerja yang ditentukan&emsp;①Mingguan(${f('es_weeklyDays')}hari)&emsp;②Bulanan(${f('es_monthlyDays')}hari)&emsp;③Tahunan(${f('es_yearlyDays')}hari)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Thời gian nghỉ ngơi&emsp;(${f('es_breakTime')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Số giờ làm việc quy định&emsp;①Tuần(${f('es_weeklyH')}giờ&nbsp;${f('es_weeklyMin')}phút)&emsp;②Tháng(${f('es_monthlyH')}giờ&nbsp;${f('es_monthlyMin')}phút)&emsp;③Năm(${f('es_yearlyH')}giờ&nbsp;${f('es_yearlyMin')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Jam lembur</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;">${cb(true,'overtime_yes_id')} ရှိ&emsp;${cb(false,'overtime_no_id')} Tidak</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Có hay không làm việc ngoài giờ quy định</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} Có&emsp;${cb(false,'overtime_no_id')} Không</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;">◦Detail ditetapkan dalam pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;)Peraturan Kerja</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></td>
         </tr>
       </table>
     </div>
@@ -592,23 +592,23 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">hari libur</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ngày</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">1. Hari libur reguler: (${f('es_fixedDay1En')})，lainnya（${f('es_otherHolidays')}）(Jumlah libur tahunan:${f('es_annualHolidays')}hari)</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;">2. Hari libur non-reguler:&emsp;hari tiap minggu/bulan, lainnya (&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">◦Detail ditetapkan dalam pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;)Peraturan Kerja</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. ၅။အလုပ်ပိတ်ရက် cố định: (${f('es_fixedDay1En')})，khác（${f('es_otherHolidays')}）(Tổng số ngày nghỉ trong năm:${f('es_annualHolidays')}ngày)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. Ngày không cố định: ngày/tuần/tháng, khác ( )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 
   <!-- Ⅵ 休暇 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. ခွင့်ရက်</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. ၆။ခွင့်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;">1. Cuti berbayar tahunan&emsp;Bila telah bekerja minimal 6 bulan →&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}hari</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">Bila belum bekerja minimal 6 bulan (${cb(false,"cb_auto_002")} ရှိ&emsp;${cb(true,"cb_auto_003")} Tidak) → Setelah&emsp;bulan berlalu,&emsp;hari</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;">2. Cuti lainnya&emsp;Berbayar (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Tidak berbayar (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">3. Cuti pulang sementara Bila Pihak Kedua ingin kembali untuk sementara ke negaranya, ia harus diberikan cuti yang diperlukan sesuai batasan butir 1 dan 2.</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">◦Detail ditetapkan dalam pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;)Peraturan Kerja</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. ၆။ခွင့်ရက် có lương trong năm&emsp;Trường hợp đã làm liên tục 6 tháng→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}ngày</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Trường hợp chưa đủ 6 tháng (${cb(false,"cb_auto_002")} Có&emsp;${cb(true,"cb_auto_003")} Không) → Qua&nbsp;&nbsp;&nbsp;tháng, được&nbsp;&nbsp;&nbsp;ngày</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. Các ngày nghỉ phép khác&emsp;Có lương (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;Không lương (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. ၆။ခွင့်ရက် về nước tạm thời&emsp;Nếu bên B có nguyện vọng về nước tạm thời, thì cho lấy ngày phép cần thiết trong phạm vi của khoản 1 và 2 ở trên.</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 
@@ -617,11 +617,11 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. လုပ်ခလစာ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;">၁. အခြေခံလုပ်ခ&emsp;${cb(true,"cb_auto_004")} Gaji bulanan (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Gaji harian(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Gaji per jam(${ff('es_salaryHourly')}JPY)</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* 別紙のとおり</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;">2. Berbagai tunjangan (tidak termasuk tambahan uang lembur)</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;">${allowLineId1}${allowLineId2}</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* 別紙のとおり</div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. ၁။အခြေခံလစာ&emsp;${cb(true,"cb_auto_004")} Lương tháng (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Lương ngày(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Lương giờ(${ff('es_salaryHourly')}JPY)</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. Các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ làm việc)</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">${allowLineId1}${allowLineId2}</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
       </div>
     </div>
   </div>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;">3. Tingkat tambahan pembayaran untuk lembur, kerja di hari libur atau kerja tengah malam</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">3. ၃။အချိန်ပို၊ ပိတ်ရက်ဆင်းခြင်း၊ညဘက်အလုပ်လုပ်ခြင်းအတွက် အပိုလုပ်အားခရာခိုင်နှုန်း</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;">(1) Kerja lembur</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">Maksimal 60 jam sebulan sesuai ketentuan hukum (${f('es_ot60under')}) ％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">(1) Làm thêm ngoài giờ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">Vượt thời gian luật định dưới 60 tiếng trong tháng (${f('es_ot60under')}) ％</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">Melebihi 60 jam (${f('es_ot60over')}) ％&emsp;Melebihi waktu yang telah ditetapkan (${f('es_otPrescribed')}) ％</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">Vượt thời gian luật định trên 60 tiếng trong tháng (${f('es_ot60over')}) ％&emsp;Vượt thời gian quy định (${f('es_otPrescribed')}) ％</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;">(2) Kerja di hari libur</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">Hari libur sesuai ketentuan hukum(${f('es_holidayLegal')})％，hari libur di luar ketentuan hukum(${f('es_holidayNonLegal')})％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">(2) Làm việc ngày nghỉ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">၅။အလုပ်ပိတ်ရက် luật định(${f('es_holidayLegal')})％，ngày nghỉ ngoài luật định(${f('es_holidayNonLegal')})％</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;">(3) Kerja tengah malam</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;">(${f('es_nightPremium')}) ％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">(3) Làm việc ban đêm</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">(${f('es_nightPremium')}) ％</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;">4. Tanggal penutupan gaji</td>
-          <td class="id" style="font-size:7pt;">${cb(true,"cb_auto_008")} Tiap bulan tanggal ${f('es_payCutoffEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"cb_auto_009")} Tiap bulan tanggal</td>
+          <td class="id" style="font-size:7pt;" data-key="79">4. Ngày kết lương</td>
+          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} Hàng tháng ngày ${f('es_payCutoffEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} Hàng tháng ngày</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,9 +689,9 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;">5. Tanggal pembayaran gaji</td>
-          <td class="id" style="font-size:7pt;">${cb(true,"cb_auto_011")} Tiap bulan tanggal ${f('es_payDayEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"cb_auto_012")} Tiap bulan tanggal</td>
+          <td class="id" style="font-size:7pt;" data-key="82">5. Ngày trả lương</td>
+          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} Hàng tháng ngày ${f('es_payDayEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} Hàng tháng ngày</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">６．賃金支払方法</td>
@@ -699,44 +699,44 @@ function p(){
           <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;">6. Cara pembayaran gaji</td>
-          <td class="id" style="font-size:7pt;">${cb(true,"pay_bank_id")} Transfer bank</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"pay_cash_id")} Pembayaran secara tunai</td>
+          <td class="id" style="font-size:7pt;" data-key="85">6. Cách thanh toán lương</td>
+          <td class="id" style="font-size:7pt;" data-key="86">${cb(true,"pay_bank_id")} Chuyển khoản</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(false,"pay_cash_id")} Trả tiền mặt tiền Yên</td>
         </tr>
         <tr>
-          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;">7. Pemotongan dari gaji berdasarkan perjanjian kerja dengan manajemen</span></td>
+          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">7. Khấu trừ khi thanh toán lương dựa trên hiệp định sử dụng lao động</span></td>
           <td style="vertical-align:top;">
             <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
               <tr><td style="white-space:nowrap;">${cb(false,"taisho_none")}&nbsp;無</td><td style="white-space:nowrap;">${cb(true,"taisho_yes")}&nbsp;有</td></tr>
-              <tr><td class="id" style="font-size:7pt;white-space:nowrap;">${cb(false,"taisho_none_id")} မရှိ</td><td class="id" style="font-size:7pt;white-space:nowrap;">${cb(true,"taisho_yes_id")} ရှိ</td></tr>
+              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">${cb(false,"taisho_none_id")} Không</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">${cb(true,"taisho_yes_id")} Có</td></tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* 別紙のとおり</td>
+          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</td>
         </tr>
       </table>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
         <colgroup><col style="width:22%"><col style="width:53%"><col style="width:25%"></colgroup>
         <tr>
-          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;">8. Kenaikan gaji</span></td>
-          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_013")} ရှိ (masa, jumlah kenaikan, dll.&emsp;${f('es_raiseConditionEn')}&emsp;)</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_015")} မရှိ</span></td>
+          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">8. Tăng lương</span></td>
+          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">${cb(true,"cb_auto_013")} Có (thời điểm, số tiền,… ${f('es_raiseConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">${cb(false,"cb_auto_015")} Không</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;">9. Bonus</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_017")} ရှိ (masa, jumlah kenaikan, dll.&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_019")} မရှိ</span></td>
+          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">9. Tiền thưởng</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">${cb(true,"cb_auto_017")} Có (thời điểm, số tiền,… ${f('es_bonusConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">${cb(false,"cb_auto_019")} Không</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;">10. Uang pesangon</span></td>
-          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_020")} ရှိ (masa, jumlah kenaikan, dll.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_022")} မရှိ</span></td>
+          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">10. Tiền nghỉ việc</span></td>
+          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} Có (thời điểm, số tiền,… )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(true,"cb_auto_022")} Không</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;">11. Tunjangan libur kerja</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_024")} ရှိ (persentase&emsp;60%)</span></td>
-          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_026")} မရှိ</span></td>
+          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">11. Trợ cấp khi nghỉ phép</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">${cb(true,"cb_auto_024")} Có (tỷ lệ 60%)</span></td>
+          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">${cb(false,"cb_auto_026")} Không</span></td>
         </tr>
       </table>
     </div>
@@ -744,12 +744,12 @@ function p(){
 
   <div style="border-top:1px solid #333;padding:6px 12px;">
   <!-- Ⅷ 退職 -->
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. အလုပ်ထွက်ခြင်းနှင့်ပတ်သက်သောကိစ္စများ</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. ၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;">1. Prosedur pengunduran diri karena alasan pribadi (Pemberitahuan disampaikan kepada presiden direktur, kepala pabrik, dll&emsp;${f('es_resignNoticeDays')}&emsp;hari sebelum pengunduran diri)</span></div>
-      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;">2. Alasan dan prosedur pemutusan hubungan kerja (PHK)</span></div>
-      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;">PHK dilakukan bila ada alasan yang tidak dapat dihindari dan pekerja yang bersangkutan diberikan pemberitahuan awal setidaknya 30 hari sebelum PHK atau diberikan minimal 30 hari upah rata-rata. Untuk PHK berdasarkan alasan yang disebabkan oleh kesalahan pekerja asing berketerampilan khusus, ada kemungkinan PHK dilakukan dengan segera tanpa pemberitahuan awal maupun pembayaran upah rata-rata setelah mendapatkan persetujuan dari Kepala Kantor Pengawasan Standar Kerja terkait.${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">◦Detail ditetapkan dalam pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;),pasal (&emsp;〜&emsp;)Peraturan Kerja</span></div>
+      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">1. Thủ tục nghỉ việc do lý do cá nhân (Báo cáo cho giám đốc/xưởng trưởng ${f('es_resignNoticeDays')} ngày trước khi nghỉ việc)</span></div>
+      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">2. အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</span></div>
+      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">Việc sa thải phải báo trước ít nhất 30 ngày, hoặc phải thanh toán tiền lương trung bình của trên 30 ngày rồi mới sa thải.${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 </div>
@@ -761,21 +761,21 @@ function p(){
 <div style="border:1px solid #333;">
 <!-- Ⅸ その他 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. အခြားသော</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. ၉။အခြား</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
-      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;">1. Kondisi keikutsertaan asuransi sosial/kondisi penerapan asuransi kerja (${cb(true,"ins_kousei_id")} Dana pensiun kesejahteraan, ${cb(true,"ins_kenko_id")} Asuransi kesehatan, ${cb(true,"ins_koyo_id")} Asuransi kerja, ${cb(true,"ins_rousai_id")} Asuransi kecelakaan kerja,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")} Dana pensiun nasional, ${cb(false,"ins_kokumin_kenko_id")} Asuransi kesehatan nasional, ${cb(false,"ins_other_id")} Lainnya (&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;))</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;">2. Pemeriksaan kesehatan saat perekrutan:&emsp;bulan ${f('es_healthCheckM')} tahun ${f('es_healthCheckY')}</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;">3. Pemeriksaan kesehatan berkala awal:&emsp;bulan ${f('es_healthCheckM2')} tahun ${f('es_healthCheckY2')} (setelah itu dilakukan setiap 1 tahun)</span></div>
-      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">4. Loket konsultasi untuk hal-hal terkait perbaikan manajemen ketenagakerjaan, dll.</span></div>
-      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Nama Divisi&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Nama dan jabatan petugas&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(Kontak ${f('es_contactTel')})</span></div>
-      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;">5. Apabila Pihak Kedua tidak dapat menanggung biaya kepulangannya saat Pihak Kedua akan pulang setelah perjanjian ini berakhir, Pihak Pertama akan menanggung biaya perjalanan tersebut dan melakukan hal-hal yang diperlukan untuk memastikan kepulangan tersebut berjalan lancar.</span></div>
+      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. Tình trạng tham gia bảo hiểm xã hội/tình trạng áp dụng bảo hiểm lao động (${cb(true,"ins_kousei_id")} Tiền lương hưu người lao động, ${cb(true,"ins_kenko_id")} Bảo hiểm sức khỏe, ${cb(true,"ins_koyo_id")} Bảo hiểm tuyển dụng, ${cb(true,"ins_rousai_id")} Bảo hiểm tai nạn lao động,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} Tiền lương hưu quốc gia, ${cb(false,"ins_kokumin_kenko_id")} Bảo hiểm sức khỏe quốc gia, ${cb(false,"ins_other_id")} Khác (</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. Khám sức khỏe khi tuyển dụng:&emsp;tháng ${f('es_healthCheckM')} năm ${f('es_healthCheckY')}</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. Khám sức khỏe định kỳ lần đầu:&emsp;tháng ${f('es_healthCheckM2')} năm ${f('es_healthCheckY2')} (sau đó thực hiện mỗi năm 1 lần)</span></div>
+      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. ဌာနအမည် တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည် (ဆက်သွယ်ရန် )</span></div>
+      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">Tên phòng ban&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Chức danh và họ tên người phụ trách&emsp;${f('es_contactPersonEn')}&emsp;(လိပ်စာ liên lạc&emsp;${f('es_contactTel')})</span></div>
+      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. ၄။ဤစာချုပ်ပြီးဆုံးသည့်အခါတွင် ဒုတိယပါတီမှ နိုင်ငံပြန်သည့်အခါတွင် ဒုတိယပါတီသည်နိုင်ငံပြန်စရိတ်အားအကုန်အကျမခံနိုင်ပါက ပထမပါတီမှအဆိုပါခရီးစရိတ်အားအကုန်အကျခံပေးမည်ဖြစ်ပြီးနိုင်ငံပြန်ရာတွင် အဆင်ပြေချောမွေ့စွာဖြစ်စေရန် လိုအပ်သည်များကိုဆောင်ရွက်ပေးရပါမည်။</span></div>
     </div>
   </div>
 
   <!-- 受取人 -->
   <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
-    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;">Penerima (tanda tangan)</span></div>
+    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">Người nhận (ký tên)</span></div>
     <div class="sign-field-area" style="height:60px;position:relative;">
       <span class="sign-field-placeholder">← ここに署名</span>
       <img class="sign-field-img" style="display:none;max-height:56px;">
@@ -786,8 +786,7 @@ function p(){
 
 <div style="margin-top:6px;font-size:8pt;">
   以上のほかは、当社就業規則による。就業規則を確認できる場所や方法（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;本社もしくは各事業所にて確認可能&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br>
-  <span class="id" style="font-size:7.5pt;">Selain yang tertulis di atas, Peraturan Kerja dari perusahaan juga berlaku. Tempat dan metode memeriksa Peraturan Kerja<br>
-  ( Dapat dikonfirmasi di kantor pusat atau kantor masing-masing )</span>
+  <span class="id" style="font-size:7.5pt;" data-key="115">Ngoài những điều khoản nêu trên, các điều khoản khác dựa theo Nội quy lao động của công ty. Nơi và phương pháp có thể xác nhận Nội quy lao động</span>
 </div>
 </div>
 <div class="doc">
@@ -795,9 +794,9 @@ function p(){
 <!-- ===== 別紙 ===== -->
 <div style="padding:5px 0;margin:20px 0 4px;">
   <div style="font-size:8pt;font-weight:bold;">参考様式第１－６号　別紙</div>
-  <div style="font-size:7.5pt;">ရည်ညွှန်းပုံစံအမှတ် ၁-၆ ပူးတွဲစာ ၁</div>
+  <div style="font-size:7.5pt;">ရည်ညွှန်းပုံစံအမှတ် ၁-၆ Văn bản đi kèm</div>
   <div style="text-align:center;font-size:10pt;font-weight:bold;margin-top:4px;">賃　金　の　支　払</div>
-  <div style="text-align:center;font-size:8pt;">လုပ်ခလစာပေးချေခြင်း</div>
+  <div style="text-align:center;font-size:8pt;">လုပ်အားခပေးချေမှု</div>
 </div>
 
 <div style="font-size:8.5pt;">
@@ -805,32 +804,32 @@ function p(){
     <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
       <colgroup><col style="width:28%"><col style="width:24%"><col style="width:24%"><col style="width:24%"></colgroup>
       <tr>
-        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">၁. အခြေခံလုပ်ခ</span></td>
-        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sMonthly,'sal_monthly_a_id')} Gaji bulanan (${ff('es_salaryMonthly')}JPY)</span></td>
-        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sDaily,'sal_daily_a_id')} Gaji harian (${ff('es_salaryDaily')}JPY)</span></td>
-        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sHourly,'sal_hourly_a_id')} Gaji per jam (${ff('es_salaryHourly')}JPY)</span></td>
+        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. ၁။အခြေခံလစာ</span></td>
+        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">${cb(sMonthly,'sal_monthly_a_id')} Lương tháng (${ff('es_salaryMonthly')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">${cb(sDaily,'sal_daily_a_id')} Lương ngày (${ff('es_salaryDaily')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">${cb(sHourly,'sal_hourly_a_id')} Lương giờ (${ff('es_salaryHourly')}JPY)</span></td>
       </tr>
       <tr>
         <td colspan="3" style="padding-top:3px;">※月給・日給の場合の１時間当たりの金額（${ff('es_calcHourly')}円）<br>
-        <span class="id" style="font-size:7.5pt;">※Jumlah gaji per jam dalam hal gaji bulanan/harian　(${ff('es_calcHourly')}JPY)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="119">※Số tiền cho 1 tiếng trong trường hợp lương tháng/lương ngày&nbsp;&nbsp;&nbsp;(${ff('es_calcHourly')}JPY)</span></td>
       </tr>
       <tr>
         <td colspan="3">※日給・時給の場合の１か月当たりの金額（${ff('es_calcMonthly')}円）<br>
-        <span class="id" style="font-size:7.5pt;">※Jumlah gaji per bulan dalam hal gaji harian/per jam　(${ff('es_calcMonthly')}JPY)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="120">※Số tiền cho 1 tháng trong trường hợp lương ngày/lương giờ&nbsp;&nbsp;&nbsp;(${ff('es_calcMonthly')}JPY)</span></td>
       </tr>
     </table>
 
-    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;">2. Nominal dan cara perhitungan berbagai tunjangan (tidak termasuk upah tambahan lembur)</span></div>
+    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">2. Số tiền và cách tính các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ)</span></div>
     <div style="margin-left:16px;">${annexAllow}</div>
     
-    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;">[Jika ada upah lembur yang tetap]</span></div>
+    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">[Nếu có lương làm thêm giờ cố định]</span></div>
     <div style="margin-left:16px;">
       <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
-      <div class="id" style="font-size:7.5pt;">(e) (Tunjangan ${f('es_fixedOTNameEn')}, ${ff('es_fixedOTAmount')} yen</div>
+      <div class="id" style="font-size:7.5pt;" data-key="123">(e) (Trợ cấp ${f('es_fixedOTNameEn')}, ${ff('es_fixedOTAmount')} yen</div>
       <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
-      <div class="id" style="font-size:7.5pt;">・Persyaratan pembayaran: Terlepas dari ada lembur atau tidak, tunjangan lembur akan dibayarkan sesuai jumlah ${f('es_fixedOTHours')} jam.</div>
+      <div class="id" style="font-size:7.5pt;" data-key="124">・Điều kiện chi trả: Chi trả xem như là trợ cấp làm thêm ngoài giờ cho phần làm việc của ${f('es_fixedOTHours')} tiếng, bất kể có làm việc ngoài giờ hay không.</div>
       <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
-      <div class="id" style="font-size:7.5pt;">(Upah tambahan lembur akan dibayarkan sebagai tambahan untuk kerja lembur melebihi ${f('es_fixedOTHours')} jam.)</div>
+      <div class="id" style="font-size:7.5pt;" data-key="125">(Chi trả thêm lương tăng ca đối với phần làm thêm ngoài giờ vượt quá ${f('es_fixedOTHours')} tiếng.)</div>
     </div>
   </div>
 
@@ -839,84 +838,84 @@ function p(){
     <span style="white-space:nowrap;">約&emsp;${ff('es_salaryTotal')}円（合計）</span>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;">3. Perkiraan besar pembayaran tiap bulan (1+2)</span>
-    <span class="id" style="white-space:nowrap;font-size:7.5pt;">Sekitar ${ff('es_salaryTotal')} yen (total)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="126">3. Số tiền thanh toán ước tính cho 1 tháng (1+2)</span>
+    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">Khoảng ${ff('es_salaryTotal')} yen (tổng)</span>
   </div>
 </div>
 </div>
 
 <div class="doc">
 <div class="page-num-label">P7</div>
-<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Item yang akan dipotong saat pembayaran gaji</span></div>
+<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. ၄။လစာငွေမှနှုတ်ယူမည့်အချက်များ</span></div>
   <table style="width:100%;font-size:8pt;border-collapse:collapse;">
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
-      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;">(a) Pajak</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) Tiền thuế</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;">(b) Premi asuransi sosial</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) Tiền bảo hiểm xã hội</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;">(c) Premi asuransi ketenagakerjaan</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) Tiền bảo hiểm tuyển dụng</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;">(d) Biaya makan</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) Tiền ăn</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;">(e) Biaya tempat tinggal</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) Tiền nhà</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;">(f) Lainnya (biaya utilitas)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) Tiền khác (Tiền nước, điện, ga)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;">(${f('es_deductOther1NameEn')})</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>sekitar</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">(${f('es_deductOther1NameEn')})</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;">sekitar &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="135">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;">sekitar &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="137">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;">sekitar &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="139">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;">sekitar &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="141">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="padding-top:3px;"></td>
-      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;">Besar potongan</span></td>
+      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">Số tiền khấu trừ</span></td>
       <td style="padding-top:3px;text-align:right;">
         <table style="border-collapse:collapse;width:100%;"><tr>
           <td style="white-space:nowrap;text-align:right;width:2em;">約</td>
           <td style="text-align:right;">${ff('es_deductTotal')}</td>
           <td style="white-space:nowrap;width:4em;">円（合計）</td>
         </tr><tr>
-          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id">Sekitar</td>
-          <td style="text-align:right;font-size:7pt;" class="id">${ff('es_deductTotal')}</td>
-          <td style="white-space:nowrap;font-size:7pt;" class="id">yen (total)</td>
+          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">Khoảng</td>
+          <td style="text-align:right;font-size:7pt;" class="id" data-key="145">${ff('es_deductTotal')}</td>
+          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">yen (tổng)</td>
         </tr></table>
       </td>
     </tr>
@@ -929,17 +928,17 @@ function p(){
       <td style="text-align:right;">${ff('es_netPay')}</td>
       <td style="white-space:nowrap;width:4em;">円（合計）</td>
     </tr><tr>
-      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id">Sekitar</td>
-      <td style="text-align:right;font-size:7.5pt;" class="id">${ff('es_netPay')}</td>
-      <td style="white-space:nowrap;font-size:7.5pt;" class="id">yen (total)</td>
+      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">Khoảng</td>
+      <td style="text-align:right;font-size:7.5pt;" class="id" data-key="148">${ff('es_netPay')}</td>
+      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">yen (tổng)</td>
     </tr></table>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;">5. Pendapatan bersih (3-4)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="150">5. Số tiền thực nhận (3-4)</span>
     <span></span>
   </div>
   <div style="font-size:7.5pt;margin-top:2px;">※欠勤等がない場合であって，時間外労働の割増賃金等は除く。<br>
-  <span class="id" style="font-size:7pt;">*Dengan catatan tidak ada absen kerja dan tidak termasuk upah tambahan lembur.</span></div>
+  <span class="id" style="font-size:7pt;" data-key="151">*Đây là trường hợp không nghỉ việc, loại trừ tiền tăng ca ngoài giờ.</span></div>
 </div>
 
 `;
