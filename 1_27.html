@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２７号　公的義務履行に関する説明書</div>
-    <div class="ver">ver.20260415.10</div>
+    <div class="ver">ver.20260415.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -52,7 +52,7 @@
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
-    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">14pt</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
   </div>
   <div id="pageArea"></div>
@@ -67,7 +67,7 @@ function p(){
 <div class="doc">
 <div class="page-num-label">P1</div>
 <div style="text-align:left;font-size:7pt;margin-bottom:2mm;">参考様式第１－２７号</div>
-<div style="font-size:18pt;font-weight:bold;text-align:center;margin:4mm 0;">公的義務履行に関する説明書</div>
+<div style="font-weight:bold;text-align:center;margin:4mm 0;">公的義務履行に関する説明書</div>
 <div style="margin-bottom:8px;">第１　労働関係法令の遵守</div>
 <div style="margin-left:2em;margin-bottom:8px;">労働保険料（適用事業所のみ）</div>
 <div style="margin-bottom:8px;">第２　社会保険関係法令の遵守</div>
@@ -90,7 +90,7 @@ function p(){
 <div style="text-align:right;margin-bottom:4px;">${f('f_docDate')}</div>
 <div style="text-align:right;">特定技能所属機関名　　　　${f('f_company')}</div>
 </div>`;
-  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
+  _fontSize = (_fontSize === 8.5) ? 14 : _fontSize;
   _applyFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
