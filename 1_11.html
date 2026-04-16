@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.08</div>
+    <div class="ver">ver.20260416.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -186,65 +186,68 @@ function p(){
 ４　（２）は、特定技能所属機関が、技能実習制度における実習実施者である場合は、過去１年間における技能実習生の行方不明者の発生状況についても記載すること。
 </div>
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">４　中長期在留者の受入れ実績等（１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は記載不要。）</div>
-<table class="tbl">
+<table class="tbl" style="font-size:8pt;">
   <tr>
-    <td style="width:5%;text-align:center;">(１)<br>□</td>
-    <td style="width:22%;">過去２年間に中長期在留者（注）の受入れ又は管理を適正に行った実績を有すること</td>
-    <td style="width:12%;text-align:center;">受入れ・管理人数</td>
-    <td style="width:15%;text-align:center;"></td>
-    <td>受入れ期間中の法令遵守</td>
+    <td rowspan="4" style="width:5%;text-align:center;vertical-align:middle;">(１)<br>□</td>
+    <td rowspan="4" style="width:20%;vertical-align:middle;">過去２年間に中長期在留者（注）の受入れ又は管理を適正に行った実績を有すること</td>
+    <td rowspan="2" style="width:12%;text-align:center;vertical-align:middle;">受入れ・管理人数</td>
+    <td colspan="3"></td>
+    <td rowspan="2" style="vertical-align:middle;">受入れ期間中の法令遵守</td>
+  </tr>
+  <tr><td colspan="3"></td></tr>
+  <tr>
+    <td>直近１年前</td>
+    <td colspan="2" style="text-align:right;">　　　　名</td>
+    <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
   </tr>
   <tr>
-    <td></td>
-    <td></td>
-    <td style="text-align:center;">直近１年前</td>
-    <td style="text-align:right;padding-right:4px;">　　　　名</td>
+    <td>直近２年前</td>
+    <td colspan="2" style="text-align:right;">　　　　名</td>
     <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
   </tr>
   <tr>
     <td></td>
     <td></td>
-    <td style="text-align:center;">直近２年前</td>
-    <td style="text-align:right;padding-right:4px;">　　　　名</td>
-    <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
+    <td>添付書類</td>
+    <td colspan="4">※以下の添付書類を提出すること。ただし、監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は、添付書類の提出不要。<br>□　受け入れた中長期在留者リスト（参考様式第１－１１－２号）</td>
   </tr>
   <tr>
-    <td></td>
-    <td></td>
-    <td colspan="3" style="font-size:8pt;">
-      ※以下の添付書類を提出すること。ただし、監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は、添付書類の提出不要。<br>
-      □　受け入れた中長期在留者リスト（参考様式第１－１１－２号）
-    </td>
+    <td rowspan="9" style="text-align:center;vertical-align:middle;">(２)<br>□</td>
+    <td rowspan="9" style="vertical-align:middle;">支援責任者及び支援担当者が過去２年間に中長期在留者（注）の生活相談業務に従事した経験を有すること</td>
+    <td rowspan="5" style="text-align:center;vertical-align:middle;">支援<br>責任者</td>
+    <td>生活相談業務期間</td>
+    <td colspan="3">年　月　日〜　年　月　日</td>
   </tr>
   <tr>
-    <td style="text-align:center;">(２)<br>□</td>
-    <td>支援責任者及び支援担当者が過去２年間に中長期在留者（注）の生活相談業務に従事した経験を有すること</td>
-    <td colspan="3">
-      <table style="width:100%;border-collapse:collapse;font-size:8pt;">
-        <tr>
-          <td style="border:1px solid #333;padding:2px;width:12%;text-align:center;">支援<br>責任者</td>
-          <td style="border:1px solid #333;padding:2px;width:20%;">生活相談業務期間</td>
-          <td style="border:1px solid #333;padding:2px;">年　月　日〜　年　月　日</td>
-          <td style="border:1px solid #333;padding:2px;width:20%;">生活相談業務に従事した機関</td>
-          <td style="border:1px solid #333;padding:2px;">機関名称：<br>所在地：</td>
-          <td style="border:1px solid #333;padding:2px;width:20%;">生活相談業務内容</td>
-          <td style="border:1px solid #333;padding:2px;font-size:7pt;">□生活に必要な契約<br>□生活オリエンテーション<br>□定期的な面談<br>□その他（　　）</td>
-        </tr>
-        <tr>
-          <td style="border:1px solid #333;padding:2px;text-align:center;">支援<br>担当者</td>
-          <td style="border:1px solid #333;padding:2px;">生活相談業務期間</td>
-          <td style="border:1px solid #333;padding:2px;">年　月　日〜　年　月　日</td>
-          <td style="border:1px solid #333;padding:2px;">生活相談業務に従事した機関</td>
-          <td style="border:1px solid #333;padding:2px;">機関名称：<br>所在地：</td>
-          <td style="border:1px solid #333;padding:2px;">生活相談業務内容</td>
-          <td style="border:1px solid #333;padding:2px;font-size:7pt;">□生活に必要な契約<br>□生活オリエンテーション<br>□定期的な面談<br>□その他（　　）</td>
-        </tr>
-      </table>
-    </td>
+    <td rowspan="2">生活相談業務に従事した機関</td>
+    <td colspan="3">機関名称：</td>
+  </tr>
+  <tr><td colspan="3">所在地：</td></tr>
+  <tr>
+    <td>生活相談業務内容</td>
+    <td colspan="3" style="font-size:7pt;">□生活に必要な契約に係る支援　□生活オリエンテーション　□定期的な面談　□その他（　　　　）</td>
+  </tr>
+  <tr>
+    <td>報酬の有無</td>
+    <td colspan="3">□　有　　□　無</td>
+  </tr>
+  <tr>
+    <td rowspan="4" style="text-align:center;vertical-align:middle;">支援<br>担当者</td>
+    <td>生活相談業務期間</td>
+    <td colspan="3">年　月　日〜　年　月　日</td>
+  </tr>
+  <tr>
+    <td rowspan="2">生活相談業務に従事した機関</td>
+    <td colspan="3">機関名称：</td>
+  </tr>
+  <tr><td colspan="3">所在地：</td></tr>
+  <tr>
+    <td>生活相談業務内容</td>
+    <td colspan="3" style="font-size:7pt;">□生活に必要な契約に係る支援　□生活オリエンテーション　□定期的な面談　□その他（　　　　）</td>
   </tr>
   <tr>
     <td style="text-align:center;">(３)<br>□</td>
-    <td colspan="4">（１）及び（２）に掲げるもののほか、これらの者と同程度に支援業務を適正に実施することができること</td>
+    <td colspan="6">（１）及び（２）に掲げるもののほか、これらの者と同程度に支援業務を適正に実施することができること</td>
   </tr>
 </table>
 </div>
