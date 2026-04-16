@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 申請内容変更申出書</div>
-    <div class="ver">ver.20260416.01</div>
+    <div class="ver">ver.20260416.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -76,38 +76,51 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="text-align:center;font-size:7pt;margin-bottom:2mm;">日本国政府法務省</div>
-<div style="font-size:10.5pt;font-weight:bold;text-align:center;letter-spacing:4px;margin-bottom:4mm;">申　請　内　容　変　更　申　出　書</div>
-<div style="font-size:9pt;margin-bottom:2mm;">${f('f_imm')||'出入国在留管理局長'}　殿</div>
-<div style="font-size:9pt;margin-bottom:4mm;line-height:1.8;">　出入国管理及び難民認定法施行規則第21条の３又は第21条の４の規定に基づき，次のとおり申請内容の変更を申し出ます。</div>
+<div style="font-size:6.5pt;margin-bottom:2mm;">別記第三十号の三様式（第二十一条の三，第二十条の四関係）</div>
+<div style="text-align:right;font-size:9pt;margin-bottom:4mm;">日本国政府法務省</div>
+<div style="font-size:13pt;font-weight:bold;text-align:center;letter-spacing:6px;margin-bottom:6mm;">申　請　内　容　変　更　申　出　書</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2mm;">
+  <div style="font-size:9pt;">${f('f_imm')||'　　　　　　　'}</div>
+  <div style="font-size:9pt;">出入国在留管理局長　　殿</div>
+</div>
+<div style="font-size:9pt;margin-bottom:6mm;">　出入国管理及び難民認定法施行規則第21条の３又は第21条の４の規定に基づき，次のとおり申請内容の変更を申し出ます。</div>
+<div style="font-size:9pt;text-align:center;margin-bottom:2mm;">
+  ${f('f_year')} 年　　${f('f_month')} 月　　${f('f_day')} 日
+</div>
+<div style="font-size:9pt;text-align:center;margin-bottom:4mm;">に行った</div>
+<div style="font-size:9pt;margin-left:4em;margin-bottom:3mm;">1．在留資格変更許可申請</div>
+<div style="font-size:9pt;margin-left:4em;margin-bottom:3mm;">2．在留期間更新許可申請</div>
+<div style="font-size:9pt;text-align:center;margin-bottom:4mm;">（申請番号　　${f('f_appNo')}　　）</div>
+<div style="font-size:9pt;margin-bottom:2mm;">については，申請の内容を</div>
+<div style="border-bottom:1px solid #333;margin-bottom:2mm;min-height:20mm;"></div>
+<div style="font-size:9pt;margin-bottom:6mm;">に変更したく，申し出ます。</div>
+<div style="font-size:9pt;margin-bottom:3mm;">法定代理人（法定代理人による申出の場合に記入）</div>
 <div style="font-size:9pt;margin-bottom:2mm;">
-  ${f('f_year')} 年　${f('f_month')} 月　${f('f_day')} 日　に行った
+  <span style="margin-right:4em;">(1)氏　名</span><span style="margin-right:4em;"></span><span>(2)本人との関係</span>
 </div>
-<div style="font-size:9pt;margin-left:2em;margin-bottom:2mm;">
-  ${type1checked}　在留資格変更許可申請<br>
-  ${type2checked}　在留期間更新許可申請
+<div style="font-size:9pt;margin-bottom:2mm;">(3)住　所</div>
+<div style="border-bottom:1px solid #333;margin-bottom:2mm;min-height:8mm;"></div>
+<div style="font-size:9pt;margin-bottom:6mm;">
+  <span style="margin-right:4em;">電話番号</span><span style="margin-left:4em;">携帯電話番号</span>
 </div>
-<div style="font-size:9pt;margin-bottom:4mm;">（申請番号　${f('f_appNo')}　）</div>
-<div style="font-size:9pt;margin-bottom:8mm;">については，申請の内容を<br><br><br>に変更したく，申し出ます。</div>
-<div style="font-size:9pt;border:1px solid #333;padding:4px 8px;margin-bottom:4mm;">
-  法定代理人（法定代理人による申出の場合に記入）<br>
-  (1)氏　名　　　　　　　　　　　　　　　(2)本人との関係　　　　　　　　　<br>
-  (3)住　所<br><br>
-  電話番号　　　　　　　　　　　　　携帯電話番号
+<div style="font-size:9pt;margin-bottom:1mm;">以上の記載内容は事実と相違ありません。</div>
+<div style="font-size:9pt;margin-bottom:2mm;">申出人（法定代理人）の署名／申出書作成年月日</div>
+<div style="font-size:9pt;text-align:right;margin-bottom:4mm;">年　　　　月　　　　日</div>
+<div style="font-size:8.5pt;margin-bottom:3mm;">
+  <span style="font-weight:bold;">注　意</span><br>
+  申出書作成後申出までに記載内容に変更が生じた場合，申出人（法定代理人）が変更箇所を訂正し，署名すること。<br>
+  申出書作成年月日は申出人（法定代理人）が自署すること。
 </div>
-<div style="font-size:9pt;margin-bottom:2mm;">以上の記載内容は事実と相違ありません。</div>
-<div style="font-size:9pt;margin-bottom:6mm;">　申出人（法定代理人）の署名／申出書作成年月日</div>
-<div style="font-size:9pt;text-align:right;margin-bottom:6mm;">${f('f_applyDate')||'　　　年　　月　　日'}</div>
-<div style="font-size:8pt;border:1px solid #333;padding:4px 8px;">
-  <div style="font-weight:bold;margin-bottom:1mm;">注　意</div>
-  <div>申出書作成後申出までに記載内容に変更が生じた場合，申出人（法定代理人）が変更箇所を訂正し，署名すること。</div>
-  <div>申出書作成年月日は申出人（法定代理人）が自署すること。</div>
-</div>
-<div style="font-size:8pt;margin-top:4mm;">
-  ※　取次者<br>
-  (1)氏　名　　　　　　　(2)住　所　東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階<br>
-  (3)所属機関等（親族等については，本人との関係）　　　　　電話番号<br>
-  　大房行政書士法人　　　　　　　　　　　　　　　　　　　　03－6424－8849
+<div style="border-top:1px solid #555;padding-top:3mm;font-size:9pt;">
+  <div style="margin-bottom:2mm;">※　取次者</div>
+  <div style="margin-bottom:2mm;display:flex;gap:2em;">
+    <span>(1)氏　名　　大房行政書士法人</span>
+    <span>(2)住　所　東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階</span>
+  </div>
+  <div style="display:flex;justify-content:space-between;">
+    <span>(3)所属機関等（親族等については，本人との関係）　大房行政書士法人</span>
+    <span>電話番号　03－6424－8849</span>
+  </div>
 </div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
