@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.25</div>
+    <div class="ver">ver.20260415.26</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -110,14 +110,14 @@ function p(){
 </div>
 <div style="margin-bottom:24px;">
   <div>１　在留期間の満了日までに「特定技能１号」への在留資格変更許可申請をすることができない事情</div>
-  <div style="border:1px solid #555;padding:4px 12px;margin-top:6px;font-size:10pt;line-height:1.52;background-image:repeating-linear-gradient(to bottom, transparent, transparent calc(1.9em - 1px), #aaa calc(1.9em - 1px), #aaa 1.9em);background-size:100% 1.9em;">
-    この度弊社で特定技能 1 号として雇用契約を締結することに決定したが、弊社側の<br>
-    特定技能 1 号申請への準備(書類準備等)が整っておらず、許可が出るまで、<br>
-    2 ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得<br>
-    できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考<br>
-    考えております。<br>
-    また、弊社で${f('f_field')}に必要な指導、助言などを行うと共に、<br>
-    在留中の日常生活に係る支援についても、適切に行っていきます。
+  <div style="border:1px solid #555;padding:0 12px;margin-top:6px;font-size:10pt;line-height:1.52em;">
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">この度弊社で特定技能 1 号として雇用契約を締結することに決定したが、弊社側の</div>
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">特定技能 1 号申請への準備(書類準備等)が整っておらず、許可が出るまで、</div>
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">2 ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得</div>
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考</div>
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">考えております。</div>
+    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">また、弊社で${f('f_field')}に必要な指導、助言などを行うと共に、</div>
+    <div style="padding:2px 0;">在留中の日常生活に係る支援についても、適切に行っていきます。</div>
   </div>
 </div>
 <div style="margin-bottom:24px;">
@@ -202,6 +202,7 @@ function p(){
 </div>
 </div>`;
 
+  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
   _applyFontSize();
   _applyIkoFontSize();
   setupPageTracker();
@@ -273,7 +274,7 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.25 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.26 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 </script>
