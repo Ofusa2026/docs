@@ -22,7 +22,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260415.31</div>
+    <div class="ver">ver.20260415.32</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
@@ -206,6 +206,7 @@ function p(){
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   _applyIkoFontSize();
   setupPageTracker();
+  fitDocToPreview();
 }
 
 function _applyIkoFontSize(){
@@ -274,9 +275,26 @@ async function loadFromDB(){
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.31 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.32 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
+
+function fitDocToPreview(){
+  const pp = document.getElementById('ppOuter') || document.querySelector('.pp');
+  const area = document.getElementById('pageArea');
+  if(!pp || !area) return;
+  const doc = area.querySelector('.doc');
+  if(!doc) return;
+  const ppW = pp.clientWidth - 40; // padding分引く
+  const docW = 794;
+  if(ppW < docW){
+    const scale = ppW / docW;
+    area.style.zoom = scale;
+  } else {
+    area.style.zoom = 1;
+  }
+}
+window.addEventListener('resize', fitDocToPreview);
 </script>
 </body>
 </html>

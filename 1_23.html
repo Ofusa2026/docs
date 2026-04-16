@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260415.16</div>
+    <div class="ver">ver.20260415.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -162,6 +162,7 @@ function p(){
   _applyFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
+  fitDocToPreview();
 }
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
@@ -183,6 +184,23 @@ async function loadFromDB(){
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 buildOfficerForm(); initCaseSelect(); p();
+
+function fitDocToPreview(){
+  const pp = document.getElementById('ppOuter') || document.querySelector('.pp');
+  const area = document.getElementById('pageArea');
+  if(!pp || !area) return;
+  const doc = area.querySelector('.doc');
+  if(!doc) return;
+  const ppW = pp.clientWidth - 40; // padding分引く
+  const docW = 794;
+  if(ppW < docW){
+    const scale = ppW / docW;
+    area.style.zoom = scale;
+  } else {
+    area.style.zoom = 1;
+  }
+}
+window.addEventListener('resize', fitDocToPreview);
 </script>
 </body>
 </html>
