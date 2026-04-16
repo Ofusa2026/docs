@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260415.67</div>
+    <div class="ver">ver.20260415.68</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -415,7 +415,7 @@ function p(){
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">Alamat</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nomor telepon</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
-        <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;印</td></tr>
+        <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nama dan jabatan representatif</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}</td></tr>
       </table>
     </div>
@@ -1392,7 +1392,7 @@ function p_iko(){
 
 
 
-console.log('%c OFUSA 書類作成システム %c ver.20260415.67 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+console.log('%c OFUSA 書類作成システム %c ver.20260415.68 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
 p();
 
