@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.02</div>
+    <div class="ver">ver.20260417.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -103,18 +103,7 @@
 <script>
 docId='1_5';
 const _title='📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）';
-// _fontSize, _editMode は ofusa_common.js で宣言済み
-
-function f(id){
-  const el=document.getElementById(id);
-  if(!el||!el.value.trim()) return `<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id.replace('es_','es.')}</span>`;
-  return `<span class="f">${esc(el.value.trim())}</span>`;
-}
-function v(id){
-  const el=document.getElementById(id);
-  return el?el.value.trim():'';
-}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// f, v, esc, _fontSize, _editMode は ofusa_common.js で宣言済み
 
 function p(){
   if(_editMode) return;
