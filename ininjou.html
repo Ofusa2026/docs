@@ -18,7 +18,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260416.01</div>
+    <div class="ver">ver.20260416.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -87,7 +87,7 @@ function p(){
   　（事務所名称又は法人名称＋代表行政書士氏名＋行政書士登録番号）<br>
   担当者氏名：　大房　明良
 </div>
-<div style="font-size:9pt;margin-bottom:6mm;border:1px solid #ccc;padding:4px 8px;">
+<div style="font-size:10pt;margin-bottom:6mm;border:1px solid #ccc;padding:4px 8px;">
   （注）個人事務所の場合：事務所代表者の事務所を行政書士証票と同一に記載すること。<br>
   　　　行政書士法人の場合：法人代表者の事業所（当該事務所が従たる事務所である場合にはその旨）を行政書士証票と同一に記載すること。
 </div>
@@ -96,15 +96,15 @@ function p(){
 <div style="font-size:10pt;margin-bottom:2mm;">${cb(appType,'new')}　新規申請に関する次の事項</div>
 <div style="font-size:10pt;margin-bottom:2mm;">${cb(appType,'change')}　変更申請に関する次の移行</div>
 <div style="font-size:10pt;margin-bottom:4mm;">${cb(appType,'notify')}　変更届け出に関する次の事項</div>
-<div style="font-size:9pt;margin-bottom:2mm;">（注）上記いずれか一つに☑選択すること。複数選択は、委任事項が不明確となるため不可。</div>
+<div style="font-size:10pt;font-weight:bold;margin-bottom:2mm;">（注）上記いずれか一つに☑選択すること。複数選択は、委任事項が不明確となるため不可。</div>
 <div style="font-size:10pt;margin-bottom:1mm;">☑建設特定技能受入計画の申請又は届出に必要な書類の作成及び収集</div>
 <div style="font-size:10pt;margin-bottom:1mm;">☑外国人就労管理システムへの入力および当該システムを利用した代理申請</div>
-<div style="font-size:9pt;margin-bottom:2mm;margin-left:2em;">（適正な就労管理及び労働環境の確保に関する事項の宣誓については、宣誓内容を精続受入れ企業に説明してその同意を得たうえで、この同意先生の代理含む）</div>
+<div style="font-size:10pt;margin-bottom:2mm;margin-left:2em;">（適正な就労管理及び労働環境の確保に関する事項の宣誓については、宣誓内容を精続受入れ企業に説明してその同意を得たうえで、この同意先生の代理含む）</div>
 <div style="font-size:10pt;margin-bottom:1mm;">☑申請内容の差し戻しによる補正及び追加資料の提出</div>
 <div style="font-size:10pt;margin-bottom:1mm;">☑審査長との渉外調整（申請内容等に関する照会の対応等の一切の行為）</div>
 <div style="font-size:10pt;margin-bottom:1mm;">☑申請の取下げ及び再申請</div>
 <div style="font-size:10pt;margin-bottom:3mm;">☑建設特定技能受入計画認定証の受領に関する件</div>
-<div style="font-size:9pt;margin-bottom:6mm;">（注）上記に該当する箇所に☑選択すること。複数選択可</div>
+<div style="font-size:10pt;font-weight:bold;margin-bottom:6mm;">（注）上記に該当する箇所に☑選択すること。複数選択可</div>
 <div style="font-size:10pt;text-align:right;margin-bottom:2mm;">以上</div>
 <div style="font-size:10pt;text-align:right;margin-bottom:6mm;">西暦　　　${f('f_docDate')}</div>
 <div style="font-size:10pt;">
