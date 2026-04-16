@@ -34,7 +34,7 @@ td,th{border:1px solid #555;padding:2px 3px;vertical-align:top;}
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.01</div>
+    <div class="ver">ver.20260417.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -133,16 +133,9 @@ td,th{border:1px solid #555;padding:2px 3px;vertical-align:top;}
 <script>
 docId='1_17';
 const _title='📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）';
-let _fontSize=7;
-let _editMode=false;
-
-function f(id){
-  const el=document.getElementById(id);
-  if(!el) return `<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id.replace('_','.')}</span>`;
-  if(!el.value.trim()) return `<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id.replace(/_/g,'.')}</span>`;
-  return `<span class="f">${esc(el.value.trim())}</span>`;
-}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// f, esc, _fontSize, _editMode は ofusa_common.js で宣言済み
+// デフォルトフォントサイズを7ptに設定
+_fontSize = 7;
 
 // 支援担当者ブロック（所属機関）
 function coStaff(){
