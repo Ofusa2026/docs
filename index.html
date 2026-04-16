@@ -159,9 +159,14 @@ function open_doc(key){
     const fr=document.getElementById(docs[k].frameId);
     if(!fr) return;
     if(k===key){
-      // 初回のみsrcをセット
       if(!fr.src || fr.src===window.location.href) fr.src=docs[k].file;
       fr.style.display='block';
+      // 案件選択済みなら送信
+      if(idxSelectedCase){
+        const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
+        if(fr.contentDocument?.readyState==='complete') setTimeout(send,200);
+        else fr.onload=()=>setTimeout(send,200);
+      }
     } else {
       fr.style.display='none';
     }
@@ -234,21 +239,6 @@ function idxSendToVisible(info){
     if(!fr||fr.style.display==='none'||!fr.src||fr.src===location.href) return;
     try{fr.contentWindow.postMessage({type:'SELECT_CASE',info},'*');}catch(e){}
   });
-}
-
-// 書類切替時に選択中の案件を送信
-const _origOpenDoc=open_doc;
-function open_doc(key){
-  _origOpenDoc(key);
-  if(idxSelectedCase&&key!=='home'){
-    setTimeout(()=>{
-      const fr=document.getElementById(docs[key]?.frameId);
-      if(!fr||!fr.src||fr.src===location.href) return;
-      const send=()=>fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');
-      if(fr.contentDocument?.readyState==='complete') send();
-      else fr.onload=send;
-    },100);
-  }
 }
 
 idxInit();
