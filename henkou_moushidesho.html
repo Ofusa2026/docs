@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>申請内容変更申出書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776264504">
+<style>
+.doc{padding:12mm 17mm 5mm 15mm!important;line-height:1.6!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 申請内容変更申出書</div>
+    <div class="ver">ver.20260416.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>管轄入管</label><input id="f_imm" oninput="p()"></div>
+      <div class="fg"><label>申請日（年）</label><input id="f_year" oninput="p()"></div>
+      <div class="fg"><label>申請日（月）</label><input id="f_month" oninput="p()"></div>
+      <div class="fg"><label>申請日（日）</label><input id="f_day" oninput="p()"></div>
+      <div class="fg"><label>申請番号</label><input id="f_appNo" oninput="p()"></div>
+      <div class="fg"><label>申請種別</label>
+        <select id="f_appType" onchange="p()">
+          <option value="1">在留資格変更許可申請</option>
+          <option value="2">在留期間更新許可申請</option>
+        </select>
+      </div>
+      <div class="fg"><label>申出日（年月日）</label><input id="f_applyDate" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776264504"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const appType = document.getElementById('f_appType')?.value||'1';
+  const type1checked = appType==='1'?'■':'□';
+  const type2checked = appType==='2'?'■':'□';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:center;font-size:7pt;margin-bottom:2mm;">日本国政府法務省</div>
+<div style="font-size:10.5pt;font-weight:bold;text-align:center;letter-spacing:4px;margin-bottom:4mm;">申　請　内　容　変　更　申　出　書</div>
+<div style="font-size:9pt;margin-bottom:2mm;">${f('f_imm')||'出入国在留管理局長'}　殿</div>
+<div style="font-size:9pt;margin-bottom:4mm;line-height:1.8;">　出入国管理及び難民認定法施行規則第21条の３又は第21条の４の規定に基づき，次のとおり申請内容の変更を申し出ます。</div>
+<div style="font-size:9pt;margin-bottom:2mm;">
+  ${f('f_year')} 年　${f('f_month')} 月　${f('f_day')} 日　に行った
+</div>
+<div style="font-size:9pt;margin-left:2em;margin-bottom:2mm;">
+  ${type1checked}　在留資格変更許可申請<br>
+  ${type2checked}　在留期間更新許可申請
+</div>
+<div style="font-size:9pt;margin-bottom:4mm;">（申請番号　${f('f_appNo')}　）</div>
+<div style="font-size:9pt;margin-bottom:8mm;">については，申請の内容を<br><br><br>に変更したく，申し出ます。</div>
+<div style="font-size:9pt;border:1px solid #333;padding:4px 8px;margin-bottom:4mm;">
+  法定代理人（法定代理人による申出の場合に記入）<br>
+  (1)氏　名　　　　　　　　　　　　　　　(2)本人との関係　　　　　　　　　<br>
+  (3)住　所<br><br>
+  電話番号　　　　　　　　　　　　　携帯電話番号
+</div>
+<div style="font-size:9pt;margin-bottom:2mm;">以上の記載内容は事実と相違ありません。</div>
+<div style="font-size:9pt;margin-bottom:6mm;">　申出人（法定代理人）の署名／申出書作成年月日</div>
+<div style="font-size:9pt;text-align:right;margin-bottom:6mm;">${f('f_applyDate')||'　　　年　　月　　日'}</div>
+<div style="font-size:8pt;border:1px solid #333;padding:4px 8px;">
+  <div style="font-weight:bold;margin-bottom:1mm;">注　意</div>
+  <div>申出書作成後申出までに記載内容に変更が生じた場合，申出人（法定代理人）が変更箇所を訂正し，署名すること。</div>
+  <div>申出書作成年月日は申出人（法定代理人）が自署すること。</div>
+</div>
+<div style="font-size:8pt;margin-top:4mm;">
+  ※　取次者<br>
+  (1)氏　名　　　　　　　(2)住　所　東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階<br>
+  (3)所属機関等（親族等については，本人との関係）　　　　　電話番号<br>
+  　大房行政書士法人　　　　　　　　　　　　　　　　　　　　03－6424－8849
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp');
+    const area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40;
+    const docW=794;
+    if(ppW<docW){const scale=ppW/docW;area.querySelectorAll('.doc').forEach(d=>{d.style.zoom=scale;});}
+    else{area.querySelectorAll('.doc').forEach(d=>{d.style.zoom=1;});}
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=reception_no,org&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas) s('f_appNo',cas.reception_no||'');
+    if(!v('f_applyDate')){const n=new Date();s('f_applyDate',`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
+}
+initCaseSelect(); p();
+</script>
+</body>
+</html>

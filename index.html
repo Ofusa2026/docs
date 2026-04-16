@@ -69,6 +69,18 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>参考様式第１－２９号<span class="item-sub">書類省略に当たっての誓約書</span></div>
     </div>
+    <div class="item" id="nav-1_4" onclick="open_doc('1_4')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－４号<span class="item-sub">報酬に関する説明書</span></div>
+    </div>
+    <div class="item" id="nav-henkou" onclick="open_doc('henkou')">
+      <span class="item-icon">📄</span>
+      <div>申請内容変更申出書</div>
+    </div>
+    <div class="item" id="nav-ininjou" onclick="open_doc('ininjou')">
+      <span class="item-icon">📄</span>
+      <div>委任状（変更）</div>
+    </div>
     <div class="divider"></div>
     <div class="section">準備中</div>
     <div class="item disabled"><span class="item-icon">📝</span><div>参考様式第１－５号<span class="item-sub">雇用契約書</span></div></div>
@@ -105,6 +117,9 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-1_25"></iframe>
     <iframe id="frame-1_27"></iframe>
     <iframe id="frame-1_29"></iframe>
+    <iframe id="frame-1_4"></iframe>
+    <iframe id="frame-henkou"></iframe>
+    <iframe id="frame-ininjou"></iframe>
   </div>
 </div>
 <script>
@@ -114,7 +129,10 @@ const docs={
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1776304017'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1776305576'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1776304017'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776306240'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776306548'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1776306548'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1776306548'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1776306548'},
 };
 let cur='home';
 function open_doc(key){
