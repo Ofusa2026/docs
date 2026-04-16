@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.19</div>
+    <div class="ver">ver.20260416.20</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -145,34 +145,42 @@ function p(){
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">３　基準適合性に係る事項</div>
 <table class="tbl">
   <tr>
-    <td rowspan="4" style="width:28%;">（１）過去１年における特定技能外国人と同種の業務に従事する労働者の離職状況</td>
-    <td rowspan="2" style="width:15%;"></td>
-    <td colspan="3" style="text-align:center;">離職理由</td>
+    <td rowspan="4" style="width:25%;">（１）過去１年における特定技能外国人と同種の業務に従事する労働者の離職状況</td>
+    <td rowspan="2" style="width:13%;"></td>
+    <td colspan="4" style="text-align:center;">離職理由</td>
   </tr>
   <tr>
-    <td style="width:18%;text-align:center;">自発的離職者</td>
-    <td colspan="2" style="text-align:center;">非自発的離職者</td>
+    <td style="width:16%;text-align:center;">自発的離職者</td>
+    <td style="width:5%;"></td>
+    <td style="width:16%;text-align:center;">非自発的離職者</td>
+    <td style="width:5%;"></td>
   </tr>
   <tr>
     <td>日本人労働者</td>
-    <td style="text-align:center;">${f('f_jpVQ')||'0'}名</td>
-    <td colspan="2" style="text-align:center;">${f('f_jpIQ')||'0'}名</td>
+    <td style="text-align:right;">${f('f_jpVQ')||'0'}</td>
+    <td>名</td>
+    <td style="text-align:right;">${f('f_jpIQ')||'0'}</td>
+    <td>名</td>
   </tr>
   <tr>
     <td>外国人労働者</td>
-    <td style="text-align:center;">${f('f_fgnVQ')||'0'}名</td>
-    <td colspan="2" style="text-align:center;">${f('f_fgnIQ')||'0'}名</td>
+    <td style="text-align:right;">${f('f_fgnVQ')||'0'}</td>
+    <td>名</td>
+    <td style="text-align:right;">${f('f_fgnIQ')||'0'}</td>
+    <td>名</td>
   </tr>
   <tr>
     <td rowspan="2">（２）前１年間の行方不明者数</td>
     <td>特定技能１号及び２号</td>
-    <td style="text-align:center;">0名</td>
+    <td style="text-align:right;">${f('f_jpVQ')||'0'}</td>
+    <td>名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
     <td>□　該当あり<br>■　該当なし</td>
   </tr>
   <tr>
     <td>技能実習</td>
-    <td style="text-align:center;">0名</td>
+    <td style="text-align:right;">0</td>
+    <td>名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
     <td>□　該当あり<br>■　該当なし</td>
   </tr>
