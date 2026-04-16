@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260415.70</div>
+    <div class="ver">ver.20260415.71</div>
   </div>
   <div style="display:flex;gap:4px;align-items:center;margin-left:8px;">
     <span style="font-size:10px;color:#aaa;">言語:</span>
@@ -377,8 +377,8 @@ function p(){
     const nEn=v('es_a'+i+'NameEn');
     const nEnVal=nEn||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}NameEn</span>`;
     const nEnSpan=`<span class="f">${nEnVal}</span>`;
-    if(i<=2) allowLineId1+=`（Tunjangan　${nEnSpan}），`;
-    else allowLineId2+=`（Tunjangan　${nEnSpan}），`;
+    if(i<=2) allowLineId1+=`（Trợ cấp　${nEnSpan}），`;
+    else allowLineId2+=`（Trợ cấp　${nEnSpan}），`;
   }
 
   // 手当（別紙用）
@@ -481,7 +481,7 @@ function p(){
       <!-- 左：直接雇用 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅱ．就業の場所</div>
-        <div style="font-size:8pt;margin-bottom:4px;">II. Tempat kerja</div>
+        <div style="font-size:8pt;margin-bottom:4px;">II. Nơi làm việc</div>
         <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} Tuyển dụng trực tiếp (điền vào phần dưới)</span></div>
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* Vào văn phòng của tổ chức tiếp nhận</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
@@ -511,7 +511,7 @@ function p(){
       <!-- 左：直接雇用側 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅲ．従事すべき業務の内容</div>
-        <div style="font-size:8pt;margin-bottom:4px;">III. Konten pekerjaan yang harus dilakukan</div>
+        <div style="font-size:8pt;margin-bottom:4px;">III. Nội dung công việc cần thực hiện</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
             <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. Lĩnh vực</span></td>
@@ -540,9 +540,9 @@ function p(){
 
   <!-- Ⅳ 労働時間等 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. Jam kerja, dll.</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. Các nội dung như thời gian làm việc</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. Jam mulai dan selesai kerja, dll.</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. Thời gian bắt đầu và kết thúc công việc</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
         <span class="id" style="font-size:7.5pt;" data-key="52">(1) Bắt đầu（${f('es_startTime')}）Kết thúc（${f('es_endTime')}）(Số giờ làm việc quy định cho 1 ngày: ${f('es_dailyHours')}giờ　${f('es_dailyMins')}phút)</span>
@@ -579,9 +579,9 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Jam istirahat&emsp;(${f('es_breakTime')}menit)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Jam kerja yang ditentukan&emsp;①Mingguan(${f('es_weeklyH')}jam&nbsp;${f('es_weeklyMin')}menit)&emsp;②Bulanan(${f('es_monthlyH')}jam&nbsp;${f('es_monthlyMin')}menit)&emsp;③Tahunan(${f('es_yearlyH')}jam&nbsp;${f('es_yearlyMin')}menit)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Hari kerja yang ditentukan&emsp;①Mingguan(${f('es_weeklyDays')}hari)&emsp;②Bulanan(${f('es_monthlyDays')}hari)&emsp;③Tahunan(${f('es_yearlyDays')}hari)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Thời gian nghỉ ngơi&emsp;(${f('es_breakTime')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Số giờ làm việc quy định&emsp;①Tuần(${f('es_weeklyH')}giờ&nbsp;${f('es_weeklyMin')}phút)&emsp;②Tháng(${f('es_monthlyH')}giờ&nbsp;${f('es_monthlyMin')}phút)&emsp;③Năm(${f('es_yearlyH')}giờ&nbsp;${f('es_yearlyMin')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
           <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Jam lembur</span></td>
@@ -597,7 +597,7 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">hari libur</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ngày</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. Ngày nghỉ cố định: (${f('es_fixedDay1En')})，khác（${f('es_otherHolidays')}）(Tổng số ngày nghỉ trong năm:${f('es_annualHolidays')}ngày)</span></div>
       <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. Ngày không cố định: ngày/tuần/tháng, khác ( )</span></div>
@@ -607,7 +607,7 @@ function p(){
 
   <!-- Ⅵ 休暇 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. Cuti</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. Nghỉ phép</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. Nghỉ phép có lương trong năm&emsp;Trường hợp đã làm liên tục 6 tháng→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}ngày</span></div>
       <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Trường hợp chưa đủ 6 tháng (${cb(false,"cb_auto_002")} Có&emsp;${cb(true,"cb_auto_003")} Không) → Qua&nbsp;&nbsp;&nbsp;tháng, được&nbsp;&nbsp;&nbsp;ngày</span></div>
@@ -619,7 +619,7 @@ function p(){
 
   <!-- Ⅶ 賃金 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. Gaji</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. Tiền lương</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
         <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. Tiền lương cơ bản&emsp;${cb(true,"cb_auto_004")} Lương tháng (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Lương ngày(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Lương giờ(${ff('es_salaryHourly')}JPY)</span></div>
@@ -756,7 +756,7 @@ function p(){
 <div style="border:1px solid #333;">
   <!-- Ⅷ 退職 -->
   <div style="padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. Hal-hal terkait pengunduran diri</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. Các nội dung liên quan đến việc nghỉ việc</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">1. Thủ tục nghỉ việc do lý do cá nhân (Báo cáo cho giám đốc/xưởng trưởng ${f('es_resignNoticeDays')} ngày trước khi nghỉ việc)</span></div>
       <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">2. Lý do và thủ tục sa thải</span></div>
@@ -766,7 +766,7 @@ function p(){
   </div>
 <!-- Ⅸ その他 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. Lainnya</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. Các nội dung khác</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. Tình trạng tham gia bảo hiểm xã hội/tình trạng áp dụng bảo hiểm lao động (${cb(true,"ins_kousei_id")} Tiền lương hưu người lao động, ${cb(true,"ins_kenko_id")} Bảo hiểm sức khỏe, ${cb(true,"ins_koyo_id")} Bảo hiểm tuyển dụng, ${cb(true,"ins_rousai_id")} Bảo hiểm tai nạn lao động,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} Tiền lương hưu quốc gia, ${cb(false,"ins_kokumin_kenko_id")} Bảo hiểm sức khỏe quốc gia, ${cb(false,"ins_other_id")} Khác (</span></div>
@@ -799,9 +799,9 @@ function p(){
 <!-- ===== 別紙 ===== -->
 <div style="padding:5px 0;margin:20px 0 4px;">
   <div style="font-size:8pt;font-weight:bold;">参考様式第１－６号　別紙</div>
-  <div style="font-size:7.5pt;">Format Referensi 1-6 Lampiran</div>
+  <div style="font-size:7.5pt;">Mẫu Tham Khảo 1-6 Văn bản đi kèm</div>
   <div style="text-align:center;font-size:10pt;font-weight:bold;margin-top:4px;">賃　金　の　支　払</div>
-  <div style="text-align:center;font-size:8pt;">Pembayaran Gaji</div>
+  <div style="text-align:center;font-size:8pt;">Thanh toán tiền lương</div>
 </div>
 
 <div style="font-size:8.5pt;">
@@ -809,7 +809,7 @@ function p(){
     <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
       <colgroup><col style="width:28%"><col style="width:24%"><col style="width:24%"><col style="width:24%"></colgroup>
       <tr>
-        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. Gaji pokok</span></td>
+        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. Tiền lương cơ bản</span></td>
         <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">${cb(sMonthly,'sal_monthly_a_id')} Lương tháng (${ff('es_salaryMonthly')}JPY)</span></td>
         <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">${cb(sDaily,'sal_daily_a_id')} Lương ngày (${ff('es_salaryDaily')}JPY)</span></td>
         <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">${cb(sHourly,'sal_hourly_a_id')} Lương giờ (${ff('es_salaryHourly')}JPY)</span></td>
