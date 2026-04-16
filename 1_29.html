@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２９号　書類省略に当たっての誓約書</div>
-    <div class="ver">ver.20260415.08</div>
+    <div class="ver">ver.20260415.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -53,7 +53,7 @@
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
-    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">14pt</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
   </div>
   <div id="pageArea"></div>
@@ -99,10 +99,17 @@ function p(){
 <div style="margin-left:2em;margin-bottom:4px;">${f('f_docDate')}</div>
 <div style="margin-left:2em;">特定技能所属機関名　　　${f('f_company')}</div>
 </div>`;
-  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
+  _fontSize = (_fontSize === 8.5) ? 14 : _fontSize;
   _applyFontSize();
+  _apply1_29FontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
+}
+function _apply1_29FontSize(){
+  const st=document.getElementById('_1_29FontStyle')||document.createElement('style');
+  st.id='_1_29FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/14;
+  st.textContent=`.doc [style*="font-size:18pt"]{font-size:${(18*s).toFixed(2)}pt!important}`;
 }
 async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
