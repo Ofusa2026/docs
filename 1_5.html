@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－５号 特定技能雇用契約書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776381161">
+<style>
+.doc{
+  background:white;
+  width:794px;
+  min-height:1123px;
+  flex-shrink:0;
+  margin:0 0 24px 0;
+  padding:15mm 14mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
+  font-size:8.5pt;line-height:1.9;color:#000;
+  position:relative;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.page-num-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;color:#bbb;font-family:sans-serif;
+  background:white;padding:0 2px;
+}
+.id{color:#000;}
+.f{color:#1a56db;font-weight:bold;}
+.sign-box{
+  border:1px solid #555;
+  padding:6px 10px;
+  margin-top:4px;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+}
+.sign-row{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:8px;
+}
+.sign-label{
+  white-space:nowrap;
+  font-size:8pt;
+  min-width:2em;
+}
+.sign-content{
+  flex:1;
+  border-bottom:1px solid #aaa;
+  min-height:40px;
+  font-size:8pt;
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
+    <div class="ver">ver.20260417.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>🔍 登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
+    <label>🏢 所属機関</label>
+    <select id="filterCompany" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
+    <label>🔤 検索（案件名・人材名）</label>
+    <input id="filterKeyword" oninput="filterCases()" placeholder="名前・案件名で絞り込み" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+    <label>👤 案件選択 <span id="caseCount" style="font-size:9px;color:#888;"></span></label>
+    <select id="caseSelect" size="6" style="width:100%;padding:2px;border:1px solid #bbb;border-radius:3px;font-size:11px;" onchange="selectCase()"></select>
+  </div>
+  <div class="fp-inner" id="formArea">
+    <div class="fs"><div class="fs-title">所属機関</div>
+      <div class="fg"><label>機関名（日）<span class="fid">es.orgName</span></label><input id="es_orgName" oninput="p()"></div>
+      <div class="fg"><label>機関名（ID）<span class="fid">es.orgNameEn</span></label><input id="es_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>代表者役職（日）<span class="fid">es.repTitle</span></label><input id="es_repTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名（日）<span class="fid">es.repName</span></label><input id="es_repName" oninput="p()"></div>
+      <div class="fg"><label>代表者役職（ID）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名（ID）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（日）<span class="fid">es.applicantName</span></label><input id="es_applicantName" oninput="p()"></div>
+      <div class="fg"><label>氏名（ID）<span class="fid">es.applicantNameEn</span></label><input id="es_applicantNameEn" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776381161"></script>
+<script>
+docId='1_5';
+const _title='📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）';
+let _fontSize=8.5;
+let _editMode=false;
+
+function f(id){
+  const el=document.getElementById(id);
+  if(!el||!el.value.trim()) return `<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id.replace('es_','es.')}</span>`;
+  return `<span class="f">${esc(el.value.trim())}</span>`;
+}
+function v(id){
+  const el=document.getElementById(id);
+  return el?el.value.trim():'';
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea');
+  if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:center;font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Format Referensi 1-5</span></div>
+
+<div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:0.15em;margin:6px 0 2px;">特　定　技　能　雇　用　契　約　書</div>
+<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Perjanjian Kerja Pekerja Berketerampilan Khusus</div>
+
+<div style="font-size:8.5pt;margin-bottom:2px;">
+  特定技能所属機関　${f('es_orgName')}<br>
+  <span class="id" style="font-size:7.5pt;">Organisasi afiliasi pekerja berketerampilan khusus</span>
+</div>
+<div style="font-size:8pt;margin-left:16px;margin-bottom:2px;">（以下「甲」という。）<span class="id" style="font-size:7pt;">（selanjutnya disebut "Pihak Pertama"）</span>と</div>
+
+<div style="font-size:8.5pt;margin-top:4px;margin-bottom:2px;">
+  特定技能外国人（候補者を含む。）　${f('es_applicantName')}<br>
+  <span class="id" style="font-size:7.5pt;">Pekerja berketerampilan khusus (termasuk calon pekerja)</span>
+</div>
+<div style="font-size:8pt;margin-left:16px;margin-bottom:8px;">（以下「乙」という。）<span class="id" style="font-size:7pt;">（selanjutnya disebut "Pihak Kedua"）</span></div>
+
+<div style="font-size:8.5pt;margin-bottom:4px;">
+  別添の雇用条件書に記載された内容に従い，特定技能雇用契約を締結する。<br>
+  <span class="id" style="font-size:7.5pt;">dengan ini mengikat diri dalam perjanjian kerja pekerja berketerampilan khusus sesuai isi yang tercantum dalam syarat kerja terlampir.</span>
+</div>
+
+<div style="border-top:1px solid #aaa;margin:10px 0 8px;"></div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  本雇用契約は、乙が、在留資格「特定技能１号」若しくは「特定技能２号」の上陸許可又は在留資格変更許可等を受けた日から、甲乙双方が速やかに調整を行い、同日から１か月以内の甲乙双方の合意により定めた日から雇用を開始するものとする。<br>
+  <span class="id" style="font-size:7pt;">Perjanjian kerja ini berlaku mulai dari tanggal Pihak Kedua masuk ke Jepang atau tanggal Pihak Kedua menerima izin perubahan visa tinggal, dsb. dengan izin tinggal "Pekerja Berketerampilan Khusus 1" atau "Pekerja Berketerampilan Khusus 2", dengan penyesuaian yang akan segera dilakukan oleh kedua belah pihak untuk memulai pekerjaan yang akan ditentukan melalui kesepakatan bersama antara Pihak Pertama dan Pihak Kedua dalam kurun waktu satu bulan sejak tanggal tersebut.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  雇用条件書に記載の雇用契約期間（雇用契約の始期と終期）は、甲乙双方の調整により定めた雇用を開始する日に伴って変更されるものとする。<br>
+  <span class="id" style="font-size:7pt;">Periode perjanjian kerja (masa mulai dan berakhirnya perjanjian kerja) yang tercantum dalam syarat kerja harus diubah sesuai tanggal mulai kerja yang ditentukan berdasarkan kesepakatan kedua belah pihak.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  甲乙双方は、乙の在留資格に係る審査結果を互いに情報共有することとする。<br>
+  <span class="id" style="font-size:7pt;">Kedua belah pihak akan saling berbagi informasi mengenai hasil keputusan terkait status visa Pihak Kedua.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  なお，雇用契約を更新することなく雇用契約期間を満了した場合，及び乙が何らかの事由で在留資格を喪失した時点で雇用契約は終了するものとする。<br>
+  <span class="id" style="font-size:7pt;">Perjanjian kerja berakhir pada saat perjanjian kerja tidak diperbarui dan periode perjanjian kerja telah berakhir, atau bila Pihak Kedua telah kehilangan izin tinggal karena suatu alasan.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:12px;">
+  本雇用契約書及び雇用条件書は２部作成し，甲乙それぞれが保有するものとする。<br>
+  <span class="id" style="font-size:7pt;">Perjanjian kerja ini dan syarat kerja dibuat dalam 2 (dua) rangkap dan masing-masing disimpan oleh Pihak Pertama dan Pihak Kedua.</span>
+</div>
+
+<div style="border-top:1px solid #aaa;margin-bottom:16px;"></div>
+
+<!-- 署名欄 -->
+<div style="display:flex;gap:20px;align-items:flex-start;">
+  <!-- 甲（特定技能所属機関）-->
+  <div style="flex:1;font-size:8pt;">
+    <div>甲　<span class="id">Pihak Pertama</span></div>
+    <div style="font-size:7pt;color:#555;">（特定技能所属機関名・代表者役職名・氏名・捺印）<br><span class="id">（Nama organisasi afiliasi pekerja berketerampilan khusus, nama, jabatan, dan tanda tangan direktur representatifnya）</span></div>
+    <div style="margin-top:6px;border:1px solid #888;padding:6px 8px;min-height:60px;font-size:8.5pt;">
+      ${f('es_orgName')}<br>
+      ${f('es_repTitle')}　${f('es_repName')}　印<br>
+      <span class="id" style="font-size:7pt;">${f('es_orgNameEn')}<br>${f('es_repTitleEn')}　${f('es_repNameEn')}</span>
+    </div>
+  </div>
+  <!-- 乙（特定技能外国人）-->
+  <div style="flex:1;font-size:8pt;">
+    <div>乙　<span class="id">Pihak Kedua</span></div>
+    <div style="font-size:7pt;color:#555;">（特定技能外国人氏名・署名）<br><span class="id">（Nama dan tanda tangan pekerja berketerampilan khusus）</span></div>
+    <div style="margin-top:6px;border:1px solid #888;padding:6px 8px;min-height:60px;font-size:8.5pt;" class="sign-field" data-signer="applicant" data-label="乙署名">
+      ${f('es_applicantName')}<br>
+      <span class="id" style="font-size:7pt;">${f('es_applicantNameEn')}</span>
+      <div class="sign-field-area" style="height:30px;position:relative;">
+        <span class="sign-field-placeholder" style="color:#bbb;font-size:9px;">← ここに署名</span>
+        <img class="sign-field-img" style="display:none;max-height:28px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /doc -->
+`;
+  _fontSize=(_fontSize===8.5)?8.5:_fontSize;
+  _applyFontSize();
+  _apply15FontSize();
+  setupPageTracker();
+}
+
+function _apply15FontSize(){
+  const st=document.getElementById('_15FontStyle')||document.createElement('style');
+  st.id='_15FontStyle';
+  document.head.appendChild(st);
+  const s=_fontSize/8.5;
+  st.textContent=[
+    `.doc [style*="font-size:13pt"]{font-size:${(13*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+p();
+</script>
+</body>
+</html>
