@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260416.20</div>
+    <div class="ver">ver.20260416.22</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -117,29 +117,30 @@ function p(){
 
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">１　所属役員</div>
 <table class="tbl">
-  <tbody>
-    ${offRows}
-  </tbody>
+  <tbody>${offRows}</tbody>
 </table>
-<div style="font-size:8pt;margin-bottom:3mm;">（注意）役員が複数名いる場合は、その全てについて記載すること。なお、役員を記載しきれない場合は、「別紙のとおり」と記載し、別紙を添付することとして差し支えない。</div>
+<div style="font-size:8pt;margin-bottom:3mm;">（注意）役員が複数名いる場合は，その全てについて記載すること。なお，役員を記載しきれない場合は，「別紙のとおり」と記載し，別紙を添付することとして差し支えない。</div>
 
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">２　決算状況</div>
 <table class="tbl" style="margin-bottom:2mm;">
   <tr>
     <th style="width:20%;"></th>
-    <th style="width:26.6%;">前年度</th>
-    <th style="width:26.6%;">前々年度</th>
-    <th style="width:26.6%;">前々々年度</th>
+    <th style="width:20%;">前年度</th>
+    <th style="width:5%;">円</th>
+    <th style="width:20%;">前々年度</th>
+    <th style="width:5%;">円</th>
+    <th style="width:20%;">前々々年度</th>
+    <th style="width:5%;">円</th>
   </tr>
-  <tr style="height:3em;"><td>売上高</td><td>${f('f_salesY1')}円</td><td>${f('f_salesY2')}円</td><td>${f('f_salesY3')}円</td></tr>
-  <tr style="height:3em;"><td>経常損益</td><td>${f('f_plY1')}円</td><td>${f('f_plY2')}円</td><td>${f('f_plY3')}円</td></tr>
-  <tr style="height:3em;"><td>純損益</td><td>${f('f_netY1')}円</td><td>${f('f_netY2')}円</td><td>${f('f_netY3')}円</td></tr>
-  <tr style="height:3em;"><td>純資産</td><td>${f('f_assetsY1')}円</td><td>${f('f_assetsY2')}円</td><td>${f('f_assetsY3')}円</td></tr>
+  <tr style="height:2.5em;"><td>売上高</td><td style="text-align:right;">${f('f_salesY1')}</td><td>円</td><td style="text-align:right;">${f('f_salesY2')}</td><td>円</td><td style="text-align:right;">${f('f_salesY3')}</td><td>円</td></tr>
+  <tr style="height:2.5em;"><td>経常損益</td><td style="text-align:right;">${f('f_plY1')}</td><td>円</td><td style="text-align:right;">${f('f_plY2')}</td><td>円</td><td style="text-align:right;">${f('f_plY3')}</td><td>円</td></tr>
+  <tr style="height:2.5em;"><td>純損益</td><td style="text-align:right;">${f('f_netY1')}</td><td>円</td><td style="text-align:right;">${f('f_netY2')}</td><td>円</td><td style="text-align:right;">${f('f_netY3')}</td><td>円</td></tr>
+  <tr style="height:2.5em;"><td>純資産</td><td style="text-align:right;">${f('f_assetsY1')}</td><td>円</td><td style="text-align:right;">${f('f_assetsY2')}</td><td>円</td><td style="text-align:right;">${f('f_assetsY3')}</td><td>円</td></tr>
 </table>
 <div style="font-size:8pt;margin-bottom:3mm;">
 （注意）<br>
-１　個人事業主の場合には、純資産の欄に所得税青色申告決算書の貸借対照表における元入金を記載してください。<br>
-２　前年度末において債務超過（純資産の欄がマイナス）がある場合には、中小企業診断士、税理士、公認会計士等の企業評価を行う能力があると認められる公的資格を有する第三者が改善の見通しについて評価を行った書面を添付してください。
+１　個人事業主の場合には，純資産の欄に所得税青色申告決算書の貸借対照表における元入金を記載してください。<br>
+２　前年度末において債務超過（純資産の欄がマイナス）がある場合には，中小企業診断士，税理士，公認会計士等の企業評価を行う能力があると認められる公的資格を有する第三者が改善の見通しについて評価を行った書面を添付してください。
 </div>
 
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">３　基準適合性に係る事項</div>
@@ -150,19 +151,19 @@ function p(){
     <td colspan="4" style="text-align:center;">離職理由</td>
   </tr>
   <tr>
-    <td style="width:16%;text-align:center;">自発的離職者</td>
-    <td style="width:5%;"></td>
-    <td style="width:16%;text-align:center;">非自発的離職者</td>
-    <td style="width:5%;"></td>
+    <td style="width:17%;text-align:center;">自発的離職者</td>
+    <td style="width:4%;"></td>
+    <td style="width:17%;text-align:center;">非自発的離職者</td>
+    <td style="width:4%;"></td>
   </tr>
-  <tr>
+  <tr style="height:2.5em;">
     <td>日本人労働者</td>
     <td style="text-align:right;">${f('f_jpVQ')||'0'}</td>
     <td>名</td>
     <td style="text-align:right;">${f('f_jpIQ')||'0'}</td>
     <td>名</td>
   </tr>
-  <tr>
+  <tr style="height:2.5em;">
     <td>外国人労働者</td>
     <td style="text-align:right;">${f('f_fgnVQ')||'0'}</td>
     <td>名</td>
@@ -172,17 +173,17 @@ function p(){
   <tr>
     <td rowspan="2">（２）前１年間の行方不明者数</td>
     <td>特定技能１号及び２号</td>
-    <td style="text-align:right;">${f('f_jpVQ')||'0'}</td>
+    <td style="text-align:right;">0</td>
     <td>名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
-    <td>□　該当あり<br>■　該当なし</td>
+    <td>□　該当あり<br>☑　該当なし</td>
   </tr>
   <tr>
     <td>技能実習</td>
     <td style="text-align:right;">0</td>
     <td>名</td>
     <td>うち責めに帰すべき事由による行方不明</td>
-    <td>□　該当あり<br>■　該当なし</td>
+    <td>□　該当あり<br>☑　該当なし</td>
   </tr>
 </table>
 </div>
@@ -191,43 +192,51 @@ function p(){
 <div class="page-num-label">P2</div>
 <div style="font-size:8pt;margin-bottom:3mm;">
 （注意）<br>
-１　（１）の「自発的離職」とは、特定技能外国人の自己都合による転職や退職をいい、「非自発的離職」とは、特定技能所属機関の経営上の都合により、人員整理を行うために希望退職を募集したり又は退職勧奨を行った場合等をいう。<br>
-２　（１）の「外国人労働者」とは、入管法別表第１の１、２及び５の表（就労資格に限る）の在留資格をもって在留する者をいう。<br>
-３　（２）は、特定技能所属機関が雇用する特定技能外国人の過去１年間における行方不明者の発生状況について記載すること。<br>
-４　（２）は、特定技能所属機関が、技能実習制度における実習実施者である場合は、過去１年間における技能実習生の行方不明者の発生状況についても記載すること。
+１　（１）の「自発的離職」とは，特定技能外国人の自己都合による転職や退職をいい，「非自発的離職」とは，特定技能所属機関の経営上の都合により，人員整理を行うために希望退職を募集したり又は退職勧奨を行った場合等をいう。<br>
+２　（１）の「外国人労働者」とは，入管法別表第１の１，２及び５の表（就労資格に限る）の在留資格をもって在留する者をいう。<br>
+３　（２）は，特定技能所属機関が雇用する特定技能外国人の過去１年間における行方不明者の発生状況について記載すること。<br>
+４　（２）は，技能実習制度における実習実施者である場合は，過去１年間における技能実習生の行方不明者の発生状況についても記載すること。
 </div>
+
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">４　中長期在留者の受入れ実績等（１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は記載不要。）</div>
 <table class="tbl" style="font-size:8pt;">
   <tr>
-    <td rowspan="3" style="width:5%;text-align:center;vertical-align:middle;">(１)<br>□</td>
-    <td rowspan="3" style="width:20%;vertical-align:middle;">過去２年間に中長期在留者（注）の受入れ又は管理を適正に行った実績を有すること</td>
-    <td style="width:12%;text-align:center;">受入れ・管理人数</td>
-    <td colspan="2"></td>
-    <td style="text-align:right;width:8%;">　　名</td>
-    <td>受入れ期間中の法令遵守</td>
+    <td rowspan="4" style="width:5%;text-align:center;vertical-align:middle;">（１）<br>□</td>
+    <td rowspan="4" style="width:18%;vertical-align:middle;">過去２年間にわたり中長期在留者の受入れを適正に行った実績</td>
+    <td colspan="3" style="text-align:center;">受入れ・管理人数</td>
+    <td colspan="2">受入れ期間中の法令遵守</td>
   </tr>
   <tr>
-    <td>直近１年前</td>
-    <td colspan="2"></td>
-    <td style="text-align:right;">　　　　名</td>
-    <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
+    <td style="width:12%;">直近１年前</td>
+    <td style="width:8%;text-align:right;"></td>
+    <td style="width:4%;">名</td>
+    <td>□　法令遵守</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>□　法令違反・行政指導あり</td>
+    <td></td>
   </tr>
   <tr>
     <td>直近２年前</td>
-    <td colspan="2"></td>
-    <td style="text-align:right;">　　　　名</td>
+    <td style="text-align:right;"></td>
+    <td>名</td>
     <td>□　法令遵守<br>□　法令違反・行政指導あり</td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td></td>
     <td>添付書類</td>
-    <td colspan="4">※以下の添付書類を提出すること。ただし、監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は、添付書類の提出不要。<br>□　受け入れた中長期在留者リスト（参考様式第１－１１－２号）</td>
+    <td colspan="4" style="font-size:7pt;">※以下の添付書類を提出すること。ただし，監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は，添付書類の提出不要。<br>□　受け入れた中長期在留者リスト（参考様式第１－１１－２号）</td>
   </tr>
   <tr>
-    <td rowspan="9" style="text-align:center;vertical-align:middle;">(２)<br>□</td>
-    <td rowspan="9" style="vertical-align:middle;">支援責任者及び支援担当者が過去２年間に中長期在留者（注）の生活相談業務に従事した経験を有すること</td>
-    <td rowspan="5" style="text-align:center;vertical-align:middle;">支援<br>責任者</td>
+    <td rowspan="10" style="text-align:center;vertical-align:middle;">（２）<br>□</td>
+    <td rowspan="10" style="vertical-align:middle;">支援責任者及び支援担当者が過去２年間に中長期在留者の生活相談業務に従事した実績を有すること</td>
+    <td rowspan="10" style="text-align:center;vertical-align:middle;">支援<br>担当者</td>
     <td>生活相談業務期間</td>
     <td colspan="3">年　月　日〜　年　月　日</td>
   </tr>
@@ -237,30 +246,32 @@ function p(){
   </tr>
   <tr><td colspan="3">所在地：</td></tr>
   <tr>
-    <td>生活相談業務内容</td>
-    <td colspan="3" style="font-size:7pt;">□生活に必要な契約に係る支援　□生活オリエンテーション　□定期的な面談　□その他（　　　　）</td>
+    <td rowspan="5">生活相談業務内容</td>
+    <td colspan="3">※以下いずれか１つ以上にチェックマークを付すこと。</td>
   </tr>
+  <tr><td colspan="3">□　生活に必要な契約に係る支援に関するもの</td></tr>
+  <tr><td colspan="3">□　生活オリエンテーションに関するもの</td></tr>
+  <tr><td colspan="3">□　定期的な面談に関するもの</td></tr>
+  <tr><td colspan="3">□　その他（　　　　　　　　　　　　　）</td></tr>
   <tr>
     <td>報酬の有無</td>
     <td colspan="3">□　有　　□　無</td>
   </tr>
   <tr>
-    <td rowspan="4" style="text-align:center;vertical-align:middle;">支援<br>担当者</td>
-    <td>生活相談業務期間</td>
-    <td colspan="3">年　月　日〜　年　月　日</td>
+    <td>添付書類</td>
+    <td colspan="3" style="font-size:7pt;">
+      必須：□　生活相談業務を行った中長期在留者リスト（参考様式第１－１１－３号）<br>
+      いずれか：<br>
+      ※生活相談の対象者の所属機関が同一の場合<br>
+      □　当該機関で生活相談業務に従事したこと及びその期間を証する書類<br>
+      ※生活相談の対象者の所属機関が同一でない場合<br>
+      □　対象者の生活相談業務に係る契約書及びその契約に基づき報酬を受けたことを証する書類<br>
+      □　その他（　　　　　　　　　　）
+    </td>
   </tr>
   <tr>
-    <td rowspan="2">生活相談業務に従事した機関</td>
-    <td colspan="3">機関名称：</td>
-  </tr>
-  <tr><td colspan="3">所在地：</td></tr>
-  <tr>
-    <td>生活相談業務内容</td>
-    <td colspan="3" style="font-size:7pt;">□生活に必要な契約に係る支援　□生活オリエンテーション　□定期的な面談　□その他（　　　　）</td>
-  </tr>
-  <tr>
-    <td style="text-align:center;">(３)<br>□</td>
-    <td colspan="6">（１）及び（２）に掲げるもののほか、これらの者と同程度に支援業務を適正に実施することができること</td>
+    <td style="text-align:center;vertical-align:middle;">（３）<br>□</td>
+    <td colspan="6">（１）及び（２）に掲げるもののほか，これらの者と同程度に支援業務を適正に実施することができること</td>
   </tr>
 </table>
 </div>
@@ -269,56 +280,40 @@ function p(){
 <div class="page-num-label">P3</div>
 <div style="font-size:8pt;margin-bottom:3mm;">
 （注意）<br>
-１　本欄は（１）から（３）欄の該当するものにチェックマークを付した上、記載すること。<br>
-２　「中長期在留者」とは、入管法別表第１の１の表、２の表及び５の表（就労資格に限る。）の上欄の在留資格を有する者をいう。<br>
-３　（１）欄の「適正に行った」とは、入管法、技能実習法及び労働基準法など出入国又は労働に関する法令の規定に違反したことにより、①刑に処せられたこと、②行政処分を受けたことのほか、③技能実習法上の改善命令又は改善勧告を受けていないことをいう。
-</div>
-<div style="font-size:8pt;margin-bottom:3mm;">
-（注意）添付書類（（２）に該当する場合）<br>
-必須：□　生活相談業務を行った中長期在留者リスト（参考様式第１－１１－３号）<br>
-いずれか：<br>
-※生活相談の対象者の所属機関が同一の場合<br>
-□　当該機関で生活相談業務に従事したこと及びその期間を証する書類<br>
-※生活相談の対象者の所属機関が同一でない場合<br>
-□　対象者の生活相談業務に係る契約書及びその契約に基づき報酬を受けたことを証する書類<br>
-□　その他（　　　　　　　　　　　　　　　　　）
-</div>
+１　本欄は，１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は，記載不要。<br>
+２　「中長期在留者」とは，入管法別表第１の１の表，２の表及び５の表（就労資格に限る。）の上欄の在留資格を有する者をいう。<br>
+３　（１）欄の「適正に行った」とは，法令違反等をしていないことをいう。
 </div>
 
-<div class="doc">
-<div class="page-num-label">P4</div>
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">５　支援体制に関する事項（１号特定技能外国人支援計画の全部の実施を登録支援機関に委託する場合は記載不要。）</div>
 <table class="tbl">
   <tr>
-    <th style="width:5%;">　</th>
+    <th style="width:5%;"></th>
     <th colspan="2">支援対象者（申請人）</th>
     <th colspan="2">支援責任者</th>
     <th colspan="2">支援担当者</th>
   </tr>
   <tr>
     <th></th>
-    <th>氏名</th>
-    <th>所属部署<br>役職</th>
-    <th>氏名</th>
-    <th>所属部署<br>役職</th>
-    <th>氏名</th>
-    <th>所属部署<br>役職</th>
+    <th style="width:13%;">氏名</th>
+    <th style="width:13%;">所属部署<br>役職</th>
+    <th style="width:13%;">氏名</th>
+    <th style="width:13%;">所属部署<br>役職</th>
+    <th style="width:13%;">氏名</th>
+    <th style="width:13%;">所属部署<br>役職</th>
   </tr>
-  <tr style="height:2em;"><td style="text-align:center;">1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr style="height:2em;"><td style="text-align:center;">2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr style="height:2em;"><td style="text-align:center;">3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr style="height:3em;"><td style="text-align:center;">1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr style="height:3em;"><td style="text-align:center;">2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr style="height:3em;"><td style="text-align:center;">3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 </table>
-<div style="font-size:8pt;margin-bottom:4mm;">（注意）申請人全員について記載しきれない場合は、「別紙のとおり」と記載し、別紙を添付することとして差し支えない。</div>
-</div>
-
-<div class="doc">
-<div class="page-num-label">P5</div>
-<div style="font-size:9pt;margin-bottom:8mm;">上記の記載内容は、事実と相違ありません。</div>
+<div style="font-size:8pt;margin-bottom:4mm;">（注意）申請人全員について記載しきれない場合は，「別紙のとおり」と記載し，別紙を添付することとして差し支えない。</div>
+<div style="font-size:9pt;margin-bottom:8mm;">上記の記載内容は，事実と相違ありません。</div>
 <div style="text-align:right;margin-bottom:4mm;">${f('f_docDate')}</div>
 <div style="text-align:right;margin-bottom:2mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
 <div style="text-align:right;">作成責任者　役職・氏名　　${f('f_author')}</div>
 </div>`;
 
+  _fontSize
   _fontSize = (_fontSize === 8.5) ? 9 : _fontSize;
   _applyFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
