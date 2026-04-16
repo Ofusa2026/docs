@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260416.01</div>
+    <div class="ver">ver.20260416.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -70,7 +70,6 @@
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
@@ -91,29 +90,14 @@ function p(){
 <div style="font-size:14pt;font-weight:bold;text-align:center;margin-bottom:4mm;">特定技能外国人の報酬に関する説明書</div>
 <div style="font-size:12pt;margin-bottom:4mm;">　申請人に対する報酬については、以下のとおり、「日本人が従事する場合の報酬の額と同等以上であること」を担保しています。</div>
 <div style="font-size:12pt;font-weight:bold;margin-bottom:2mm;">１　申請人に対する報酬</div>
-<table class="tbl2" style="margin-bottom:4mm;">
-  <tr>
-    <td style="width:38%;">①申請人の氏名</td>
-    <td>${f('f_applicant')}</td>
-  </tr>
-  <tr>
-    <td>②申請人の役職、職務内容、責任の程度</td>
-    <td>${f('f_jobDesc')}</td>
-  </tr>
-  <tr>
-    <td>③申請人の年齢、性別及び経験年数</td>
-    <td>（${f('f_age')}歳）（${f('f_gender')}）（経験　${f('f_exp')}　年）</td>
-  </tr>
-  <tr>
-    <td>④申請人に対する報酬</td>
-    <td>月給　${f('f_salaryM')}　円　／　時間給　${f('f_salaryH')}　円</td>
-  </tr>
-  <tr>
-    <td>⑤その他</td>
-    <td></td>
-  </tr>
+<table class="tbl2" style="margin-bottom:3mm;">
+  <tr><td style="width:38%;">①申請人の氏名</td><td>${f('f_applicant')}</td></tr>
+  <tr><td>②申請人の役職、職務内容、責任の程度</td><td>${f('f_jobDesc')}</td></tr>
+  <tr><td>③申請人の年齢、性別及び経験年数</td><td>（${f('f_age')}歳）（${f('f_gender')}）（経験　${f('f_exp')}　年）</td></tr>
+  <tr><td>④申請人に対する報酬</td><td>月給　${f('f_salaryM')}　円　／　時間給　${f('f_salaryH')}　円</td></tr>
+  <tr><td>⑤その他</td><td></td></tr>
 </table>
-<div style="font-size:9pt;margin-bottom:4mm;">
+<div style="font-size:9pt;margin-bottom:3mm;">
 （注意）<br>
 １　①は、在留カード（申請人が所持していない場合は旅券）と同一の氏名を記載すること。<br>
 ２　③の経験年数は、申請人に従事させる業務に係る経験年数を記載すること。<br>
@@ -121,82 +105,40 @@ function p(){
 ４　⑤は、報酬以外の諸手当等が支給されている場合など特記すべき事項がある場合に記載すること。
 </div>
 <div style="font-size:12pt;font-weight:bold;margin-bottom:2mm;">２　比較対象となる日本人労働者がいる場合</div>
-<table class="tbl2">
-  <tr>
-    <td style="width:38%;">①比較対象となる日本人労働者の役職、職務内容、責任の程度</td>
-    <td colspan="2">${f('f_jpJobDesc')}</td>
-  </tr>
-  <tr>
-    <td>②比較対象となる日本人労働者の年齢、性別及び経験年数</td>
-    <td colspan="2">（${f('f_jpAge')}歳）（${f('f_jpGender')}）（${f('f_jpExp')}）</td>
-  </tr>
-  <tr>
-    <td>③比較対象となる日本人労働者の報酬</td>
-    <td colspan="2">月額　${f('f_jpSalary')}　円</td>
-  </tr>
-  <tr>
-    <td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td>
-    <td style="width:15%;">規程の有無</td>
-    <td>${f('f_wageReg')}</td>
-  </tr>
-  <tr>
-    <td>有の場合</td>
-    <td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${f('f_salaryRule')}　円</td>
-  </tr>
-  <tr>
-    <td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td>
-    <td colspan="2">${f('f_jpReason')}</td>
-  </tr>
-  <tr>
-    <td>⑥その他</td>
-    <td colspan="2"></td>
-  </tr>
+<table class="tbl2" style="margin-bottom:3mm;">
+  <tr><td style="width:38%;">①比較対象となる日本人労働者の役職、職務内容、責任の程度</td><td colspan="2">${f('f_jpJobDesc')}</td></tr>
+  <tr><td>②比較対象となる日本人労働者の年齢、性別及び経験年数</td><td colspan="2">（${f('f_jpAge')}歳）（${f('f_jpGender')}）（${f('f_jpExp')}）</td></tr>
+  <tr><td>③比較対象となる日本人労働者の報酬</td><td colspan="2">月額　${f('f_jpSalary')}　円</td></tr>
+  <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>${f('f_wageReg')}</td></tr>
+  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${f('f_salaryRule')}　円</td></tr>
+  <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2">${f('f_jpReason')}</td></tr>
+  <tr><td>⑥その他</td><td colspan="2"></td></tr>
 </table>
+<div style="font-size:9pt;">
+（注意）<br>
+１　①は、比較対象となる日本人労働者の役職、職務内容、責任の程度が、申請人と同等であることを示すこと。<br>
+２　②の経験年数は、比較対象となる日本人労働者の経験年数を記載すること。<br>
+３　③は、月給及び時間給以外の給与形態の場合については、月給又は時間給に換算した報酬を記載すること。また、月給又は時間給のいずれかを記載すればよいが、本様式において統一して記載すること。
+</div>
 </div>
 
 <div class="doc">
 <div class="page-num-label">P2</div>
-<div style="font-size:9pt;margin-bottom:4mm;">
-（注意）<br>
-１　①は、比較対象となる日本人労働者の役職、職務内容、責任の程度が、申請人と同等であることを示すこと。<br>
-２　②の経験年数は、比較対象となる日本人労働者の経験年数を記載すること。<br>
-３　③は、月給及び時間給以外の給与形態の場合については、月給又は時間給に換算した報酬を記載すること。また、月給又は時間給のいずれかを記載すればよいが、本様式において統一して記載すること。<br>
+<div style="font-size:9pt;margin-bottom:3mm;">
 ４　④は、賃金規程を作成している場合には、必ず「有」を丸印で囲むこと。また、賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬を具体的に記載し、当該賃金規程を参考資料として添付すること。<br>
 ５　⑥は、報酬以外の諸手当等が支給されている場合など特記すべき事項がある場合に記載すること。
 </div>
 <div style="font-size:12pt;font-weight:bold;margin-bottom:2mm;">３　比較対象となる日本人労働者がいない場合</div>
-<table class="tbl2" style="margin-bottom:4mm;">
-  <tr>
-    <td style="width:38%;">①最も近い職務を担う日本人労働者の職務内容や責任の程度</td>
-    <td colspan="2"></td>
-  </tr>
-  <tr>
-    <td>②最も近い職務を担う日本人労働者の年齢、性別及び経験年数</td>
-    <td colspan="2">（　　　歳）（　男　・　女　）（経験　　　年）</td>
-  </tr>
-  <tr>
-    <td>③最も近い職務を担う日本人労働者の報酬</td>
-    <td colspan="2">月給　　　　　　円　／　時間給　　　　　　円</td>
-  </tr>
-  <tr>
-    <td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td>
-    <td style="width:15%;">規程の有無</td>
-    <td>有　・　無</td>
-  </tr>
-  <tr>
-    <td>有の場合</td>
-    <td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>月給　　　　円　／　時間給　　　　円</td>
-  </tr>
-  <tr>
-    <td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td>
-    <td colspan="2"></td>
-  </tr>
-  <tr>
-    <td>⑥その他</td>
-    <td colspan="2"></td>
-  </tr>
+<table class="tbl2" style="margin-bottom:3mm;">
+  <tr><td style="width:38%;">①最も近い職務を担う日本人労働者の職務内容や責任の程度</td><td colspan="2"></td></tr>
+  <tr><td>②最も近い職務を担う日本人労働者の年齢、性別及び経験年数</td><td colspan="2">（　　　歳）（　男　・　女　）（経験　　　年）</td></tr>
+  <tr><td>③最も近い職務を担う日本人労働者の報酬</td><td colspan="2">月給　　　　　　円　／　時間給　　　　　　円</td></tr>
+  <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>有　・　無</td></tr>
+  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>月給　　　　円　／　時間給　　　　円</td></tr>
+  <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2"></td></tr>
+  <tr><td>⑥その他</td><td colspan="2"></td></tr>
 </table>
-<div style="font-size:9pt;margin-bottom:4mm;">
+<div style="font-size:9pt;margin-bottom:3mm;">
 （注意）<br>
 １　①は、申請人と最も近い職務を担う日本人労働者の役職、職務内容、責任の程度について、申請人と比べて、具体的にどのような差異があるのかも併せて、詳細に記載すること。<br>
 ２　②の経験年数は、申請人と最も近い職務を担う日本人労働者の経験年数を記載すること。<br>
@@ -206,14 +148,8 @@ function p(){
 </div>
 <div style="font-size:12pt;margin-bottom:4mm;">上記の記載内容は、事実と相違ありません。</div>
 <div style="text-align:right;margin-bottom:2mm;">${f('f_docDate')}　作成</div>
-</div>
-
-<div class="doc">
-<div class="page-num-label">P3</div>
-<div style="text-align:right;margin-bottom:4mm;font-size:12pt;">
-  <div style="margin-bottom:8mm;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
-  <div>作成責任者　役職・氏名　　${f('f_author')}</div>
-</div>
+<div style="text-align:right;margin-bottom:6mm;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
+<div style="text-align:right;">作成責任者　役職・氏名　　${f('f_author')}</div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
   _applyFontSize();
