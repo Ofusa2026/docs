@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.05</div>
+    <div class="ver">ver.20260417.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -161,31 +161,36 @@ function p(){
 <div style="border-top:1px solid #aaa;margin-bottom:16px;"></div>
 
 <!-- 署名欄 -->
-<div style="display:flex;gap:20px;align-items:flex-start;">
+<div style="display:flex;gap:0;align-items:flex-start;font-size:8pt;margin-top:8px;">
   <!-- 甲（特定技能所属機関）-->
-  <div style="flex:1;font-size:8pt;">
-    <div>甲　<span class="id">Pihak Pertama</span></div>
-    <div style="font-size:7pt;color:#555;">（特定技能所属機関名・代表者役職名・氏名・捺印）<br>
-    <span class="id">（Nama organisasi afiliasi pekerja berketerampilan khusus, nama, jabatan, dan tanda tangan direktur representatifnya）</span></div>
-    <div style="margin-top:10px;font-size:8.5pt;line-height:2.2;">
-      <div style="text-align:center;border-bottom:1px solid #333;width:20em;">${f('es_orgName')}</div>
-      <div style="text-align:center;border-bottom:1px solid #333;width:20em;margin-top:4px;">${f('es_orgNameEn')}</div>
-      ${f('es_repTitle')}　${f('es_repName')}　印<br>
-      <span class="id" style="font-size:7pt;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span>
+  <div style="flex:1;">
+    <div style="margin-bottom:2px;">甲</div>
+    <div style="border-bottom:1px solid #333;min-width:18em;padding-bottom:1px;margin-bottom:2px;">${f('es_orgName')}</div>
+    <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
+      <span>${f('es_repTitle')}</span>
+      <span style="border-bottom:1px solid #333;min-width:8em;padding-bottom:1px;">${f('es_repName')}</span>
+      <span>印</span>
     </div>
+    <div style="font-size:7pt;color:#555;margin-bottom:2px;">（特定技能所属機関名・代表者役職名・氏名・捺印）</div>
+    <div style="margin-bottom:2px;">Pihak Pertama</div>
+    <div style="border-bottom:1px solid #333;min-width:18em;padding-bottom:1px;margin-bottom:2px;">${f('es_orgNameEn')}</div>
+    <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px;">
+      <span style="border-bottom:1px solid #333;min-width:12em;padding-bottom:1px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span>
+      <span style="font-size:7pt;">ttd.</span>
+    </div>
+    <div style="font-size:7pt;color:#555;">(Nama organisasi afiliasi pekerja berketerampilan khusus, nama, jabatan, dan tanda tangan direktur representatifnya)</div>
   </div>
   <!-- 乙（特定技能外国人）-->
-  <div style="flex:1;font-size:8pt;">
-    <div>乙　<span class="id">Pihak Kedua</span></div>
-    <div style="font-size:7pt;color:#555;">（特定技能外国人氏名・署名）<br>
-    <span class="id">（Nama dan tanda tangan pekerja berketerampilan khusus）</span></div>
-    <div style="margin-top:10px;font-size:8.5pt;line-height:2.2;" class="sign-field" data-signer="applicant" data-label="乙署名">
-      <div style="text-align:center;border-bottom:1px solid #333;width:20em;">${f('es_applicantName')}</div>
-      <div style="text-align:center;border-bottom:1px solid #333;width:20em;margin-top:4px;">${f('es_applicantNameEn')}</div>
-      <div class="sign-field-area" style="height:35px;border-bottom:1px solid #333;width:20em;margin-top:12px;position:relative;">
-        <span class="sign-field-placeholder" style="color:#bbb;font-size:9px;">← ここに署名</span>
-        <img class="sign-field-img" style="display:none;max-height:33px;">
-      </div>
+  <div style="flex:1;" class="sign-field" data-signer="applicant" data-label="乙署名">
+    <div style="margin-bottom:2px;">乙</div>
+    <div style="border-bottom:1px solid #333;min-width:18em;padding-bottom:1px;margin-bottom:2px;">${f('es_applicantName')}</div>
+    <div style="font-size:7pt;color:#555;margin-bottom:2px;">（特定技能外国人の署名）</div>
+    <div style="margin-bottom:2px;">Pihak Kedua</div>
+    <div style="border-bottom:1px solid #333;min-width:18em;padding-bottom:1px;margin-bottom:2px;">${f('es_applicantNameEn')}</div>
+    <div style="font-size:7pt;color:#555;margin-bottom:6px;">(Tanda tangan pekerja asing berketerampilan khusus)</div>
+    <div class="sign-field-area" style="height:35px;border-bottom:1px solid #333;min-width:18em;position:relative;">
+      <span class="sign-field-placeholder" style="color:#bbb;font-size:9px;">← ここに署名</span>
+      <img class="sign-field-img" style="display:none;max-height:33px;">
     </div>
   </div>
 </div>
