@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.08</div>
+    <div class="ver">ver.20260417.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -481,7 +481,7 @@ function p(){
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ကုမ္ပဏီအမည်</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် ) ${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">၁။အလုပ်စတင်ချိန် ( ) အလုပ်ပြီးဆုံးချိန် ( ) (တစ်ရက်တာအလုပ်ချိန် ${f('es_dailyHours')}  နာရီ   ${f('es_dailyMins')}  မိနစ် )</span></td></tr>
           <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">ဆက်သွယ်ရန်လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">၂။အလုပ်နားချိန် ( မိနစ်) ${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
@@ -509,12 +509,12 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">၂။ ပုံမှန်မဟုတ်သောရက်များ- တစ်ပတ်/လ ရက်၊ , အခြား ( )</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက် ${f('es_applicantFieldEn')}</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">3။သတ်မှတ်အလုပ်ချိန်ဇယား (၁)တစ်ပတ်တာ ( နာရီ မိနစ် ) (၂)တစ်လတာ ( နာရီ မိနစ် ) (၃)နှစ် ( နာရီ မိနစ် )</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">၄။သတ်မှတ်အလုပ်လုပ်ရက် (၁)တစ်ပတ်တာ ( ရက် ) (၂)တစ်လတာ ( ရက် ) (၃)နှစ် ( ရက် )</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">၂။လုပ်ငန်းတာ၀န် ${f('es_categoryEn')} ၂။လုပ်ငန်းတာ၀န်</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">၆။ခွင့်ရက် ${f('es_categoryEn')}</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">၅။အချိန်ပိုအလုပ်ချိန်ရှိမရှိ ရှိမည် မရှိပါ</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">၁။နှစ်စဥ်ခွင့်ခံစားခွင့်၆လဆက်တိုက်အလုပ်ခွင်၀င်ပြီးနောက်→ 10 hari ရက် ${cb(false,"cb_auto_001")}</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">၅။အလုပ်ပိတ်ရက်</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">ကနဦး ၆ လကြာအလုပ်ခွင်၀င်ပြီးနောက် နှစ်စဥ်ခွင့်ခံစားခွင့် ( ရှိမည် မရှိပါ ) → လကြာပြီးနောက် ရက်</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">၂။ ပုံမှန်မဟုတ်သောရက်များ- တစ်ပတ်/လ ရက်၊ , အခြား ( )</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">၂။အခြားခွင့်ရက် လစာ‌ပေး ( ) လစာမဲ့ ( )</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">၃။ယာယီနိုင်ငံပြန်ခွင့်  ဒုတိယပါတီမှ  ယာယီနိုင်ငံပြန်လိုပါကအထက်ပါ ၁ နှင့် ၂ အတွင်းရှိခွင့်ရက် များကိုလိုအပ်သလိုယူနိုင်ပါသည်။</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">၆။ခွင့်ရက်</td></tr>
         </table>
       </div>
     </div>
@@ -540,14 +540,14 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက် ${f('es_startTime')} ${f('es_endTime')} ${f('es_dailyHours')} ${f('es_dailyMins')}</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">၁။နှစ်စဥ်ခွင့်ခံစားခွင့်၆လဆက်တိုက်အလုပ်ခွင်၀င်ပြီးနောက်→ 10 hari ရက်</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">၇။လုပ်ခလစာ</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">ကနဦး ၆ လကြာအလုပ်ခွင်၀င်ပြီးနောက် နှစ်စဥ်ခွင့်ခံစားခွင့် ( ရှိမည် မရှိပါ ) → လကြာပြီးနောက် ရက်</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">(၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">၂။အခြားခံစားခွင့်(အချိန်ပိုလုပ်အားခများမပါ၀င်ပါ) ${cb(false,'shift_work_id')}</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">၂။အခြားခွင့်ရက် လစာ‌ပေး ( ) လစာမဲ့ ( )</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">၃။ယာယီနိုင်ငံပြန်ခွင့်  ဒုတိယပါတီမှ  ယာယီနိုင်ငံပြန်လိုပါကအထက်ပါ ၁ နှင့် ၂ အတွင်းရှိခွင့်ရက် များကိုလိုအပ်သလိုယူနိုင်ပါသည်။</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">(ခံစားခွင့် ${f('es_allowance1NameEn')} ), (ခံစားခွင့် ${f('es_allowance2NameEn')} ), (ခံစားခွင့် ${f('es_allowance3NameEn')} )</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">၇။လုပ်ခလစာ</span></div>`;
           }).join('');
         })()}
       </div>
@@ -580,11 +580,11 @@ function p(){
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
           <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">၅. အချိန်ပိုအလုပ်ချိန်ရှိမရှိ</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည် ${cb(true,'overtime_yes_id')} ${cb(false,'overtime_no_id')}</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">၁။အခြေခံလစာ လစဥ်လစာ ( ယန်း) နေ့စဥ်လစာ ( ${f('es_salaryDaily')} ယန်း) တစ်နာရီလစာ ယန်း)</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">(၁)အချိန်ပို သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း ( ) ％</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></td>
         </tr>
       </table>
     </div>
@@ -594,9 +594,9 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် ( ) ％ ${f('es_fixedDay1En')} ${f('es_otherHolidays')} ${f('es_annualHolidays')}</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း ( ) ％</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">(၂)အလုပ်ပိတ်ရက် သတ်မှတ်အလုပ်ပိတ်ရက် ( )％ , သတ်မှတ်ထားခြင်းမရှိသည့်ပိတ်ရက် ( )％</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">၂။အခြားခံစားခွင့်(အချိန်ပိုလုပ်အားခများမပါ၀င်ပါ)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">(ခံစားခွင့် ${f('es_allowance1NameEn')} ), (ခံစားခွင့် ${f('es_allowance2NameEn')} ), (ခံစားခွင့် ${f('es_allowance3NameEn')} )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">(ခံစားခွင့် ${f('es_allowance4NameEn')} )</span></div>
     </div>
   </div>
 
@@ -604,11 +604,11 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">၆။ခွင့်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">(၃)ညဆိုင်းဆင်းခြင်း ( )％ ${f('es_paidLeaveEn')||f('es_paidLeave')}</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">ကနဦး ၆ လကြာအလုပ်ခွင်၀င်ပြီးနောက် နှစ်စဥ်ခွင့်ခံစားခွင့် ( ရှိမည် မရှိပါ ) → လကြာပြီးနောက် ရက်</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">၄။လုပ်အားခပေးသည့်နောက်ဆုံးရက် ${f('es_payCutoffEn')} လစဥ်        ရက်</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">၅။လုပ်အားခပေးသည့်ရက် ${f('es_payDayEn')} လစဥ်        ရက်</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">၃။အချိန်ပို၊ ပိတ်ရက်ဆင်းခြင်း၊ညဘက်အလုပ်လုပ်ခြင်းအတွက် အပိုလုပ်အားခရာခိုင်နှုန်း</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">(၁)အချိန်ပို သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း ( ) ％</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် ( ) ％</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း ( ) ％</span></div>
     </div>
   </div>
 
@@ -617,10 +617,10 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">၇။လုပ်ခလစာ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည် ${cb(true,"cb_auto_004")} ${ff('es_salaryMonthly')} ${cb(false,"cb_auto_005")} ${ff('es_salaryDaily')} ${cb(false,"cb_auto_006")} ${ff('es_salaryHourly')}</span></div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">(၂)အလုပ်ပိတ်ရက် သတ်မှတ်အလုပ်ပိတ်ရက် ( )％ , သတ်မှတ်ထားခြင်းမရှိသည့်ပိတ်ရက် ( )％</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</span></div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">(၃)ညဆိုင်းဆင်းခြင်း ( )％</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">၄။လုပ်အားခပေးသည့်နောက်ဆုံးရက် ${f('es_payCutoffEn')} လစဥ်        ရက်</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
       </div>
     </div>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">၅။လုပ်အားခပေးသည့်ရက် ${f('es_payDayEn')} လစဥ်        ရက်</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း ${f('es_ot60under')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ ${f('es_ot60over')} ${f('es_otPrescribed')}</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">၁။မိမိဆန္ဒဖြင့်အလုပ်ထွက်မည်ဆိုလျှင်ဆောင်ရွက်ပုံ(အလုပ်ထွက်မည့်ရက် ရက်မတိုင်ခင်တွင် ကုမ္ပဏီဥက္ကဠနှင့်စက်ရုံမှုးတို့အားအသိပေးရမည်။)</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">၂။အလုပ်ထုတ်သည့်အကြောင်းအရင်းနှင့်ဆောင်ရွက်ပုံများ ${f('es_holidayLegal')} ${f('es_holidayNonLegal')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက် ${f('es_nightPremium')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79">၉။အခြား</td>
-          <td class="id" style="font-size:7pt;" data-key="80">၂။အလုပ်ခန့်စဥ် ကျန်းမာရေးစစ်ဆေးခြင်း  နှစ် နှစ် လ ${cb(true,"cb_auto_008")} ${f('es_payCutoffEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">3. ပထမအကြိမ် ပုံမှန်ကျန်းမာရေးစစ်ဆေးခြင်း- နှစ် လ (ထိုနောက် တစ်နှစ်တစ်ကြိမ် ဆောင်ရွက်သည်)</td>
+          <td class="id" style="font-size:7pt;" data-key="79">၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ</td>
+          <td class="id" style="font-size:7pt;" data-key="80">၁။မိမိဆန္ဒဖြင့်အလုပ်ထွက်မည်ဆိုလျှင်ဆောင်ရွက်ပုံ(အလုပ်ထွက်မည့်ရက် ရက်မတိုင်ခင်တွင် ကုမ္ပဏီဥက္ကဠနှင့်စက်ရုံမှုးတို့အားအသိပေးရမည်။)</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">၂။အလုပ်ထုတ်သည့်အကြောင်းအရင်းနှင့်ဆောင်ရွက်ပုံများ</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,7 +689,7 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82">၄။ အလုပ်ခန့်အပ်ခြင်းစီမံခန့်ခွဲမှု ပြင်ဆင်ခြင်းနှင့် ပတ်သတ်ပြီး ဆွေးနွေးရန် ဌာန</td>
+          <td class="id" style="font-size:7pt;" data-key="82">အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</td>
           <td class="id" style="font-size:7pt;" data-key="83">ဌာနအမည် ${f('es_contactDeptEn')} တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည် ${f('es_contactPersonEn')} (ဆက်သွယ်ရန် )</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">၄။ဤစာချုပ်ပြီးဆုံးသည့်အခါတွင် ဒုတိယပါတီမှ နိုင်ငံပြန်သည့်အခါတွင် ဒုတိယပါတီသည်နိုင်ငံပြန်စရိတ်အားအကုန်အကျမခံနိုင်ပါက ပထမပါတီမှအဆိုပါခရီးစရိတ်အားအကုန်အကျခံပေးမည်ဖြစ်ပြီးနိုင်ငံပြန်ရာတွင် အဆင်ပြေချောမွေ့စွာဖြစ်စေရန် လိုအပ်သည်များကိုဆောင်ရွက်ပေးရပါမည်။ ${cb(false,"cb_auto_012")}</td>
         </tr>

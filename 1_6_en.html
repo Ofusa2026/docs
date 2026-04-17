@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260417.07</div>
+    <div class="ver">ver.20260417.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -481,7 +481,7 @@ function p(){
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(Immediately after hiring)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">Name of office</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">Address</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">Address</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">Start time ( : ) Finishing time ( : )  Day applied ( ); prescribed working hours for one day ( hours minutes )</span></td></tr>
           <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">Contact information</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
@@ -509,12 +509,12 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">III. Contents of work to be engaged in</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. Field</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">Days off</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">)</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. Work category</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">Additional days off: days per week/month, others ( )</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">○ Details are stipulated in Article ( ), Article ( ) and Article ( ) of the Rules of Employment.</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,"cb_auto_001")} No possibility of change</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">Leave</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. Field</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">Annual paid leave Those working continuously for six months or more →　( ) days</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. Work category</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">Those working continuously for up to six months   （ Yes No）→ After a lapse of ( months and days )</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">Other leave　        Paid ( )  　Unpaid ( )</td></tr>
         </table>
       </div>
     </div>
@@ -540,14 +540,14 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. Start and finish times</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">(1) Start time（${f('es_startTime')}）Finish time（${f('es_endTime')}）(Prescribed working hours per day:: ${f('es_dailyHours')}hours　${f('es_dailyMins')}mins)</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">Leave for temporary return home: If the specified skilled worker wishes to return home temporarily, he or she must be given necessary days off within the scope of the abovementioned 1 and 2.</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【If the following systems apply to the worker】</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">○ Details are stipulated in Article ( ), Article ( ) and Article ( ) of the Rules of Employment.</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} Irregular labor system: unit (${f('es_flexUnitEn')})</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* If an irregular labor system is adopted, attach a copy of the yearly calendar in a language the worker understands.</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} Work shift system using a combination of the following working hours</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">Basic pay Monthly wage ( yen) Daily wage ( yen) Hourly wage( yen)</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* Details given in the attachment.</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">Various allowances (excluding add* Details given in the attachment itional pay rate for overtime)</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">Start time(${startStr})Finish time(${endStr}).(Day applied ${daysEnStr}),Prescribed hours per day ${hStr}hours${minStr}mins)</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">( ${f('es_allowance1NameEn')} allowance ), ( ${f('es_allowance2NameEn')} allowance ), ( ${f('es_allowance3NameEn')} allowance )</span></div>`;
           }).join('');
         })()}
       </div>
@@ -580,11 +580,11 @@ function p(){
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
           <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Overtime work</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} Yes&emsp;${cb(false,'overtime_no_id')} No</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${f('es_allowance4NameEn')}</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">◦Details are stipulated in Article (&emsp;〜&emsp;), Article (&emsp;〜&emsp;) of the Rules of Employment</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">* Details given in the attachment.</span></td>
         </tr>
       </table>
     </div>
@@ -594,9 +594,9 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">days</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. Regular days off: (${f('es_fixedDay1En')})，other（${f('es_otherHolidays')}）(Total annual days off:${f('es_annualHolidays')}days)</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. Additional days off: days/week/month, other ( )</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">◦Details are stipulated in Article (&emsp;〜&emsp;), Article (&emsp;〜&emsp;) of the Rules of Employment</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">Additional pay rate for overtime, holiday work or night work</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">) ％</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">Overtime work: Legal overtime 60 hours or less a month ( ) ％</span></div>
     </div>
   </div>
 
@@ -604,11 +604,11 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. Leave</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. Annual paid leave&emsp;Those working 6+ months continuously→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}days</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Less than 6 months (${cb(false,"cb_auto_002")} Yes&emsp;${cb(true,"cb_auto_003")} No) → After&nbsp;&nbsp;&nbsp;months, get&nbsp;&nbsp;&nbsp;days</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. Other leave&emsp;Paid (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;Unpaid (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. Leave for temporary return home: If the worker wishes to return home temporarily, necessary leave shall be granted within the limits of 1. and 2. above.</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦Details are stipulated in Article (&emsp;〜&emsp;), Article (&emsp;〜&emsp;) of the Rules of Employment</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">Legal overtime over 60 hours a month ( ) ％</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Fixed overtime (</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">Holiday work Legal holiday work ( )％ , Non-legal holiday work ( )％</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">Night work ( )％</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">Closing day of payroll ${f('es_payCutoffEn')} of every month of every month</span></div>
     </div>
   </div>
 
@@ -617,10 +617,10 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. Wages</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. Basic pay&emsp;${cb(true,"cb_auto_004")} Monthly wage (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Daily wage(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Hourly wage(${ff('es_salaryHourly')}JPY)</span></div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">Pay day ${f('es_payDayEn')} of every month of every month</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Details given in the attachment</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. Various allowances (excluding additional pay for overtime)</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">${allowLineId1}${allowLineId2}</span></div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">Method of wage payment Bank transfer Payment in yen (cash)</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">Deduction from wages in accordance with labor-management agreement No Yes</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Details given in the attachment</div>
       </div>
     </div>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">3. Additional pay rate for overtime, holiday work or night work</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">* Details given in the attachment</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">(1) Overtime work</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">Legal overtime 60 hours or less a month (${f('es_ot60under')}) ％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">Wage raise Yes (Timing，amount, etc. ${f('es_raiseConditionEn')} ), No</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">Bonus Yes (Timing，amount, etc. ${f('es_bonusConditionEn')} ), No</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">Legal overtime over 60 hours a month (${f('es_ot60over')}) ％&emsp;Fixed overtime (${f('es_otPrescribed')}) ％</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">Retirement allowance Yes (Timing，amount, etc. ${f('es_severanceConditionEn')} ), No</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">(2) (2) Holiday work</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">Legal holiday work(${f('es_holidayLegal')})％，Non-legal holiday work(${f('es_holidayNonLegal')})％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">Leave allowance Yes (rate ), No</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">Items concerning retirement</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">(3) (3) Night work</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">(${f('es_nightPremium')}) ％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">Procedure for retirement for personal reasons (Notification should be made to the president or the factory foreman, etc. no less than days before retirement)</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">Reasons and procedure for the dismissal</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79">4. Closing day of payroll</td>
-          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} Every month on ${f('es_payCutoffEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} Every month on</td>
+          <td class="id" style="font-size:7pt;" data-key="79">In cases of dismissal, the specified skilled worker shall be dismissed through being given 30 days’ advance notice or at least 30 days of the average wage only when there are unavoidable reasons for the dismissal. In cases of dismissal based on a cause attributable to the fault of the specified skilled worker, there is the possibility of immediate dismissal without giving advance notice or the average wage being paid on approval being obtained from the Director of the Labor Standards Office Concerned.</td>
+          <td class="id" style="font-size:7pt;" data-key="80">○ Details are stipulated in Article ( ), Article ( ) and Article ( ) of the Rules of Employment.</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">Others</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,7 +689,7 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82">5. Pay day</td>
+          <td class="id" style="font-size:7pt;" data-key="82">,</td>
           <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} Every month on ${f('es_payDayEn')}</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} Every month on</td>
         </tr>

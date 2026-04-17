@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.06</div>
+    <div class="ver">ver.20260417.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -481,7 +481,7 @@ function p(){
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(2) [ในกรณีที่มีการใช้ระบบดังต่อไปนี้กับผู้ใช้แรงงาน]</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ชื่อสถานที่ปฏิบัติงาน</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">ที่อยู่</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที) ${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">ที่อยู่</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที)</span></td></tr>
           <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">หมายเลขติดต่อ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">2. เวลาพัก ( นาที ) ${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
@@ -509,12 +509,12 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">III. รายละเอียดงานที่ควรจะปฏิบัติ</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">นหยุดประจำ : ทุกวัน ${f('es_fixedDay1En')} ของสัปดาห์, วันหยุดนักขัตฤกษ์ของประเทศญี่ปุ่น, อื่นๆ ( ${f('es_otherHolidaysEn')} ) (จำนวนวันหยุดรวมต่อปี วัน)</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">2. วันหยุดพิเศษ: จำนวน วันต่อสัปดาห์/เดือน, อื่นๆ ( ) ${f('es_applicantFieldEn')}</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">วันหยุด</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">นหยุดประจำ : ทุกวัน ${f('es_fixedDay1En')} ของสัปดาห์, วันหยุดนักขัตฤกษ์ของประเทศญี่ปุ่น, อื่นๆ ( ${f('es_otherHolidaysEn')} ) (จำนวนวันหยุดรวมต่อปี วัน)</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">VI. วันหยุด ${f('es_categoryEn')}</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. วันหยุดพิเศษ: จำนวน วันต่อสัปดาห์/เดือน, อื่นๆ ( )</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">1. วันลาพักร้อนประจำปี                                          ในกรณีที่ทำงานต่อเนื่องครบ 6 เดือน  → ${f('es_paidLeave')} วัน</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">VI. วันหยุด</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">วันลาพักร้อนประจำปีในกรณีที่ทำงานต่อเนื่องยังไม่ครบ 6 เดือน                        ( มี ไม่มี) → ทำงานครบ เดือน ได้วันหยุด วัน</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. วันลาพักร้อนประจำปี                                          ในกรณีที่ทำงานต่อเนื่องครบ 6 เดือน  → ${f('es_paidLeave')} วัน</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. วันลาอื่นๆ　　 　ลาแบบได้รับค่าจ้าง ( ${f('es_paidLeaveEn')} )　　ลาแบบไม่ได้รับค่าจ้าง ( ${f('es_unpaidLeaveEn')} )</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">3. วันลากลับประเทศชั่วคราว   ในกรณีที่ผู้รับจ้างต้องการกลับประเทศชั่วคราว ให้ลาหยุดเท่าที่จำเป็นภายในจำนวนวันลาในข้อ 1 หรือ 2 ด้านบน</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">วันลาพักร้อนประจำปีในกรณีที่ทำงานต่อเนื่องยังไม่ครบ 6 เดือน                        ( มี ไม่มี) → ทำงานครบ เดือน ได้วันหยุด วัน</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">2. วันลาอื่นๆ　　 　ลาแบบได้รับค่าจ้าง ( ${f('es_paidLeaveEn')} )　　ลาแบบไม่ได้รับค่าจ้าง ( ${f('es_unpaidLeaveEn')} )</td></tr>
         </table>
       </div>
     </div>
@@ -540,14 +540,14 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. เวลาเริ่มและเลิกงาน ฯลฯ</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่ ${f('es_startTime')} ${f('es_endTime')} ${f('es_dailyHours')} ${f('es_dailyMins')}</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">3. วันลากลับประเทศชั่วคราว   ในกรณีที่ผู้รับจ้างต้องการกลับประเทศชั่วคราว ให้ลาหยุดเท่าที่จำเป็นภายในจำนวนวันลาในข้อ 1 หรือ 2 ด้านบน</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">VII. ค่าจ้าง</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">(2) [ในกรณีที่มีการใช้ระบบดังต่อไปนี้กับผู้ใช้แรงงาน]</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">*รายละเอียดตามเอกสารแนบ</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">2. เงินช่วยเหลือต่างๆ (ไม่รวมค่าจ้างที่เพิ่มขึ้นในส่วนของการทำงานนอกเวลา) ${cb(false,'shift_work_id')}</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">VII. ค่าจ้าง</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">1. ค่าจ้างพื้นฐาน รายเดือน ( เยน ) รายวัน ( ${f('es_salaryDaily')} เยน ) ■ รายชั่วโมง( เยน )</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">*รายละเอียดตามเอกสารแนบ</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">(เงินช่วยเหลือค่า ${f('es_allowance1NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance2NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance3NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance4NameEn')} )</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">2. เงินช่วยเหลือต่างๆ (ไม่รวมค่าจ้างที่เพิ่มขึ้นในส่วนของการทำงานนอกเวลา)</span></div>`;
           }).join('');
         })()}
       </div>
@@ -580,11 +580,11 @@ function p(){
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
           <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. มีการทำงานนอกเหนือเวลาที่กำหนดหรือไม่</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">*รายละเอียดตามเอกสารแนบ ${cb(true,'overtime_yes_id')} ${cb(false,'overtime_no_id')}</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">(เงินช่วยเหลือค่า ${f('es_allowance1NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance2NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance3NameEn')} ) , (เงินช่วยเหลือค่า ${f('es_allowance4NameEn')} )</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">3. อัตราค่าจ้างที่เพิ่มขึ้น ซึ่งจะจ่ายให้ในกรณีทำงานนอกเวลาการทำงาน ทำงานในวันหยุด หรือการทำงานช่วงเวลากลางดึก</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">*รายละเอียดตามเอกสารแนบ</span></td>
         </tr>
       </table>
     </div>
@@ -594,9 +594,9 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">วัน</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">(1) นอกเวลาการทำงาน                            ไม่เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย ( ) ％ ${f('es_fixedDay1En')} ${f('es_otherHolidays')} ${f('es_annualHolidays')}</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย ( ) ％</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">เกินกว่าที่กำหนด ( ) ％</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">3. อัตราค่าจ้างที่เพิ่มขึ้น ซึ่งจะจ่ายให้ในกรณีทำงานนอกเวลาการทำงาน ทำงานในวันหยุด หรือการทำงานช่วงเวลากลางดึก</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">(1) นอกเวลาการทำงาน                            ไม่เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย ( ) ％</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย ( ) ％</span></div>
     </div>
   </div>
 
@@ -604,11 +604,11 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. วันลา</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">(2) วันหยุด วันหยุดตามกฎหมาย ( )％ , วันหยุดที่กฎหมายไม่ได้กำหนด ( )％ ${f('es_paidLeaveEn')||f('es_paidLeave')}</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">(3) ช่วงเวลากลางดึก ( )％ ${cb(false,"cb_auto_002")} ${cb(true,"cb_auto_003")}</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">4. วันตัดรอบค่าจ้าง ทุกวัน ${f('es_payCutoffEn')} ${f('es_payCutoffEn')} ทุกวัน ของเดือน</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">5. วันจ่ายค่าจ้าง ทุกวัน ${f('es_payDayEn')} ${f('es_payDayEn')} ทุกวัน ของเดือน</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">6. วิธีการจ่ายค่าจ้าง โอนเข้าธนาคาร จ่ายเป็นเงินสด</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">เกินกว่าที่กำหนด ( ) ％</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">(2) วันหยุด วันหยุดตามกฎหมาย ( )％ , วันหยุดที่กฎหมายไม่ได้กำหนด ( )％</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">(3) ช่วงเวลากลางดึก ( )％</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">4. วันตัดรอบค่าจ้าง ทุกวัน ${f('es_payCutoffEn')} ${f('es_payCutoffEn')} ทุกวัน ของเดือน</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">5. วันจ่ายค่าจ้าง ทุกวัน ${f('es_payDayEn')} ${f('es_payDayEn')} ทุกวัน ของเดือน</span></div>
     </div>
   </div>
 
@@ -617,10 +617,10 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. ค่าจ้าง</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">7. การหักเงินตอนจ่ายค่าจ้างตามข้อตกลงการบริหารจัดการแรงงาน ไม่หัก หัก ${cb(true,"cb_auto_004")} ${ff('es_salaryMonthly')} ${cb(false,"cb_auto_005")} ${ff('es_salaryDaily')} ${cb(false,"cb_auto_006")} ${ff('es_salaryHourly')}</span></div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">6. วิธีการจ่ายค่าจ้าง โอนเข้าธนาคาร จ่ายเป็นเงินสด</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* รายละเอียดตามเอกสารแนบ</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">*รายละเอียดตามเอกสารแนบ</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">8. การขึ้นเงินเดือน มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_raiseConditionEn')} ), ไม่มี</span></div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">7. การหักเงินตอนจ่ายค่าจ้างตามข้อตกลงการบริหารจัดการแรงงาน ไม่หัก หัก</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">*รายละเอียดตามเอกสารแนบ</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* รายละเอียดตามเอกสารแนบ</div>
       </div>
     </div>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">9. โบนัส มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_bonusConditionEn')} ), ไม่มี</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">8. การขึ้นเงินเดือน มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_raiseConditionEn')} ), ไม่มี</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">10. เงินชดเชยกรณีที่ให้เมื่อออกจากงาน มี มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_severanceConditionEn')} ), ไม่มี</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">11. เงินชดเชยกรณีที่บริษัทหยุดดำเนินการ มี    (สัดส่วน ), ไม่มี ${f('es_ot60under')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">9. โบนัส มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_bonusConditionEn')} ), ไม่มี</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">10. เงินชดเชยกรณีที่ให้เมื่อออกจากงาน มี มี   (ระยะเวลา, จำนวนเงิน ฯลฯ ${f('es_severanceConditionEn')} ), ไม่มี</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">VIII. รายการที่เกี่ยวข้องกับการลาออก ${f('es_ot60over')} ${f('es_otPrescribed')}</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">11. เงินชดเชยกรณีที่บริษัทหยุดดำเนินการ มี    (สัดส่วน ), ไม่มี</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">1. ขั้นตอนสำหรับการลาออกด้วยเหตุผลส่วนตัว                                       (ต้องยื่นให้ประธานบริษัท / ผู้จัดการโรงงาน ล่วงหน้าเป็นเวลา วันก่อนลาออก)</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">2.  เหตุผลและขั้นตอนการเลิกจ้าง ${f('es_holidayLegal')} ${f('es_holidayNonLegal')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">VIII. รายการที่เกี่ยวข้องกับการลาออก</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">1. ขั้นตอนสำหรับการลาออกด้วยเหตุผลส่วนตัว                                       (ต้องยื่นให้ประธานบริษัท / ผู้จัดการโรงงาน ล่วงหน้าเป็นเวลา วันก่อนลาออก)</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">ในการเลิกจ้าง เฉพาะในกรณีที่มีเหตุอันหลีกเลี่ยงไม่ได้ อย่างน้อยที่สุดต้องแจ้งล่วงหน้า 30 วัน หรือเลิกจ้างโดยจ่ายค่าจ้างเฉลี่ยของระยะเวลาตั้งแต่ 30 วันขึ้นไป ในกรณีของการเลิกจ้างด้วยเหตุอันเนื่องมาจากความบกพร่องของแรงงานเฉพาะทางชาวต่างชาติ เมื่อได้รับการอนุมัติจากผู้อำนวยการกองกำกับดูแลมาตรฐานแรงงานที่มีอำนาจสั่งการ สามารถเลิกจ้างได้ทันทีโดยไม่ต้องมีการแจ้งล่วงหน้า และไม่จำเป็นต้องจ่ายค่าจ้างเฉลี่ย</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">○รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่(      )ข้อที่          ถึงข้อที่ ${f('es_nightPremium')}</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">2.  เหตุผลและขั้นตอนการเลิกจ้าง</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">ในการเลิกจ้าง เฉพาะในกรณีที่มีเหตุอันหลีกเลี่ยงไม่ได้ อย่างน้อยที่สุดต้องแจ้งล่วงหน้า 30 วัน หรือเลิกจ้างโดยจ่ายค่าจ้างเฉลี่ยของระยะเวลาตั้งแต่ 30 วันขึ้นไป ในกรณีของการเลิกจ้างด้วยเหตุอันเนื่องมาจากความบกพร่องของแรงงานเฉพาะทางชาวต่างชาติ เมื่อได้รับการอนุมัติจากผู้อำนวยการกองกำกับดูแลมาตรฐานแรงงานที่มีอำนาจสั่งการ สามารถเลิกจ้างได้ทันทีโดยไม่ต้องมีการแจ้งล่วงหน้า และไม่จำเป็นต้องจ่ายค่าจ้างเฉลี่ย</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79">IX.   อื่นๆ</td>
-          <td class="id" style="font-size:7pt;" data-key="80">1. สถานะเงื่อนไขประกันสังคมและประกันแรงงาน ( เงินบำนาญสวัสดิการ , ประกันสุขภาพ , ประกันการจ้างงาน , ประกันอุบัติเหตุในการทำงาน , ${cb(true,"cb_auto_008")} ${f('es_payCutoffEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">2. การตรวจสุขภาพเมื่อรับเข้าทำงาน ปี เดือน ${cb(false,"cb_auto_009")}</td>
+          <td class="id" style="font-size:7pt;" data-key="79">○รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่(      )ข้อที่          ถึงข้อที่</td>
+          <td class="id" style="font-size:7pt;" data-key="80">IX.   อื่นๆ</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">1. สถานะเงื่อนไขประกันสังคมและประกันแรงงาน ( เงินบำนาญสวัสดิการ , ประกันสุขภาพ , ประกันการจ้างงาน , ประกันอุบัติเหตุในการทำงาน ,</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,7 +689,7 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82">3. การตรวจสุขภาพประจำระยะเวลาในครั้งแรก ปี เดือน (  ดำเนินการทุกปีหลังจากนั้น  )</td>
+          <td class="id" style="font-size:7pt;" data-key="82">เงินบำนาญของรัฐ , ประกันสุขภาพของรัฐ , □ อื่นๆ ( ))</td>
           <td class="id" style="font-size:7pt;" data-key="83">4. หน่วยงานให้คําปรึกษาเกี่ยวกับการปรับปรุงการจัดการจ้างงาน ${cb(true,"cb_auto_011")} ${f('es_payDayEn')}</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">ชื่อแผนก ${f('es_contactDeptEn')} ตำแหน่งและชื่อนามสกุลของเจ้าหน้าที่ ${f('es_contactPersonEn')} (หมายเลขติดต่อ )</td>
         </tr>
