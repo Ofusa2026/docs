@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.05</div>
+    <div class="ver">ver.20260417.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -481,8 +481,8 @@ function p(){
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(2) [ในกรณีที่มีการใช้ระบบดังต่อไปนี้กับผู้ใช้แรงงาน]</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ชื่อสถานที่ปฏิบัติงาน</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที)</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที) ${f('es_officeAddressEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที)</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">2. เวลาพัก ( นาที ) ${f('es_officeTel')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">ที่อยู่</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">เริ่มงาน ( นาฬิกา นาที ) เลิกงาน ( นาฬิกา นาที ) (วันที่เข้างาน , จำนวนชั่วโมงการทำงานใน 1 วัน ชั่วโมง นาที) ${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">หมายเลขติดต่อ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">2. เวลาพัก ( นาที ) ${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
@@ -492,9 +492,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">3. จำนวนชั่วโมงการทำงานใน ① สัปดาห์ ( ชั่วโมง นาที ） ② เดือน ( ชั่วโมง นาที ） ③ปี  ( ชั่วโมง นาที） ${cb(false,'hire_dispatch_id')}</span></div>
         <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">4. จำนวนวันทำงานใน ① สัปดาห์ ( วัน) ②เดือน( วัน) ③ ปี ( วัน) ${cb(false,'change_none_direct_id')}</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">5. มีการทำงานนอกเหนือเวลาที่กำหนดหรือไม่ ■ มี □ ไม่มี</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่( ～ ),ข้อที่ ( ～ ),ข้อที่ (      ) ถึงข้อที่</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">วันหยุด</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">ชื่อสถานที่ปฏิบัติงาน</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">ที่อยู่</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">หมายเลขติดต่อ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>
