@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260417.12</div>
+    <div class="ver">ver.20260417.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -480,9 +480,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">(1) सुरुवात ( ${f('es_startTime')} ) अन्त्य ( ${f('es_startTime')} ) (एक दिनको काम गर्ने समय ${f('es_dailyHours')}　घण्टा　　${f('es_dailyMins')}　　मिनेट )</span></div>
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(२) 【तलको प्रणालीलाई अवलम्बन गरेको खण्डमा】</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">※ एक वर्षको दरले परिवर्तित समय प्रणाली अवलम्बन गरेको खण्डमा，दोस्रो पक्षले राम्रोसँग बुझ्ने भाषामा लेखिएको क्यालेण्डरको कपी अथवा श्रम व्यवस्थाको निरीक्षण कार्यालयमा पेश गरिएको परिवर्तित समय प्रणालीसँग सम्बन्धित सम्झौता पत्र यसैसँग संलग्न गरिएको छ।</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">फेरबदर प्रणालीको रूपमा तलका काम गर्ने समयको सम्मिश्रण गरिनेछ।</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">सुरु （ बजे मिनेट） अन्त्य （ बजे मिनेट） （प्रयोगको मिति , १ दिनको निर्धारित कामको समय घण्टा मिनेट）</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">सुरु （ बजे मिनेट） अन्त्य （ बजे मिनेट） （प्रयोगको मिति , १ दिनको निर्धारित कामको समय घण्टा मिनेट）</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">सुरु （ बजे मिनेट） अन्त्य （ बजे मिनेट） （प्रयोगको मिति , १ दिनको निर्धारित कामको समय घण्टा मिनेट）</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">२．  ब्रेक समय ( मिनेट）</span></td></tr>
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">कामको स्थान</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">स्थान</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">सम्पर्क नं</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">२．  ब्रेक समय ( मिनेट）</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
@@ -492,9 +492,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">३．निर्धारित कामको समय (१) हप्ता（ घण्टा मिनेट） (२) महिना（ घण्टा मिनेट） (३)वर्ष（ घण्टा मिनेट）</span></div>
         <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">४．निर्धारित कामको दिन (१) हप्ता（ दिन） (२)महिना（ दिन） (३) वर्ष（ दिन）</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">५． ओभरटाइमको सम्बन्धमा ■ गर्ने □ नगर्ने</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">○विस्तृत रूपमा, कामको नियमको भाग बुँदा～भाग बुँदा,  भाग बुँदा～भाग बुँदा,  भाग बुँदा～भाग बुँदा</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">Ⅴ．बिदा (एक दिनको)</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">कामको स्थान</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">स्थान</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">सम्पर्क नं</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>

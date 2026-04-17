@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260417.12</div>
+    <div class="ver">ver.20260417.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -480,9 +480,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">1. 시업·종업의 시각 등</span></div>
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(1) 시업 ( ) 종업 ( ) (하루 소정 노동 시간 수 ${f('es_dailyHours')} 시간 ${f('es_dailyMins')} 분 )</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">(2) 【다음 제도가 노동자에게 적용되는 경우】</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">변형 노동 시간제: ( ${f('es_flexDetailEn')} ) 단위의 변형시간 노동제</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">※1년 단위의 변형 노동 시간제를 채용하고 있는 경우에는, 을이 충분히 이해할 수 있는 언어로 병기한 연간 캘린더의 사본 및 노동 기준 감독서에 신고한 변형 노동 시간제에 관한 협정서의 사본을 첨부한다.</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">□ 교대제로서 다음 근무시간의 조합에 따른다.</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">시업 ( 시 분) 종업 ( 시 분) (적용일 ) 하루 소정 노동시간 시간 분)</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">시업( 시 분) 종업 ( 시 분) (적용일 ) 하루 소정 노동시간 시간 분)</span></td></tr>
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">사업소명</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">소재지</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">연락처</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">시업( 시 분) 종업 ( 시 분) (적용일 ) 하루 소정 노동시간 시간 분)</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
@@ -492,9 +492,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">시업 ( 시 분) 종업 ( 시 분) (적용일 ) 하루 소정 노동시간 시간 분)</span></div>
         <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">2. 휴식 시간 ( 분)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">3. 소정 노동시간수 ① 주 ( 시간 분) ② 달 ( 시간 ${f('es_monthlyMin')} 분) ③ 년 ( 시간 분)</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">4. 소정 노동일수 ① 주 ( 일) ② 월 ( 일) ③ 년 ( 일)</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">5. 소정 시간 외 노동의 유무 유 무</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">사업소명</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">소재지</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">연락처</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>
