@@ -3,531 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>参考様式第１－１７号 支援計画書</title>
-<link rel="stylesheet" href="ofusa_common.css?v=1776381386">
+<title>参考様式第１－１７号 １号特定技能外国人支援計画書（インドネシア語）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
 <style>
-.doc{
-  background:white;width:794px;min-height:1123px;flex-shrink:0;
-  margin:0 0 24px 0;padding:10mm 12mm;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
-  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
-  font-size:7pt;line-height:1.5;color:#000;
-  position:relative;box-sizing:border-box;overflow:hidden;
-}
-.page-num-label{
-  position:absolute;top:5px;right:8px;
-  font-size:8px;color:#bbb;font-family:sans-serif;background:white;padding:0 2px;
-}
-table{border-collapse:collapse;width:100%;font-size:6.5pt;}
-td,th{border:1px solid #555;padding:2px 3px;vertical-align:top;}
-.th{background:#e8e8e8;font-weight:normal;white-space:nowrap;}
+.doc{padding:15mm!important;line-height:1.5!important;min-height:auto!important;font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;}
 .id{color:#000;}
-.f{color:#1a56db;font-weight:bold;}
-.section-hd{background:#ccc;font-weight:bold;font-size:7pt;padding:2px 4px;}
-.cb{display:inline-block;width:10px;height:10px;border:1px solid #333;text-align:center;line-height:10px;font-size:7pt;margin-right:2px;}
-.cb-on::after{content:'■';}
-.cb-off::after{content:'□';}
-.sig-line{border-bottom:1px solid #333;display:inline-block;min-width:120px;}
+.tbl{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:4mm;}
+.tbl td,.tbl th{border:1px solid #000;padding:4px 6px;vertical-align:middle;}
+.sec-lbl{width:20px;text-align:center;writing-mode:vertical-rl;font-weight:bold;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.02</div>
+    <div class="app-bar-title">📄 参考様式第１－１７号（インドネシア語）　１号特定技能外国人支援計画書【プロト】</div>
+    <div class="ver">ver.20260417.01</div>
   </div>
   <div class="bar-btns">
-    <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
-    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
   </div>
 </div>
 <div class="main">
 <div class="fp">
   <div class="fp-case">
-    <label>🔍 登録支援機関</label>
-    <select id="filterOrg" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
-    <label>🏢 所属機関</label>
-    <select id="filterCompany" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
-    <label>🔤 検索（案件名・人材名）</label>
-    <input id="filterKeyword" oninput="filterCases()" placeholder="名前・案件名で絞り込み" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
-    <label>👤 案件選択 <span id="caseCount" style="font-size:9px;color:#888;"></span></label>
-    <select id="caseSelect" size="6" style="width:100%;padding:2px;border:1px solid #bbb;border-radius:3px;font-size:11px;" onchange="selectCase()"></select>
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
-  <div class="fp-inner" id="formArea">
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg"><label>年</label><input id="f_docY" oninput="p()" placeholder="2026"></div>
+      <div class="fg"><label>月</label><input id="f_docM" oninput="p()" placeholder="4"></div>
+      <div class="fg"><label>日</label><input id="f_docD" oninput="p()" placeholder="17"></div>
+    </div>
     <div class="fs"><div class="fs-title">Ⅰ 支援対象者</div>
-      <div class="fg"><label>氏名（EN）<span class="fid">applicantNameEn</span></label><input id="applicantNameEn" oninput="p()"></div>
-      <div class="fg"><label>性別（日）<span class="fid">p.gender</span></label><input id="p_gender" oninput="p()"></div>
-      <div class="fg"><label>性別（ID）<span class="fid">p.genderEn</span></label><input id="p_genderEn" oninput="p()"></div>
-      <div class="fg"><label>生年（西暦）<span class="fid">p.birthY</span></label><input id="p_birthY" oninput="p()"></div>
-      <div class="fg"><label>生月<span class="fid">p.birthM</span></label><input id="p_birthM" oninput="p()"></div>
-      <div class="fg"><label>生日<span class="fid">p.birthD</span></label><input id="p_birthD" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicantName" oninput="p()" placeholder="TARO YAMADA"></div>
+      <div class="fg"><label>ほか何名</label><input id="f_otherCount" oninput="p()" placeholder="0"></div>
+      <div class="fg"><label>性別（日）</label>
+        <select id="f_gender" onchange="p()">
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <div class="fg"><label>生年月日 年</label><input id="f_birthY" oninput="p()" placeholder="1990"></div>
+      <div class="fg"><label>月</label><input id="f_birthM" oninput="p()" placeholder="1"></div>
+      <div class="fg"><label>日</label><input id="f_birthD" oninput="p()" placeholder="15"></div>
+      <div class="fg"><label>国籍（日）</label><input id="f_nationality" oninput="p()" value="インドネシア"></div>
+      <div class="fg"><label>国籍（ID）</label><input id="f_nationalityEn" oninput="p()" value="Indonesia"></div>
     </div>
-    <div class="fs"><div class="fs-title">Ⅱ 所属機関</div>
-      <div class="fg"><label>機関名（ふりがな）<span class="fid">co.nameKana</span></label><input id="co_nameKana" oninput="p()"></div>
-      <div class="fg"><label>機関名（日）<span class="fid">co.name</span></label><input id="co_name" oninput="p()"></div>
-      <div class="fg"><label>機関名（EN）<span class="fid">co.nameEn</span></label><input id="co_nameEn" oninput="p()"></div>
-      <div class="fg"><label>郵便番号<span class="fid">co.zip</span></label><input id="co_zip" oninput="p()"></div>
-      <div class="fg"><label>住所（日）<span class="fid">co.fullAddress</span></label><input id="co_fullAddress" oninput="p()"></div>
-      <div class="fg"><label>住所（EN）<span class="fid">co.addressEn</span></label><input id="co_addressEn" oninput="p()"></div>
-      <div class="fg"><label>電話番号<span class="fid">co.tel</span></label><input id="co_tel" oninput="p()"></div>
-      <div class="fg"><label>支援担当者<span class="fid">co.supportStaff</span></label><input id="co_supportStaff" oninput="p()"></div>
-      <div class="fg"><label>支援責任者役職（日）<span class="fid">co.supportManagerTitle</span></label><input id="co_supportManagerTitle" oninput="p()"></div>
-      <div class="fg"><label>支援責任者名（EN）<span class="fid">co.supportManagerNameEn</span></label><input id="co_supportManagerNameEn" oninput="p()"></div>
-      <div class="fg"><label>支援責任者役職（EN）<span class="fid">co.supportManagerTitleEn</span></label><input id="co_supportManagerTitleEn" oninput="p()"></div>
-      <div class="fg"><label>作成責任者名（日）<span class="fid">co.authorName</span></label><input id="co_authorName" oninput="p()"></div>
-      <div class="fg"><label>作成責任者名（EN）<span class="fid">co.authorNameEn</span></label><input id="co_authorNameEn" oninput="p()"></div>
-    </div>
-    <div class="fs"><div class="fs-title">Ⅲ 登録支援機関</div>
-      <div class="fg"><label>登録番号<span class="fid">so.regNo</span></label><input id="so_regNo" oninput="p()"></div>
-      <div class="fg"><label>登録年月日<span class="fid">so.regDate</span></label><input id="so_regDate" oninput="p()"></div>
-      <div class="fg"><label>機関名（ふりがな）<span class="fid">so.nameKana</span></label><input id="so_nameKana" oninput="p()"></div>
-      <div class="fg"><label>機関名（日）<span class="fid">so.name</span></label><input id="so_name" oninput="p()"></div>
-      <div class="fg"><label>機関名（EN）<span class="fid">so.nameEn</span></label><input id="so_nameEn" oninput="p()"></div>
-      <div class="fg"><label>郵便番号<span class="fid">so.zip</span></label><input id="so_zip" oninput="p()"></div>
-      <div class="fg"><label>住所（日）<span class="fid">so.address</span></label><input id="so_address" oninput="p()"></div>
-      <div class="fg"><label>住所（EN）<span class="fid">so.addressEn</span></label><input id="so_addressEn" oninput="p()"></div>
-      <div class="fg"><label>電話番号<span class="fid">so.tel</span></label><input id="so_tel" oninput="p()"></div>
-      <div class="fg"><label>代表者（ふりがな）<span class="fid">so.repNameKana</span></label><input id="so_repNameKana" oninput="p()"></div>
-      <div class="fg"><label>代表者名（日）<span class="fid">so.repName</span></label><input id="so_repName" oninput="p()"></div>
-      <div class="fg"><label>代表者名（EN）<span class="fid">so.repNameEn</span></label><input id="so_repNameEn" oninput="p()"></div>
-      <div class="fg"><label>支援事務所〒<span class="fid">so.officeZip</span></label><input id="so_officeZip" oninput="p()"></div>
-      <div class="fg"><label>支援事務所住所（日）<span class="fid">so.officeAddress</span></label><input id="so_officeAddress" oninput="p()"></div>
-      <div class="fg"><label>支援事務所住所（EN）<span class="fid">so.officeAddressEn</span></label><input id="so_officeAddressEn" oninput="p()"></div>
-      <div class="fg"><label>支援事務所TEL<span class="fid">so.officeTel</span></label><input id="so_officeTel" oninput="p()"></div>
-      <div class="fg"><label>支援責任者（ふりがな）<span class="fid">so.supportManagerKana</span></label><input id="so_supportManagerKana" oninput="p()"></div>
-      <div class="fg"><label>支援責任者名（日）<span class="fid">so.supportManager</span></label><input id="so_supportManager" oninput="p()"></div>
-      <div class="fg"><label>支援責任者役職（日）<span class="fid">so.supportManagerTitle</span></label><input id="so_supportManagerTitle" oninput="p()"></div>
-      <div class="fg"><label>支援責任者役職（EN）<span class="fid">so.supportManagerTitleEn</span></label><input id="so_supportManagerTitleEn" oninput="p()"></div>
-      <div class="fg"><label>支援中の1号人数<span class="fid">so.supporterCount</span></label><input id="so_supporterCount" oninput="p()"></div>
-      <div class="fg"><label>支援担当者数<span class="fid">so.supportStaffCount</span></label><input id="so_supportStaffCount" oninput="p()"></div>
-    </div>
-    <div class="fs"><div class="fs-title">作成日・契約</div>
-      <div class="fg"><label>作成年<span class="fid">case.docYear</span></label><input id="case_docYear" oninput="p()"></div>
-      <div class="fg"><label>作成月<span class="fid">case.docMonth</span></label><input id="case_docMonth" oninput="p()"></div>
-      <div class="fg"><label>作成日<span class="fid">case.docDay</span></label><input id="case_docDay" oninput="p()"></div>
-      <div class="fg"><label>契約開始年<span class="fid">es.contractStartY</span></label><input id="es_contractStartY" oninput="p()"></div>
-      <div class="fg"><label>契約開始月<span class="fid">es.contractStartM</span></label><input id="es_contractStartM" oninput="p()"></div>
-      <div class="fg"><label>契約開始日<span class="fid">es.contractStartD</span></label><input id="es_contractStartD" oninput="p()"></div>
-      <div class="fg"><label>書類作成年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
-      <div class="fg"><label>書類作成月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div>
-      <div class="fg"><label>書類作成日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div>
-    </div>
-    <div class="fs"><div class="fs-title">住居情報</div>
-      <div class="fg"><label>同居人数<span class="fid">es.cohabitants</span></label><input id="es_cohabitants" oninput="p()"></div>
-      <div class="fg"><label>居住費徴収区分<span class="fid">es.housingFeeType</span></label><input id="es_housingFeeType" oninput="p()"></div>
-      <div class="fg"><label>居住費（円）<span class="fid">es.housingFee</span></label><input id="es_housingFee" oninput="p()"></div>
-      <div class="fg"><label>所有形態<span class="fid">es.housingOwnership</span></label><input id="es_housingOwnership" oninput="p()"></div>
-      <div class="fg"><label>費用説明（日）<span class="fid">es.actualCostDesc</span></label><textarea id="es_actualCostDesc" oninput="p()" rows="2"></textarea></div>
-      <div class="fg"><label>費用説明（EN）<span class="fid">es.actualCostDescEn</span></label><textarea id="es_actualCostDescEn" oninput="p()" rows="2"></textarea></div>
+    <div class="fs"><div class="fs-title">Ⅱ 特定技能所属機関</div>
+      <div class="fg"><label>ふりがな</label><input id="f_coNameKana" oninput="p()" placeholder="かぶしきがいしゃ〇〇"></div>
+      <div class="fg"><label>機関名（日）</label><input id="f_coName" oninput="p()" placeholder="株式会社〇〇"></div>
+      <div class="fg"><label>機関名（英）</label><input id="f_coNameEn" oninput="p()" placeholder="XX Co., Ltd."></div>
+      <div class="fg"><label>郵便番号</label><input id="f_coZip" oninput="p()" placeholder="100-0001"></div>
+      <div class="fg"><label>住所（日）</label><input id="f_coAddress" oninput="p()" placeholder="東京都〇〇区〇〇1-2-3"></div>
+      <div class="fg"><label>住所（英）</label><input id="f_coAddressEn" oninput="p()" placeholder="1-2-3 XX, XX-ku, Tokyo"></div>
+      <div class="fg"><label>電話番号</label><input id="f_coTel" oninput="p()" placeholder="03-1234-5678"></div>
     </div>
   </div>
 </div>
 <div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1776381386"></script>
+<script src="ofusa_common.js?v=1776316942"></script>
 <script>
 docId='1_17';
-const _title='📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）';
-// f, esc, _fontSize, _editMode は ofusa_common.js で宣言済み
-// デフォルトフォントサイズを7ptに設定
-_fontSize = 7;
-
-// 支援担当者ブロック（所属機関）
-function coStaff(){
-  return `${f('co_supportStaff')}<br>${f('co_supportManagerTitle')}<br>${f('co_supportManagerNameEn')}<br>${f('co_supportManagerTitleEn')}`;
-}
-// 標準実施予定セル（有のパターン）
-function ada(text){return `<span class="cb cb-on"></span>有 Ada（${text}）<br><span class="cb cb-off"></span>無 Tidak`;}
-// 委託無
-const TIDAK='無 Tidak';
-// 住所空欄
-const ADDR='〒　　－<br>Kode pos:';
 
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea');
   if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:10pt;margin-bottom:2px;">参考様式第１－１７号</div>
+<div style="font-size:9pt;color:#555;margin-bottom:10mm;">Format Referensi 1-17</div>
 
-  // ページ共通ヘッダー
-  const hdr=`<div style="display:flex;justify-content:space-between;font-size:6pt;margin-bottom:2px;">
-    <span>参考様式第１－１７号　Format Referensi 1-17</span>
-    <span>作成日 Tanggal dibuat: ${f('case_docDay')}日${f('case_docMonth')}月${f('case_docYear')}年 /
-      ${f('case_docDay')} bulan ${f('case_docMonth')} tahun ${f('case_docYear')}</span>
-  </div>
-  <div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:3px;">
-    １号特定技能外国人支援計画書<br>
-    <span style="font-size:8pt;">Rencana Bantuan Pekerja Asing Berketerampilan Khusus 1</span>
-  </div>`;
+<div style="font-size:16pt;font-weight:bold;text-align:center;letter-spacing:0.4em;margin-bottom:4mm;">１号特定技能外国人支援計画書</div>
+<div style="font-size:11pt;text-align:center;margin-bottom:6mm;">Rencana Bantuan Pekerja Asing Berketerampilan Khusus 1</div>
 
-  // 支援内容共通列ヘッダー
-  const colHdr=`<tr style="background:#ddd;font-size:6pt;">
-    <td style="width:28%;">支援内容<br>Isi bantuan</td>
-    <td style="width:16%;">実施予定<br>Rencana pelaksanaan</td>
-    <td style="width:8%;">委託<br>有無</td>
-    <td style="width:20%;">支援担当者<br>氏名（役職）<br>Nama (Jabatan)</td>
-    <td style="width:8%;">住所<br>（委託時のみ）</td>
-    <td style="width:20%;">実施方法<br>Cara pelaksanaan</td>
-  </tr>`;
+<div style="font-size:10pt;text-align:right;margin-bottom:1mm;">作成日：　${f('f_docY')}　年　${f('f_docM')}　月　${f('f_docD')}　日</div>
+<div style="font-size:9pt;text-align:right;margin-bottom:4mm;color:#000;">Tanggal dibuat: tanggal ${f('f_docD')} bulan ${f('f_docM')} tahun ${f('f_docY')}</div>
 
-  // ===== P1 =====
-  const p1=`<div class="doc"><div class="page-num-label">P1</div>
-${hdr}
-<table>
-<!-- Ⅰ 支援対象者 -->
-<tr><td colspan="5" class="section-hd">Ⅰ　支援対象者　I. Penerima Bantuan</td></tr>
-<tr>
-  <td class="th" style="width:20%;">１　氏名<br>1. Nama</td>
-  <td colspan="2">${f('applicantNameEn')}<br>（ほか　　名）</td>
-  <td class="th" style="width:10%;">２　性別<br>2. Jenis kelamin</td>
-  <td>${f('p_gender')}<br>${f('p_genderEn')}</td>
-</tr>
-<tr>
-  <td class="th">３　生年月日<br>3. Tanggal lahir</td>
-  <td colspan="2">${f('p_birthY')}年${f('p_birthM')}月${f('p_birthD')}日<br>
-    Tanggal ${f('p_birthD')} bulan ${f('p_birthM')} tahun ${f('p_birthY')}</td>
-  <td class="th">４　国籍・地域<br>4. Warga negara</td>
-  <td>インドネシア<br>Indonesia</td>
-</tr>
-<!-- Ⅱ 所属機関 -->
-<tr><td colspan="5" class="section-hd">Ⅱ　特定技能所属機関　II. Organisasi Afiliasi Pekerja Berketerampilan Khusus</td></tr>
-<tr>
-  <td class="th">１　名称<br>（ふりがな）</td>
-  <td colspan="4">${f('co_nameKana')}<br>${f('co_name')}<br>${f('co_nameEn')}</td>
-</tr>
-<tr>
-  <td class="th">２　住所<br>2. Alamat</td>
-  <td colspan="4">〒${f('co_zip')}&emsp;${f('co_fullAddress')}<br>${f('co_addressEn')}&emsp;（電話 ${f('co_tel')}）</td>
-</tr>
-<tr>
-  <td class="th" rowspan="3">４　支援体制<br>4. Struktur bantuan</td>
-  <td class="th" colspan="2">支援責任者 Penanggung jawab bantuan</td>
-  <td class="th">氏名 Nama</td>
-  <td class="th">役職 Jabatan</td>
-</tr>
-<tr>
-  <td class="th" colspan="2">（ふりがな）</td>
-  <td>${f('co_supportManagerNameEn')}</td>
-  <td>${f('co_supportManagerTitle')}<br>${f('co_supportManagerTitleEn')}</td>
-</tr>
-<tr>
-  <td colspan="2">支援中の１号人数<br>Jumlah pekerja 1 yang memberikan bantuan</td>
-  <td colspan="2">支援の中立性を確保していることの有無<br>Jaminan netralitas pemberian bantuan<br><span class="cb cb-on"></span>有 Ada&emsp;<span class="cb cb-off"></span>無 Tidak</td>
-</tr>
-<tr>
-  <td class="th"></td>
-  <td colspan="2">支援担当者数 Jumlah PIC pemberi bantuan</td>
-  <td colspan="2"></td>
-</tr>
-<!-- Ⅲ 登録支援機関 -->
-<tr><td colspan="5" class="section-hd">Ⅲ　登録支援機関　III. Organisasi Pemberi Bantuan Terdaftar</td></tr>
-<tr>
-  <td class="th">１　登録番号<br>1. Nomor pendaftaran</td>
-  <td colspan="2">${f('so_regNo')}</td>
-  <td class="th">登録年月日<br>Tanggal pendaftaran</td>
-  <td>${f('so_regDate')}</td>
-</tr>
-<tr>
-  <td class="th">３　名称<br>（ふりがな）</td>
-  <td colspan="4">${f('so_nameKana')}<br>${f('so_name')}<br>${f('so_nameEn')}</td>
-</tr>
-<tr>
-  <td class="th">４　住所<br>4. Alamat</td>
-  <td colspan="4">〒${f('so_zip')}&emsp;${f('so_address')}<br>${f('so_addressEn')}&emsp;（電話 ${f('so_tel')}）</td>
-</tr>
-<tr>
-  <td class="th">５　代表者<br>（ふりがな）</td>
-  <td colspan="4">${f('so_repNameKana')}<br>${f('so_repName')}&emsp;${f('so_repNameEn')}</td>
-</tr>
-<tr>
-  <td class="th">６　支援事務所<br>6. Lokasi kantor bantuan</td>
-  <td colspan="4">〒${f('so_officeZip')}&emsp;${f('so_officeAddress')}<br>${f('so_officeAddressEn')}&emsp;（電話 ${f('so_officeTel')}）</td>
-</tr>
-<tr>
-  <td class="th" rowspan="3">７　支援体制<br>7. Struktur bantuan</td>
-  <td class="th" colspan="2">支援責任者 Penanggung jawab bantuan</td>
-  <td class="th">氏名（ふりがな）<br>Nama</td>
-  <td class="th">役職 Jabatan</td>
-</tr>
-<tr>
-  <td colspan="2">${f('so_supportManagerKana')}</td>
-  <td>${f('so_supportManager')}</td>
-  <td>${f('so_supportManagerTitle')}<br>${f('so_supportManagerTitleEn')}</td>
-</tr>
-<tr>
-  <td colspan="2">支援中の１号人数 ${f('so_supporterCount')}名</td>
-  <td colspan="2">支援の適正性を確保していることの有無<br><span class="cb cb-on"></span>有 Ada&emsp;<span class="cb cb-off"></span>無 Tidak</td>
-</tr>
-<tr>
-  <td class="th"></td>
-  <td colspan="2">支援担当者数 ${f('so_supportStaffCount')}名</td>
-  <td colspan="2"></td>
-</tr>
-</table>
-</div>`;
-
-  // ===== P2 Ⅳ-1 事前ガイダンス =====
-  const p2=`<div class="doc"><div class="page-num-label">P2</div>
-${hdr}
-<div style="font-weight:bold;font-size:7pt;margin-bottom:2px;">Ⅳ　支援内容　IV. Isi Bantuan</div>
-<table>
-<tr><td colspan="6" class="section-hd">１　事前ガイダンスの提供　1. Penyediaan panduan awal</td></tr>
-${colHdr}
-<tr><td>ａ．労働条件・従事業務・活動内容等<br>a. Syarat kerja, isi tugas, isi kegiatan, dll.</td>
-  <td><span class="cb cb-on"></span>有（${f('es_createY')}/${f('es_createM')}/${f('es_createD')}）Ada<br><span class="cb cb-off"></span>無 Tidak</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-off"></span>対面 Tatap muka<br><span class="cb cb-on"></span>テレビ電話 Alat telekonferensi<br><span class="cb cb-off"></span>その他 Lainnya</td></tr>
-<tr><td>ｂ．本邦で行える活動内容<br>b. Isi kegiatan yang dapat dilakukan di Jepang</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｃ．入国手続に関する事項<br>c. Prosedur kedatangan ke Jepang</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｄ．保証金・違約金契約の締結禁止<br>d. Larangan uang jaminan, denda</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｅ．外国機関への費用支払いについて<br>e. Biaya kepada lembaga luar negeri</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｆ．支援費用を負担させないこと<br>f. Tidak membebankan biaya bantuan</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｇ．入国時の送迎支援内容<br>g. Antar-jemput saat datang</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｈ．住居確保支援内容<br>h. Pemastian tempat tinggal</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｉ．相談・苦情の対応<br>i. Penanganan konsultasi dan keluhan</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｊ．支援担当者氏名及び連絡先<br>j. Nama dan kontak PIC bantuan</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有 Ada<br><span class="cb cb-off"></span>無 Tidak</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-<tr><td colspan="6">イ　実施言語 B. Bahasa: インドネシア語 Bahasa Indonesia<br>
-  ウ　実施予定時間 C. Waktu rencana: 合計　3　時間 Total 3 jam</td></tr>
-</table>
-</div>`;
-
-  // ===== P3 Ⅳ-2 送迎・Ⅳ-3 住居 =====
-  const p3=`<div class="doc"><div class="page-num-label">P3</div>
-${hdr}
-<table>
-<tr><td colspan="6" class="section-hd">２　出入国する際の送迎　2. Antar-jemput saat keberangkatan/kedatangan</td></tr>
-${colHdr}
-<tr><td>ａ．到着空港での出迎え・送迎<br>a. Penjemputan di bandara</td>
-  <td>${ada(f('es_contractStartY')+'/'+f('es_contractStartM')+'/'+f('es_contractStartD'))}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>出迎え空港（成田 空港 Bandara Narita）<br><span class="cb cb-on"></span>送迎方法（公共交通機関 Transportasi umum）</td></tr>
-<tr><td>ｂ．出国予定空港までの送迎<br>b. Antar-jemput ke bandara keberangkatan</td>
-  <td>${ada('契約終了後適宜 dilakukan sesuai setelah perjanjian berakhir')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>出国予定空港（未定 belum tahu）<br><span class="cb cb-on"></span>送迎方法（未定 belum tahu）</td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
+<table class="tbl">
+  <colgroup>
+    <col style="width:28px;">
+    <col style="width:22%;">
+    <col>
+    <col style="width:16%;">
+    <col style="width:22%;">
+  </colgroup>
+  <tr>
+    <td rowspan="2" class="sec-lbl">Ⅰ<br>欄</td>
+    <td>
+      <div>１　氏　　名</div>
+      <div style="font-size:9pt;">1. Nama</div>
+    </td>
+    <td>
+      <div style="text-align:center;">${f('f_applicantName')}　（ほか　${f('f_otherCount')}　名）</div>
+      <div style="text-align:right;font-size:9pt;">${f('f_applicantName')}　(Nama lain: ${f('f_otherCount')})</div>
+    </td>
+    <td>
+      <div>２　性　　別</div>
+      <div style="font-size:9pt;">2. Jenis kelamin</div>
+    </td>
+    <td>
+      <div style="text-align:center;">${f('f_gender')}</div>
+      <div style="text-align:center;font-size:9pt;">${f('f_gender')==='男'?'Laki-laki':'Perempuan'}</div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div>３　生年月日</div>
+      <div style="font-size:9pt;">3. Tanggal lahir</div>
+    </td>
+    <td>
+      <div style="text-align:center;">${f('f_birthY')}　年　${f('f_birthM')}　月　${f('f_birthD')}　日</div>
+      <div style="text-align:center;font-size:9pt;">Tanggal ${f('f_birthD')} bulan ${f('f_birthM')} tahun ${f('f_birthY')}</div>
+    </td>
+    <td>
+      <div>４　国籍・地域</div>
+      <div style="font-size:9pt;">4. Warga negara, daerah</div>
+    </td>
+    <td>
+      <div>${f('f_nationality')}</div>
+      <div style="font-size:9pt;">${f('f_nationalityEn')}</div>
+    </td>
+  </tr>
 </table>
 
-<table style="margin-top:6px;">
-<tr><td colspan="6" class="section-hd">３　適切な住居の確保に係る支援　3. Bantuan pemastian tempat tinggal</td></tr>
-${colHdr}
-<tr><td>ａ．不動産情報提供・住宅確保手続同行・連帯保証<br>a. Informasi vendor properti, bantuan prosedur, penjamin</td>
-  <td>${ada('bでの入居に合意しなかった場合に実施<br>Dilakukan bila tidak setuju pindah di b')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｂ．賃借人となって住居提供<br>b. Menyediakan tempat tinggal dengan menjadi pemberi sewa</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｃ．社宅等の提供<br>c. Menyediakan asrama perusahaan</td>
-  <td><span class="cb cb-off"></span>有 Ada<br><span class="cb cb-on"></span>無（a,bで実施 Menerapkan dalam a dan b）</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
+<table class="tbl">
+  <colgroup>
+    <col style="width:28px;">
+    <col style="width:22%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td rowspan="2" class="sec-lbl">Ⅱ<br>欄</td>
+    <td>
+      <div style="font-size:9pt;">（ふりがな）(Furigana)</div>
+      <div>１　氏名又は名称</div>
+      <div style="font-size:9pt;">1. Nama atau panggilan</div>
+    </td>
+    <td>
+      <div style="border-bottom:1px dotted #888;padding-bottom:2px;font-size:9pt;color:#555;">${f('f_coNameKana')}</div>
+      <div style="border-bottom:1px solid #000;padding:4px 0;font-weight:bold;">${f('f_coName')}</div>
+      <div style="padding-top:4px;font-size:9pt;">${f('f_coNameEn')}</div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div>２　住　　所</div>
+      <div style="font-size:9pt;">2. Alamat</div>
+    </td>
+    <td>
+      <div>〒 ${f('f_coZip')}</div>
+      <div style="font-size:9pt;">Kode pos: ${f('f_coZip')}</div>
+      <div style="margin-top:2mm;">${f('f_coAddress')}</div>
+      <div style="font-size:9pt;">${f('f_coAddressEn')}</div>
+      <div style="text-align:right;margin-top:2mm;">（電話　${f('f_coTel')}）</div>
+      <div style="text-align:right;font-size:9pt;">(Telepon　${f('f_coTel')})</div>
+    </td>
+  </tr>
 </table>
 
-<table style="margin-top:6px;">
-<tr><td colspan="2" class="section-hd">ｄ　住居の概要　d. Garis besar tempat tinggal</td></tr>
-<tr>
-  <td style="width:50%;">
-    <span class="cb cb-off"></span>申請時点で確保済み<br>
-    <span class="cb cb-on"></span>申請後に確保するもの<br>
-    Tempat tinggal yang dipastikan setelah mengajukan permohonan
-  </td>
-  <td>
-    居室の広さ（同居人数計 ${f('es_cohabitants')}人 orang）<br>
-    <span class="cb cb-on"></span>１人当たり7.5㎡以上確保 Minimal 7,5m²/orang<br>
-    寝室の広さ <span class="cb cb-on"></span>１人当たり4.5㎡以上 Minimal 4,5m²/orang<br><br>
-    ①居住費徴収有無 ${f('es_housingFeeType')}<br>
-    ②居住費：１か月当たり約 ${f('es_housingFee')}円 yen/bulan<br>
-    ③提供住居 ${f('es_housingOwnership')}<br>
-    ④費用説明 ${f('es_actualCostDesc')}<br>${f('es_actualCostDescEn')}
-  </td>
-</tr>
-</table>
-
-<table style="margin-top:6px;">
-<tr><td colspan="6" class="section-hd">イ　生活に必要な契約に係る支援　B. Bantuan perjanjian kehidupan</td></tr>
-${colHdr}
-<tr><td>ａ．銀行口座開設手続補助<br>a. Bantuan pembukaan rekening bank</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>情報提供<br><span class="cb cb-on"></span>必要に応じて同行</td></tr>
-<tr><td>ｂ．携帯電話契約手続補助<br>b. Bantuan prosedur telepon seluler</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>情報提供<br><span class="cb cb-on"></span>必要に応じて同行</td></tr>
-<tr><td>ｃ．電気・水道・ガス手続補助<br>c. Bantuan prosedur listrik, air, gas</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>情報提供<br><span class="cb cb-on"></span>必要に応じて同行</td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-</table>
-</div>`;
-
-  // ===== P4 Ⅳ-4 生活オリエンテーション =====
-  const p4=`<div class="doc"><div class="page-num-label">P4</div>
-${hdr}
-<table>
-<tr><td colspan="6" class="section-hd">４　生活オリエンテーションの実施　4. Pelaksanaan orientasi terkait kehidupan</td></tr>
-${colHdr}
-<tr><td>ａ．本邦での生活一般に関する事項<br>a. Hal-hal terkait kehidupan umum di Jepang</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td>
-  <td><span class="cb cb-on"></span>対面 Tatap muka</td></tr>
-<tr><td>ｂ．行政機関への届出・手続<br>b. Prosedur pelaporan ke lembaga pemerintah</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｃ．相談・苦情の連絡先<br>c. Kontak konsultasi dan keluhan</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｄ．医療機関に関する事項<br>d. Lembaga medis</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｅ．防災・防犯・緊急時対応<br>e. Pencegahan bencana, kejahatan, darurat</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｆ．出入国・労働法令違反時の対応<br>f. Penanganan pelanggaran hukum keimigrasian/ketenagakerjaan</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-<tr><td colspan="6">イ　実施言語: インドネシア語 Bahasa Indonesia　ウ　実施予定時間: 合計 8 時間 Total 8 jam</td></tr>
-</table>
-
-<table style="margin-top:6px;">
-<tr><td colspan="6" class="section-hd">５　日本語学習の機会の提供　5. Penyediaan kesempatan belajar bahasa Jepang</td></tr>
-${colHdr}
-<tr><td>ａ．日本語教室等への入学案内・手続補助<br>a. Panduan masuk kelas bahasa Jepang, bantuan prosedur</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｂ．自主学習教材・オンライン講座情報提供<br>b. Informasi materi belajar mandiri, kelas online</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｃ．日本語教師との契約による講習提供<br>c. Kesempatan belajar dengan pengajar bahasa Jepang</td>
-  <td><span class="cb cb-off"></span>有 Ada<br><span class="cb cb-on"></span>無（a,bで実施 Menerapkan dalam a dan b）</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-</table>
-</div>`;
-
-  // ===== P5 Ⅳ-6 相談苦情・Ⅳ-7 交流 =====
-  const p5=`<div class="doc"><div class="page-num-label">P5</div>
-${hdr}
-<table>
-<tr><td colspan="5" class="section-hd">６　相談又は苦情への対応　6. Penanganan konsultasi dan keluhan</td></tr>
-<tr style="background:#ddd;font-size:6pt;">
-  <td style="width:30%;">支援内容 Isi bantuan</td>
-  <td style="width:14%;">実施予定</td>
-  <td style="width:8%;">委託</td>
-  <td style="width:24%;">支援担当者 氏名（役職）</td>
-  <td style="width:24%;">住所（委託時のみ）</td>
-</tr>
-<tr><td>ａ．相談・苦情への適切対応・助言・指導<br>a. Penanganan yang sesuai, nasihat, bimbingan</td>
-  <td>${ada('適宜実施<br>dilakukan dengan sesuai')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td></tr>
-<tr><td>ｂ．関係行政機関の案内・同行<br>b. Panduan lembaga pemerintah terkait, menemani</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td></td></tr>
-</table>
-
-<table style="margin-top:4px;font-size:6pt;">
-<tr><td colspan="9" class="section-hd">イ　実施方法 B. Cara pelaksanaan</td></tr>
-<tr class="th"><td>対応時間</td><td>平日月<br>Senin</td><td>火<br>Selasa</td><td>水<br>Rabu</td><td>木<br>Kamis</td><td>金<br>Jumat</td><td>土<br>Sabtu</td><td>日<br>Minggu</td><td>祝<br>Hari raya</td></tr>
-<tr><td>時間帯</td>
-  <td>17〜20時</td><td></td><td>17〜20時</td><td></td><td>17〜20時</td>
-  <td>8〜20時</td><td>8〜20時</td><td>8〜20時</td></tr>
-<tr><td colspan="9">
-  相談方法: <span class="cb cb-on"></span>直接面談 <span class="cb cb-on"></span>電話 <span class="cb cb-off"></span>メール <span class="cb cb-on"></span>その他（LINE等）<br>
-  緊急時: <span class="cb cb-on"></span>直接面談 <span class="cb cb-on"></span>電話 <span class="cb cb-off"></span>メール <span class="cb cb-on"></span>その他（必要に応じて訪問）<br>
-  ウ　実施言語: インドネシア語 Bahasa Indonesia
-</td></tr>
-</table>
-
-<table style="margin-top:6px;">
-<tr><td colspan="6" class="section-hd">７　日本人との交流促進に係る支援　7. Bantuan dorongan interaksi dengan orang Jepang</td></tr>
-${colHdr}
-<tr><td>ａ．地域住民との交流の場の情報提供・同行<br>a. Informasi tempat interaksi penduduk setempat, menemani</td>
-  <td>${ada('雇用後一週間以内<br>dalam waktu satu minggu')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｂ．日本文化理解のための地域行事案内<br>b. Panduan acara daerah untuk memahami budaya Jepang</td>
-  <td></td><td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>（自由記入）Isian bebas</td>
-  <td><span class="cb cb-off"></span>有<span class="cb cb-off"></span>無</td>
-  <td>有・無</td><td></td><td>${ADDR}</td><td></td></tr>
-</table>
-</div>`;
-
-  // ===== P6 Ⅳ-8 転職支援・署名 =====
-  const p6=`<div class="doc"><div class="page-num-label">P6</div>
-${hdr}
-<table>
-<tr><td colspan="6" class="section-hd">８　非自発的離職時の転職支援　8. Bantuan pindah kerja saat pemutusan kerja</td></tr>
-${colHdr}
-<tr><td>ａ．次の受入れ先情報の入手・提供<br>a. Mendapatkan dan menyediakan informasi tempat kerja berikutnya</td>
-  <td>${ada('非自発的離職時に実施<br>Dilakukan pada saat pergantian paksa')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｂ．公共職業安定所等の案内・同行<br>b. Panduan tempat kerja stabil, menemani</td>
-  <td>${ada('非自発的離職時に実施<br>Dilakukan pada saat pergantian paksa')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｃ．推薦状の作成<br>c. Membuat surat rekomendasi</td>
-  <td>${ada('非自発的離職時に実施<br>Dilakukan pada saat pergantian paksa')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-<tr><td>ｄ．職業紹介事業による就職先紹介<br>d. Mediasi pengenalan tempat kerja</td>
-  <td>${ada('非自発的離職時に実施<br>Dilakukan pada saat pergantian paksa')}</td>
-  <td>${TIDAK}</td><td>${coStaff()}</td><td>${ADDR}</td><td></td></tr>
-</table>
-
-<div style="margin-top:10px;font-size:6.5pt;border-top:1px solid #555;padding-top:6px;">
-  <p>上記の支援は、地方公共団体が実施する共生社会の実現のための施策を踏まえ、適切に実施します。また，本書面は支援対象者が十分に理解できる言語に翻訳し，支援対象者に交付するとともに，内容について十分に説明しました。</p>
-  <p style="font-size:6pt;color:#444;">Bantuan di atas akan diberikan secara tepat sesuai dengan kebijakan yang diterapkan pemerintah daerah untuk mewujudkan masyarakat koeksistensi. Selain itu, dokumen ini telah diterjemahkan ke dalam bahasa yang dapat dipahami sasaran penerima bantuan dengan baik dan telah diberikan kepada sasaran penerima bantuan serta diberikan penjelasan yang mencukupi.</p>
-</div>
-
-<table style="margin-top:6px;">
-<tr>
-  <td style="width:50%;">
-    特定技能所属機関の氏名又は名称<br>${f('co_name')}<br>${f('co_nameEn')}<br><br>
-    作成責任者の氏名<br>${f('co_authorName')}<br>${f('co_authorNameEn')}
-  </td>
-  <td style="width:50%;font-size:6pt;">
-    本書面について，インドネシア語による翻訳文の交付を受け，その内容について説明を受け十分に理解しました。<br>
-    また、Ⅳ欄９アａの定期的な面談について<br>
-    <span class="cb cb-on"></span>対面とオンラインの併用&emsp;<span class="cb cb-off"></span>対面のみ&emsp;で実施することを希望します。<br><br>
-    署名日 Tanggal dibuat:<br>
-    ${f('case_docDay')}日 ${f('case_docMonth')}月 ${f('case_docYear')}年<br>
-    ${f('case_docDay')} bulan ${f('case_docMonth')} tahun ${f('case_docYear')}<br><br>
-    １号特定技能外国人の署名 / Tanda tangan pekerja asing berketerampilan khusus 1:<br>
-    <div class="sign-field-area" style="height:35px;border-bottom:1px solid #333;margin-top:4px;position:relative;">
-      <span class="sign-field-placeholder" style="color:#bbb;font-size:9px;">← ここに署名</span>
-      <img class="sign-field-img" style="display:none;max-height:33px;">
-    </div>
-  </td>
-</tr>
-</table>
-</div>`;
-
-  w.innerHTML = p1 + p2 + p3 + p4 + p5 + p6;
+</div><!-- /doc -->
+`;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _applyFontSize();
+  _apply1_17FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
+  fitDocToPreview();
 }
+
+function _apply1_17FontSize(){
+  const st=document.getElementById('_1_17FontStyle')||document.createElement('style');
+  st.id='_1_17FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10;
+  st.textContent=[
+    `.doc [style*="font-size:16pt"]{font-size:${(16*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10pt"]{font-size:${(10*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+function fitDocToPreview(){
+  // no-op
+}
+
+// プレースホルダデータで初期表示
+(function initDefaults(){
+  const defaults = {
+    f_docY:'2026', f_docM:'4', f_docD:'17',
+    f_applicantName:'TARO YAMADA', f_otherCount:'0',
+    f_gender:'男', f_birthY:'1990', f_birthM:'1', f_birthD:'15',
+    f_nationality:'インドネシア', f_nationalityEn:'Indonesia',
+    f_coNameKana:'かぶしきがいしゃ〇〇', f_coName:'株式会社〇〇',
+    f_coNameEn:'XX Co., Ltd.',
+    f_coZip:'100-0001', f_coAddress:'東京都千代田区〇〇1-2-3',
+    f_coAddressEn:'1-2-3 XX, Chiyoda-ku, Tokyo',
+    f_coTel:'03-1234-5678',
+  };
+  Object.keys(defaults).forEach(k=>{
+    const el=document.getElementById(k);
+    if(el && !el.value) el.value = defaults[k];
+  });
+})();
 
 p();
 </script>
