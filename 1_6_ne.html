@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260417.4</div>
+    <div class="ver">ver.20260417.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -574,12 +574,12 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Thời gian nghỉ ngơi&emsp;(${f('es_breakTime')}phút)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Số giờ làm việc quy định&emsp;①Tuần(${f('es_weeklyH')}giờ&nbsp;${f('es_weeklyMin')}phút)&emsp;②Tháng(${f('es_monthlyH')}giờ&nbsp;${f('es_monthlyMin')}phút)&emsp;③Năm(${f('es_yearlyH')}giờ&nbsp;${f('es_yearlyMin')}phút)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">२. ब्रेक समय&emsp;(${f('es_breakTime')}मिनेट）</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">३. निर्धारित कामको समय&emsp;①हप्ता（${f('es_weeklyH')}घण्टा&nbsp;${f('es_weeklyMin')}मिनेट）&emsp;②महिना（${f('es_monthlyH')}घण्टा&nbsp;${f('es_monthlyMin')}मिनेट）&emsp;③वर्ष（${f('es_yearlyH')}घण्टा&nbsp;${f('es_yearlyMin')}मिनेट）</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">४. निर्धारित कामको दिन&emsp;①हप्ता（${f('es_weeklyDays')}दिन）&emsp;②महिना（${f('es_monthlyDays')}दिन）&emsp;③वर्ष（${f('es_yearlyDays')}दिन）</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Có hay không làm việc ngoài giờ quy định</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">५. ओभरटाइमको सम्बन्धमा</span></td>
           <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">※विस्तृत रूपमा, अर्को पानामा भए अनुरूप ${cb(true,'overtime_yes_id')} ${cb(false,'overtime_no_id')}</span></td>
         </tr>
         <tr>
@@ -592,7 +592,7 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ngày</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">दिन</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">कानुनमा निर्धारित महिनाको ६० घण्टाभन्दा बढि काम गरेमा ( ) ％ ${f('es_fixedDay1En')} ${f('es_otherHolidays')} ${f('es_annualHolidays')}</span></div>
       <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">पू पूर्वनिर्धारित समयभन्दा बढि काम गरेमा ( ) ％</span></div>
