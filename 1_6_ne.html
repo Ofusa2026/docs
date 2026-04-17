@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260417.26</div>
+    <div class="ver">ver.20260417.27</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -387,7 +387,7 @@ function p(){
       return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id" data-key="1">आधार फारम १ भाग – १</div>`;
+    annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（${ph(nEn,'NameEn')} भत्ता , ${ph(amt,'Amount',true)} येन / गणना विधि: ${ph(calc,'Calc')}）</div>`;
   });
 
   w.innerHTML=`
