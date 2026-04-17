@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260417.06</div>
+    <div class="ver">ver.20260417.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -794,7 +794,7 @@ function p(){
 <!-- ===== 別紙 ===== -->
 <div style="padding:5px 0;margin:20px 0 4px;">
   <div style="font-size:8pt;font-weight:bold;">参考様式第１－６号　別紙</div>
-  <div style="font-size:7.5pt;">참고 양식 제1-6호 Văn bản đi kèm</div>
+  <div style="font-size:7.5pt;">참고 양식 제1-6호 별지</div>
   <div style="text-align:center;font-size:10pt;font-weight:bold;margin-top:4px;">賃　金　の　支　払</div>
   <div style="text-align:center;font-size:8pt;">임금 지불</div>
 </div>
@@ -846,42 +846,42 @@ function p(){
 
 <div class="doc">
 <div class="page-num-label">P7</div>
-<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Các mục khấu trừ khi thanh toán tiền lương</span></div>
+<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. 임금 지급 시 공제 항목</span></div>
   <table style="width:100%;font-size:8pt;border-collapse:collapse;">
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
       <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) 세금</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) 사회 보험료</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) 고용 보험료</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) 식비</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) 주거비</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) 기타 (수도광열비)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">(${f('es_deductOther1NameEn')})</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
