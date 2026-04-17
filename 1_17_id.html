@@ -34,7 +34,7 @@
 .id{color:#000;font-size:8pt;}
 .tbl{width:100%;border-collapse:collapse;font-size:9pt;}
 .tbl td{border:1px solid #000;padding:3px 5px;vertical-align:top;}
-.tbl .sect-lbl{width:25px;text-align:center;font-weight:bold;writing-mode:vertical-rl;}
+.tbl .sect-lbl{text-align:center;vertical-align:middle;}
 .tbl .item-lbl{width:22%;}
 .tbl .val-lbl{width:10%;}
 .tbl .val-narrow{width:20%;}
@@ -45,7 +45,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.162</div>
+    <div class="ver">ver.20260417.163</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -122,14 +122,19 @@ function p(){
 
 <table class="tbl" style="margin-bottom:8px;width:100%;table-layout:fixed;">
   <colgroup>
-    <col style="width:1.67%;">
-    <col style="width:16.67%;">
-    <col style="width:38.33%;">
-    <col style="width:12.67%;">
-    <col style="width:30.66%;">
+    <col style="width:4%;">
+    <col style="width:16%;">
+    <col style="width:37%;">
+    <col style="width:13%;">
+    <col style="width:30%;">
   </colgroup>
   <tr>
-    <td class="sect-lbl" rowspan="2">Ⅰ 支援対象者<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:6pt;font-weight:normal;">I.<br>Penerima<br>Bantuan</span></td>
+    <td class="sect-lbl" rowspan="2" style="padding:4px 2px;">
+      <div style="display:flex;justify-content:center;align-items:flex-start;gap:3px;height:100%;">
+        <div style="writing-mode:vertical-rl;font-weight:bold;white-space:nowrap;">Ⅰ 支援対象者</div>
+        <div style="writing-mode:vertical-rl;font-size:7pt;font-weight:normal;white-space:nowrap;" class="id">I. Penerima Bantuan</div>
+      </div>
+    </td>
     <td>１　氏　名<br><span class="id">1. Nama</span></td>
     <td style="vertical-align:middle;">
       <div>${f('f_appName')}　　（ほか　${f('f_otherCount')}　名）</div>
@@ -154,7 +159,12 @@ function p(){
     </td>
   </tr>
   <tr>
-    <td class="sect-lbl" rowspan="2">Ⅱ 特定技能所属機関<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:6pt;font-weight:normal;">II.<br>Organisasi<br>Afiliasi</span></td>
+    <td class="sect-lbl" rowspan="2" style="padding:4px 2px;">
+      <div style="display:flex;justify-content:center;align-items:flex-start;gap:3px;height:100%;">
+        <div style="writing-mode:vertical-rl;font-weight:bold;white-space:nowrap;">Ⅱ 特定技能所属機関</div>
+        <div style="writing-mode:vertical-rl;font-size:7pt;font-weight:normal;white-space:nowrap;" class="id">II. Organisasi Afiliasi</div>
+      </div>
+    </td>
     <td>
       （ふりがな）<span class="id">(Futigana)</span><br>
       １　氏名又は名称<br><span class="id">1. Nama atau panggilan</span>
