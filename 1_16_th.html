@@ -30,7 +30,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 แบบอ้างอิงที่ 1-16（タイ語）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260417.122</div>
+    <div class="ver">ver.20260417.130</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -196,7 +196,7 @@ function p(){
 <div style="font-size:8.5pt;margin-bottom:4mm;">
   <div style="margin-bottom:1mm;">（注意）<span class="id">(หมายเหตุ)</span></div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang jawaban "ไม่มี" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">หากเลือก "ไม่มี" ในช่องที่ 1 ไม่จำเป็นต้องกรอกช่องที่ 2 เป็นต้นไป</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">ช่องที่ 2 ถึง 5 ใช้ "เว็บไซต์รวมบริการทรัพยากรบุคคล" ของสำนักงานจัดหางานกระทรวงสาธารณสุข แรงงานและสวัสดิการ กรอกข้อมูลที่เกี่ยวข้องเกี่ยวกับผู้ประกอบการจัดหางานดังกล่าว นอกจากนี้ให้แนบภาพหน้าจอที่แสดงข้อมูลดังกล่าว</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
@@ -217,7 +217,7 @@ function p(){
     <col>
   </colgroup>
   <tr>
-    <td class="lbl">１　取次ぎの有無<br><span class="id">มี/tidak ada perantaraan</span></td>
+    <td class="lbl">１　取次ぎの有無<br><span class="id">การดำเนินการผ่านตัวกลางมี/ไม่มี</span></td>
     <td colspan="2" style="text-align:center;border-right:none;">
       <input type="checkbox" class="chk-box">有<br><span class="id">มี</span>
     </td>
@@ -262,7 +262,7 @@ function p(){
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">องค์กรตัวกลาง หมายถึง ผู้ที่ทำหน้าที่เป็นตัวกลางในการส่งต่อข้อมูลเกี่ยวกับผู้หางาน ฯลฯ ให้กับผู้ประกอบการจัดหางาน เมื่อผู้ประกอบการจัดหางานทำการจัดหางานให้แก่ผู้จ้างงาน</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang "ไม่มี" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">หากเลือก "ไม่มี" ในช่องที่ 1 ไม่จำเป็นต้องกรอกช่องที่ 2 เป็นต้นไป</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">ในช่องที่ 5 กรอกจำนวนเงินและรายการที่ผู้หางานและผู้จ้างงานจ่ายให้องค์กรตัวกลาง นอกจากนี้ หากผู้หางานและผู้จ้างงานจ่ายค่าใช้จ่ายเป็นสกุลเงินอื่นนอกจากเงินเยน ให้ระบุจำนวนเงินที่จ่ายในสกุลเงินนั้นและจำนวนที่แปลงเป็นเงินเยน</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
@@ -287,9 +287,9 @@ function p(){
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
 <div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">วันที่จัดทำ：${f('f_docDate')}</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ชื่อ organisasi afiliasi pekerja berketerampilan khusus</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ชื่อองค์กรในสังกัดทักษะเฉพาะ</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
-<div style="font-size:9pt;text-align:right;" class="id">ชื่อ dan jabatan penanggung jawab pengisian</div>
+<div style="font-size:9pt;text-align:right;" class="id">ชื่อและตำแหน่งของผู้รับผิดชอบในการจัดทำ</div>
 </div>
 
 <div class="doc">
@@ -298,10 +298,10 @@ function p(){
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <th style="text-align:center;width:6%;">#</th>
-    <th style="text-align:center;">支払先機関の名称<br><span class="id">ชื่อ lembaga penerima pembayaran</span></th>
+    <th style="text-align:center;">支払先機関の名称<br><span class="id">ชื่อองค์กรผู้รับชำระเงิน</span></th>
     <th style="text-align:center;width:18%;">名目<br><span class="id">รายการ</span></th>
     <th style="text-align:center;width:18%;">支払年月日<br><span class="id">วันที่ชำระเงิน</span></th>
-    <th style="text-align:center;width:20%;">支払金額<br><span class="id">จำนวนเงิน Pembayaran</span></th>
+    <th style="text-align:center;width:20%;">支払金額<br><span class="id">จำนวนเงินที่ชำระ</span></th>
   </tr>
   <tr>
     <td style="text-align:center;">１</td>

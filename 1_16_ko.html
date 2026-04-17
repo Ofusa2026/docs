@@ -30,7 +30,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260417.119</div>
+    <div class="ver">ver.20260417.127</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -196,7 +196,7 @@ function p(){
 <div style="font-size:8.5pt;margin-bottom:4mm;">
   <div style="margin-bottom:1mm;">（注意）<span class="id">(주의)</span></div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang jawaban "무" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">1란에서 무에 체크를 한 경우에는 2 이하의 란은 기재할 필요 없음.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">2부터 5란까지는 후생노동성 직업안정국 홈페이지의 "인재서비스 종합 사이트"를 활용하여 당해 직업소개사업자에 대한 해당하는 정보를 기입할 것. 또한 당해 정보가 게재된 화면의 사본을 첨부할 것.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
@@ -217,7 +217,7 @@ function p(){
     <col>
   </colgroup>
   <tr>
-    <td class="lbl">１　取次ぎの有無<br><span class="id">유/tidak ada perantaraan</span></td>
+    <td class="lbl">１　取次ぎの有無<br><span class="id">중개의 유무</span></td>
     <td colspan="2" style="text-align:center;border-right:none;">
       <input type="checkbox" class="chk-box">有<br><span class="id">유</span>
     </td>
@@ -262,7 +262,7 @@ function p(){
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">중개기관이란 직업소개사업자가 구인자에게 구직자를 알선할 때 당해 직업소개사업자에 대하여 구직자 등에 관한 정보의 중개를 행하는 자를 말한다.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang "무" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">1란에서 무에 체크를 한 경우에는 2 이하의 란은 기재할 필요 없음.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
   <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">5란은 구직자 및 구인자가 중개기관에 지불한 금액 및 명목에 대하여 기재할 것. 또한 구직자 및 구인자가 일본 엔 이외로 비용을 지불한 경우에는 당해 통화로 지불한 금액 및 일본 엔으로 환산한 금액을 기재할 것.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
@@ -287,9 +287,9 @@ function p(){
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
 <div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">작성 연월일：${f('f_docDate')}</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">성명 또는 명칭 organisasi afiliasi pekerja berketerampilan khusus</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">특정기능소속기관의 성명 또는 명칭</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
-<div style="font-size:9pt;text-align:right;" class="id">성명 또는 명칭 dan jabatan penanggung jawab pengisian</div>
+<div style="font-size:9pt;text-align:right;" class="id">작성 책임자의 성명 및 직위</div>
 </div>
 
 <div class="doc">
@@ -298,10 +298,10 @@ function p(){
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <th style="text-align:center;width:6%;">#</th>
-    <th style="text-align:center;">支払先機関の名称<br><span class="id">성명 또는 명칭 lembaga penerima pembayaran</span></th>
+    <th style="text-align:center;">支払先機関の名称<br><span class="id">지불처 기관의 명칭</span></th>
     <th style="text-align:center;width:18%;">名目<br><span class="id">명목</span></th>
     <th style="text-align:center;width:18%;">支払年月日<br><span class="id">지불 연월일</span></th>
-    <th style="text-align:center;width:20%;">支払金額<br><span class="id">금액 Pembayaran</span></th>
+    <th style="text-align:center;width:20%;">支払金額<br><span class="id">지불 금액</span></th>
   </tr>
   <tr>
     <td style="text-align:center;">１</td>
