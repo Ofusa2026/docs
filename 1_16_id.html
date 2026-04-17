@@ -11,6 +11,7 @@
 .id{color:#555;font-size:0.88em;}
 .tbl{width:100%;border-collapse:collapse;font-size:10pt;}
 .tbl td,.tbl th{border:1px solid #000;padding:3px 5px;vertical-align:top;}
+.tbl td.dashed-bottom{border-bottom:1px dashed #888;}
 .tbl .lbl{width:28%;}
 .chk{display:inline-block;width:1.2em;height:1.2em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1.1em;margin-right:4px;}
 .chk-on{background:#000;color:#fff;font-weight:bold;}
@@ -26,7 +27,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（インドネシア語）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260417.110</div>
+    <div class="ver">ver.20260417.111</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -135,40 +136,48 @@ function p(){
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <td class="lbl">１　あっせんの有無<br><span class="id">Ada/tidak ada mediasi</span></td>
-    <td colspan="3">
-      <span class="chk">□</span>有 <span class="id">Ada</span>　　
-      <span class="chk chk-on">■</span>無 <span class="id">Tidak ada</span>
+    <td style="width:36%;text-align:center;">
+      <span class="chk">□</span>有<br><span class="id">Ada</span>
+    </td>
+    <td style="text-align:center;">
+      <span class="chk chk-on">■</span>無<br><span class="id">Tidak ada</span>
     </td>
   </tr>
   <tr>
-    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Nomor izin/penerimaan pemberitahuan<br>(tanggal penerimaan pemberitahuan)</span></td>
-    <td colspan="3">－－－－－　　<br>（　　年　　月　　日）</td>
+    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Nomor izin/penerimaan pemberitahuan</span><br><span class="id">(tanggal penerimaan pemberitahuan)</span></td>
+    <td colspan="2">－－－－－　　<br>（　　年　　月　　日）</td>
   </tr>
   <tr>
     <td>３　職業紹介事業者の区分<br><span class="id">Klasifikasi agen tenaga kerja</span></td>
-    <td colspan="3">
-      <span class="chk">□</span>有料職業紹介事業者 <span class="id">Agen tenaga kerja dengan komisi</span>　　
-      <span class="chk">□</span>無料職業紹介事業者 <span class="id">Agen tenaga kerja tanpa komisi</span>
+    <td style="text-align:center;">
+      <span class="chk">□</span>有料職業紹介事業者<br><span class="id">Agen tenaga kerja dengan komisi</span>
+    </td>
+    <td style="text-align:center;">
+      <span class="chk">□</span>無料職業紹介事業者<br><span class="id">Agen tenaga kerja tanpa komisi</span>
     </td>
   </tr>
   <tr>
     <td>４　職業紹介事業者の氏名<br><span class="id">Nama agen tenaga kerja</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
   </tr>
   <tr>
     <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Alamat agen tenaga kerja<br>(nomor telepon)</span></td>
-    <td colspan="3">〒<span class="id"> / Kode pos</span>　　－　　<br>（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
+    <td colspan="2">〒<span class="id"> / Kode pos</span>　　－　　<br>（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
   </tr>
   <tr>
-    <td rowspan="2">６　職業紹介事業者へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen tenaga kerja</span></td>
-    <td style="width:20%;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
-    <td>額 <span class="id">Jumlah</span>（　　　円 <span class="id">yen</span>）</td>
-    <td>名目 <span class="id">Nominal</span>　　　として <span class="id">Sebagai</span></td>
+    <td rowspan="4">６　職業紹介事業者へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen tenaga kerja</span></td>
+    <td rowspan="2" style="width:22%;vertical-align:middle;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
+    <td class="dashed-bottom">額 <span class="id">Jumlah</span>　　　（　　　　　　円 <span class="id">Yen</span>）</td>
   </tr>
   <tr>
-    <td>求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>
-    <td>額 <span class="id">Jumlah</span>（　　　円 <span class="id">yen</span>）</td>
-    <td>名目 <span class="id">Nominal</span>　　　として <span class="id">Sebagai</span></td>
+    <td>名目 <span class="id">Nominal</span>　　　　　　　　　　　　　　　　　　として <span class="id">Sebagai</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;">求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>
+    <td class="dashed-bottom">額 <span class="id">Jumlah</span>　　　（　　　　　　円 <span class="id">Yen</span>）</td>
+  </tr>
+  <tr>
+    <td>名目 <span class="id">Nominal</span>　　　　　　　　　　　　　　　　　　として <span class="id">Sebagai</span></td>
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
@@ -186,33 +195,39 @@ function p(){
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <td class="lbl">１　取次ぎの有無<br><span class="id">Ada/tidak ada perantaraan</span></td>
-    <td colspan="3">
-      <span class="chk">□</span>有 <span class="id">Ada</span>　　
-      <span class="chk">□</span>無 <span class="id">Tidak ada</span>
+    <td style="width:36%;text-align:center;">
+      <span class="chk">□</span>有<br><span class="id">Ada</span>
+    </td>
+    <td style="text-align:center;">
+      <span class="chk">□</span>無<br><span class="id">Tidak ada</span>
     </td>
   </tr>
   <tr>
     <td>２　氏名又は名称<br><span class="id">Nama</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
   </tr>
   <tr>
     <td>３　所在国<br><span class="id">Negara domisili</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="2">&nbsp;</td>
   </tr>
   <tr>
     <td>４　所在地<br><span class="id">Alamat</span></td>
-    <td colspan="3">（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
+    <td colspan="2">（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
   </tr>
   <tr>
-    <td rowspan="2">５　取次機関へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen perantara</span></td>
-    <td style="width:20%;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
-    <td>額 <span class="id">Jumlah</span>（　　　円 <span class="id">yen</span>）</td>
-    <td>名目 <span class="id">Nominal</span>　　　として <span class="id">Sebagai</span></td>
+    <td rowspan="4">５　取次機関へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen perantara</span></td>
+    <td rowspan="2" style="width:22%;vertical-align:middle;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
+    <td class="dashed-bottom">額 <span class="id">Jumlah</span>　　　（　　　　　　円 <span class="id">Yen</span>）</td>
   </tr>
   <tr>
-    <td>求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>
-    <td>額 <span class="id">Jumlah</span>（　　　円 <span class="id">yen</span>）</td>
-    <td>名目 <span class="id">Nominal</span>　　　として <span class="id">Sebagai</span></td>
+    <td>名目 <span class="id">Nominal</span>　　　　　　　　　　　　　　　　　　として <span class="id">Sebagai</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;">求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>
+    <td class="dashed-bottom">額 <span class="id">Jumlah</span>　　　（　　　　　　円 <span class="id">Yen</span>）</td>
+  </tr>
+  <tr>
+    <td>名目 <span class="id">Nominal</span>　　　　　　　　　　　　　　　　　　として <span class="id">Sebagai</span></td>
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
