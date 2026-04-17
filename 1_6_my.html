@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.27</div>
+    <div class="ver">ver.20260417.28</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -642,20 +642,19 @@ function p(){
           <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;">၃။ အချိန်ပို၊ အလုပ်ပိတ်ရက် သို့မဟုတ် ညနေပိုင်းလုပ်ငန်းအတွက် ပေးချေသည့် အပိုငွေနှုန်း</td>
         </tr>
         <tr>
-          <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
-          <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
+          <td style="width:33%;padding-left:8px;vertical-align:top;">(1) 所定時間外<br><span class="id" style="font-size:7pt;">(၁) အချိန်ပို</span></td>
+          <td style="width:33%;vertical-align:top;">法定超月60時間以内<br><span class="id" style="font-size:7pt;">သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း</span></td>
+          <td style="width:33%;vertical-align:top;">（${f('es_ot60under')}）％<br><span class="id" style="font-size:7pt;">（${f('es_ot60under')}）％</span></td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;">(၁) အချိန်ပို</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း (${f('es_ot60under')}) ％</td>
+          <td style="width:33%;"></td>
+          <td style="width:33%;vertical-align:top;">法定超月60時間超<br><span class="id" style="font-size:7pt;">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက်</span></td>
+          <td style="width:33%;vertical-align:top;">（${f('es_ot60over')}）％<br><span class="id" style="font-size:7pt;">（${f('es_ot60over')}）％</span></td>
         </tr>
         <tr>
-          <td></td>
-          <td colspan="2">法定超月60時間超（${f('es_ot60over')}）％&emsp;所定超（${f('es_otPrescribed')}）％</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် (${f('es_ot60over')}) ％&emsp;သတ်မှတ်ချိန်ကျော်လွန်နှုန်း (${f('es_otPrescribed')}) ％</td>
+          <td style="width:33%;"></td>
+          <td style="width:33%;vertical-align:top;">所定超<br><span class="id" style="font-size:7pt;">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း</span></td>
+          <td style="width:33%;vertical-align:top;">（${f('es_otPrescribed')}）％<br><span class="id" style="font-size:7pt;">（${f('es_otPrescribed')}）％</span></td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
