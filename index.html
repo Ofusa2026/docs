@@ -65,6 +65,20 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="divider"></div>
     <div class="section">特定技能</div>
+    <div class="item" id="nav-1_5" onclick="open_1_5('id')">
+      <span class="item-icon">📝</span>
+      <div>参考様式第１－５号<span class="item-sub">雇用契約書</span></div>
+    </div>
+    <div class="lang-btns-side" id="langbtns-1_5">
+      <button class="lbtn active" onclick="open_1_5('id');event.stopPropagation()">🇮🇩</button>
+      <button class="lbtn" onclick="open_1_5('vi');event.stopPropagation()">🇻🇳</button>
+      <button class="lbtn" onclick="open_1_5('th');event.stopPropagation()">🇹🇭</button>
+      <button class="lbtn" onclick="open_1_5('ne');event.stopPropagation()">🇳🇵</button>
+      <button class="lbtn" onclick="open_1_5('my');event.stopPropagation()">🇲🇲</button>
+      <button class="lbtn" onclick="open_1_5('en');event.stopPropagation()">🇬🇧</button>
+      <button class="lbtn" onclick="open_1_5('ko');event.stopPropagation()">🇰🇷</button>
+      <button class="lbtn" onclick="open_1_5('zh');event.stopPropagation()">🇨🇳</button>
+    </div>
     <div class="item" id="nav-1_6" onclick="open_1_6('id')">
       <span class="item-icon">📋</span>
       <div>参考様式第１－６号<span class="item-sub">雇用条件書</span></div>
@@ -126,12 +140,26 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-16_1" onclick="open_doc('16_1')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="divider"></div>
     <div class="section">準備中</div>
-    <div class="item disabled"><span class="item-icon">📝</span><div>参考様式第１－５号<span class="item-sub">雇用契約書</span></div></div>
     <div class="item" id="nav-1_11" onclick="open_doc('1_11')"><span class="item-icon">📊</span><div>参考様式第１－１１号<span class="item-sub">所属機関概要書</span></div></div>
   </div>
   <div class="content" id="content">
     <div class="home" id="home-screen">
       <div class="cards">
+        <div class="card" onclick="open_1_5('id')">
+          <div class="card-icon">📝</div>
+          <div class="card-title">参考様式第１－５号</div>
+          <div class="card-sub">雇用契約書</div>
+          <div class="card-langs">
+            <button class="lbtn-card" onclick="open_1_5('id');event.stopPropagation()">🇮🇩</button>
+            <button class="lbtn-card" onclick="open_1_5('vi');event.stopPropagation()">🇻🇳</button>
+            <button class="lbtn-card" onclick="open_1_5('th');event.stopPropagation()">🇹🇭</button>
+            <button class="lbtn-card" onclick="open_1_5('ne');event.stopPropagation()">🇳🇵</button>
+            <button class="lbtn-card" onclick="open_1_5('my');event.stopPropagation()">🇲🇲</button>
+            <button class="lbtn-card" onclick="open_1_5('en');event.stopPropagation()">🇬🇧</button>
+            <button class="lbtn-card" onclick="open_1_5('ko');event.stopPropagation()">🇰🇷</button>
+            <button class="lbtn-card" onclick="open_1_5('zh');event.stopPropagation()">🇨🇳</button>
+          </div>
+        </div>
         <div class="card" onclick="open_1_6('id')">
           <div class="card-icon">📋</div>
           <div class="card-title">参考様式第１－６号</div>
@@ -152,17 +180,13 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
           <div class="card-sub">特定活動→特定技能１号</div>
         </div>
         <div class="card disabled">
-          <div class="card-icon">📝</div>
-          <div class="card-title">参考様式第１－５号</div>
-          <div class="card-sub">準備中</div>
-        </div>
-        <div class="card disabled">
           <div class="card-icon">📊</div>
           <div class="card-title">参考様式第１－１１号</div>
           <div class="card-sub">準備中</div>
         </div>
       </div>
     </div>
+    <iframe id="frame-1_5"></iframe>
     <iframe id="frame-1_6"></iframe>
     <iframe id="frame-iko"></iframe>
     <iframe id="frame-1_23"></iframe>
@@ -212,6 +236,47 @@ const docs={
   '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1776392009'},
   '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1776392009'},
 };
+let cur1_5Lang='id';
+const LANG_FILES_1_5={
+  'id':'1_5.html?v=1776404437',
+  'vi':'1_5_vi.html?v=1776404437',
+  'th':'1_5_th.html?v=1776404437',
+  'ne':'1_5_ne.html?v=1776404437',
+  'my':'1_5_my.html?v=1776404437',
+  'en':'1_5_en.html?v=1776404437',
+  'ko':'1_5_ko.html?v=1776404437',
+  'zh':'1_5_zh.html?v=1776404437',
+};
+function open_1_5(lang){
+  cur1_5Lang=lang;
+  // ボタンのactive切り替え（1_5関連のみ）
+  document.querySelectorAll('#langbtns-1_5 .lbtn,.lbtn-card').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes('open_1_5')) b.classList.remove('active');
+  });
+  document.querySelectorAll(`#langbtns-1_5 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_5('${lang}')"]`).forEach(b=>b.classList.add('active'));
+  // サイドバーactive
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-1_5')?.classList.add('active');
+  // ホーム非表示・他iframe非表示
+  document.getElementById('home-screen').style.display='none';
+  Object.keys(docs).forEach(k=>{
+    const fr=document.getElementById(docs[k].frameId);
+    if(fr) fr.style.display='none';
+  });
+  // 1_6のiframeも隠す
+  const fr1_6=document.getElementById('frame-1_6');
+  if(fr1_6) fr1_6.style.display='none';
+  // 1_5 iframeを表示・言語ファイルをセット
+  const fr=document.getElementById('frame-1_5');
+  fr.src=LANG_FILES_1_5[lang];
+  fr.style.display='block';
+  cur='1_5';
+  // 案件選択済みなら送信
+  if(idxSelectedCase){
+    const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
+    fr.onload=()=>setTimeout(send,200);
+  }
+}
 let cur1_6Lang='id';
 const LANG_FILES={
   'id':'1_6.html?v=1776352402',
@@ -224,9 +289,11 @@ const LANG_FILES={
 };
 function open_1_6(lang){
   cur1_6Lang=lang;
-  // ボタンのactive切り替え
-  document.querySelectorAll('.lbtn,.lbtn-card').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll(`.lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="'${lang}'"]`).forEach(b=>b.classList.add('active'));
+  // ボタンのactive切り替え（1_6関連のみ）
+  document.querySelectorAll('#langbtns-1_6 .lbtn,.lbtn-card').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes('open_1_6')) b.classList.remove('active');
+  });
+  document.querySelectorAll(`#langbtns-1_6 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_6('${lang}')"]`).forEach(b=>b.classList.add('active'));
   // サイドバーactive
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-1_6')?.classList.add('active');
@@ -236,6 +303,9 @@ function open_1_6(lang){
     const fr=document.getElementById(docs[k].frameId);
     if(fr) fr.style.display='none';
   });
+  // 1_5のiframeも隠す
+  const fr1_5=document.getElementById('frame-1_5');
+  if(fr1_5) fr1_5.style.display='none';
   // 1_6 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_6');
   fr.src=LANG_FILES[lang];
@@ -253,6 +323,11 @@ function open_doc(key){
   document.getElementById(key==='home'?'nav-home':(docs[key]?.navId||'nav-home'))?.classList.add('active');
   // コンテンツ
   document.getElementById('home-screen').style.display=key==='home'?'flex':'none';
+  // 1_5 / 1_6のiframeを隠す（docsに入ってないので個別処理）
+  const fr1_5=document.getElementById('frame-1_5');
+  if(fr1_5) fr1_5.style.display='none';
+  const fr1_6=document.getElementById('frame-1_6');
+  if(fr1_6) fr1_6.style.display='none';
   Object.keys(docs).forEach(k=>{
     const fr=document.getElementById(docs[k].frameId);
     if(!fr) return;
