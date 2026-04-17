@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+.doc{padding:15mm!important;line-height:1.45!important;min-height:auto!important}
+.id{color:#555;font-size:0.88em;}
+.row{margin-bottom:2mm;}
+.ja{font-size:10.5pt;}
+.vi{color:#555;font-size:9.5pt;margin-top:0.5mm;}
+.sec{margin-bottom:3.5mm;}
+.sec-h{font-size:11pt;font-weight:bold;margin-bottom:1mm;}
+.sec-h-vi{color:#555;font-size:9.5pt;margin-bottom:1.5mm;}
+.box{border:1px solid #000;padding:2mm 3mm;margin-bottom:2.5mm;}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
+input.chk-box:checked{background:#000;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.tbl-amt{width:100%;border-collapse:collapse;font-size:10pt;}
+.tbl-amt td{padding:1mm 2mm;vertical-align:top;}
+.under{border-bottom:1px solid #000;display:inline-block;min-width:4em;padding:0 2px;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</div>
+    <div class="ver">ver.20260417.148</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg3">
+        <div class="fg"><label>作成日（年）</label><input id="f_createY" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="f_createM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_createD" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>機関名（日）</label><input id="f_orgName" oninput="p()"></div>
+      <div class="fg"><label>機関名（ローマ字）</label><input id="f_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>所在地（日）</label><input id="f_orgAddress" oninput="p()"></div>
+      <div class="fg"><label>所在地（ローマ字）</label><input id="f_orgAddressEn" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_orgTel" oninput="p()"></div>
+      <div class="fg"><label>代表者 役職（日）</label><input id="f_repTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者 役職（ローマ字）</label><input id="f_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者 氏名（日）</label><input id="f_repName" oninput="p()"></div>
+      <div class="fg"><label>代表者 氏名（ローマ字）</label><input id="f_repNameEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">１．基本賃金</div>
+      <div class="fg"><label>月額（円）</label><input id="f_salaryMonthly" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">２．諸手当</div>
+      <div class="fg3">
+        <div class="fg"><label>(a)手当名（日）</label><input id="f_allowance1Name" oninput="p()"></div>
+        <div class="fg"><label>(a)手当名（ローマ字）</label><input id="f_allowance1NameEn" oninput="p()"></div>
+        <div class="fg"><label>(a)金額（円）</label><input id="f_allowance1Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(a)計算方法（日）</label><input id="f_allowance1Calc" oninput="p()"></div>
+      <div class="fg"><label>(a)計算方法（ローマ字）</label><input id="f_allowance1CalcEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(b)手当名（日）</label><input id="f_allowance2Name" oninput="p()"></div>
+        <div class="fg"><label>(b)手当名（ローマ字）</label><input id="f_allowance2NameEn" oninput="p()"></div>
+        <div class="fg"><label>(b)金額（円）</label><input id="f_allowance2Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(b)計算方法（日）</label><input id="f_allowance2Calc" oninput="p()"></div>
+      <div class="fg"><label>(b)計算方法（ローマ字）</label><input id="f_allowance2CalcEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(c)手当名（日）</label><input id="f_allowance3Name" oninput="p()"></div>
+        <div class="fg"><label>(c)手当名（ローマ字）</label><input id="f_allowance3NameEn" oninput="p()"></div>
+        <div class="fg"><label>(c)金額（円）</label><input id="f_allowance3Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(c)計算方法（日）</label><input id="f_allowance3Calc" oninput="p()"></div>
+      <div class="fg"><label>(c)計算方法（ローマ字）</label><input id="f_allowance3CalcEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">３．固定残業代</div>
+      <div class="fg"><label>固定残業</label>
+        <select id="f_fixedOT" onchange="onFixedOTSelect()">
+          <option value="無">無 / မရှိ</option>
+          <option value="有">有 / ရှိ</option>
+        </select>
+      </div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」クリックでも切替可</div>
+      <div class="fg3">
+        <div class="fg"><label>時間</label><input id="f_fixedOTHours" oninput="p()"></div>
+        <div class="fg"><label>金額（円）</label><input id="f_fixedOTAmount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>計算方法（日）</label><input id="f_fixedOTCalc" oninput="p()"></div>
+      <div class="fg"><label>တွက်ချက်နည်း (my)</label><input id="f_fixedOTCalcEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">４．月支払概算額</div>
+      <div class="fg"><label>合計（円）</label><input id="f_salaryTotal" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">５．控除項目</div>
+      <div class="fg"><label>(a)税金（円）</label><input id="f_deductTax" oninput="p()"></div>
+      <div class="fg"><label>(b)社会保険料（円）</label><input id="f_deductSocialIns" oninput="p()"></div>
+      <div class="fg"><label>(c)雇用保険料（円）</label><input id="f_deductEmpIns" oninput="p()"></div>
+      <div class="fg"><label>(d)食費（円）</label><input id="f_deductFood" oninput="p()"></div>
+      <div class="fg"><label>(e)居住費（円）</label><input id="f_deductHousing" oninput="p()"></div>
+      <div class="fg"><label>(f)水道光熱費（円）</label><input id="f_deductUtility" oninput="p()"></div>
+      <div class="fg"><label>(g)その他（名目）</label><input id="f_deductOther1Name" oninput="p()"></div>
+      <div class="fg"><label>(g)その他（円）</label><input id="f_deductOther1Amount" oninput="p()"></div>
+      <div class="fg"><label>控除合計（円）</label><input id="f_deductTotal" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">６．手取り支給額</div>
+      <div class="fg"><label>手取り（円）</label><input id="f_netPay" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">７．業務内容</div>
+      <div class="fg"><label>従事させる業務区分（日）</label><input id="f_workType" oninput="p()"></div>
+      <div class="fg"><label>လုပ်ငန်းအပိုင်းအခြား (my)</label><input id="f_workTypeEn" oninput="p()"></div>
+      <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="p()"></div>
+      <div class="fg"><label>ဆောက်လုပ်ရေးလုပ်ငန်းအမျိုးအစား (my)</label><input id="f_workCatEn" oninput="p()"></div>
+      <div class="fg"><label>具体的職種・作業内容（日）</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
+      <div class="fg"><label>လုပ်ငန်းအမျိုးအစားနှင့် အကြောင်းအရာ (my)</label><textarea id="f_workDetailEn" oninput="p()" rows="3"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">８．昇給</div>
+      <div class="fg"><label>昇給額（日）</label><input id="f_raiseAmount" oninput="p()"></div>
+      <div class="fg"><label>လစာတိုးမည့်ပမာဏ (my)</label><input id="f_raiseAmountEn" oninput="p()"></div>
+      <div class="fg"><label>昇給条件（日）</label><input id="f_raiseCond" oninput="p()"></div>
+      <div class="fg"><label>လစာတိုးမှု သတ်မှတ်ချက် (my)</label><input id="f_raiseCondEn" oninput="p()"></div>
+      <div class="fg"><label>昇給時期（日）</label><input id="f_raiseTime" oninput="p()"></div>
+      <div class="fg"><label>လစာတိုးမည့်ကာလ (my)</label><input id="f_raiseTimeEn" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776316942"></script>
+<script>
+// 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
+let _fixedOTState = '無';
+function onFixedOTSelect(){
+  // 左パネルのセレクト変更を状態に反映
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) _fixedOTState = sel.value;
+  p();
+}
+function toggleFixedOT(val){
+  // プレビュー上のクリック→状態を変更し、セレクトにも反映
+  _fixedOTState = val;
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) sel.value = val;
+  p();
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const fixedOT = _fixedOTState || '無';
+  const otY = fixedOT==='有' ? 'chk-on' : '';
+  const otN = fixedOT==='無' ? 'chk-on' : '';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10pt;margin-bottom:2px;">様式第２（第３条関係）</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用契約に係る重要事項事前説明書</div>
+<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">အလုပ်ခန့်အပ်ခြင်းစာချုပ်နှင့် ပတ်သက်သောအရေးကြီးသည့်ကြိုတင်ရှင်းလင်းချက်များ</div>
+<div style="height:1.8em;">&nbsp;</div>
+<div style="height:1.8em;">&nbsp;</div>
+
+<div class="row ja">建設特定技能受入計画を申請予定である（特定技能所属機関名）<span class="under">${f('f_orgName')}</span>は、雇用契約に係る重要事項について、下記内容を事前に説明し、内容を理解させたうえで国土交通省へ申請する。</div>
+<div class="row vi">ဆောက်လုပ်ရေးဆိုင်ရာကျွမ်းကျင်လုပ်သားများအားလက်ခံမှုအစီအစဉ်ကို လျှောက်ထားရန် စီစဉ်ထားသည့် <span class="under">${f('f_orgNameEn')}</span> (ကျွမ်းကျင်လုပ်သားနှင့်သက်ဆိုင်သည့်အဖွဲ့အစည်းအမည်) သည် အလုပ်ခန့်အပ်ခြင်းစာချုပ်နှင့် ပတ်သက်သောအရေးကြီးသည့်ရှင်းလင်းချက်များနှင့်စပ်လျဉ်း၍ အောက်ပါအကြောင်းအရာများကို ကြိုတင်၍ ရှင်းလင်းပြီး အကြောင်းအရာများကို နားလည်စေပြီးမှ မြေ၊ အခြေခံအဆောက်အအုံ၊ သယ်ယူပို့ဆောင်ရေးနှင့် ခရီးသွားဝန်ကြီးဌာနသို့ လျှောက်ထားပါမည်။</div>
+
+<div class="sec">
+  <div class="sec-h">１．基本賃金</div>
+  <div class="sec-h-vi">အခြေခံလစာ</div>
+  <div class="row ja">月額（<span class="under">${f('f_salaryMonthly')}</span>円　手当<span class="under">&nbsp;</span>円、手当<span class="under">&nbsp;</span>円を含む。）</div>
+  <div class="row vi">လစာ（<span class="under">${f('f_salaryMonthly')}</span> ယန်း　ခံစားခွင့်ဘောနပ်စ် <span class="under">&nbsp;</span> ယန်း၊ ခံစားခွင့်ဘောနပ်စ် <span class="under">&nbsp;</span> ယန်းအပါအဝင်）</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）</div>
+  <div class="sec-h-vi">ခံစားခွင့်ရနိုင်မည့် ငွေကြေးပမာဏများနှင့် တွက်ချက်ပုံ (အချိန်ပိုလုပ်အားခများမပါဝင်ပါ။)</div>
+  <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${f('f_allowance1Amount')}</span>円／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
+  <div class="row vi">(a)（<span class="under">${f('f_allowance1NameEn')}</span> ခံစားခွင့်,　<span class="under">${f('f_allowance1Amount')}</span> ယန်း／တွက်ချက်ပုံ：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
+  <div class="row ja">(b)（<span class="under">${f('f_allowance2Name')}</span>手当　<span class="under">${f('f_allowance2Amount')}</span>円／計算方法：<span class="under">${f('f_allowance2Calc')}</span>）</div>
+  <div class="row vi">(b)（<span class="under">${f('f_allowance2NameEn')}</span> ခံစားခွင့်,　<span class="under">${f('f_allowance2Amount')}</span> ယန်း／တွက်ချက်ပုံ：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
+  <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${f('f_allowance3Amount')}</span>円／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
+  <div class="row vi">(c)（<span class="under">${f('f_allowance3NameEn')}</span> ခံစားခွင့်,　<span class="under">${f('f_allowance3Amount')}</span> ယန်း／တွက်ချက်ပုံ：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">３．固定残業代　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span>有　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span>無）</div>
+  <div class="sec-h-vi">အတည်သတ်မှတ်ထားသည့် အချိန်ပိုကြေး　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> ရှိ　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> မရှိ）</div>
+  <div class="row ja" style="font-size:9.5pt;">（固定残業代が有る場合は以下に記入）</div>
+  <div class="row vi">(အတည်သတ်မှတ်ထားသည့် အချိန်ပိုကြေးရှိပါက အောက်တွင်ဖော်ပြပါ)</div>
+  <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${f('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
+  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> နာရီ　<span class="under">${f('f_fixedOTAmount')}</span> ယန်း【တွက်ချက်နည်း】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
+  <div class="row ja" style="font-size:9.5pt;">固定残業代を超えた労働時間分については割増賃金を追加で支払う。</div>
+  <div class="row vi">အတည်သတ်မှတ်ထားသည့် အချိန်ပိုကြေးကို ကျော်လွန်သွားသည့် အလုပ်လုပ်ချိန်နှင့် စပ်လျဉ်း၍ အပိုလုပ်အားခကို ထပ်ပေါင်း၍ ပေးချေသည်။</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">４．１か月当たりの支払概算額（１＋２＋３）</div>
+  <div class="row ja" style="font-size:9.5pt;">（１．基本賃金の月額に算入した手当については、二重に計上しないように注意すること。）</div>
+  <div class="row vi">(၁. အခြေခံလုပ်အားခ၏ လစာတွင် ထပ်ပေါင်းထည့်ထားသည့် ခံစားခွင့်ဘောနပ်စ်နှင့် စပ်လျဉ်း၍၊ နှစ်ဆမတွက်ချက်မိစေရန် သတိပြုရမည်။)</div>
+  <div class="row ja" style="text-align:right;">約　<span class="under">${f('f_salaryTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">ခန့်မှန်းလစာတစ်လစာပေးချေမှု (၁+၂+၃)　မှန်းခြေ　<span class="under">${f('f_salaryTotal')}</span>　ယန်း（စုစုပေါင်း）</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+
+<div class="sec">
+  <div class="sec-h">５．賃金支払時に控除する項目</div>
+  <div class="sec-h-vi">လစာငွေမှနှုတ်ယူမည့်အချက်များ</div>
+  <table class="tbl-amt">
+    <tr>
+      <td style="width:45%;" class="ja">(a)税　　　金</td>
+      <td style="width:55%;" class="ja">（<span class="under">${f('f_deductTax')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(a) အခွန်</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductTax')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(b)社会保険料</td>
+      <td class="ja">（<span class="under">${f('f_deductSocialIns')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(b) လူမှုဖူလုံရေးအာမခံကြေး</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductSocialIns')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(c)雇用保険料</td>
+      <td class="ja">（<span class="under">${f('f_deductEmpIns')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(c) အလုပ်အာမခံကြေး</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductEmpIns')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(d)食　　　費</td>
+      <td class="ja">（<span class="under">${f('f_deductFood')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(d) စားစရိတ်</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductFood')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(e)居　住　費</td>
+      <td class="ja">（<span class="under">${f('f_deductHousing')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(e) နေထိုင်စရိတ်</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductHousing')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(f)その他（水道光熱費）</td>
+      <td class="ja">（<span class="under">${f('f_deductUtility')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(f) အခြား (ရေမီးအသုံးစရိတ်များ)</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductUtility')}</span> ယန်း）</td>
+    </tr>
+    <tr>
+      <td class="ja">(g)その他（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="ja">（<span class="under">${f('f_deductOther1Amount')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(g) အခြား（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="vi">（မှန်းခြေ <span class="under">${f('f_deductOther1Amount')}</span> ယန်း）</td>
+    </tr>
+  </table>
+  <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${f('f_deductTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">နှုတ်ယူမည့်ငွေပမာဏ　မှန်းခြေ　<span class="under">${f('f_deductTotal')}</span>　ယန်း（စုစုပေါင်း）</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">６．手取り支給額（４－５）　約　<span class="under">${f('f_netPay')}</span>　円（合計）</div>
+  <div class="sec-h-vi">လက်ကျန်လစာငွေ (၄-၅)　မှန်းခြေ　<span class="under">${f('f_netPay')}</span>　ယန်း（စုစုပေါင်း）</div>
+  <div class="row ja" style="font-size:9pt;">※欠勤等がない場合であって、時間外労働の割増賃金等は除く。</div>
+  <div class="row vi" style="font-size:8.5pt;">※အလုပ်ပျက်ကွက်ခြင်းမရှိသည့်အခါတွင်ရမည့် အချိန်ပိုလစာမပါဝင်သေးသည့် လက်ကျန်လစာငွေဖြစ်ပါသည်။</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">７．業務内容（従事させる業務区分、従事させる工事業の種類、具体的職種及び作業内容）</div>
+  <div class="row ja" style="font-size:9.5pt;">（職種名等だけでなく具体的にどのような現場でどのような業務に従事させるのか説明すること）</div>
+  <div class="sec-h-vi">လုပ်ငန်းအကြောင်းအရာ (လုပ်ဆောင်ရမည့်လုပ်ငန်းအပိုင်းအခြား၊ လုပ်ဆောင်ရမည့် ဆောက်လုပ်ရေးလုပ်ငန်းအမျိုးအစား၊ တိကျသောလုပ်ငန်းအမျိုးအစားနှင့် လုပ်ငန်းအကြောင်းအရာ)<br>(အလုပ်အမျိုးအစားအမည်ကိုသာမက မည်သည့်နေရာတွင် မည်သို့သောလုပ်ငန်းကို လုပ်ဆောင်စေမည်ဟူသော အသေးစိတ်ကိုပါ ရှင်းပြရန်)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">従事させる業務区分：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
+    <div class="row vi">လုပ်ဆောင်ရမည့်လုပ်ငန်းအပိုင်းအခြား：<span class="under" style="min-width:20em;">${f('f_workTypeEn')}</span></div>
+    <div class="row ja">従事させる工事業の種類：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
+    <div class="row vi">လုပ်ဆောင်ရမည့် ဆောက်လုပ်ရေးလုပ်ငန်းအမျိုးအစား：<span class="under" style="min-width:20em;">${f('f_workCatEn')}</span></div>
+    <div class="row ja">従事させる具体的職種及び作業内容：<span class="under" style="min-width:20em;">${f('f_workDetail')}</span></div>
+    <div class="row vi">လုပ်ဆောင်ရမည့် တိကျသောလုပ်ငန်းအမျိုးအစားနှင့် လုပ်ငန်းအကြောင်းအရာ：<span class="under" style="min-width:20em;">${f('f_workDetailEn')}</span></div>
+  </div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+
+<div class="sec">
+  <div class="sec-h">８．技能の習熟等に応じた昇給について</div>
+  <div class="row ja" style="font-size:9.5pt;">（昇給額、昇給条件及び昇給時期について説明すること。従事させる具体的職種及び作業内容に応じた同等の技能を有する日本人が従事する場合の報酬と同等以上になるよう留意すること。）</div>
+  <div class="sec-h-vi">နည်းပညာများအားကျွမ်းကျင်မှုစသည်အပေါ်လိုက်၍ လစာတိုးမြှင့်ခြင်းအကြောင်း<br>(လစာတိုးမည့်ပမာဏ၊ လစာတိုးမြှင့်ခြင်းသတ်မှတ်ချက်များနှင့်၊ လစာတိုးမြှင့်ကာလများနှင့်ပတ်သက်၍ရှင်းပြရန်။ လုပ်ဆောင်ရမည့် တိကျသောလုပ်ငန်းအမျိုးအစားနှင့် လုပ်ငန်းအကြောင်းအရာကိုလိုက်၍ ၎င်းနှင့်ညီမျှသော နည်းပညာကို တတ်မြောက်ထားသည့် ဂျပန်လူမျိုးမှ လုပ်ဆောင်သည့်အခြေအနေရှိ ခံစားခွင့်ဘောနပ်စ်နှင့် တန်းတူသို့မဟုတ် ထို့ထက်ပိုမည်ဖြစ်ကြောင်းကို သိထားရန်။)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">昇給額：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
+    <div class="row vi">လစာတိုးမည့်ပမာဏ：<span class="under" style="min-width:20em;">${f('f_raiseAmountEn')}</span></div>
+    <div class="row ja">昇給条件：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
+    <div class="row vi">လစာတိုးမှု သတ်မှတ်ချက်：<span class="under" style="min-width:20em;">${f('f_raiseCondEn')}</span></div>
+    <div class="row ja">昇給時期：<span class="under" style="min-width:20em;">${f('f_raiseTime')}</span></div>
+    <div class="row vi">လစာတိုးမည့်ကာလ：<span class="under" style="min-width:20em;">${f('f_raiseTimeEn')}</span></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">９．従事させる業務区分、工事業等に応じた安全衛生教育及び技能の習得について</div>
+  <div class="row ja" style="font-size:9.5pt;">（安全衛生教育の実施内容や、技能検定の受験時期や合格後の支給手当、昇給への反映等について説明すること）</div>
+  <div class="sec-h-vi">လုပ်ဆောင်ရမည့်လုပ်ငန်း အပိုင်းအခြား၊ ဆောက်လုပ်ရေးလုပ်ငန်းတို့အလိုက် ကျန်းမာရေးနှင့် ဘေးကင်းလုံခြုံမှုပညာပေးခြင်းနှင့် ကျွမ်းကျင်တတ်မြောက်မှုများအကြောင်း<br>(ကျန်းမာရေးနှင့်ဘေးကင်းလုံခြုံမှုပညာပေးခြင်းလက်တွေ့အကောင်အထည်ဖော်မှုအကြောင်းအရာများ၊ ကျွမ်းကျင်မှု စာမေးပွဲဖြေဆိုရမည့်ကာလ၊ စာမေးပွဲအောင်မြင်ပြီးနောက်၏ လစာခံစားခွင့်၊ လစာတိုးမြှင့်မှုအပေါ်သုံးသပ်မှု စသည်တို့နှင့် ပတ်သက်၍ရှင်းလင်းပြရန်)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">採用時、作業内容の変更、労働安全衛生法上に定める危険又は有害な業務、職長等の職務に従事することとなったとき、法令に安全衛生教育の実施が必要とされるときは安全衛生教育を実施する。受入れ後1年以内に建設キャリアアップシステムのレベル２に相当する技能教育を施す。また、受入れ後3年以内に技能検定1級、取得を目標とするため、社内勉強会の開催等を行う。</div>
+    <div class="row vi">အလုပ်ခန့်ထားစဉ်၊ အလုပ်အကြောင်းအရာပြောင်းလဲသည့်အခါ၊ စက်မှုဘေးကင်းရေးနှင့် ကျန်းမာရေးအက်ဥပဒေက သတ်မှတ်ထားသည့် အန္တရာယ်ရှိသော သို့မဟုတ် အန္တရာယ်ရှိသောအလုပ်တွင် ခန့်အပ်ခံရသည့်အခါ၊ ဖိုမင်ရာထူးကို တာဝန်ပေးအပ်သည့်အခါ၊ စသည်တို့ကို အလုပ်ခန့်ထားသည့်အခါ၊ ဥပဒေအရ လိုအပ်သည့်အချိန်တွင် ကျွန်ုပ်တို့သည် လုံခြုံမှုနှင့် ကျန်းမာရေးပညာပေးမှုကို ပေးပါသည်။ လက်ခံပြီး တစ်နှစ်အတွင်း ဆောက်လုပ်ရေးအသက်မွေးဝမ်းကျောင်းတိုးမြှင့်မှုစနစ်၏ အဆင့် ၂ နှင့်ညီမျှသော ကျွမ်းကျင်မှုပညာပေးခြင်းကို ပြုလုပ်ပေးပါသည်။ လက်ခံပြီး သုံးနှစ်အတွင်း ဝန်ထမ်းအသစ်များ Grade 1 Skills Certification ကို လက်ခံရရှိရန် ရည်ရွယ်ချက်ဖြင့် ကုမ္ပဏီတွင်း လေ့လာမှု ဆွေးနွေးပွဲများကို ကျင်းပပါသည်။</div>
+  </div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+
+<div class="sec">
+  <div class="sec-h">10．個人情報の提供に係る同意について</div>
+  <div class="row ja" style="font-size:9.5pt;">（建設特定技能受入計画の適正な実施を確保するため、建設キャリアアップシステムを運営する一般財団法人建設業振興基金、適正就労監理機関及び特定技能外国人受入事業実施法人へ認定受入計画に記載された内容（個人情報を含む。）を提供することに同意しているか）</div>
+  <div class="sec-h-vi">ကိုယ်ရေးကိုယ်တာအချက်အလက်များပေးအပ်ခြင်းနှင့်ပတ်သက်သည့်သဘောတူညီချက်အကြောင်း<br>(ဆောက်လုပ်ရေးဆိုင်ရာကျွမ်းကျင်လုပ်သားများအားလက်ခံမှုအစီအစဉ်ကို သင့်လျော်သောအကောင်အထည်ဖော်မှု ပြုလုပ်ရန်အတွက် ဆောက်လုပ်ရေးဆိုင်ရာအသက်မွေးဝမ်းကျောင်းတိုးမြှင့်မှုစနစ်ကို လည်ပတ်နေသည့် ဆောက်လုပ်ရေးလုပ်ငန်းမြှင့်တင်ရေးရန်ပုံငွေအဖွဲ့၊ သင့်လျော်သည့်အလုပ်ခန့်အပ်မှုဆိုင်ရာကြီးကြပ်ရေးအဖွဲ့နှင့် နိုင်ငံခြားသားကျွမ်းကျင်လုပ်သားများလက်ခံသည့်လုပ်ငန်းအကောင်အထည်ဖော်အဖွဲ့များသို့ အသိအမှတ်ပြု လက်ခံမှုစီမံချက်တွင် ထည့်သွင်းရေးသားမည့်အကြောင်းအရာများ (ကိုယ်ရေးကိုယ်တာအချက်အလက်များအပါအဝင်) ပေးအပ်ခြင်းကို သဘောတူမည်လား)</div>
+  <div class="row ja">　　<input type="checkbox" class="chk-box" checked>同意している。　　　<input type="checkbox" class="chk-box">同意していない。</div>
+  <div class="row vi">　　☑ သဘောတူပါသည်　　　☐ သဘောမတူပါ</div>
+</div>
+
+<div class="sec" style="margin-top:6mm;">
+  <div class="row ja">(西暦) <span class="under">${f('f_createY')}</span>年 <span class="under">${f('f_createM')}</span>月 <span class="under">${f('f_createD')}</span>日、前記１から10の内容について以下の者が十分に理解することができる言語（ミャンマー語）にて説明し、内容を理解していることを確認した。</div>
+  <div class="row vi">(ခရစ်နှစ်) <span class="under">${f('f_createY')}</span> ခုနှစ် <span class="under">${f('f_createM')}</span> လ <span class="under">${f('f_createD')}</span> ရက်တွင်၊ အထက်ပါ 1 မှ 10 အထိအကြောင်းအရာများနှင့်ပတ်သက်၍ အောက်ပါပုဂ္ဂိုလ်မှ အပြည့်အဝနားလည်နိုင်သည့်ဘာသာစကား (မြန်မာဘာသာ) ဖြင့် ရှင်းပြခဲ့ပြီး အကြောင်းအရာများနားလည်ကြောင်းကို အတည်ပြုခဲ့ပါသည်။</div>
+</div>
+
+<div style="margin-top:8mm;text-align:left;font-size:10.5pt;">
+  <div style="margin-bottom:8mm;">（サイン / လက်မှတ်）　<span style="display:inline-block;border-bottom:1px solid #000;width:18em;">&nbsp;</span>　殿</div>
+</div>
+
+<table style="width:65%;margin-left:auto;margin-right:0;border-collapse:collapse;font-size:10pt;margin-top:4mm;">
+  <tr>
+    <td style="width:38%;padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">説明者</div>
+      <div class="vi">ရှင်းပြသူ</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repNameEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">特定技能所属機関名</div>
+      <div class="vi">ကျွမ်းကျင်လုပ်သားနှင့်သက်ဆိုင်သည့်အဖွဲ့အစည်းအမည်</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgNameEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">所在地</div>
+      <div class="vi">တည်နေရာ</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgAddress')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgAddressEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">電話番号</div>
+      <div class="vi">ဖုန်းနံပါတ်</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgTel')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">代表者　役職・氏名</div>
+      <div class="vi">ကိုယ်စားလှယ်၏ရာထူး・အမည်</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repTitle')} ${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repTitleEn')} ${f('f_repNameEn')}</span></div>
+    </td>
+  </tr>
+</table>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _applyFontSize();
+  _applyJuuyouMyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applyJuuyouMyFontSize(){
+  const st=document.getElementById('_juuyouMyFontStyle')||document.createElement('style');
+  st.id='_juuyouMyFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10.5pt"]{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10pt"]{font-size:${(10*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9.5pt"]{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:8.5pt"]{font-size:${(8.5*s).toFixed(2)}pt!important}`,
+    `.ja{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.vi{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.sec-h{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.sec-h-vi{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.tbl-amt{font-size:${(10*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cos]=await Promise.all([
+      companyId?sb(`companies?select=name,full_address,author_name,author_title,tel&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,full_address,author_name,author_title,tel&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+    ]);
+    const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(co){
+      s('f_orgName',co.name||'');
+      s('f_orgAddress',co.full_address||'');
+      s('f_orgTel',co.tel||'');
+      s('f_repTitle',co.author_title||'');
+      s('f_repName',co.author_name||'');
+    }
+    if(!v('f_createY')){
+      const n=new Date();
+      document.getElementById('f_createY').value=String(n.getFullYear());
+      document.getElementById('f_createM').value=String(n.getMonth()+1);
+      document.getElementById('f_createD').value=String(n.getDate());
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadFromDB==='function') loadFromDB();
+});
+</script>
+</body>
+</html>
