@@ -48,7 +48,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.167</div>
+    <div class="ver">ver.20260417.168</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -201,10 +201,10 @@ function p(){
     <col style="width:4%;">
     <col style="width:16%;">
     <col style="width:14%;">
-    <col style="width:13%;">
-    <col style="width:18%;">
-    <col style="width:10%;">
-    <col style="width:25%;">
+    <col style="width:14%;">
+    <col style="width:16%;">
+    <col style="width:8%;">
+    <col style="width:28%;">
   </colgroup>
   <!-- 1行目: 3.事務所所在地 -->
   <tr>
@@ -227,62 +227,62 @@ function p(){
       <div class="id" style="text-align:right;">(Telepon　　　 -  　　　-　　　　 )</div>
     </td>
   </tr>
-  <!-- 2行目: 4.支援業務 / 支援責任者 ふりがな氏名 / 役職 -->
+  <!-- 2行目: 4.支援業務 / 支援責任者 / ふりがな氏名ラベル / 入力欄 / 役職ラベル / 役職入力欄 -->
   <tr>
     <td rowspan="3" style="vertical-align:top;">
       ４　支援業務を行う体制の概要<br>
       <span class="id">4. Garis besar struktur untuk melakukan tugas pemberian bantuan</span>
     </td>
-    <td rowspan="2" style="vertical-align:middle;">
-      支援責任者<br>
+    <td style="vertical-align:middle;text-align:center;">
+      支　援　責　任　者<br>
       <span class="id">Penanggung jawab bantuan</span>
     </td>
-    <td>
+    <td style="vertical-align:middle;">
       （ふりがな）<span class="id">(Furigana)</span><br>
       氏　　名<br><span class="id">Nama</span>
     </td>
-    <td>
-      <div style="font-size:8pt;color:#666;min-height:1em;">&nbsp;</div>
+    <td style="vertical-align:top;">
+      <div style="font-size:8pt;color:#666;min-height:1.2em;">&nbsp;</div>
       <div style="border-bottom:1px dashed #888;min-height:1.4em;">&nbsp;</div>
     </td>
-    <td style="vertical-align:middle;">
+    <td style="vertical-align:middle;text-align:center;">
       役　　職<br><span class="id">Jabatan</span>
     </td>
-    <td style="vertical-align:middle;min-height:2em;">&nbsp;</td>
+    <td colspan="2" style="vertical-align:middle;min-height:2em;">&nbsp;</td>
   </tr>
-  <!-- 3行目: 支援を行っている1号特定技能外国人数 / 名 / 中立性 / 有無 -->
+  <!-- 3行目: 支援を行っている1号特定技能外国人数 / 名 / 中立性（rowspan2） -->
   <tr>
-    <td style="vertical-align:middle;">
+    <td style="vertical-align:middle;text-align:center;">
       支援を行っている<br>
       １号特定技能外国人数<br>
       <span class="id">Jumlah pekerja asing berketerampilan khusus 1 yang memberikan bantuan</span>
     </td>
-    <td style="text-align:center;vertical-align:middle;">
+    <td colspan="2" style="text-align:center;vertical-align:middle;">
       　　　名<br>
       <span class="id">Nama</span>
     </td>
-    <td colspan="3" rowspan="2" style="vertical-align:top;font-size:8pt;line-height:1.4;">
+    <td colspan="3" rowspan="2" style="vertical-align:top;font-size:8pt;line-height:1.4;padding:6px 8px;">
       <div style="text-align:center;font-weight:bold;margin-bottom:2mm;">支援の中立性を確保していることの有無</div>
       <div>支援責任者及び支援担当者が，支援対象者と異なる部署の職員であるなど，当該対象者に対する指揮命令権を有しない者であること、また，異なる部署であっても，当該対象者に指揮命令をし得る立場にないこと</div>
       <div class="id" style="text-align:center;font-weight:bold;margin-top:2mm;">Jaminan netralitas pemberian bantuan ada atau tidak</div>
       <div class="id" style="font-size:7.5pt;margin-top:1mm;">Penanggung jawab dan petugas bantuan adalah orang yang tidak memiliki wewenang memerintah terhadap target sasaran bantuan, seperti staf dari departemen yang berbeda dengan target sasaran bantuan dll. Kemudian jika mereka berada di departemen yang berbeda pun, posisinya bukan pada posisi berwewenang memerintah target sasaran bantuan.</div>
-      <div style="text-align:center;margin-top:3mm;">
-        <span style="display:inline-block;margin:0 10mm;">有</span>
-        <span style="display:inline-block;margin:0 10mm;">無</span>
+      <div style="text-align:center;margin-top:3mm;font-size:10pt;">
+        <span style="display:inline-block;margin:0 12mm;">有</span>
+        <span style="display:inline-block;margin:0 12mm;">無</span>
       </div>
       <div class="id" style="text-align:center;">
-        <span style="display:inline-block;margin:0 10mm;">Ada</span>
-        <span style="display:inline-block;margin:0 10mm;">Tidak</span>
+        <span style="display:inline-block;margin:0 12mm;">Ada</span>
+        <span style="display:inline-block;margin:0 12mm;">Tidak</span>
       </div>
     </td>
   </tr>
-  <!-- 4行目: 支援担当者数 -->
+  <!-- 4行目: 支援担当者数 / 名 -->
   <tr>
-    <td style="vertical-align:middle;">
-      支援担当者数<br>
+    <td style="vertical-align:middle;text-align:center;">
+      支　援　担　当　者　数<br>
       <span class="id">Jumlah PIC pemberi bantuan</span>
     </td>
-    <td style="text-align:center;vertical-align:middle;">
+    <td colspan="2" style="text-align:center;vertical-align:middle;">
       　　　名<br>
       <span class="id">Nama</span>
     </td>
