@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.30</div>
+    <div class="ver">ver.20260417.31</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -806,16 +806,16 @@ function p(){
       <tr>
         <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">၁။ အခြေခံလစာ</span></td>
         <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sMonthly,'sal_monthly_a_id')} လစာ (${ff('es_salaryMonthly')}ယန်း)</span></td>
-        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sDaily,'sal_daily_a_id')} တစ်ရက်တာလစာ (${ff('es_salaryDaily')}ယန်း)</span></td>
+        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;<span class="id" style="font-size:7.5pt;">${cb(sDaily,'sal_daily_a_id')} တစ်ရက်တာလစာ (${ff('es_salaryDaily')}ယန်း)</span></td>
         <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;">${cb(sHourly,'sal_hourly_a_id')} တစ်နာရီလစာ (${ff('es_salaryHourly')}ယန်း)</span></td>
       </tr>
       <tr>
         <td colspan="3" style="padding-top:3px;">※月給・日給の場合の１時間当たりの金額（${ff('es_calcHourly')}円）<br>
-        <span class="id" style="font-size:7.5pt;">※Jumlah gaji per jam dalam hal gaji bulanan/harian　(${ff('es_calcHourly')}ယန်း)</span></td>
+        <span class="id" style="font-size:7.5pt;">※တစ်လစာ၊တစ်ရက်တာလစာ၏တစ်နာရီစာလစာပမာဏ　(${ff('es_calcHourly')}ယန်း)</span></td>
       </tr>
       <tr>
         <td colspan="3">※日給・時給の場合の１か月当たりの金額（${ff('es_calcMonthly')}円）<br>
-        <span class="id" style="font-size:7.5pt;">※Jumlah gaji per bulan dalam hal gaji harian/per jam　(${ff('es_calcMonthly')}ယန်း)</span></td>
+        <span class="id" style="font-size:7.5pt;">※တစ်ရက်တာလစာ၊တစ်နာရီလစာ၏တစ်လစာလစာပမာဏ　(${ff('es_calcMonthly')}ယန်း)</span></td>
       </tr>
     </table>
 
