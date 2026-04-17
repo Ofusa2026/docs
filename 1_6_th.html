@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.17</div>
+    <div class="ver">ver.20260417.18</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -393,10 +393,10 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">Format Referensi 1-6</span></div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">แบบฟอร์มอ้างอิงเลขที่ 1-6</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
-<div style="text-align:center;font-size:10pt;padding-bottom:8px;">Syarat Kerja</div>
+<div style="text-align:center;font-size:10pt;padding-bottom:8px;">หนังสือเงื่อนไขการว่าจ้าง</div>
 
 <div style="border:1px solid #333;">
 
@@ -404,32 +404,32 @@ function p(){
   <div style="padding:8px 12px 10px;">
     <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
-      <span class="id" style="font-size:7.5pt;">Tanggal ${f('es_createD')} Bulan ${f('es_createM')} Tahun ${f('es_createY')}</span>
+      <span class="id" style="font-size:7.5pt;">${f('es_createY')} ปี ${f('es_createM')} เดือน ${f('es_createD')} วัน</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">Kepada Yth&nbsp;&nbsp;${f('applicantName')}</span></div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">(เรียน)&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
       <table style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nama organisasi afiliasi pekerja berketerampilan khusus</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">ชื่อองค์กรที่แรงงานเฉพาะทางสังกัด</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Alamat</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">ที่อยู่</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nomor telepon</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">โทรศัพท์</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Nama dan jabatan representatif</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">ชื่อ-นามสกุลและตำแหน่งตัวแทนองค์กร</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')} ${f('es_repNameEn')} ตราประทับ</td></tr>
       </table>
     </div>
   </div>
 
   <!-- Ⅰ 雇用契約期間 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;">I. Periode perjanjian kerja</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;">I. ระยะเวลาสัญญาว่าจ้าง</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">1. Periode perjanjian kerja</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">1. ระยะเวลาสัญญาว่าจ้าง</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">(Dari tanggal ${f('es_contractStartD')} Bulan ${f('es_contractStartM')} Tahun ${f('es_contractStartY')} hingga Tanggal ${f('es_contractEndD')} Bulan ${f('es_contractEndM')} Tahun ${f('es_contractEndY')}) Tanggal rencana masuk: Tanggal ${f('es_entryD')} Bulan ${f('es_entryM')} Tahun ${f('es_entryY')}</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">${f('es_contractStartY')} ปี ${f('es_contractStartM')} เดือน ${f('es_contractStartD')} วัน 〜 ${f('es_contractEndY')} ปี ${f('es_contractEndM')} เดือน ${f('es_contractEndD')} วัน วันกำหนดเข้าประเทศญี่ปุ่น ${f('es_entryY')} ปี ${f('es_entryM')} เดือน ${f('es_entryD')} วัน</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2. Pembaruan perjanjian</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2.มีการต่อสัญญาหรือไม่</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -438,29 +438,29 @@ function p(){
             <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
           </tr>
           <tr style="font-size:7.5pt;">
-            <td class="id" style="white-space:nowrap;">${cb(rAuto,'renewal_auto_id')}&nbsp;Diperbarui secara otomatis</td>
-            <td class="id" style="white-space:nowrap;">${cb(rPos,'renewal_pos_id')}&nbsp;Dapat diperbarui</td>
-            <td class="id" style="white-space:nowrap;">${cb(rNone,'renewal_none_id')}&nbsp;Tidak diperbarui</td>
+            <td class="id" style="white-space:nowrap;">${cb(rAuto,'renewal_auto_id')}&nbsp;ต่อสัญญาโดยอัตโนมัติ</td>
+            <td class="id" style="white-space:nowrap;">${cb(rPos,'renewal_pos_id')}&nbsp;อาจจะมีการต่อสัญญา</td>
+            <td class="id" style="white-space:nowrap;">${cb(rNone,'renewal_none_id')}&nbsp;ไม่มีการต่อสัญญา</td>
           </tr>
         </table>
-        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">※ Kriteria penilaian untuk pembaruan perjanjian di atas pada pilihan "Dapat diperbarui" adalah sebagai berikut.</span></div>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">* ในกรณีที่ข้อด้านบนเป็น "อาจจะมีการต่อสัญญา" เกณฑ์ในการพิจารณาต่อสัญญาเป็นไปดังต่อไปนี้</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;Volume pekerjaan pada akhir periode perjanjian</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;Kinerja dan sikap pekerja</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;Kemajuan pekerjaan yang melibatkan pekerja</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;ปริมาณงานในขณะที่หมดระยะเวลาสัญญา</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;ผลงานและท่าทีของแรงงาน</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;สถานะความคืบหน้าของงานที่ทำอยู่</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;Kemampuan pekerja dalam melaksanakan pekerjaan</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;Manajemen perusahaan</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;Lainnya（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;ความสามารถในการทำงานให้ลุล่วงของแรงงาน</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;สถานการณ์ดำเนินธุรกิจของบริษัท</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;อื่นๆ（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Apakah ada batasan perpanjangan? (Tidak ada/Ada (maksimal&nbsp;&nbsp;&nbsp;&nbsp;kali perpanjangan/total periode kontrak maksimal&nbsp;&nbsp;&nbsp;&nbsp;tahun))</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[Jika dibuat perjanjian kerja waktu tertentu dengan perusahaan yang sama sebagaimana diatur dalam Undang-Undang Perjanjian Kerja, dengan total periode kontrak lebih dari 5 tahun]</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">มีการจำกัดในการต่อสัญญาหรือไม่ (ไม่มี / มี (ต่อได้ไม่เกิน&nbsp;&nbsp;&nbsp;&nbsp;ครั้ง / ระยะเวลาสัญญารวมไม่เกิน&nbsp;&nbsp;&nbsp;&nbsp;ปี ) )</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[กรณีมีการทำสัญญาว่าจ้างโดยมีกำหนดระยะเวลาโดยระยะเวลาสัญญารวมเกิน 5 ปีกับบริษัทเดียวกันตามที่กำหนดในกฎหมายสัญญาจ้างแรงงาน]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
-      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">Dengan mengajukan permohonan untuk membuat perjanjian kerja tanpa periode yang ditetapkan (perjanjian kerja waktu tidak tertentu)dengan perusahaan selama periode perjanjian ini konversi</span><br><span class="id" style="font-size:6.5pt;">ke pekerjaan berdasarkan perjanjian kerja waktu tidak tertentu akan dimulaipada keesokan hari dari tanggal terakhir periode perjanjian ini (tanggal&nbsp;&nbsp;&nbsp;bulan&nbsp;&nbsp;&nbsp;tahun&nbsp;&nbsp;&nbsp;)<br><span class="id" style="font-size:6.5pt;">Dalam hal ini, apakah ada perubahan syarat kerja dari perjanjian ini? (Tidak ada/Ada (seperti yang ditunjukkan pada Lampiran 2))</span></span></div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">หากท่านต้องการแจ้งความประสงค์ที่จะทำสัญญาจ้างที่ไม่กำหนดระยะเวลา (สัญญาว่าจ้างโดยไม่มีกำหนดระยะเวลา) ต่อบริษัทในระหว่างระยะเวลาสัญญานี้</span><br><span class="id" style="font-size:6.5pt;">สามารถเปลี่ยนเป็นการจ้างงานโดยสัญญาว่าจ้างไม่กำหนดระยะเวลาได้ตั้งแต่วันถัดจากวันสุดท้ายของระยะเวลาสัญญานี้ (ตั้งแต่&nbsp;&nbsp;ปี&nbsp;&nbsp;เดือน&nbsp;&nbsp;วัน)<br><span class="id" style="font-size:6.5pt;">ซึ่งอาจมีหรือไม่มีการเปลี่ยนแปลงเงื่อนไขการทำงานจากสัญญานี้ (มี/ไม่มี (ตามเอกสารแนบ2))</span></span></div>
     </div>
   </div>
 </div>
