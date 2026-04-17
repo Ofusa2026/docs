@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.16</div>
+    <div class="ver">ver.20260417.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -574,17 +574,17 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">၂. အလုပ်နားချိန်&emsp;(${f('es_breakTime')}မိနစ်)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">၃. သတ်မှတ်အလုပ်ချိန်ဇယား&emsp;①တစ်ပတ်တာ（${f('es_weeklyH')}နာရီ&nbsp;${f('es_weeklyMin')}မိနစ်)&emsp;②တစ်လတာ（${f('es_monthlyH')}နာရီ&nbsp;${f('es_monthlyMin')}မိနစ်)&emsp;③နှစ်（${f('es_yearlyH')}နာရီ&nbsp;${f('es_yearlyMin')}မိနစ်)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">၄. သတ်မှတ်အလုပ်လုပ်ရက်&emsp;①တစ်ပတ်တာ（${f('es_weeklyDays')}ရက်）&emsp;②တစ်လတာ（${f('es_monthlyDays')}ရက်）&emsp;③နှစ်（${f('es_yearlyDays')}ရက်）</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">၂။ အလုပ်နားချိန်&emsp;(${f('es_breakTime')}မိနစ်)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">၃။ သတ်မှတ်အလုပ်ချိန်ဇယား&emsp;①တစ်ပတ်တာ(${f('es_weeklyH')}နာရီ&nbsp;${f('es_weeklyMin')}မိနစ်)&emsp;②တစ်လတာ(${f('es_monthlyH')}နာရီ&nbsp;${f('es_monthlyMin')}မိနစ်)&emsp;③နှစ်(${f('es_yearlyH')}နာရီ&nbsp;${f('es_yearlyMin')}မိနစ်)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">၄။ သတ်မှတ်အလုပ်လုပ်ရက်&emsp;①တစ်ပတ်တာ(${f('es_weeklyDays')}ရက်)&emsp;②တစ်လတာ(${f('es_monthlyDays')}ရက်)&emsp;③နှစ်(${f('es_yearlyDays')}ရက်)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">၅. အချိန်ပိုအလုပ်ချိန်ရှိမရှိ</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">(ခံစားခွင့် ${f('es_allowance1NameEn')} ), (ခံစားခွင့် ${f('es_allowance2NameEn')} ), (ခံစားခွင့် ${f('es_allowance3NameEn')} )</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">၅။ အချိန်ပိုအလုပ်ချိန်ရှိမရှိ</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;">${cb(true,'overtime_yes_id')} ရှိမည်&emsp;${cb(false,'overtime_no_id')} မရှိပါ</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">(ခံစားခွင့် ${f('es_allowance4NameEn')} )</span></td>
+          <span class="id" style="font-size:7pt;">○အသေးစိတ်မှာ အလုပ်ခန့်စည်းမျဉ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်တွင်ဖော်ပြသည်</span></td>
         </tr>
       </table>
     </div>
@@ -592,36 +592,36 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ရက်</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">၅။ အလုပ်ပိတ်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">၃။အချိန်ပို၊ ပိတ်ရက်ဆင်းခြင်း၊ညဘက်အလုပ်လုပ်ခြင်းအတွက် အပိုလုပ်အားခရာခိုင်နှုန်း</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">(၁)အချိန်ပို သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း ( ) ％</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">၁။ ပုံမှန်ပိတ်ရက်: (${f('es_fixedDay1En')}), အခြား（${f('es_otherHolidays')}）(နှစ်စဥ်ပိတ်ရက်စုစုပေါင်း ${f('es_annualHolidays')} ရက်)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;">၂။ ပုံမှန်မဟုတ်သောပိတ်ရက်: တစ်ပတ်/တစ်လ ရက်, အခြား (                    )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○အသေးစိတ်မှာ အလုပ်ခန့်စည်းမျဉ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်တွင်ဖော်ပြသည်</span></div>
     </div>
   </div>
 
   <!-- Ⅵ 休暇 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">၆။ခွင့်ရက်</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. ခွင့်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် ( ) ％</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း ( ) ％</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">(၂)အလုပ်ပိတ်ရက် သတ်မှတ်အလုပ်ပိတ်ရက် ( )％ , သတ်မှတ်ထားခြင်းမရှိသည့်ပိတ်ရက် ( )％</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">(၃)ညဆိုင်းဆင်းခြင်း ( )％</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">၄။လုပ်အားခပေးသည့်နောက်ဆုံးရက် ${f('es_payCutoffEn')} လစဥ်        ရက်</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;">၁။ နှစ်စဥ်လစာပေးခွင့် ၆လဆက်တိုက်အလုပ်ဆင်းပြီးနောက် →&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')} ရက်</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">ကနဦး ၆ လကြာ (${cb(false,"cb_auto_002")} ရှိမည်&emsp;${cb(true,"cb_auto_003")} မရှိပါ) → လကြာပြီးနောက်&emsp;ရက်</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;">၂။ အခြားခွင့်ရက်&emsp;လစာပေးခွင့် (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;လစာမဲ့ (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">၃။ ယာယီနိုင်ငံပြန်ခွင့် ဒုတိယပါတီမှ ယာယီနိုင်ငံပြန်လိုပါက အထက်ပါ ၁ နှင့် ၂ အတွင်း လိုအပ်သောခွင့်ကိုပေးရမည်</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○အသေးစိတ်မှာ အလုပ်ခန့်စည်းမျဉ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်တွင်ဖော်ပြသည်</span></div>
     </div>
   </div>
 
   <!-- Ⅶ 賃金 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">၇။လုပ်ခလစာ</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. လုပ်ခလစာ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">၅။လုပ်အားခပေးသည့်ရက် ${f('es_payDayEn')} လစဥ်        ရက်</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;">၁။ အခြေခံလစာ&emsp;${cb(true,"cb_auto_004")} လစဥ်လစာ (${ff('es_salaryMonthly')}ယန်း)&emsp;${cb(false,"cb_auto_005")} နေ့စဥ်လစာ(${ff('es_salaryDaily')}ယန်း)&emsp;${cb(false,"cb_auto_006")} တစ်နာရီလစာ(${ff('es_salaryHourly')}ယန်း)</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*အသေးစိတ်မှာ ပူးတွဲပါအတိုင်းဖြစ်သည်</div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;">၂။ အမျိုးမျိုးသောထောက်ပံ့ကြေး (အချိန်ပိုအလုပ်ကြေးမပါ)</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;">${allowLineId1}${allowLineId2}</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*အသေးစိတ်မှာ ပူးတွဲပါအတိုင်းဖြစ်သည်</div>
       </div>
     </div>
   </div>
