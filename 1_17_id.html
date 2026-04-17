@@ -8,17 +8,23 @@
 <style>
 .doc{
   background:white;
-  width:794px;
-  min-height:1123px;
+  width:1123px;
+  min-height:794px;
   flex-shrink:0;
   margin:0 0 24px 0;
-  padding:15mm 8mm;
+  padding:10mm 12mm;
   box-shadow:0 4px 20px rgba(0,0,0,.5);
   font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
   font-size:9pt;line-height:1.6;color:#000;
   position:relative;
   box-sizing:border-box;
   overflow:hidden;
+}
+@page{size:A4 landscape;margin:0;}
+@media print{
+  .app-bar,.fp{display:none!important;}
+  .main{display:block!important;}
+  .doc{box-shadow:none!important;margin:0!important;}
 }
 .page-num-label{
   position:absolute;top:5px;right:8px;
@@ -39,7 +45,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.161</div>
+    <div class="ver">ver.20260417.162</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
