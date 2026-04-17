@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.26</div>
+    <div class="ver">ver.20260417.27</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;">เริ่มงาน([VAR])เลิกงาน([VAR])(วันที่เข้างาน [VAR],จำนวนชั่วโมงการทำงานใน 1 วัน [VAR]ชั่วโมง[VAR]นาที)</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;">เริ่มงาน(${startStr})เลิกงาน(${endStr})(วันที่เข้างาน ${daysEnStr},จำนวนชั่วโมงการทำงานใน 1 วัน ${hStr}ชั่วโมง${minStr}นาที)</span></div>`;
           }).join('');
         })()}
       </div>
