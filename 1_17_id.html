@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－１７号 支援計画書（インドネシア語）</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776381161">
+<style>
+.doc{
+  background:white;
+  width:794px;
+  min-height:1123px;
+  flex-shrink:0;
+  margin:0 0 24px 0;
+  padding:15mm 14mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
+  font-size:9pt;line-height:1.6;color:#000;
+  position:relative;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.page-num-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;color:#bbb;font-family:sans-serif;
+  background:white;padding:0 2px;
+}
+.id{color:#000;font-size:8pt;}
+.tbl{width:100%;border-collapse:collapse;font-size:9pt;}
+.tbl td{border:1px solid #000;padding:3px 5px;vertical-align:top;}
+.tbl .sect-lbl{width:25px;text-align:center;font-weight:bold;writing-mode:vertical-rl;}
+.tbl .item-lbl{width:22%;}
+.tbl .val-lbl{width:10%;}
+.tbl .val-narrow{width:20%;}
+.dashed-bottom{border-bottom:1px dashed #888;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
+    <div class="ver">ver.20260417.158</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg"><label>作成年</label><input id="f_docY" oninput="p()" placeholder="2026"></div>
+      <div class="fg"><label>作成月</label><input id="f_docM" oninput="p()" placeholder="4"></div>
+      <div class="fg"><label>作成日</label><input id="f_docD" oninput="p()" placeholder="17"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅰ 支援対象者</div>
+      <div class="fg"><label>氏名（英字）</label><input id="f_appName" oninput="p()" placeholder="例: SUKARNO ACHMAD"></div>
+      <div class="fg"><label>同時申請人数（ほか__名）</label><input id="f_otherCount" oninput="p()" placeholder="例: 2"></div>
+      <div class="fg"><label>性別（日）</label>
+        <select id="f_gender" onchange="p()">
+          <option value="">選択</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+      <div class="fg"><label>生年（西暦）</label><input id="f_birthY" oninput="p()" placeholder="1995"></div>
+      <div class="fg"><label>生月</label><input id="f_birthM" oninput="p()" placeholder="3"></div>
+      <div class="fg"><label>生日</label><input id="f_birthD" oninput="p()" placeholder="15"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅱ 特定技能所属機関</div>
+      <div class="fg"><label>機関名（ふりがな）</label><input id="f_coKana" oninput="p()"></div>
+      <div class="fg"><label>機関名（日）</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>機関名（ID）</label><input id="f_coNameEn" oninput="p()"></div>
+      <div class="fg"><label>郵便番号</label><input id="f_coZip" oninput="p()" placeholder="例: 144-0052"></div>
+      <div class="fg"><label>住所（日）</label><input id="f_coAddr" oninput="p()"></div>
+      <div class="fg"><label>住所（ID）</label><input id="f_coAddrEn" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_coTel" oninput="p()" placeholder="例: 03-6424-8849"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776381161"></script>
+<script>
+docId='1_17_id';
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea');
+  if(!w) return;
+  const gender = v('f_gender');
+  const genderEn = gender==='男' ? 'Pria' : (gender==='女' ? 'Wanita' : '');
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:9pt;margin-bottom:1px;">参考様式第１－１７号</div>
+<div style="font-size:8pt;margin-bottom:10px;" class="id">Format Referensi 1-17</div>
+
+<div style="text-align:center;font-size:16pt;letter-spacing:0.3em;margin:10px 0 4px;">１号特定技能外国人支援計画書</div>
+<div style="text-align:center;font-size:10pt;margin-bottom:10px;" class="id">Rencana Bantuan Pekerja Asing Berketerampilan Khusus 1</div>
+
+<div style="text-align:right;font-size:9pt;margin-bottom:2px;">
+  作成日：　${f('f_docY')}　年　${f('f_docM')}　月　${f('f_docD')}　日
+</div>
+<div style="text-align:right;font-size:8pt;margin-bottom:8px;" class="id">
+  Tanggal dibuat: tanggal ${f('f_docD')} bulan ${f('f_docM')} tahun ${f('f_docY')}
+</div>
+
+<table class="tbl" style="margin-bottom:8px;">
+  <colgroup>
+    <col style="width:25px;">
+    <col style="width:22%;">
+    <col>
+    <col style="width:15%;">
+    <col style="width:20%;">
+  </colgroup>
+  <tr>
+    <td class="sect-lbl" rowspan="4">Ⅰ 支援対象者<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:7pt;font-weight:normal;">I.<br>Penerima<br>Bantuan</span></td>
+    <td>１　氏　名<br><span class="id">1. Nama</span></td>
+    <td colspan="1" style="vertical-align:middle;">
+      <div>${f('f_appName')}　　（ほか　${f('f_otherCount')}　名）</div>
+      <div class="id">${f('f_appName')} (Nama lain: ${f('f_otherCount')} )</div>
+    </td>
+    <td style="vertical-align:middle;">２　性　別<br><span class="id">2. Jenis kelamin</span></td>
+    <td style="vertical-align:middle;text-align:center;">
+      <div>${gender}</div>
+      <div class="id">${genderEn}</div>
+    </td>
+  </tr>
+  <tr>
+    <td>３　生年月日<br><span class="id">3. Tanggal lahir</span></td>
+    <td>
+      <div>${f('f_birthY')}　年　${f('f_birthM')}　月　${f('f_birthD')}　日</div>
+      <div class="id">Tanggal ${f('f_birthD')} bulan ${f('f_birthM')} tahun ${f('f_birthY')}</div>
+    </td>
+    <td style="vertical-align:middle;">４　国籍・地域<br><span class="id">4. Warga negara, daerah</span></td>
+    <td style="vertical-align:middle;text-align:center;">
+      <div>インドネシア</div>
+      <div class="id">Indonesia</div>
+    </td>
+  </tr>
+</table>
+
+<table class="tbl" style="margin-bottom:8px;">
+  <colgroup>
+    <col style="width:25px;">
+    <col style="width:22%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td class="sect-lbl" rowspan="2">Ⅱ 特定技能所属機関<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:7pt;font-weight:normal;">II.<br>Organisasi<br>Afiliasi</span></td>
+    <td>
+      （ふりがな）<span class="id">(Futigana)</span><br>
+      １　氏名又は名称<br><span class="id">1. Nama atau panggilan</span>
+    </td>
+    <td>
+      <div style="font-size:8pt;color:#666;">${f('f_coKana')}</div>
+      <div style="border-bottom:1px dashed #888;padding-bottom:2px;margin-bottom:4px;">${f('f_coName')}</div>
+      <div class="id">${f('f_coNameEn')}</div>
+    </td>
+  </tr>
+  <tr>
+    <td>２　住所<br><span class="id">2. Alamat</span></td>
+    <td>
+      <div>〒　${f('f_coZip')}</div>
+      <div class="id">Kode pos: ${f('f_coZip')}</div>
+      <div style="margin-top:2px;">${f('f_coAddr')}</div>
+      <div class="id">${f('f_coAddrEn')}</div>
+      <div style="text-align:right;margin-top:4px;">（電話　${f('f_coTel')}　）</div>
+      <div class="id" style="text-align:right;">(Telepon　${f('f_coTel')}　)</div>
+    </td>
+  </tr>
+</table>
+</div><!-- /doc -->
+`;
+  _fontSize=(_fontSize===8.5)?9:_fontSize;
+  _applyFontSize();
+  setupPageTracker();
+}
+
+p();
+</script>
+</body>
+</html>
