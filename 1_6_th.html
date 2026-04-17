@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.27</div>
+    <div class="ver">ver.20260417.29</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71"></td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;">3. อัตราค่าจ้างที่เพิ่มขึ้น ซึ่งจะจ่ายให้ในกรณีทำงานนอกเวลาการทำงาน ทำงานในวันหยุด หรือการทำงานช่วงเวลากลางดึก</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72"></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73"></td>
+          <td class="id" style="font-size:7pt;padding-left:8px;">(1) นอกเวลาการทำงาน</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">ไม่เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย (${f('es_ot60under')}) ％</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74"></td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">เกิน 60 ชั่วโมงต่อเดือนตามกฎหมาย (${f('es_ot60over')}) ％&emsp;เกินกว่าที่กำหนด (${f('es_otPrescribed')}) ％</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75"></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76"></td>
+          <td class="id" style="font-size:7pt;padding-left:8px;">(2) วันหยุด</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;">วันหยุดตามกฎหมาย(${f('es_holidayLegal')})％，วันหยุดที่กฎหมายไม่ได้กำหนด(${f('es_holidayNonLegal')})％</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77"></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78"></td>
+          <td class="id" style="font-size:7pt;padding-left:8px;">(3) ช่วงเวลากลางดึก</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;">(${f('es_nightPremium')}) ％</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79"></td>
-          <td class="id" style="font-size:7pt;" data-key="80"></td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81"></td>
+          <td class="id" style="font-size:7pt;">4. วันตัดรอบค่าจ้าง</td>
+          <td class="id" style="font-size:7pt;">${cb(true,"cb_auto_008")} ทุกวัน ${f('es_payCutoffEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"cb_auto_009")} ทุกวัน</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,9 +689,9 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82"></td>
-          <td class="id" style="font-size:7pt;" data-key="83"></td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84"></td>
+          <td class="id" style="font-size:7pt;">5. วันจ่ายค่าจ้าง</td>
+          <td class="id" style="font-size:7pt;">${cb(true,"cb_auto_011")} ทุกวัน ${f('es_payDayEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"cb_auto_012")} ทุกวัน</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">６．賃金支払方法</td>
@@ -699,44 +699,44 @@ function p(){
           <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="85"></td>
-          <td class="id" style="font-size:7pt;" data-key="86"></td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87"></td>
+          <td class="id" style="font-size:7pt;">6. วิธีการจ่ายค่าจ้าง</td>
+          <td class="id" style="font-size:7pt;">${cb(true,"pay_bank_id")} โอนเข้าธนาคาร</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"pay_cash_id")} จ่ายเป็นเงินสด</td>
         </tr>
         <tr>
-          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88"></span></td>
+          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;">7. การหักเงินตอนจ่ายค่าจ้างตามข้อตกลงการบริหารจัดการแรงงาน</span></td>
           <td style="vertical-align:top;">
             <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
               <tr><td style="white-space:nowrap;">${cb(false,"taisho_none")}&nbsp;無</td><td style="white-space:nowrap;">${cb(true,"taisho_yes")}&nbsp;有</td></tr>
-              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89"></td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90"></td></tr>
+              <tr><td class="id" style="font-size:7pt;white-space:nowrap;">${cb(false,"taisho_none_id")} ไม่หัก</td><td class="id" style="font-size:7pt;white-space:nowrap;">${cb(true,"taisho_yes_id")} หัก</td></tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* </td>
+          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;*รายละเอียดตามเอกสารแนบ</td>
         </tr>
       </table>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
         <colgroup><col style="width:22%"><col style="width:53%"><col style="width:25%"></colgroup>
         <tr>
-          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91"></span></td>
-          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92"></span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93"></span></td>
+          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;">8. การขึ้นเงินเดือน</span></td>
+          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_013")} มี   (ระยะเวลา, จำนวนเงิน ฯลฯ&emsp;${f('es_raiseConditionEn')}&emsp;)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_015")} ไม่หัก</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94"></span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95"></span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96"></span></td>
+          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;">9. โบนัส</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_017")} มี   (ระยะเวลา, จำนวนเงิน ฯลฯ&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_019")} ไม่หัก</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97"></span></td>
-          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98"></span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99"></span></td>
+          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;">10. เงินชดเชยกรณีที่ให้เมื่อออกจากงาน มี</span></td>
+          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_020")} มี   (ระยะเวลา, จำนวนเงิน ฯลฯ&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_022")} ไม่หัก</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100"></span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101"></span></td>
-          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102"></span></td>
+          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;">11. เงินชดเชยกรณีที่บริษัทหยุดดำเนินการ</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_024")} หัก (persentase&emsp;60%)</span></td>
+          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_026")} ไม่หัก</span></td>
         </tr>
       </table>
     </div>
@@ -744,12 +744,12 @@ function p(){
 
   <div style="border-top:1px solid #333;padding:6px 12px;">
   <!-- Ⅷ 退職 -->
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. </span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. รายการที่เกี่ยวข้องกับการลาออก</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103"></span></div>
-      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104"></span></div>
-      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105"></span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106"></span></div>
+      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;">1. ขั้นตอนสำหรับการลาออกด้วยเหตุผลส่วนตัว (แจ้งต่อประธานบริษัท ผู้จัดการโรงงาน ฯลฯ&emsp;${f('es_resignNoticeDays')}&emsp;วันก่อนลาออก)</span></div>
+      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;">2.  เหตุผลและขั้นตอนการเลิกจ้าง</span></div>
+      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;">ในการเลิกจ้าง เฉพาะในกรณีที่มีเหตุอันหลีกเลี่ยงไม่ได้ อย่างน้อยที่สุดต้องแจ้งล่วงหน้า 30 วัน หรือเลิกจ้างโดยจ่ายค่าจ้างเฉลี่ยของระยะเวลาตั้งแต่ 30 วันขึ้นไป ในกรณีของการเลิกจ้างด้วยเหตุอันเนื่องมาจากความบกพร่องของแรงงานเฉพาะทางชาวต่างชาติ เมื่อได้รับการอนุมัติจากผู้อำนวยการกองกำกับดูแลมาตรฐานแรงงานที่มีอำนาจสั่งการ สามารถเลิกจ้างได้ทันทีโดยไม่ต้องมีการแจ้งล่วงหน้า และไม่จำเป็นต้องจ่ายค่าจ้างเฉลี่ย${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่(  )ข้อที่  ถึงข้อที่</span></div>
     </div>
   </div>
 </div>
