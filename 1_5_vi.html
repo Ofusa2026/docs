@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（ベトナム語版）</div>
-    <div class="ver">ver.20260417.147</div>
+    <div class="ver">ver.20260417.155</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -177,12 +177,12 @@ function p(){
   <!-- 甲（左カラム）-->
   <div style="flex:1;">
     <div style="margin-left:10em;">${f('es_orgName')}</div>
-    <div>甲<span style="margin-left:5em;">${f('es_repTitle')}　${f('es_repName')}<span style="margin-left:5em;">印</span></span></div>
+    <div style="display:flex;align-items:center;"><span style="width:3em;">甲</span><span style="flex:1;"></span><span>${f('es_repTitle')}　${f('es_repName')}</span><span style="flex:1;"></span><span style="width:3em;text-align:right;">印</span></div>
     <div style="height:0.8em;"></div>
     <div style="font-size:7.5pt;">（特定技能所属機関名・代表者役職名・氏名・捺印）</div>
     <div style="height:0.8em;"></div>
     <div style="margin-left:10em;">${f('es_orgNameEn')}</div>
-    <div>Bên A&emsp;${f('es_repTitleEn')}　${f('es_repNameEn')}　Đóng dấu</div>
+    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Bên A</span><span style="flex:1;"></span><span>${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="flex:1;"></span><span style="min-width:3em;text-align:right;">Đóng dấu</span></div>
     <div style="font-size:7pt;">(Tên cơ quan liên kết kỹ năng đặc định/<br>Chức vụ người đại diện/Tên họ/Đóng dấu)</div>
   </div>
   <!-- 乙（右カラム）-->
