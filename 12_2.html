@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分野参考様式第１２－２号（登録支援機関）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+.doc{padding:15mm!important;line-height:1.45!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 分野参考様式第１２－２号（漁業 登録支援機関）　受入れに関する誓約書</div>
+    <div class="ver">ver.20260417.99</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>作成責任者（支援責任者）</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">登録支援機関</div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_soName" oninput="p()"></div>
+      <div class="fg"><label>住所</label><textarea id="f_soAddr" oninput="p()" rows="2"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>住所</label><textarea id="f_coAddr" oninput="p()" rows="2"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776316942"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10.5pt;margin-bottom:4px;">分野参考様式第１２－２号（登録支援機関）</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0;">漁業分野における特定技能外国人の受入れに関する誓約書</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">出入国在留管理庁長官　殿</div>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
+  <tr>
+    <td style="width:40%;"></td>
+    <td colspan="2">登録支援機関</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="width:24%;padding-left:2em;">氏名又は名称</td>
+    <td>${f('f_soName')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:2mm;padding-left:2em;">住　　　　所</td>
+    <td style="padding-top:2mm;">${f('f_soAddr')}</td>
+  </tr>
+</table>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
+  <tr>
+    <td style="width:40%;"></td>
+    <td colspan="2">特定技能所属機関</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="width:24%;padding-left:2em;">氏名又は名称</td>
+    <td>${f('f_coName')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:2mm;padding-left:2em;">住　　　　所</td>
+    <td style="padding-top:2mm;">${f('f_coAddr')}</td>
+  </tr>
+</table>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
+  <tr>
+    <td style="width:40%;"></td>
+    <td colspan="2">特定技能外国人</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="width:24%;padding-left:2em;">氏　　　　名</td>
+    <td>${f('f_applicant')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">性　　　　別</td>
+    <td style="padding-top:1.5mm;">${f('f_gender')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">国籍・地域</td>
+    <td style="padding-top:1.5mm;">${f('f_nationality')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">生 年 月 日</td>
+    <td style="padding-top:1.5mm;">${f('f_birthdate')}</td>
+  </tr>
+</table>
+<div style="text-align:center;font-size:12pt;margin:2mm 0;">記</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">　漁業分野における上記の特定技能所属機関が雇用する特定技能外国人に係る１号特定技能外国人支援計画の実施の委託を受けるに当たり、以下の事項について誓約します。</div>
+<div style="border:1px solid #000;padding:3mm 5mm;font-size:10.5pt;">
+  <div style="margin-bottom:2mm;">【誓約事項】</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;">農林水産省が設置する漁業分野における特定技能外国人の受入れに関する協議会及びその構成員が行う報告の徴収、資料の要求、調査その他の指導に対し、必要な協力を行うこと。</div>
+</div>
+<div style="font-size:10.5pt;margin-top:3mm;margin-bottom:4mm;text-indent:-2.2em;padding-left:2.2em;">（注）誓約事項を遵守することができなくなった場合は、その旨当該分野を所管する関係行政機関の長及び特定技能所属機関に対し、報告を行うこと。</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;text-align:right;">作成年月日　${f('f_docDate')}</div>
+<div style="font-size:10.5pt;text-align:right;">作成責任者　${f('f_author')}</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  _apply12_2FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply12_2FontSize(){
+  const st=document.getElementById('_12_2FontStyle')||document.createElement('style');
+  st.id='_12_2FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:12pt"]{font-size:${(12*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10.5pt"]{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName,orgId}=info;
+  try{
+    const [cases,cos,orgs]=await Promise.all([
+      caseId?sb('cases?select=applicant,applicant_en,support_org_id&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,full_address,author_name,author_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,full_address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      orgId?sb(`support_orgs?select=name,address,support_manager&id=eq.${orgId}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0]; let org=orgs&&orgs[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // orgIdが無ければcase.support_org_idから再取得
+    if(!org && cas && cas.support_org_id){
+      const orgs2=await sb(`support_orgs?select=name,address,support_manager&id=eq.${cas.support_org_id}`);
+      org=orgs2&&orgs2[0];
+    }
+    if(org){
+      s('f_soName',org.name||'');
+      s('f_soAddr',org.address||'');
+      s('f_author',org.support_manager||'');
+    }
+    if(co){
+      s('f_coName',co.name||'');
+      s('f_coAddr',co.full_address||'');
+    }
+    if(cas){
+      s('f_applicant',cas.applicant_en||cas.applicant||'');
+    }
+    if(caseId){
+      const persons=await sb('persons?select=gender,nationality,birthdate&case_id=eq.'+caseId);
+      const pd=persons&&persons[0];
+      if(pd){
+        s('f_gender',pd.gender||'');
+        s('f_nationality',pd.nationality||'');
+        s('f_birthdate',pd.birthdate||'');
+      }
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{
+        d.style.zoom = scale;
+      });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadFromDB==='function') loadFromDB();
+});
+</script>
+</body>
+</html>
