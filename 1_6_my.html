@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.15</div>
+    <div class="ver">ver.20260417.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -393,7 +393,7 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</span></div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">ရည်ညွှန်းပုံစံအမှတ် ၁-၆</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
 <div style="text-align:center;font-size:10pt;padding-bottom:8px;">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</div>
@@ -404,32 +404,32 @@ function p(){
   <div style="padding:8px 12px 10px;">
     <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
-      <span class="id" style="font-size:7.5pt;" data-key="3">နှစ် လ ရက်</span>
+      <span class="id" style="font-size:7.5pt;">${f('es_createY')} နှစ် ${f('es_createM')} လ ${f('es_createD')} ရက်</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">ဦး/ဒေါ်</span></div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">(ဦး/ဒေါ်)&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
       <table style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="5">အထူးကျွမ်းကျင်လုပ်သား‌ဆောင်ရွက်မည့်အဖွဲ့အစည်းအမည် ${f('es_orgNameEn')}</td><td class="id" style="font-size:7pt;" data-key="6">လိပ်စာ ${f('es_orgAddressEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">အထူးကျွမ်းကျင်လုပ်သား‌ဆောင်ရွက်မည့်အဖွဲ့အစည်းအမည်</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="7">ဖုန်းနံပါတ်</td><td class="id" style="font-size:7pt;" data-key="8">ကိုယ်စားလှယ်၏ ရာထူး၊အမည် ${f('es_repTitleEn')} ${f('es_repNameEn')} (တံဆိပ်တုံး)</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">လိပ်စာ</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">၁။အလုပ်ခန့်သည့်ကာလ</td><td class="id" style="font-size:7pt;" data-key="10">၁။အလုပ်ခန့်သည့်ကာလ</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">ဖုန်းနံပါတ်</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">( နှစ် လ ရက် မှ နှစ် လ ရက် ) ဂျပန်နိုင်ငံ၀င်ရောက်မည့်ရက်စွဲ</td><td class="id" style="font-size:7pt;" data-key="12">၂။စာချုပ်သက်တမ်းတိုးခြင်းရှိမရှိ</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">ကိုယ်စားလှယ်၏ ရာထူး၊အမည်</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}&nbsp;(တံဆိပ်တုံး)</td></tr>
       </table>
     </div>
   </div>
 
   <!-- Ⅰ 雇用契約期間 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">အလိုလျှောက် စာချုပ်သက်တန်းတိုးမည်ဖြစ်သည် သက်တန်းတိုးခြင်းရှိနိုင်သည် စာချုပ်သက်တန်းတိုးမည်မဟုတ်ပါ</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;">၁။ အလုပ်ခန့်သည့်ကာလ</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">※    အထက္ပါစာခ်ဳပ္သက္တမ္းတိုးျခင္းရွိမရွိတြင္ "ၒၒၒသက္တမ္းတိုးျခင္းရွိနိုင္သည္။"  ဆိုပါက သက္တမ္းတိုးရန္ဆံုးျဖတ္မွုစံနွုန္းကို ေအာက္ပါအတိုင္းသတ္မွတ္မည္။</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">၁။ အလုပ်ခန့်သည့်ကာလ</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">စာခ်ဳပ္သက္တမ္းျပည့္ခ်ိန္လုပ္ငန္းတာဝန္ပမာဏ လုပ္သား၏လုပ္ေဆာင္နိုင္မွုရလဒ္၊အျပူအမူ လုပ္သား၏လုပ္ငန္းတာဝန္ျပီးေျမာက္မွူစြမ္းရည္</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">( ${f('es_contractStartY')} နှစ် ${f('es_contractStartM')} လ ${f('es_contractStartD')} ရက် မှ ${f('es_contractEndY')} နှစ် ${f('es_contractEndM')} လ ${f('es_contractEndD')} ရက် ) ဂျပန်နိုင်ငံ၀င်ရောက်မည့်ရက်စွဲ ${f('es_entryY')} နှစ် ${f('es_entryM')} လ ${f('es_entryD')} ရက်</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">ကုမၸဏီစီမံခန့္ခြဲမွုအေျခအေန တာဝန္ယူထားသည့္လုပ္ငန္းတိုးတက္မွုအေျခအေန အျခား ( )</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">၂။ စာချုပ်သက်တမ်းတိုးခြင်းရှိမရှိ</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -438,29 +438,29 @@ function p(){
             <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
           </tr>
           <tr style="font-size:7.5pt;">
-            <td class="id" style="white-space:nowrap;" data-key="17">※ကုမ္ပဏီ၏စီးပွားရေးအခြေအနေမှာအလွန်အမင်းဆိုး၀ါးသွားပါကစာချုပ်သက်တမ်းတိုးခြင်းရှိမည်မဟုတ်ပါ။</td>
-            <td class="id" style="white-space:nowrap;" data-key="18">၃။စာချုပ်သက်တန်းတိုးခြင်းအတွက် အကန့်အသတ်ရှိ?မရှိ(မရှိ/ ရှိ(သက်တန်းတိုးခြင်း ကြိမ်အထိ/စုစုပေါင်းသက်တန်းတိုးခြင်းကာလ နှစ်အထိ)</td>
-            <td class="id" style="white-space:nowrap;" data-key="19">[အလုပ်သမားစာချုပ်ဥပဒေတွင်ပြဌာန်းထားသည့် တူညီသည့်ကုမ္ပဏီဖြင့် ချုပ်ဆိုသောစာချုပ်သည် ၅နှစ်ကို ကျော်လွန်သည့် စာချုပ်ဖြစ်ပါက]</td>
+            <td class="id" style="white-space:nowrap;">${cb(rAuto,'renewal_auto_id')}&nbsp;အလိုလျှောက် စာချုပ်သက်တန်းတိုးမည်ဖြစ်သည်</td>
+            <td class="id" style="white-space:nowrap;">${cb(rPos,'renewal_pos_id')}&nbsp;သက်တန်းတိုးခြင်းရှိနိုင်သည်</td>
+            <td class="id" style="white-space:nowrap;">${cb(rNone,'renewal_none_id')}&nbsp;စာချုပ်သက်တမ်းတိုးခြင်းမရှိပါ</td>
           </tr>
         </table>
-        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">ဤစာချုပ်သက်တန်းအတွင်း ကုမ္ပဏီဖြင့် သက်တန်းကာလ အကန့်အသတ်မရှိသော အလုပ်စာချုပ်ချုပ်ဆိုသည့်အခါတွင် ,ဤစာချုပ်ပြီးဆုံးသည့်ရက်ဧ်။နောက်ရက်</span></div>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">※ အထက်ပါစာချုပ်သက်တမ်းတိုးခြင်းတွင် "သက်တန်းတိုးခြင်းရှိနိုင်သည်" ဟုဆိုထားပါကတိုးခြင်းဆုံးဖြတ်ချက်အခြေခံသည် အောက်ပါအတိုင်းဖြစ်သည်။</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">၂။အလုပ်နေရာ</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">■ တိုက်ရိုက်အလုပ်ခန့်အပ်ခြင်း(အောက်တွင်ဖြည့်စွက်ပါ) □ အလုပ်စေလွှတ်ခန့်အပ်ခြင်း(ပူးတွဲပါ"အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ရှင်းလင်းစာ"တွင်ဖြည့်စွက်ပါ)</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">လက်ခံသောအဖွဲ့အစည်း၏ရုံးခန်းသို့ဝင်ပါ။ (ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;စာချုပ်သက်တမ်းကုန်ချိန်လုပ်ငန်းတာ၀န်ပမာဏ</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;လုပ်သား၏ လုပ်ဆောင်နိုင်မှုရလဒ်၊ အပြုအမူ</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;တာ၀န်ယူထားသည့်လုပ်ငန်းတိုးတက်မှုအခြေအနေ</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">ကုမ္ပဏီအမည် ${f('es_officeNameEn')} ကုမ္ပဏီအမည်</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">လိပ်စာ ${f('es_officeAddressEn')} လိပ်စာ</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">ဆက်သွယ်ရန်လိပ်စာ ဆက်သွယ်ရန်လိပ်စာ</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;လုပ်သား၏ လုပ်ငန်းဆောင်ရွက်နိုင်မှုစွမ်းရည်</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;ကုမ္ပဏီစီမံခန့်ခွဲမှုအခြေအနေ</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;အခြား（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">(ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">၃။ စာချုပ်သက်တမ်းတိုးခြင်းအတွက် အကန့်အသတ်ရှိ?မရှိ (မရှိ / ရှိ (သက်တန်းတိုးခြင်း&nbsp;&nbsp;&nbsp;&nbsp;ကြိမ်အထိ / စုစုပေါင်းစာချုပ်ကာလ&nbsp;&nbsp;&nbsp;&nbsp;နှစ်အထိ))</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[အလုပ်သမားစာချုပ်ဥပဒေတွင်ပြဌာန်းထားသည့် တူညီသည့်ကုမ္ပဏီဖြင့် ချုပ်ဆိုသောစာချုပ်သက်တမ်းစုစုပေါင်း ၅နှစ်ကျော်သောကာလသတ်မှတ်ထားသောအလုပ်ခန့်စာချုပ်ချုပ်ဆိုသောကိစ္စ]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
-      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">၁။လုပ်ငန်းအမျိုးအစား ${f('es_applicantFieldEn')} ၁။လုပ်ငန်းအမျိုးအစား</span><br><span class="id" style="font-size:6.5pt;" data-key="30">၂။လုပ်ငန်းတာ၀န် ${f('es_categoryEn')} ၂။လုပ်ငန်းတာ၀န်</span></span></span></div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">ဤစာချုပ်သက်တန်းအတွင်း ကုမ္ပဏီဖြင့် သက်တန်းကာလ အကန့်အသတ်မရှိသော အလုပ်စာချုပ်ချုပ်ဆိုရန် လျှောက်ထားပါက</span><br><span class="id" style="font-size:6.5pt;">ဤစာချုပ်သက်တမ်း၏ နောက်ဆုံးရက် (နှစ်&nbsp;&nbsp;&nbsp;လ&nbsp;&nbsp;&nbsp;ရက်) ၏ နောက်တစ်ရက်မှ သက်တမ်းကာလ အကန့်အသတ်မရှိသော အလုပ်ခန့်အပ်ခြင်းသို့ ပြောင်းလဲနိုင်သည်။<br><span class="id" style="font-size:6.5pt;">ဤကိစ္စတွင် ဤစာချုပ်မှ အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ပြောင်းလဲမှုရှိ/မရှိ? (မရှိ / ရှိ (ပူးတွဲပါ ၂ အတိုင်း))</span></span></div>
     </div>
   </div>
 </div>
