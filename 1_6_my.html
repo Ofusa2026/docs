@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.18</div>
+    <div class="ver">ver.20260417.19</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -645,18 +645,12 @@ function p(){
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
-        <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</td>
-        </tr>
+
         <tr>
           <td></td>
-          <td colspan="2">法定超月60時間超（${f('es_ot60over')}）％&emsp;所定超（${f('es_otPrescribed')}）％<br><span class="id" style="font-size:7pt;">တစ်လ ၆၀နာရီကျော် (${f('es_ot60over')}) ％&emsp;သတ်မှတ်ထားသည်ထက်ကျော် (${f('es_otPrescribed')}) ％</span></td>
+          <td colspan="2">法定超月60時間超（${f('es_ot60over')}）％&emsp;所定超（${f('es_otPrescribed')}）％</td>
         </tr>
-        <tr>
-          <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</td>
-        </tr>
+
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
