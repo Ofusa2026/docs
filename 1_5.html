@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.11</div>
+    <div class="ver">ver.20260417.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -175,12 +175,14 @@ function p(){
 <!-- 署名欄 -->
 <div style="font-size:8pt;margin-top:8px;line-height:1.9;">
   <div style="display:flex;align-items:baseline;">
-    <span style="flex:1;">${f('es_orgName')}</span>
-    <span style="flex:1;"></span>
+    <span style="margin-left:10em;">${f('es_orgName')}</span>
+    <span style="flex:1;margin-left:2em;">${f('es_orgNameEn')}</span>
   </div>
   <div style="display:flex;align-items:baseline;">
-    <span style="white-space:nowrap;margin-right:4px;">甲</span>
-    <span style="flex:1;">${f('es_repTitle')}　${f('es_repName')}　印</span>
+    <span style="white-space:nowrap;">甲</span>
+    <span style="margin-left:5em;white-space:nowrap;">${f('es_repTitle')}　${f('es_repName')}</span>
+    <span style="margin-left:5em;white-space:nowrap;">印</span>
+    <span style="flex:1;"></span>
     <span style="white-space:nowrap;margin-right:4px;">乙</span>
     <span style="flex:1;" class="sign-field" data-signer="applicant" data-label="乙署名">
       <div class="sign-field-area" style="height:22px;display:inline-block;min-width:10em;vertical-align:middle;position:relative;">
@@ -195,10 +197,6 @@ function p(){
     <span style="flex:1;font-size:7.5pt;">（特定技能外国人の署名）</span>
   </div>
   <div style="height:0.8em;"></div>
-  <div style="display:flex;align-items:baseline;">
-    <span style="flex:1;">${f('es_orgNameEn')}</span>
-    <span style="flex:1;"></span>
-  </div>
   <div style="display:flex;align-items:baseline;">
     <span style="white-space:nowrap;margin-right:4px;">Pihak Pertama</span>
     <span style="flex:1;">${f('es_repTitleEn')}　${f('es_repNameEn')}　ttd.</span>
