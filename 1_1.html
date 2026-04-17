@@ -7,7 +7,7 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1776316942">
 <style>
-.doc{padding:15mm!important;line-height:1.52!important;min-height:auto!important}
+.doc{padding:15mm!important;line-height:1.35!important;min-height:auto!important}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１号　介護分野における特定技能外国人の受入れに関する誓約書</div>
-    <div class="ver">ver.20260417.83</div>
+    <div class="ver">ver.20260417.84</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -61,7 +61,6 @@
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
@@ -78,10 +77,10 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="text-align:left;font-size:10.5pt;margin-bottom:6px;">分野参考様式第１－１号</div>
-<div style="font-size:14pt;font-weight:bold;text-align:center;margin:6mm 0;">介護分野における特定技能外国人の受入れに関する誓約書</div>
+<div style="text-align:left;font-size:10.5pt;margin-bottom:4px;">分野参考様式第１－１号</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0;">介護分野における特定技能外国人の受入れに関する誓約書</div>
 <div style="font-size:10.5pt;margin-bottom:2mm;">出入国在留管理庁長官　殿</div>
-<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:4mm;">
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
   <tr>
     <td style="width:40%;"></td>
     <td colspan="2">特定技能所属機関</td>
@@ -93,11 +92,11 @@ function p(){
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:3mm;padding-left:2em;">住　　　　所</td>
-    <td style="padding-top:3mm;">${f('f_coAddr')}</td>
+    <td style="padding-top:2mm;padding-left:2em;">住　　　　所</td>
+    <td style="padding-top:2mm;">${f('f_coAddr')}</td>
   </tr>
 </table>
-<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:6mm;">
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
   <tr>
     <td style="width:40%;"></td>
     <td colspan="2">特定技能外国人</td>
@@ -109,40 +108,36 @@ function p(){
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:2mm;padding-left:2em;">性　　　　別</td>
-    <td style="padding-top:2mm;">${f('f_gender')}</td>
+    <td style="padding-top:1.5mm;padding-left:2em;">性　　　　別</td>
+    <td style="padding-top:1.5mm;">${f('f_gender')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:2mm;padding-left:2em;">国籍・地域</td>
-    <td style="padding-top:2mm;">${f('f_nationality')}</td>
+    <td style="padding-top:1.5mm;padding-left:2em;">国籍・地域</td>
+    <td style="padding-top:1.5mm;">${f('f_nationality')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:2mm;padding-left:2em;">生 年 月 日</td>
-    <td style="padding-top:2mm;">${f('f_birthdate')}</td>
+    <td style="padding-top:1.5mm;padding-left:2em;">生 年 月 日</td>
+    <td style="padding-top:1.5mm;">${f('f_birthdate')}</td>
   </tr>
 </table>
-<div style="text-align:center;font-size:12pt;margin:4mm 0;">記</div>
-<div style="font-size:10.5pt;margin-bottom:4mm;">　介護分野における上記の特定技能外国人を受け入れるに当たり、以下の事項について誓約します。</div>
-<div style="border:1px solid #000;padding:4mm 5mm;font-size:10.5pt;">
-  <div style="margin-bottom:3mm;">【誓約事項】</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">１．１号特定技能外国人（出入国管理及び難民認定法（昭和２６年政令第３１９号）別表第１の２の表の特定技能の在留資格（同表の特定技能の項の下欄第１号に係るものに限る。）をもって在留する外国人をいう。以下同じ。）に従事させる業務が、身体介護（利用者の心身の状況に応じた入浴、食事、排せつの介助等）及びこれに付随する支援業務（レクリエーションの実施、機能訓練の補助等）であること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">２．１号特定技能外国人が利用者の居宅においてサービスを提供する介護等の業務に従事する場合にあっては、出入国管理及び難民認定法第七条第一項第二号の基準を定める省令及び特定技能雇用契約及び一号特定技能外国人支援計画の基準等を定める省令の規定に基づき介護分野について特定の産業上の分野に特有の事情に鑑みて当該分野を所管する関係行政機関の長が定める基準（平成３１年厚生労働省告示第６６号）第２条第２号に掲げる事項を遵守していること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">３．特定技能雇用契約において一号特定技能外国人を労働者派遣事業の適正な運営の確保及び派遣労働者の保護等に関する法律（昭和６０年法律第８８号）第２条第１号に規定する労働者派遣の対象とするものではないことを定めること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">４．１号特定技能外国人を受け入れる事業所が、介護等の業務を行うものであること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">５．１号特定技能外国人を受け入れる事業所において、１号特定技能外国人の数が、当該事業所の日本人等の常勤の介護職員の総数を超えないこと。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">６．厚生労働大臣が設置する介護分野における特定技能外国人の受入れに関する協議会（以下「協議会」という。）の構成員であること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">７．協議会において協議が調った事項に関する措置を講ずること。</div>
-  <div style="margin-bottom:3mm;text-indent:-1.5em;padding-left:1.5em;">８．協議会に対し、必要な協力を行うこと。</div>
+<div style="text-align:center;font-size:12pt;margin:2mm 0;">記</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">　介護分野における上記の特定技能外国人を受け入れるに当たり、以下の事項について誓約します。</div>
+<div style="border:1px solid #000;padding:3mm 5mm;font-size:10.5pt;">
+  <div style="margin-bottom:1.5mm;">【誓約事項】</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">１．１号特定技能外国人（出入国管理及び難民認定法（昭和２６年政令第３１９号）別表第１の２の表の特定技能の在留資格（同表の特定技能の項の下欄第１号に係るものに限る。）をもって在留する外国人をいう。以下同じ。）に従事させる業務が、身体介護（利用者の心身の状況に応じた入浴、食事、排せつの介助等）及びこれに付随する支援業務（レクリエーションの実施、機能訓練の補助等）であること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">２．１号特定技能外国人が利用者の居宅においてサービスを提供する介護等の業務に従事する場合にあっては、出入国管理及び難民認定法第七条第一項第二号の基準を定める省令及び特定技能雇用契約及び一号特定技能外国人支援計画の基準等を定める省令の規定に基づき介護分野について特定の産業上の分野に特有の事情に鑑みて当該分野を所管する関係行政機関の長が定める基準（平成３１年厚生労働省告示第６６号）第２条第２号に掲げる事項を遵守していること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">３．特定技能雇用契約において一号特定技能外国人を労働者派遣事業の適正な運営の確保及び派遣労働者の保護等に関する法律（昭和６０年法律第８８号）第２条第１号に規定する労働者派遣の対象とするものではないことを定めること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">４．１号特定技能外国人を受け入れる事業所が、介護等の業務を行うものであること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">５．１号特定技能外国人を受け入れる事業所において、１号特定技能外国人の数が、当該事業所の日本人等の常勤の介護職員の総数を超えないこと。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">６．厚生労働大臣が設置する介護分野における特定技能外国人の受入れに関する協議会（以下「協議会」という。）の構成員であること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">７．協議会において協議が調った事項に関する措置を講ずること。</div>
+  <div style="margin-bottom:1.5mm;text-indent:-1.5em;padding-left:1.5em;">８．協議会に対し、必要な協力を行うこと。</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;">９．介護分野への特定技能外国人の受入れに関し、厚生労働大臣又はその委託を受けた者が行う必要な調査、指導、情報の収集、意見の聴取その他業務に対して必要な協力を行うこと。</div>
 </div>
-</div>
-
-<div class="doc">
-<div class="page-num-label">P2</div>
-<div style="font-size:10.5pt;margin-bottom:6mm;text-indent:-2.2em;padding-left:2.2em;">（注）誓約事項を遵守することができなくなった場合は、その旨出入国在留管理庁長官及び当該分野を所管する関係行政機関の長に対し、報告を行うこと。</div>
-<div style="font-size:10.5pt;margin-bottom:4mm;">　作成年月日　${f('f_docDate')}</div>
+<div style="font-size:10.5pt;margin-top:3mm;margin-bottom:4mm;text-indent:-2.2em;padding-left:2.2em;">（注）誓約事項を遵守することができなくなった場合は、その旨出入国在留管理庁長官及び当該分野を所管する関係行政機関の長に対し、報告を行うこと。</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">　作成年月日　${f('f_docDate')}</div>
 <div style="font-size:10.5pt;">　作成責任者　${f('f_author')}</div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
