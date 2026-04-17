@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260417.143</div>
+    <div class="ver">ver.20260417.144</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -100,12 +100,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>(c)計算方法（ローマ字）</label><input id="f_allowance3CalcEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">３．固定残業代</div>
-      <div class="fg"><label>固定残業</label>
-        <select id="f_fixedOT" onchange="p()">
-          <option value="無">無 / Không</option>
-          <option value="有">有 / Có</option>
-        </select>
-      </div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」を直接クリックで切替</div>
       <div class="fg3">
         <div class="fg"><label>時間</label><input id="f_fixedOTHours" oninput="p()"></div>
         <div class="fg"><label>金額（円）</label><input id="f_fixedOTAmount" oninput="p()"></div>
@@ -163,10 +158,16 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 </div>
 <script src="ofusa_common.js?v=1776316942"></script>
 <script>
+// 固定残業代の状態（プレビュー上の☑/☐クリックで切替）
+let _fixedOTState = '無';
+function toggleFixedOT(val){
+  _fixedOTState = val;
+  p();
+}
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  const fixedOT = v('f_fixedOT') || '無';
+  const fixedOT = _fixedOTState || '無';
   const otY = fixedOT==='有' ? 'chk-on' : '';
   const otN = fixedOT==='無' ? 'chk-on' : '';
   w.innerHTML=`
@@ -200,8 +201,8 @@ function p(){
 </div>
 
 <div class="sec">
-  <div class="sec-h">３．固定残業代　（<span class="${otY}" style="padding:0 3px;">${otY?'☑':'☐'}</span>有　・　<span class="${otN}" style="padding:0 3px;">${otN?'☑':'☐'}</span>無）</div>
-  <div class="sec-h-vi">Tiền tăng ca cố định　（${otY?'☑':'☐'} Có　・　${otN?'☑':'☐'} Không）</div>
+  <div class="sec-h">３．固定残業代　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span>有　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span>無）</div>
+  <div class="sec-h-vi">Tiền tăng ca cố định　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> Có　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> Không）</div>
   <div class="row ja" style="font-size:9.5pt;">（固定残業代が有る場合は以下に記入）</div>
   <div class="row vi">(Điền vào bên dưới nếu có tiền tăng ca cố định)</div>
   <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${f('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
