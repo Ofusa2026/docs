@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１号　介護分野における特定技能外国人の受入れに関する誓約書</div>
-    <div class="ver">ver.20260417.81</div>
+    <div class="ver">ver.20260417.82</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -81,40 +81,48 @@ function p(){
 <div style="text-align:left;font-size:10.5pt;margin-bottom:6px;">分野参考様式第１－１号</div>
 <div style="font-size:14pt;font-weight:bold;text-align:center;margin:6mm 0;">介護分野における特定技能外国人の受入れに関する誓約書</div>
 <div style="font-size:10.5pt;margin-bottom:2mm;">出入国在留管理庁長官　殿</div>
-<div style="font-size:10.5pt;margin-bottom:3mm;">　特定技能所属機関</div>
 <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:4mm;">
   <tr>
-    <td style="width:8%;"></td>
-    <td style="width:24%;">氏名又は名称</td>
-    <td style="border-bottom:1px solid #000;">${f('f_coName')}</td>
+    <td style="width:40%;">特定技能所属機関</td>
+    <td style="width:20%;"></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>氏名又は名称</td>
+    <td>${f('f_coName')}</td>
   </tr>
   <tr>
     <td></td>
     <td style="padding-top:3mm;">住　　　　所</td>
-    <td style="border-bottom:1px solid #000;padding-top:3mm;">${f('f_coAddr')}</td>
+    <td style="padding-top:3mm;">${f('f_coAddr')}</td>
   </tr>
 </table>
-<div style="font-size:10.5pt;margin-bottom:3mm;">　特定技能外国人</div>
 <table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:6mm;">
   <tr>
-    <td style="width:8%;"></td>
-    <td style="width:24%;">氏　　　　名</td>
-    <td style="border-bottom:1px solid #000;">${f('f_applicant')}</td>
+    <td style="width:40%;">特定技能外国人</td>
+    <td style="width:20%;"></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>氏　　　　名</td>
+    <td>${f('f_applicant')}</td>
   </tr>
   <tr>
     <td></td>
     <td style="padding-top:2mm;">性　　　　別</td>
-    <td style="border-bottom:1px solid #000;padding-top:2mm;">${f('f_gender')}</td>
+    <td style="padding-top:2mm;">${f('f_gender')}</td>
   </tr>
   <tr>
     <td></td>
     <td style="padding-top:2mm;">国籍・地域</td>
-    <td style="border-bottom:1px solid #000;padding-top:2mm;">${f('f_nationality')}</td>
+    <td style="padding-top:2mm;">${f('f_nationality')}</td>
   </tr>
   <tr>
     <td></td>
     <td style="padding-top:2mm;">生 年 月 日</td>
-    <td style="border-bottom:1px solid #000;padding-top:2mm;">${f('f_birthdate')}</td>
+    <td style="padding-top:2mm;">${f('f_birthdate')}</td>
   </tr>
 </table>
 <div style="text-align:center;font-size:12pt;margin:4mm 0;">記</div>
