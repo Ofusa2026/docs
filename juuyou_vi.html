@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260417.144</div>
+    <div class="ver">ver.20260417.145</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -100,7 +100,13 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>(c)計算方法（ローマ字）</label><input id="f_allowance3CalcEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">３．固定残業代</div>
-      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」を直接クリックで切替</div>
+      <div class="fg"><label>固定残業</label>
+        <select id="f_fixedOT" onchange="onFixedOTSelect()">
+          <option value="無">無 / Không</option>
+          <option value="有">有 / Có</option>
+        </select>
+      </div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」クリックでも切替可</div>
       <div class="fg3">
         <div class="fg"><label>時間</label><input id="f_fixedOTHours" oninput="p()"></div>
         <div class="fg"><label>金額（円）</label><input id="f_fixedOTAmount" oninput="p()"></div>
@@ -158,10 +164,19 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 </div>
 <script src="ofusa_common.js?v=1776316942"></script>
 <script>
-// 固定残業代の状態（プレビュー上の☑/☐クリックで切替）
+// 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
+function onFixedOTSelect(){
+  // 左パネルのセレクト変更を状態に反映
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) _fixedOTState = sel.value;
+  p();
+}
 function toggleFixedOT(val){
+  // プレビュー上のクリック→状態を変更し、セレクトにも反映
   _fixedOTState = val;
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) sel.value = val;
   p();
 }
 function p(){
