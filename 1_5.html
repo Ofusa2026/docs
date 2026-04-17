@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.03</div>
+    <div class="ver">ver.20260417.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -117,17 +117,14 @@ function p(){
 <div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:0.15em;margin:6px 0 2px;">特　定　技　能　雇　用　契　約　書</div>
 <div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Perjanjian Kerja Pekerja Berketerampilan Khusus</div>
 
-<div style="font-size:8.5pt;margin-bottom:2px;">
-  特定技能所属機関　${f('es_orgName')}<br>
-  <span class="id" style="font-size:7.5pt;">Organisasi afiliasi pekerja berketerampilan khusus</span>
+<div style="font-size:8.5pt;line-height:1.8;margin-bottom:8px;">
+  特定技能所属機関　${f('es_orgName')}　（以下「甲」という。）と<br>
+  <span class="id" style="font-size:7.5pt;">Organisasi afiliasi pekerja berketerampilan khusus　${f('es_orgNameEn')}</span><br>
+  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Pertama") dan</span><br>
+  特定技能外国人（候補者を含む。）　${f('es_applicantName')}　（以下「乙」という。）は、<br>
+  <span class="id" style="font-size:7.5pt;">Pekerja berketerampilan khusus (termasuk calon pekerja)　${f('es_applicantNameEn')}</span><br>
+  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Kedua")</span>
 </div>
-<div style="font-size:8pt;margin-left:16px;margin-bottom:2px;">（以下「甲」という。）<span class="id" style="font-size:7pt;">（selanjutnya disebut "Pihak Pertama"）</span>と</div>
-
-<div style="font-size:8.5pt;margin-top:4px;margin-bottom:2px;">
-  特定技能外国人（候補者を含む。）　${f('es_applicantName')}<br>
-  <span class="id" style="font-size:7.5pt;">Pekerja berketerampilan khusus (termasuk calon pekerja)</span>
-</div>
-<div style="font-size:8pt;margin-left:16px;margin-bottom:8px;">（以下「乙」という。）<span class="id" style="font-size:7pt;">（selanjutnya disebut "Pihak Kedua"）</span></div>
 
 <div style="font-size:8.5pt;margin-bottom:4px;">
   別添の雇用条件書に記載された内容に従い，特定技能雇用契約を締結する。<br>
