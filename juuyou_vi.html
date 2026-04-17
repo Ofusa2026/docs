@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260417.141</div>
+    <div class="ver">ver.20260417.142</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -169,6 +169,8 @@ function p(){
 <div style="text-align:left;font-size:10pt;margin-bottom:2px;">様式第２（第３条関係）</div>
 <div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用契約に係る重要事項事前説明書</div>
 <div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">BẢN GIẢI THÍCH TRƯỚC ĐIỀU KHOẢN QUAN TRỌNG LIÊN QUAN ĐẾN HỢP ĐỒNG TUYỂN DỤNG</div>
+<div style="height:1.8em;">&nbsp;</div>
+<div style="height:1.8em;">&nbsp;</div>
 
 <div class="row ja">建設特定技能受入計画を申請予定である（特定技能所属機関名）<span class="under">${f('f_orgName')}</span>は、雇用契約に係る重要事項について、下記内容を事前に説明し、内容を理解させたうえで国土交通省へ申請する。</div>
 <div class="row vi">Công ty <span class="under">${f('f_orgNameEn')}</span> (tên cơ quan trực thuộc kỹ năng đặc định) dự định nộp kế hoạch tiếp nhận kỹ năng đặc định ngành xây dựng xin giải thích trước những điều khoản quan trọng dưới đây liên quan đến hợp đồng tuyển dụng và trên cơ sở đã nhận được sự lí giải về nội dung này sẽ nộp đơn tới Bộ Đất đai, Cơ sở hạ tầng, Giao thông vận tải và Du lịch Nhật Bản.</div>
@@ -290,7 +292,7 @@ function p(){
   <div class="sec-h">７．業務内容（従事させる業務区分、従事させる工事業の種類、具体的職種及び作業内容）</div>
   <div class="row ja" style="font-size:9.5pt;">（職種名等だけでなく具体的にどのような現場でどのような業務に従事させるのか説明すること）</div>
   <div class="sec-h-vi">Nội dung công việc (phân loại công việc sẽ làm, loại công trình, ngành nghề và nội dung công việc cụ thể sẽ làm)<br>(Không chỉ nêu tên công việc, v.v. mà còn giải thích cụ thể sẽ làm công việc gì, loại công trình gì.)</div>
-  <div class="box">
+  <div style="padding:1mm 0;">
     <div class="row ja">従事させる業務区分：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
     <div class="row vi">Phân loại công việc sẽ làm：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
     <div class="row ja">従事させる工事業の種類：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
@@ -308,7 +310,7 @@ function p(){
   <div class="sec-h">８．技能の習熟等に応じた昇給について</div>
   <div class="row ja" style="font-size:9.5pt;">（昇給額、昇給条件及び昇給時期について説明すること。従事させる具体的職種及び作業内容に応じた同等の技能を有する日本人が従事する場合の報酬と同等以上になるよう留意すること。）</div>
   <div class="sec-h-vi">Liên quan đến tăng lương theo sự thành thạo của kỹ năng, v.v…<br>(Giải thích về số tiên tăng lương, điều kiện tăng lương và thời gian tăng lương. Chú ý đảm bảo mức thù lao tương đương hoặc cao hơn so với người lao động Nhật có cùng kỹ năng theo ngành nghề và nội dung công việc cụ thể sẽ làm.)</div>
-  <div class="box">
+  <div style="padding:1mm 0;">
     <div class="row ja">昇給額：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
     <div class="row vi">Số tiền tăng lương：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
     <div class="row ja">昇給条件：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
@@ -322,7 +324,7 @@ function p(){
   <div class="sec-h">９．従事させる業務区分、工事業等に応じた安全衛生教育及び技能の習得について</div>
   <div class="row ja" style="font-size:9.5pt;">（安全衛生教育の実施内容や、技能検定の受験時期や合格後の支給手当、昇給への反映等について説明すること）</div>
   <div class="sec-h-vi">Liên quan đến đào tạo an toàn vệ sinh và học tập kỹ năng ứng với phân loại công việc, công trình, v.v. sẽ làm<br>(Giải thích về nội dung thực hiện đào tạo an toàn vệ sinh, thời gian thi kỹ năng, phụ cấp lương sau khi thi đậu, phản ảnh về việc tăng lương, v.v…)</div>
-  <div class="box">
+  <div style="padding:1mm 0;">
     <div class="row ja">採用時、作業内容の変更、労働安全衛生法上に定める危険又は有害な業務、職長等の職務に従事することとなったとき、法令に安全衛生教育の実施が必要とされるときは安全衛生教育を実施する。受入れ後1年以内に建設キャリアアップシステムのレベル２に相当する技能教育を施す。また、受入れ後3年以内に技能検定1級、取得を目標とするため、社内勉強会の開催等を行う。</div>
     <div class="row vi">Chúng tôi cung cấp chương trình đào tạo về an toàn và sức khỏe khi được pháp luật yêu cầu, chẳng hạn như tại thời điểm tuyển dụng, khi nội dung công việc thay đổi, khi nhân viên được phân công làm công việc nguy hiểm hoặc độc hại theo quy định của Đạo luật An toàn và Sức khỏe Lao động, khi họ được phân công vào vị trí quản đốc, v.v. Chúng tôi cung cấp chương trình đào tạo kỹ năng tương đương Cấp độ 2 của Hệ thống Phát triển Nghề nghiệp Xây dựng trong vòng một năm kể từ ngày tuyển dụng. Chúng tôi cũng tổ chức các buổi học nội bộ với mục tiêu giúp nhân viên mới đạt được Chứng chỉ Kỹ năng Cấp độ 1 trong vòng ba năm kể từ ngày tuyển dụng.</div>
   </div>
@@ -341,19 +343,19 @@ function p(){
   <div class="row vi">Vào ngày <span class="under">${f('f_createD')}</span> tháng <span class="under">${f('f_createM')}</span> năm <span class="under">${f('f_createY')}</span>, người có tên dưới đây xác nhận đã giải thích đầy đủ nội dung từ mục 1 tới mục 10 ở trên bằng ngôn ngữ có thể hiểu đầy đủ (tiếng Việt) và đã hiểu hết các nội dung.</div>
 </div>
 
-<div style="margin-top:8mm;text-align:right;font-size:10.5pt;">
+<div style="margin-top:8mm;text-align:left;font-size:10.5pt;">
   <div style="margin-bottom:8mm;">（サイン / Ký tên）　<span style="display:inline-block;border-bottom:1px solid #000;width:18em;">&nbsp;</span>　殿</div>
 </div>
 
-<table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:4mm;">
+<table style="width:65%;margin-left:auto;margin-right:0;border-collapse:collapse;font-size:10pt;margin-top:4mm;">
   <tr>
-    <td style="width:30%;padding:1mm 2mm;vertical-align:top;">
+    <td style="width:38%;padding:1mm 2mm;vertical-align:top;">
       <div class="ja">説明者</div>
       <div class="vi">Người giải thích</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
-      <div class="ja"><span class="under" style="min-width:18em;">${f('f_repName')}</span></div>
-      <div class="vi"><span class="under" style="min-width:18em;">${f('f_repNameEn')}</span></div>
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repNameEn')}</span></div>
     </td>
   </tr>
   <tr>
@@ -362,8 +364,8 @@ function p(){
       <div class="vi">Tên cơ quan trực thuộc kỹ năng đặc định</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
-      <div class="ja"><span class="under" style="min-width:18em;">${f('f_orgName')}</span></div>
-      <div class="vi"><span class="under" style="min-width:18em;">${f('f_orgNameEn')}</span></div>
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgNameEn')}</span></div>
     </td>
   </tr>
   <tr>
@@ -372,8 +374,8 @@ function p(){
       <div class="vi">Địa chỉ</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
-      <div class="ja"><span class="under" style="min-width:18em;">${f('f_orgAddress')}</span></div>
-      <div class="vi"><span class="under" style="min-width:18em;">${f('f_orgAddressEn')}</span></div>
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgAddress')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgAddressEn')}</span></div>
     </td>
   </tr>
   <tr>
@@ -382,7 +384,7 @@ function p(){
       <div class="vi">Số điện thoại</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
-      <div class="ja"><span class="under" style="min-width:18em;">${f('f_orgTel')}</span></div>
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgTel')}</span></div>
     </td>
   </tr>
   <tr>
@@ -391,8 +393,8 @@ function p(){
       <div class="vi">Người đại diện  Chức vụ/Họ tên</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
-      <div class="ja"><span class="under" style="min-width:18em;">${f('f_repTitle')} ${f('f_repName')}</span></div>
-      <div class="vi"><span class="under" style="min-width:18em;">${f('f_repTitleEn')} ${f('f_repNameEn')}</span></div>
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repTitle')} ${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repTitleEn')} ${f('f_repNameEn')}</span></div>
     </td>
   </tr>
 </table>
