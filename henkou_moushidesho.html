@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 申請内容変更申出書</div>
-    <div class="ver">ver.20260416.10</div>
+    <div class="ver">ver.20260417.157</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -52,6 +52,8 @@
         </select>
       </div>
       <div class="fg"><label>申出日（年月日）</label><input id="f_applyDate" oninput="p()"></div>
+      <div class="fg"><label>申請内容</label><textarea id="f_content" oninput="p()" style="min-height:60px;width:100%;box-sizing:border-box;"></textarea></div>
+      <div class="fg"><label>取次者氏名</label><input id="f_agentName" oninput="p()"></div>
     </div>
   </div>
 </div>
@@ -106,7 +108,7 @@ function p(){
 <div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;">2．在留期間更新許可申請</div><div style="font-size: 9pt; margin-left: 4em; margin-bottom: 3mm;"><br></div>
 <div style="font-size: 9pt; margin-bottom: 4mm; text-align: right;">（申請番号　　${f('f_appNo')}　　）</div>
 <div style="font-size: 9pt; margin-bottom: 2mm;">については，申請の内容を</div>
-<div style="border-bottom: 2px solid #000; margin-bottom: 2mm; min-height: 16mm;"></div>
+<div style="border-bottom: 2px solid #000; margin-bottom: 2mm; min-height: 16mm; padding: 2mm 2mm; white-space: pre-wrap;">${f('f_content')}</div>
 <div style="font-size: 9pt; margin-bottom: 6mm;">に変更したく，申し出ます。</div>
 <div style="font-size: 9pt; margin-bottom: 3mm;"><br></div><div style="font-size: 9pt; margin-bottom: 3mm;">法定代理人（法定代理人による申出の場合に記入）</div>
 <div style="font-size: 9pt; margin-bottom: 2mm; white-space: nowrap;">
@@ -129,7 +131,7 @@ function p(){
 <div style="border-top: 1px solid rgb(85, 85, 85); padding-top: 3mm; font-size: 9pt;">
   <div style="margin-bottom: 2mm;">※　取次者</div>
   <div style="margin-bottom: 2mm; white-space: nowrap;">
-    (1)氏　名　<span style="text-decoration: underline;">　　　　　　　　　　　　　　　　　</span>　　(2)住　所　<span style="text-decoration: underline;">東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階　　　</span>
+    (1)氏　名　<span style="text-decoration: underline;">　${f('f_agentName')}　　　　　　　　　　　　　　　　　</span>　　(2)住　所　<span style="text-decoration: underline;">東京都大田区蒲田５丁目１１−１０　FUNDES蒲田8階　　　</span>
   </div>
   <div style="white-space: nowrap;">
     (3)所属機関等（親族等については，本人との関係）<span style="text-decoration: underline;">　大房行政書士法人　　　　　</span>　電話番号<span style="text-decoration: underline;">　03－6424－8849　</span>
