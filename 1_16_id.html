@@ -30,7 +30,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（インドネシア語）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260417.115</div>
+    <div class="ver">ver.20260417.116</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -284,7 +284,8 @@ function p(){
 <div style="font-size:10pt;margin-bottom:2mm;">以上の１から３までの内容について相違ありません。なお，求職者（申請人）が在留資格「特定技能」の活動を行うことに関連して保証金，違約金の支払等の不適切な費用徴収がされていないことを本人から聞き取るなどして確認しています。</div>
 <div style="font-size:9pt;margin-bottom:4mm;" class="id">Isi dari poin 1 hingga poin 3 di atas sudah sesuai. Selain itu, dipastikan dari tanya jawab dengan pemohon bahwa pencari kerja (pemohon) tidak dipungut biaya yang tidak semestinya seperti uang jaminan, uang denda dll terkait kegiatan izin tinggal "keterampilan khusus".</div>
 
-<div style="font-size:10pt;margin-bottom:2mm;">作成年月日 <span class="id">Tanggal pengisian</span>：${f('f_docDate')}</div>
+<div style="font-size:10pt;margin-bottom:1mm;">作成年月日：${f('f_docDate')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;" class="id">Tanggal pengisian：${f('f_docDate')}</div>
 <div style="font-size:10pt;margin-bottom:2mm;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
 <div style="font-size:9pt;margin-bottom:3mm;" class="id">Nama organisasi afiliasi pekerja berketerampilan khusus</div>
 <div style="font-size:10pt;margin-bottom:2mm;">作成責任者の氏名及び役職　${f('f_author')}</div>
@@ -353,11 +354,9 @@ function p(){
   <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. Mengenai kolom nominal, isikan persis seperti nominal ditunjukkan pemohon.</div>
 </div>
 
-<div style="font-size:10pt;margin-bottom:2mm;border:1px solid #000;padding:3mm 4mm;">
-特定技能雇用契約の申込みの取次ぎ又は在留資格「特定技能」に係る活動の準備に関して，自国等の機関に対し，上記の費用の額及び内訳について十分に理解した上で支払いました。また，上記の費用以外の費用については，徴収されていません。
-<div style="margin-top:2mm;" class="id" style="font-size:9pt;">Setelah sepenuhnya memahami jumlah dan rincian biaya di atas, saya membayar ke lembaga di negara sendiri dll. terkait agen perantara permohonan kontrak kerja keterampilan khusus atau persiapan kegiatan yang terkait dengan izin tinggal "keterampilan khusus". Dan tidak ada lagi biaya dipungut selain pengeluaran di atas.</div>
-</div>
-<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Tanda tangan pemohon</span>　　　　　　　　　　　　　</div>
+<div style="font-size:10pt;margin-bottom:2mm;">特定技能雇用契約の申込みの取次ぎ又は在留資格「特定技能」に係る活動の準備に関して，自国等の機関に対し，上記の費用の額及び内訳について十分に理解した上で支払いました。また，上記の費用以外の費用については，徴収されていません。</div>
+<div style="font-size:9pt;margin-bottom:4mm;" class="id">Setelah sepenuhnya memahami jumlah dan rincian biaya di atas, saya membayar ke lembaga di negara sendiri dll. terkait agen perantara permohonan kontrak kerja keterampilan khusus atau persiapan kegiatan yang terkait dengan izin tinggal "keterampilan khusus". Dan tidak ada lagi biaya dipungut selain pengeluaran di atas.</div>
+<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Tanda tangan pemohon</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
   _applyFontSize();
