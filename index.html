@@ -113,6 +113,17 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <div>移行準備説明書<span class="item-sub">特定活動→特定技能１号</span></div>
     </div>
     <div class="divider"></div>
+    <div class="section">国交省</div>
+    <div class="item" id="nav-juuyou" onclick="open_juuyou('id')">
+      <span class="item-icon">📑</span>
+      <div>様式第２（第３条関係）<span class="item-sub">重要事項事前説明書</span></div>
+    </div>
+    <div class="lang-btns-side" id="langbtns-juuyou">
+      <button class="lbtn active" onclick="open_juuyou('id');event.stopPropagation()">🇮🇩</button>
+      <button class="lbtn" onclick="open_juuyou('vi');event.stopPropagation()">🇻🇳</button>
+      <button class="lbtn" onclick="open_juuyou('my');event.stopPropagation()">🇲🇲</button>
+    </div>
+    <div class="divider"></div>
     <div class="section">その他</div>
     <div class="item" id="nav-henkou" onclick="open_doc('henkou')">
       <span class="item-icon">📄</span>
@@ -143,6 +154,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
   <div class="content" id="content">
     <iframe id="frame-1_5"></iframe>
     <iframe id="frame-1_6"></iframe>
+    <iframe id="frame-juuyou"></iframe>
     <iframe id="frame-iko"></iframe>
     <iframe id="frame-1_23"></iframe>
     <iframe id="frame-1_25"></iframe>
@@ -221,6 +233,9 @@ function open_1_5(lang){
   // 1_6のiframeも隠す
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
+  // juuyouのiframeも隠す
+  const frJ=document.getElementById('frame-juuyou');
+  if(frJ) frJ.style.display='none';
   // 1_5 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_5');
   fr.src=LANG_FILES_1_5[lang];
@@ -261,6 +276,9 @@ function open_1_6(lang){
   // 1_5のiframeも隠す
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
+  // juuyouのiframeも隠す
+  const frJ=document.getElementById('frame-juuyou');
+  if(frJ) frJ.style.display='none';
   // 1_6 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_6');
   fr.src=LANG_FILES[lang];
@@ -272,17 +290,54 @@ function open_1_6(lang){
     fr.onload=()=>setTimeout(send,200);
   }
 }
+let curJuuyouLang='id';
+const LANG_FILES_JUUYOU={
+  'id':'juuyou_id.html',
+  'vi':'juuyou_vi.html',
+  'my':'juuyou_my.html',
+};
+function open_juuyou(lang){
+  curJuuyouLang=lang;
+  // ボタンのactive切り替え（juuyou関連のみ）
+  document.querySelectorAll('#langbtns-juuyou .lbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#langbtns-juuyou .lbtn[onclick*="'${lang}'"]`).forEach(b=>b.classList.add('active'));
+  // サイドバーactive
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-juuyou')?.classList.add('active');
+  // ホーム非表示・他iframe非表示
+  document.getElementById('home-screen')?.style&&(document.getElementById('home-screen').style.display='none');
+  Object.keys(docs).forEach(k=>{
+    const fr=document.getElementById(docs[k].frameId);
+    if(fr) fr.style.display='none';
+  });
+  // 1_5 / 1_6のiframeも隠す
+  const fr1_5=document.getElementById('frame-1_5');
+  if(fr1_5) fr1_5.style.display='none';
+  const fr1_6=document.getElementById('frame-1_6');
+  if(fr1_6) fr1_6.style.display='none';
+  // juuyou iframeを表示
+  const fr=document.getElementById('frame-juuyou');
+  fr.src=LANG_FILES_JUUYOU[lang];
+  fr.style.display='block';
+  cur='juuyou';
+  if(idxSelectedCase){
+    const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
+    fr.onload=()=>setTimeout(send,200);
+  }
+}
 function open_doc(key){
   // サイドバー
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById(key==='home'?'nav-home':(docs[key]?.navId||'nav-home'))?.classList.add('active');
   // コンテンツ
   const _hs=document.getElementById('home-screen');if(_hs)_hs.style.display=key==='home'?'flex':'none';
-  // 1_5 / 1_6のiframeを隠す（docsに入ってないので個別処理）
+  // 1_5 / 1_6 / juuyouのiframeを隠す（docsに入ってないので個別処理）
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
+  const frJ=document.getElementById('frame-juuyou');
+  if(frJ) frJ.style.display='none';
   Object.keys(docs).forEach(k=>{
     const fr=document.getElementById(docs[k].frameId);
     if(!fr) return;
