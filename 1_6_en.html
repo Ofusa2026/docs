@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260417.14</div>
+    <div class="ver">ver.20260417.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -393,7 +393,7 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">WRITTEN EMPLOYMENT CONDITIONS</span></div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">Reference Form 1-6</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
 <div style="text-align:center;font-size:10pt;padding-bottom:8px;">WRITTEN EMPLOYMENT CONDITIONS</div>
@@ -404,32 +404,32 @@ function p(){
   <div style="padding:8px 12px 10px;">
     <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
-      <span class="id" style="font-size:7.5pt;" data-key="3">day month year</span>
+      <span class="id" style="font-size:7.5pt;">${f('es_createD')} day ${f('es_createM')} month ${f('es_createY')} year</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">To</span></div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">To&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
       <table style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="5">Name of the organization of affiliation of the specified skilled worker: ${f('es_orgNameEn')}</td><td class="id" style="font-size:7pt;" data-key="6">Address: ${f('es_orgAddressEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Name of the organization of affiliation of the specified skilled worker</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="7">Tel. no.:</td><td class="id" style="font-size:7pt;" data-key="8">Representative’s name and title: ${f('es_repTitleEn')} ${f('es_repNameEn')} Seal</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Address</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">Period of the employment contract</td><td class="id" style="font-size:7pt;" data-key="10">Period of the employment contract</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Tel. no.</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">(From: day month year to day month year ) Scheduled date of entry:</td><td class="id" style="font-size:7pt;" data-key="12">2. Renewal of contract</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;">Representative's name and title</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}&nbsp;Seal</td></tr>
       </table>
     </div>
   </div>
 
   <!-- Ⅰ 雇用契約期間 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">The contract shall be automatically renewed The contract may be renewed The contract is not renewable</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;">I. Period of the employment contract</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">*If the contract may be renewed, the renewal of the contract shall be determined by the following criteria.</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">1. Period of the employment contract</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">Volume of work to be done at the time the term of contract expires Employee’s work record and work attitude Employee’s capability to execute their tasks</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">(From: ${f('es_contractStartD')} day ${f('es_contractStartM')} month ${f('es_contractStartY')} year to ${f('es_contractEndD')} day ${f('es_contractEndM')} month ${f('es_contractEndY')} year) Scheduled date of entry: ${f('es_entryD')} day ${f('es_entryM')} month ${f('es_entryY')} year</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">3. Limit on contract renewal (No / Yes (Up to times / Total contract period of up to years))</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2. Renewal of contract</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -438,29 +438,29 @@ function p(){
             <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
           </tr>
           <tr style="font-size:7.5pt;">
-            <td class="id" style="white-space:nowrap;" data-key="17">[If the employee has executed a fixed-term employment contract with the same employer under the Labor Contracts Act, and the total contract period exceeds five years]</td>
-            <td class="id" style="white-space:nowrap;" data-key="18">By requesting the employer to execute an employment contract with no fixed term (a non-fixed term employment contract) during the term of the fixed term employment contract, the employee may change</td>
-            <td class="id" style="white-space:nowrap;" data-key="19">Place of employment</td>
+            <td class="id" style="white-space:nowrap;">${cb(rAuto,'renewal_auto_id')}&nbsp;The contract shall be automatically renewed</td>
+            <td class="id" style="white-space:nowrap;">${cb(rPos,'renewal_pos_id')}&nbsp;The contract may be renewed</td>
+            <td class="id" style="white-space:nowrap;">${cb(rNone,'renewal_none_id')}&nbsp;The contract shall not be renewed</td>
           </tr>
         </table>
-        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">Direct employment (fill in below) Dispatch employment (fill in the separate “Employment Conditions Statement”)</span></div>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">*If the contract may be renewed, the renewal of the contract shall be determined based on the following criteria.</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">(Immediately after hiring) (Extent of change) No possibility of change (If there is a possibility of change, provide details below.)</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">Name of office ${f('es_officeNameEn')} Name of office</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">Address ${f('es_officeAddressEn')} Address</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;Volume of work to be done at the time the term of contract expires</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;Employee's work performance and attitude</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;Progress of work currently being performed</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">Contact information Contact information</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">Contents of work to be engaged in</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">(Extent of change) No possibility of change (If there is a possibility of change, provide details below.)</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;Employee's ability to perform work</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;Company's management situation</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;Other（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">Working hours, etc.</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">Start and finish times</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Limit on contract renewal (No / Yes (Up to&nbsp;&nbsp;&nbsp;&nbsp;times / Total contract period of up to&nbsp;&nbsp;&nbsp;&nbsp;years))</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[If the employee has executed a fixed-term employment contract with the same employer as specified under the Labor Contract Act, with a total contract period exceeding 5 years]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
-      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">Start time ( ) Finish time ( ) (Number of prescribed working hours in one day: ${f('es_dailyHours')} hours ${f('es_dailyMins')} minutes )</span><br><span class="id" style="font-size:6.5pt;" data-key="30">【If the following systems apply to the worker】</span></span></span></div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">By requesting the employer to execute an employment contract with no fixed term (open-ended employment contract) during the period of this contract,</span><br><span class="id" style="font-size:6.5pt;">the employee may convert to employment based on an open-ended employment contract from the day following the last day of this contract period (day&nbsp;&nbsp;&nbsp;month&nbsp;&nbsp;&nbsp;year&nbsp;&nbsp;&nbsp;).<br><span class="id" style="font-size:6.5pt;">In this case, will there be any changes to the employment conditions from this contract? (No / Yes (as shown in Attachment 2))</span></span></div>
     </div>
   </div>
 </div>
