@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－１６号（タイ語）斡旋無</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+.doc{padding:15mm!important;line-height:1.45!important;min-height:auto!important}
+.id{color:#555;font-size:0.88em;}
+.tbl{width:100%;border-collapse:collapse;font-size:10pt;}
+.tbl td,.tbl th{border:1px solid #000;padding:3px 5px;vertical-align:top;}
+.tbl td.dashed-bottom{border-bottom:1px dashed #888;}
+.tbl .lbl{width:28%;}
+.chk{display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1em;margin-right:4px;}
+.chk-on{background:#000;color:#fff;font-weight:bold;}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
+input.chk-box:checked{background:#000;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 แบบอ้างอิงที่ 1-16（タイ語）　雇用の経緯に係る説明書【斡旋無】</div>
+    <div class="ver">ver.20260417.122</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者（役職・氏名）</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">事前ガイダンス</div>
+      <div class="fg"><label>計画通り実施</label>
+        <select id="f_guidance" onchange="p()">
+          <option value="有">有 / Ya</option>
+          <option value="無">無 / Tidak</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">自国等の機関への支払（最大5件）</div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※該当なしの場合は空欄のまま</div>
+      <div class="fg"><label>①支払先機関名</label><input id="f_p1_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>①名目</label><input id="f_p1_kind" oninput="p()"></div>
+        <div class="fg"><label>①年月日</label><input id="f_p1_date" oninput="p()"></div>
+        <div class="fg"><label>①金額（円）</label><input id="f_p1_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>②支払先機関名</label><input id="f_p2_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>②名目</label><input id="f_p2_kind" oninput="p()"></div>
+        <div class="fg"><label>②年月日</label><input id="f_p2_date" oninput="p()"></div>
+        <div class="fg"><label>②金額（円）</label><input id="f_p2_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>③支払先機関名</label><input id="f_p3_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>③名目</label><input id="f_p3_kind" oninput="p()"></div>
+        <div class="fg"><label>③年月日</label><input id="f_p3_date" oninput="p()"></div>
+        <div class="fg"><label>③金額（円）</label><input id="f_p3_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>④支払先機関名</label><input id="f_p4_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>④名目</label><input id="f_p4_kind" oninput="p()"></div>
+        <div class="fg"><label>④年月日</label><input id="f_p4_date" oninput="p()"></div>
+        <div class="fg"><label>④金額（円）</label><input id="f_p4_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>⑤支払先機関名</label><input id="f_p5_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>⑤名目</label><input id="f_p5_kind" oninput="p()"></div>
+        <div class="fg"><label>⑤年月日</label><input id="f_p5_date" oninput="p()"></div>
+        <div class="fg"><label>⑤金額（円）</label><input id="f_p5_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>合計（円）</label><input id="f_p_total" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1776316942"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const guidance = v('f_guidance') || '有';
+  const guidY = guidance==='有' ? 'chk-on' : '';
+  const guidN = guidance==='無' ? 'chk-on' : '';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10pt;margin-bottom:2px;">参考様式第１－１６号</div>
+<div style="text-align:left;font-size:9pt;" class="id">แบบอ้างอิงที่ 1-16</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用の経緯に係る説明書</div>
+<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">เอกสารคำอธิบายรายละเอียดการจ้างงาน</div>
+<div style="font-size:10pt;margin-bottom:2mm;">特定技能外国人　${f('f_applicant')}　との間で特定技能雇用契約を締結するに当たっての雇用の経緯は以下のとおりです。</div>
+<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">รายละเอียดการจ้างงานในการทำสัญญาจ้างงานทักษะเฉพาะกับคนต่างด้าวทักษะเฉพาะ ${f('f_applicant')} มีดังต่อไปนี้</div>
+
+<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">ผู้ประกอบการจัดหางาน (ในประเทศ)</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td class="lbl">１　あっせんの有無<br><span class="id">การจัดหางานมี/ไม่มี</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有<br><span class="id">มี</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box" checked>無<br><span class="id">ไม่มี</span>
+    </td>
+  </tr>
+  <tr>
+    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">หมายเลขการอนุญาต・การรับแจ้ง</span><br><span class="id">(วันที่รับแจ้ง)</span></td>
+    <td colspan="3">－－－－－　　<br>（　　年　　月　　日）</td>
+  </tr>
+  <tr>
+    <td>３　職業紹介事業者の区分<br><span class="id">ประเภทของผู้ประกอบการจัดหางาน</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有料職業紹介事業者<br><span class="id">ผู้ประกอบการจัดหางานแบบเสียค่าบริการ</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box">無料職業紹介事業者<br><span class="id">ผู้ประกอบการจัดหางานแบบไม่เสียค่าบริการ</span>
+    </td>
+  </tr>
+  <tr>
+    <td>４　職業紹介事業者の氏名<br><span class="id">ชื่อผู้ประกอบการจัดหางาน</span></td>
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr>
+    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">ที่อยู่ผู้ประกอบการจัดหางาน (หมายเลขโทรศัพท์)</span></td>
+    <td colspan="3">〒<span class="id"> / รหัสไปรษณีย์</span>　　－　　<br>（電話番号 <span class="id">หมายเลขโทรศัพท์</span>　　　－　　　－　　　）</td>
+  </tr>
+  <tr>
+    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">ค่าใช้จ่ายที่จ่ายให้ผู้ประกอบการจัดหางาน</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">ผู้หางาน (ผู้ยื่นคำขอ)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>
+    <td class="dashed-bottom">（　　　　　　円 <span class="id">เยน</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">ผู้จ้างงาน (องค์กรในสังกัดทักษะเฉพาะ)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>
+    <td class="dashed-bottom">（　　　　　　円 <span class="id">เยน</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）<span class="id">(หมายเหตุ)</span></div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang jawaban "ไม่มี" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">ช่องที่ 2 ถึง 5 ใช้ "เว็บไซต์รวมบริการทรัพยากรบุคคล" ของสำนักงานจัดหางานกระทรวงสาธารณสุข แรงงานและสวัสดิการ กรอกข้อมูลที่เกี่ยวข้องเกี่ยวกับผู้ประกอบการจัดหางานดังกล่าว นอกจากนี้ให้แนบภาพหน้าจอที่แสดงข้อมูลดังกล่าว</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">ในช่องที่ 6 กรอกจำนวนเงินและรายการที่ผู้หางานและผู้จ้างงานจ่ายให้ผู้ประกอบการจัดหางาน นอกจากนี้ หากผู้หางานจ่ายค่าใช้จ่ายเป็นสกุลเงินอื่นนอกจากเงินเยน ให้ระบุจำนวนเงินที่จ่ายในสกุลเงินนั้นและจำนวนที่แปลงเป็นเงินเยน</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　職業紹介事業者との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">หากมีสัญญาที่ทำไว้กับผู้ประกอบการจัดหางาน ให้แนบสำเนามาด้วย</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">องค์กรตัวกลาง (ต่างประเทศ) (กรอกเฉพาะกรณีที่เลือก "มี" ในข้อ 1)</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td class="lbl">１　取次ぎの有無<br><span class="id">มี/tidak ada perantaraan</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有<br><span class="id">มี</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box">無<br><span class="id">ไม่มี</span>
+    </td>
+  </tr>
+  <tr>
+    <td>２　氏名又は名称<br><span class="id">ชื่อ</span></td>
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr>
+    <td>３　所在国<br><span class="id">ประเทศที่ตั้ง</span></td>
+    <td colspan="3">&nbsp;</td>
+  </tr>
+  <tr>
+    <td>４　所在地<br><span class="id">ที่อยู่</span></td>
+    <td colspan="3">（電話番号 <span class="id">หมายเลขโทรศัพท์</span>　　　－　　　－　　　）</td>
+  </tr>
+  <tr>
+    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">ค่าใช้จ่ายที่จ่ายให้องค์กรตัวกลาง</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">ผู้หางาน (ผู้ยื่นคำขอ)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>
+    <td class="dashed-bottom">（　　　　　　円 <span class="id">เยน</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">ผู้จ้างงาน (องค์กรในสังกัดทักษะเฉพาะ)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>
+    <td class="dashed-bottom">（　　　　　　円 <span class="id">เยน</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）<span class="id">(หมายเหตุ)</span></div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">องค์กรตัวกลาง หมายถึง ผู้ที่ทำหน้าที่เป็นตัวกลางในการส่งต่อข้อมูลเกี่ยวกับผู้หางาน ฯลฯ ให้กับผู้ประกอบการจัดหางาน เมื่อผู้ประกอบการจัดหางานทำการจัดหางานให้แก่ผู้จ้างงาน</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang "ไม่มี" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">ในช่องที่ 5 กรอกจำนวนเงินและรายการที่ผู้หางานและผู้จ้างงานจ่ายให้องค์กรตัวกลาง นอกจากนี้ หากผู้หางานและผู้จ้างงานจ่ายค่าใช้จ่ายเป็นสกุลเงินอื่นนอกจากเงินเยน ให้ระบุจำนวนเงินที่จ่ายในสกุลเงินนั้นและจำนวนที่แปลงเป็นเงินเยน</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">หากมีสัญญาที่ทำไว้กับองค์กรตัวกลาง ให้แนบสำเนามาด้วย</div>
+</div>
+
+<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">การดำเนินการแนะนำล่วงหน้า</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <tr>
+    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">มี/ไม่มีการดำเนินการตามที่กำหนดในแผนการสนับสนุนคนต่างด้าวทักษะเฉพาะหมายเลข 1</span></td>
+    <td style="text-align:center;">
+      <input type="checkbox" class="chk-box" ${guidance==='有'?'checked':''}>有　
+      <input type="checkbox" class="chk-box" ${guidance==='無'?'checked':''}>無<br>
+      <span class="id">มี / ไม่มี</span>
+    </td>
+  </tr>
+</table>
+
+<div style="font-size:10pt;margin-bottom:2mm;">以上の１から３までの内容について相違ありません。なお，求職者（申請人）が在留資格「特定技能」の活動を行うことに関連して保証金，違約金の支払等の不適切な費用徴収がされていないことを本人から聞き取るなどして確認しています。</div>
+<div style="font-size:9pt;margin-bottom:4mm;" class="id">เนื้อหาในข้อ 1 ถึง 3 ข้างต้นไม่มีความแตกต่าง นอกจากนี้ ได้ยืนยันจากการสอบถามผู้ยื่นคำขอว่าผู้หางาน (ผู้ยื่นคำขอ) ไม่ถูกเรียกเก็บค่าใช้จ่ายที่ไม่เหมาะสม เช่น เงินประกัน ค่าปรับ ที่เกี่ยวข้องกับการทำกิจกรรมในสถานภาพการพำนัก "ทักษะเฉพาะ"</div>
+
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">วันที่จัดทำ：${f('f_docDate')}</div>
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ชื่อ organisasi afiliasi pekerja berketerampilan khusus</div>
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
+<div style="font-size:9pt;text-align:right;" class="id">ชื่อ dan jabatan penanggung jawab pengisian</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">ค่าใช้จ่ายที่ผู้หางาน (ผู้ยื่นคำขอ) จ่ายให้แก่องค์กรในประเทศของตน ฯลฯ</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <tr>
+    <th style="text-align:center;width:6%;">#</th>
+    <th style="text-align:center;">支払先機関の名称<br><span class="id">ชื่อ lembaga penerima pembayaran</span></th>
+    <th style="text-align:center;width:18%;">名目<br><span class="id">รายการ</span></th>
+    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">วันที่ชำระเงิน</span></th>
+    <th style="text-align:center;width:20%;">支払金額<br><span class="id">จำนวนเงิน Pembayaran</span></th>
+  </tr>
+  <tr>
+    <td style="text-align:center;">１</td>
+    <td>${f('f_p1_name') || '該当なし'}</td>
+    <td>${f('f_p1_kind')}</td>
+    <td>${f('f_p1_date')}</td>
+    <td>${f('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">２</td>
+    <td>${f('f_p2_name')}</td>
+    <td>${f('f_p2_kind')}</td>
+    <td>${f('f_p2_date')}</td>
+    <td>${f('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">３</td>
+    <td>${f('f_p3_name')}</td>
+    <td>${f('f_p3_kind')}</td>
+    <td>${f('f_p3_date')}</td>
+    <td>${f('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">４</td>
+    <td>${f('f_p4_name')}</td>
+    <td>${f('f_p4_kind')}</td>
+    <td>${f('f_p4_date')}</td>
+    <td>${f('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">５</td>
+    <td>${f('f_p5_name')}</td>
+    <td>${f('f_p5_kind')}</td>
+    <td>${f('f_p5_date')}</td>
+    <td>${f('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+  <tr>
+    <td colspan="4" style="text-align:right;">計　<span class="id">รวม</span></td>
+    <td>${f('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　自国等の機関は，特段対象を限定するものではなく，特定技能雇用契約の申込みの取次ぎ又は活動の準備に関与した全ての機関をいう。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　支払金額については，現地通貨又は米ドルで記載し，括弧書きで日本円に換算した金額を記載すること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:2mm;">３　名目については，申請人に示した名目どおりに記載すること。</div>
+  <div style="margin-bottom:1mm;" class="id">(หมายเหตุ)</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;" class="id">1. องค์กรในประเทศของตน ฯลฯ ไม่ได้จำกัดเฉพาะเจาะจง แต่หมายถึงทุกองค์กรที่เกี่ยวข้องกับการเป็นตัวกลางในการยื่นคำขอสัญญาจ้างงานทักษะเฉพาะหรือการเตรียมกิจกรรม</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;" class="id">2. เกี่ยวกับจำนวนเงินที่ชำระ ให้ระบุเป็นสกุลเงินท้องถิ่นหรือดอลลาร์สหรัฐ และให้ระบุจำนวนที่แปลงเป็นเงินเยนในวงเล็บ</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. เกี่ยวกับรายการ ให้กรอกตามรายการที่ระบุให้ผู้ยื่นคำขอเห็น</div>
+</div>
+
+<div style="font-size:10pt;margin-bottom:2mm;">特定技能雇用契約の申込みの取次ぎ又は在留資格「特定技能」に係る活動の準備に関して，自国等の機関に対し，上記の費用の額及び内訳について十分に理解した上で支払いました。また，上記の費用以外の費用については，徴収されていません。</div>
+<div style="font-size:9pt;margin-bottom:4mm;" class="id">เกี่ยวกับการเป็นตัวกลางในการยื่นคำขอสัญญาจ้างงานทักษะเฉพาะหรือการเตรียมกิจกรรมที่เกี่ยวข้องกับสถานภาพการพำนัก "ทักษะเฉพาะ" ได้ชำระเงินให้องค์กรในประเทศของตน ฯลฯ หลังจากเข้าใจจำนวนเงินและรายละเอียดของค่าใช้จ่ายข้างต้นเป็นอย่างดีแล้ว นอกจากนี้ ไม่ได้ถูกเรียกเก็บค่าใช้จ่ายอื่นใดนอกเหนือจากค่าใช้จ่ายข้างต้น</div>
+<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">ลายเซ็นผู้ยื่นคำขอ</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _applyFontSize();
+  _apply1_16_thFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply1_16_thFontSize(){
+  const st=document.getElementById('_1_16_thFontStyle')||document.createElement('style');
+  st.id='_1_16_thFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10pt"]{font-size:${(10*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9.5pt"]{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:8.5pt"]{font-size:${(8.5*s).toFixed(2)}pt!important}`,
+    `.tbl{font-size:${(10*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      caseId?sb('cases?select=applicant,applicant_en&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,author_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(co){
+      s('f_company',co.name||'');
+      s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+    }
+    if(cas){
+      s('f_applicant',cas.applicant_en||cas.applicant||'');
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadFromDB==='function') loadFromDB();
+});
+</script>
+</body>
+</html>
