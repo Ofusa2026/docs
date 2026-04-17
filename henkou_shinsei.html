@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776427000">
+<style>
+.doc{
+  background:white;
+  width:794px;
+  min-height:1123px;
+  flex-shrink:0;
+  margin:0 0 24px 0;
+  padding:12mm 14mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
+  font-size:8pt;line-height:1.7;color:#000;
+  position:relative;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.page-num-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;color:#bbb;font-family:sans-serif;
+}
+.doc-title{text-align:center;font-size:13pt;font-weight:bold;letter-spacing:4px;margin:6px 0 2px;}
+.doc-sub{text-align:center;font-size:8pt;margin-bottom:6px;}
+.head-right{display:flex;justify-content:space-between;font-size:7.5pt;margin-bottom:4px;}
+.law-text{font-size:7.5pt;margin-bottom:6px;border-bottom:1px solid #999;padding-bottom:4px;}
+table.form-table{width:100%;border-collapse:collapse;font-size:7.5pt;}
+table.form-table td{border:1px solid #555;padding:2px 4px;vertical-align:top;}
+.no-border td{border:none;padding:1px 4px;}
+.item-label{font-weight:normal;white-space:nowrap;}
+.val{border-bottom:1px solid #555;min-width:80px;display:inline-block;}
+.en{font-size:6.5pt;color:#333;}
+.yn{white-space:nowrap;}
+.section-head{background:#eee;font-size:7.5pt;padding:2px 4px;margin:4px 0 2px;border-left:3px solid #555;}
+.row{display:flex;align-items:flex-start;margin-bottom:2px;gap:4px;}
+.row label{white-space:nowrap;font-size:7pt;}
+.fill{border-bottom:1px solid #555;flex:1;min-height:12px;}
+.fill-s{border-bottom:1px solid #555;width:60px;min-height:12px;display:inline-block;}
+.fill-m{border-bottom:1px solid #555;width:120px;min-height:12px;display:inline-block;}
+.fill-l{border-bottom:1px solid #555;width:200px;min-height:12px;display:inline-block;}
+.fill-xl{border-bottom:1px solid #555;width:300px;min-height:12px;display:inline-block;}
+.cb{display:inline-block;width:10px;height:10px;border:1px solid #555;margin-right:2px;vertical-align:middle;text-align:center;line-height:10px;font-size:8px;}
+.cb.checked::after{content:'■';}
+.ymd{display:inline-flex;align-items:center;gap:2px;font-size:7.5pt;}
+.ymd .fill-s{width:40px;}
+.indent1{padding-left:12px;}
+.indent2{padding-left:24px;}
+.note{font-size:6.5pt;color:#333;}
+.sign-area{display:flex;justify-content:flex-end;margin-top:8px;}
+.sign-box{border:1px solid #555;width:200px;height:40px;font-size:7pt;padding:3px;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title" id="docTitle">📄 在留資格変更許可申請書</div>
+    <div class="ver">ver.20260418.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>🔍 登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+      <option value="">── すべて ──</option>
+    </select>
+    <label>🏢 所属機関</label>
+    <select id="filterCompany" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+      <option value="">── すべて ──</option>
+    </select>
+    <label>🔤 検索（案件名・人材名）</label>
+    <input id="filterText" placeholder="名前・案件名で絞り込み" oninput="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;box-sizing:border-box;margin-bottom:5px;">
+    <label>👤 案件選択 <span id="caseCount" style="color:#888;font-weight:normal;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">
+      <option value="">── 選択 ──</option>
+    </select>
+  </div>
+  <div class="fp-inner">
+    <!-- 申請人情報 -->
+    <div class="fs"><div class="fs-title">申請人情報</div>
+      <div class="fg"><label>氏名<span class="fid">パスポート.氏名</span></label><input id="p_name" oninput="p()"></div>
+      <div class="fg"><label>国籍<span class="fid">パスポート.国籍</span></label><input id="p_nationality" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>生年月日（年）<span class="fid">パスポート.生年月日（年）</span></label><input id="p_byear" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">パスポート.生年月日（月）</span></label><input id="p_bmonth" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">パスポート.生年月日（日）</span></label><input id="p_bday" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>職業<span class="fid">在留カード_表.職業</span></label><input id="p_job" oninput="p()"></div>
+      <div class="fg"><label>本国居住地<span class="fid">パスポート.本国における居住地</span></label><input id="p_hometown" oninput="p()"></div>
+      <div class="fg"><label>住居地（日本）<span class="fid">人材データ.住所</span></label><textarea id="p_address" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>旅券番号<span class="fid">パスポート.旅券番号</span></label><input id="p_passport_no" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>有効期限（年）<span class="fid">パスポート.旅券有効期限（年）</span></label><input id="p_pexp_y" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">パスポート.旅券有効期限（月）</span></label><input id="p_pexp_m" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">パスポート.旅券有効期限（日）</span></label><input id="p_pexp_d" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>現在の在留資格<span class="fid">在留カード.現に有する在留資格</span></label><input id="p_status" oninput="p()"></div>
+      <div class="fg"><label>在留期間<span class="fid">在留カード_表.在留期間</span></label><input id="p_period" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>期間満了（年）<span class="fid">在留期限（年）</span></label><input id="p_exp_y" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">在留期限（月）</span></label><input id="p_exp_m" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">在留期限（日）</span></label><input id="p_exp_d" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>在留カード番号<span class="fid">在留カード番号</span></label><input id="p_card_no" oninput="p()"></div>
+      <div class="fg"><label>希望する在留資格<span class="fid">希望する在留資格</span></label><input id="p_desired_status" oninput="p()"></div>
+      <div class="fg"><label>電話番号<span class="fid">所属機関.電話番号</span></label><input id="p_tel" oninput="p()"></div>
+    </div>
+    <!-- 所属機関情報 -->
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>機関名<span class="fid">所属機関名</span></label><input id="org_name" oninput="p()"></div>
+      <div class="fg"><label>住所<span class="fid">所属機関住所</span></label><textarea id="org_address" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>電話番号<span class="fid">所属機関.電話番号</span></label><input id="org_tel" oninput="p()"></div>
+      <div class="fg"><label>法人番号<span class="fid">所属機関.法人番号</span></label><input id="org_corp_no" oninput="p()"></div>
+      <div class="fg"><label>資本金（円）<span class="fid">所属機関.所属機関資本金</span></label><input id="org_capital" oninput="p()"></div>
+      <div class="fg"><label>年間売上（万円）<span class="fid">所属機関.年間売上金額</span></label><input id="org_sales" oninput="p()"></div>
+      <div class="fg"><label>常勤職員数<span class="fid">所属機関.常勤職員数</span></label><input id="org_staff" oninput="p()"></div>
+      <div class="fg"><label>代表者名<span class="fid">所属機関.代表者名</span></label><input id="org_rep" oninput="p()"></div>
+      <div class="fg"><label>労働保険番号<span class="fid">所属機関.労働保険番号</span></label><input id="org_labor_ins" oninput="p()"></div>
+    </div>
+    <!-- 雇用条件 -->
+    <div class="fs"><div class="fs-title">雇用条件</div>
+      <div class="fg3">
+        <div class="fg"><label>契約開始（年）</label><input id="ec_start_y" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="ec_start_m" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="ec_start_d" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>契約終了（年）</label><input id="ec_end_y" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="ec_end_m" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="ec_end_d" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>分野<span class="fid">雇用条件.分野</span></label><input id="ec_field" oninput="p()"></div>
+      <div class="fg"><label>業務区分<span class="fid">雇用条件.区分</span></label><input id="ec_category" oninput="p()"></div>
+      <div class="fg"><label>所定労働時間/週（h）<span class="fid">雇用条件.所定労働時間(週平均)</span></label><input id="ec_weekly_h" oninput="p()"></div>
+      <div class="fg"><label>所定労働時間/月（h）<span class="fid">雇用条件.所定労働時間(月平均)</span></label><input id="ec_monthly_h" oninput="p()"></div>
+      <div class="fg"><label>月額報酬（円）<span class="fid">雇用条件.月額報酬</span></label><input id="ec_salary" oninput="p()"></div>
+      <div class="fg"><label>基本給時間換算額（円）<span class="fid">雇用条件.基本給の時間換算額</span></label><input id="ec_hourly" oninput="p()"></div>
+      <div class="fg"><label>日本人の月額報酬（円）<span class="fid">所属機関.日本人の月額報酬</span></label><input id="ec_jp_salary" oninput="p()"></div>
+      <div class="fg"><label>勤務事業所名<span class="fid">雇用条件.(事業所名)</span></label><input id="ec_office_name" oninput="p()"></div>
+      <div class="fg"><label>事業所住所<span class="fid">雇用条件.事業所住所</span></label><textarea id="ec_office_addr" oninput="p()" rows="2"></textarea></div>
+    </div>
+    <!-- 登録支援機関 -->
+    <div class="fs"><div class="fs-title">登録支援機関</div>
+      <div class="fg"><label>機関名<span class="fid">登録支援機関名</span></label><input id="rso_name" oninput="p()"></div>
+      <div class="fg"><label>住所<span class="fid">登録支援機関住所</span></label><input id="rso_address" oninput="p()"></div>
+      <div class="fg"><label>電話番号<span class="fid">登録支援機関電話番号</span></label><input id="rso_tel" oninput="p()"></div>
+      <div class="fg"><label>代表者名<span class="fid">登録支援機関代表者名</span></label><input id="rso_rep" oninput="p()"></div>
+      <div class="fg"><label>登録番号<span class="fid">登録支援機関番号</span></label><input id="rso_reg_no" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>登録年<span class="fid">登録支援機関登録年月日(年)</span></label><input id="rso_reg_y" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">登録支援機関登録年月日(月)</span></label><input id="rso_reg_m" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">登録支援機関登録年月日(日)</span></label><input id="rso_reg_d" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>支援事業所名<span class="fid">登録支援機関支援事業所名</span></label><input id="rso_office" oninput="p()"></div>
+      <div class="fg"><label>支援事業所住所<span class="fid">登録支援機関支援事業所住所</span></label><input id="rso_office_addr" oninput="p()"></div>
+      <div class="fg"><label>対応言語<span class="fid">登録支援機関対応言語</span></label><input id="rso_lang" oninput="p()"></div>
+      <div class="fg"><label>支援委託手数料（円/月）<span class="fid">支援委託費</span></label><input id="rso_fee" oninput="p()"></div>
+    </div>
+    <!-- 職業紹介事業者 -->
+    <div class="fs"><div class="fs-title">職業紹介事業者（任意）</div>
+      <div class="fg"><label>事業者名<span class="fid">職業紹介事業者名</span></label><input id="pea_name" oninput="p()"></div>
+      <div class="fg"><label>住所<span class="fid">職業紹介事業者住所</span></label><input id="pea_address" oninput="p()"></div>
+      <div class="fg"><label>電話番号<span class="fid">職業紹介事業者電話番号</span></label><input id="pea_tel" oninput="p()"></div>
+      <div class="fg"><label>許可番号<span class="fid">職業紹介事業者番号</span></label><input id="pea_no" oninput="p()"></div>
+    </div>
+    <!-- 作成日 -->
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg3">
+        <div class="fg"><label>年<span class="fid">書類作成日(年)</span></label><input id="doc_y" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">書類作成日(月)</span></label><input id="doc_m" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">書類作成日(日)</span></label><input id="doc_d" oninput="p()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pp">
+  <div class="pn">
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button>
+    <button class="pn-btn" onclick="adjustFontSize(-0.5)">A-</button>
+    <span id="fontSizeLabel" style="font-size:11px;padding:0 4px;">8pt</span>
+    <button class="pn-btn" onclick="adjustFontSize(0.5)">A+</button>
+  </div>
+
+  <div id="pageArea">
+
+  <!-- P1: 申請人用（変更）1 -->
+  <div class="doc">
+    <div class="page-num-label">P1</div>
+    <div class="head-right">
+      <span>別記第三十号様式（第二十条関係）<br>申請人等作成用 １<br><span class="en">For applicant, part 1</span></span>
+      <span style="text-align:right;">日本国政府法務省<br><span class="en">Ministry of Justice, Government of Japan</span></span>
+    </div>
+    <div class="doc-title">在留資格変更許可申請書</div>
+    <div class="doc-sub">APPLICATION FOR CHANGE OF STATUS OF RESIDENCE</div>
+    <div style="font-size:8pt;margin-bottom:2px;">法務大臣殿　<span class="en">To the Minister of Justice</span></div>
+    <div class="law-text">出入国管理及び難民認定法第２０条第２項の規定に基づき，次のとおり在留資格の変更を申請します。<br>
+    <span class="en" style="font-size:6.5pt;">Pursuant to the provisions of Paragraph 2 of Article 20 of the Immigration Control and Refugee Recognition Act, I hereby apply for a change of status of residence.</span></div>
+
+    <table class="form-table">
+      <tr>
+        <td style="width:42%;">１　国籍・地域　<span class="en">Nationality/Region</span><br><span id="v_p_nationality"></span></td>
+        <td>２　生年月日　<span class="en">Date of birth</span><br>
+          <span id="v_p_byear"></span>年&nbsp;<span id="v_p_bmonth"></span>月&nbsp;<span id="v_p_bday"></span>日<br>
+          <span class="en"><span id="v_p_byear2"></span> Year <span id="v_p_bmonth2"></span> Month <span id="v_p_bday2"></span> Day</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">３　氏名　<span class="en">Name</span><br>
+          <span id="v_p_name" style="font-size:11pt;"></span><br>
+          <span class="en">Family name &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Given name</span>
+        </td>
+      </tr>
+      <tr>
+        <td>４　性別　<span class="en">Sex</span>　男・女　<span class="en">Male / Female</span></td>
+        <td>５　出生地　<span class="en">Place of birth</span><br><span id="v_p_hometown"></span></td>
+      </tr>
+      <tr>
+        <td>６　配偶者の有無　<span class="en">Marital status</span>　有・無　<span class="en">Married / Single</span></td>
+        <td>７　職業　<span class="en">Occupation</span><br><span id="v_p_job"></span></td>
+      </tr>
+      <tr>
+        <td colspan="2">８　本国における居住地　<span class="en">Home town/city</span><br><span id="v_p_hometown2"></span></td>
+      </tr>
+      <tr>
+        <td colspan="2">９　住居地　<span class="en">Address in Japan</span><br>
+          <span id="v_p_address"></span><br>
+          電話番号　<span class="en">Telephone No.</span>　<span id="v_p_tel"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>１０　旅券　<span class="en">Passport</span><br>
+          (1)番号　<span class="en">Number</span>　<span id="v_p_passport_no"></span>
+        </td>
+        <td>(2)有効期限　<span class="en">Date of expiration</span><br>
+          <span id="v_p_pexp_y"></span>年&nbsp;<span id="v_p_pexp_m"></span>月&nbsp;<span id="v_p_pexp_d"></span>日
+        </td>
+      </tr>
+      <tr>
+        <td>１１　現に有する在留資格　<span class="en">Status of residence</span><br>
+          <span id="v_p_status"></span><br>
+          在留期間　<span class="en">Period of stay</span>　<span id="v_p_period"></span>
+        </td>
+        <td>在留期間の満了日　<span class="en">Date of expiration</span><br>
+          <span id="v_p_exp_y"></span>年&nbsp;<span id="v_p_exp_m"></span>月&nbsp;<span id="v_p_exp_d"></span>日
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">１２　在留カード番号　<span class="en">Residence card number</span><br><span id="v_p_card_no"></span></td>
+      </tr>
+      <tr>
+        <td colspan="2">１３　希望する在留資格　<span class="en">Desired status of residence</span><br>
+          <span id="v_p_desired_status"></span><br>
+          在留期間　３年　（審査の結果によって希望の期間とならない場合があります。）<br>
+          <span class="en">Period of stay　3 years　(It may not be as desired after examination.)</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">１４　変更の理由　<span class="en">Reason for change of status of residence</span><br>就労のため</td>
+      </tr>
+      <tr>
+        <td colspan="2">１５　犯罪を理由とする処分を受けたことの有無（日本国外におけるものを含む。）<br>
+          <span class="en" style="font-size:6.5pt;">Criminal record (in Japan / overseas) ※Including dispositions due to traffic violations, etc.</span><br>
+          有（具体的内容　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　）・無<br>
+          <span class="en">Yes (Detail: &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;) / No</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">１６　在日親族及び同居者　<span class="en">Family in Japan and anyone you currently reside with</span><br>
+          有（「有」の場合は以下に記入）・無　<span class="en">Yes / No</span>
+          <table style="width:100%;border-collapse:collapse;font-size:6.5pt;margin-top:3px;">
+            <tr style="background:#eee;">
+              <td style="border:1px solid #999;padding:1px 3px;width:12%;">続柄<br><span class="en">Relationship</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;width:22%;">氏名<br><span class="en">Name</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;width:14%;">生年月日<br><span class="en">Date of birth</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;width:12%;">国籍<br><span class="en">Nationality</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;width:8%;">同居<br><span class="en">Residing</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;width:20%;">勤務先・通学先<br><span class="en">Employment/school</span></td>
+              <td style="border:1px solid #999;padding:1px 3px;">在留カード番号<br><span class="en">Residence card no.</span></td>
+            </tr>
+            <tr><td style="border:1px solid #999;height:14px;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;font-size:6pt;text-align:center;">有・無</td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td></tr>
+            <tr><td style="border:1px solid #999;height:14px;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;font-size:6pt;text-align:center;">有・無</td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td></tr>
+            <tr><td style="border:1px solid #999;height:14px;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;font-size:6pt;text-align:center;">有・無</td><td style="border:1px solid #999;"></td><td style="border:1px solid #999;"></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <div class="note" style="margin-top:4px;">（注）申請書に事実に反する記載をしたことが判明した場合には，不利益な扱いを受けることがあります。<br>
+    Note: In case it is found that you have misrepresented the facts in an application, you will be unfavorably treated.</div>
+  </div>
+
+  <!-- P2: 申請人用（変更）２V -->
+  <div class="doc">
+    <div class="page-num-label">P2</div>
+    <div class="head-right">
+      <span>申請人等作成用 ２　V（「特定技能（１号）」・「特定技能（２号）」）<br><span class="en">For applicant, part 2  V ("Specified Skilled Worker (i)"・"Specified Skilled Worker (ⅱ)")</span></span>
+      <span style="text-align:right;">在留資格変更用<br><span class="en">For change of status</span></span>
+    </div>
+
+    <div class="section-head">１７　特定技能所属機関　<span class="en">Organization of affiliation of the specified skilled worker</span></div>
+    <table class="form-table">
+      <tr><td style="width:35%;">(1)氏名又は名称　<span class="en">Name</span></td><td><span id="v_org_name"></span></td></tr>
+      <tr><td>(2)住所（所在地）　<span class="en">Address</span></td><td><span id="v_org_address"></span>&emsp;電話番号　<span id="v_org_tel"></span></td></tr>
+    </table>
+
+    <div class="section-head">１８　技能水準　<span class="en">Skill level</span></div>
+    <div class="indent1">
+      <div><span class="cb"></span>分野別運用方針に定める評価方法による証明　<span class="en">Proof based on the evaluation method specified in the field-specific operational policy</span></div>
+      <div class="indent2"><span class="cb"></span>試験による証明　<span class="en">Proof based on the passing of an exam</span></div>
+      <div class="indent2" style="display:flex;gap:8px;align-items:center;">
+        <span>合格した試験名　<span class="en">Name of passed exam</span>　<span class="fill-l"></span></span>
+        <span>受験地　<span class="en">Exam location</span>　<span class="cb"></span>日本国内　<span class="cb"></span>日本国外（国名：<span class="fill-m"></span>）</span>
+      </div>
+      <div class="indent2"><span class="cb"></span>その他の評価方法による証明　<span class="en">Proof based on some other evaluation method</span></div>
+      <div><span class="cb"></span>技能実習2号を良好に修了　<span class="en">Successfully completed Technical Intern Training (ii)</span></div>
+    </div>
+
+    <div class="section-head">１９　日本語能力（「特定技能1号」での在留を希望する場合に記入）<br><span class="en">Japanese language ability (Fill in this section if you wish to reside with the status of "Specified Skilled Worker (i)")</span></div>
+    <div class="indent1">
+      <div><span class="cb"></span>分野別運用方針に定める評価方法による証明</div>
+      <div class="indent2"><span class="cb"></span>試験による証明</div>
+      <div class="indent2" style="display:flex;gap:8px;align-items:center;">
+        <span>合格した試験名　<span class="fill-l"></span></span>
+        <span>受験地　<span class="cb"></span>日本国内　<span class="cb"></span>日本国外（国名：<span class="fill-m"></span>）</span>
+      </div>
+      <div class="indent2"><span class="cb"></span>その他の評価方法による証明</div>
+      <div><span class="cb"></span>技能実習2号を良好に修了</div>
+    </div>
+
+    <div class="section-head">２０　良好に修了した技能実習2号（上記18，19において技能実習2号を良好に修了を選択した場合に記入）</div>
+    <div class="indent1">
+      <div>(1)職種・作業</div>
+      <div style="display:flex;gap:8px;margin:3px 0;">
+        <span>職種　<span class="fill-m"></span></span>
+        <span>作業　<span class="fill-m"></span></span>
+      </div>
+      <div>良好に修了したことの証明</div>
+      <div class="indent2"><span class="cb"></span>3級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明</div>
+      <div class="indent2"><span class="cb"></span>実習状況に関する書面による証明</div>
+      <div>(2)職種・作業（複数ある場合）</div>
+      <div style="display:flex;gap:8px;margin:3px 0;">
+        <span>職種　<span class="fill-m"></span></span>
+        <span>作業　<span class="fill-m"></span></span>
+      </div>
+      <div class="indent2"><span class="cb"></span>3級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明</div>
+      <div class="indent2"><span class="cb"></span>実習状況に関する書面による証明</div>
+    </div>
+
+    <div class="section-head">２１　申請時における特定技能1号での通算在留期間</div>
+    <div class="indent1">
+      <span id="v_total_stay"></span>年&emsp;<span class="fill-s"></span>月
+    </div>
+  </div>
+
+  <!-- P3: 所属機関用（変更）V1 -->
+  <div class="doc">
+    <div class="page-num-label">P3</div>
+    <div class="head-right">
+      <span>所属機関等作成用 １　V（「特定技能（1号）」・「特定技能（2号）」）<br><span class="en">For organization, part 1  V</span></span>
+      <span style="text-align:right;">在留資格変更用<br><span class="en">For change of status</span></span>
+    </div>
+
+    <table class="form-table">
+      <tr><td colspan="2">１　雇用している外国人の氏名　<span class="en">Name of foreign national being offered employment</span><br><span id="v_p_name2" style="font-size:10pt;"></span></td></tr>
+    </table>
+
+    <div class="section-head">２　特定技能雇用契約　<span class="en">Employment contract for a specified skilled worker</span></div>
+    <table class="form-table">
+      <tr>
+        <td colspan="2">(1)雇用契約期間　<span class="en">Period of employment contract</span><br>
+          <span id="v_ec_start_y"></span>年&nbsp;<span id="v_ec_start_m"></span>月&nbsp;<span id="v_ec_start_d"></span>日　から　<span id="v_ec_end_y"></span>年&nbsp;<span id="v_ec_end_m"></span>月&nbsp;<span id="v_ec_end_d"></span>日　まで
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">(2)従事すべき業務の内容<br>
+          特定産業分野　<span id="v_ec_field"></span>&emsp;&emsp;業務区分　<span id="v_ec_category"></span><br>
+          職種　999（別紙「職種一覧」から選択）
+        </td>
+      </tr>
+      <tr>
+        <td>(3)所定労働時間（週平均）　<span id="v_ec_weekly_h"></span>時間<br>
+          所定労働時間（月平均）　<span id="v_ec_monthly_h"></span>時間<br>
+          通常の労働者の所定労働時間と同等　有・無
+        </td>
+        <td>(4)月額報酬（各種手当・実費弁償除く）<br>
+          <span id="v_ec_salary"></span>円<br>
+          基本給の時間換算額　<span id="v_ec_hourly"></span>円<br>
+          日本人の月額報酬　<span id="v_ec_jp_salary"></span>円<br>
+          日本人と同等以上の報酬　有・無
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          (5)報酬の支払方法　<span class="cb"></span>通貨払　<span class="cb checked"></span>口座振込み<br>
+          (6)外国人であることを理由とした異なる待遇の有無　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (7)一時帰国時の有給休暇付与　有・無<br>
+          (8)分野固有の基準適合　有・無<br>
+          (9)帰国旅費負担　有・無<br>
+          (10)健康状況把握措置　有・無<br>
+          (11)適正在留のための基準適合　有・無
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">(12)派遣先（労働者派遣の場合に記入）<br>
+          氏名又は名称　<span class="fill-xl"></span><br>
+          住所　<span class="fill-xl"></span>&emsp;電話番号　<span class="fill-m"></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">(13)職業紹介事業者<br>
+          氏名又は名称　<span id="v_pea_name"></span><br>
+          住所　<span id="v_pea_address"></span>&emsp;電話番号　<span id="v_pea_tel"></span><br>
+          許可・届出番号　<span id="v_pea_no"></span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- P4: 所属機関用（変更）V2 -->
+  <div class="doc">
+    <div class="page-num-label">P4</div>
+    <div class="head-right">
+      <span>所属機関等作成用 2　V（「特定技能（1号）」・「特定技能（2号）」）<br><span class="en">For organization, part 2  V</span></span>
+      <span style="text-align:right;">在留資格変更用</span>
+    </div>
+
+    <div class="section-head">３　特定技能所属機関</div>
+    <table class="form-table">
+      <tr>
+        <td style="width:50%;">(1)氏名又は名称<br><span id="v_org_name2"></span></td>
+        <td>(2)法人番号（13桁）<br><span id="v_org_corp_no"></span></td>
+      </tr>
+      <tr>
+        <td colspan="2">(3)雇用保険適用事業所番号（11桁）&emsp;<span class="fill-l"></span></td>
+      </tr>
+      <tr>
+        <td>(4)業種（別紙「業種一覧」から選択）<br><span class="fill-m"></span></td>
+        <td>(5)住所（所在地）<br><span id="v_org_address2"></span>&emsp;電話番号　<span id="v_org_tel2"></span></td>
+      </tr>
+      <tr>
+        <td>(6)資本金　<span id="v_org_capital"></span>円</td>
+        <td>(7)年間売上金額（直近年度）　<span id="v_org_sales"></span>万円</td>
+      </tr>
+      <tr>
+        <td>(8)常勤職員数　<span id="v_org_staff"></span>名</td>
+        <td>(9)代表者の氏名　<span id="v_org_rep"></span></td>
+      </tr>
+      <tr>
+        <td colspan="2">(10)勤務させる事業所名　<span id="v_ec_office_name"></span>&emsp;所在地　<span id="v_ec_office_addr"></span><br>
+          健康保険・厚生年金適用事業所　有・無<br>
+          労災・雇用保険適用事業所　有・無<br>
+          労働保険番号　<span id="v_org_labor_ins"></span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          (11)労働・社会保険・租税法令違反の有無　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (12)同種業務従事者の非自発的離職（1年以内）　有（内容・理由：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (13)責めに帰すべき事由による行方不明者の発生　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (14)役員等の法令違反・刑事処分　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (15)役員等の精神機能の障害　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (16)役員等の破産手続開始・未復権　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (17)役員等の実習認定取消　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (18)役員等が取消法人の役員であったこと　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (19)出入国・労働法令の不正行為（5年以内）　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (20)役員等が暴力団員（5年以内を含む）　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+          (21)未成年者の法定代理人が(14)〜(20)に該当　有（内容・該当者名：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- P5: 所属機関用（変更）V3 -->
+  <div class="doc">
+    <div class="page-num-label">P5</div>
+    <div class="head-right">
+      <span>所属機関等作成用 3　V（「特定技能（1号）」・「特定技能（2号）」）</span>
+      <span>在留資格変更用</span>
+    </div>
+
+    <table class="form-table">
+      <tr><td colspan="2">
+        (22)暴力団員等による事業支配　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+        (23)外国人の活動内容文書の作成・保存（1年以上）　有・無<br>
+        (24)保証金徴収・違約金等の支払契約を認識して締結　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+        (25)不履行に関する違約金等の支払契約　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+        (26)支援費用を外国人に負担させない措置　有・無<br>
+        (27)労働者派遣先が下記のいずれかに該当　有・無<br>
+      </td></tr>
+      <tr><td colspan="2">
+        <div class="indent1">
+          <span class="cb"></span>①特定産業分野に係る業務を行っていること<br>
+          <span class="cb"></span>②地方公共団体または①が資本金の過半数を出資<br>
+          <span class="cb"></span>③地方公共団体または①が業務執行に実質的に関与<br>
+          <span class="cb"></span>④農業分野で国家戦略特別区域法の特定機関であること
+        </div>
+        (28)派遣先が(11)〜(22)に該当　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+        (29)労災保険加入等の措置　有（内容：雇用開始後すぐに労災保険に加入）・無<br>
+        (30)雇用契約を継続して履行する体制が適切に整備　有・無<br>
+        (31)報酬の支払方法（振込確認可能な方法）　有・無<br>
+        (32)共生社会施策への協力　有・無<br>
+        <div class="indent1">
+          ○事業所所在地の市町村長への協力確認書提出　有・無<br>
+          &emsp;提出年月日（<span id="v_doc_y"></span>年&nbsp;<span id="v_doc_m"></span>月&nbsp;<span id="v_doc_d"></span>日提出&emsp;<span id="v_ec_office_city"></span>市・区・町・村長）<br>
+          ○住居地の市町村長への協力確認書提出　有・無
+        </div>
+        (33)特定産業分野固有の雇用契約適正履行基準適合　有・無
+      </td></tr>
+      <tr><td colspan="2">
+        （以下(34)〜(42)は申請人が「特定技能1号」かつ登録支援機関に支援計画の全部を委託しない場合に記入）<br>
+        (34)支援責任者名　<span class="fill-m"></span>&emsp;所属・役職　<span class="fill-m"></span><br>
+        &emsp;役員又は職員の中から支援責任者を選任　有・無<br>
+        (35)支援担当者名　<span class="fill-m"></span>&emsp;所属・役職　<span class="fill-m"></span><br>
+        &emsp;事業所ごとに1名以上の支援担当者を選任　有・無<br>
+        (36)下記のいずれかに該当　有・無<br>
+        <div class="indent1">
+          <span class="cb"></span>①過去2年以内に中長期在留者の受入れ・管理の実績を有すること<br>
+          <span class="cb"></span>②支援責任者及び担当者が過去2年以内に中長期在留者の生活相談等に従事した経験を有すること<br>
+          <span class="cb"></span>③その他支援業務を適正に実施できる事情を有すること（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）
+        </div>
+        (37)外国人が理解できる言語による支援実施体制　有・無<br>
+        (38)支援状況文書の作成・保存（1年以上）　有・無
+      </td></tr>
+    </table>
+  </div>
+
+  <!-- P6: 所属機関用（変更）V4 -->
+  <div class="doc">
+    <div class="page-num-label">P6</div>
+    <div class="head-right">
+      <span>所属機関等作成用 4　V（「特定技能（1号）」・「特定技能（2号）」）</span>
+      <span>在留資格変更用</span>
+    </div>
+
+    <table class="form-table">
+      <tr><td colspan="2">
+        (39)支援責任者・担当者が中立な立場で支援計画を実施できる立場　有・無<br>
+        (40)5年以内に適合支援計画に基づく支援を怠ったことの有無　有（内容：&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）・無<br>
+        (41)定期的な面談実施体制　有・無<br>
+        (42)特定産業分野固有の支援計画適正実施基準適合　有・無
+      </td></tr>
+    </table>
+
+    <div class="section-head">４　１号特定技能外国人支援計画（「特定技能1号」での在留を希望する場合に記入）</div>
+    <table class="form-table">
+      <tr><td>
+        (1)在留資格変更前の事前情報提供（外国人が理解できる言語）　有・無<br>
+        (2)対面又はテレビ電話等による事前情報提供　有・無<br>
+        (3)出入国時の港・飛行場への送迎　有・無<br>
+        (4)適切な住居確保の支援　有・無<br>
+        (5)銀行口座開設・携帯電話契約等の支援　有・無<br>
+        (6)変更後の生活情報提供（外国人が理解できる言語）　有・無<br>
+        (7)行政手続き等への同行・支援　有・無<br>
+        (8)日本語学習の機会提供　有・無<br>
+        (9)相談・苦情への適切な対応（外国人が理解できる言語）　有・無<br>
+        (10)日本人との交流促進支援　有・無<br>
+        (11)非自発的離職時の転職支援　有・無<br>
+        (12)定期的な面談・問題発生時の行政機関への通報　有・無<br>
+        (13)日本語及び外国語による支援計画書の作成・交付　有・無<br>
+        (14)分野固有の事項を支援計画に記載　有・無<br>
+        (15)支援の内容が適正在留に資し適切に実施可能　有・無<br>
+        (16)分野固有の支援計画基準適合　有・無
+      </td></tr>
+    </table>
+
+    <div class="section-head">５　登録支援機関（支援計画の全部を委託する場合に記入）</div>
+    <table class="form-table">
+      <tr>
+        <td style="width:50%;">(1)氏名又は名称<br><span id="v_rso_name"></span></td>
+        <td>(2)法人番号（13桁）<br><span class="fill-l"></span></td>
+      </tr>
+      <tr>
+        <td>(4)住所（所在地）<br><span id="v_rso_address"></span>&emsp;電話番号　<span id="v_rso_tel"></span></td>
+        <td>(5)代表者の氏名<br><span id="v_rso_rep"></span></td>
+      </tr>
+      <tr>
+        <td>(6)登録番号　<span id="v_rso_reg_no"></span></td>
+        <td>(7)登録年月日　<span id="v_rso_reg_y"></span>年&nbsp;<span id="v_rso_reg_m"></span>月&nbsp;<span id="v_rso_reg_d"></span>日</td>
+      </tr>
+      <tr>
+        <td>(8)支援を行う事業所名　<span id="v_rso_office"></span></td>
+        <td>(9)所在地　<span id="v_rso_office_addr"></span></td>
+      </tr>
+      <tr>
+        <td>(10)支援責任者名　支援計画書の通り</td>
+        <td>(11)支援担当者名　支援計画書の通り</td>
+      </tr>
+      <tr>
+        <td>(12)対応可能言語　<span id="v_rso_lang"></span></td>
+        <td>(13)支援委託手数料（月額/人）　<span id="v_rso_fee"></span>円</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:8px;font-size:8pt;">以上の記載内容は事実と相違ありません。<br>
+    <span class="en">I hereby declare that the statement given above is true and correct.</span></div>
+    <div class="sign-area">
+      <div class="sign-box">
+        特定技能所属機関名・代表者氏名<br>
+        <span id="v_org_name3"></span>　<span id="v_org_rep2"></span><br>
+        書類作成日：<span id="v_doc_y2"></span>年&nbsp;<span id="v_doc_m2"></span>月&nbsp;<span id="v_doc_d2"></span>日
+      </div>
+    </div>
+    <div class="note">（注）申請書作成後申請までに記載内容に変更が生じた場合，特定技能所属機関が変更箇所を訂正すること。</div>
+  </div>
+
+  <!-- P7: 職種一覧・業種一覧（参照用） -->
+  <div class="doc">
+    <div class="page-num-label">P7</div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:4px;">別紙　職種一覧　<span class="en">Attachment: A list of occupation</span></div>
+    <div class="note">（このシートは提出する必要はありません。There is no need to submit this sheet.）</div>
+    <table class="form-table" style="font-size:7pt;">
+      <tr style="background:#eee;"><td style="width:5%;">番号</td><td style="width:45%;">職種</td><td style="width:5%;">番号</td><td>職種</td></tr>
+      <tr><td>1</td><td>経営 Executive</td><td>53</td><td>接客（その他）Service(others)</td></tr>
+      <tr><td>2</td><td>管理業務 Management work</td><td>54</td><td>製品製造 Product manufacturing</td></tr>
+      <tr><td>3</td><td>調査研究 Research</td><td>55</td><td>保健師 Public health nurse</td></tr>
+      <tr><td>11</td><td>建築・土木・測量技術 Architecture, civil engineering</td><td>57</td><td>准看護師 Assistant nurse</td></tr>
+      <tr><td>12</td><td>情報処理・通信技術 IT, communications</td><td>65</td><td>弁護士 Lawyer</td></tr>
+      <tr><td>25</td><td>翻訳・通訳 Translation / Interpretation</td><td>72</td><td>税理士 Certified tax accountant</td></tr>
+      <tr><td>29</td><td>会計事務 Accounting</td><td>73</td><td>社会保険労務士</td></tr>
+      <tr><td>32</td><td>調理 Cooking</td><td>74</td><td>行政書士</td></tr>
+      <tr><td>41</td><td>介護福祉士 Certified care worker</td><td>100</td><td>その他のサービス職業従事者</td></tr>
+      <tr><td>42</td><td>研究 Research</td><td>101</td><td>農林漁業従事者 Agriculture, forestry and fishery</td></tr>
+      <tr><td>47</td><td>医師 Doctor</td><td>102</td><td>製品製造・加工処理従事者（金属製品）</td></tr>
+      <tr><td>50</td><td>看護師 Nurse</td><td>103</td><td>製品製造・加工処理従事者（金属製品除く）</td></tr>
+      <tr><td>51</td><td>接客（販売店）Service(store)</td><td>107</td><td>建設躯体工事従事者</td></tr>
+      <tr><td>52</td><td>接客（飲食店）Service(restaurant)</td><td>999</td><td>その他 Others</td></tr>
+    </table>
+    <div style="font-size:9pt;font-weight:bold;margin:8px 0 4px;">別紙　業種一覧　<span class="en">Attachment: A list of business type</span></div>
+    <table class="form-table" style="font-size:7pt;">
+      <tr style="background:#eee;"><td style="width:5%;">番号</td><td style="width:45%;">業種</td><td style="width:5%;">番号</td><td>業種</td></tr>
+      <tr><td>1</td><td>農林業 Agriculture</td><td>22</td><td>小売業 Retail</td></tr>
+      <tr><td>2</td><td>漁業 Fishery</td><td>27</td><td>金融・保険業 Finance / insurance</td></tr>
+      <tr><td>3</td><td>鉱業，採石業 Mining, quarrying</td><td>28</td><td>不動産・物品賃貸業</td></tr>
+      <tr><td>4</td><td>建設業 Construction</td><td>33</td><td>宿泊業 Accommodation</td></tr>
+      <tr><td>5</td><td>製造業（食料品）Food manufacturing</td><td>34</td><td>飲食サービス業 Food service</td></tr>
+      <tr><td>6</td><td>製造業（繊維工業）Textile</td><td>35</td><td>生活関連サービス・娯楽業</td></tr>
+      <tr><td>7</td><td>製造業（プラスチック製品）</td><td>36</td><td>学校教育 School education</td></tr>
+      <tr><td>8</td><td>製造業（金属製品）</td><td>38</td><td>医療・福祉業 Medical / welfare</td></tr>
+      <tr><td>9</td><td>製造業（生産用機械器具）</td><td>40</td><td>社会保険・社会福祉・介護事業</td></tr>
+      <tr><td>10</td><td>製造業（電気機械器具）</td><td>42</td><td>職業紹介・労働者派遣業</td></tr>
+      <tr><td>11</td><td>製造業（輸送用機械器具）</td><td>43</td><td>その他の事業サービス業</td></tr>
+      <tr><td>13</td><td>電気・ガス・水道業</td><td>44</td><td>その他のサービス業</td></tr>
+      <tr><td>14</td><td>情報通信業 IT</td><td>46</td><td>公務 Public service</td></tr>
+      <tr><td>15</td><td>運輸・信書便事業 Transportation</td><td>47</td><td>分類不能の産業 Unclassifiable</td></tr>
+    </table>
+  </div>
+
+  </div><!-- pageArea -->
+</div><!-- pp -->
+</div><!-- main -->
+
+<script src="ofusa_common.js?v=1776427000"></script>
+<script>
+function f(key){ return v(key)||''; }
+function v(key){
+  const el = document.getElementById(key);
+  return el ? el.value : '';
+}
+
+function p(){
+  // P1
+  document.getElementById('v_p_nationality').textContent = v('p_nationality');
+  document.getElementById('v_p_byear').textContent = v('p_byear');
+  document.getElementById('v_p_byear2').textContent = v('p_byear');
+  document.getElementById('v_p_bmonth').textContent = v('p_bmonth');
+  document.getElementById('v_p_bmonth2').textContent = v('p_bmonth');
+  document.getElementById('v_p_bday').textContent = v('p_bday');
+  document.getElementById('v_p_bday2').textContent = v('p_bday');
+  document.getElementById('v_p_name').textContent = v('p_name');
+  document.getElementById('v_p_name2').textContent = v('p_name');
+  document.getElementById('v_p_job').textContent = v('p_job');
+  document.getElementById('v_p_hometown').textContent = v('p_hometown');
+  document.getElementById('v_p_hometown2').textContent = v('p_hometown');
+  document.getElementById('v_p_address').textContent = v('p_address');
+  document.getElementById('v_p_tel').textContent = v('p_tel');
+  document.getElementById('v_p_passport_no').textContent = v('p_passport_no');
+  document.getElementById('v_p_pexp_y').textContent = v('p_pexp_y');
+  document.getElementById('v_p_pexp_m').textContent = v('p_pexp_m');
+  document.getElementById('v_p_pexp_d').textContent = v('p_pexp_d');
+  document.getElementById('v_p_status').textContent = v('p_status');
+  document.getElementById('v_p_period').textContent = v('p_period');
+  document.getElementById('v_p_exp_y').textContent = v('p_exp_y');
+  document.getElementById('v_p_exp_m').textContent = v('p_exp_m');
+  document.getElementById('v_p_exp_d').textContent = v('p_exp_d');
+  document.getElementById('v_p_card_no').textContent = v('p_card_no');
+  document.getElementById('v_p_desired_status').textContent = v('p_desired_status');
+  // 機関
+  ['org_name','org_name2','org_name3'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('org_name'); });
+  ['org_address','org_address2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('org_address'); });
+  ['org_tel','org_tel2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('org_tel'); });
+  document.getElementById('v_org_corp_no').textContent = v('org_corp_no');
+  document.getElementById('v_org_capital').textContent = v('org_capital');
+  document.getElementById('v_org_sales').textContent = v('org_sales');
+  document.getElementById('v_org_staff').textContent = v('org_staff');
+  ['org_rep','org_rep2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('org_rep'); });
+  document.getElementById('v_org_labor_ins').textContent = v('org_labor_ins');
+  // 雇用
+  document.getElementById('v_ec_start_y').textContent = v('ec_start_y');
+  document.getElementById('v_ec_start_m').textContent = v('ec_start_m');
+  document.getElementById('v_ec_start_d').textContent = v('ec_start_d');
+  document.getElementById('v_ec_end_y').textContent = v('ec_end_y');
+  document.getElementById('v_ec_end_m').textContent = v('ec_end_m');
+  document.getElementById('v_ec_end_d').textContent = v('ec_end_d');
+  document.getElementById('v_ec_field').textContent = v('ec_field');
+  document.getElementById('v_ec_category').textContent = v('ec_category');
+  document.getElementById('v_ec_weekly_h').textContent = v('ec_weekly_h');
+  document.getElementById('v_ec_monthly_h').textContent = v('ec_monthly_h');
+  document.getElementById('v_ec_salary').textContent = v('ec_salary');
+  document.getElementById('v_ec_hourly').textContent = v('ec_hourly');
+  document.getElementById('v_ec_jp_salary').textContent = v('ec_jp_salary');
+  document.getElementById('v_ec_office_name').textContent = v('ec_office_name');
+  document.getElementById('v_ec_office_addr').textContent = v('ec_office_addr');
+  // 紹介
+  document.getElementById('v_pea_name').textContent = v('pea_name');
+  document.getElementById('v_pea_address').textContent = v('pea_address');
+  document.getElementById('v_pea_tel').textContent = v('pea_tel');
+  document.getElementById('v_pea_no').textContent = v('pea_no');
+  // 登録支援
+  document.getElementById('v_rso_name').textContent = v('rso_name');
+  document.getElementById('v_rso_address').textContent = v('rso_address');
+  document.getElementById('v_rso_tel').textContent = v('rso_tel');
+  document.getElementById('v_rso_rep').textContent = v('rso_rep');
+  document.getElementById('v_rso_reg_no').textContent = v('rso_reg_no');
+  document.getElementById('v_rso_reg_y').textContent = v('rso_reg_y');
+  document.getElementById('v_rso_reg_m').textContent = v('rso_reg_m');
+  document.getElementById('v_rso_reg_d').textContent = v('rso_reg_d');
+  document.getElementById('v_rso_office').textContent = v('rso_office');
+  document.getElementById('v_rso_office_addr').textContent = v('rso_office_addr');
+  document.getElementById('v_rso_lang').textContent = v('rso_lang');
+  document.getElementById('v_rso_fee').textContent = v('rso_fee');
+  // 作成日
+  ['doc_y','doc_y2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('doc_y'); });
+  ['doc_m','doc_m2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('doc_m'); });
+  ['doc_d','doc_d2'].forEach(id=>{ const el=document.getElementById('v_'+id); if(el) el.textContent=v('doc_d'); });
+}
+
+// DB連携
+async function loadFromDB(){
+  if(typeof loadFromDBCommon==='function') await loadFromDBCommon();
+  p();
+}
+async function saveForm(){
+  if(typeof saveFormCommon==='function') await saveFormCommon();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  p();
+  if(typeof setupPageTracker==='function') setupPageTracker();
+});
+</script>
+</body>
+</html>
