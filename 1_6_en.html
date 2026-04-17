@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260417.19</div>
+    <div class="ver">ver.20260417.20</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -554,8 +554,8 @@ function p(){
           const maxRows = shifts.length > 0 ? shifts.length : 5;
           return Array.from({length:maxRows},(_,i)=>{
             const s = rows[i]||{start:'',end:'',h:'',min:'',days:'',daysEn:''};
-            const startStr = s.start ? s.start : '&emsp;時&emsp;分';
-            const endStr   = s.end   ? s.end   : '&emsp;時&emsp;分';
+            const startStr = s.start ? s.start : '&emsp;:&emsp;';
+            const endStr   = s.end   ? s.end   : '&emsp;:&emsp;';
             const daysStr  = s.days  ? s.days  : '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
