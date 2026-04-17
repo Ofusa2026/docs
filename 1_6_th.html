@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260417.12</div>
+    <div class="ver">ver.20260417.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -509,12 +509,12 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">III. รายละเอียดงานที่ควรจะปฏิบัติ</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">2. วันหยุดพิเศษ: จำนวน วันต่อสัปดาห์/เดือน, อื่นๆ ( )</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. สาขาของงาน</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">VI. วันหยุด</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">1. วันลาพักร้อนประจำปี                                          ในกรณีที่ทำงานต่อเนื่องครบ 6 เดือน  → ${f('es_paidLeave')} วัน</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. ประเภทของงาน</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">วันลาพักร้อนประจำปีในกรณีที่ทำงานต่อเนื่องยังไม่ครบ 6 เดือน                        ( มี ไม่มี) → ทำงานครบ เดือน ได้วันหยุด วัน</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,'cb_auto_001')}&nbsp;ไม่มีการเปลี่ยนแปลง</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">2. วันลาอื่นๆ　　 　ลาแบบได้รับค่าจ้าง ( ${f('es_paidLeaveEn')} )　　ลาแบบไม่ได้รับค่าจ้าง ( ${f('es_unpaidLeaveEn')} )</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. สาขาของงาน</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">3. วันลากลับประเทศชั่วคราว   ในกรณีที่ผู้รับจ้างต้องการกลับประเทศชั่วคราว ให้ลาหยุดเท่าที่จำเป็นภายในจำนวนวันลาในข้อ 1 หรือ 2 ด้านบน</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ (      )ข้อที่          ถึงข้อที่</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. ประเภทของงาน</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（${f('es_categoryEn')}）</td></tr>
         </table>
       </div>
     </div>

@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260417.14</div>
+    <div class="ver">ver.20260417.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -509,12 +509,12 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">III. 종사해야 할 업무 내용</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">○ 자세한 내용은 취업 규칙 제 조~제 조, 제 조~제 조, 제 조~제 조</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">Ⅴ. 휴일</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. 분야</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">1. 정례일: 요일, 기타 ( ) 연간 총 휴일 일수 ( 일)</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">2. 비정례일 : 주·월당 일, 기타 ( )</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. 업무 구분</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
           </tr>
         </table>
       </div>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">○ 자세한 내용은 취업 규칙 제 조~제 조, 제 조~제 조, 제 조~제 조</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,'cb_auto_001')}&nbsp;변경 가능성 없음</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">Ⅵ. 휴가</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. 분야</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">1. 연례 유급 휴가 6개월 근속한 경우→ 10일</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">근속 6개월 미만의 연차 유급 휴가 ( 유 무) → 개월 경과에 일)</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. 업무 구분</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（${f('es_categoryEn')}）</td></tr>
         </table>
       </div>
     </div>
