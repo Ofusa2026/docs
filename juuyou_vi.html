@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260417.142</div>
+    <div class="ver">ver.20260417.143</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -130,14 +130,20 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>手取り（円）</label><input id="f_netPay" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">７．業務内容</div>
-      <div class="fg"><label>従事させる業務区分</label><input id="f_workType" oninput="p()"></div>
-      <div class="fg"><label>従事させる工事業の種類</label><input id="f_workCat" oninput="p()"></div>
-      <div class="fg"><label>具体的職種・作業内容</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
+      <div class="fg"><label>従事させる業務区分（日）</label><input id="f_workType" oninput="p()"></div>
+      <div class="fg"><label>Phân loại công việc (vi)</label><input id="f_workTypeVi" oninput="p()"></div>
+      <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="p()"></div>
+      <div class="fg"><label>Loại công trình (vi)</label><input id="f_workCatVi" oninput="p()"></div>
+      <div class="fg"><label>具体的職種・作業内容（日）</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
+      <div class="fg"><label>Ngành nghề và nội dung công việc (vi)</label><textarea id="f_workDetailVi" oninput="p()" rows="3"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">８．昇給</div>
-      <div class="fg"><label>昇給額</label><input id="f_raiseAmount" oninput="p()"></div>
-      <div class="fg"><label>昇給条件</label><input id="f_raiseCond" oninput="p()"></div>
-      <div class="fg"><label>昇給時期</label><input id="f_raiseTime" oninput="p()"></div>
+      <div class="fg"><label>昇給額（日）</label><input id="f_raiseAmount" oninput="p()"></div>
+      <div class="fg"><label>Số tiền tăng lương (vi)</label><input id="f_raiseAmountVi" oninput="p()"></div>
+      <div class="fg"><label>昇給条件（日）</label><input id="f_raiseCond" oninput="p()"></div>
+      <div class="fg"><label>Điều kiện nâng lương (vi)</label><input id="f_raiseCondVi" oninput="p()"></div>
+      <div class="fg"><label>昇給時期（日）</label><input id="f_raiseTime" oninput="p()"></div>
+      <div class="fg"><label>Thời gian tăng lương (vi)</label><input id="f_raiseTimeVi" oninput="p()"></div>
     </div>
   </div>
 </div>
@@ -294,11 +300,11 @@ function p(){
   <div class="sec-h-vi">Nội dung công việc (phân loại công việc sẽ làm, loại công trình, ngành nghề và nội dung công việc cụ thể sẽ làm)<br>(Không chỉ nêu tên công việc, v.v. mà còn giải thích cụ thể sẽ làm công việc gì, loại công trình gì.)</div>
   <div style="padding:1mm 0;">
     <div class="row ja">従事させる業務区分：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
-    <div class="row vi">Phân loại công việc sẽ làm：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
+    <div class="row vi">Phân loại công việc sẽ làm：<span class="under" style="min-width:20em;">${f('f_workTypeVi')}</span></div>
     <div class="row ja">従事させる工事業の種類：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
-    <div class="row vi">Loại công trình sẽ làm：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
+    <div class="row vi">Loại công trình sẽ làm：<span class="under" style="min-width:20em;">${f('f_workCatVi')}</span></div>
     <div class="row ja">従事させる具体的職種及び作業内容：<span class="under" style="min-width:20em;">${f('f_workDetail')}</span></div>
-    <div class="row vi">Ngành nghề và nội dung công việc cụ thể sẽ làm：<span class="under" style="min-width:20em;">${f('f_workDetail')}</span></div>
+    <div class="row vi">Ngành nghề và nội dung công việc cụ thể sẽ làm：<span class="under" style="min-width:20em;">${f('f_workDetailVi')}</span></div>
   </div>
 </div>
 </div>
@@ -312,11 +318,11 @@ function p(){
   <div class="sec-h-vi">Liên quan đến tăng lương theo sự thành thạo của kỹ năng, v.v…<br>(Giải thích về số tiên tăng lương, điều kiện tăng lương và thời gian tăng lương. Chú ý đảm bảo mức thù lao tương đương hoặc cao hơn so với người lao động Nhật có cùng kỹ năng theo ngành nghề và nội dung công việc cụ thể sẽ làm.)</div>
   <div style="padding:1mm 0;">
     <div class="row ja">昇給額：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
-    <div class="row vi">Số tiền tăng lương：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
+    <div class="row vi">Số tiền tăng lương：<span class="under" style="min-width:20em;">${f('f_raiseAmountVi')}</span></div>
     <div class="row ja">昇給条件：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
-    <div class="row vi">Điều kiện nâng lương：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
+    <div class="row vi">Điều kiện nâng lương：<span class="under" style="min-width:20em;">${f('f_raiseCondVi')}</span></div>
     <div class="row ja">昇給時期：<span class="under" style="min-width:20em;">${f('f_raiseTime')}</span></div>
-    <div class="row vi">Thời gian tăng lương：<span class="under" style="min-width:20em;">${f('f_raiseTime')}</span></div>
+    <div class="row vi">Thời gian tăng lương：<span class="under" style="min-width:20em;">${f('f_raiseTimeVi')}</span></div>
   </div>
 </div>
 
