@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.23</div>
+    <div class="ver">ver.20260417.24</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -648,9 +648,14 @@ function p(){
         </tr>
 
         <tr>
-          <td></td>
-          <td style="width:33%;vertical-align:top;">法定超月60時間超（${f('es_ot60over')}）％</td>
-          <td style="width:33%;vertical-align:top;">所定超（${f('es_otPrescribed')}）％</td>
+          <td style="width:33%;"></td>
+          <td style="width:33%;vertical-align:top;">法定超月60時間超<br><span class="id" style="font-size:7pt;"></span></td>
+          <td style="width:33%;vertical-align:top;">（${f('es_ot60over')}）％<br><span class="id" style="font-size:7pt;">（${f('es_ot60over')}）％</span></td>
+        </tr>
+        <tr>
+          <td style="width:33%;"></td>
+          <td style="width:33%;vertical-align:top;">所定超<br><span class="id" style="font-size:7pt;"></span></td>
+          <td style="width:33%;vertical-align:top;">（${f('es_otPrescribed')}）％<br><span class="id" style="font-size:7pt;">（${f('es_otPrescribed')}）％</span></td>
         </tr>
 
         <tr>
