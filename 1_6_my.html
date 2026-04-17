@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260417.11</div>
+    <div class="ver">ver.20260417.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -387,13 +387,13 @@ function p(){
       return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id" data-key="1">(${ltr})（ခံစားခွင့်　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}ယန်း/တွက်ချက်နည်း:${ph(calcEn,'CalcEn')}）</div>`;
+    annexAllow+=`<div class="id" data-key="1">ရည်ညွှန်းပုံစံအမှတ် ၁-၆</div>`;
   });
 
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">ရည်ညွှန်းပုံစံအမှတ် ၁-၆</span></div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</span></div>
 
 <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
 <div style="text-align:center;font-size:10pt;padding-bottom:8px;">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</div>
@@ -404,9 +404,9 @@ function p(){
   <div style="padding:8px 12px 10px;">
     <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
-      <span class="id" style="font-size:7.5pt;" data-key="3">နှစ် လ ရက် ${f('es_createD')} ${f('es_createM')} ${f('es_createY')}</span>
+      <span class="id" style="font-size:7.5pt;" data-key="3">နှစ် လ ရက်</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">ဦး/ဒေါ် ${f('applicantName')}</span></div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">ဦး/ဒေါ်</span></div>
     <div style="display:flex;justify-content:flex-end;">
       <table style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
@@ -414,22 +414,22 @@ function p(){
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="7">ဖုန်းနံပါတ်</td><td class="id" style="font-size:7pt;" data-key="8">ကိုယ်စားလှယ်၏ ရာထူး၊အမည် ${f('es_repTitleEn')} ${f('es_repNameEn')} (တံဆိပ်တုံး)</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">၁။အလုပ်ခန့်သည့်ကာလ</td><td class="id" style="font-size:7pt;" data-key="10">၁။အလုပ်ခန့်သည့်ကာလ ${f('es_orgTel')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">၁။အလုပ်ခန့်သည့်ကာလ</td><td class="id" style="font-size:7pt;" data-key="10">၁။အလုပ်ခန့်သည့်ကာလ</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
-        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">( နှစ် လ ရက် မှ နှစ် လ ရက် ) ဂျပန်နိုင်ငံ၀င်ရောက်မည့်ရက်စွဲ</td><td class="id" style="font-size:7pt;" data-key="12">၂။စာချုပ်သက်တမ်းတိုးခြင်းရှိမရှိ ${f('es_repTitleEn')} ${f('es_repNameEn')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">( နှစ် လ ရက် မှ နှစ် လ ရက် ) ဂျပန်နိုင်ငံ၀င်ရောက်မည့်ရက်စွဲ</td><td class="id" style="font-size:7pt;" data-key="12">၂။စာချုပ်သက်တမ်းတိုးခြင်းရှိမရှိ</td></tr>
       </table>
     </div>
   </div>
 
   <!-- Ⅰ 雇用契約期間 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">၁။အလုပ်ခန့်သည့်ကာလ</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">အလိုလျှောက် စာချုပ်သက်တန်းတိုးမည်ဖြစ်သည် သက်တန်းတိုးခြင်းရှိနိုင်သည် စာချုပ်သက်တန်းတိုးမည်မဟုတ်ပါ</span></div>
     <div style="margin-left:8px;">
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">※    အထက္ပါစာခ်ဳပ္သက္တမ္းတိုးျခင္းရွိမရွိတြင္ "ၒၒၒသက္တမ္းတိုးျခင္းရွိနိုင္သည္။"  ဆိုပါက သက္တမ္းတိုးရန္ဆံုးျဖတ္မွုစံနွုန္းကို ေအာက္ပါအတိုင္းသတ္မွတ္မည္။</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">( နှစ် လ ရက် မှ နှစ် လ ရက် ) ဂျပန်နိုင်ငံ၀င်ရောက်မည့်ရက်စွဲ</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">စာခ်ဳပ္သက္တမ္းျပည့္ခ်ိန္လုပ္ငန္းတာဝန္ပမာဏ လုပ္သား၏လုပ္ေဆာင္နိုင္မွုရလဒ္၊အျပူအမူ လုပ္သား၏လုပ္ငန္းတာဝန္ျပီးေျမာက္မွူစြမ္းရည္</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">၃။စာချုပ်သက်တန်းတိုးခြင်းအတွက် အကန့်အသတ်ရှိ?မရှိ(မရှိ/ ရှိ(သက်တန်းတိုးခြင်း ကြိမ်အထိ/စုစုပေါင်းသက်တန်းတိုးခြင်းကာလ နှစ်အထိ)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">ကုမၸဏီစီမံခန့္ခြဲမွုအေျခအေန တာဝန္ယူထားသည့္လုပ္ငန္းတိုးတက္မွုအေျခအေန အျခား ( )</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -438,29 +438,29 @@ function p(){
             <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
           </tr>
           <tr style="font-size:7.5pt;">
-            <td class="id" style="white-space:nowrap;" data-key="17">${cb(rAuto,'renewal_auto_id')}&nbsp;အလိုလျှောက် စာချုပ်သက်တန်းတိုးမည်</td>
-            <td class="id" style="white-space:nowrap;" data-key="18">${cb(rPos,'renewal_pos_id')}&nbsp;သက်တန်းတိုးခြင်းရှိနိုင်သည်</td>
-            <td class="id" style="white-space:nowrap;" data-key="19">${cb(rNone,'renewal_none_id')}&nbsp;စာချုပ်သက်တန်းတိုးမည်မဟုတ်ပါ</td>
+            <td class="id" style="white-space:nowrap;" data-key="17">※ကုမ္ပဏီ၏စီးပွားရေးအခြေအနေမှာအလွန်အမင်းဆိုး၀ါးသွားပါကစာချုပ်သက်တမ်းတိုးခြင်းရှိမည်မဟုတ်ပါ။</td>
+            <td class="id" style="white-space:nowrap;" data-key="18">၃။စာချုပ်သက်တန်းတိုးခြင်းအတွက် အကန့်အသတ်ရှိ?မရှိ(မရှိ/ ရှိ(သက်တန်းတိုးခြင်း ကြိမ်အထိ/စုစုပေါင်းသက်တန်းတိုးခြင်းကာလ နှစ်အထိ)</td>
+            <td class="id" style="white-space:nowrap;" data-key="19">[အလုပ်သမားစာချုပ်ဥပဒေတွင်ပြဌာန်းထားသည့် တူညီသည့်ကုမ္ပဏီဖြင့် ချုပ်ဆိုသောစာချုပ်သည် ၅နှစ်ကို ကျော်လွန်သည့် စာချုပ်ဖြစ်ပါက]</td>
           </tr>
         </table>
-        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">■ တိုက်ရိုက်အလုပ်ခန့်အပ်ခြင်း(အောက်တွင်ဖြည့်စွက်ပါ) □ အလုပ်စေလွှတ်ခန့်အပ်ခြင်း(ပူးတွဲပါ"အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ရှင်းလင်းစာ"တွင်ဖြည့်စွက်ပါ)</span></div>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">ဤစာချုပ်သက်တန်းအတွင်း ကုမ္ပဏီဖြင့် သက်တန်းကာလ အကန့်အသတ်မရှိသော အလုပ်စာချုပ်ချုပ်ဆိုသည့်အခါတွင် ,ဤစာချုပ်ပြီးဆုံးသည့်ရက်ဧ်။နောက်ရက်</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">${cb(false,'kijun_1_id')}&nbsp;စာချုပ်သက်တမ်းပြည့်ချိန်လုပ်ငန်းတာဝန်ပမာဏ</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">${cb(false,'kijun_2_id')}&nbsp;လုပ်သား၏ လုပ်ဆောင်နိုင်မှုရလဒ်၊ အပြုအမူ</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">${cb(false,'kijun_3_id')}&nbsp;တာဝန်ယူထားသည့်လုပ်ငန်းတိုးတက်မှုအခြေအနေ</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">၂။အလုပ်နေရာ</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">■ တိုက်ရိုက်အလုပ်ခန့်အပ်ခြင်း(အောက်တွင်ဖြည့်စွက်ပါ) □ အလုပ်စေလွှတ်ခန့်အပ်ခြင်း(ပူးတွဲပါ"အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ရှင်းလင်းစာ"တွင်ဖြည့်စွက်ပါ)</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">လက်ခံသောအဖွဲ့အစည်း၏ရုံးခန်းသို့ဝင်ပါ။ (ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">${cb(false,'kijun_4_id')}&nbsp;လုပ်သား၏ လုပ်ငန်းတာဝန် ဆောင်ရွက်နိုင်မှုစွမ်းရည်</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">${cb(false,'kijun_5_id')}&nbsp;ကုမ္ပဏီစီမံခန့်ခွဲမှုအခြေအနေ</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">${cb(false,'kijun_6_id')}&nbsp;အခြား（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">ကုမ္ပဏီအမည် ${f('es_officeNameEn')} ကုမ္ပဏီအမည်</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">လိပ်စာ ${f('es_officeAddressEn')} လိပ်စာ</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">ဆက်သွယ်ရန်လိပ်စာ ဆက်သွယ်ရန်လိပ်စာ</span></td>
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">၁။လုပ်ငန်းအမျိုးအစား ${f('es_applicantFieldEn')} ၁။လုပ်ငန်းအမျိုးအစား</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">၂။လုပ်ငန်းတာ၀န် ${f('es_categoryEn')} ၂။လုပ်ငန်းတာ၀န်</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">(ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
-      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">၄။အလုပ်ချိန်စသည်</span><br><span class="id" style="font-size:6.5pt;" data-key="30">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></span></span></div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">၁။လုပ်ငန်းအမျိုးအစား ${f('es_applicantFieldEn')} ၁။လုပ်ငန်းအမျိုးအစား</span><br><span class="id" style="font-size:6.5pt;" data-key="30">၂။လုပ်ငန်းတာ၀န် ${f('es_categoryEn')} ၂။လုပ်ငန်းတာ၀န်</span></span></span></div>
     </div>
   </div>
 </div>
@@ -477,24 +477,24 @@ function p(){
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅱ．就業の場所</div>
         <div style="font-size:8pt;margin-bottom:4px;">၂။အလုပ်နေရာ</div>
-        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">■ တိုက်ရိုက်အလုပ်ခန့်အပ်ခြင်း(အောက်တွင်ဖြည့်စွက်ပါ) □ အလုပ်စေလွှတ်ခန့်အပ်ခြင်း(ပူးတွဲပါ"အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ရှင်းလင်းစာ"တွင်ဖြည့်စွက်ပါ)</span></div>
-        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">(၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span></div>
+        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">၄။အလုပ်ချိန်စသည်</span></div>
+        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ကုမ္ပဏီအမည်</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">ဆက်သွယ်ရန်လိပ်စာ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">၂။အလုပ်နားချိန် ( မိနစ်) ${f('es_officeTel')}</span></td></tr>
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">၁။အလုပ်စတင်ချိန် ( ) အလုပ်ပြီးဆုံးချိန် ( ) (တစ်ရက်တာအလုပ်ချိန် ${f('es_dailyHours')}  နာရီ   ${f('es_dailyMins')}  မိနစ် )</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">(၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">တစ်နှစ်ကြာပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်ဖြင့်ခန့်အပ်ပါကဒုတိယပါတီ မှ ကောင်းမွန်စွာနားလည်သဘောပေါက်သည့် ဘာသာစကားဖြင့် ရေးဆွဲထားသည့်တစ်နှစ်တာပြက္ခဒိန်မိတ္တူနှင့်လုပ်သားစံနှုန်းသတ်မှတ်သည့်ရုံးသို့တင်သွင်းထားသည့်ပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်ဖြင့်အလုပ်ခန့်အပ်မှုမိတ္တူအားပူးတွဲတင်ပြပါ။</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">အလုပ်အဆိုင်းစနစ်ဖြင့် အောက်ပါအချိန်ဇယားအတိုင်းယူနိုင်သည်။</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：派遣雇用 / 変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">3။သတ်မှတ်အလုပ်ချိန်ဇယား (၁)တစ်ပတ်တာ ( နာရီ မိနစ် ) (၂)တစ်လတာ ( နာရီ မိနစ် ) (၃)နှစ် ( နာရီ မိနစ် ) ${cb(false,'hire_dispatch_id')}</span></div>
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">၄။သတ်မှတ်အလုပ်လုပ်ရက် (၁)တစ်ပတ်တာ ( ရက် ) (၂)တစ်လတာ ( ရက် ) (၃)နှစ် ( ရက် ) ${cb(false,'change_none_direct_id')}</span></div>
+        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">၂။အလုပ်နားချိန် ( မိနစ်)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">ကုမ္ပဏီအမည်</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">လိပ်စာ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">ဆက်သွယ်ရန်လိပ်စာ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">3။သတ်မှတ်အလုပ်ချိန်ဇယား (၁)တစ်ပတ်တာ ( နာရီ မိနစ် ) (၂)တစ်လတာ ( နာရီ မိနစ် ) (၃)နှစ် ( နာရီ မိနစ် )</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">၄။သတ်မှတ်အလုပ်လုပ်ရက် (၁)တစ်ပတ်တာ ( ရက် ) (၂)တစ်လတာ ( ရက် ) (၃)နှစ် ( ရက် )</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">၅။အချိန်ပိုအလုပ်ချိန်ရှိမရှိ ရှိမည် မရှိပါ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>
@@ -509,11 +509,11 @@ function p(){
         <div style="font-size:8pt;margin-bottom:4px;">၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">3။သတ်မှတ်အလုပ်ချိန်ဇယား (၁)တစ်ပတ်တာ ( နာရီ မိနစ် ) (၂)တစ်လတာ ( နာရီ မိနစ် ) (၃)နှစ် ( နာရီ မိနစ် )</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">၄။သတ်မှတ်အလုပ်လုပ်ရက် (၁)တစ်ပတ်တာ ( ရက် ) (၂)တစ်လတာ ( ရက် ) (၃)နှစ် ( ရက် )</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">၅။အလုပ်ပိတ်ရက်</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">၅။အချိန်ပိုအလုပ်ချိန်ရှိမရှိ ရှိမည် မရှိပါ</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">၂။ ပုံမှန်မဟုတ်သောရက်များ- တစ်ပတ်/လ ရက်၊ , အခြား ( )</span></td>
             <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></td>
           </tr>
         </table>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">၅။အလုပ်ပိတ်ရက်</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">၆။ခွင့်ရက်</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">၂။ ပုံမှန်မဟုတ်သောရက်များ- တစ်ပတ်/လ ရက်၊ , အခြား ( )</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">၁။နှစ်စဥ်ခွင့်ခံစားခွင့်၆လဆက်တိုက်အလုပ်ခွင်၀င်ပြီးနောက်→ 10 hari ရက်</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">၆။ခွင့်ရက်</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">ကနဦး ၆ လကြာအလုပ်ခွင်၀င်ပြီးနောက် နှစ်စဥ်ခွင့်ခံစားခွင့် ( ရှိမည် မရှိပါ ) → လကြာပြီးနောက် ရက်</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">၂။အခြားခွင့်ရက် လစာ‌ပေး ( ) လစာမဲ့ ( )</td></tr>
         </table>
       </div>
     </div>
@@ -540,14 +540,14 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">၁။နှစ်စဥ်ခွင့်ခံစားခွင့်၆လဆက်တိုက်အလုပ်ခွင်၀င်ပြီးနောက်→ 10 hari ရက်</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">၃။ယာယီနိုင်ငံပြန်ခွင့်  ဒုတိယပါတီမှ  ယာယီနိုင်ငံပြန်လိုပါကအထက်ပါ ၁ နှင့် ၂ အတွင်းရှိခွင့်ရက် များကိုလိုအပ်သလိုယူနိုင်ပါသည်။</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">ကနဦး ၆ လကြာအလုပ်ခွင်၀င်ပြီးနောက် နှစ်စဥ်ခွင့်ခံစားခွင့် ( ရှိမည် မရှိပါ ) → လကြာပြီးနောက် ရက်</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">၂။အခြားခွင့်ရက် လစာ‌ပေး ( ) လစာမဲ့ ( )</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">၃။ယာယီနိုင်ငံပြန်ခွင့်  ဒုတိယပါတီမှ  ယာယီနိုင်ငံပြန်လိုပါကအထက်ပါ ၁ နှင့် ၂ အတွင်းရှိခွင့်ရက် များကိုလိုအပ်သလိုယူနိုင်ပါသည်။</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">၇။လုပ်ခလစာ</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">၁။အခြေခံလစာ လစဥ်လစာ ( ယန်း) နေ့စဥ်လစာ ( ${f('es_salaryDaily')} ယန်း) တစ်နာရီလစာ ယန်း)</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">၇။လုပ်ခလစာ</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">၂။အခြားခံစားခွင့်(အချိန်ပိုလုပ်အားခများမပါ၀င်ပါ)</span></div>`;
           }).join('');
         })()}
       </div>
@@ -580,11 +580,11 @@ function p(){
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
           <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">၅. အချိန်ပိုအလုပ်ချိန်ရှိမရှိ</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">၁။အခြေခံလစာ လစဥ်လစာ ( ယန်း) နေ့စဥ်လစာ ( ${f('es_salaryDaily')} ယန်း) တစ်နာရီလစာ ယန်း)</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">(ခံစားခွင့် ${f('es_allowance1NameEn')} ), (ခံစားခွင့် ${f('es_allowance2NameEn')} ), (ခံစားခွင့် ${f('es_allowance3NameEn')} )</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">(ခံစားခွင့် ${f('es_allowance4NameEn')} )</span></td>
         </tr>
       </table>
     </div>
@@ -594,9 +594,9 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">၂။အခြားခံစားခွင့်(အချိန်ပိုလုပ်အားခများမပါ၀င်ပါ)</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">(ခံစားခွင့် ${f('es_allowance1NameEn')} ), (ခံစားခွင့် ${f('es_allowance2NameEn')} ), (ခံစားခွင့် ${f('es_allowance3NameEn')} )</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">(ခံစားခွင့် ${f('es_allowance4NameEn')} )</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">၃။အချိန်ပို၊ ပိတ်ရက်ဆင်းခြင်း၊ညဘက်အလုပ်လုပ်ခြင်းအတွက် အပိုလုပ်အားခရာခိုင်နှုန်း</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">(၁)အချိန်ပို သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း ( ) ％</span></div>
     </div>
   </div>
 
@@ -604,11 +604,11 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">၆။ခွင့်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">၃။အချိန်ပို၊ ပိတ်ရက်ဆင်းခြင်း၊ညဘက်အလုပ်လုပ်ခြင်းအတွက် အပိုလုပ်အားခရာခိုင်နှုန်း</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">(၁)အချိန်ပို သတ်မှတ်ထားသည့် အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အတွင်း ( ) ％</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် ( ) ％</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း ( ) ％</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">သတ်မှတ်ထားသည့်အလုပ်ချိန်တစ်လလျှင် နာရီ ၆၀ အထက် ( ) ％</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">သတ်မှတ်ချိန်ကျော်လွန်နှုန်း ( ) ％</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">(၂)အလုပ်ပိတ်ရက် သတ်မှတ်အလုပ်ပိတ်ရက် ( )％ , သတ်မှတ်ထားခြင်းမရှိသည့်ပိတ်ရက် ( )％</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">(၃)ညဆိုင်းဆင်းခြင်း ( )％</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">၄။လုပ်အားခပေးသည့်နောက်ဆုံးရက် ${f('es_payCutoffEn')} လစဥ်        ရက်</span></div>
     </div>
   </div>
 
@@ -617,10 +617,10 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">၇။လုပ်ခလစာ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">(၂)အလုပ်ပိတ်ရက် သတ်မှတ်အလုပ်ပိတ်ရက် ( )％ , သတ်မှတ်ထားခြင်းမရှိသည့်ပိတ်ရက် ( )％</span></div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">၅။လုပ်အားခပေးသည့်ရက် ${f('es_payDayEn')} လစဥ်        ရက်</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">(၃)ညဆိုင်းဆင်းခြင်း ( )％</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">၄။လုပ်အားခပေးသည့်နောက်ဆုံးရက် ${f('es_payCutoffEn')} လစဥ်        ရက်</span></div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</span></div>
         <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</div>
       </div>
     </div>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">၅။လုပ်အားခပေးသည့်ရက် ${f('es_payDayEn')} လစဥ်        ရက်</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</td>
         </tr>
         <tr>
           <td></td>
@@ -655,23 +655,23 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">※အသေးစိတ်မှာပူးတွဲပါစာရွက်စာတမ်းအတိုင်းဖြစ်ပါသည်</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">၁။မိမိဆန္ဒဖြင့်အလုပ်ထွက်မည်ဆိုလျှင်ဆောင်ရွက်ပုံ(အလုပ်ထွက်မည့်ရက် ရက်မတိုင်ခင်တွင် ကုမ္ပဏီဥက္ကဠနှင့်စက်ရုံမှုးတို့အားအသိပေးရမည်။)</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">၂။အလုပ်ထုတ်သည့်အကြောင်းအရင်းနှင့်ဆောင်ရွက်ပုံများ</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79">၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ</td>
-          <td class="id" style="font-size:7pt;" data-key="80">၁။မိမိဆန္ဒဖြင့်အလုပ်ထွက်မည်ဆိုလျှင်ဆောင်ရွက်ပုံ(အလုပ်ထွက်မည့်ရက် ရက်မတိုင်ခင်တွင် ကုမ္ပဏီဥက္ကဠနှင့်စက်ရုံမှုးတို့အားအသိပေးရမည်။)</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">၂။အလုပ်ထုတ်သည့်အကြောင်းအရင်းနှင့်ဆောင်ရွက်ပုံများ</td>
+          <td class="id" style="font-size:7pt;" data-key="79">အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</td>
+          <td class="id" style="font-size:7pt;" data-key="80">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">၉။အခြား</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,9 +689,9 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82">အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</td>
-          <td class="id" style="font-size:7pt;" data-key="83">ဌာနအမည် ${f('es_contactDeptEn')} တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည် ${f('es_contactPersonEn')} (ဆက်သွယ်ရန် )</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">၄။ဤစာချုပ်ပြီးဆုံးသည့်အခါတွင် ဒုတိယပါတီမှ နိုင်ငံပြန်သည့်အခါတွင် ဒုတိယပါတီသည်နိုင်ငံပြန်စရိတ်အားအကုန်အကျမခံနိုင်ပါက ပထမပါတီမှအဆိုပါခရီးစရိတ်အားအကုန်အကျခံပေးမည်ဖြစ်ပြီးနိုင်ငံပြန်ရာတွင် အဆင်ပြေချောမွေ့စွာဖြစ်စေရန် လိုအပ်သည်များကိုဆောင်ရွက်ပေးရပါမည်။ ${cb(false,"cb_auto_012")}</td>
+          <td class="id" style="font-size:7pt;" data-key="82">၁။လူမှုဖူလုံရေးအာမခံလျှောက်ထားခြင်း၊လုပ်သားအာမခံအသုံးပြုခြင်း( လုပ်သားပင်စင်၊ ကျန်းမာရေးအာမခံ၊ ,</td>
+          <td class="id" style="font-size:7pt;" data-key="83">၂။အလုပ်ခန့်စဥ် ကျန်းမာရေးစစ်ဆေးခြင်း  နှစ် နှစ် လ</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">၃။ပထမအကြိမ်ဆေးစစ်ခြင်း နှစ် လ (setelah itu dilakukan setiap    1 kali / tahun   ) (နောက်ပိုင်း          အလိုက်ဆေးစစ်ခြင်း)</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">６．賃金支払方法</td>
@@ -699,16 +699,16 @@ function p(){
           <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="85">အထက်ဖော်ပြပါအပြင် ကုမ္ပဏီဧ်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းပေါ်မူတည်ပါသည်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းကို လေ့လာနိုင်သော နေရာနှင့်နည်းလမ်း</td>
-          <td class="id" style="font-size:7pt;" data-key="86">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">၆။လုပ်အားခပေးချေမှုနည်းလမ်း ဘဏ်မှလွဲခြင်း ငွေသားဖြင့်ပေးခြင်း</td>
+          <td class="id" style="font-size:7pt;" data-key="85">၄။ အလုပ်ခန့်အပ်ခြင်းစီမံခန့်ခွဲမှု ပြင်ဆင်ခြင်းနှင့် ပတ်သတ်ပြီး ဆွေးနွေးရန် ဌာန</td>
+          <td class="id" style="font-size:7pt;" data-key="86">ဌာနအမည် ${f('es_contactDeptEn')} တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည် ${f('es_contactPersonEn')} (ဆက်သွယ်ရန် )</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">၄။ဤစာချုပ်ပြီးဆုံးသည့်အခါတွင် ဒုတိယပါတီမှ နိုင်ငံပြန်သည့်အခါတွင် ဒုတိယပါတီသည်နိုင်ငံပြန်စရိတ်အားအကုန်အကျမခံနိုင်ပါက ပထမပါတီမှအဆိုပါခရီးစရိတ်အားအကုန်အကျခံပေးမည်ဖြစ်ပြီးနိုင်ငံပြန်ရာတွင် အဆင်ပြေချောမွေ့စွာဖြစ်စေရန် လိုအပ်သည်များကိုဆောင်ရွက်ပေးရပါမည်။</td>
         </tr>
         <tr>
-          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</span></td>
+          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">အထက်ဖော်ပြပါအပြင် ကုမ္ပဏီဧ်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းပေါ်မူတည်ပါသည်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းကို လေ့လာနိုင်သော နေရာနှင့်နည်းလမ်း</span></td>
           <td style="vertical-align:top;">
             <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
               <tr><td style="white-space:nowrap;">${cb(false,"taisho_none")}&nbsp;無</td><td style="white-space:nowrap;">${cb(true,"taisho_yes")}&nbsp;有</td></tr>
-              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">၇။လုပ်သားစီမံခန့်ခွဲ ရေးသဘောတူညီချက်အရလုပ်အားခထဲမှနှုတ်ယူခြင်း မရှိပါ ရှိမည်</td></tr>
+              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">ရည်ညွှန်းပုံစံအမှတ် ၁-၆ ပူးတွဲပါစာရွက်စာတမ်း</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">လုပ်အားခပေးချေမှု</td></tr>
             </table>
           </td>
         </tr>
@@ -719,24 +719,24 @@ function p(){
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
         <colgroup><col style="width:22%"><col style="width:53%"><col style="width:25%"></colgroup>
         <tr>
-          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">၈။လစာတိုးခြင်း ရှိမည်(အချိန်ပမာဏစသည် ${f('es_raiseConditionEn')} ), မရှိပါ</span></td>
+          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">၁။အခြေခံလစာ</span></td>
+          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">လစာ( ယန်း) တစ်ရက်တာလစာ( ယန်း) တစ်နာရီလစာ( ယန်း)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">※တစ်လစာ၊တစ်ရက်တာလစာ၏တစ်နာရီစာလစာပမာဏ ( ယန်း)</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">၉။ဆုကြေး ရှိမည်(အချိန်ပမာဏစသည် ${f('es_bonusConditionEn')} ), မရှိပါ</span></td>
+          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">※တစ်ရက်တာလစာ၊တစ်နာရီလစာ၏တစ်လစာလစာပမာဏ ( ယန်း)</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">၂။ခံစားခွင့်ရနိုင်မည့် ငွေကြေးပမာဏများနှင့် တွက်ချက်ပုံ (အချိန်ပိုလုပ်အားခများမပါ၀င်ပါ။)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">(a)  (ခံစားခွင့် လ ယန်း  /  တွက်ချက်ပုံ : ${f('es_allowance1CalcEn')} )</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">၁၀။အလုပ်ထွက်ခ ရှိမည်(အချိန်ပမာဏစသည် ${f('es_severanceConditionEn')} ), မရှိပါ</span></td>
+          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">(b)  (ခံစားခွင့် လ ယန်း  /  တွက်ချက်ပုံ : ${f('es_allowance2CalcEn')} )</span></td>
+          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">(c)  (ခံစားခွင့် လ ယန်း  /  တွက်ချက်ပုံ : ${f('es_allowance3CalcEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">(d)  (ခံစားခွင့် လ ယန်း  /  တွက်ချက်ပုံ : ${f('es_allowance3CalcEn')} )</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</span></td>
-          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">၁၁။လုပ်ငန်းနားစဥ်ခံစားခွင့် ■ ရှိမည် ( ), နှုန်း</span></td>
+          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">[ပုံသေအချိန်ပိုလစာရှိသည့်အခါတွင်]</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">(e)  ( ${f('es_fixedOTNameEn')} ယန်း</span></td>
+          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">・ထောက်ပံရန်လိုအပ်ချက်: သတ်မှတ်ချိန်ပြင်ပတွင် အလုပ်လုပ်ခြင်းရှိခြင်း/မရှိခြင်းနှင့်မဆိုင်ပဲ နာရီစာကို သတ်မှတ်ချိန်ပြင်ပအလုပ်လုပ်သည့်အတွက်ထောက်ပံ့ငွေအဖြစ်ပေးပါမည်။</span></td>
         </tr>
       </table>
     </div>
@@ -746,10 +746,10 @@ function p(){
   <!-- Ⅷ 退職 -->
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">၈။အလုပ်ထွက်ခြင်းအကြောင်းအရာများ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">၁။မိမိဆန္ဒဖြင့်အလုပ်ထွက်မည်ဆိုလျှင်ဆောင်ရွက်ပုံ(အလုပ်ထွက်မည့်ရက် ရက်မတိုင်ခင်တွင် ကုမ္ပဏီဥက္ကဠနှင့်စက်ရုံမှုးတို့အားအသိပေးရမည်။)</span></div>
-      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">၂။အလုပ်ထုတ်သည့်အကြောင်းအရင်းနှင့်ဆောင်ရွက်ပုံများ</span></div>
-      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">အလုပ်ထုတ်ခြင်းသည်ရှောင်လွှဲ၍မရသည့်အကြောင်းရှိခြင်းအတွက်သာလျှင် အနည်းဆုံးရက် ၃၀ ကြိုတင်အသိပေးခြင်းသို့မဟုတ် ရက် ၃၀ ထက်မနည်းသောလုပ်အားခအားပေးချေပြီးအလုပ်ထုတ်နိုင်သည်။ပြစ်ချက်ကြောင့်ထုတ်ပယ်ရပါကလုပ်သားစံနှုန်းသတ်မှတ်ရေးရုံးမှသဘောတူညီမှုကိုရရှိပြီးနောက် အသိပေးခြင်းနှင့် လျော်ကြေးပေးခြင်း မရှိဘဲချက်ချင်းအလုပ်ထုတ်နိုင်ပါသည်။</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">○အသေးစိတ်မှာအလုပ်ခန့်စည်းမျဥ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်</span></div>
+      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">( နာရီကို ကျော်လွန်ပြီးအလုပ်လုပ်သည့် အချိန်အတွက်ကို ထပ်ဆောင်းငွေပေးဆောင်ပါမည်)</span></div>
+      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">၃။ခန့်မှန်းလစာတစ်လစာ‌ပေးချေမှု (၁+၂) မှန်းခြေ ယန်း(စုစုပေါင်း)</span></div>
+      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">၄။လစာငွေမှနှုတ်ယူမည့်အချက်များ</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">(a)အခွန် (မှန်းခြေ ယန်း)</span></div>
     </div>
   </div>
 </div>
@@ -764,18 +764,18 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">၉။အခြား</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
-      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">၁။လူမှုဖူလုံရေးအာမခံလျှောက်ထားခြင်း၊လုပ်သားအာမခံအသုံးပြုခြင်း( လုပ်သားပင်စင်၊ ကျန်းမာရေးအာမခံ၊ ,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">၁။လူမှုဖူလုံရေးအာမခံလျှောက်ထားခြင်း၊လုပ်သားအာမခံအသုံးပြုခြင်း( လုပ်သားပင်စင်၊ ကျန်းမာရေးအာမခံ၊ ,</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">၂။အလုပ်ခန့်စဥ် ကျန်းမာရေးစစ်ဆေးခြင်း  နှစ် နှစ် လ</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. ပထမအကြိမ် ပုံမှန်ကျန်းမာရေးစစ်ဆေးခြင်း: တပ် ${f('es_healthCheckM2')} နှစ် ${f('es_healthCheckY2')} (ထိုနောက် တစ်နှစ်တစ်ကြိမ် ဆောင်ရွက်သည်)</span></div>
-      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">၄။ အလုပ်ခန့်အပ်ခြင်းစီမံခန့်ခွဲမှု ပြင်ဆင်ခြင်းနှင့် ပတ်သတ်ပြီး ဆွေးနွေးရန် ဌာန</span></div>
-      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">ဌာနအမည် ${f('es_contactDeptEn')} တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည် ${f('es_contactPersonEn')} (ဆက်သွယ်ရန် )</span></div>
-      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">၄။ဤစာချုပ်ပြီးဆုံးသည့်အခါတွင် ဒုတိယပါတီမှ နိုင်ငံပြန်သည့်အခါတွင် ဒုတိယပါတီသည်နိုင်ငံပြန်စရိတ်အားအကုန်အကျမခံနိုင်ပါက ပထမပါတီမှအဆိုပါခရီးစရိတ်အားအကုန်အကျခံပေးမည်ဖြစ်ပြီးနိုင်ငံပြန်ရာတွင် အဆင်ပြေချောမွေ့စွာဖြစ်စေရန် လိုအပ်သည်များကိုဆောင်ရွက်ပေးရပါမည်။</span></div>
+      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">(b)လူမှုဖူလုံရေးအာမခံ (မှန်းခြေ ယန်း)</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">(c)အလုပ်ခန့်အပ်မှုအာမခံ (မှန်းခြေ ယန်း)</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">(d)စားစရိတ် (မှန်းခြေ ယန်း)</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">(e)နေထိုင်စရိတ် (မှန်းခြေ ယန်း)</span></div>
+      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">(f)အခြား(ရေမီးအသုံးစရိတ်များ (မှန်းခြေ ယန်း)</span></div>
+      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">( ${f('es_deductOther1NameEn')} ) (မှန်းခြေ ယန်း)</span></div>
+      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">( ) (မှန်းခြေ ယန်း)</span></div>
     </div>
   </div>
 
   <!-- 受取人 -->
   <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
-    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">လက်ခံသူ (လက်မှတ်)</span></div>
+    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">( ) (မှန်းခြေ ယန်း)</span></div>
     <div class="sign-field-area" style="height:60px;position:relative;">
       <span class="sign-field-placeholder">← ここに署名</span>
       <img class="sign-field-img" style="display:none;max-height:56px;">
@@ -786,7 +786,7 @@ function p(){
 
 <div style="margin-top:6px;font-size:8pt;">
   以上のほかは、当社就業規則による。就業規則を確認できる場所や方法（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;本社もしくは各事業所にて確認可能&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br>
-  <span class="id" style="font-size:7.5pt;" data-key="115">အထက်ဖော်ပြပါအပြင် ကုမ္ပဏီဧ်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းပေါ်မူတည်ပါသည်။လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်းကို လေ့လာနိုင်သော နေရာနှင့်နည်းလမ်း</span>
+  <span class="id" style="font-size:7.5pt;" data-key="115">( ) (မှန်းခြေ ယန်း)</span>
 </div>
 </div>
 <div class="doc">
@@ -805,31 +805,31 @@ function p(){
       <colgroup><col style="width:28%"><col style="width:24%"><col style="width:24%"><col style="width:24%"></colgroup>
       <tr>
         <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. ၁။အခြေခံလစာ</span></td>
-        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">■ လစဥ်လစာ( ယန်း) □ နေ့စဥ်လစာ ( ယန်း) ■ တစ်နာရီလစာ ( ယန်း)</span></td>
-        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">□ နေ့စဥ်လစာ ( ယန်း)</span></td>
-        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">□ တစ်နာရီလစာ ( ယန်း)</span></td>
+        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">( ) (မှန်းခြေ ယန်း)</span></td>
+        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">နှုတ်ယူမည့်ပမာဏ မှန်းခြေ ယန်း(စုစုပေါင်း)</span></td>
+        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">၅။လက်ကျန်လစာငွေ(၃-၄) မှန်းခြေ ယန်း(စုစုပေါင်း)</span></td>
       </tr>
       <tr>
         <td colspan="3" style="padding-top:3px;">※月給・日給の場合の１時間当たりの金額（${ff('es_calcHourly')}円）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="119">※လစဥ်/နေ့စဥ်လစာ အခြေပြုပြီး တစ်နာရီဈေးနှုန်း ( ယန်း)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="119">※အလုပ်ပျက်ကွက်ခြင်းမရှိသည့်အခါတွင်ရမည့်အချိန်ပိုလစာမပါ၀င်သေးသည့်လက်ကျန်လစာငွေဖြစ်ပါသည်။</span></td>
       </tr>
       <tr>
         <td colspan="3">※日給・時給の場合の１か月当たりの金額（${ff('es_calcMonthly')}円）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="120">※နေ့စဥ်/နာရီဈေးနှုန်း အခြေပြုပြီး တစ်လဈေးနှုန်း ( ယန်း)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="120">ရည္ၫႊန္းပုံစံအမွတ္ ၁-၆ ပူးတြဲပါစာရြက္စာတမ္း ၂ (အလုပ္ခန္႔အပ္ျခင္းသတ္မွတ္ခ်က္စာခ်ဳပ္ I ၌ [အလုပ္သမားစာခ်ဳပ္  ဥပေဒတြင္</span></td>
       </tr>
     </table>
 
-    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">၂။ အခြားခံစားခွင့်ပမာဏနှင့် တွက်ချက်နည်း (အချိန်ပို လုပ်အားခများမပါ)</span></div>
+    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်</span></div>
     <div style="margin-left:16px;">${annexAllow}</div>
     
-    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">【သတ်မှတ်အချိန်ပို လုပ်အားခရှိပါကSS】</span></div>
+    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">ဤစာခ်ဳပ္သက္တမ္းကာလအတြင္း ကာလသတ္မွတ္ခ်က္မရွိေသာ အလုပ္ခန္႔အပ္မႈစာခ်ဳပ္ (ကာလကန္႔သတ္ခ်က္မဲ့အလုပ္ခန္႔အပ္မႈစာခ်ဳပ္) ခ်ဳပ္ဆိုရန္</span></div>
     <div style="margin-left:16px;">
       <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
-      <div class="id" style="font-size:7.5pt;" data-key="123">(e) (ခံစားခွင့် ${f('es_fixedOTNameEn')} , ${ff('es_fixedOTAmount')} ယန်း</div>
+      <div class="id" style="font-size:7.5pt;" data-key="123">နှစ် လ ရက်</div>
       <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
-      <div class="id" style="font-size:7.5pt;" data-key="124">・ပေးချေမှုအခြေအနေ: အချိန်ပိုအလုပ်ရှိမရှိမဆိုပဲ နာရီ၏ အချိန်ပိုလုပ်အားခကို ပေးချေမည်။</div>
+      <div class="id" style="font-size:7.5pt;" data-key="124">ဦး/ဒေါ်</div>
       <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
-      <div class="id" style="font-size:7.5pt;" data-key="125">(နာရီကျော်လွန်ပြီးအလုပ်လုပ်သည့်အတွက် ထပ်ဆောင်းပေးချေမည်)</div>
+      <div class="id" style="font-size:7.5pt;" data-key="125">အထူးကျွမ်းကျင်လုပ်သား‌ဆောင်ရွက်မည့်အဖွဲ့အစည်းအမည်</div>
     </div>
   </div>
 
@@ -838,8 +838,8 @@ function p(){
     <span style="white-space:nowrap;">約&emsp;${ff('es_salaryTotal')}円（合計）</span>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;" data-key="126">၃။ တစ်လတာ ပေးချေမည့်ခန့်မှန်းငွေပမာဏ (၁+၂)</span>
-    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">ခန့် ${ff('es_salaryTotal')} ယန်း (စုစုပေါင်း)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="126">လိပ်စာ</span>
+    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">ဖုန်းနံပါတ်</span>
   </div>
 </div>
 </div>
@@ -850,72 +850,72 @@ function p(){
   <table style="width:100%;font-size:8pt;border-collapse:collapse;">
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
-      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">( က) အခွန်</span></td>
+      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">ကိုယ်စားလှယ်၏ ရာထူး၊အမည် (တံဆိပ်တုံး)</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(ခ) လူမှုဖူလုံရေးကြေး</span></td>
+      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">၁။အလုပ်ခန့်သည့်ကာလ ကာလသတ္မွတ္ခ်က္မရွိ</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(ဂ) လုပ်သားဖူလုံရေးကြေး</span></td>
+      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">၂။အလုပ်နေရာ</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(ဃ) အစားအသောက်ကုန်ကျစရိတ်</span></td>
+      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">တိုက်ရိုက်အလုပ်ခန့်အပ်ခြင်း(အောက်တွင်ဖြည့်စွက်ပါ) အလုပ်စေလွှတ်ခန့်အပ်ခြင်း(ပူးတွဲပါ"အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်ရှင်းလင်းစာ"တွင်ဖြည့်စွက်ပါ)</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(င) နေထိုင်ရေးကုန်ကျစရိတ်</span></td>
+      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">လက်ခံသောအဖွဲ့အစည်း၏ရုံးခန်းသို့ဝင်ပါ။ (ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(စ) အခြား (ရေ၊မီး၊ဓာတ်ငွေ့)</span></td>
+      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">ကုမ္ပဏီအမည် ကုမ္ပဏီအမည်</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">( ${f('es_deductOther1NameEn')} )</span></td>
+      <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">လိပ်စာ လိပ်စာ</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ခန့်</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="135">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">ခန့်</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="135">ဆက်သွယ်ရန်လိပ်စာ ဆက်သွယ်ရန်လိပ်စာ</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">၃။မျှော်မှန်းလုပ်ငန်းတာ၀န်</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="137">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">ခန့်</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="137">(ပြောင်းလဲသည့်နယ်ပယ်) ပြောင်းလဲခြင်းရှိ/မရှိ (ပြောင်းလဲခြင်းရှိသည့်အခါ အောက်ပါတို့ကို ဖြည့်ပါ။)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">၁။လုပ်ငန်းအမျိုးအစား ၁။လုပ်ငန်းအမျိုးအစား</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="139">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">ခန့်</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="139">၂။လုပ်ငန်းတာ၀န် ၂။လုပ်ငန်းတာ၀န်</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">၄။အလုပ်ချိန်စသည်</span></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="141">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">ခန့်</span></td>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="141">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">၁။အလုပ်စတင်ချိန် ( ) အလုပ်ပြီးဆုံးချိန် ( ) (တစ်ရက်တာအလုပ်ချိန် )</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="padding-top:3px;"></td>
-      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">နှုတ်ယူငွေပမာဏ</span></td>
+      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">(၂)"အောက်ပါစနစ်များနှင့်အလုပ်သမားမှ အကျုံး၀င်ပါက"</span></td>
       <td style="padding-top:3px;text-align:right;">
         <table style="border-collapse:collapse;width:100%;"><tr>
           <td style="white-space:nowrap;text-align:right;width:2em;">約</td>
           <td style="text-align:right;">${ff('es_deductTotal')}</td>
           <td style="white-space:nowrap;width:4em;">円（合計）</td>
         </tr><tr>
-          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">ခန့်</td>
-          <td style="text-align:right;font-size:7pt;" class="id" data-key="145">${ff('es_deductTotal')}</td>
-          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">ယန်း (စုစုပေါင်း)</td>
+          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">ပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်： （ ） ပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်၏ယူနစ်</td>
+          <td style="text-align:right;font-size:7pt;" class="id" data-key="145">တစ်နှစ်ကြာပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်ဖြင့်ခန့်အပ်ပါကဒုတိယပါတီ မှ ကောင်းမွန်စွာနားလည်သဘောပေါက်သည့် ဘာသာစကားဖြင့် ရေးဆွဲထားသည့်တစ်နှစ်တာပြက္ခဒိန်မိတ္တူနှင့်လုပ်သားစံနှုန်းသတ်မှတ်သည့်ရုံးသို့တင်သွင်းထားသည့်ပုံမှန်မဟုတ်သည့်အလုပ်ချိန်စနစ်ဖြင့်အလုပ်ခန့်အပ်မှုမိတ္တူအားပူးတွဲတင်ပြပါ။</td>
+          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">အလုပ်အဆိုင်းစနစ်ဖြင့် အောက်ပါအချိန်ဇယားအတိုင်းယူနိုင်သည်။</td>
         </tr></table>
       </td>
     </tr>
@@ -928,17 +928,17 @@ function p(){
       <td style="text-align:right;">${ff('es_netPay')}</td>
       <td style="white-space:nowrap;width:4em;">円（合計）</td>
     </tr><tr>
-      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">ခန့်</td>
-      <td style="text-align:right;font-size:7.5pt;" class="id" data-key="148">${ff('es_netPay')}</td>
-      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">ယန်း (စုစုပေါင်း)</td>
+      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</td>
+      <td style="text-align:right;font-size:7.5pt;" class="id" data-key="148">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</td>
+      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">အလုပ်စတင်ချိန်( နာရီ မိနစ် ) အလုပ်ပြီးဆုံးချိန် နာရီ မိနစ် ) (လုပ်နိုင်သည့်ရက် ,  တစ်ရက်တာအလုပ်ချိန်ဇယား နာရီ မိနစ် )</td>
     </tr></table>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;" data-key="150">၅။ အသားတင်ရရှိငွေ (၃-၄)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="150">၂။အလုပ်နားချိန် ( မိနစ်)</span>
     <span></span>
   </div>
   <div style="font-size:7.5pt;margin-top:2px;">※欠勤等がない場合であって，時間外労働の割増賃金等は除く。<br>
-  <span class="id" style="font-size:7pt;" data-key="151">※ပျက်ကွက်မှုမရှိဘဲ အချိန်ပိုလုပ်အားခများမပါဝင်ပါ</span></div>
+  <span class="id" style="font-size:7pt;" data-key="151">3။သတ်မှတ်အလုပ်ချိန်ဇယား (၁)တစ်ပတ်တာ ( နာရီ မိနစ် ) (၂)တစ်လတာ ( နာရီ မိနစ် ) (၃)နှစ် ( နာရီ မိနစ် )</span></div>
 </div>
 
 `;
