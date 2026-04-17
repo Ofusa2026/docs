@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260417.20</div>
+    <div class="ver">ver.20260417.22</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -574,17 +574,17 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">२. ब्रेक समय&emsp;(${f('es_breakTime')}मिनेट）</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">३. निर्धारित कामको समय&emsp;①हप्ता（${f('es_weeklyH')}घण्टा&nbsp;${f('es_weeklyMin')}मिनेट）&emsp;②महिना（${f('es_monthlyH')}घण्टा&nbsp;${f('es_monthlyMin')}मिनेट）&emsp;③वर्ष（${f('es_yearlyH')}घण्टा&nbsp;${f('es_yearlyMin')}मिनेट）</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">४. निर्धारित कामको दिन&emsp;①हप्ता（${f('es_weeklyDays')}दिन）&emsp;②महिना（${f('es_monthlyDays')}दिन）&emsp;③वर्ष（${f('es_yearlyDays')}दिन）</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">२. ब्रेक समय&emsp;(${f('es_breakTime')}मिनेट)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">३. निर्धारित काम गर्ने समय&emsp;①हप्ता(${f('es_weeklyH')}घण्टा&nbsp;${f('es_weeklyMin')}मिनेट)&emsp;②महिना(${f('es_monthlyH')}घण्टा&nbsp;${f('es_monthlyMin')}मिनेट)&emsp;③वर्ष(${f('es_yearlyH')}घण्टा&nbsp;${f('es_yearlyMin')}मिनेट)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">४. निर्धारित काम गर्ने दिन&emsp;①हप्ता(${f('es_weeklyDays')}दिन)&emsp;②महिना(${f('es_monthlyDays')}दिन)&emsp;③वर्ष(${f('es_yearlyDays')}दिन)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">५. ओभरटाइमको सम्बन्धमा</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">※विस्तृत रूपमा, अर्को पानामा भए अनुरूप</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">५. निर्धारित समयभन्दा बाहिर काम गर्ने स्थिति</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;">${cb(true,'overtime_yes_id')} छ&emsp;${cb(false,'overtime_no_id')} छैन</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">३．निर्धारित समय बाहेक，एक दिनको बिदा अथवा रातमा काम गरे बापत गरिने ज्यालाको वृद्धिदर</span></td>
+          <span class="id" style="font-size:7pt;">○विस्तृत रूपमा, कामको नियमको भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदामा उल्लेख छ।</span></td>
         </tr>
       </table>
     </div>
@@ -592,36 +592,36 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">दिन</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">Ⅴ. बिदा</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">(१) निर्धारित समय बाहेक कानुन निर्धारित महिनाको ६० घण्टासम्म काम गरेमा ( ) ％</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">कानुनमा निर्धारित महिनाको ६० घण्टाभन्दा बढि काम गरेमा ( ) ％</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">पू पूर्वनिर्धारित समयभन्दा बढि काम गरेमा ( ) ％</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">१. नियमित बिदा: (${f('es_fixedDay1En')}), अन्य（${f('es_otherHolidays')}）(वार्षिक कुल बिदा ${f('es_annualHolidays')} दिन)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;">२. अनियमित बिदा: हप्ता/महिनामा दिन, अन्य (                    )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○विस्तृत रूपमा, कामको नियमको भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदामा उल्लेख छ।</span></div>
     </div>
   </div>
 
   <!-- Ⅵ 休暇 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">Ⅵ．लामो बिदा</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. बिदा</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">(२) बिदाको दिन　　　　　कानुनीरूपले पाइने बिदा( )％ , कानुनीरूपले पाइने बाहेकको बिदा ( )％</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">(3) रातको काम ( )％</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">४．ज्यालाको हिसाब बन्द गरिने दिन प्रत्येक महिना ${f('es_payCutoffEn')} गते प्रत्येक महिना गते</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">५．Ïयालाको पेæकȧ गǐरने Ǒदन प्रत्येक महिना ${f('es_payDayEn')} गते प्रत्येक महिना गते</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">६．ज्यालाको पेश्की गर्ने तरिका बैंकको खातामा जम्मा गर्ने नगद दिने</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;">१. वार्षिक तलबी बिदा ६ महिना निरन्तर काम गरेको खण्डमा →&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')} दिन</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">६ महिना निरन्तर काम नगरेको खण्डमा (${cb(false,"cb_auto_002")} छ&emsp;${cb(true,"cb_auto_003")} छैन) → महिना पुगेपछि&emsp;दिन</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;">२. अन्य बिदा&emsp;तलबी (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;बिना तलब (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">३. अस्थायी स्वदेश फिर्ती बिदा कामदारले अस्थायी रूपमा स्वदेश फर्कन चाहेमा, माथिको १ र २ को दायराभित्र आवश्यक बिदा दिइनेछ।</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○विस्तृत रूपमा, कामको नियमको भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदा, भाग बुँदा～भाग बुँदामा उल्लेख छ।</span></div>
     </div>
   </div>
 
   <!-- Ⅶ 賃金 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">Ⅶ．ज्याला</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. तलब</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">७．श्रम व्यवस्थापन सम्झौताअनुसार पेश्की दिने बेला घटाउने रकम छैन छ</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※विस्तृत रूपमा, अर्को पानामा भए अनुरूप</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">※विस्तृत रूपमा, अर्को पानामा भए अनुरूप</span></div>
-        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">८．ज्याला वृद्धि छ（समय, रकम आदि ${f('es_raiseConditionEn')} ), छैन</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;※विस्तृत रूपमा, अर्को पानामा भए अनुरूप</div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;">१. आधारभूत तलब&emsp;${cb(true,"cb_auto_004")} मासिक (${ff('es_salaryMonthly')}येन)&emsp;${cb(false,"cb_auto_005")} दैनिक(${ff('es_salaryDaily')}येन)&emsp;${cb(false,"cb_auto_006")} प्रतिघण्टा(${ff('es_salaryHourly')}येन)</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*विस्तृत विवरण संलग्न अनुसार</div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;">२. विभिन्न भत्ताहरू (ओभरटाइम थप तलब बाहेक)</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;">${allowLineId1}${allowLineId2}</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;*विस्तृत विवरण संलग्न अनुसार</div>
       </div>
     </div>
   </div>
