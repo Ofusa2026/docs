@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260417.30</div>
+    <div class="ver">ver.20260417.31</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -651,13 +651,11 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td>法定超月60時間超（${f('es_ot60over')}）％</td>
-          <td class="id" style="font-size:7pt;">Legal overtime over 60 hours a month (${f('es_ot60over')}) ％</td>
+          <td colspan="2">法定超月60時間超（${f('es_ot60over')}）％<br><span class="id" style="font-size:7pt;">Legal overtime over 60 hours a month (${f('es_ot60over')}) ％</span></td>
         </tr>
         <tr>
           <td></td>
-          <td>所定超（${f('es_otPrescribed')}）％</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;">Fixed overtime (${f('es_otPrescribed')}) ％</td>
+          <td colspan="2">所定超（${f('es_otPrescribed')}）％<br><span class="id" style="font-size:7pt;padding-bottom:2px;">Fixed overtime (${f('es_otPrescribed')}) ％</span></td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
