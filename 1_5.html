@@ -58,7 +58,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.06</div>
+    <div class="ver">ver.20260417.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -88,6 +88,11 @@
       <div class="fg"><label>代表者氏名（日）<span class="fid">es.repName</span></label><input id="es_repName" oninput="p()"></div>
       <div class="fg"><label>代表者役職（ID）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
       <div class="fg"><label>代表者氏名（ID）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg"><label>作成年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
+      <div class="fg"><label>作成月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div>
+      <div class="fg"><label>作成日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">特定技能外国人</div>
       <div class="fg"><label>氏名（日）<span class="fid">es.applicantName</span></label><input id="es_applicantName" oninput="p()"></div>
@@ -158,7 +163,13 @@ function p(){
   <span class="id" style="font-size:7pt;">Perjanjian kerja ini dan syarat kerja dibuat dalam 2 (dua) rangkap dan masing-masing disimpan oleh Pihak Pertama dan Pihak Kedua.</span>
 </div>
 
-<div style="border-top:1px solid #aaa;margin-bottom:16px;"></div>
+<div style="border-top:1px solid #aaa;margin-bottom:8px;"></div>
+
+<!-- 締結日 -->
+<div style="text-align:right;font-size:8pt;margin-bottom:10px;line-height:1.8;">
+  ${f('es_createY')}　年　${f('es_createM')}　月　${f('es_createD')}　日　締結<br>
+  <span class="id" style="font-size:7.5pt;">Pengikatan dilakukan tanggal ${f('es_createD')} / ${f('es_createM')} / ${f('es_createY')}</span>
+</div>
 
 <!-- 署名欄 -->
 <div style="display:flex;gap:0;align-items:flex-start;font-size:8pt;margin-top:8px;">
