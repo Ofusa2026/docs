@@ -39,7 +39,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　１号特定技能外国人支援計画書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.158</div>
+    <div class="ver">ver.20260417.159</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -114,18 +114,18 @@ function p(){
   Tanggal dibuat: tanggal ${f('f_docD')} bulan ${f('f_docM')} tahun ${f('f_docY')}
 </div>
 
-<table class="tbl" style="margin-bottom:8px;">
+<table class="tbl" style="margin-bottom:8px;width:270px;table-layout:fixed;">
   <colgroup>
-    <col style="width:25px;">
-    <col style="width:22%;">
-    <col>
-    <col style="width:15%;">
-    <col style="width:20%;">
+    <col style="width:5px;">
+    <col style="width:50px;">
+    <col style="width:115px;">
+    <col style="width:38px;">
+    <col style="width:62px;">
   </colgroup>
   <tr>
-    <td class="sect-lbl" rowspan="4">Ⅰ 支援対象者<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:7pt;font-weight:normal;">I.<br>Penerima<br>Bantuan</span></td>
+    <td class="sect-lbl" rowspan="2">Ⅰ 支援対象者<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:6pt;font-weight:normal;">I.<br>Penerima<br>Bantuan</span></td>
     <td>１　氏　名<br><span class="id">1. Nama</span></td>
-    <td colspan="1" style="vertical-align:middle;">
+    <td style="vertical-align:middle;">
       <div>${f('f_appName')}　　（ほか　${f('f_otherCount')}　名）</div>
       <div class="id">${f('f_appName')} (Nama lain: ${f('f_otherCount')} )</div>
     </td>
@@ -147,21 +147,13 @@ function p(){
       <div class="id">Indonesia</div>
     </td>
   </tr>
-</table>
-
-<table class="tbl" style="margin-bottom:8px;">
-  <colgroup>
-    <col style="width:25px;">
-    <col style="width:22%;">
-    <col>
-  </colgroup>
   <tr>
-    <td class="sect-lbl" rowspan="2">Ⅱ 特定技能所属機関<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:7pt;font-weight:normal;">II.<br>Organisasi<br>Afiliasi</span></td>
+    <td class="sect-lbl" rowspan="2">Ⅱ 特定技能所属機関<br><span style="writing-mode:horizontal-tb;display:inline-block;font-size:6pt;font-weight:normal;">II.<br>Organisasi<br>Afiliasi</span></td>
     <td>
       （ふりがな）<span class="id">(Futigana)</span><br>
       １　氏名又は名称<br><span class="id">1. Nama atau panggilan</span>
     </td>
-    <td>
+    <td colspan="3">
       <div style="font-size:8pt;color:#666;">${f('f_coKana')}</div>
       <div style="border-bottom:1px dashed #888;padding-bottom:2px;margin-bottom:4px;">${f('f_coName')}</div>
       <div class="id">${f('f_coNameEn')}</div>
@@ -169,7 +161,7 @@ function p(){
   </tr>
   <tr>
     <td>２　住所<br><span class="id">2. Alamat</span></td>
-    <td>
+    <td colspan="3">
       <div>〒　${f('f_coZip')}</div>
       <div class="id">Kode pos: ${f('f_coZip')}</div>
       <div style="margin-top:2px;">${f('f_coAddr')}</div>
