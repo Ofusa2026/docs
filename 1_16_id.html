@@ -13,8 +13,11 @@
 .tbl td,.tbl th{border:1px solid #000;padding:3px 5px;vertical-align:top;}
 .tbl td.dashed-bottom{border-bottom:1px dashed #888;}
 .tbl .lbl{width:28%;}
-.chk{display:inline-block;width:1.2em;height:1.2em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1.1em;margin-right:4px;}
+.chk{display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1em;margin-right:4px;}
 .chk-on{background:#000;color:#fff;font-weight:bold;}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
+input.chk-box:checked{background:#000;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -27,7 +30,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（インドネシア語）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260417.114</div>
+    <div class="ver">ver.20260417.115</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -134,42 +137,46 @@ function p(){
 
 <div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Agen tenaga kerja (Jepang)</span></div>
 <table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
   <tr>
     <td class="lbl">１　あっせんの有無<br><span class="id">Ada/tidak ada mediasi</span></td>
-    <td style="width:36%;text-align:center;border-right:none;">
-      <span class="chk">□</span>有<br><span class="id">Ada</span>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有<br><span class="id">Ada</span>
     </td>
-    <td style="width:36%;text-align:center;border-left:none;">
-      <span class="chk chk-on">■</span>無<br><span class="id">Tidak ada</span>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box" checked>無<br><span class="id">Tidak ada</span>
     </td>
   </tr>
   <tr>
     <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Nomor izin/penerimaan pemberitahuan</span><br><span class="id">(tanggal penerimaan pemberitahuan)</span></td>
-    <td colspan="2">－－－－－　　<br>（　　年　　月　　日）</td>
+    <td colspan="3">－－－－－　　<br>（　　年　　月　　日）</td>
   </tr>
   <tr>
     <td>３　職業紹介事業者の区分<br><span class="id">Klasifikasi agen tenaga kerja</span></td>
-    <td style="width:36%;text-align:center;border-right:none;">
-      <span class="chk">□</span>有料職業紹介事業者<br><span class="id">Agen tenaga kerja dengan komisi</span>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有料職業紹介事業者<br><span class="id">Agen tenaga kerja dengan komisi</span>
     </td>
-    <td style="width:36%;text-align:center;border-left:none;">
-      <span class="chk">□</span>無料職業紹介事業者<br><span class="id">Agen tenaga kerja tanpa komisi</span>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box">無料職業紹介事業者<br><span class="id">Agen tenaga kerja tanpa komisi</span>
     </td>
   </tr>
   <tr>
     <td>４　職業紹介事業者の氏名<br><span class="id">Nama agen tenaga kerja</span></td>
-    <td colspan="2">&nbsp;</td>
+    <td colspan="3">&nbsp;</td>
   </tr>
   <tr>
     <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Alamat agen tenaga kerja<br>(nomor telepon)</span></td>
-    <td colspan="2">〒<span class="id"> / Kode pos</span>　　－　　<br>（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
+    <td colspan="3">〒<span class="id"> / Kode pos</span>　　－　　<br>（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
   </tr>
-</table>
-<table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen tenaga kerja</span></td>
-    <td rowspan="2" style="width:22%;vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
-    <td class="dashed-bottom" style="width:12%;text-align:center;">額<br><span class="id">Jumlah</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>
     <td class="dashed-bottom">（　　　　　　円 <span class="id">Yen</span>）</td>
   </tr>
   <tr>
@@ -188,10 +195,14 @@ function p(){
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
   <div style="margin-bottom:1mm;">（注意）<span class="id">(Perhatian)</span></div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。<br><span class="id" style="padding-left:0;">Jika mencentang jawaban "Tidak ada" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</span></div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang jawaban "Tidak ada" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Untuk kolom 2 hingga kolom 5, tulis informasi tentang agen tenaga kerja tersebut dengan memanfaatkan Situs Terpadu Layanan Sumber Daya Manusia yang terdapat pada situs web Biro Jaminan Kerja, Kementerian Kesehatan, Ketenagakerjaan, dan Kesejahteraan. Selain itu, lampirkan screenshot layar tempat informasi tersebut dimuat.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;">４　職業紹介事業者との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Pada kolom 6, tulis jumlah dan nominal yang dibayarkan oleh pencari kerja dan perekrut kerja kepada agen tenaga kerja. Selain itu, jika pencari kerja membayar biaya dalam mata uang selain yen Jepang, tulis jumlah yang dibayarkan dalam mata uang tersebut dan jumlah konversinya dalam yen Jepang.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　職業紹介事業者との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">Jika ada dokumen kontrak yang dibuat dengan agen tenaga kerja, lampirkan salinan kontrak tersebut.</div>
 </div>
 </div>
 
@@ -199,33 +210,37 @@ function p(){
 <div class="page-num-label">P2</div>
 <div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Agen perantara (luar Jepang) (hanya diisi bila mencentang jawaban "Ada" pada kolom 1)</span></div>
 <table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
   <tr>
     <td class="lbl">１　取次ぎの有無<br><span class="id">Ada/tidak ada perantaraan</span></td>
-    <td style="width:36%;text-align:center;border-right:none;">
-      <span class="chk">□</span>有<br><span class="id">Ada</span>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box">有<br><span class="id">Ada</span>
     </td>
     <td style="text-align:center;border-left:none;">
-      <span class="chk">□</span>無<br><span class="id">Tidak ada</span>
+      <input type="checkbox" class="chk-box">無<br><span class="id">Tidak ada</span>
     </td>
   </tr>
   <tr>
     <td>２　氏名又は名称<br><span class="id">Nama</span></td>
-    <td colspan="2">&nbsp;</td>
+    <td colspan="3">&nbsp;</td>
   </tr>
   <tr>
     <td>３　所在国<br><span class="id">Negara domisili</span></td>
-    <td colspan="2">&nbsp;</td>
+    <td colspan="3">&nbsp;</td>
   </tr>
   <tr>
     <td>４　所在地<br><span class="id">Alamat</span></td>
-    <td colspan="2">（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
+    <td colspan="3">（電話番号 <span class="id">Nomor telepon</span>　　　－　　　－　　　）</td>
   </tr>
-</table>
-<table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen perantara</span></td>
-    <td rowspan="2" style="width:22%;vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
-    <td class="dashed-bottom" style="width:12%;text-align:center;">額<br><span class="id">Jumlah</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>
     <td class="dashed-bottom">（　　　　　　円 <span class="id">Yen</span>）</td>
   </tr>
   <tr>
@@ -245,9 +260,13 @@ function p(){
 <div style="font-size:8.5pt;margin-bottom:4mm;">
   <div style="margin-bottom:1mm;">（注意）<span class="id">(Perhatian)</span></div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Agen perantara adalah pihak yang melakukan perantaraan informasi mengenai pencari kerja bagi agen tenaga kerja, saat agen tenaga kerja tersebut melakukan mediasi antara pencari kerja dan perekrut kerja.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Jika mencentang "Tidak ada" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:2mm;" class="id">Pada kolom 5, tulis jumlah dan nominal yang dibayarkan oleh pencari kerja dan perekrut kerja kepada agen perantara. Selain itu, jika pencari kerja membayar biaya dalam mata uang selain yen Jepang, tulis jumlah yang dibayarkan dalam mata uang tersebut dan jumlah konversinya dalam yen Jepang.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">Jika ada dokumen kontrak yang dibuat dengan agen perantara, lampirkan salinan kontrak tersebut.</div>
 </div>
 
 <div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pelaksanaan panduan awal</span></div>
@@ -255,8 +274,8 @@ function p(){
   <tr>
     <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Pelaksanaan Sesuai yang Ditetapkan pada Rencana Bantuan Pekerja Asing Berketerampilan Khusus 1</span></td>
     <td style="text-align:center;">
-      <span class="chk ${guidY}">${guidance==='有'?'■':'□'}</span>有　
-      <span class="chk ${guidN}">${guidance==='無'?'■':'□'}</span>無<br>
+      <input type="checkbox" class="chk-box" ${guidance==='有'?'checked':''}>有　
+      <input type="checkbox" class="chk-box" ${guidance==='無'?'checked':''}>無<br>
       <span class="id">Ya / Tidak</span>
     </td>
   </tr>
