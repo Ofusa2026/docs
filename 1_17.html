@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260419.006
+  ver.20260419.007
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -138,7 +138,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260419.006</span>
+  <span class="ver">ver.20260419.007</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -510,6 +510,17 @@ async function loadCaseById(caseId, companyId){
     var coObj = dbRowToCompany(coRow);
     var cIdx = companies.findIndex(function(x){ return x.id === coObj.id; });
     if(cIdx >= 0) companies[cIdx] = coObj; else companies.push(coObj);
+    // デバッグ: 支援担当者系の値を確認
+    log("companies取得: name=" + coObj.name + " / supportStaff=[" + coObj.supportStaff + "]"
+        + " / supportManagerNameEn=[" + coObj.supportManagerNameEn + "]"
+        + " / supportManagerTitleEn=[" + coObj.supportManagerTitleEn + "]");
+    console.log("[DEBUG] coRow raw keys:", Object.keys(coRow));
+    console.log("[DEBUG] coRow.support_staff:", JSON.stringify(coRow.support_staff));
+    console.log("[DEBUG] coRow.support_manager_name_en:", JSON.stringify(coRow.support_manager_name_en));
+    console.log("[DEBUG] coRow.support_manager_title_en:", JSON.stringify(coRow.support_manager_title_en));
+    console.log("[DEBUG] coObj全体:", coObj);
+  } else {
+    log("⚠ companies取得失敗（coRow=null）");
   }
   if(pRow){
     personData[caseId] = Object.assign(personData[caseId]||{}, dbRowToPerson(pRow));
