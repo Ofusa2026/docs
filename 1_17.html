@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260419.008
+  ver.20260419.009
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -138,7 +138,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260419.008</span>
+  <span class="ver">ver.20260419.009</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -173,12 +173,31 @@
 
   <!-- ========= 現在の案件 ========= -->
   <div class="card">
-    <h2>2. 案件を確認</h2>
+    <h2>2. 案件を確認・編集</h2>
     <div id="caseInfo" class="case-info">
       <div id="caseInfoEmpty" style="color:var(--muted);font-size:13px;">
         左サイドバー上部の案件選択欄で案件を選ぶと、ここに案件情報が表示されます。
       </div>
       <dl id="caseInfoDl" style="display:none;"></dl>
+    </div>
+    <div id="mappingEditor" style="display:none;margin-top:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:700;">📝 マッピング値（編集して保存すると次回以降に反映）</div>
+        <button id="btnSaveMapping" class="primary" style="padding:6px 14px;font-size:12px;" disabled>💾 変更を保存</button>
+      </div>
+      <div style="max-height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;">
+        <table id="mappingEditorTable" style="width:100%;font-size:12px;border-collapse:collapse;">
+          <thead style="position:sticky;top:0;background:#f8f9fa;">
+            <tr>
+              <th style="padding:6px 8px;text-align:left;width:30%;border-bottom:1px solid var(--border);">ラベル</th>
+              <th style="padding:6px 8px;text-align:left;width:50%;border-bottom:1px solid var(--border);">値</th>
+              <th style="padding:6px 8px;text-align:left;width:20%;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);">保存先</th>
+            </tr>
+          </thead>
+          <tbody id="mappingEditorBody"></tbody>
+        </table>
+      </div>
+      <div id="saveStatus" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
     </div>
   </div>
 
@@ -1609,6 +1628,7 @@ function renderCaseInfo(){
   if(!currentCase){
     $("caseInfoEmpty").style.display = "block";
     $("caseInfoDl").style.display = "none";
+    $("mappingEditor").style.display = "none";
     return;
   }
   var c = currentCase;
@@ -1631,6 +1651,202 @@ function renderCaseInfo(){
   ].map(function(kv){ return "<dt>"+esc(kv[0])+"</dt><dd>"+esc(kv[1])+"</dd>"; }).join("");
   $("caseInfoEmpty").style.display = "none";
   dl.style.display = "grid";
+  renderMappingEditor();
+}
+
+/* ==========================================================
+   マッピングエディタ（マッピング値を編集して保存）
+   ========================================================== */
+var mappingDirtyKeys = {}; // 編集された input の dataset.key をトラック
+
+function renderMappingEditor(){
+  if(!currentCase || !MAPPING_1_17 || !MAPPING_1_17.length){
+    $("mappingEditor").style.display = "none";
+    return;
+  }
+  var c = currentCase;
+  var pd = personData[c.id] || {};
+  var co = findCompanyByName(c.company, c.companyId) || findCompanyByName(c.org) || {};
+  var es = (co.empSets && currentEmpSetIdx!=='') ? co.empSets[parseInt(currentEmpSetIdx,10)]||{} : {};
+
+  // _rv 相当: 案件管理index.htmlのrv()と同じ挙動で値を返す（doGenerateFromMapping内部rvと同一）
+  // ここでは読み取り専用に単純化、計算系フィールドは rv() を直接呼ぶ代わりに現在値を評価
+  // ただし保存時の「編集元の値」は生のDBカラム値で比較する
+  var tbody = $("mappingEditorBody");
+  var rows = [];
+  mappingDirtyKeys = {};
+
+  MAPPING_1_17.forEach(function(m, i){
+    var info = resolveMappingWriteTarget(m.field);
+    // 現在値の取得（編集可能な原始値）
+    var currentValue = readFieldValue(m.field, c, pd, co, es);
+    var editable = info.editable;
+    var cellId = 'mapInput_' + i;
+    var targetLabel = info.table ? info.table + '.' + info.column : '(自動計算)';
+
+    rows.push(
+      '<tr>' +
+        '<td style="padding:6px 8px;border-bottom:1px solid #eee;color:#555;">' + esc(m.label||m.cell||m.field) + '</td>' +
+        '<td style="padding:4px 8px;border-bottom:1px solid #eee;">' +
+          (editable
+            ? '<input type="text" id="'+cellId+'" data-field="'+esc(m.field)+'" value="'+esc(currentValue)+'" '
+              + 'style="width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">'
+            : '<span style="color:#888;font-style:italic;">'+esc(currentValue||'(空)')+'</span>'
+          ) +
+        '</td>' +
+        '<td style="padding:6px 8px;border-bottom:1px solid #eee;color:#999;font-size:10px;">' + esc(targetLabel) + '</td>' +
+      '</tr>'
+    );
+  });
+  tbody.innerHTML = rows.join('');
+  $("mappingEditor").style.display = "block";
+
+  // 入力変更で「保存」ボタン有効化
+  Array.from(tbody.querySelectorAll('input')).forEach(function(inp){
+    inp.addEventListener('input', function(){
+      mappingDirtyKeys[inp.dataset.field] = true;
+      $("btnSaveMapping").disabled = false;
+      $("saveStatus").textContent = "未保存の変更があります。";
+      $("saveStatus").style.color = "#c0392b";
+    });
+  });
+  $("btnSaveMapping").disabled = true;
+  $("saveStatus").textContent = "";
+}
+
+/**
+ * field 値から DB書き込み先（テーブル・カラム）を判定
+ * 返り値: {table, column, editable}
+ */
+function resolveMappingWriteTarget(field){
+  if(!field || typeof field !== 'string') return {table:'', column:'', editable:false};
+  // 計算フィールド（分割系・自動算出など）は編集不可
+  var COMPUTED = /^(auto$|case\.docYear$|case\.docMonth$|case\.docDay$|case\.docCreateDate$|case\.entryDate$|p\.birthY$|p\.birthM$|p\.birthD$|p\.expireY$|p\.expireM$|p\.expireD$|p\.passExpY$|p\.passExpM$|p\.passExpD$|es\.createY$|es\.createM$|es\.createD$|es\.entryY$|es\.entryM$|es\.entryD$|es\.contractStartY$|es\.contractStartM$|es\.contractStartD$|es\.contractEndY$|es\.contractEndM$|es\.contractEndD$|es\.officePref$|es\.officeCity$|es\.housingFeeType$|co\.fullAddress$|co\.authorTitleName$|co\.repTitleName$)/;
+  if(COMPUTED.test(field)) return {table:'', column:'', editable:false};
+
+  // プレフィックスごとに判定
+  if(field.indexOf('co.') === 0) return { table:'companies', column: camelToSnake(field.substring(3)), editable:true };
+  if(field.indexOf('p.')  === 0) return { table:'persons',   column: camelToSnake(field.substring(2)), editable:true };
+  if(field.indexOf('case.')=== 0) return { table:'cases',    column: camelToSnake(field.substring(5)), editable:true };
+  if(field.indexOf('es.') === 0) return { table:'emp_sets',  column: field.substring(3), editable:true }; // companies.emp_sets[idx] JSONB
+  if(field.indexOf('so.') === 0) return { table:'support_orgs', column: camelToSnake(field.substring(3)), editable:true };
+  // 直接キー（applicantNameEn 等）は persons
+  return { table:'persons', column: camelToSnake(field), editable:true };
+}
+
+function camelToSnake(s){ return s.replace(/([A-Z])/g, '_$1').toLowerCase(); }
+
+/**
+ * 現在値を各オブジェクトから読む。計算フィールドは doGenerateFromMapping 内のロジックと同じに
+ * なるよう簡易版で対応。
+ */
+function readFieldValue(field, c, p, co, es){
+  if(!field) return '';
+  // 計算系
+  if(field === 'auto') return new Date().toLocaleDateString('ja-JP');
+  var now = new Date();
+  if(field==='case.docCreateDate'){ var d=c.docCreateDate||''; if(d){var pp=d.split(/[-\/]/); if(pp.length>=3) return pp[0]+'年'+parseInt(pp[1],10)+'月'+parseInt(pp[2],10)+'日';} return d; }
+  if(field==='case.docYear'){ var d=c.docCreateDate||''; if(d){return d.split(/[-\/]/)[0]||'';} return ''; }
+  if(field==='case.docMonth'){var d=c.docCreateDate||'';if(d){var x=d.split(/[-\/]/)[1];return x?String(parseInt(x,10)):'';}return '';}
+  if(field==='case.docDay'){var d=c.docCreateDate||'';if(d){var x=d.split(/[-\/]/)[2];return x?String(parseInt(x,10)):'';}return '';}
+  if(field==='p.birthY'){var bd=p.birthdate||'';var m=bd.match(/(\d{4})/);return m?m[1]:'';}
+  if(field==='p.birthM'){var bd=p.birthdate||'';var m=bd.match(/\d{4}[\/\-年](\d{1,2})/);return m?m[1]:'';}
+  if(field==='p.birthD'){var bd=p.birthdate||'';var m=bd.match(/\d{4}[\/\-年]\d{1,2}[\/\-月](\d{1,2})/);return m?m[1]:'';}
+  if(field==='case.entryDate'){var ey=es.entryY||'',em=es.entryM||'',ed=es.entryD||'';if(ey&&em&&ed)return ey+'/'+em+'/'+ed;return p.entryDate||'';}
+  if(field==='es.createY'){var d=c.docCreateDate||'';return d?d.split(/[-\/]/)[0]||'':'';}
+  if(field==='es.createM'){var d=c.docCreateDate||'';var x=d.split(/[-\/]/)[1];return x?String(parseInt(x,10)):'';}
+  if(field==='es.createD'){var d=c.docCreateDate||'';var x=d.split(/[-\/]/)[2];return x?String(parseInt(x,10)):'';}
+  if(field==='es.contractStartY'){var _cs=p.contractStart||'';return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
+  if(field==='es.contractStartM'){var _cs=p.contractStart||'';var _m=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _m?String(parseInt(_m,10)):'';}
+  if(field==='es.contractStartD'){var _cs=p.contractStart||'';var _d=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _d?String(parseInt(_d,10)):'';}
+  if(field==='es.officePref'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).pref;}
+  if(field==='es.officeCity'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).city;}
+  if(field==='es.housingFeeType'){var dh=es.deductHousing||'';return (dh&&dh!=='0'&&dh!=='０')?'有':'無';}
+  if(field==='co.fullAddress') return (co.pref||'')+(co.city||'')+(co.address||'');
+  if(field==='co.authorTitleName') return ((co.authorTitle||'')+' '+(co.authorName||'')).trim();
+  // 直接参照
+  if(field.indexOf('co.')===0) return co[field.substring(3)]||'';
+  if(field.indexOf('p.') ===0) return p[field.substring(2)]||'';
+  if(field.indexOf('case.')===0) return c[field.substring(5)]||'';
+  if(field.indexOf('es.')===0) return es[field.substring(3)]||'';
+  // 直接キー
+  if(p[field] !== undefined) return p[field];
+  return '';
+}
+
+/**
+ * 保存ボタン押下
+ */
+async function saveMappingChanges(){
+  if(!currentCase){ return; }
+  var btn = $("btnSaveMapping");
+  btn.disabled = true;
+  $("saveStatus").textContent = "保存中...";
+  $("saveStatus").style.color = "#666";
+
+  // 入力値を集める
+  var inputs = $("mappingEditorBody").querySelectorAll('input[data-field]');
+  var changes = { companies:{}, persons:{}, cases:{}, emp_sets:{}, support_orgs:{} };
+  Array.from(inputs).forEach(function(inp){
+    var field = inp.dataset.field;
+    if(!mappingDirtyKeys[field]) return;
+    var target = resolveMappingWriteTarget(field);
+    if(!target.editable || !target.table) return;
+    var val = inp.value;
+    changes[target.table][target.column] = val;
+  });
+
+  try {
+    var c = currentCase;
+    var co = findCompanyByName(c.company, c.companyId) || findCompanyByName(c.org) || {};
+    var so = supportOrgs.find(function(s){ return s.name===c.org; }) || {};
+
+    // companies
+    if(Object.keys(changes.companies).length && co.id){
+      var r = await _sb.from("companies").update(changes.companies).eq("id", co.id);
+      if(r.error) throw new Error("companies保存失敗: "+r.error.message);
+    }
+    // persons (upsert by case_id)
+    if(Object.keys(changes.persons).length){
+      var row = Object.assign({ case_id: c.id, updated_at: new Date().toISOString() }, changes.persons);
+      var r2 = await _sb.from("persons").upsert(row, { onConflict: "case_id" });
+      if(r2.error) throw new Error("persons保存失敗: "+r2.error.message);
+    }
+    // cases
+    if(Object.keys(changes.cases).length){
+      var r3 = await _sb.from("cases").update(changes.cases).eq("id", c.id);
+      if(r3.error) throw new Error("cases保存失敗: "+r3.error.message);
+    }
+    // emp_sets（JSONB配列の該当indexだけ更新）
+    if(Object.keys(changes.emp_sets).length && co.id){
+      var idx = parseInt(currentEmpSetIdx, 10) || 0;
+      var newEmpSets = JSON.parse(JSON.stringify(co.empSets||[]));
+      if(!newEmpSets[idx]) newEmpSets[idx] = {};
+      Object.keys(changes.emp_sets).forEach(function(k){
+        newEmpSets[idx][k] = changes.emp_sets[k];
+      });
+      var r4 = await _sb.from("companies").update({ emp_sets: newEmpSets }).eq("id", co.id);
+      if(r4.error) throw new Error("emp_sets保存失敗: "+r4.error.message);
+    }
+    // support_orgs
+    if(Object.keys(changes.support_orgs).length && so.id){
+      var r5 = await _sb.from("support_orgs").update(changes.support_orgs).eq("id", so.id);
+      if(r5.error) throw new Error("support_orgs保存失敗: "+r5.error.message);
+    }
+
+    // 再ロード
+    await loadCaseById(c.id, c.companyId);
+    currentCase = cData.find(function(x){ return x.id === c.id; });
+    renderCaseInfo();
+    $("saveStatus").textContent = "✅ 保存しました。";
+    $("saveStatus").style.color = "#0a7a3b";
+    mappingDirtyKeys = {};
+  } catch(e){
+    console.error(e);
+    $("saveStatus").textContent = "❌ " + e.message;
+    $("saveStatus").style.color = "#c0392b";
+    btn.disabled = false;
+  }
 }
 
 /* ==========================================================
@@ -1711,6 +1927,7 @@ async function onGenerate(){
 $("selKind").addEventListener("change",  refreshTemplateList);
 $("selTemplate").addEventListener("change", updateGenerateBtn);
 $("btnGenerate").addEventListener("click", onGenerate);
+$("btnSaveMapping").addEventListener("click", saveMappingChanges);
 
 /* ==========================================================
    起動
