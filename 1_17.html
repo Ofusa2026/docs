@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260419.007
+  ver.20260419.008
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -138,7 +138,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260419.007</span>
+  <span class="ver">ver.20260419.008</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -510,17 +510,9 @@ async function loadCaseById(caseId, companyId){
     var coObj = dbRowToCompany(coRow);
     var cIdx = companies.findIndex(function(x){ return x.id === coObj.id; });
     if(cIdx >= 0) companies[cIdx] = coObj; else companies.push(coObj);
-    // デバッグ: 支援担当者系の値を確認
-    log("companies取得: name=" + coObj.name + " / supportStaff=[" + coObj.supportStaff + "]"
-        + " / supportManagerNameEn=[" + coObj.supportManagerNameEn + "]"
-        + " / supportManagerTitleEn=[" + coObj.supportManagerTitleEn + "]");
-    console.log("[DEBUG] coRow raw keys:", Object.keys(coRow));
-    console.log("[DEBUG] coRow.support_staff:", JSON.stringify(coRow.support_staff));
-    console.log("[DEBUG] coRow.support_manager_name_en:", JSON.stringify(coRow.support_manager_name_en));
-    console.log("[DEBUG] coRow.support_manager_title_en:", JSON.stringify(coRow.support_manager_title_en));
-    console.log("[DEBUG] coObj全体:", coObj);
+    log("会社取得: " + coObj.name + " (supportStaff=[" + (coObj.supportStaff||'') + "])");
   } else {
-    log("⚠ companies取得失敗（coRow=null）");
+    log("⚠ 会社レコードが見つかりません");
   }
   if(pRow){
     personData[caseId] = Object.assign(personData[caseId]||{}, dbRowToPerson(pRow));
@@ -1516,6 +1508,28 @@ function fixSplitPlaceholders(xml, phMap, rv){
    ========================================================== */
 var allTemplates = []; // public.templatesの全行
 
+// マッピング（settings.tplMappings.cat6_tpl0 から取得）
+// 案件管理システムと同じ仕組みで 1-17(支援計画書)=カテゴリIndex 6, tpl0 のキーに保存されている
+var MAPPING_1_17 = []; // [{cell, field, label, source, ...}, ...]
+var TPL_CATEGORY_INDEX_1_17 = 6; // TEMPLATE_CATEGORIES配列での1-17のインデックス（案件管理index.htmlと同じ）
+
+async function loadMappings(){
+  if(!_sb) return;
+  try {
+    var res = await _sb.from("settings").select("value").eq("key", "tplMappings").single();
+    if(res.error){ log("⚠ tplMappings取得失敗: " + res.error.message); return; }
+    var tplMappings = res.data && res.data.value;
+    if(typeof tplMappings === "string"){ try { tplMappings = JSON.parse(tplMappings); } catch(e){} }
+    if(!tplMappings || typeof tplMappings !== "object"){ log("⚠ tplMappings形式不正"); return; }
+    // 1-17のtpl0マッピングを取得（各言語版のテンプレートで共通）
+    MAPPING_1_17 = tplMappings["cat" + TPL_CATEGORY_INDEX_1_17 + "_tpl0"] || [];
+    log("マッピング: " + MAPPING_1_17.length + "項目 読み込み (cat"+TPL_CATEGORY_INDEX_1_17+"_tpl0)");
+  } catch(e){
+    console.error(e);
+    log("⚠ マッピング読み込みエラー: " + e.message);
+  }
+}
+
 // 1-17号固定のグループ名
 const TARGET_GROUP = "1-17(支援計画書)";
 
@@ -1677,9 +1691,9 @@ async function onGenerate(){
     var ab = await dlRes.data.arrayBuffer();
     var bytes = new Uint8Array(ab);
 
-    log("変数置換開始 (" + bytes.byteLength + " bytes)");
+    log("変数置換開始 (" + bytes.byteLength + " bytes, マッピング"+MAPPING_1_17.length+"項目)");
     // doGenerateFromMapping は bytesOverride 経由で processTemplateBytes を呼ぶ
-    doGenerateFromMapping(caseId, empSetIdx, [], bytes);
+    doGenerateFromMapping(caseId, empSetIdx, MAPPING_1_17, bytes);
 
     setStatus("✅ 生成完了（ダウンロードフォルダを確認してください）", "success");
   } catch(e) {
@@ -1708,6 +1722,7 @@ $("btnGenerate").addEventListener("click", onGenerate);
   }
   try {
     await loadTemplates();
+    await loadMappings();
     setStatus("テンプレート読み込み完了。案件を選択してください（index.htmlサイドバー上部）。", "info");
     // 親ページに「準備完了」通知（親が既に案件選択済みなら再送信を促したい場合用）
     try { window.parent && window.parent !== window && window.parent.postMessage({type:"CHILD_READY", child:"1_17"}, "*"); } catch(e){}
