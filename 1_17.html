@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260419.003
+  ver.20260419.005
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -138,7 +138,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260419.003</span>
+  <span class="ver">ver.20260419.005</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -162,18 +162,10 @@
           <option value="変更">変更</option>
         </select>
       </div>
-      <div>
-        <label>言語</label>
-        <select id="selLang">
-          <option value="">(全て)</option>
-        </select>
-      </div>
-    </div>
-    <div class="row">
-      <div style="flex:2;">
+      <div style="flex:3;">
         <label>テンプレート</label>
         <select id="selTemplate">
-          <option value="">-- 上で条件を選ぶ --</option>
+          <option value="">-- 読み込み中 --</option>
         </select>
       </div>
     </div>
@@ -1443,20 +1435,12 @@ async function loadTemplates(){
     return;
   }
 
-  // 言語一覧（1-17に存在するもののみ）
-  var langs = {};
-  allTemplates.forEach(function(t){ if(t.language) langs[t.language] = true; });
-  var llist = Object.keys(langs).sort();
-  $("selLang").innerHTML = '<option value="">(全て)</option>'
-    + llist.map(function(l){ return '<option value="'+esc(l)+'">'+esc(l)+'</option>'; }).join("");
-
   // 初期表示: 全件を並べる
   refreshTemplateList();
 }
 
 function refreshTemplateList(){
   var kind = $("selKind").value;
-  var lang = $("selLang").value;
   var sel  = $("selTemplate");
 
   var list = allTemplates.filter(function(t){
@@ -1464,7 +1448,6 @@ function refreshTemplateList(){
       var hay = (t.kind||"") + " " + (t.name||"") + " " + (t.filename||"");
       if(hay.indexOf(kind) < 0) return false;
     }
-    if(lang && t.language !== lang) return false;
     return true;
   });
   _currentTplList = list; // processTemplateBytesから参照
@@ -1610,7 +1593,6 @@ async function onGenerate(){
    イベント登録
    ========================================================== */
 $("selKind").addEventListener("change",  refreshTemplateList);
-$("selLang").addEventListener("change",  refreshTemplateList);
 $("selTemplate").addEventListener("change", updateGenerateBtn);
 $("btnGenerate").addEventListener("click", onGenerate);
 
