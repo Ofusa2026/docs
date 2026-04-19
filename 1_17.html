@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1-17号 支援計画書 生成 | OFUSA docs</title>
+<!--
+  ========================================================
+  OFUSA docs 1_17.html
+  ver.20260419.003
+  --------------------------------------------------------
+  役割: 1-17号（支援計画書）専用の自動生成ツール。
+        Supabase Storage上のdocxテンプレート（全13件:
+        認定/変更 × 6言語）を案件データで変数置換して
+        .docxをダウンロードする。
+
+  注意: 1-17号は他の1-X号HTMLと違いHTMLマスターではなく
+        docxマスター運用。プレビュー・入力機能なし。
+  
+  方針: 案件管理システム(index.html)のコア3部品
+        (PLACEHOLDER_MAP / doGenerateFromMapping / processTemplateBytes)
+        をそのまま移植。依存するグローバル変数・補助関数は
+        本ファイル上部で生成・スタブ化する。
+  ========================================================
+-->
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --border:#e1e5eb;
+    --text:#222;
+    --muted:#666;
+    --primary:#0066cc;
+    --primary-hover:#0052a3;
+    --success:#0a7a3b;
+    --danger:#c0392b;
+    --navy:#1a365d;
+    --gray-400:#666;
+    --accent:#fff7e0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0;
+    font-family:"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    background:var(--bg); color:var(--text);
+    font-size:14px; line-height:1.6;
+  }
+  header{
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:12px 20px; display:flex; align-items:center; gap:12px;
+    position:sticky; top:0; z-index:10;
+  }
+  header h1{ font-size:16px; margin:0; flex:1; }
+  header .ver{ font-size:11px; color:var(--muted); }
+  header a.back{
+    font-size:12px; color:var(--primary); text-decoration:none;
+    padding:4px 10px; border:1px solid var(--border); border-radius:4px;
+  }
+  header a.back:hover{ background:#f0f4f8; }
+
+  main{ max-width:960px; margin:20px auto; padding:0 16px; }
+  .card{
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:20px; margin-bottom:16px;
+  }
+  .card h2{
+    font-size:15px; margin:0 0 12px; padding-bottom:8px;
+    border-bottom:2px solid var(--primary); color:var(--primary);
+  }
+  .row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+  .row > div{ flex:1; min-width:200px; }
+  label{
+    display:block; font-size:12px; color:var(--muted);
+    margin-bottom:4px; font-weight:600;
+  }
+  select, input[type=text]{
+    width:100%; padding:8px 10px; border:1px solid var(--border);
+    border-radius:4px; font-size:14px; background:#fff;
+  }
+  select:focus, input:focus{ outline:none; border-color:var(--primary); }
+
+  button{
+    padding:10px 20px; border:none; border-radius:4px;
+    font-size:14px; cursor:pointer; font-weight:600;
+  }
+  button.primary{ background:var(--primary); color:#fff; }
+  button.primary:hover{ background:var(--primary-hover); }
+  button.primary:disabled{ background:#aaa; cursor:not-allowed; }
+
+  .status{
+    margin-top:12px; padding:10px 12px; border-radius:4px;
+    font-size:13px; display:none;
+  }
+  .status.info   { background:#e8f1fa; color:#0052a3; display:block; }
+  .status.success{ background:#e7f5ec; color:var(--success); display:block; }
+  .status.error  { background:#fbe9e7; color:var(--danger);  display:block; }
+
+  .log{
+    margin-top:12px; max-height:240px; overflow-y:auto;
+    background:#1e1e1e; color:#d4d4d4; padding:10px;
+    border-radius:4px; font-family:"Menlo","Consolas",monospace;
+    font-size:11px; white-space:pre-wrap; display:none;
+  }
+  .log.show{ display:block; }
+
+  .note{
+    background:var(--accent); border-left:3px solid #e0b040;
+    padding:8px 12px; font-size:12px; color:#6b5000;
+    margin-bottom:12px; border-radius:0 4px 4px 0;
+  }
+
+  .case-info{
+    background:#f8f9fa; border:1px solid var(--border);
+    border-radius:4px; padding:10px; margin-top:8px;
+    font-size:12px; display:none;
+  }
+  .case-info.show{ display:block; }
+  .case-info dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:2px 10px; }
+  .case-info dt{ color:var(--muted); }
+
+  #dg_missing_edit{
+    margin-top:12px; display:none;
+  }
+
+  .toast{
+    position:fixed; bottom:20px; right:20px;
+    background:var(--navy); color:#fff; padding:10px 16px;
+    border-radius:6px; font-size:13px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    opacity:0; transition:opacity 0.3s;
+    pointer-events:none; z-index:100;
+  }
+  .toast.show{ opacity:0.95; }
+  .toast.error{ background:var(--danger); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 1-17号 支援計画書 生成</h1>
+  <span class="ver">ver.20260419.003</span>
+  <a href="./index.html" class="back">← docsトップへ</a>
+</header>
+
+<main>
+
+  <div class="note">
+    <strong>使い方:</strong>
+    左サイドバー上部で案件を選び、このページで種別（認定/変更）・言語・テンプレートを選んで生成ボタンを押してください。
+    <br><small>※ この書類だけは HTML ではなく Word(docx) で運用しているため、専用の自動生成ツールになっています。</small>
+  </div>
+
+  <!-- ========= テンプレート選択 ========= -->
+  <div class="card">
+    <h2>1. テンプレートを選ぶ</h2>
+    <div class="row">
+      <div>
+        <label>種別</label>
+        <select id="selKind">
+          <option value="">(全て)</option>
+          <option value="認定">認定</option>
+          <option value="変更">変更</option>
+        </select>
+      </div>
+      <div>
+        <label>言語</label>
+        <select id="selLang">
+          <option value="">(全て)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div style="flex:2;">
+        <label>テンプレート</label>
+        <select id="selTemplate">
+          <option value="">-- 上で条件を選ぶ --</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========= 現在の案件 ========= -->
+  <div class="card">
+    <h2>2. 案件を確認</h2>
+    <div id="caseInfo" class="case-info">
+      <div id="caseInfoEmpty" style="color:var(--muted);font-size:13px;">
+        左サイドバー上部の案件選択欄で案件を選ぶと、ここに案件情報が表示されます。
+      </div>
+      <dl id="caseInfoDl" style="display:none;"></dl>
+    </div>
+  </div>
+
+  <!-- ========= 生成 ========= -->
+  <div class="card">
+    <h2>3. 生成してダウンロード</h2>
+    <button id="btnGenerate" class="primary" disabled>▶ 生成する</button>
+    <div id="status" class="status"></div>
+    <div id="log" class="log"></div>
+    <div id="dg_missing_edit"></div>
+  </div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- ========= ライブラリ ========= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ========= 設定 ========= -->
+<script>
+/* ==========================================================
+   Supabase接続設定
+   index.html と同じ publishable key を使用
+   ========================================================== */
+const SUPABASE_URL = "https://ehwlgbwpycglmopiqyty.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u";
+
+var _sb = null;
+var DB_READY = false;
+try {
+  _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  DB_READY = true;
+} catch(e) { console.error("Supabase init failed:", e); }
+</script>
+
+<!-- ========= データ層とスタブ ========= -->
+<script>
+/* ==========================================================
+   グローバル状態（案件管理と互換）
+   ========================================================== */
+var cData        = [];   // 案件
+var companies    = [];   // 企業
+var personData   = {};   // case_id → person
+var supportOrgs  = [];   // 支援機関
+
+// 選択状態（doGenerateFromMapping / processTemplateBytes から参照される）
+var _selectedDocType = "";
+var _selectedTplRef  = null;
+var _selectedTplIdx  = 0;
+var _currentTplList  = [];
+
+// テンプレートカテゴリ（ダミー）
+// doGenerateFromMapping は _selectedDocType → TEMPLATE_CATEGORIES[ci] で引くが、
+// generator.html では選択中テンプレートのgroup_nameをそのまま使う単純版にする。
+var TEMPLATE_CATEGORIES = [];
+
+/* ==========================================================
+   ユーティリティ / スタブ
+   ========================================================== */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// Toast
+function showToast(msg, type){
+  var t = $("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (type==="error" ? " error" : "");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ t.className = "toast"; }, 3000);
+}
+
+// ログ表示
+function setStatus(msg, type){
+  var s = $("status");
+  s.textContent = msg;
+  s.className = "status " + (type||"info");
+}
+function log(msg){
+  var l = $("log");
+  l.classList.add("show");
+  l.textContent += "[" + new Date().toLocaleTimeString() + "] " + msg + "\n";
+  l.scrollTop = l.scrollHeight;
+}
+function clearLog(){ $("log").textContent = ""; $("log").classList.remove("show"); }
+
+// 案件管理にある関数のスタブ（generator.htmlでは不要な副作用を無効化）
+function logCaseAction(){ /* no-op */ }
+function renderSupportList(){}
+function renderSupportTree(){}
+
+/* ==========================================================
+   補助関数（案件管理 index.html からの移植）
+   ========================================================== */
+
+// normalizeCoName (index.html 29274-29281)
+function normalizeCoName(s) {
+  try { s = (s||'').normalize('NFKC'); } catch(e) {}
+  return s.replace(/　/g, ' ')
+           .replace(/\s*&\s*/g, '&')
+           .replace(/\s+/g, ' ')
+           .trim();
+}
+
+// findCompanyByName (index.html 29282-29293)
+function findCompanyByName(name, companyId) {
+  if (!name && !companyId) return null;
+  if (companyId) {
+    var byId = companies.find(function(x){ return x.id === companyId; });
+    if (byId) return byId;
+  }
+  if (!name) return null;
+  var n = normalizeCoName(name);
+  return companies.find(function(x){ return normalizeCoName(x.name) === n; }) || null;
+}
+
+// splitAddress (index.html 6684-6695)
+function splitAddress(str) {
+  if (!str) return {pref:'', city:'', rest:''};
+  var prefPattern = /^(北海道|東京都|(?:京都|大阪)府|.{2,3}県)/;
+  var pm = str.match(prefPattern);
+  var pref = pm ? pm[1] : '';
+  var rest1 = pm ? str.substring(pref.length) : str;
+  var cityPattern = /^(.+?[市区町村郡])/;
+  var cm = rest1.match(cityPattern);
+  var city = cm ? cm[1] : '';
+  var rest = cm ? rest1.substring(city.length) : rest1;
+  return {pref: pref, city: city, rest: rest};
+}
+
+// getDisplayName (index.html 22370-22373)
+function getDisplayName(cas) {
+  var pd = personData[cas.id] || {};
+  return pd.applicantNameEn || pd.applicantName || cas.applicant || cas.name || '';
+}
+
+// sanitizeStoragePath: 簡易版（index.htmlの実装は複雑なのでシンプル化）
+function sanitizeStoragePath(path){
+  if(!path) return path;
+  // スペースや特殊文字をURL-safeに
+  return path.split('/').map(function(seg){
+    return encodeURIComponent(seg).replace(/'/g,'%27');
+  }).join('/');
+}
+
+/* ==========================================================
+   Supabase → インメモリ データロード
+   ========================================================== */
+function dbRowToCase(r) {
+  return {
+    id: r.id, applicant: r.applicant||'', name: r.name||'',
+    nationality: r.nationality||'', org: r.org||'', company: r.company||'',
+    appType: r.app_type||'', residenceStatus: r.residence_status||'',
+    currentStatus: r.current_status||'', team: r.team||'', staff: r.staff||'',
+    toritsugisha: r.toritsugisha||'', expire: r.expire||'',
+    tokureiDate: r.tokurei_date||'', tempReturn: r.temp_return||'',
+    shinsaDate: r.shinsa_date||'',
+    empSetIdx: r.emp_set_idx||'', soOfficeIdx: r.so_office_idx!=null?r.so_office_idx:null,
+    companyId: r.company_id||'',
+    supportFee: r.support_fee||'', applicantField: r.applicant_field||'',
+    jobCategory: r.job_category||'', receiptNo: r.receipt_no||'',
+    receiptDate: r.receipt_date||'', docCreateDate: r.doc_create_date||'',
+    madoguchiDate: r.madoguchi_date||'', madoguchiReceiveDate: r.madoguchi_receive_date||'',
+    applicationDeadline: r.application_deadline||'',
+    applicantFieldEn: r.applicant_field_en||'', jobCategoryEn: r.job_category_en||'',
+    acceptExp: r.accept_exp||'',
+    _caseNo: r.case_no||'',
+    folderNo: r.folder_no||'', industry: r.industry||'', memo: r.memo||'',
+    authorName: r.author_name||'', authorTitle: r.author_title||'',
+    sharedCaseNo: r.shared_case_no||''
+  };
+}
+
+function dbRowToCompany(r) {
+  var co = {
+    id:r.id, name:r.name||'', nameKana:r.name_kana||'', nameEn:r.name_en||'',
+    corpNo:r.corp_no||'', empInsNo:r.emp_ins_no||'', laborInsNo:r.labor_ins_no||'',
+    industry:r.industry||'', industryCode:r.industry_code||'',
+    zip:r.zip||'', pref:r.pref||'', city:r.city||'', address:r.address||'',
+    addressCode:r.address_code||'', detailAddress:r.detail_address||'',
+    addressEn:r.address_en||'', tel:r.tel||'',
+    repName:r.rep_name||'', repTitle:r.rep_title||'', repNameEn:r.rep_name_en||'', repTitleEn:r.rep_title_en||'',
+    authorName:r.author_name||'', authorTitle:r.author_title||'', authorNameEn:r.author_name_en||'',
+    capital:r.capital||'', sales:r.sales||'', employees:r.employees||'',
+    foreignEmployees:r.foreign_employees||'', techTrainees:r.tech_trainees||'',
+    jpSalary:r.jp_salary||'',
+    supportOrgName:r.support_org_name||'', supportOrgAddress:r.support_org_address||'', supportOrgNo:r.support_org_no||'',
+    empSets:r.emp_sets||[], officers:r.officers||[], folderNo:r.folder_no||'',
+    supportManagerName:r.support_manager_name||'', supportManagerTitle:r.support_manager_title||'',
+    supportManagerNameEn:r.support_manager_name_en||'', supportManagerTitleEn:r.support_manager_title_en||'',
+    supportStaff:r.support_staff||'',
+    corpType:r.corp_type||'', companyCategory:r.company_category||'',
+    categoryCode:r.category_code||'', occupationCode:r.occupation_code||'',
+    hasJobPlacement:r.has_job_placement||'',
+    salesY1:r.sales_y1||'', salesY2:r.sales_y2||'', salesY3:r.sales_y3||'',
+    ordinaryPLY1:r.ordinary_pl_y1||'', ordinaryPLY2:r.ordinary_pl_y2||'', ordinaryPLY3:r.ordinary_pl_y3||'',
+    netPLY1:r.net_pl_y1||'', netPLY2:r.net_pl_y2||'', netPLY3:r.net_pl_y3||'',
+    netAssetsY1:r.net_assets_y1||'', netAssetsY2:r.net_assets_y2||'', netAssetsY3:r.net_assets_y3||'',
+    jpCompJobDesc:r.jp_comp_job_desc||'', jpCompAge:r.jp_comp_age||'',
+    jpCompGender:r.jp_comp_gender||'', jpCompExp:r.jp_comp_exp||'',
+    jpCompSalary:r.jp_comp_salary||'', jpCompReason:r.jp_comp_reason||'',
+    wageRegulation:r.wage_regulation||'', extra:r.extra||{}
+  };
+  // extraフィールドからフォールバック
+  var _extraKeys=['salesY1','salesY2','salesY3','ordinaryPLY1','ordinaryPLY2','ordinaryPLY3','netPLY1','netPLY2','netPLY3','netAssetsY1','netAssetsY2','netAssetsY3'];
+  if(co.extra && typeof co.extra === 'object'){
+    _extraKeys.forEach(function(k){ if(!co[k] && co.extra[k]) co[k] = co.extra[k]; });
+  }
+  return co;
+}
+
+var PERSON_COLUMN_MAP = {
+  applicant_name_en:'applicantNameEn', residence_card:'residenceCard',
+  passport:'passport', passport_expiry:'passportExpiry', birthdate:'birthdate',
+  birth_place:'birthPlace', nationality:'nationality', nationality_code:'nationalityCode',
+  gender:'gender', spouse:'spouse', occupation:'occupation',
+  age:'age', experience:'experience',
+  home_country_address:'homeCountryAddress', jp_postal_code:'jpPostalCode',
+  address_code:'addressCode', jp_detail_address:'jpDetailAddress', address:'address',
+  tel_num:'telNum', phone:'phone', cel_phone:'celPhone', email:'email',
+  notification_email:'notificationEmail', residence_status:'residenceStatus',
+  entry_date:'entryDate', arrival_port:'arrivalPort',
+  stay_years:'stayYears', stay_months:'stayMonths', visa_place:'visaPlace',
+  contract_start:'contractStart', contract_end:'contractEnd',
+  skill_eval_type:'skillEvalType', skill_exam_1:'skillExam1',
+  skill_exam_loc_1:'skillExamLoc1', skill_exam_code_1:'skillExamCode1',
+  skill_exam_loc_code_1:'skillExamLocCode1',
+  skill_exam_2:'skillExam2', skill_exam_loc_2:'skillExamLoc2',
+  skill_exam_3:'skillExam3', skill_exam_loc_3:'skillExamLoc3',
+  jp_eval_type:'jpEvalType', jp_exam_1:'jpExam1', jp_exam_loc_1:'jpExamLoc1',
+  jp_exam_code_1:'jpExamCode1', jp_exam_loc_code_1:'jpExamLocCode1',
+  jp_exam_2:'jpExam2', jp_exam_loc_2:'jpExamLoc2',
+  jp_exam_3:'jpExam3', jp_exam_loc_3:'jpExamLoc3',
+  gijutsu_type:'gijutsuType', gijutsu_work:'gijutsuWork', gijutsu_proof:'gijutsuProof',
+  past_entry:'pastEntry', past_entry_count:'pastEntryCount',
+  deportation:'deportation', deportation_count:'deportationCount',
+  stay_period:'stayPeriod', stay_period_other:'stayPeriodOther',
+  total_stay_year:'totalStayYear', total_stay_month:'totalStayMonth',
+  line_group_id:'lineGroupId', temp_return:'tempReturn',
+  hoped_stay_period:'hopedStayPeriod',
+  hire_date:'hireDate', salary:'salary',
+  past_entry_from:'pastEntryFrom', past_entry_to:'pastEntryTo',
+  past_coe:'pastCOE', past_coe_count:'pastCOECount', past_coe_denied:'pastCOEDenied',
+  deportation_date:'deportationDate',
+  temp_return_flag:'tempReturnFlag', first_entry:'firstEntry',
+  edu_country:'eduCountry', education:'education', school_name:'schoolName',
+  completion_date:'completionDate', major:'major', major_detail:'majorDetail',
+  jp_address:'jpAddress'
+};
+
+function dbRowToPerson(r) {
+  var p = {};
+  Object.keys(PERSON_COLUMN_MAP).forEach(function(k){
+    if(r[k]!==null && r[k]!==undefined) p[PERSON_COLUMN_MAP[k]] = r[k];
+  });
+  if(r.extra && typeof r.extra === 'object') Object.assign(p, r.extra);
+  if(r.extra_data && typeof r.extra_data === 'object') Object.assign(p, r.extra_data);
+  return p;
+}
+
+function dbRowToSupportOrg(r) {
+  return {
+    id:r.id, name:r.name||'', nameKana:r.name_kana||'', nameEn:r.name_en||'', corpNo:r.corp_no||'',
+    empInsNo:r.emp_ins_no||'',
+    regNo:r.reg_no||'', regDate:r.reg_date||'', zip:r.zip||'',
+    pref:r.pref||'', city:r.city||'', addressDetail:r.address_detail||'',
+    address:r.address||'', addressEn:r.address_en||'', tel:r.tel||'',
+    repName:r.rep_name||'', repNameKana:r.rep_name_kana||'',
+    repNameEn:r.rep_name_en||'', languages:r.languages||'',
+    displayName:r.display_name||'',
+    supportManager:r.support_manager||'',
+    supportManagerKana:r.support_manager_kana||'', supportManagerTitle:r.support_manager_title||'',
+    supporterCount:r.supporter_count||'', supportStaffCount:r.support_staff_count||'',
+    supportStaffList:r.support_staff_list||[],
+    jobPermitNo:r.job_permit_no||'', jobPermitDate:r.job_permit_date||'',
+    supportManagerName:r.support_manager_name||'', supportManagerNameEn:r.support_manager_name_en||'',
+    supportManagerTitleEn:r.support_manager_title_en||'',
+    folderNo:r.folder_no||'',
+    offices:r.offices||[]
+  };
+}
+
+/* ==========================================================
+   必要時に1件だけロード（index.html 側からのSELECT_CASE受信時）
+   ========================================================== */
+async function loadCaseById(caseId, companyId){
+  if(!_sb) throw new Error("Supabase未接続");
+  log("案件取得: " + caseId);
+
+  // 案件本体
+  var caseRes = await _sb.from("cases").select("*").eq("id", caseId).single();
+  if(caseRes.error) throw new Error("案件取得失敗: " + caseRes.error.message);
+  var cRow = caseRes.data;
+
+  // 企業（companyId指定があればそれで、なければorg名で）
+  var coRow = null;
+  if(companyId){
+    var r = await _sb.from("companies").select("*").eq("id", companyId).single();
+    if(!r.error) coRow = r.data;
+  }
+  if(!coRow && cRow.company){
+    var r2 = await _sb.from("companies").select("*").eq("name", cRow.company).limit(1);
+    if(!r2.error && r2.data && r2.data.length) coRow = r2.data[0];
+  }
+  if(!coRow && cRow.org){
+    var r3 = await _sb.from("companies").select("*").eq("name", cRow.org).limit(1);
+    if(!r3.error && r3.data && r3.data.length) coRow = r3.data[0];
+  }
+
+  // 人材
+  var pRes = await _sb.from("persons").select("*").eq("case_id", caseId).limit(1);
+  var pRow = (pRes.data && pRes.data.length) ? pRes.data[0] : null;
+
+  // 支援機関（案件のorg名で引く）
+  var soRow = null;
+  if(cRow.org){
+    var so = await _sb.from("support_orgs").select("*").eq("name", cRow.org).limit(1);
+    if(!so.error && so.data && so.data.length) soRow = so.data[0];
+  }
+
+  // グローバル配列/オブジェクトに格納（既存データを上書き）
+  var caseObj = dbRowToCase(cRow);
+  // 同じIDがあれば入れ替え、なければ追加
+  var idx = cData.findIndex(function(x){ return x.id === caseId; });
+  if(idx >= 0) cData[idx] = caseObj; else cData.push(caseObj);
+
+  if(coRow){
+    var coObj = dbRowToCompany(coRow);
+    var cIdx = companies.findIndex(function(x){ return x.id === coObj.id; });
+    if(cIdx >= 0) companies[cIdx] = coObj; else companies.push(coObj);
+  }
+  if(pRow){
+    personData[caseId] = Object.assign(personData[caseId]||{}, dbRowToPerson(pRow));
+  }
+  if(soRow){
+    var soObj = dbRowToSupportOrg(soRow);
+    var sIdx = supportOrgs.findIndex(function(x){ return x.id === soObj.id; });
+    if(sIdx >= 0) supportOrgs[sIdx] = soObj; else supportOrgs.push(soObj);
+  }
+
+  log("案件データ取得完了: " + (pRow && pRow.applicant_name_en || caseObj.applicant || caseId));
+  return caseObj;
+}
+</script>
+
+<!-- ========= PLACEHOLDER_MAP (案件管理 index.html 18151-18437) ========= -->
+<script>
+/* === ここから PLACEHOLDER_MAP（そのまま移植） === */
+window.PLACEHOLDER_MAP = {
+  '人材データ.氏名(英語)':'applicantNameEn',
+  '案件一覧基本情報.各雇用条件.外国人職務内容':'es.foreignerJobDesc',
+  '人材データ.年齢':'p.age',
+  '人材データ.性別':'p.gender',
+  '人材データ.経験年数':'p.experience',
+  '案件一覧基本情報.雇用条件.月額基本給':'es.salaryMonthly',
+  '案件一覧基本情報.各雇用条件.時間給':'es.salaryHourly',
+  '所属機関.基本情報.比較対象日本人職務内容':'es.jpCompJobDesc',
+  '所属機関.基本情報.比較対象日本人年齢':'es.jpCompAge',
+  '所属機関.基本情報.比較対象日本人性別':'es.jpCompGender',
+  '所属機関.基本情報.比較対象日本人経験':'es.jpCompExp',
+  '所属機関.基本情報.比較対象日本人賃金':'es.jpCompSalary',
+  '所属機関.基本情報.賃金規定有無':'es.wageRegulation',
+  '所属機関.基本情報.比較対象日本人同等理由':'es.jpCompReason',
+  '案件一覧.基本情報.書類作成日':'case.docCreateDate',
+  '案件一覧.所属機関':'case.company',
+  '所属機関.基本情報.代表者役職+代表者名':'co.authorTitleName',
+  // 1-17（支援計画書）用
+  'パスポート.氏名':'applicantNameEn',
+  'パスポート.氏名カンマなし':'applicantNameEn',
+  'パスポート.性別':'p.gender',
+  'パスポート.生年月日（年）':'p.birthY',
+  'パスポート.生年月日（月）':'p.birthM',
+  'パスポート.生年月日（日）':'p.birthD',
+  '所属機関.会社名':'co.name',
+  '企業情報.会社名':'co.name',
+  '企業情報.会社名(ひらがな)':'co.nameKana',
+  '企業情報.会社名(英語)':'co.nameEn',
+  '企業情報.会社住所(英語)':'co.addressEn',
+  '企業情報.作成責任者':'co.authorName',
+  '企業情報.作成責任者英語':'co.authorNameEn',
+  '企業情報.郵便番号':'co.zip',
+  '企業情報.(所在地)(都道府県)':'co.pref',
+  '企業情報.(所在地)(市区町村)':'co.city',
+  '企業情報.(所在地)(町名丁目番地号等)':'co.address',
+  '企業情報.所在地':'co.fullAddress',
+  '企業情報.電話番号':'co.tel',
+  '企業情報.代表者名':'co.repName',
+  '企業情報.代表者役職':'co.repTitle',
+  '企業情報.代表者役職+氏名':'co.repTitleName',
+  '企業情報.支援担当者':'co.supportStaff',
+  // 書類作成日（短縮形）
+  '書類作成日':'case.docCreateDate',
+  // 所属機関.作成責任者（バリアント）
+  '所属機関.作成責任者氏名':'co.authorName',
+  '所属機関.作成責任者役職':'co.authorTitle',
+  '所属機関.作成責任者役職氏名':'co.authorTitleName',
+  // パスポート.性別バリアント
+  'パスポート.性別(漢字のみ)':'p.gender',
+  '在留期間':'p.stayPeriod',
+  // ===== 窓口申請書（変更）=====
+  'パスポート.国籍':'p.nationality',
+  'パスポート.本国における居住地':'p.homeAddress',
+  'パスポート.旅券番号':'p.passport',
+  'パスポート.旅券有効期限（年）':'p.passExpY',
+  'パスポート.旅券有効期限（月）':'p.passExpM',
+  'パスポート.旅券有効期限（日）':'p.passExpD',
+  '人材データ.住所':'p.address',
+  '在留カード.現に有する在留資格':'p.residenceStatus',
+  '在留カード_表.在留期間':'p.stayPeriod',
+  '在留カード_表.職業':'es.foreignerJobDesc',
+  '在留カード番号':'p.residenceCard',
+  '在留期限（年）':'p.expireY',
+  '在留期限（月）':'p.expireM',
+  '在留期限（日）':'p.expireD',
+  '希望する在留資格':'p.desiredStatus',
+  '申請人氏名':'applicantName',
+  '所属機関名':'co.name',
+  '所属機関住所':'co.fullAddress',
+  '所属機関.代表者名':'co.repName',
+  '所属機関代表者名':'co.repName',
+  '所属機関.電話番号':'co.tel',
+  '所属機関.法人番号':'co.corporateNo',
+  '所属機関.雇用保険適用事業所番号':'co.employInsNo',
+  '所属機関.労働保険番号':'co.laborInsNo',
+  '所属機関.常勤職員数':'co.fullTimeStaff',
+  '所属機関.年間売上金額':'co.annualSales',
+  '所属機関.所属機関資本金':'co.capital',
+  '所属機関.日本人の月額報酬':'co.jpCompSalary',
+  '特定技能通算在留期間':'p.totalStayYear',
+  '登録支援機関名':'so.name',
+  '｛｛登録支援機関名｝｝':'so.name',
+  '｛｛登録支援機関名ふりがな｝｝':'so.nameKana',
+  '｛｛登録支援機関名英語｝｝':'so.nameEn',
+  '｛｛登録支援機関郵便番号｝｝':'so.zip',
+  '｛｛登録支援機関住所｝｝':'so.address',
+  '｛｛登録支援機関英語住所｝｝':'so.addressEn',
+  '｛｛登録支援機関支援事業所郵便番号｝｝':'so.officeZip',
+  '｛｛登録支援機関支援事業所住所｝｝':'so.officeAddress',
+  '｛｛登録支援機関支援事業所英語住所｝｝':'so.officeAddressEn',
+  '｛｛登録支援機関支援事業所電話番号｝｝':'so.officeTel',
+  '｛｛登録支援機関支援責任者ふりがな｝｝':'so.supportManagerKana',
+  '｛｛登録支援機関支援責任者役職｝｝':'so.supportManagerTitle',
+  '｛｛登録支援機関支援責任者役職翻訳｝｝':'so.supportManagerTitleEn',
+  '｛｛登録支援機関支援者数｝｝':'so.supporterCount',
+  '｛｛登録支援機関支援担当者数｝｝':'so.supportStaffCount',
+  '登録支援機関住所':'so.address',
+  '登録支援機関番号':'so.regNo',
+  '登録支援機関名ふりがな':'so.nameKana',
+  '登録支援機関名英語':'so.nameEn',
+  '登録支援機関郵便番号':'so.zip',
+  '登録支援機関英語住所':'so.addressEn',
+  '登録支援機関支援事業所郵便番号':'so.officeZip',
+  '登録支援機関支援事業所英語住所':'so.officeAddressEn',
+  '登録支援機関支援事業所電話番号':'so.officeTel',
+  '登録支援機関支援責任者':'so.supportManager',
+  '登録支援機関支援責任者ふりがな':'so.supportManagerKana',
+  '登録支援機関支援責任者役職':'so.supportManagerTitle',
+  '登録支援機関支援責任者役職翻訳':'so.supportManagerTitleEn',
+  '登録支援機関支援者数':'so.supporterCount',
+  '登録支援機関支援担当者数':'so.supportStaffCount',
+  '登録支援機関電話番号':'so.tel',
+  '登録支援機関代表者名':'so.repName',
+  '登録支援機関代表者':'so.repName',
+  '登録支援機関代表者ふりがな':'so.repNameKana',
+  '登録支援機関代表者英語':'so.repNameEn',
+  '登録年月日':'so.regDate',
+  '登録支援機関登録年月日':'so.regDate',
+  '所属機関.支援担当者役職':'co.supportManagerTitle',
+  '所属機関.支援担当者英語氏名':'co.supportManagerNameEn',
+  '所属機関.支援担当者英語役職':'co.supportManagerTitleEn',
+  '書類作成日(年)':'case.docYear',
+  '書類作成日(月)':'case.docMonth',
+  '書類作成日(日)':'case.docDay',
+  '登録支援機関支援事業所名':'so.officeName',
+  '登録支援機関支援事業所住所':'so.officeAddress',
+  '登録支援機関対応言語':'so.language',
+  '登録支援機関登録年月日(年)':'so.regY',
+  '登録支援機関登録年月日(月)':'so.regM',
+  '登録支援機関登録年月日(日)':'so.regD',
+  '支援委託費':'es.supportFee',
+  '職業紹介事業者名':'co.jobAgencyName',
+  '職業紹介事業者住所':'co.jobAgencyAddress',
+  '職業紹介事業者番号':'co.jobAgencyNo',
+  '職業紹介事業者電話番号':'co.jobAgencyTel',
+  '職業紹介事業者受理年月日(年)':'co.jobAgencyRecvY',
+  '職業紹介事業者受理年月日(月)':'co.jobAgencyRecvM',
+  '職業紹介事業者受理年月日(日)':'co.jobAgencyRecvD',
+  '雇用条件.(事業所名)':'es.officeName',
+  '雇用条件.事業所住所':'es.officeAddress',
+  '雇用条件.分野':'es.field',
+  '雇用条件.区分':'es.category',
+  '雇用条件.月額報酬':'es.salaryMonthly',
+  '雇用条件.基本給の時間換算額':'es.salaryHourly',
+  '雇用条件.所定労働時間(週平均)':'es.weeklyHours',
+  '雇用条件.所定労働時間(月平均)':'es.monthlyHours',
+  '雇用条件.雇用契約期間(始期)(年)':'es.contractStartY',
+  '雇用条件.雇用契約期間(始期)(月)':'es.contractStartM',
+  '雇用条件.雇用契約期間(始期)(日)':'es.contractStartD',
+  '雇用条件.雇用契約期間(終期)(年)':'es.contractEndY',
+  '雇用条件.雇用契約期間(終期)(月)':'es.contractEndM',
+  '雇用条件.雇用契約期間(終期)(日)':'es.contractEndD',
+  'パスポート.在留期間':'p.stayPeriod',
+  '所属機関.在留期間':'p.stayPeriod',
+  'パスポート.国籍（カナ）':'p.nationality',
+  'パスポート.生年月日':'p.birthdate',
+  // 所属機関住所バリアント
+  '所属機関.(所在地)(都道府県)':'co.pref',
+  '所属機関.(所在地)(市区町村)':'co.city',
+  '所属機関.(所在地)(町名丁目番地号等)':'co.address',
+  '所属機関.会社名(ひらがな)':'co.nameKana',
+  '所属機関.会社名(英語)':'co.nameEn',
+  '所属機関.郵便番号':'co.zip',
+  '所属機関.住所':'co.fullAddress',
+  '所属機関.住所(都道府県)':'co.pref',
+  '所属機関.住所(市区町村)':'co.city',
+  '所属機関.住所(番地以降)':'co.address',
+  '所属機関.(所在地)(都道府県)':'co.pref',
+  '所属機関.(所在地)(市区町村)':'co.city',
+  '所属機関.(所在地)(町名丁目番地号等)':'co.address',
+  '所属機関.電話番号':'co.tel',
+  '所属機関.会社住所(英語)':'co.addressEn',
+  '所属機関.作成責任者':'co.authorName',
+  '所属機関.作成責任者英語':'co.authorNameEn',
+  '所属機関.支援担当者':'co.supportStaff',
+  '雇用条件.作成日(年)':'es.createY',
+  '雇用条件.作成日(月)':'es.createM',
+  '雇用条件.作成日(日)':'es.createD',
+  '雇用条件.事業所(所在地)(都道府県)':'es.officePref',
+  '雇用条件.事業所(所在地)(市区町村)':'es.officeCity',
+  '雇用条件.事業所(都道府県英語)':'es.officePrefEn',
+  '雇用条件.事業所(市区町村英語)':'es.officeCityEn',
+  '雇用条件.入国予定日':'case.entryDate',
+  '雇用条件.入国予定日(年)':'es.entryY',
+  '雇用条件.入国予定日(月)':'es.entryM',
+  '雇用条件.入国予定日(日)':'es.entryD',
+  '雇用条件.同居人数':'es.cohabitants',
+  '雇用条件.居住費徴収の有無':'es.housingFeeType',
+  '雇用条件.居住費徴収費用':'es.housingFee',
+  '雇用条件.自己所有/借上':'es.housingOwnership',
+  '雇用条件.実費相当説明':'es.actualCostDesc',
+  '雇用条件.支援担当':'co.supportStaff',
+  // 1-11（特定技能所属機関概要書）用
+  '所属機関.基本情報.作成責任者役職+氏名':'co.authorTitleName',
+  '所属機関.基本情報.前年度売上高':'co.prevSales1',
+  '所属機関.基本情報.前年度経常損益':'co.prevOrdinary1',
+  '所属機関.基本情報.前年度純損益':'co.prevNet1',
+  '所属機関.基本情報.前年度純資産':'co.prevAsset1',
+  '所属機関.基本情報.前々年度売上高':'co.prevSales2',
+  '所属機関.基本情報.前々年度経常損益':'co.prevOrdinary2',
+  '所属機関.基本情報.前々年度純損益':'co.prevNet2',
+  '所属機関.基本情報.前々年度純資産':'co.prevAsset2',
+  '所属機関.基本情報.前々々年度売上高':'co.prevSales3',
+  '所属機関.基本情報.前々々年度経常損益':'co.prevOrdinary3',
+  '所属機関.基本情報.前々々年度純損益':'co.prevNet3',
+  '所属機関.基本情報.前々々年度純資産':'co.prevAsset3',
+  '所属機関.基本情報.(日本人)自発的離職者':'co.jpVoluntaryQuit',
+  '所属機関.基本情報.(日本人)非自発的離職者':'co.jpInvoluntaryQuit',
+  '所属機関.基本情報.(外国人)自発的離職者':'co.fnVoluntaryQuit',
+  '所属機関.基本情報.(外国人)非自発的離職者':'co.fnInvoluntaryQuit',
+  '所属機関.基本情報.行方不明者(直近1年)':'co.missingCount',
+  '所属機関.基本情報.行方不明者(直近2年)':'co.missing2y',
+  '所属機関.基本情報.行方不明者(直近3年)':'co.missing3y',
+  // 役員情報（①〜⑩）
+  '所属機関.基本情報.①役員ふりがな':'co.officer1Kana',
+  '所属機関.基本情報.①役員氏名':'co.officer1Name',
+  '所属機関.基本情報.①役員役職':'co.officer1Title',
+  '所属機関.基本情報.②役員ふりがな':'co.officer2Kana',
+  '所属機関.基本情報.②役員氏名':'co.officer2Name',
+  '所属機関.基本情報.②役員役職':'co.officer2Title',
+  '所属機関.基本情報.③役員ふりがな':'co.officer3Kana',
+  '所属機関.基本情報.③役員氏名':'co.officer3Name',
+  '所属機関.基本情報.③役員役職':'co.officer3Title',
+  '所属機関.基本情報.④役員ふりがな':'co.officer4Kana',
+  '所属機関.基本情報.④役員氏名':'co.officer4Name',
+  '所属機関.基本情報.④役員役職':'co.officer4Title',
+  '所属機関.基本情報.⑤役員ふりがな':'co.officer5Kana',
+  '所属機関.基本情報.⑤役員氏名':'co.officer5Name',
+  '所属機関.基本情報.⑤役員役職':'co.officer5Title',
+  '所属機関.基本情報.⑥役員ふりがな':'co.officer6Kana',
+  '所属機関.基本情報.⑥役員氏名':'co.officer6Name',
+  '所属機関.基本情報.⑥役員役職':'co.officer6Title',
+  '所属機関.基本情報.⑦役員ふりがな':'co.officer7Kana',
+  '所属機関.基本情報.⑦役員氏名':'co.officer7Name',
+  '所属機関.基本情報.⑦役員役職':'co.officer7Title',
+  '所属機関.基本情報.⑧役員ふりがな':'co.officer8Kana',
+  '所属機関.基本情報.⑧役員氏名':'co.officer8Name',
+  '所属機関.基本情報.⑧役員役職':'co.officer8Title',
+  '所属機関.基本情報.⑨役員ふりがな':'co.officer9Kana',
+  '所属機関.基本情報.⑨役員氏名':'co.officer9Name',
+  '所属機関.基本情報.⑨役員役職':'co.officer9Title',
+  '所属機関.基本情報.⑩役員ふりがな':'co.officer10Kana',
+  '所属機関.基本情報.⑩役員氏名':'co.officer10Name',
+  '所属機関.基本情報.⑩役員役職':'co.officer10Title',
+  // 1-25（登録支援機関との支援委託契約に関する説明書）用
+  '所属機関.基本情報.登録支援機関名':'co.supportOrgName',
+  '所属機関.基本情報.登録支援機関番号':'co.supportOrgNumber',
+  '登録支援機関名':'so.name',
+  '｛｛登録支援機関名｝｝':'so.name',
+  '｛｛登録支援機関名ふりがな｝｝':'so.nameKana',
+  '｛｛登録支援機関名英語｝｝':'so.nameEn',
+  '｛｛登録支援機関郵便番号｝｝':'so.zip',
+  '｛｛登録支援機関住所｝｝':'so.address',
+  '｛｛登録支援機関英語住所｝｝':'so.addressEn',
+  '｛｛登録支援機関支援事業所郵便番号｝｝':'so.officeZip',
+  '｛｛登録支援機関支援事業所住所｝｝':'so.officeAddress',
+  '｛｛登録支援機関支援事業所英語住所｝｝':'so.officeAddressEn',
+  '｛｛登録支援機関支援事業所電話番号｝｝':'so.officeTel',
+  '｛｛登録支援機関支援責任者ふりがな｝｝':'so.supportManagerKana',
+  '｛｛登録支援機関支援責任者役職｝｝':'so.supportManagerTitle',
+  '｛｛登録支援機関支援責任者役職翻訳｝｝':'so.supportManagerTitleEn',
+  '｛｛登録支援機関支援者数｝｝':'so.supporterCount',
+  '｛｛登録支援機関支援担当者数｝｝':'so.supportStaffCount',
+  '登録支援機関住所':'so.address',
+  '登録支援機関名ふりがな':'so.nameKana',
+  '登録支援機関名英語':'so.nameEn',
+  '登録支援機関郵便番号':'so.zip',
+  '登録支援機関英語住所':'so.addressEn',
+  '登録支援機関支援事業所郵便番号':'so.officeZip',
+  '登録支援機関支援事業所英語住所':'so.officeAddressEn',
+  '登録支援機関支援事業所電話番号':'so.officeTel',
+  '登録支援機関支援責任者ふりがな':'so.supportManagerKana',
+  '登録支援機関支援責任者役職':'so.supportManagerTitle',
+  '登録支援機関支援責任者役職翻訳':'so.supportManagerTitleEn',
+  '登録支援機関支援者数':'so.supporterCount',
+  '登録支援機関支援担当者数':'so.supportStaffCount',
+  '登録支援機関.支援責任者氏名':'so.staff',
+  '登録支援機関.支援責任者名':'so.staff',
+  '登録支援機関.代表者名':'so.repName',
+  '登録支援機関.電話番号':'so.tel',
+  '登録支援機関.登録番号':'so.regNo',
+  '案件一覧.人材データ.契約終了日':'case.contractEndDate',
+  '雇用条件.支援委託費':'es.supportFee',
+  '所属機関電話番号':'co.tel',
+  '所属機関代表役職':'co.repTitle'
+};
+
+/* === ここまで === */
+</script>
+
+<!-- ========= doGenerateFromMapping (18679-18971) ========= -->
+<script>
+/* === ここから doGenerateFromMapping（そのまま移植） === */
+function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zipCallback){
+  var c=cData.find(function(x){return x.id===caseId;});
+  if(!c) return;
+  var co=findCompanyByName(c.company);
+  if(!co&&c.org)co=findCompanyByName(c.org);
+  co=co||{};
+  var es=(co.empSets&&empSetIdx!=='') ? co.empSets[parseInt(empSetIdx)]||{} : {};
+  var p=personData[caseId]||{};
+  var now=new Date();
+
+  function rv(field){
+    if(!field) return '';
+    // PLACEHOLDER_MAPで変換（日本語プレースホルダー → so./co./es.等のフィールドキー）
+    var _PM2 = window.PLACEHOLDER_MAP || {};
+    if(typeof field === 'string' && _PM2[field]) field = _PM2[field];
+    // 企業情報.xxx → 所属機関.xxx に自動変換（テンプレート表記揺れ対応）
+    if(typeof field === 'string' && field.indexOf('企業情報.') === 0) {
+      var _soKey = '所属機関.' + field.substring(5);
+      var _soMapped = _PM2[_soKey] || _PM2[field];
+      if(_soMapped) field = _soMapped;
+    }
+    // 関数型フィールドに対応（PLACEHOLDER_MAPに関数を直接定義可能）
+    if(typeof field === 'function') return String(field(c,p,co,es)||'');
+    if(field==='auto') return now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+    if(field==='co.fullAddress') return (co.pref||'')+(co.city||'')+(co.address||'');
+    if(field==='co.authorTitleName') return ((co.authorTitle||'')+' '+(co.authorName||'')).trim();
+    if(field==='co.repTitleName') return ((co.repTitle||'')+' '+(co.repName||'')).trim();
+    if(field==='case.docCreateDate'){var _dcd=c.docCreateDate||'';if(_dcd){var _dcdp=_dcd.split(/[-\/]/);if(_dcdp.length>=3)return _dcdp[0]+'年'+parseInt(_dcdp[1],10)+'月'+parseInt(_dcdp[2],10)+'日';}return _dcd;}
+    if(field==='case.docYear'){var _dy=c.docCreateDate||'';if(_dy){var _dp=_dy.split(/[-\/]/);return _dp[0]||'';}return '';}
+    if(field==='case.docMonth'){var _dm=c.docCreateDate||'';if(_dm){var _dpm=_dm.split(/[-\/]/);return _dpm[1]?String(parseInt(_dpm[1],10)):'';}return '';}
+    if(field==='case.docDay'){var _dd=c.docCreateDate||'';if(_dd){var _dpd=_dd.split(/[-\/]/);return _dpd[2]?String(parseInt(_dpd[2],10)):'';}return '';}
+    // 在留期限分割
+    if(field==='p.expireY'){var ex=p.expire||c.expire||'';var ep=ex.split(/[-\/]/);return ep[0]||'';}
+    if(field==='p.expireM'){var ex2=p.expire||c.expire||'';var ep2=ex2.split(/[-\/]/);return ep2[1]?String(parseInt(ep2[1],10)):'';}
+    if(field==='p.expireD'){var ex3=p.expire||c.expire||'';var ep3=ex3.split(/[-\/]/);return ep3[2]?String(parseInt(ep3[2],10)):'';}
+    // パスポート有効期限分割
+    if(field==='p.passExpY'){var pe=p.passportExpiry||p.passportExpire||'';var pp=pe.split(/[-\/]/);return pp[0]||'';}
+    if(field==='p.passExpM'){var pe2=p.passportExpiry||p.passportExpire||'';var pp2=pe2.split(/[-\/]/);return pp2[1]?String(parseInt(pp2[1],10)):'';}
+    if(field==='p.passExpD'){var pe3=p.passportExpiry||p.passportExpire||'';var pp3=pe3.split(/[-\/]/);return pp3[2]?String(parseInt(pp3[2],10)):'';}
+    // その他人材データ直接参照
+    if(field==='p.homeAddress') return p.homeAddress||p.birthPlace||p.homeTown||'';
+    if(field==='p.desiredStatus') return p.desiredStatus||c.residenceStatus||'特定技能1号';
+    if(field==='p.address') return p.address||c.address||'';
+    if(field==='case.company') return c.company||'';
+    // 作成日分割（案件の書類作成日から自動）
+    if(field==='es.createY'){var cd=c.docCreateDate||'';if(cd){var cp=cd.split(/[-\/]/);return cp[0]||'';}return '';}
+    if(field==='es.createM'){var cd2=c.docCreateDate||'';if(cd2){var cp2=cd2.split(/[-\/]/);return cp2[1]?String(parseInt(cp2[1],10)):'';}return '';}
+    if(field==='es.createD'){var cd3=c.docCreateDate||'';if(cd3){var cp3=cd3.split(/[-\/]/);return cp3[2]?String(parseInt(cp3[2],10)):'';}return '';}
+    // 雇用契約期間（始期・終期）分割取得
+    if(field==='es.contractStartY'){var _cs=p.contractStart||'';return _cs.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractStartM'){var _cs=p.contractStart||'';var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractStartD'){var _cs=p.contractStart||'';var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    if(field==='es.contractEndY'){var _ce=p.contractEnd||'';return _ce.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractEndM'){var _ce=p.contractEnd||'';var _m=_ce.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractEndD'){var _ce=p.contractEnd||'';var _d=_ce.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    // 分野・区分のフォールバック
+    if(field==='es.applicantField'){var _af=es.applicantField||es.field||c.applicantField||'';return _af.replace(/（特定技能[１２]号）/g,'');}
+    if(field==='es.weeklyHours') return es.weeklyHours||es.workHoursWeek||'';
+    if(field==='es.monthlyHours') return es.monthlyHours||'';
+    if(field==='es.salaryHourly') return es.salaryHourly||es.hourlyRate||'';
+    // 生年月日分割（人材データから自動）
+    if(field==='p.birthY'){var bd=p.birthdate||'';var bm=bd.match(/(\d{4})/);return bm?bm[1]:'';}
+    if(field==='p.birthM'){var bd2=p.birthdate||'';var bm2=bd2.match(/\d{4}[\/\-年](\d{1,2})/);return bm2?bm2[1]:'';}
+    if(field==='p.birthD'){var bd3=p.birthdate||'';var bm3=bd3.match(/\d{4}[\/\-年]\d{1,2}[\/\-月](\d{1,2})/);return bm3?bm3[1]:'';}
+    // 事業所住所分割（officeAddressから自動）
+    if(field==='es.officePref'){var oa=es.officeAddr||es.officeAddress||'';var sp=splitAddress(oa);return sp.pref;}
+    if(field==='es.officeCity'){var oa2=es.officeAddr||es.officeAddress||'';var sp2=splitAddress(oa2);return sp2.city;}
+    // 事業所英語住所（分割入力フィールド）
+    if(field==='es.officePrefEn') return es.officePrefEn||'';
+    if(field==='es.officeCityEn') return es.officeCityEn||'';
+    // 居住費徴収有無（deductHousingに値があれば有）
+    if(field==='es.housingFeeType'){var dh=es.deductHousing||'';return (dh&&dh!=='0'&&dh!=='０')?'有':'無';}
+    // 居住費徴収費用 = deductHousingそのまま
+    if(field==='es.housingFee') return es.deductHousing||'';
+    if(field==='es.supportFee') return es.supportFee||c.supportFee||'';
+    // 入国予定日（/区切り）
+    if(field==='case.entryDate'){var ey=es.entryY||'',em=es.entryM||'',ed=es.entryD||'';if(ey&&em&&ed)return ey+'/'+em+'/'+ed;var ped=p.entryDate||'';if(ped){var edm=ped.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});var edp=edm.match(/(\d{4})[年\/\-](\d{1,2})[月\/\-](\d{1,2})/);if(edp)return edp[1]+'/'+edp[2]+'/'+edp[3];}return ped;}
+    if(field.indexOf('p.')===0) return p[field.substring(2)]||'';
+    if(field==='co.supportOrgName'){return co.supportOrgName||c.org||'';}
+    if(field==='co.supportOrgNumber'){var _sonn2=co.supportOrgName||c.org||'';var _soObjN2=supportOrgs.find(function(x){return x.name===_sonn2;})||{};return co.supportOrgNumber||_soObjN2.regNo||'';}
+    // co.officerNName/Kana/Title → co.officers配列から解決（1-23は代表取締役をスキップ）
+    if(field.indexOf('co.officer')===0){var _om2=field.match(/^co\.officer(\d+)(Name|Kana|Title)$/);if(_om2){var _oi2=parseInt(_om2[1],10)-1;var _ok2={Name:'name',Kana:'kana',Title:'title'}[_om2[2]];
+      var _officers123b=(co.officers||[]).filter(function(o){return !o.title||o.title.indexOf('代表取締役')<0;});
+      var _oo2=_officers123b[_oi2]||{};return _oo2[_ok2]||'';}}
+    // co.prevSales/Ordinary/Net/Asset エイリアス
+    var _coAlias2={'prevSales1':'salesY1','prevSales2':'salesY2','prevSales3':'salesY3','prevOrdinary1':'ordinaryPLY1','prevOrdinary2':'ordinaryPLY2','prevOrdinary3':'ordinaryPLY3','prevNet1':'netPLY1','prevNet2':'netPLY2','prevNet3':'netPLY3','prevAsset1':'netAssetsY1','prevAsset2':'netAssetsY2','prevAsset3':'netAssetsY3'};
+    if(field.indexOf('co.')===0){var _coK2=field.substring(3);if(_coAlias2[_coK2])return co[_coAlias2[_coK2]]||'';return co[_coK2]||'';}
+    if(field.indexOf('es.')===0){
+      var k=field.substring(3);
+      k=(_ES_ALIAS&&_ES_ALIAS[k])||k;
+      // 雇用契約期間の分割フィールド対応
+      if(k==='contractStartY'){var _cs=p.contractStart||'';return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
+      if(k==='contractStartM'){var _cs=p.contractStart||'';var _csm=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _csm?String(parseInt(_csm,10)):'';}
+      if(k==='contractStartD'){var _cs=p.contractStart||'';var _csd=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _csd?String(parseInt(_csd,10)):'';}
+      if(k==='contractEndY'){var _ce=p.contractEnd||'';return p.contractEndY||(_ce.split(/[-\/]/)[0]||'');}
+      if(k==='contractEndM'){var _ce=p.contractEnd||'';var _cem=p.contractEndM||(_ce.split(/[-\/]/)[1]||'');return _cem?String(parseInt(_cem,10)):'';}
+      if(k==='contractEndD'){var _ce=p.contractEnd||'';var _ced=p.contractEndD||(_ce.split(/[-\/]/)[2]||'');return _ced?String(parseInt(_ced,10)):'';}
+      if(k==='applicantField'){var _af2=es.applicantField||es.field||c.applicantField||'';return _af2.replace(/（特定技能[１２]号）/g,'');}
+      if(k==='category'){var _cat=es.category||'';return _cat.replace(/（[^）]*分野[・・]特定技能[１２]号）/g,'').replace(/（特定技能[１２]号）/g,'');}
+      if(k==='weeklyH') return es.weeklyH||es.weeklyHours||es.workHoursWeek||'';
+      if(k==='salaryHourly') return es.salaryHourly||es.hourlyRate||'';
+      // 時間→分変換：小数部×60（例 39.5→30分、170.6→36分）
+      function _extractMin(hStr){ var s=String(hStr||''); var d=s.indexOf('.'); if(d<0) return '0'; var frac=parseFloat('0.'+s.substring(d+1)); return String(Math.round(frac*60)); }
+      if(k==='dailyMins'){if(es.dailyMins) return String(es.dailyMins);var _dh=String(es.dailyHours||'');return _dh&&_dh.indexOf('.')>=0?_extractMin(_dh):'0';}
+      if(k==='weeklyMin'){if(es.weeklyMins) return String(es.weeklyMins);if(es.weeklyMin) return String(es.weeklyMin);return _extractMin(es.weeklyH||es.weeklyHours);}
+      if(k==='monthlyMin'){if(es.monthlyMins) return String(es.monthlyMins);if(es.monthlyMin) return String(es.monthlyMin);return _extractMin(es.monthlyH);}
+      if(k==='yearlyMin'){if(es.yearlyMins) return String(es.yearlyMins);if(es.yearlyMin) return String(es.yearlyMin);return _extractMin(es.yearlyH);}
+
+      // 入国予定日分割
+      if(k==='entryY') return es.entryY||(es.entryDate||'').split(/[-\/]/)[0]||'';
+      if(k==='entryM'){var _entM=(es.entryM||(es.entryDate||'').split(/[-\/]/)[1]||'');return _entM?String(parseInt(_entM,10)):'';}
+      if(k==='entryD'){var _entD=(es.entryD||(es.entryDate||'').split(/[-\/]/)[2]||'');return _entD?String(parseInt(_entD,10)):'';}
+      // 事業所電話（officeTelがなければ相談窓口の電話）
+      if(k==='officeTel') return es.officeTel||es.contactTel||co.tel||'';
+      if(k==='officeTelEn') return es.officeTelEn||es.contactTelEn||es.contactTel||co.tel||'';
+
+      // 金額フィールドはカンマ区切りで返す
+      var _COMMA_NUM_KEYS = {
+        salaryMonthly:1,salaryHourly:1,salaryDaily:1,totalMonthly:1,calcMonthly:1,calcHourly:1,
+        allowance1Amt:1,allowance2Amt:1,allowance3Amt:1,allowance4Amt:1,
+        fixedOTAmount:1,fixedOTAmt:1,
+        deductTax:1,deductSocial:1,deductEmployment:1,
+        deductHousing:1,deductFood:1,deductUtility:1,deductOther1Amount:1,deductOther2Amount:1,deductTotal:1,
+        netPay:1,
+        jpCompSalary:1,jpCompAllow1Amt:1,jpCompAllow2Amt:1,jpCompAllow3Amt:1,salaryRuleApply:1
+      };
+      // 締日・支払日：旧フォーマット「毎月末」「翌月25」→「毎月末日」「翌月25日」に正規化
+      if(k==='payCutoffDay'||k==='payDay'){
+        var _pdRaw=String(es[k]||'');
+        if(_pdRaw) return _pdRaw.replace(/^(毎月|翌月)(末)$/, '$1末日').replace(/^(毎月|翌月)(\d+)$/, '$1$2日');
+        return '';
+      }
+      if(es[k]!=null&&es[k]!==''){
+        var _rawV = es[k];
+        if(_COMMA_NUM_KEYS[k] && _rawV !== '' && !isNaN(Number(String(_rawV).replace(/,/g,'')))){
+          return Number(String(_rawV).replace(/,/g,'')).toLocaleString('ja-JP');
+        }
+        return String(_rawV);
+      }
+      // es.に値がない場合、所属機関基本情報からフォールバック
+      if(k==='orgName') return co.name||'';
+      if(k==='orgNameEn') return co.nameEn||'';
+      if(k==='orgAddress') return (co.pref||'')+(co.city||'')+(co.address||'');
+      if(k==='orgAddressEn') return co.addressEn||'';
+      if(k==='orgTel') return co.tel||'';
+      if(k==='orgTelEn') return co.tel||'';
+      if(k==='repName') return co.repName||'';
+      if(k==='repNameEn') return co.repNameEn||co.repName||'';
+      if(k==='repTitle') return co.repTitle||'';
+      if(k==='repTitleEn') return co.repTitleEn||co.repTitle||'';
+      // 比較対象日本人フィールド：全empSetsを検索してフォールバック（旧データ互換含む）
+      var _jpCompKeys=['jpCompJobDesc','jpCompAge','jpCompGender','jpCompExp','jpCompSalary','jpCompReason','wageRegulation'];
+      if(_jpCompKeys.indexOf(k)>=0){
+        if(co.empSets){for(var _esi=0;_esi<co.empSets.length;_esi++){var _esOther=co.empSets[_esi];if(_esOther&&_esOther[k]!=null&&_esOther[k]!=='')return String(_esOther[k]);}}
+        return co[k]||'';
+      }
+      return '';
+    }
+    if(field.indexOf('so.')===0){var _soName=co.supportOrgName||c.org||'';var _so=supportOrgs.find(function(x){return x.name===_soName;})||{};
+      var _soF=field.substring(3);
+      // 登録年月日の分割
+      if(_soF==='regY'||_soF==='regM'||_soF==='regD'){var _rd=(_so.regDate||'').split('-');if(_soF==='regY')return _rd[0]||'';if(_soF==='regM')return _rd[1]?String(parseInt(_rd[1])):'';if(_soF==='regD')return _rd[2]?String(parseInt(_rd[2])):'';}
+      // 代表者ふりがな
+      // 機関名（明示）
+      if(_soF==='name') return _so.name||'';
+      if(_soF==='nameKana') return _so.nameKana||'';
+      if(_soF==='nameEn') return _so.nameEn||'';
+      if(_soF==='repNameKana') return _so.repNameKana||_so.repName||'';
+      // 代表者英語
+      if(_soF==='repNameEn') return _so.repNameEn||'';
+      // 支援責任者
+      if(_soF==='supportManagerKana') return _so.supportManagerKana||'';
+      if(_soF==='supportManagerEn') return _so.supportManagerNameEn||'';
+      if(_soF==='supportManagerTitle') return _so.supportManagerTitle||'';
+      if(_soF==='supportManagerTitleEn') return _so.supportManagerTitleEn||'';
+      if(_soF==='supporterCount') return _so.supporterCount||'';
+      if(_soF==='supportStaffCount') return _so.supportStaffCount||'';
+      // offices[c.soOfficeIdx]からのフォールバック（複数事業所対応）
+      var _soOIdx = (c && c.soOfficeIdx != null) ? parseInt(c.soOfficeIdx)||0 : 0;
+      var _soOffice0 = (_so.offices && _so.offices[_soOIdx]) || (_so.offices && _so.offices[0]) || {};
+      if(_soF==='officeName') return _soOffice0.officeName||'';
+      if(_soF==='officeAddress') return _soOffice0.officeAddress||'';
+      if(_soF==='officeTel') return _soOffice0.officeTel||'';
+      if(_soF==='officeZip') return _soOffice0.officeZip||_so.zip||'';
+      if(_soF==='officePref') return _soOffice0.officePref||_so.pref||'';
+      if(_soF==='officeCity') return _soOffice0.officeCity||_so.city||'';
+      if(_soF==='officeAddressEn') return _soOffice0.officeAddressEn||_so.addressEn||'';
+      if(_soF==='officeAddress') return _soOffice0.officeAddress||_so.address||'';
+      if(_soF==='officeTel') return _soOffice0.officeTel||_so.tel||'';
+      // staffは古いフィールド名。supportManagerにフォールバック
+      if(_soF==='staff') return _so.staff||_so.supportManager||_so.supportManagerName||'';
+      return _so[_soF]||'';
+    }
+    if(field==='applicantName') return getDisplayName(c);
+    if(field==='applicantNameEn') return p.applicantNameEn||p.nameEn||c.applicant||'';
+    if(field==='applicantField') return c.applicantField||es.applicantField||es.field||'';
+    if(field==='applicantFieldEn') return c.applicantFieldEn||es.applicantFieldEn||'';
+    if(field==='jobCategory') return c.jobCategory||es.category||'';
+    if(field==='jobCategoryEn') return c.jobCategoryEn||es.categoryEn||'';
+    if(field==='case.contractEndDate'){var ce=p.contractEnd||p.contractEndDate||'';if(ce){var _cep=ce.split(/[-\/]/);if(_cep.length>=3)return _cep[0]+'年'+parseInt(_cep[1],10)+'月'+parseInt(_cep[2],10)+'日';return ce;}var cey=p.contractEndY||'',cem=p.contractEndM||'',ced=p.contractEndD||'';if(cey&&cem&&ced)return cey+'年'+cem+'月'+ced+'日';return '';}
+    return '';
+  }
+
+
+
+  // ユーザー追加プレースホルダーマッピングをマージ
+  try{
+    var upm=JSON.parse(localStorage.getItem('ofusa_userPHMap')||'{}');
+    Object.keys(upm).forEach(function(k){ if(upm[k]) PLACEHOLDER_MAP[k]=upm[k]; });
+  }catch(e){}
+
+  // 企業情報.xxx → 所属機関.xxx の自動フォールバック登録
+  // テンプレートに{{企業情報.xxx}}と書かれていても所属機関データで解決する
+  Object.keys(PLACEHOLDER_MAP).forEach(function(k){
+    if(k.indexOf('所属機関.') === 0){
+      var kigyoKey = '企業情報.' + k.substring(5);
+      if(!PLACEHOLDER_MAP[kigyoKey]) PLACEHOLDER_MAP[kigyoKey] = PLACEHOLDER_MAP[k];
+    }
+  });
+
+  // bytesOverrideがある場合（ZIP一括生成）はテンプレート取得スキップ
+  if (bytesOverride) {
+    var docTypesMapB={'1-5':'1-5(雇用契約書)','1-6':'1-6(雇用条件書)','1-3':'1-3(受診者の申告書別紙)','1-4':'1-4(特定技能外国人の報酬に関する説明書)','1-11':'1-11(特定技能所属機関概要書)','1-16':'1-16(雇用の経緯に係る説明書)','1-17':'1-17(支援計画書)','1-23':'1-23(特定技能所属機関の役員に関する誓約書)','1-25':'1-25(登録支援機関との支援委託契約に関する説明書)','1-27':'1-27(公的義務履行に関する説明書)','1-29':'1-29(書類省略に当たっての誓約書)','field':'分野別必要書類','window':'窓口申請書','jyuyo':'重要事項事前説明書','inin':'委任状'};
+    var tplGroupB = docTypesMapB[_selectedDocType] || '';
+    var ciB = -1;
+    TEMPLATE_CATEGORIES.forEach(function(cat, i) { if (cat.name === tplGroupB) ciB = i; });
+    processTemplateBytes(bytesOverride, ciB >= 0 ? ciB : 0, c, mappingArr, rv, PLACEHOLDER_MAP, zipCallback);
+    return;
+  }
+
+  // テンプレートファイルを取得（選択中の書類タイプに応じて動的に解決）
+  var docTypesMap={'1-5':'1-5(雇用契約書)','1-6':'1-6(雇用条件書)','1-3':'1-3(受診者の申告書別紙)','1-4':'1-4(特定技能外国人の報酬に関する説明書)','1-11':'1-11(特定技能所属機関概要書)','1-16':'1-16(雇用の経緯に係る説明書)','1-17':'1-17(支援計画書)','1-23':'1-23(特定技能所属機関の役員に関する誓約書)','1-25':'1-25(登録支援機関との支援委託契約に関する説明書)','1-27':'1-27(公的義務履行に関する説明書)','1-29':'1-29(書類省略に当たっての誓約書)','field':'分野別必要書類','window':'窓口申請書','jyuyo':'重要事項事前説明書','inin':'委任状'};
+  var tplGroup = docTypesMap[_selectedDocType] || '';
+  var ci=-1;
+  TEMPLATE_CATEGORIES.forEach(function(cat,i){if(cat.name===tplGroup)ci=i;});
+  if(ci<0){alert('テンプレートカテゴリが見つかりません（'+tplGroup+'）');return;}
+  var tplData;
+  try{tplData=JSON.parse(localStorage.getItem('ofusa_templates')||'{}');}catch(e){tplData={};}
+  var entry=null;
+  var _ref=(typeof _selectedTplRef!=='undefined')?_selectedTplRef:null;
+  console.log('📥 doGenerate ref.name:', _ref&&_ref.name, '| idx:', _selectedTplIdx, '| tplGroup:', tplGroup);
+
+  // ★ DB_READY時は常にSupabaseを優先（localStorageの古いキャッシュを使わない）
+  if(!entry||!entry.data){
+    // Supabase Storageから取得（_selectedTplRef.storagePathまたはname一致で）
+    if(DB_READY){
+      showToast('📥 テンプレートをサーバーから取得中...');
+      _sb.from('templates').select('*').eq('group_name',tplGroup).then(function(res){
+        if(res.error||!res.data||!res.data.length){alert('テンプレートファイルが見つかりません。\n📁 書類テンプレからアップロードしてください。\n（ネットワークエラーの場合はページをリロードして再試行してください）');return;}
+        // ★ _selectedTplRefのstoragePath/nameで優先マッチ
+        var _sbRef=(typeof _selectedTplRef!=='undefined')?_selectedTplRef:null;
+        var tplRow=null;
+        // ★ storagePathは16進数化で信頼できないのでnameのみでマッチ
+        if(_sbRef&&_sbRef.name){
+          tplRow=res.data.find(function(r){return r.name===_sbRef.name||r.filename===_sbRef.name;});
+        }
+        if(!tplRow) tplRow=res.data[Math.min(_selectedTplIdx, res.data.length-1)];
+        console.log('📥 Supabase: ref.name=', _sbRef&&_sbRef.name, '| matched:', tplRow&&(tplRow.name||tplRow.filename), '| path:', tplRow&&tplRow.storage_path);
+        if(!tplRow.storage_path){alert('テンプレートのStorageパスが未設定です。再アップロードしてください。');return;}
+        console.info('📥 [OFUSA] Storage download path:', tplRow.storage_path);
+        // sanitizedパスでも試みる
+        var dlPath = tplRow.storage_path;
+        var dlPathSan = sanitizeStoragePath(dlPath);
+        function tryDl(path, fallbackPath) {
+          _sb.storage.from('templates').download(path).then(function(dlRes){
+            if((dlRes.error||!dlRes.data) && fallbackPath && fallbackPath!==path){
+              console.warn('⚠️ [OFUSA] path失敗、sanitized再試行:', fallbackPath);
+              tryDl(fallbackPath, null);
+              return;
+            }
+            if(dlRes.error||!dlRes.data){alert('テンプレートのダウンロードに失敗しました。\npath: '+path+'\nerror: '+(dlRes.error&&dlRes.error.message));return;}
+            dlRes.data.arrayBuffer().then(function(ab){
+              var bytes=new Uint8Array(ab);
+              processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zipCallback);
+            });
+          });
+        }
+        tryDl(dlPath, dlPathSan);
+      });
+      return; // 非同期なのでここでreturn
+    }
+    alert('テンプレートファイルが見つかりません。\n📁 書類テンプレからアップロードしてください。');return;
+  }
+
+  // Base64→バイナリ
+  var rawData = entry.data;
+  if(rawData.indexOf(',')>=0) rawData = rawData.split(',')[1];
+  var binary=atob(rawData);
+  var bytes=new Uint8Array(binary.length);
+  for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+
+  processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zipCallback);
+}
+
+/* === ここまで === */
+</script>
+
+<!-- ========= processTemplateBytes + fixSplitPlaceholders (18974-19254) ========= -->
+<script>
+/* === ここから processTemplateBytes & fixSplitPlaceholders（そのまま移植） === */
+function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zipCallback) {
+  // JSZipでdocxを開いてプレースホルダー置換
+  if(typeof JSZip==='undefined'){alert('JSZipが読み込まれていません');return;}
+
+  // テンプレート名からxlsxかdocxか判定
+  // _selectedTplRefのstoragePathやnameから拡張子を判定（_selectedTplIdxとCATEGORIES配列はズレるため使わない）
+  var _ref2 = (typeof _selectedTplRef!=='undefined') ? _selectedTplRef : null;
+  // _currentTplListから正確なfilenameを取得
+  var _curTplEntry = (_currentTplList&&_selectedTplIdx!=null) ? _currentTplList[_selectedTplIdx] : null;
+  var tplName = (_ref2&&_ref2.name) ? _ref2.name
+    : ((_curTplEntry&&(_curTplEntry.filename||_curTplEntry.name))||'');
+  // storagePathから拡張子を推定（最も信頼できる）
+  var _spExt = (_ref2&&_ref2.storagePath) ? (_ref2.storagePath.match(/\.\w+$/) || [''])[0].toLowerCase() : '';
+  var _curExt = (_curTplEntry&&(_curTplEntry.filename||'').match(/\.\w+$/)) ? (_curTplEntry.filename.match(/\.\w+$/) || [''])[0].toLowerCase() : '';
+  var _tplFilename = (_curTplEntry&&_curTplEntry.filename)||tplName;
+  var isXlsx = /\.xlsx?$/i.test(tplName) || /\.xlsx?$/i.test(_tplFilename) || _spExt==='.xlsx' || _curExt==='.xlsx' || (TEMPLATE_CATEGORIES[ci]&&TEMPLATE_CATEGORIES[ci].name==='窓口申請書');
+
+  if (isXlsx) {
+    // xlsxテンプレートのプレースホルダー置換
+    JSZip.loadAsync(bytes).then(function(zip) {
+      // sharedStrings.xmlとシートXMLの両方を処理
+      var fileList = Object.keys(zip.files);
+      var sheetFiles = fileList.filter(function(f){ return /xl\/worksheets\/sheet\d+\.xml/.test(f); });
+
+      function _escXml(v){ return String(v||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      function _cleanOnly(v){ return String(v||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' '); }
+      function replacePH(text, noEscape) {
+        var esc = noEscape ? _cleanOnly : _escXml;
+        // PLACEHOLDER_MAP（日本語キー）の置換
+        Object.keys(PLACEHOLDER_MAP).forEach(function(phKey) {
+          var val = rv(PLACEHOLDER_MAP[phKey]);
+          var escaped = esc(val);
+          ['{{'+phKey+'}}','{{ '+phKey+'}}','{{'+phKey+' }}','{{ '+phKey+' }}'].forEach(function(ph){
+            text = text.split(ph).join(escaped);
+          });
+        });
+        // 直接変数（{{es.xxx}} {{co.xxx}} {{p.xxx}} {{applicantName}} 等）の置換
+        text = text.replace(/\{\{([^}]+)\}\}/g, function(match, field) {
+          var val = rv(field.trim());
+          return esc(val);
+        });
+        return text;
+      }
+
+      var tasks = [];
+      // sharedStrings.xmlの置換
+      if (zip.file('xl/sharedStrings.xml')) {
+        tasks.push(zip.file('xl/sharedStrings.xml').async('string').then(function(xml){
+          xml = xml.replace(/(<t(?:[^>]*)>)([\s\S]*?)(<\/t>)/g, function(m, open, text, close){
+            var decoded = text.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+            var replaced = replacePH(decoded, true);
+            replaced = replaced.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return open + replaced + close;
+          });
+          zip.file('xl/sharedStrings.xml', new TextEncoder().encode(xml));
+        }));
+      }
+      // 全シートXMLの置換
+      sheetFiles.forEach(function(sf){
+        tasks.push(zip.file(sf).async('string').then(function(xml){
+          xml = xml.replace(/<c([^>]*)><f>[^<]*<\/f><v>(\{\{[^}]+\}\}[^<]*)<\/v><\/c>/g, function(m, attrs, val){
+            var newAttrs = attrs.indexOf('t=') >= 0 ? attrs : attrs + ' t="str"';
+            return '<c' + newAttrs + '><v>' + val + '</v></c>';
+          });
+          zip.file(sf, new TextEncoder().encode(replacePH(xml)));
+        }));
+      });
+
+      return Promise.all(tasks).then(function(){
+        return zip.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      });
+    }).then(function(blob){
+      var _tplIdxForNameX = (typeof _selectedTplIdx === 'number') ? _selectedTplIdx : 0;
+      var _tplForNameX = TEMPLATE_CATEGORIES[ci]&&TEMPLATE_CATEGORIES[ci].templates[_tplIdxForNameX];
+      // ★ refのnameを優先
+      var catName = (typeof _selectedTplRef!=='undefined'&&_selectedTplRef&&_selectedTplRef.name)
+        ? _selectedTplRef.name
+        : ((_tplForNameX&&_tplForNameX.name)||(_tplForNameX&&_tplForNameX.filename)||(TEMPLATE_CATEGORIES[ci]&&TEMPLATE_CATEGORIES[ci].name)||'書類');
+      var fname = catName + '_' + getDisplayName(c) + '.xlsx';
+      if (typeof zipCallback === 'function') { zipCallback(blob, fname); return; }
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=fname;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('✅ Excel書類を出力しました');
+
+      var area=document.getElementById('dg_missing_edit');
+      if(area){
+        var h='<div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;">';
+        h+='<div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:10px;">✅ マッピング結果（'+mappingArr.length+'項目）</div>';
+        h+='<table style="width:100%;font-size:11px;border-collapse:collapse;">';
+        mappingArr.forEach(function(m){
+          var val=rv(m.field);
+          h+='<tr><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb;color:var(--gray-400);width:40%;">'+esc(m.label||m.cell)+'</td>';
+          h+='<td style="padding:3px 6px;border-bottom:1px solid #e5e7eb;font-weight:600;'+(val?'color:var(--navy);':'color:#dc2626;')+'">'+esc(String(val)||'（空欄）')+'</td></tr>';
+        });
+        h+='</table></div>';
+        area.innerHTML=h;
+        area.style.display='block';
+      }
+    }).catch(function(err){
+      console.error('Excel生成エラー:',err);
+      alert('Excel生成エラー: '+err.message);
+    });
+    return;
+  }
+
+  JSZip.loadAsync(bytes).then(function(zip){
+    return zip.file('word/document.xml').async('string').then(function(xml){
+      // スペルチェックタグを除去（proofErrがrun分割の原因になるため）
+      xml = xml.replace(/<w:proofErr[^/]*\/>/g, '');
+      // XMLの<w:t>タグ内テキストを結合してプレースホルダーを検出・置換
+      // まず分割されたrunを結合してから置換する
+      Object.keys(PLACEHOLDER_MAP).forEach(function(phKey){
+        if(typeof PLACEHOLDER_MAP[phKey] !== 'string') return; // 関数型など非文字列は無視
+        var val = rv(PLACEHOLDER_MAP[phKey]);
+        var escaped = val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        // {{プレースホルダー}} の形式で置換（run分割対応）
+        var ph = '{{'+phKey+'}}';
+        // 単純置換（1つのw:tに収まっている場合）
+        xml = xml.split(ph).join(escaped);
+        // スペース入りバリアント
+        xml = xml.split('{{ '+phKey+'}}').join(escaped);
+        xml = xml.split('{{'+phKey+' }}').join(escaped);
+        xml = xml.split('{{ '+phKey+' }}').join(escaped);
+        // 全角カッコ対応（｛｛...｝｝）
+        xml = xml.split('｛｛'+phKey+'｝｝').join(escaped);
+        xml = xml.split('｛｛ '+phKey+'｝｝').join(escaped);
+        xml = xml.split('｛｛'+phKey+' ｝｝').join(escaped);
+      });
+
+      // 直接変数形式（{{es.xxx}} {{p.xxx}} 等）の単純置換
+      xml = xml.replace(/\{\{([^}\n]+)\}\}/g, function(match, field) {
+        var k = field.trim();
+        if(PLACEHOLDER_MAP[k]) return match; // PHMAPキーは後で処理
+        var val = rv(k);
+        return String(val||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      });
+      // 全角カッコ直接変数形式（｛｛so.xxx｝｝等）の単純置換
+      xml = xml.replace(/｛｛([^｝\n]+)｝｝/g, function(match, field) {
+        var k = field.trim();
+        if(PLACEHOLDER_MAP[k]) return match;
+        var val = rv(k);
+        return String(val||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      });
+      // run分割対応: w:tタグ間に分かれた{{...}}を処理
+      // 全テキストノードを走査して結合→置換→再分割
+      // デバッグ: xmlにso.関連変数があるか確認
+      xml = fixSplitPlaceholders(xml, PLACEHOLDER_MAP, rv);
+
+      var _xmlBytes = new TextEncoder().encode(xml);
+      zip.file('word/document.xml', _xmlBytes);
+      return zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+    });
+  }).then(function(blob){
+    var _tplIdxForName = (typeof _selectedTplIdx === 'number') ? _selectedTplIdx : 0;
+    var _tplForName = TEMPLATE_CATEGORIES[ci]&&TEMPLATE_CATEGORIES[ci].templates[_tplIdxForName];
+    // ★ refのnameを優先
+    var _fnBase=(typeof _selectedTplRef!=='undefined'&&_selectedTplRef&&_selectedTplRef.name)
+      ? _selectedTplRef.name
+      : ((_tplForName&&_tplForName.name)||(_tplForName&&_tplForName.filename)||(TEMPLATE_CATEGORIES[ci]&&TEMPLATE_CATEGORIES[ci].name)||'書類');
+    var fname = _fnBase+'_'+getDisplayName(c)+'.docx';
+    // ZIP一括生成モードの場合はコールバックに渡す
+    if (typeof zipCallback === 'function') { zipCallback(blob, fname); return; }
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('✅ Word書類を出力しました');
+
+    // プレビューも表示
+    var area=document.getElementById('dg_missing_edit');
+    var h='<div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;">';
+    h+='<div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:10px;">✅ マッピング結果（'+mappingArr.length+'項目）</div>';
+    h+='<table style="width:100%;font-size:11px;border-collapse:collapse;">';
+    mappingArr.forEach(function(m){
+      var val=rv(m.field);
+      h+='<tr><td style="padding:3px 6px;border-bottom:1px solid #e5e7eb;color:var(--gray-400);width:40%;">'+esc(m.label||m.cell)+'</td>';
+      h+='<td style="padding:3px 6px;border-bottom:1px solid #e5e7eb;font-weight:600;'+(val?'color:var(--navy);':'color:#dc2626;')+'">'+esc(String(val)||'（空欄）')+'</td></tr>';
+    });
+    h+='</table></div>';
+    area.innerHTML=h;
+    area.style.display='block';
+  }).catch(function(err){
+    console.error('Word生成エラー:',err);
+    alert('Word生成エラー: '+err.message);
+  });
+}
+
+// run分割されたプレースホルダーを修復して置換
+function fixSplitPlaceholders(xml, phMap, rv){
+  // 全w:tノード（開閉タグ + self-closing）の位置を記録
+  var tNodes=[];
+  var re=/<w:t(?=[ >\/])((?:[^>]*[^\/])?)>([\s\S]*?)<\/w:t>|<w:t\/>/g;
+  var m;
+  while((m=re.exec(xml))!==null){
+    if(m[2]!==undefined){
+      // 開閉タグ: <w:t attr>text</w:t>
+      tNodes.push({start:m.index, end:m.index+m[0].length, text:m[2], selfClose:false});
+    } else {
+      // self-closing: <w:t/>
+      tNodes.push({start:m.index, end:m.index+m[0].length, text:'', selfClose:true});
+    }
+  }
+  if(!tNodes.length) return xml;
+
+  // 結合テキストとオフセットマップ構築
+  var concat='';
+  var offsetMap=[];
+  for(var i=0;i<tNodes.length;i++){
+    for(var j=0;j<tNodes[i].text.length;j++) offsetMap.push(i);
+    concat+=tNodes[i].text;
+  }
+
+  // プレースホルダー検出
+  var replacements=[];
+  // PLACEHOLDER_MAPキー（日本語形式）
+  Object.keys(phMap).forEach(function(k){
+    if(typeof phMap[k] !== 'string') return; // 関数型など非文字列は無視
+    var val=rv(phMap[k]);
+    var escaped=String(val).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    ['{{ '+k+' }}','{{ '+k+'}}','{{'+k+' }}','{{'+k+'}}',
+      '｛｛'+k+'｝｝','｛｛ '+k+'｝｝','｛｛'+k+' ｝｝'].forEach(function(v){
+      var pos=0;
+      while((pos=concat.indexOf(v,pos))>=0){
+        replacements.push({start:pos,end:pos+v.length,value:escaped});
+        pos+=v.length;
+      }
+    });
+  });
+  // 直接変数形式（{{es.xxx}} {{p.xxx}} 等）をconcatからスキャンして追加
+  var directRe=/\{\{([^}\n]+)\}\}/g, dm;
+  while((dm=directRe.exec(concat))!==null){
+    var dk=dm[1].trim();
+    // PLACEHOLDER_MAPに既にある場合はスキップ（重複処理防止）
+    if(phMap[dk]) continue;
+    var dval=rv(dk);
+    var descaped=String(dval).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    replacements.push({start:dm.index,end:dm.index+dm[0].length,value:descaped});
+  }
+  if(!replacements.length) return xml;
+
+  // ソート＆重複除去
+  replacements.sort(function(a,b){return a.start-b.start;});
+  var unique=[],lastEnd=-1;
+  replacements.forEach(function(r){if(r.start>=lastEnd){unique.push(r);lastEnd=r.end;}});
+  replacements=unique;
+
+  // 影響を受けるノードを特定
+  var affected={};
+  replacements.forEach(function(r){
+    for(var ci=r.start;ci<r.end&&ci<offsetMap.length;ci++) affected[offsetMap[ci]]=true;
+  });
+
+  // 影響ノードの新テキスト計算
+  var nodeNew={};
+  Object.keys(affected).forEach(function(k){nodeNew[k]='';});
+  var ci=0,ri=0;
+  while(ci<concat.length){
+    if(ri<replacements.length&&ci===replacements[ri].start){
+      var r=replacements[ri];
+      nodeNew[offsetMap[ci]]+=r.value;
+      ci=r.end; ri++;
+    } else {
+      if(affected[offsetMap[ci]]) nodeNew[offsetMap[ci]]+=concat[ci];
+      ci++;
+    }
+  }
+
+  // 影響ノードのみXMLを書き換え（後ろから）
+  var result=xml;
+  for(var i2=tNodes.length-1;i2>=0;i2--){
+    if(!affected[i2]) continue;
+    var tn=tNodes[i2];
+    var newXml='<w:t xml:space="preserve">'+(nodeNew[i2]||'')+'</w:t>';
+    result=result.substring(0,tn.start)+newXml+result.substring(tn.end);
+  }
+  return result;
+}
+
+/* === ここまで === */
+</script>
+
+<!-- ========= UI / アプリロジック ========= -->
+<script>
+/* ==========================================================
+   テンプレート一覧
+   ========================================================== */
+var allTemplates = []; // public.templatesの全行
+
+// 1-17号固定のグループ名
+const TARGET_GROUP = "1-17(支援計画書)";
+
+async function loadTemplates(){
+  if(!_sb) return;
+  var res = await _sb.from("templates")
+    .select("*")
+    .eq("group_name", TARGET_GROUP)
+    .order("name");
+  if(res.error){
+    setStatus("テンプレート取得失敗: " + res.error.message, "error");
+    return;
+  }
+  allTemplates = res.data || [];
+  log("1-17テンプレート: " + allTemplates.length + "件");
+
+  if(allTemplates.length === 0){
+    setStatus("⚠ "+TARGET_GROUP+" のテンプレートがDBに登録されていません。", "error");
+    return;
+  }
+
+  // 言語一覧（1-17に存在するもののみ）
+  var langs = {};
+  allTemplates.forEach(function(t){ if(t.language) langs[t.language] = true; });
+  var llist = Object.keys(langs).sort();
+  $("selLang").innerHTML = '<option value="">(全て)</option>'
+    + llist.map(function(l){ return '<option value="'+esc(l)+'">'+esc(l)+'</option>'; }).join("");
+
+  // 初期表示: 全件を並べる
+  refreshTemplateList();
+}
+
+function refreshTemplateList(){
+  var kind = $("selKind").value;
+  var lang = $("selLang").value;
+  var sel  = $("selTemplate");
+
+  var list = allTemplates.filter(function(t){
+    if(kind){
+      var hay = (t.kind||"") + " " + (t.name||"") + " " + (t.filename||"");
+      if(hay.indexOf(kind) < 0) return false;
+    }
+    if(lang && t.language !== lang) return false;
+    return true;
+  });
+  _currentTplList = list; // processTemplateBytesから参照
+  sel.innerHTML = list.length
+    ? '<option value="">-- テンプレートを選択 --</option>' + list.map(function(t,i){
+        return '<option value="'+i+'">'+esc(t.name||t.filename||t.storage_path)+'</option>';
+      }).join("")
+    : '<option value="">該当なし</option>';
+  updateGenerateBtn();
+}
+
+/* ==========================================================
+   案件受信（index.html からの postMessage）
+   ========================================================== */
+var currentCase = null;       // 選択中の案件オブジェクト
+var currentEmpSetIdx = "";    // index.html から渡された雇用条件セットインデックス
+
+window.addEventListener("message", async function(e){
+  var d = e.data;
+  if(!d || d.type !== "SELECT_CASE" || !d.info) return;
+  var info = d.info;
+  log("SELECT_CASE受信: " + JSON.stringify({
+    caseId: info.caseId, companyId: info.companyId, empSetIdx: info.empSetIdx
+  }));
+  try {
+    setStatus("案件データ取得中...", "info");
+    await loadCaseById(info.caseId, info.companyId);
+    currentCase = cData.find(function(x){ return x.id === info.caseId; });
+    currentEmpSetIdx = (info.empSetIdx != null && info.empSetIdx !== "")
+      ? String(info.empSetIdx)
+      : (currentCase && currentCase.empSetIdx != null ? String(currentCase.empSetIdx) : "0");
+    renderCaseInfo();
+    updateGenerateBtn();
+    setStatus("案件読み込み完了。テンプレートを選んでください。", "success");
+  } catch(err) {
+    console.error(err);
+    log("ERROR: " + err.message);
+    setStatus("案件読み込みエラー: " + err.message, "error");
+  }
+});
+
+function renderCaseInfo(){
+  if(!currentCase){
+    $("caseInfoEmpty").style.display = "block";
+    $("caseInfoDl").style.display = "none";
+    return;
+  }
+  var c = currentCase;
+  var pd = personData[c.id] || {};
+  var co = findCompanyByName(c.company, c.companyId) || findCompanyByName(c.org) || {};
+  var empSetLabel = "(なし)";
+  if(co.empSets && co.empSets.length){
+    var idx = parseInt(currentEmpSetIdx, 10) || 0;
+    var es = co.empSets[idx];
+    if(es) empSetLabel = "#" + idx + " : " + (es.name || es.label || ("セット"+(idx+1)));
+  }
+  var dl = $("caseInfoDl");
+  dl.innerHTML = [
+    ["案件番号", c._caseNo || "(なし)"],
+    ["外国人氏名", getDisplayName(c) || "?"],
+    ["国籍", c.nationality || pd.nationality || "?"],
+    ["企業名", c.company || "?"],
+    ["支援機関", c.org || "(なし)"],
+    ["雇用条件セット", empSetLabel]
+  ].map(function(kv){ return "<dt>"+esc(kv[0])+"</dt><dd>"+esc(kv[1])+"</dd>"; }).join("");
+  $("caseInfoEmpty").style.display = "none";
+  dl.style.display = "grid";
+}
+
+/* ==========================================================
+   生成ボタン
+   ========================================================== */
+function updateGenerateBtn(){
+  var ok = $("selTemplate").value !== "" && currentCase != null;
+  $("btnGenerate").disabled = !ok;
+}
+
+async function onGenerate(){
+  clearLog();
+  var btn = $("btnGenerate");
+  btn.disabled = true;
+  setStatus("生成中...", "info");
+  try {
+    var tplIdxStr = $("selTemplate").value;
+    if(tplIdxStr === "") throw new Error("テンプレート未選択");
+    var tpl = _currentTplList[parseInt(tplIdxStr, 10)];
+    if(!tpl) throw new Error("テンプレート取得失敗");
+    if(!tpl.storage_path) throw new Error("テンプレートのstorage_pathがDBにセットされていません");
+
+    var caseId = currentCase && currentCase.id;
+    if(!caseId) throw new Error("案件未選択（index.html左サイドバーで案件を選んでください）");
+    var empSetIdx = currentEmpSetIdx || "";
+
+    // グローバル選択状態をセット（processTemplateBytesが参照）
+    _selectedDocType = tpl.group_name || "";
+    _selectedTplRef  = {
+      name: tpl.name || tpl.filename || "",
+      storagePath: tpl.storage_path
+    };
+    _selectedTplIdx  = parseInt(tplIdxStr, 10);
+
+    // ファイル名ベースをテンプレート名にしたいので、TEMPLATE_CATEGORIESに現在選択用エントリを1つ作る
+    TEMPLATE_CATEGORIES = [{
+      name: tpl.group_name || "",
+      templates: _currentTplList.map(function(t){
+        return { name: t.name || t.filename, filename: t.filename || t.name };
+      })
+    }];
+
+    // Storageからテンプレートを直接ダウンロードして processTemplateBytes を呼ぶ
+    // （doGenerateFromMappingの分岐回避: bytesOverride経由）
+    log("Storage取得: " + tpl.storage_path);
+    var dlRes = await _sb.storage.from("templates").download(tpl.storage_path);
+    if(dlRes.error || !dlRes.data){
+      // sanitizedパスで再試行
+      var safe = sanitizeStoragePath(tpl.storage_path);
+      if(safe !== tpl.storage_path){
+        log("再試行 (sanitized): " + safe);
+        dlRes = await _sb.storage.from("templates").download(safe);
+      }
+    }
+    if(dlRes.error || !dlRes.data){
+      throw new Error("Storageダウンロード失敗: " + (dlRes.error && dlRes.error.message));
+    }
+    var ab = await dlRes.data.arrayBuffer();
+    var bytes = new Uint8Array(ab);
+
+    log("変数置換開始 (" + bytes.byteLength + " bytes)");
+    // doGenerateFromMapping は bytesOverride 経由で processTemplateBytes を呼ぶ
+    doGenerateFromMapping(caseId, empSetIdx, [], bytes);
+
+    setStatus("✅ 生成完了（ダウンロードフォルダを確認してください）", "success");
+  } catch(e) {
+    console.error(e);
+    log("ERROR: " + e.message);
+    setStatus("❌ " + e.message, "error");
+  } finally {
+    updateGenerateBtn();
+  }
+}
+
+/* ==========================================================
+   イベント登録
+   ========================================================== */
+$("selKind").addEventListener("change",  refreshTemplateList);
+$("selLang").addEventListener("change",  refreshTemplateList);
+$("selTemplate").addEventListener("change", updateGenerateBtn);
+$("btnGenerate").addEventListener("click", onGenerate);
+
+/* ==========================================================
+   起動
+   ========================================================== */
+(async function init(){
+  if(!_sb){
+    setStatus("⚠ Supabase接続に失敗しました。", "error");
+    return;
+  }
+  try {
+    await loadTemplates();
+    setStatus("テンプレート読み込み完了。案件を選択してください（index.htmlサイドバー上部）。", "info");
+    // 親ページに「準備完了」通知（親が既に案件選択済みなら再送信を促したい場合用）
+    try { window.parent && window.parent !== window && window.parent.postMessage({type:"CHILD_READY", child:"1_17"}, "*"); } catch(e){}
+  } catch(e) {
+    console.error(e);
+    setStatus("初期化エラー: " + e.message, "error");
+  }
+})();
+</script>
+</body>
+</html>
