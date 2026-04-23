@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.001</div>
+    <div class="ver">ver.20260423.002</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -476,25 +476,25 @@ function p(){
       <!-- 左：直接雇用 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅱ．就業の場所</div>
-        <div style="font-size:8pt;margin-bottom:4px;">II. Nơi làm việc</div>
-        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} Tuyển dụng trực tiếp (điền vào phần dưới)</span></div>
-        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* Vào văn phòng của tổ chức tiếp nhận</span></div>
+        <div style="font-size:8pt;margin-bottom:4px;">II. ទីកន្លែងធ្វើការ</div>
+        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} ការជួលផ្ទាល់ (បំពេញក្នុងផ្នែកខាងក្រោម)</span></div>
+        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* កត់ត្រាការិយាល័យនៃស្ថាប័នទទួល</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">Tên công ty</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">Địa chỉ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">Địa chỉ liên lạc</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ឈ្មោះក្រុមហ៊ុន</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">អាសយដ្ឋាន</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">ទំនាក់ទំនង</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：派遣雇用 / 変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">${cb(false,'hire_dispatch_id')} Tuyển dụng phái cử (Điền vào mẫu "Bản Trình bày Rõ Điều Kiện Làm Việc")</span></div>
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">${cb(false,'change_none_direct_id')} Không có khả năng thay đổi (Trường hợp có thay đổi thì điền vào phần dưới)</span></div>
+        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">${cb(false,'hire_dispatch_id')} ការជួលតាមរយៈការបញ្ជូន (បំពេញក្នុង "ឯកសារបង្ហាញច្បាស់លក្ខខណ្ឌការងារ")</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">${cb(false,'change_none_direct_id')} មិនមានលទ្ធភាពនៃការផ្លាស់ប្តូរ (ប្រសិនបើមានការផ្លាស់ប្តូរ សូមបំពេញខាងក្រោម)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">Tên công ty</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">Địa chỉ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">Địa chỉ liên lạc</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">ឈ្មោះក្រុមហ៊ុន</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">អាសយដ្ឋាន</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">ទំនាក់ទំនង</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
         </table>
       </div>
     </div>
@@ -506,14 +506,14 @@ function p(){
       <!-- 左：直接雇用側 -->
       <div style="flex:1;padding:6px 8px 6px 12px;">
         <div style="font-size:9pt;font-weight:bold;">Ⅲ．従事すべき業務の内容</div>
-        <div style="font-size:8pt;margin-bottom:4px;">III. Nội dung công việc cần thực hiện</div>
+        <div style="font-size:8pt;margin-bottom:4px;">III. ខ្លឹមសារនៃការងារដែលត្រូវធ្វើ</div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
-            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. Lĩnh vực</span></td>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. វិស័យ</span></td>
             <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. Danh mục công việc</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. ប្រភេទនៃការងារ</span></td>
             <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
           </tr>
         </table>
@@ -522,12 +522,12 @@ function p(){
       <div style="width:2px;background:#777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
-        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,"cb_auto_001")} Không có khả năng thay đổi</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,"cb_auto_001")} មិនមានលទ្ធភាពនៃការផ្លាស់ប្តូរ</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
-          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. Lĩnh vực</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. វិស័យ</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. Danh mục công việc</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. ប្រភេទនៃការងារ</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
         </table>
       </div>
     </div>
@@ -535,19 +535,19 @@ function p(){
 
   <!-- Ⅳ 労働時間等 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. Các nội dung như thời gian làm việc</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. ខ្លឹមសារអំពីម៉ោងធ្វើការ ។ល។</span></div>
     <div style="margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. Thời gian bắt đầu và kết thúc công việc</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. ពេលវេលាចាប់ផ្តើម និងបញ្ចប់ការងារ</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">(1) Bắt đầu（${f('es_startTime')}）Kết thúc（${f('es_endTime')}）(Số giờ làm việc quy định cho 1 ngày: ${f('es_dailyHours')}giờ　${f('es_dailyMins')}phút)</span>
+        <span class="id" style="font-size:7.5pt;" data-key="52">(1) ចាប់ផ្តើម（${f('es_startTime')}）បញ្ចប់（${f('es_endTime')}）(ចំនួនម៉ោងធ្វើការកំណត់ក្នុង 1 ថ្ងៃ: ${f('es_dailyHours')}ម៉ោង ${f('es_dailyMins')}នាទី)</span>
       </div>
-      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【Trường hợp chế độ sau đây được áp dụng cho người lao động】</span></div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【ករណីប្រព័ន្ធខាងក្រោមនេះត្រូវបានអនុវត្តចំពោះកម្មករ】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} Chế độ thời gian làm việc biến hình: Chế độ thời gian làm việc biến hình đơn vị (${f('es_flexUnitEn')})</span>
-        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* Trường hợp đang sử dụng chế độ thời gian làm việc biến hình có đơn vị là 1 năm thì sẽ kèm theo bản sao lịch trong năm có ghi cả ngôn ngữ mà bên B có thể hiểu được đầy đủ và bản sao bản hiệp định liên quan.</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} Kết hợp thời gian lao động sau đây như chế độ xen kẽ.</span></div>
+        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបាន៖ ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានឯកតា (${f('es_flexUnitEn')})</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* ក្នុងករណីប្រើប្រាស់ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានក្នុងឯកតា 1 ឆ្នាំ ត្រូវភ្ជាប់ច្បាប់ចម្លងនៃប្រតិទិនប្រចាំឆ្នាំដែលមានភាសាដែលភាគីខអាចយល់បានយ៉ាងពេញលេញ និងច្បាប់ចម្លងនៃកិច្ចព្រមព្រៀងទាក់ទងនឹងប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានដែលបានដាក់ជូនការិយាល័យត្រួតពិនិត្យស្តង់ដារការងារ។</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} ជាប្រព័ន្ធឆ្លាស់គ្នា សូមបញ្ចូលគ្នានៃម៉ោងធ្វើការខាងក្រោម។</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -560,7 +560,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">Bắt đầu(${startStr})Kết thúc(${endStr}).(Ngày áp dụng ${daysEnStr}),Số giờ làm việc quy định cho 1 ngày ${hStr}giờ ${minStr}phút</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">ចាប់ផ្តើម(${startStr})បញ្ចប់(${endStr}).(ថ្ងៃអនុវត្ត ${daysEnStr}),ចំនួនម៉ោងធ្វើការកំណត់ក្នុង 1 ថ្ងៃ ${hStr}ម៉ោង ${minStr}នាទី</span></div>`;
           }).join('');
         })()}
       </div>
