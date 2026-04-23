@@ -377,3 +377,88 @@ async function sendSignRequest(){
     console.error(e);
   }
 }
+
+/* ==========================================================
+   汎用: 親index.htmlからのSELECT_CASE受信＆案件データ展開
+   loadFromDB が定義されていない書類（1_5系など）でも、
+   persons/cases/companies から取得して入力欄(es_xxx)に自動セット
+   ========================================================== */
+async function loadCaseToForm(info){
+  if(!info||!info.caseId) return;
+  console.log('[doc] loadCaseToForm:', info);
+  const {caseId, companyId, companyName, empSetIdx} = info;
+  try {
+    const [cases, persons] = await Promise.all([
+      sb('cases?select=*&id=eq.'+caseId),
+      sb('persons?select=*&case_id=eq.'+caseId)
+    ]);
+    const cas = cases && cases[0];
+    const _pdRaw = persons && persons[0];
+    const pd = (_pdRaw && _pdRaw.data) || _pdRaw || {};
+
+    // 会社取得（companyId → companyName → cas.company → cas.org の順）
+    let co = null;
+    if(companyId){
+      const r = await sb('companies?select=*&id=eq.'+companyId);
+      if(r && r[0]) co = r[0];
+    }
+    if(!co && companyName){
+      const r = await sb('companies?select=*&name=eq.'+encodeURIComponent(companyName));
+      if(r && r[0]) co = r[0];
+    }
+    if(!co && cas && cas.company){
+      const r = await sb('companies?select=*&name=eq.'+encodeURIComponent(cas.company));
+      if(r && r[0]) co = r[0];
+    }
+    if(!co && cas && cas.org){
+      const r = await sb('companies?select=*&name=eq.'+encodeURIComponent(cas.org));
+      if(r && r[0]) co = r[0];
+    }
+    co = co || {};
+
+    // emp_sets 取得
+    const idx = parseInt(empSetIdx||0)||0;
+    const es = (co.emp_sets||[])[idx] || {};
+
+    // 入力欄にセット
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(val!==undefined && val!==null && String(val)!=='') el.value = val;
+    };
+
+    // es_xxx フィールド(emp_sets由来)
+    Object.keys(es).forEach(k => {
+      setVal('es_'+k, es[k]);
+    });
+
+    // 会社関連 es_orgXxx (emp_sets に無ければcompaniesから)
+    setVal('es_orgName', es.orgName || co.name || '');
+    setVal('es_orgNameEn', es.orgNameEn || co.name_en || '');
+    setVal('es_orgAddress', es.orgAddress || co.address || '');
+    setVal('es_orgAddressEn', es.orgAddressEn || co.address_en || '');
+    setVal('es_orgTel', es.orgTel || co.tel || '');
+    setVal('es_repName', es.repName || co.rep_name || '');
+    setVal('es_repTitle', es.repTitle || co.rep_title || '');
+    setVal('es_repNameEn', es.repNameEn || co.rep_name_en || '');
+    setVal('es_repTitleEn', es.repTitleEn || co.rep_title_en || '');
+
+    // 申請人氏名 (persons → cases)
+    setVal('es_applicantName', pd.name_jp || pd.applicant_name || (cas && cas.applicant) || '');
+    setVal('es_applicantNameEn', pd.name_en || pd.applicant_name_en || '');
+
+    // 作成日（未設定なら今日）
+    const n = new Date();
+    if(!v('es_createY')) setVal('es_createY', String(n.getFullYear()));
+    if(!v('es_createM')) setVal('es_createM', String(n.getMonth()+1));
+    if(!v('es_createD')) setVal('es_createD', String(n.getDate()));
+
+    // プレビュー再描画
+    if(typeof p==='function') p();
+    showToast('✅ 案件データを読み込みました');
+  } catch(e) {
+    console.error('[doc] loadCaseToForm error:', e);
+    showToast('⚠️ 読込エラー: ' + e.message);
+  }
+}
+

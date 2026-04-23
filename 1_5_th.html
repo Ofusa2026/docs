@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－５号 特定技能雇用契約書（タイ語）</title>
-<link rel="stylesheet" href="ofusa_common.css?v=1776381161">
+<link rel="stylesheet" href="ofusa_common.css?v=1776949086">
 <style>
 .doc{
   background:white;
@@ -105,7 +105,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1776381161"></script>
+<script src="ofusa_common.js?v=1776949086"></script>
 <script>
 docId='1_5_th';
 const _title='📄 参考様式第１－５号　特定技能雇用契約書（タイ語版）';
@@ -223,6 +223,34 @@ function _apply15_thFontSize(){
 }
 
 p();
+
+// index.htmlからの案件選択を受信（自動追加）
+if(!window._selectCaseListenerAdded){
+  window._selectCaseListenerAdded=true;
+  window.addEventListener('message', function(e){
+    if(!e.data||e.data.type!=='SELECT_CASE') return;
+    const info=e.data.info;
+    if(!info||!info.caseId) return;
+    console.log('[doc] SELECT_CASE received:', info);
+    const sel=document.getElementById('caseSelect');
+    if(sel){
+      let found=false;
+      for(let o of sel.options){
+        try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+      }
+      if(!found){
+        const opt=document.createElement('option');
+        opt.value=JSON.stringify(info);
+        opt.textContent='（indexから選択）';
+        sel.appendChild(opt);
+        sel.value=opt.value;
+      }
+    }
+    if(typeof loadFromDB==='function'){ loadFromDB(info); }
+    else if(typeof loadCaseToForm==='function'){ loadCaseToForm(info); }
+  });
+}
+
 </script>
 </body>
 </html>

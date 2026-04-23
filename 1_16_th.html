@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－１６号（タイ語）斡旋無</title>
 <style>.fp-case{display:none!important;}</style>
-<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<link rel="stylesheet" href="ofusa_common.css?v=1776949086">
 <style>
 .doc{padding:15mm!important;line-height:1.45!important;min-height:auto!important}
 .id{color:#555;font-size:0.88em;}
@@ -117,7 +117,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1776316942"></script>
+<script src="ofusa_common.js?v=1776949086"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -379,10 +379,15 @@ function _apply1_16_thFontSize(){
     `.tbl{font-size:${(10*s).toFixed(2)}pt!important}`,
   ].join('');
 }
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  }
+  if(!info||!info.caseId){ console.warn('[doc] no caseId'); return; }
+  console.log('[doc] loadFromDB caseId='+info.caseId+' companyId='+info.companyId+' companyName='+info.companyName);
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
@@ -443,7 +448,7 @@ window.addEventListener('message', function(e){
       sel.value=opt.value;
     }
   }
-  if(typeof loadFromDB==='function') loadFromDB();
+  if(typeof loadFromDB==='function') loadFromDB(info);
 });
 </script>
 </body>

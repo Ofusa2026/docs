@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－６号 雇用条件書</title>
-<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<link rel="stylesheet" href="ofusa_common.css?v=1776949086">
 <style>
 /* 書類固有スタイル */
 .doc{
@@ -327,7 +327,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1776316942"></script>
+<script src="ofusa_common.js?v=1776949086"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -1086,12 +1086,16 @@ function collectFormValues(){
 
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
-async function loadFromDB(){
+async function loadFromDB(passedInfo){
   if(_currentDoc==='iko'){ await loadFromDB_iko(); return; }
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info;
-  try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  }
+  if(!info||!info.caseId){ console.warn('[doc] no caseId'); return; }
+  console.log('[doc] loadFromDB caseId='+info.caseId+' companyId='+info.companyId+' companyName='+info.companyName);
   const {caseId, companyId, companyName, empSetIdx, applicantField, applicantFieldEn} = info;
 
   // ローディング表示
@@ -1397,6 +1401,33 @@ initCaseSelect();
 p();
 
 setupPageTracker();
+
+
+// index.htmlからの案件選択を受信（自動追加）
+if(!window._selectCaseListenerAdded){
+  window._selectCaseListenerAdded=true;
+  window.addEventListener('message', function(e){
+    if(!e.data||e.data.type!=='SELECT_CASE') return;
+    const info=e.data.info;
+    if(!info||!info.caseId) return;
+    console.log('[doc] SELECT_CASE received:', info);
+    const sel=document.getElementById('caseSelect');
+    if(sel){
+      let found=false;
+      for(let o of sel.options){
+        try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+      }
+      if(!found){
+        const opt=document.createElement('option');
+        opt.value=JSON.stringify(info);
+        opt.textContent='（indexから選択）';
+        sel.appendChild(opt);
+        sel.value=opt.value;
+      }
+    }
+    if(typeof loadFromDB==='function'){ loadFromDB(info); }
+  });
+}
 
 </script>
 
