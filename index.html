@@ -94,6 +94,21 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <button class="lbtn" onclick="open_1_6('en');event.stopPropagation()">🇬🇧</button>
       <button class="lbtn" onclick="open_1_6('ko');event.stopPropagation()">🇰🇷</button>
     </div>
+    <div class="item" id="nav-1_16" onclick="open_1_16('id')">
+      <span class="item-icon">💼</span>
+      <div>参考様式第１－１６号<span class="item-sub">雇用の経緯に係る説明書</span></div>
+    </div>
+    <div class="lang-btns-side" id="langbtns-1_16">
+      <button class="lbtn active" onclick="open_1_16('id');event.stopPropagation()">🇮🇩</button>
+      <button class="lbtn" onclick="open_1_16('vi');event.stopPropagation()">🇻🇳</button>
+      <button class="lbtn" onclick="open_1_16('th');event.stopPropagation()">🇹🇭</button>
+      <button class="lbtn" onclick="open_1_16('ne');event.stopPropagation()">🇳🇵</button>
+      <button class="lbtn" onclick="open_1_16('my');event.stopPropagation()">🇲🇲</button>
+      <button class="lbtn" onclick="open_1_16('km');event.stopPropagation()">🇰🇭</button>
+      <button class="lbtn" onclick="open_1_16('en');event.stopPropagation()">🇬🇧</button>
+      <button class="lbtn" onclick="open_1_16('ko');event.stopPropagation()">🇰🇷</button>
+      <button class="lbtn" onclick="open_1_16('zh');event.stopPropagation()">🇨🇳</button>
+    </div>
     <div class="item" id="nav-1_17" onclick="open_doc('1_17')">
       <span class="item-icon">📖</span>
       <div>参考様式第１－１７号<span class="item-sub">支援計画書（自動生成）</span></div>
@@ -163,6 +178,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-1_3"></iframe>
     <iframe id="frame-1_5"></iframe>
     <iframe id="frame-1_6"></iframe>
+    <iframe id="frame-1_16"></iframe>
     <iframe id="frame-1_17"></iframe>
     <iframe id="frame-juuyou"></iframe>
     <iframe id="frame-iko"></iframe>
@@ -251,6 +267,9 @@ function open_1_5(lang){
   // 1_6のiframeも隠す
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
+  // 1_16のiframeも隠す
+  const fr1_16_a=document.getElementById('frame-1_16');
+  if(fr1_16_a) fr1_16_a.style.display='none';
   // juuyouのiframeも隠す
   const frJ=document.getElementById('frame-juuyou');
   if(frJ) frJ.style.display='none';
@@ -294,6 +313,9 @@ function open_1_6(lang){
   // 1_5のiframeも隠す
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
+  // 1_16のiframeも隠す
+  const fr1_16_b=document.getElementById('frame-1_16');
+  if(fr1_16_b) fr1_16_b.style.display='none';
   // juuyouのiframeも隠す
   const frJ=document.getElementById('frame-juuyou');
   if(frJ) frJ.style.display='none';
@@ -302,6 +324,50 @@ function open_1_6(lang){
   fr.src=LANG_FILES[lang];
   fr.style.display='block';
   cur='1_6';
+  // 案件選択済みなら送信
+  if(idxSelectedCase){
+    const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
+    fr.onload=()=>setTimeout(send,200);
+  }
+}
+let cur1_16Lang='id';
+const LANG_FILES_1_16={
+  'id':'1_16_id.html?v=1776908908',
+  'vi':'1_16_vi.html?v=1776908908',
+  'th':'1_16_th.html?v=1776908908',
+  'ne':'1_16_ne.html?v=1776908908',
+  'my':'1_16_my.html?v=1776908908',
+  'km':'1_16_km.html?v=1776908908',
+  'en':'1_16_en.html?v=1776908908',
+  'ko':'1_16_ko.html?v=1776908908',
+  'zh':'1_16_zh.html?v=1776908908',
+};
+function open_1_16(lang){
+  cur1_16Lang=lang;
+  // ボタンのactive切り替え（1_16関連のみ）
+  document.querySelectorAll('#langbtns-1_16 .lbtn,.lbtn-card').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes('open_1_16')) b.classList.remove('active');
+  });
+  document.querySelectorAll(`#langbtns-1_16 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_16('${lang}')"]`).forEach(b=>b.classList.add('active'));
+  // サイドバーactive
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-1_16')?.classList.add('active');
+  // ホーム非表示・他iframe非表示
+  document.getElementById('home-screen')?.style&&(document.getElementById('home-screen').style.display='none');
+  Object.keys(docs).forEach(k=>{
+    const fr=document.getElementById(docs[k].frameId);
+    if(fr) fr.style.display='none';
+  });
+  // 他の多言語iframeも隠す
+  ['frame-1_5','frame-1_6','frame-juuyou'].forEach(fid=>{
+    const el=document.getElementById(fid);
+    if(el) el.style.display='none';
+  });
+  // 1_16 iframeを表示・言語ファイルをセット
+  const fr=document.getElementById('frame-1_16');
+  fr.src=LANG_FILES_1_16[lang];
+  fr.style.display='block';
+  cur='1_16';
   // 案件選択済みなら送信
   if(idxSelectedCase){
     const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
@@ -328,11 +394,13 @@ function open_juuyou(lang){
     const fr=document.getElementById(docs[k].frameId);
     if(fr) fr.style.display='none';
   });
-  // 1_5 / 1_6のiframeも隠す
+  // 1_5 / 1_6 / 1_16のiframeも隠す
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
+  const fr1_16_c=document.getElementById('frame-1_16');
+  if(fr1_16_c) fr1_16_c.style.display='none';
   // juuyou iframeを表示
   const fr=document.getElementById('frame-juuyou');
   fr.src=LANG_FILES_JUUYOU[lang];
@@ -349,11 +417,13 @@ function open_doc(key){
   document.getElementById(key==='home'?'nav-home':(docs[key]?.navId||'nav-home'))?.classList.add('active');
   // コンテンツ
   const _hs=document.getElementById('home-screen');if(_hs)_hs.style.display=key==='home'?'flex':'none';
-  // 1_5 / 1_6 / juuyouのiframeを隠す（docsに入ってないので個別処理）
+  // 1_5 / 1_6 / 1_16 / juuyouのiframeを隠す（docsに入ってないので個別処理）
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
+  const fr1_16=document.getElementById('frame-1_16');
+  if(fr1_16) fr1_16.style.display='none';
   const frJ=document.getElementById('frame-juuyou');
   if(frJ) frJ.style.display='none';
   Object.keys(docs).forEach(k=>{
