@@ -380,8 +380,8 @@ async function sendSignRequest(){
 
 /* ==========================================================
    汎用: 親index.htmlからのSELECT_CASE受信＆案件データ展開
-   loadFromDB が定義されていない書類（1_5系など）でも、
-   persons/cases/companies から取得して入力欄(es_xxx)に自動セット
+   各書類の入力欄プレフィックスに幅広く対応
+   (es_*, f_*, 接頭辞なし) すべて試して存在するものだけセット
    ========================================================== */
 async function loadCaseToForm(info){
   if(!info||!info.caseId) return;
@@ -415,50 +415,82 @@ async function loadCaseToForm(info){
       if(r && r[0]) co = r[0];
     }
     co = co || {};
+    console.log('[doc] company loaded:', co.name || '(none)');
 
     // emp_sets 取得
     const idx = parseInt(empSetIdx||0)||0;
     const es = (co.emp_sets||[])[idx] || {};
 
-    // 入力欄にセット
-    const setVal = (id, val) => {
-      const el = document.getElementById(id);
-      if(!el) return;
-      if(val!==undefined && val!==null && String(val)!=='') el.value = val;
+    // 入力欄にセット：複数のID候補を試して存在するものにセット
+    const setValMulti = (ids, val) => {
+      if(val===undefined || val===null || String(val)==='') return;
+      const list = Array.isArray(ids) ? ids : [ids];
+      for(const id of list){
+        const el = document.getElementById(id);
+        if(el){ el.value = val; break; }
+      }
     };
 
-    // es_xxx フィールド(emp_sets由来)
+    // 現在値チェック（空なら新値をセット用）
+    const getEl = (id) => document.getElementById(id);
+    const isEmpty = (ids) => {
+      const list = Array.isArray(ids) ? ids : [ids];
+      for(const id of list){
+        const el = getEl(id);
+        if(el && el.value) return false;
+      }
+      return true;
+    };
+
+    // === 所属機関情報 ===
+    const companyAddress = (co.pref||'')+(co.city||'')+(co.address||'');
+    setValMulti(['es_orgName','f_company','f_orgName'], es.orgName || co.name);
+    setValMulti(['es_orgNameEn','f_companyEn','f_orgNameEn'], es.orgNameEn || co.name_en);
+    setValMulti(['es_orgAddress','f_address','f_orgAddress'], es.orgAddress || companyAddress);
+    setValMulti(['es_orgAddressEn','f_addressEn','f_orgAddressEn'], es.orgAddressEn || co.address_en);
+    setValMulti(['es_orgTel','f_tel','f_orgTel'], es.orgTel || co.tel);
+    setValMulti(['es_repName','f_repName'], es.repName || co.rep_name);
+    setValMulti(['es_repTitle','f_repTitle'], es.repTitle || co.rep_title);
+    setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || co.rep_name_en);
+    setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || co.rep_title_en);
+
+    // 作成責任者
+    setValMulti(['f_author'], [co.author_title, co.author_name].filter(Boolean).join('　'));
+    setValMulti(['es_authorName','f_authorName'], co.author_name);
+    setValMulti(['es_authorTitle','f_authorTitle'], co.author_title);
+
+    // === 申請人 ===
+    const applicantNameJp = pd.name_jp || pd.applicant_name || (cas && cas.applicant) || '';
+    const applicantNameEn = pd.name_en || pd.applicant_name_en || '';
+    setValMulti(['es_applicantName','applicantName','f_applicant','f_applicantName'], applicantNameJp);
+    setValMulti(['es_applicantNameEn','f_applicantEn','f_applicantNameEn'], applicantNameEn);
+
+    // 性別・年齢・経験（persons由来）
+    setValMulti(['f_age','es_age'], pd.age);
+    setValMulti(['f_gender','es_gender'], pd.gender);
+    setValMulti(['f_exp','es_experience','es_exp'], pd.experience);
+
+    // === emp_sets 全フィールドを自動で es_xxx / f_xxx にセット ===
     Object.keys(es).forEach(k => {
-      setVal('es_'+k, es[k]);
+      setValMulti(['es_'+k, 'f_'+k], es[k]);
     });
 
-    // 会社関連 es_orgXxx (emp_sets に無ければcompaniesから)
-    setVal('es_orgName', es.orgName || co.name || '');
-    setVal('es_orgNameEn', es.orgNameEn || co.name_en || '');
-    setVal('es_orgAddress', es.orgAddress || co.address || '');
-    setVal('es_orgAddressEn', es.orgAddressEn || co.address_en || '');
-    setVal('es_orgTel', es.orgTel || co.tel || '');
-    setVal('es_repName', es.repName || co.rep_name || '');
-    setVal('es_repTitle', es.repTitle || co.rep_title || '');
-    setVal('es_repNameEn', es.repNameEn || co.rep_name_en || '');
-    setVal('es_repTitleEn', es.repTitleEn || co.rep_title_en || '');
-
-    // 申請人氏名 (persons → cases)
-    setVal('es_applicantName', pd.name_jp || pd.applicant_name || (cas && cas.applicant) || '');
-    setVal('es_applicantNameEn', pd.name_en || pd.applicant_name_en || '');
-
-    // 作成日（未設定なら今日）
+    // === 作成日 ===
     const n = new Date();
-    if(!v('es_createY')) setVal('es_createY', String(n.getFullYear()));
-    if(!v('es_createM')) setVal('es_createM', String(n.getMonth()+1));
-    if(!v('es_createD')) setVal('es_createD', String(n.getDate()));
+    if(isEmpty(['es_createY','f_createY','f_docYear'])) setValMulti(['es_createY','f_createY','f_docYear'], String(n.getFullYear()));
+    if(isEmpty(['es_createM','f_createM','f_docMonth'])) setValMulti(['es_createM','f_createM','f_docMonth'], String(n.getMonth()+1));
+    if(isEmpty(['es_createD','f_createD','f_docDay'])) setValMulti(['es_createD','f_createD','f_docDay'], String(n.getDate()));
+    // f_docDate(令和形式)
+    if(isEmpty(['f_docDate'])){
+      setValMulti(['f_docDate'], `令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);
+    }
 
     // プレビュー再描画
     if(typeof p==='function') p();
-    showToast('✅ 案件データを読み込みました');
+    if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
-    showToast('⚠️ 読込エラー: ' + e.message);
+    if(typeof showToast==='function') showToast('⚠️ 読込エラー: ' + e.message);
   }
 }
 
