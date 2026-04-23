@@ -59,12 +59,9 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <select id="idx_caseSelect" size="1" onchange="idxCaseSelected()"></select>
     </div>
     <div class="section">特定技能</div>
-    <div class="item" id="nav-1_3" onclick="open_1_3('en')">
+    <div class="item" id="nav-1_3" onclick="open_doc('1_3')">
       <span class="item-icon">🩺</span>
       <div>参考様式第１－３号別紙<span class="item-sub">受診者の申告書</span></div>
-    </div>
-    <div class="lang-btns-side" id="langbtns-1_3">
-      <button class="lbtn active" onclick="open_1_3('en');event.stopPropagation()">🇬🇧</button>
     </div>
     <div class="item" id="nav-1_4" onclick="open_doc('1_4')">
       <span class="item-icon">📄</span>
@@ -206,6 +203,7 @@ const docs={
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1776316942'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1776316942'},
   '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776316942'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1776908200'},
   '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1776316942'},
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1776317436'},
   '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1776321090'},
@@ -223,42 +221,6 @@ const docs={
   '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1776392009'},
   '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1776392009'},
 };
-let cur1_3Lang='en';
-const LANG_FILES_1_3={
-  'en':'1_3_en.html?v=1776907770',
-};
-function open_1_3(lang){
-  cur1_3Lang=lang;
-  // ボタンのactive切り替え（1_3関連のみ）
-  document.querySelectorAll('#langbtns-1_3 .lbtn,.lbtn-card').forEach(b=>{
-    if(b.getAttribute('onclick')?.includes('open_1_3')) b.classList.remove('active');
-  });
-  document.querySelectorAll(`#langbtns-1_3 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_3('${lang}')"]`).forEach(b=>b.classList.add('active'));
-  // サイドバーactive
-  document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
-  document.getElementById('nav-1_3')?.classList.add('active');
-  // ホーム非表示・他iframe非表示
-  document.getElementById('home-screen')?.style&&(document.getElementById('home-screen').style.display='none');
-  Object.keys(docs).forEach(k=>{
-    const fr=document.getElementById(docs[k].frameId);
-    if(fr) fr.style.display='none';
-  });
-  // 他の多言語iframeも隠す
-  ['frame-1_5','frame-1_6','frame-juuyou'].forEach(fid=>{
-    const el=document.getElementById(fid);
-    if(el) el.style.display='none';
-  });
-  // 1_3 iframeを表示・言語ファイルをセット
-  const fr=document.getElementById('frame-1_3');
-  fr.src=LANG_FILES_1_3[lang];
-  fr.style.display='block';
-  cur='1_3';
-  // 案件選択済みなら送信
-  if(idxSelectedCase){
-    const send=()=>{try{fr.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*');}catch(e){}};
-    fr.onload=()=>setTimeout(send,200);
-  }
-}
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
   'id':'1_5.html?v=1776404437',
@@ -289,9 +251,6 @@ function open_1_5(lang){
   // 1_6のiframeも隠す
   const fr1_6=document.getElementById('frame-1_6');
   if(fr1_6) fr1_6.style.display='none';
-  // 1_3のiframeも隠す
-  const fr1_3b=document.getElementById('frame-1_3');
-  if(fr1_3b) fr1_3b.style.display='none';
   // juuyouのiframeも隠す
   const frJ=document.getElementById('frame-juuyou');
   if(frJ) frJ.style.display='none';
@@ -335,9 +294,6 @@ function open_1_6(lang){
   // 1_5のiframeも隠す
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
-  // 1_3のiframeも隠す
-  const fr1_3c=document.getElementById('frame-1_3');
-  if(fr1_3c) fr1_3c.style.display='none';
   // juuyouのiframeも隠す
   const frJ=document.getElementById('frame-juuyou');
   if(frJ) frJ.style.display='none';
@@ -393,9 +349,7 @@ function open_doc(key){
   document.getElementById(key==='home'?'nav-home':(docs[key]?.navId||'nav-home'))?.classList.add('active');
   // コンテンツ
   const _hs=document.getElementById('home-screen');if(_hs)_hs.style.display=key==='home'?'flex':'none';
-  // 1_3 / 1_5 / 1_6 / juuyouのiframeを隠す（docsに入ってないので個別処理）
-  const fr1_3=document.getElementById('frame-1_3');
-  if(fr1_3) fr1_3.style.display='none';
+  // 1_5 / 1_6 / juuyouのiframeを隠す（docsに入ってないので個別処理）
   const fr1_5=document.getElementById('frame-1_5');
   if(fr1_5) fr1_5.style.display='none';
   const fr1_6=document.getElementById('frame-1_6');

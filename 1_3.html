@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－３号（別紙）受診者の申告書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+  body{margin:0;background:#f5f7fa;}
+  .app-bar{background:#1a365d;color:#fff;padding:10px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;}
+  .app-bar-title{font-size:14px;font-weight:bold;}
+  .ver{font-size:11px;opacity:0.7;}
+  .bar-btns{margin-left:auto;display:flex;gap:8px;}
+
+  .lang-bar{background:#fff;padding:10px 20px;border-bottom:1px solid #e1e5eb;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .lang-bar-label{font-size:12px;color:#666;margin-right:6px;}
+  .lbtn{background:#f0f4f8;border:1px solid #d1d5db;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:16px;transition:all 0.15s;}
+  .lbtn:hover{background:#e0e7ef;}
+  .lbtn.active{background:#0066cc;color:#fff;border-color:#0066cc;box-shadow:0 0 0 2px rgba(0,102,204,0.15);}
+  .btn-dl{background:#0a7a3b;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;margin-left:auto;}
+  .btn-dl:hover{background:#086630;}
+  .btn-dl:disabled{background:#aaa;cursor:not-allowed;}
+
+  .preview-wrap{padding:16px;}
+  .preview-inner{background:#fff;border:1px solid #e1e5eb;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.05);}
+  iframe.pdf-preview{width:100%;height:calc(100vh - 170px);border:none;display:block;}
+
+  .empty-state{padding:40px 20px;text-align:center;color:#888;font-size:14px;}
+  .hint{font-size:11px;color:#888;padding:4px 20px 0;}
+</style>
+</head>
+<body>
+
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－３号（別紙）　受診者の申告書</div>
+    <div class="ver">ver.20260423.001</div>
+  </div>
+</div>
+
+<div class="lang-bar">
+  <span class="lang-bar-label">言語を選ぶ：</span>
+  <button class="lbtn active" data-lang="id" onclick="showLang('id')" title="インドネシア語">🇮🇩</button>
+  <button class="lbtn" data-lang="vi" onclick="showLang('vi')" title="ベトナム語">🇻🇳</button>
+  <button class="lbtn" data-lang="th" onclick="showLang('th')" title="タイ語">🇹🇭</button>
+  <button class="lbtn" data-lang="km" onclick="showLang('km')" title="カンボジア語">🇰🇭</button>
+  <button class="lbtn" data-lang="my" onclick="showLang('my')" title="ミャンマー語">🇲🇲</button>
+  <button class="lbtn" data-lang="en" onclick="showLang('en')" title="英語">🇬🇧</button>
+  <button class="btn-dl" id="btnDownload" onclick="downloadCurrent()">⬇ ダウンロード</button>
+</div>
+<div class="hint">※ 印刷してご本人に記入・署名してもらう書類です。</div>
+
+<div class="preview-wrap">
+  <div class="preview-inner">
+    <iframe id="pdfPreview" class="pdf-preview" src=""></iframe>
+  </div>
+</div>
+
+<script>
+const PDF_FILES = {
+  id: { path: 'pdf/1_3_id.pdf', name: '参考様式第1-3号別紙_インドネシア語.pdf', label: 'インドネシア語' },
+  vi: { path: 'pdf/1_3_vi.pdf', name: '参考様式第1-3号別紙_ベトナム語.pdf',     label: 'ベトナム語' },
+  th: { path: 'pdf/1_3_th.pdf', name: '参考様式第1-3号別紙_タイ語.pdf',         label: 'タイ語' },
+  km: { path: 'pdf/1_3_km.pdf', name: '参考様式第1-3号別紙_カンボジア語.pdf',   label: 'カンボジア語' },
+  my: { path: 'pdf/1_3_my.pdf', name: '参考様式第1-3号別紙_ミャンマー語.pdf',   label: 'ミャンマー語' },
+  en: { path: 'pdf/1_3_en.pdf', name: '参考様式第1-3号別紙_英語.pdf',           label: '英語' },
+};
+let currentLang = 'id';
+
+function showLang(lang){
+  if(!PDF_FILES[lang]) return;
+  currentLang = lang;
+  document.querySelectorAll('.lbtn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  document.getElementById('pdfPreview').src = PDF_FILES[lang].path + '#view=FitH';
+}
+
+function downloadCurrent(){
+  const f = PDF_FILES[currentLang];
+  if(!f) return;
+  const a = document.createElement('a');
+  a.href = f.path;
+  a.download = f.name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// 初期表示
+showLang('id');
+</script>
+
+</body>
+</html>
