@@ -541,8 +541,15 @@ function idxCaseSelected(){
 
 function idxSendToVisible(info){
   if(!info) return;
+  // docs オブジェクト内のiframe
   Object.keys(docs).forEach(k=>{
     const fr=document.getElementById(docs[k].frameId);
+    if(!fr||fr.style.display==='none'||!fr.src||fr.src===location.href) return;
+    try{fr.contentWindow.postMessage({type:'SELECT_CASE',info},'*');}catch(e){}
+  });
+  // docs に入っていない多言語iframe(1_5/1_6/1_16/juuyou)にも送信
+  ['frame-1_5','frame-1_6','frame-1_16','frame-juuyou'].forEach(fid=>{
+    const fr=document.getElementById(fid);
     if(!fr||fr.style.display==='none'||!fr.src||fr.src===location.href) return;
     try{fr.contentWindow.postMessage({type:'SELECT_CASE',info},'*');}catch(e){}
   });
