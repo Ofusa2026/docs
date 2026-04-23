@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260423.001</div>
+    <div class="ver">ver.20260423.002</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -196,11 +196,22 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
-      sb('cases?select=applicant,emp_set_idx&id=eq.'+caseId),
+      sb('cases?select=applicant,company,org,emp_set_idx&id=eq.'+caseId),
       companyId?sb(`companies?select=name,author_name,author_title,emp_sets&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const cas=cases&&cases[0];
+    let co=cos&&cos[0];
+    // cos で取れなかった場合、cases.company でフォールバック検索
+    if(!co && cas && cas.company){
+      const cos2 = await sb(`companies?select=name,author_name,author_title,emp_sets&name=eq.${encodeURIComponent(cas.company)}`);
+      co = cos2 && cos2[0];
+    }
+    // それでも取れなければ cases.org でフォールバック
+    if(!co && cas && cas.org){
+      const cos3 = await sb(`companies?select=name,author_name,author_title,emp_sets&name=eq.${encodeURIComponent(cas.org)}`);
+      co = cos3 && cos3[0];
+    }
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(cas) s('f_applicant',cas.applicant||'');
     if(co){
