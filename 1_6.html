@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260417.80</div>
+    <div class="ver">ver.20260423.007</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1411,6 +1411,10 @@ if(!window._selectCaseListenerAdded){
     const info=e.data.info;
     if(!info||!info.caseId) return;
     console.log('[doc] SELECT_CASE received:', info);
+    // 画面にデバッグトースト表示
+    if(typeof showToast==='function'){
+      showToast('📥 受信: caseId=' + info.caseId.substring(0,20) + ' company='+(info.companyName||'').substring(0,15));
+    }
     const sel=document.getElementById('caseSelect');
     if(sel){
       let found=false;
