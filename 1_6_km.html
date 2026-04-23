@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.005</div>
+    <div class="ver">ver.20260423.006</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -387,7 +387,7 @@ function p(){
       return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id" data-key="1">(${ltr})（Trợ cấp　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}yen/Cách tính:${ph(calcEn,'CalcEn')}）</div>`;
+    annexAllow+=`<div class="id" data-key="1">(${ltr})（ប្រាក់ឧបត្ថម្ភ　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}yen/វិធីគណនា:${ph(calcEn,'CalcEn')}）</div>`;
   });
 
   w.innerHTML=`
@@ -794,9 +794,9 @@ function p(){
 <!-- ===== 別紙 ===== -->
 <div style="padding:5px 0;margin:20px 0 4px;">
   <div style="font-size:8pt;font-weight:bold;">参考様式第１－６号　別紙</div>
-  <div style="font-size:7.5pt;">Mẫu Tham Khảo 1-6 Văn bản đi kèm</div>
+  <div style="font-size:7.5pt;">ទម្រង់ឯកសារយោង លេខ 1 – 6 ឯកសារភ្ជាប់</div>
   <div style="text-align:center;font-size:10pt;font-weight:bold;margin-top:4px;">賃　金　の　支　払</div>
-  <div style="text-align:center;font-size:8pt;">Thanh toán tiền lương</div>
+  <div style="text-align:center;font-size:8pt;">ការបើកប្រាក់ឈ្នួល</div>
 </div>
 
 <div style="font-size:8.5pt;">
@@ -804,32 +804,32 @@ function p(){
     <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
       <colgroup><col style="width:28%"><col style="width:24%"><col style="width:24%"><col style="width:24%"></colgroup>
       <tr>
-        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. Tiền lương cơ bản</span></td>
-        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">${cb(sMonthly,'sal_monthly_a_id')} Lương tháng (${ff('es_salaryMonthly')}JPY)</span></td>
-        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">${cb(sDaily,'sal_daily_a_id')} Lương ngày (${ff('es_salaryDaily')}JPY)</span></td>
-        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">${cb(sHourly,'sal_hourly_a_id')} Lương giờ (${ff('es_salaryHourly')}JPY)</span></td>
+        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. ប្រាក់ឈ្នួលមូលដ្ឋាន</span></td>
+        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">${cb(sMonthly,'sal_monthly_a_id')} ប្រាក់ខែ (${ff('es_salaryMonthly')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">${cb(sDaily,'sal_daily_a_id')} ប្រាក់ថ្ងៃ (${ff('es_salaryDaily')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">${cb(sHourly,'sal_hourly_a_id')} ប្រាក់ម៉ោង (${ff('es_salaryHourly')}JPY)</span></td>
       </tr>
       <tr>
         <td colspan="3" style="padding-top:3px;">※月給・日給の場合の１時間当たりの金額（${ff('es_calcHourly')}円）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="119">※Số tiền cho 1 tiếng trong trường hợp lương tháng/lương ngày&nbsp;&nbsp;&nbsp;(${ff('es_calcHourly')}JPY)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="119">※ចំនួនទឹកប្រាក់ក្នុងមួយម៉ោងករណីប្រាក់ខែ/ប្រាក់ថ្ងៃ&nbsp;&nbsp;&nbsp;(${ff('es_calcHourly')}JPY)</span></td>
       </tr>
       <tr>
         <td colspan="3">※日給・時給の場合の１か月当たりの金額（${ff('es_calcMonthly')}円）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="120">※Số tiền cho 1 tháng trong trường hợp lương ngày/lương giờ&nbsp;&nbsp;&nbsp;(${ff('es_calcMonthly')}JPY)</span></td>
+        <span class="id" style="font-size:7.5pt;" data-key="120">※ចំនួនទឹកប្រាក់ក្នុងមួយខែករណីប្រាក់ថ្ងៃ/ប្រាក់ម៉ោង&nbsp;&nbsp;&nbsp;(${ff('es_calcMonthly')}JPY)</span></td>
       </tr>
     </table>
 
-    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">2. Số tiền và cách tính các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ)</span></div>
+    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">2. ចំនួនទឹកប្រាក់ និងវិធីគណនាប្រាក់ឧបត្ថម្ភនានា (មិនរាប់បញ្ចូលប្រាក់ឈ្នួលបន្ថែមសម្រាប់ការងារខាងក្រៅម៉ោង)</span></div>
     <div style="margin-left:16px;">${annexAllow}</div>
     
-    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">[Nếu có lương làm thêm giờ cố định]</span></div>
+    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">[ករណីមានប្រាក់ឧបត្ថម្ភការងារហួសម៉ោងថេរ]</span></div>
     <div style="margin-left:16px;">
       <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
-      <div class="id" style="font-size:7.5pt;" data-key="123">(e) (Trợ cấp ${f('es_fixedOTNameEn')}, ${ff('es_fixedOTAmount')} yen</div>
+      <div class="id" style="font-size:7.5pt;" data-key="123">(e) (ប្រាក់ឧបត្ថម្ភ ${f('es_fixedOTNameEn')}, ${ff('es_fixedOTAmount')} yen</div>
       <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
-      <div class="id" style="font-size:7.5pt;" data-key="124">・Điều kiện chi trả: Chi trả xem như là trợ cấp làm thêm ngoài giờ cho phần làm việc của ${f('es_fixedOTHours')} tiếng, bất kể có làm việc ngoài giờ hay không.</div>
+      <div class="id" style="font-size:7.5pt;" data-key="124">・លក្ខខណ្ឌបង់ប្រាក់: បើកជាប្រាក់ឧបត្ថម្ភការងារហួសម៉ោងសម្រាប់រយៈពេល ${f('es_fixedOTHours')} ម៉ោង ទោះបីជាមាន ឬគ្មានការងារហួសម៉ោងក៏ដោយ។</div>
       <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
-      <div class="id" style="font-size:7.5pt;" data-key="125">(Chi trả thêm lương tăng ca đối với phần làm thêm ngoài giờ vượt quá ${f('es_fixedOTHours')} tiếng.)</div>
+      <div class="id" style="font-size:7.5pt;" data-key="125">(ប្រាក់ឈ្នួលបន្ថែមសម្រាប់ផ្នែកការងារហួសម៉ោងលើសពី ${f('es_fixedOTHours')} ម៉ោង នឹងបើកបន្ថែម។)</div>
     </div>
   </div>
 
@@ -838,84 +838,84 @@ function p(){
     <span style="white-space:nowrap;">約&emsp;${ff('es_salaryTotal')}円（合計）</span>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;" data-key="126">3. Số tiền thanh toán ước tính cho 1 tháng (1+2)</span>
-    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">Khoảng ${ff('es_salaryTotal')} yen (tổng)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="126">3. ចំនួនទឹកប្រាក់ប៉ាន់ស្មានដែលបើកក្នុងមួយខែ (1+2)</span>
+    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">ប្រហែល ${ff('es_salaryTotal')} yen (សរុប)</span>
   </div>
 </div>
 </div>
 
 <div class="doc">
 <div class="page-num-label">P7</div>
-<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Các mục khấu trừ khi thanh toán tiền lương</span></div>
+<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. មុខទំនិញដែលកាត់កងនៅពេលបើកប្រាក់ឈ្នួល</span></div>
   <table style="width:100%;font-size:8pt;border-collapse:collapse;">
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
-      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) Tiền thuế</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) ពន្ធ</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) Tiền bảo hiểm xã hội</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) ថ្លៃធានារ៉ាប់រងសង្គម</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) Tiền bảo hiểm tuyển dụng</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) ថ្លៃធានារ៉ាប់រងការជួល</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) Tiền ăn</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) ថ្លៃអាហារ</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) Tiền nhà</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) ថ្លៃកន្លែងស្នាក់នៅ</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) Tiền khác (Tiền nước, điện, ga)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) ថ្លៃផ្សេងៗ (ថ្លៃទឹក ភ្លើង ហ្គាស)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">(${f('es_deductOther1NameEn')})</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>ប្រហែល</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="135">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">ប្រហែល &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="137">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">ប្រហែល &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="139">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">ប្រហែល &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="141">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">ប្រហែល &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
       <td></td>
     </tr>
     <tr>
       <td style="padding-top:3px;"></td>
-      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">Số tiền khấu trừ</span></td>
+      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">ចំនួនទឹកប្រាក់កាត់កង</span></td>
       <td style="padding-top:3px;text-align:right;">
         <table style="border-collapse:collapse;width:100%;"><tr>
           <td style="white-space:nowrap;text-align:right;width:2em;">約</td>
           <td style="text-align:right;">${ff('es_deductTotal')}</td>
           <td style="white-space:nowrap;width:4em;">円（合計）</td>
         </tr><tr>
-          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">Khoảng</td>
+          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">ប្រហែល</td>
           <td style="text-align:right;font-size:7pt;" class="id" data-key="145">${ff('es_deductTotal')}</td>
-          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">yen (tổng)</td>
+          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">yen (សរុប)</td>
         </tr></table>
       </td>
     </tr>
@@ -928,17 +928,17 @@ function p(){
       <td style="text-align:right;">${ff('es_netPay')}</td>
       <td style="white-space:nowrap;width:4em;">円（合計）</td>
     </tr><tr>
-      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">Khoảng</td>
+      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">ប្រហែល</td>
       <td style="text-align:right;font-size:7.5pt;" class="id" data-key="148">${ff('es_netPay')}</td>
-      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">yen (tổng)</td>
+      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">yen (សរុប)</td>
     </tr></table>
   </div>
   <div style="display:flex;justify-content:space-between;">
-    <span class="id" style="font-size:7.5pt;" data-key="150">5. Số tiền thực nhận (3-4)</span>
+    <span class="id" style="font-size:7.5pt;" data-key="150">5. ចំនួនទឹកប្រាក់ទទួលសុទ្ធ (3-4)</span>
     <span></span>
   </div>
   <div style="font-size:7.5pt;margin-top:2px;">※欠勤等がない場合であって，時間外労働の割増賃金等は除く。<br>
-  <span class="id" style="font-size:7pt;" data-key="151">*Đây là trường hợp không nghỉ việc, loại trừ tiền tăng ca ngoài giờ.</span></div>
+  <span class="id" style="font-size:7pt;" data-key="151">*នេះជាករណីមិនមានការអវត្តមាន ដោយមិនរាប់បញ្ចូលប្រាក់ឈ្នួលបន្ថែមសម្រាប់ការងារខាងក្រៅម៉ោង។</span></div>
 </div>
 
 `;
