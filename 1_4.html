@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260416.04</div>
+    <div class="ver">ver.20260423.001</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -220,9 +220,9 @@ async function loadFromDB(){
       s('f_salaryRule',es.salaryRuleApply||'');
       s('f_jpReason',es.jpCompReason||'');
     }
-    const persons=await sb('persons?select=age,gender,experience_years&case_id=eq.'+caseId);
+    const persons=await sb('persons?select=age,gender,experience&case_id=eq.'+caseId);
     const pd=persons&&persons[0];
-    if(pd){s('f_age',pd.age||'');s('f_gender',pd.gender||'');s('f_exp',pd.experience_years||'');}
+    if(pd){s('f_age',pd.age||'');s('f_gender',pd.gender||'');s('f_exp',pd.experience||'');}
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
