@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.002</div>
+    <div class="ver">ver.20260423.003</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -574,17 +574,17 @@ function p(){
 <div style="border:1px solid #333;">
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Thời gian nghỉ ngơi&emsp;(${f('es_breakTime')}phút)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Số giờ làm việc quy định&emsp;①Tuần(${f('es_weeklyH')}giờ&nbsp;${f('es_weeklyMin')}phút)&emsp;②Tháng(${f('es_monthlyH')}giờ&nbsp;${f('es_monthlyMin')}phút)&emsp;③Năm(${f('es_yearlyH')}giờ&nbsp;${f('es_yearlyMin')}phút)</span></div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. ពេលវេលាសម្រាក&emsp;(${f('es_breakTime')}នាទី)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. ចំនួនម៉ោងធ្វើការកំណត់&emsp;①សប្តាហ៍(${f('es_weeklyH')}ម៉ោង ${f('es_weeklyMin')}នាទី)&emsp;②ខែ(${f('es_monthlyH')}ម៉ោង ${f('es_monthlyMin')}នាទី)&emsp;③ឆ្នាំ(${f('es_yearlyH')}ម៉ោង ${f('es_yearlyMin')}នាទី)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. ចំនួនថ្ងៃធ្វើការកំណត់&emsp;①សប្តាហ៍(${f('es_weeklyDays')}ថ្ងៃ)&emsp;②ខែ(${f('es_monthlyDays')}ថ្ងៃ)&emsp;③ឆ្នាំ(${f('es_yearlyDays')}ថ្ងៃ)</span></div>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
         <tr>
-          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Có hay không làm việc ngoài giờ quy định</span></td>
-          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} Có&emsp;${cb(false,'overtime_no_id')} Không</span></td>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. មាន ឬ គ្មានការងារខាងក្រៅម៉ោងកំណត់</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} មាន&emsp;${cb(false,'overtime_no_id')} គ្មាន</span></td>
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
-          <span class="id" style="font-size:7pt;" data-key="59">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></td>
+          <span class="id" style="font-size:7pt;" data-key="59">◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;)</span></td>
         </tr>
       </table>
     </div>
@@ -592,36 +592,36 @@ function p(){
 
   <!-- Ⅴ 休日 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ngày</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">Ⅴ. ថ្ងៃឈប់សម្រាក</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. Ngày nghỉ cố định: (${f('es_fixedDay1En')})，khác（${f('es_otherHolidays')}）(Tổng số ngày nghỉ trong năm:${f('es_annualHolidays')}ngày)</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. Ngày không cố định: ngày/tuần/tháng, khác ( )</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. ថ្ងៃឈប់សម្រាកកំណត់: (${f('es_fixedDay1En')}), ផ្សេងៗ (${f('es_otherHolidays')}) (ចំនួនថ្ងៃឈប់សរុបក្នុងមួយឆ្នាំ: ${f('es_annualHolidays')}ថ្ងៃ)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. ថ្ងៃឈប់សម្រាកមិនកំណត់: ថ្ងៃ/សប្តាហ៍/ខែ, ផ្សេងៗ ( )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 
   <!-- Ⅵ 休暇 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. Nghỉ phép</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">Ⅵ. ការឈប់សម្រាក</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. Nghỉ phép có lương trong năm&emsp;Trường hợp đã làm liên tục 6 tháng→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}ngày</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Trường hợp chưa đủ 6 tháng (${cb(false,"cb_auto_002")} Có&emsp;${cb(true,"cb_auto_003")} Không) → Qua&nbsp;&nbsp;&nbsp;tháng, được&nbsp;&nbsp;&nbsp;ngày</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. Các ngày nghỉ phép khác&emsp;Có lương (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;Không lương (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. Nghỉ phép về nước tạm thời&emsp;Nếu bên B có nguyện vọng về nước tạm thời, thì cho lấy ngày phép cần thiết trong phạm vi của khoản 1 và 2 ở trên.</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. ការឈប់សម្រាកប្រចាំឆ្នាំមានប្រាក់ឈ្នួល&emsp;ករណីធ្វើការបន្តគ្នា 6 ខែ → ${f('es_paidLeaveEn')||f('es_paidLeave')}ថ្ងៃ</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">ករណីមិនទាន់គ្រប់ 6 ខែ (${cb(false,"cb_auto_002")} មាន&emsp;${cb(true,"cb_auto_003")} គ្មាន) → ឆ្លងកាត់&nbsp;&nbsp;ខែ បាន&nbsp;&nbsp;ថ្ងៃ</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. ការឈប់សម្រាកផ្សេងៗ&emsp;មានប្រាក់ឈ្នួល (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;គ្មានប្រាក់ឈ្នួល (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. ការឈប់ត្រឡប់ទៅស្រុកកំណើតជាបណ្តោះអាសន្ន&emsp;ប្រសិនបើភាគីខមានបំណងត្រឡប់ទៅស្រុកកំណើតជាបណ្តោះអាសន្ន នឹងត្រូវឲ្យឈប់សម្រាកចាំបាច់ក្នុងវិសាលភាពនៃចំណុចទី 1 និង 2 ខាងលើ។</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 
   <!-- Ⅶ 賃金 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. Tiền lương</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">Ⅶ. ប្រាក់ឈ្នួល</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="padding:4px 0;margin-bottom:6px;">
-        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. Tiền lương cơ bản&emsp;${cb(true,"cb_auto_004")} Lương tháng (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Lương ngày(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Lương giờ(${ff('es_salaryHourly')}JPY)</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
-        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. Các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ làm việc)</span></div>
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. ប្រាក់ឈ្នួលមូលដ្ឋាន&emsp;${cb(true,"cb_auto_004")} ប្រាក់ខែ (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} ប្រាក់ថ្ងៃ (${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} ប្រាក់ម៉ោង (${ff('es_salaryHourly')}JPY)</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* ព័ត៌មានលម្អិតដូចក្នុងឯកសារភ្ជាប់</div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. ប្រាក់ឧបត្ថម្ភនានា (មិនរាប់បញ្ចូលប្រាក់ឈ្នួលបន្ថែមសម្រាប់ការងារខាងក្រៅម៉ោង)</span></div>
         <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">${allowLineId1}${allowLineId2}</span></div>
-        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* ព័ត៌មានលម្អិតដូចក្នុងឯកសារភ្ជាប់</div>
       </div>
     </div>
   </div>
