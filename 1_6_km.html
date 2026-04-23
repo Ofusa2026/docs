@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－６号 雇用条件書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+/* 書類固有スタイル */
+.doc{
+  background:white;
+  width:794px;
+  min-height:1123px;
+  flex-shrink:0;
+  margin:0 0 24px 0;
+  padding:15mm 14mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;
+  font-size:8.5pt;line-height:1.9;color:#000;
+  position:relative;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.page-num-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;color:#bbb;font-family:sans-serif;letter-spacing:0.05em;
+  background:white;padding:0 2px;
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
+    <div class="ver">ver.20260423.001</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="sendSignRequest()" style="background:#b45309;color:white;">✉️ 署名依頼</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+
+  <div class="fp-case">
+    <label>🔍 登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+      <option value="">── すべて ──</option>
+    </select>
+    <label>🏢 所属機関</label>
+    <select id="filterCompany" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+      <option value="">── すべて ──</option>
+    </select>
+    <label>🔤 検索（案件名・人材名）</label>
+    <input id="filterText" placeholder="名前・案件名で絞り込み" oninput="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;box-sizing:border-box;margin-bottom:5px;">
+    <label>👤 案件選択 <span id="caseCount" style="color:#888;font-weight:normal;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">
+      <option value="">── 選択 ──</option>
+    </select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">作成日・宛先</div>
+      <div class="fg3">
+        <div class="fg"><label>年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
+        <div class="fg"><label>月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div>
+        <div class="fg"><label>日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>宛先氏名<span class="fid">applicantName</span></label><input id="applicantName" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">所属機関</div>
+      <div class="fg"><label>機関名（日）<span class="fid">es.orgName</span></label><input id="es_orgName" oninput="p()"></div>
+      <div class="fg"><label>機関名（ID）<span class="fid">es.orgNameEn</span></label><input id="es_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>所在地（日）<span class="fid">es.orgAddress</span></label><textarea id="es_orgAddress" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>所在地（ID）<span class="fid">es.orgAddressEn</span></label><textarea id="es_orgAddressEn" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>電話番号<span class="fid">es.orgTel</span></label><input id="es_orgTel" oninput="p()"></div>
+      <div class="fg2">
+        <div class="fg"><label>代表者役職（日）<span class="fid">es.repTitle</span></label><input id="es_repTitle" oninput="p()"></div>
+        <div class="fg"><label>代表者氏名（日）<span class="fid">es.repName</span></label><input id="es_repName" oninput="p()"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>代表者役職（ID）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
+        <div class="fg"><label>代表者氏名（ID）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅰ 雇用契約期間</div>
+      <div class="fg3">
+        <div class="fg"><label>開始年<span class="fid">es.contractStartY</span></label><input id="es_contractStartY" oninput="p()"></div>
+        <div class="fg"><label>開始月<span class="fid">es.contractStartM</span></label><input id="es_contractStartM" oninput="p()"></div>
+        <div class="fg"><label>開始日<span class="fid">es.contractStartD</span></label><input id="es_contractStartD" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>終了年<span class="fid">es.contractEndY</span></label><input id="es_contractEndY" oninput="p()"></div>
+        <div class="fg"><label>終了月<span class="fid">es.contractEndM</span></label><input id="es_contractEndM" oninput="p()"></div>
+        <div class="fg"><label>終了日<span class="fid">es.contractEndD</span></label><input id="es_contractEndD" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>入国予定年<span class="fid">es.entryY</span></label><input id="es_entryY" oninput="p()"></div>
+        <div class="fg"><label>入国予定月<span class="fid">es.entryM</span></label><input id="es_entryM" oninput="p()"></div>
+        <div class="fg"><label>入国予定日<span class="fid">es.entryD</span></label><input id="es_entryD" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>契約更新</label>
+        <select id="es_renewal" onchange="p()">
+          <option value="auto">自動的に更新する</option>
+          <option value="possible">更新する場合があり得る</option>
+          <option value="none">契約の更新はしない</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅱ 就業の場所</div>
+      <div class="fg"><label>事業所名（日）<span class="fid">es.officeName</span></label><input id="es_officeName" oninput="p()"></div>
+      <div class="fg"><label>事業所名（ID）<span class="fid">es.officeNameEn</span></label><input id="es_officeNameEn" oninput="p()"></div>
+      <div class="fg"><label>所在地（日）<span class="fid">es.officeAddress</span></label><textarea id="es_officeAddress" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>所在地（ID）<span class="fid">es.officeAddressEn</span></label><textarea id="es_officeAddressEn" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>連絡先<span class="fid">es.officeTel</span></label><input id="es_officeTel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅲ 業務内容</div>
+      <div class="fg"><label>分野（日）<span class="fid">es.applicantField</span></label><input id="es_applicantField" oninput="p()"></div>
+      <div class="fg"><label>分野（ID）<span class="fid">es.applicantFieldEn</span></label><input id="es_applicantFieldEn" oninput="p()"></div>
+      <div class="fg"><label>業務区分（日）<span class="fid">es.category</span></label><input id="es_category" oninput="p()"></div>
+      <div class="fg"><label>業務区分（ID）<span class="fid">es.categoryEn</span></label><input id="es_categoryEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅳ 労働時間</div>
+      <div class="fg2">
+        <div class="fg"><label>始業<span class="fid">es.startTime</span></label><input id="es_startTime" placeholder="09:00" oninput="p()"></div>
+        <div class="fg"><label>終業<span class="fid">es.endTime</span></label><input id="es_endTime" placeholder="18:00" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>休憩（分）<span class="fid">es.breakTime</span></label><input id="es_breakTime" oninput="p()"></div>
+      <div class="fg2">
+        <div class="fg"><label>1日(H)<span class="fid">es.dailyHours</span></label><input id="es_dailyHours" oninput="p()"></div>
+        <div class="fg"><label>1日(分)<span class="fid">es.dailyMins</span></label><input id="es_dailyMins" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>週(H)<span class="fid">es.weeklyH</span></label><input id="es_weeklyH" oninput="p()"></div>
+        <div class="fg"><label>週(分)<span class="fid">es.weeklyMin</span></label><input id="es_weeklyMin" oninput="p()"></div>
+        <div class="fg"><label>週(日)<span class="fid">es.weeklyDays</span></label><input id="es_weeklyDays" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>月(H)<span class="fid">es.monthlyH</span></label><input id="es_monthlyH" oninput="p()"></div>
+        <div class="fg"><label>月(分)<span class="fid">es.monthlyMin</span></label><input id="es_monthlyMin" oninput="p()"></div>
+        <div class="fg"><label>月(日)<span class="fid">es.monthlyDays</span></label><input id="es_monthlyDays" oninput="p()"></div>
+      </div>
+      <div class="fg3">
+        <div class="fg"><label>年(H)<span class="fid">es.yearlyH</span></label><input id="es_yearlyH" oninput="p()"></div>
+        <div class="fg"><label>年(分)<span class="fid">es.yearlyMin</span></label><input id="es_yearlyMin" oninput="p()"></div>
+        <div class="fg"><label>年(日)<span class="fid">es.yearlyDays</span></label><input id="es_yearlyDays" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>変形労働単位（日）<span class="fid">es.flexUnit</span></label><input id="es_flexUnit" placeholder="例：1ヶ月" oninput="p()"></div>
+      <div class="fg"><label>変形労働単位（ID）<span class="fid">es.flexUnitEn</span></label><input id="es_flexUnitEn" placeholder="例：1 bulan" oninput="p()"></div>
+      <div class="fs-title" style="margin-top:8px;">交代制シフト（最大5パターン）</div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト1</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift1Start</span></label><input id="es_shift1Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift1End</span></label><input id="es_shift1End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift1H</span></label><input id="es_shift1H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift1Min</span></label><input id="es_shift1Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift1Days</span></label><input id="es_shift1Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（ID）<span class="fid">es.shift1DaysEn</span></label><input id="es_shift1DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト2</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift2Start</span></label><input id="es_shift2Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift2End</span></label><input id="es_shift2End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift2H</span></label><input id="es_shift2H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift2Min</span></label><input id="es_shift2Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift2Days</span></label><input id="es_shift2Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（ID）<span class="fid">es.shift2DaysEn</span></label><input id="es_shift2DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト3</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift3Start</span></label><input id="es_shift3Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift3End</span></label><input id="es_shift3End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift3H</span></label><input id="es_shift3H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift3Min</span></label><input id="es_shift3Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift3Days</span></label><input id="es_shift3Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（ID）<span class="fid">es.shift3DaysEn</span></label><input id="es_shift3DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト4</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift4Start</span></label><input id="es_shift4Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift4End</span></label><input id="es_shift4End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift4H</span></label><input id="es_shift4H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift4Min</span></label><input id="es_shift4Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift4Days</span></label><input id="es_shift4Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（ID）<span class="fid">es.shift4DaysEn</span></label><input id="es_shift4DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト5</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift5Start</span></label><input id="es_shift5Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift5End</span></label><input id="es_shift5End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift5H</span></label><input id="es_shift5H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift5Min</span></label><input id="es_shift5Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift5Days</span></label><input id="es_shift5Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（ID）<span class="fid">es.shift5DaysEn</span></label><input id="es_shift5DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅴ 休日</div>
+      <div class="fg"><label>定例休日（日）<span class="fid">es.fixedDay1</span></label><input id="es_fixedDay1" oninput="p()"></div>
+      <div class="fg"><label>定例休日（ID）<span class="fid">es.fixedDay1En</span></label><input id="es_fixedDay1En" oninput="p()"></div>
+      <div class="fg"><label>その他休日<span class="fid">es.otherHolidays</span></label><input id="es_otherHolidays" oninput="p()"></div>
+      <div class="fg"><label>年間合計休日(日)<span class="fid">es.annualHolidays</span></label><input id="es_annualHolidays" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅵ 休暇</div>
+      <div class="fg"><label>年次有給(日)<span class="fid">es.paidLeave</span></label><input id="es_paidLeave" oninput="p()"></div>
+      <div class="fg"><label>年次有給（ID）<span class="fid">es.paidLeaveEn</span></label><input id="es_paidLeaveEn" oninput="p()"></div>
+      <div class="fg"><label>その他有給<span class="fid">es.otherPaid</span></label><input id="es_otherPaid" oninput="p()"></div>
+      <div class="fg"><label>その他無給（日）<span class="fid">es.unpaidLeave</span></label><input id="es_unpaidLeave" oninput="p()"></div>
+      <div class="fg"><label>その他無給（ID）<span class="fid">es.unpaidLeaveEn</span></label><input id="es_unpaidLeaveEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅶ 賃金</div>
+      <div class="fg"><label>月給（円）<span class="fid">es.salaryMonthly</span></label><input id="es_salaryMonthly" oninput="p()"></div>
+      <div class="fg"><label>日給（円）<span class="fid">es.salaryDaily</span></label><input id="es_salaryDaily" oninput="p()"></div>
+      <div class="fg"><label>時給（円）<span class="fid">es.salaryHourly</span></label><input id="es_salaryHourly" oninput="p()"></div>
+      <div class="fg"><label>換算時給（円）<span class="fid">es.calcHourly</span></label><input id="es_calcHourly" oninput="p()"></div>
+      <div class="fg"><label>換算月給（円）<span class="fid">es.calcMonthly</span></label><input id="es_calcMonthly" oninput="p()"></div>
+      <div id="allowanceInputs"></div>
+      <div class="fg"><label>所定外60H以内割増率(%)<span class="fid">es.ot60under</span></label><input id="es_ot60under" placeholder="25" oninput="p()"></div>
+      <div class="fg"><label>所定外60H超割増率(%)<span class="fid">es.ot60over</span></label><input id="es_ot60over" placeholder="50" oninput="p()"></div>
+      <div class="fg"><label>所定超割増率(%)<span class="fid">es.otPrescribed</span></label><input id="es_otPrescribed" oninput="p()"></div>
+      <div class="fg"><label>法定休日割増率(%)<span class="fid">es.holidayLegal</span></label><input id="es_holidayLegal" oninput="p()"></div>
+      <div class="fg"><label>法定外休日割増率(%)<span class="fid">es.holidayNonLegal</span></label><input id="es_holidayNonLegal" oninput="p()"></div>
+      <div class="fg"><label>深夜割増率(%)<span class="fid">es.nightPremium</span></label><input id="es_nightPremium" placeholder="25" oninput="p()"></div>
+      <div class="fg2">
+        <div class="fg"><label>締切日（日）<span class="fid">es.payCutoff</span></label><input id="es_payCutoff" oninput="p()"></div>
+        <div class="fg"><label>締切日（ID）<span class="fid">es.payCutoffEn</span></label><input id="es_payCutoffEn" oninput="p()"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>支払日（日）<span class="fid">es.payDay</span></label><input id="es_payDay" oninput="p()"></div>
+        <div class="fg"><label>支払日（ID）<span class="fid">es.payDayEn</span></label><input id="es_payDayEn" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>昇給条件（日）<span class="fid">es.raiseCondition</span></label><input id="es_raiseCondition" oninput="p()"></div>
+      <div class="fg"><label>昇給条件（ID）<span class="fid">es.raiseConditionEn</span></label><input id="es_raiseConditionEn" oninput="p()"></div>
+      <div class="fg"><label>賞与条件（日）<span class="fid">es.bonusCondition</span></label><input id="es_bonusCondition" oninput="p()"></div>
+      <div class="fg"><label>賞与条件（ID）<span class="fid">es.bonusConditionEn</span></label><input id="es_bonusConditionEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">別紙 固定残業代</div>
+      <div class="fg"><label>手当名称（日）<span class="fid">es.fixedOTName</span></label><input id="es_fixedOTName" oninput="p()"></div>
+      <div class="fg"><label>手当名称（ID）<span class="fid">es.fixedOTNameEn</span></label><input id="es_fixedOTNameEn" oninput="p()"></div>
+      <div class="fg"><label>固定残業時間<span class="fid">es.fixedOTHours</span></label><input id="es_fixedOTHours" oninput="p()"></div>
+      <div class="fg"><label>超過時間<span class="fid">es.fixedOTHours2</span></label><input id="es_fixedOTHours2" oninput="p()"></div>
+      <div class="fg"><label>固定残業代（円）<span class="fid">es.fixedOTAmount</span></label><input id="es_fixedOTAmount" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">別紙 控除</div>
+      <div class="fg"><label>税（円）<span class="fid">es.deductTax</span></label><input id="es_deductTax" oninput="p()"></div>
+      <div class="fg"><label>社会保険料（円）<span class="fid">es.deductSocialIns</span></label><input id="es_deductSocialIns" oninput="p()"></div>
+      <div class="fg"><label>雇用保険料（円）<span class="fid">es.deductEmpIns</span></label><input id="es_deductEmpIns" oninput="p()"></div>
+      <div class="fg"><label>食費（円）<span class="fid">es.deductFood</span></label><input id="es_deductFood" oninput="p()"></div>
+      <div class="fg"><label>居住費（円）<span class="fid">es.deductHousing</span></label><input id="es_deductHousing" oninput="p()"></div>
+      <div class="fg"><label>光熱費（円）<span class="fid">es.deductUtility</span></label><input id="es_deductUtility" oninput="p()"></div>
+      <div class="fg2">
+        <div class="fg"><label>その他控除名（日）<span class="fid">es.deductOther1Name</span></label><input id="es_deductOther1Name" oninput="p()"></div>
+        <div class="fg"><label>その他控除名（ID）<span class="fid">es.deductOther1NameEn</span></label><input id="es_deductOther1NameEn" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>その他控除額（円）<span class="fid">es.deductOther1Amount</span></label><input id="es_deductOther1Amount" oninput="p()"></div>
+      <div class="fg2">
+        <div class="fg"><label>その他控除2名（日）<span class="fid">es.deductOther2Name</span></label><input id="es_deductOther2Name" oninput="p()"></div>
+        <div class="fg"><label>その他控除2名（ID）<span class="fid">es.deductOther2NameEn</span></label><input id="es_deductOther2NameEn" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>その他控除2額（円）<span class="fid">es.deductOther2Amount</span></label><input id="es_deductOther2Amount" oninput="p()"></div>
+      <div class="fg"><label>控除合計（円）<span class="fid">es.deductTotal</span></label><input id="es_deductTotal" oninput="p()"></div>
+      <div class="fg"><label>支払概算総額（円）<span class="fid">es.salaryTotal</span></label><input id="es_salaryTotal" oninput="p()"></div>
+      <div class="fg"><label>手取り支給額（円）<span class="fid">es.netPay</span></label><input id="es_netPay" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅷ 退職</div>
+      <div class="fg"><label>自己都合退職申出日数<span class="fid">es.resignNoticeDays</span></label><input id="es_resignNoticeDays" placeholder="14" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅸ その他</div>
+      <div class="fg2">
+        <div class="fg"><label>雇入時健診（年）<span class="fid">es.healthCheckY</span></label><input id="es_healthCheckY" oninput="p()"></div>
+        <div class="fg"><label>（月）<span class="fid">es.healthCheckM</span></label><input id="es_healthCheckM" oninput="p()"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>定期健診（年）<span class="fid">es.healthCheckY2</span></label><input id="es_healthCheckY2" oninput="p()"></div>
+        <div class="fg"><label>（月）<span class="fid">es.healthCheckM2</span></label><input id="es_healthCheckM2" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>相談窓口部署（日）<span class="fid">es.contactDept</span></label><input id="es_contactDept" oninput="p()"></div>
+      <div class="fg"><label>相談窓口部署（ID）<span class="fid">es.contactDeptEn</span></label><input id="es_contactDeptEn" oninput="p()"></div>
+      <div class="fg"><label>担当者名（日）<span class="fid">es.contactPerson</span></label><input id="es_contactPerson" oninput="p()"></div>
+      <div class="fg"><label>担当者名（ID）<span class="fid">es.contactPersonEn</span></label><input id="es_contactPersonEn" oninput="p()"></div>
+      <div class="fg"><label>連絡先電話番号<span class="fid">es.contactTel</span></label><input id="es_contactTel" oninput="p()"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="pp" id="ppOuter">
+<div class="page-nav" id="pageNav">
+  <span class="page-nav-label">ページ:</span>
+  <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button>
+  <button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button>
+  <button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="margin-left:8px;background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
+  <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+  <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+  <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
+  <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+</div>
+<div class="pp" id="pageArea">
+  <div class="doc" style="display:flex;align-items:center;justify-content:center;min-height:300px;"><div style="color:#aaa;text-align:center;padding:40px;font-family:sans-serif;">← 左フォームに入力するとプレビューが表示されます</div></div>
+</div>
+</div>
+</div>
+
+<script src="ofusa_common.js?v=1776316942"></script>
+<script>
+function p(){
+  if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
+  if(_currentDoc==='iko'){ p_iko(); return; }
+  resetCbSeq();
+  // シフト入力があれば shift_work を自動ON（手動変更は維持）
+  const _shiftHasData = [1,2,3,4,5].some(i=>document.getElementById('es_shift'+i+'Start')?.value||document.getElementById('es_shift'+i+'End')?.value);
+  if(_shiftHasData && !('shift_work' in cbState)) cbState['shift_work']=true;
+  if(_shiftHasData && !('shift_work_id' in cbState)) cbState['shift_work_id']=true;
+  const w=document.getElementById('pageArea');if(!w)return;
+  const rn=v('es_renewal');
+  // シフトパターン（最大5）
+  const shifts=[];
+  for(let i=1;i<=5;i++){
+    const s=v('es_shift'+i+'Start'),e=v('es_shift'+i+'End');
+    if(s||e){
+      shifts.push({
+        start:s||'',end:e||'',
+        h:v('es_shift'+i+'H')||'',min:v('es_shift'+i+'Min')||'',
+        days:v('es_shift'+i+'Days')||'',daysEn:v('es_shift'+i+'DaysEn')||''
+      });
+    }
+  }
+  // 給与形態: 入力値のある項目をONにする（複数入力時は月給優先）
+  const hasMon=!!v('es_salaryMonthly'), hasDay=!!v('es_salaryDaily'), hasHour=!!v('es_salaryHourly');
+  const sMonthly = hasMon||((!hasMon&&!hasDay&&!hasHour)); // デフォルト月給
+  const sDaily   = !hasMon && hasDay;
+  const sHourly  = !hasMon && !hasDay && hasHour;
+  const rAuto=rn==='auto',rPos=rn==='possible',rNone=rn==='none';
+
+  // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
+  let allowLine1='',allowLine2='';
+  for(let i=1;i<=4;i++){
+    const n=v('es_a'+i+'Name');
+    const nVal=n||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}Name</span>`;
+    const nSpan=`<span class="f">${nVal}</span>`;
+    if(i<=2) allowLine1+=`（${nSpan}　手当），`;
+    else allowLine2+=`（${nSpan}　手当），`;
+  }
+  let allowLineId1='',allowLineId2='';
+  for(let i=1;i<=4;i++){
+    const nEn=v('es_a'+i+'NameEn');
+    const nEnVal=nEn||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}NameEn</span>`;
+    const nEnSpan=`<span class="f">${nEnVal}</span>`;
+    if(i<=2) allowLineId1+=`（Trợ cấp　${nEnSpan}），`;
+    else allowLineId2+=`（Trợ cấp　${nEnSpan}），`;
+  }
+
+  // 手当（別紙用）
+  let annexAllow='';
+  ['a','b','c','d'].forEach((ltr,i)=>{
+    const idx=i+1;
+    const n=v('es_a'+idx+'Name'),nEn=v('es_a'+idx+'NameEn');
+    const amt=v('es_a'+idx+'Amt'),calc=v('es_a'+idx+'Calc'),calcEn=v('es_a'+idx+'CalcEn');
+    const ph=(val,key,isMoney=false)=>{
+      if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
+      return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
+    };
+    annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
+    annexAllow+=`<div class="id" data-key="1">(${ltr})（Trợ cấp　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)}yen/Cách tính:${ph(calcEn,'CalcEn')}）</div>`;
+  });
+
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">ទម្រង់ឯកសារយោង លេខ 1 – 6</span></div>
+
+<div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;padding:10px 0 4px;">雇　用　条　件　書</div>
+<div style="text-align:center;font-size:10pt;padding-bottom:8px;">ឯកសារស្តីអំពីលក្ខខណ្ឌការងារ</div>
+
+<div style="border:1px solid #333;">
+
+  <!-- 日付・宛先・所属機関 -->
+  <div style="padding:8px 12px 10px;">
+    <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
+      ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
+      <span class="id" style="font-size:7.5pt;" data-key="3">${f('es_createY')} ឆ្នាំ ${f('es_createM')} ខែ ${f('es_createD')} ថ្ងៃ</span>
+    </div>
+    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;" data-key="4">ជូនចំពោះ&nbsp;&nbsp;${f('applicantName')}</span></div>
+    <div style="display:flex;justify-content:flex-end;">
+      <table style="font-size:8pt;border-collapse:collapse;width:55%;">
+        <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="5">ឈ្មោះស្ថាប័ននៃជនបរទេសជំនាញជាក់លាក់</td><td class="id" style="font-size:7pt;" data-key="6">${f('es_orgNameEn')}</td></tr>
+        <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="7">អាសយដ្ឋាន</td><td class="id" style="font-size:7pt;" data-key="8">${f('es_orgAddressEn')}</td></tr>
+        <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="9">លេខទូរស័ព្ទ</td><td class="id" style="font-size:7pt;" data-key="10">${f('es_orgTel')}</td></tr>
+        <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
+        <tr><td class="id" style="font-size:7pt;padding-right:6px;" data-key="11">ឈ្មោះនិងតួនាទីអ្នកតំណាង</td><td class="id" style="font-size:7pt;" data-key="12">${f('es_repTitleEn')}&nbsp;${f('es_repNameEn')}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ⅰ 雇用契約期間 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅰ．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;margin-left:8px;" data-key="13">Ⅰ. រយៈពេលកិច្ចសន្យាការងារ</span></div>
+    <div style="margin-left:8px;">
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">1. រយៈពេលកិច្ចសន្យាការងារ</span></div>
+      <div style="margin-left:8px;font-size:8.5pt;">
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">(${f('es_contractStartY')} ឆ្នាំ ${f('es_contractStartM')} ខែ ${f('es_contractStartD')} ថ្ងៃ ～ ${f('es_contractEndY')} ឆ្នាំ ${f('es_contractEndM')} ខែ ${f('es_contractEndD')} ថ្ងៃ) ថ្ងៃគ្រោងចូលប្រទេសជប៉ុន ${f('es_entryY')} ឆ្នាំ ${f('es_entryM')} ខែ ${f('es_entryD')} ថ្ងៃ</span></div>
+      </div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">2. ការពន្យារកិច្ចសន្យាជាថ្មី</span></div>
+      <div style="margin-left:8px;">
+        <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
+          <tr>
+            <td style="white-space:nowrap;width:34%;">${cb(rAuto,"renewal_auto")}&nbsp;自動的に更新する</td>
+            <td style="white-space:nowrap;width:33%;">${cb(rPos,'renewal_pos')}&nbsp;更新する場合があり得る</td>
+            <td style="white-space:nowrap;">${cb(rNone,'renewal_none')}&nbsp;契約の更新はしない</td>
+          </tr>
+          <tr style="font-size:7.5pt;">
+            <td class="id" style="white-space:nowrap;" data-key="17">${cb(rAuto,'renewal_auto_id')}&nbsp;ពន្យារកិច្ចសន្យាដោយស្វ័យប្រវត្តិ</td>
+            <td class="id" style="white-space:nowrap;" data-key="18">${cb(rPos,'renewal_pos_id')}&nbsp;អាចមានការពន្យារកិច្ចសន្យា</td>
+            <td class="id" style="white-space:nowrap;" data-key="19">${cb(rNone,'renewal_none_id')}&nbsp;មិនមានការពន្យារកិច្ចសន្យា</td>
+          </tr>
+        </table>
+        <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">※ ស្តង់ដានៃការវិនិច្ឆ័យសម្រាប់ "អាចមានការពន្យារកិច្ចសន្យា" ក្នុងចំណុចការពន្យារកិច្ចសន្យាជាថ្មីខាងលើ គឺអាស្រ័យដូចខាងក្រោម។</span></div>
+        <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
+          <tr>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">${cb(false,'kijun_1_id')}&nbsp;បរិមាណការងារនៅពេលបញ្ចប់កិច្ចសន្យា</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">${cb(false,'kijun_2_id')}&nbsp;ឥរិយាបថឬពិន្ទុការងាររបស់បុគ្គលិក</span></td>
+            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">${cb(false,'kijun_3_id')}&nbsp;វឌ្ឍនភាពនៃការងារដែលកំពុងអនុវត្ត</span></td>
+          </tr>
+          <tr>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">${cb(false,'kijun_4_id')}&nbsp;សមត្ថភាពរបស់បុគ្គលិកក្នុងការបំពេញការងារ</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">${cb(false,'kijun_5_id')}&nbsp;ស្ថានភាពហិរញ្ញវត្ថុរបស់ក្រុមហ៊ុន</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">${cb(false,'kijun_6_id')}&nbsp;ផ្សេងទៀត（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
+          </tr>
+        </table>
+      </div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">3. ចំនួនអតិបរមានៃការពន្យារកិច្ចសន្យាការងារ (គ្មាន・មាន (ពន្យារបាន&nbsp;&nbsp;&nbsp;&nbsp;ដង/សរុបនៃអំឡុងពេលនៃកិច្ចសន្យាការងារ ត្រឹម&nbsp;&nbsp;&nbsp;&nbsp;ឆ្នាំ))</span></div>
+      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">【ករណីចុះកិច្ចសន្យាការងារមានកំណត់ដែលសរុបអំឡុងពេលនៃកិច្ចសន្យាជាមួយក្រុមហ៊ុនតែមួយលើសពី 5 ឆ្នាំ ដែលបានកំណត់ក្នុងច្បាប់ស្តីពីកិច្ចសន្យាការងារ】</span></div>
+      <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
+      <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">ក្នុងអំឡុងពេលនៃកិច្ចសន្យានេះ អ្នកអាចដាក់ពាក្យស្នើសុំចុះកិច្ចសន្យាការងារគ្មានកំណត់រយៈពេល (កិច្ចសន្យាគ្មានកំណត់) ជាមួយក្រុមហ៊ុន</span><br><span class="id" style="font-size:6.5pt;" data-key="30">ហើយចាប់ពីថ្ងៃបន្ទាប់ពីថ្ងៃចុងក្រោយនៃរយៈពេលកិច្ចសន្យានេះ (&nbsp;&nbsp;ឆ្នាំ&nbsp;&nbsp;ខែ&nbsp;&nbsp;ថ្ងៃ) អ្នកអាចប្តូរទៅជាការងារតាមកិច្ចសន្យាគ្មានកំណត់។<br><span class="id" style="font-size:6.5pt;">ក្នុងករណីនេះ តើមានការផ្លាស់ប្តូរលក្ខខណ្ឌការងារពីកិច្ចសន្យានេះឬទេ? (គ្មាន・មាន (ដូចក្នុងឯកសារភ្ជាប់លេខ 2))</span></span></span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="border:1px solid #333;">
+<!-- Ⅱ 就業の場所 -->
+  <div style="border-top:1px solid #333;">
+    <div style="display:flex;gap:0;">
+      <!-- 左：直接雇用 -->
+      <div style="flex:1;padding:6px 8px 6px 12px;">
+        <div style="font-size:9pt;font-weight:bold;">Ⅱ．就業の場所</div>
+        <div style="font-size:8pt;margin-bottom:4px;">II. Nơi làm việc</div>
+        <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} Tuyển dụng trực tiếp (điền vào phần dưới)</span></div>
+        <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* Vào văn phòng của tổ chức tiếp nhận</span></div>
+        <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
+          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">Tên công ty</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">Địa chỉ</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">Địa chỉ liên lạc</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
+        </table>
+      </div>
+      <!-- 縦線 -->
+      <div style="width:2px;background:#777;flex-shrink:0;"></div>
+      <!-- 右：派遣雇用 / 変更の範囲 -->
+      <div style="flex:1;padding:6px 12px 6px 8px;">
+        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="39">${cb(false,'hire_dispatch_id')} Tuyển dụng phái cử (Điền vào mẫu "Bản Trình bày Rõ Điều Kiện Làm Việc")</span></div>
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;" data-key="40">${cb(false,'change_none_direct_id')} Không có khả năng thay đổi (Trường hợp có thay đổi thì điền vào phần dưới)</span></div>
+        <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id" data-key="41">Tên công ty</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="42">Địa chỉ</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="43">Địa chỉ liên lạc</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ⅲ 業務内容 -->
+  <div style="border-top:1px solid #333;">
+    <div style="display:flex;gap:0;">
+      <!-- 左：直接雇用側 -->
+      <div style="flex:1;padding:6px 8px 6px 12px;">
+        <div style="font-size:9pt;font-weight:bold;">Ⅲ．従事すべき業務の内容</div>
+        <div style="font-size:8pt;margin-bottom:4px;">III. Nội dung công việc cần thực hiện</div>
+        <table style="width:100%;border-collapse:collapse;font-size:8pt;">
+          <tr>
+            <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. Lĩnh vực</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
+          </tr>
+          <tr>
+            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. Danh mục công việc</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id" data-key="47">（${f('es_categoryEn')}）</span></td>
+          </tr>
+        </table>
+      </div>
+      <!-- 縦線 -->
+      <div style="width:2px;background:#777;flex-shrink:0;"></div>
+      <!-- 右：変更の範囲 -->
+      <div style="flex:1;padding:6px 12px 6px 8px;">
+        <div style="font-size:7.5pt;">（変更の範囲）${cb(false,"change_none_disp")}&nbsp;変更の可能性なし<br><span class="id" style="font-size:7pt;" data-key="48">${cb(false,"cb_auto_001")} Không có khả năng thay đổi</span></div>
+        <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
+          <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">1. Lĩnh vực</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">2. Danh mục công việc</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ⅳ 労働時間等 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅳ．労働時間等<br><span style="font-size:8pt;font-weight:normal;">IV. Các nội dung như thời gian làm việc</span></div>
+    <div style="margin-left:8px;">
+      <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">1. Thời gian bắt đầu và kết thúc công việc</span></div>
+      <div style="font-size:8.5pt;margin-left:8px;">
+        (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
+        <span class="id" style="font-size:7.5pt;" data-key="52">(1) Bắt đầu（${f('es_startTime')}）Kết thúc（${f('es_endTime')}）(Số giờ làm việc quy định cho 1 ngày: ${f('es_dailyHours')}giờ　${f('es_dailyMins')}phút)</span>
+      </div>
+      <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【Trường hợp chế độ sau đây được áp dụng cho người lao động】</span></div>
+      <div style="margin-left:16px;font-size:8pt;">
+        ${cb(false,'flex_work')}&nbsp;変形労働時間制：（${f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
+        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} Chế độ thời gian làm việc biến hình: Chế độ thời gian làm việc biến hình đơn vị (${f('es_flexUnitEn')})</span>
+        <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* Trường hợp đang sử dụng chế độ thời gian làm việc biến hình có đơn vị là 1 năm thì sẽ kèm theo bản sao lịch trong năm có ghi cả ngôn ngữ mà bên B có thể hiểu được đầy đủ và bản sao bản hiệp định liên quan.</span></div>
+        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} Kết hợp thời gian lao động sau đây như chế độ xen kẽ.</span></div>
+        ${(()=>{
+          // シフトデータがあれば実データ、なければ空欄行を5行表示
+          const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
+          const maxRows = shifts.length > 0 ? shifts.length : 5;
+          return Array.from({length:maxRows},(_,i)=>{
+            const s = rows[i]||{start:'',end:'',h:'',min:'',days:'',daysEn:''};
+            const startStr = s.start ? s.start : '&emsp;時&emsp;分';
+            const endStr   = s.end   ? s.end   : '&emsp;時&emsp;分';
+            const daysStr  = s.days  ? s.days  : '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
+            const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
+            const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
+            const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">Bắt đầu(${startStr})Kết thúc(${endStr}).(Ngày áp dụng ${daysEnStr}),Số giờ làm việc quy định cho 1 ngày ${hStr}giờ ${minStr}phút</span></div>`;
+          }).join('');
+        })()}
+      </div>
+</div></div>
+</div>
+</div>
+
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+<div style="border:1px solid #333;">
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;">２．休憩時間&emsp;（${f('es_breakTime')}分）<br><span style="font-weight:normal;font-size:8pt;">2. Thời gian nghỉ ngơi&emsp;(${f('es_breakTime')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">３．所定労働時間数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyH')}時間&nbsp;${f('es_weeklyMin')}分）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyH')}時間&nbsp;${f('es_monthlyMin')}分）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyH')}時間&nbsp;${f('es_yearlyMin')}分）</span><br><span style="font-weight:normal;font-size:8pt;">3. Số giờ làm việc quy định&emsp;①Tuần(${f('es_weeklyH')}giờ&nbsp;${f('es_weeklyMin')}phút)&emsp;②Tháng(${f('es_monthlyH')}giờ&nbsp;${f('es_monthlyMin')}phút)&emsp;③Năm(${f('es_yearlyH')}giờ&nbsp;${f('es_yearlyMin')}phút)</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:4px;margin-left:8px;">４．所定労働日数&emsp;<span style="white-space:nowrap;">①週（${f('es_weeklyDays')}日）</span>&emsp;<span style="white-space:nowrap;">②月（${f('es_monthlyDays')}日）</span>&emsp;<span style="white-space:nowrap;">③年（${f('es_yearlyDays')}日）</span><br><span style="font-weight:normal;font-size:8pt;">4. Số ngày làm việc quy định&emsp;①Tuần(${f('es_weeklyDays')}ngày)&emsp;②Tháng(${f('es_monthlyDays')}ngày)&emsp;③Năm(${f('es_yearlyDays')}ngày)</span></div>
+      <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:4px;margin-left:8px;">
+        <tr>
+          <td style="font-weight:bold;vertical-align:top;">５．所定時間外労働の有無<br><span style="font-weight:normal;font-size:8pt;">5. Có hay không làm việc ngoài giờ quy định</span></td>
+          <td style="vertical-align:top;">${cb(true,'overtime_yes')}&nbsp;有&emsp;${cb(false,'overtime_no')}&nbsp;無<br><span class="id" style="font-size:8pt;" data-key="58">${cb(true,'overtime_yes_id')} Có&emsp;${cb(false,'overtime_no_id')} Không</span></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br>
+          <span class="id" style="font-size:7pt;" data-key="59">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ⅴ 休日 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">ngày</span></div>
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;" data-key="60">1. Ngày nghỉ cố định: (${f('es_fixedDay1En')})，khác（${f('es_otherHolidays')}）(Tổng số ngày nghỉ trong năm:${f('es_annualHolidays')}ngày)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;" data-key="61">2. Ngày không cố định: ngày/tuần/tháng, khác ( )</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="62">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+    </div>
+  </div>
+
+  <!-- Ⅵ 休暇 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. Nghỉ phép</span></div>
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. Nghỉ phép có lương trong năm&emsp;Trường hợp đã làm liên tục 6 tháng→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}ngày</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">Trường hợp chưa đủ 6 tháng (${cb(false,"cb_auto_002")} Có&emsp;${cb(true,"cb_auto_003")} Không) → Qua&nbsp;&nbsp;&nbsp;tháng, được&nbsp;&nbsp;&nbsp;ngày</span></div>
+      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. Các ngày nghỉ phép khác&emsp;Có lương (${f('es_paidLeaveEn')||f('es_otherPaid')})&emsp;&emsp;Không lương (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
+      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. Nghỉ phép về nước tạm thời&emsp;Nếu bên B có nguyện vọng về nước tạm thời, thì cho lấy ngày phép cần thiết trong phạm vi của khoản 1 và 2 ở trên.</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+    </div>
+  </div>
+
+  <!-- Ⅶ 賃金 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅶ．賃金<br><span style="font-size:8pt;font-weight:normal;">VII. Tiền lương</span></div>
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div style="padding:4px 0;margin-bottom:6px;">
+        <div>１．基本賃金&emsp;${cb(sMonthly,'sal_monthly')}&nbsp;月給（${ff('es_salaryMonthly')}円）&emsp;${cb(sDaily,'sal_daily')}&nbsp;日給（${ff('es_salaryDaily')}円）&emsp;${cb(sHourly,'sal_hourly')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="68">1. Tiền lương cơ bản&emsp;${cb(true,"cb_auto_004")} Lương tháng (${ff('es_salaryMonthly')}JPY)&emsp;${cb(false,"cb_auto_005")} Lương ngày(${ff('es_salaryDaily')}JPY)&emsp;${cb(false,"cb_auto_006")} Lương giờ(${ff('es_salaryHourly')}JPY)</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
+        <div style="margin-top:4px;">２．諸手当（時間外労働の割増賃金は除く）<br><span class="id" style="font-size:7.5pt;" data-key="69">2. Các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ làm việc)</span></div>
+        <div style="margin-left:8px;">${allowLine1}${allowLine2}<br><span class="id" style="font-size:7.5pt;" data-key="70">${allowLineId1}${allowLineId2}</span></div>
+        <div style="font-size:7.5pt;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+<div style="border:1px solid #333;">
+<div><div>
+<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:2px;">
+        <colgroup><col style="width:30%"><col style="width:35%"><col style="width:35%"></colgroup>
+        <tr>
+          <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
+        </tr>
+        <tr>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">3. Tỷ suất lương ngoài giờ trả cho lao động vào ngày nghỉ hoặc ban đêm ngoài thời gian quy định</td>
+        </tr>
+        <tr>
+          <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
+          <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">(1) Làm thêm ngoài giờ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">Vượt thời gian luật định dưới 60 tiếng trong tháng (${f('es_ot60under')}) ％</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td colspan="2">法定超月60時間超（${f('es_ot60over')}）％&emsp;所定超（${f('es_otPrescribed')}）％</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">Vượt thời gian luật định trên 60 tiếng trong tháng (${f('es_ot60over')}) ％&emsp;Vượt thời gian quy định (${f('es_otPrescribed')}) ％</td>
+        </tr>
+        <tr>
+          <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
+          <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">(2) Làm việc ngày nghỉ</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">Ngày nghỉ luật định(${f('es_holidayLegal')})％，ngày nghỉ ngoài luật định(${f('es_holidayNonLegal')})％</td>
+        </tr>
+        <tr>
+          <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
+          <td colspan="2">（${f('es_nightPremium')}）％</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">(3) Làm việc ban đêm</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">(${f('es_nightPremium')}) ％</td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">４．賃金締切日</td>
+          <td>${cb(true,"pay_cutoff_main")}&nbsp;毎月${f('es_payCutoff')}日</td>
+          <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;" data-key="79">4. Ngày kết lương</td>
+          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} Hàng tháng ngày ${f('es_payCutoffEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} Hàng tháng ngày</td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">５．賃金支払日</td>
+          <td>${cb(true,"pay_day_main")}&nbsp;毎月${f('es_payDay')}日</td>
+          <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;" data-key="82">5. Ngày trả lương</td>
+          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} Hàng tháng ngày ${f('es_payDayEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} Hàng tháng ngày</td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">６．賃金支払方法</td>
+          <td>${cb(true,"pay_bank")}&nbsp;口座振込</td>
+          <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
+        </tr>
+        <tr>
+          <td class="id" style="font-size:7pt;" data-key="85">6. Cách thanh toán lương</td>
+          <td class="id" style="font-size:7pt;" data-key="86">${cb(true,"pay_bank_id")} Chuyển khoản</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(false,"pay_cash_id")} Trả tiền mặt tiền Yên</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">7. Khấu trừ khi thanh toán lương dựa trên hiệp định sử dụng lao động</span></td>
+          <td style="vertical-align:top;">
+            <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
+              <tr><td style="white-space:nowrap;">${cb(false,"taisho_none")}&nbsp;無</td><td style="white-space:nowrap;">${cb(true,"taisho_yes")}&nbsp;有</td></tr>
+              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">${cb(false,"taisho_none_id")} Không</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">${cb(true,"taisho_yes_id")} Có</td></tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</td>
+        </tr>
+      </table>
+      <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
+        <colgroup><col style="width:22%"><col style="width:53%"><col style="width:25%"></colgroup>
+        <tr>
+          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">8. Tăng lương</span></td>
+          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">${cb(true,"cb_auto_013")} Có (thời điểm, số tiền,… ${f('es_raiseConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">${cb(false,"cb_auto_015")} Không</span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">9. Tiền thưởng</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">${cb(true,"cb_auto_017")} Có (thời điểm, số tiền,… ${f('es_bonusConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">${cb(false,"cb_auto_019")} Không</span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">10. Tiền nghỉ việc</span></td>
+          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} Có (thời điểm, số tiền,… )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(true,"cb_auto_022")} Không</span></td>
+        </tr>
+        <tr>
+          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">11. Trợ cấp khi nghỉ phép</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">${cb(true,"cb_auto_024")} Có (tỷ lệ 60%)</span></td>
+          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">${cb(false,"cb_auto_026")} Không</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+  <!-- Ⅷ 退職 -->
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. Các nội dung liên quan đến việc nghỉ việc</span></div>
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">1. Thủ tục nghỉ việc do lý do cá nhân (Báo cáo cho giám đốc/xưởng trưởng ${f('es_resignNoticeDays')} ngày trước khi nghỉ việc)</span></div>
+      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">2. Lý do và thủ tục sa thải</span></div>
+      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">Việc sa thải phải báo trước ít nhất 30 ngày, hoặc phải thanh toán tiền lương trung bình của trên 30 ngày rồi mới sa thải.${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div class="doc">
+<div class="page-num-label">P5</div>
+<div style="border:1px solid #333;">
+<!-- Ⅸ その他 -->
+  <div style="border-top:1px solid #333;padding:6px 12px;">
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. Các nội dung khác</span></div>
+    <div style="font-size:8.5pt;margin-left:8px;">
+      <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
+      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. Tình trạng tham gia bảo hiểm xã hội/tình trạng áp dụng bảo hiểm lao động (${cb(true,"ins_kousei_id")} Tiền lương hưu người lao động, ${cb(true,"ins_kenko_id")} Bảo hiểm sức khỏe, ${cb(true,"ins_koyo_id")} Bảo hiểm tuyển dụng, ${cb(true,"ins_rousai_id")} Bảo hiểm tai nạn lao động,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} Tiền lương hưu quốc gia, ${cb(false,"ins_kokumin_kenko_id")} Bảo hiểm sức khỏe quốc gia, ${cb(false,"ins_other_id")} Khác (</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. Khám sức khỏe khi tuyển dụng:&emsp;tháng ${f('es_healthCheckM')} năm ${f('es_healthCheckY')}</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. Khám sức khỏe định kỳ lần đầu:&emsp;tháng ${f('es_healthCheckM2')} năm ${f('es_healthCheckY2')} (sau đó thực hiện mỗi năm 1 lần)</span></div>
+      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. Đầu mối tư vấn về các nội dung liên quan đến việc cải thiện quản lý tuyển dụng, v.v.</span></div>
+      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">Tên phòng ban&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Chức danh và họ tên người phụ trách&emsp;${f('es_contactPersonEn')}&emsp;(Địa chỉ liên lạc&emsp;${f('es_contactTel')})</span></div>
+      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. Khi bên B về nước sau khi kết thúc hợp đồng này, nếu bên B không thể chi trả chi phí về nước, bên A ngoài việc chịu chi phí về nước đó, còn thực hiện các biện pháp cần thiết để việc về nước được thuận lợi.</span></div>
+    </div>
+  </div>
+
+  <!-- 受取人 -->
+  <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
+    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">Người nhận (ký tên)</span></div>
+    <div class="sign-field-area" style="height:60px;position:relative;">
+      <span class="sign-field-placeholder">← ここに署名</span>
+      <img class="sign-field-img" style="display:none;max-height:56px;">
+    </div>
+  </div>
+
+</div><!-- /outer-border -->
+
+<div style="margin-top:6px;font-size:8pt;">
+  以上のほかは、当社就業規則による。就業規則を確認できる場所や方法（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;本社もしくは各事業所にて確認可能&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br>
+  <span class="id" style="font-size:7.5pt;" data-key="115">Ngoài những điều khoản nêu trên, các điều khoản khác dựa theo Nội quy lao động của công ty. Nơi và phương pháp có thể xác nhận Nội quy lao động</span>
+</div>
+</div>
+<div class="doc">
+<div class="page-num-label">P6</div>
+<!-- ===== 別紙 ===== -->
+<div style="padding:5px 0;margin:20px 0 4px;">
+  <div style="font-size:8pt;font-weight:bold;">参考様式第１－６号　別紙</div>
+  <div style="font-size:7.5pt;">Mẫu Tham Khảo 1-6 Văn bản đi kèm</div>
+  <div style="text-align:center;font-size:10pt;font-weight:bold;margin-top:4px;">賃　金　の　支　払</div>
+  <div style="text-align:center;font-size:8pt;">Thanh toán tiền lương</div>
+</div>
+
+<div style="font-size:8.5pt;">
+  <div style="padding:5px 0;margin-bottom:6px;">
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
+      <colgroup><col style="width:28%"><col style="width:24%"><col style="width:24%"><col style="width:24%"></colgroup>
+      <tr>
+        <td style="font-weight:bold;vertical-align:top;">１．基本賃金<br><span style="font-weight:normal;font-size:8pt;">1. Tiền lương cơ bản</span></td>
+        <td style="vertical-align:top;">${cb(sMonthly,'sal_monthly_a')}&nbsp;月給（${ff('es_salaryMonthly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="116">${cb(sMonthly,'sal_monthly_a_id')} Lương tháng (${ff('es_salaryMonthly')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sDaily,'sal_daily_a')}&nbsp;日給（${ff('es_salaryDaily')}円）<br><span class="id" style="font-size:7.5pt;" data-key="117">${cb(sDaily,'sal_daily_a_id')} Lương ngày (${ff('es_salaryDaily')}JPY)</span></td>
+        <td style="vertical-align:top;">${cb(sHourly,'sal_hourly_a')}&nbsp;時間給（${ff('es_salaryHourly')}円）<br><span class="id" style="font-size:7.5pt;" data-key="118">${cb(sHourly,'sal_hourly_a_id')} Lương giờ (${ff('es_salaryHourly')}JPY)</span></td>
+      </tr>
+      <tr>
+        <td colspan="3" style="padding-top:3px;">※月給・日給の場合の１時間当たりの金額（${ff('es_calcHourly')}円）<br>
+        <span class="id" style="font-size:7.5pt;" data-key="119">※Số tiền cho 1 tiếng trong trường hợp lương tháng/lương ngày&nbsp;&nbsp;&nbsp;(${ff('es_calcHourly')}JPY)</span></td>
+      </tr>
+      <tr>
+        <td colspan="3">※日給・時給の場合の１か月当たりの金額（${ff('es_calcMonthly')}円）<br>
+        <span class="id" style="font-size:7.5pt;" data-key="120">※Số tiền cho 1 tháng trong trường hợp lương ngày/lương giờ&nbsp;&nbsp;&nbsp;(${ff('es_calcMonthly')}JPY)</span></td>
+      </tr>
+    </table>
+
+    <div style="font-size:8.5pt;font-weight:bold;margin-top:6px;margin-bottom:3px;">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;" data-key="121">2. Số tiền và cách tính các khoản trợ cấp (không bao gồm tiền tăng ca ngoài giờ)</span></div>
+    <div style="margin-left:16px;">${annexAllow}</div>
+    
+    <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;" data-key="122">[Nếu có lương làm thêm giờ cố định]</span></div>
+    <div style="margin-left:16px;">
+      <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
+      <div class="id" style="font-size:7.5pt;" data-key="123">(e) (Trợ cấp ${f('es_fixedOTNameEn')}, ${ff('es_fixedOTAmount')} yen</div>
+      <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
+      <div class="id" style="font-size:7.5pt;" data-key="124">・Điều kiện chi trả: Chi trả xem như là trợ cấp làm thêm ngoài giờ cho phần làm việc của ${f('es_fixedOTHours')} tiếng, bất kể có làm việc ngoài giờ hay không.</div>
+      <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
+      <div class="id" style="font-size:7.5pt;" data-key="125">(Chi trả thêm lương tăng ca đối với phần làm thêm ngoài giờ vượt quá ${f('es_fixedOTHours')} tiếng.)</div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;margin-top:6px;">
+    <span style="font-size:8.5pt;font-weight:bold;">３．１か月当たりの支払概算額（１＋２）</span>
+    <span style="white-space:nowrap;">約&emsp;${ff('es_salaryTotal')}円（合計）</span>
+  </div>
+  <div style="display:flex;justify-content:space-between;">
+    <span class="id" style="font-size:7.5pt;" data-key="126">3. Số tiền thanh toán ước tính cho 1 tháng (1+2)</span>
+    <span class="id" style="white-space:nowrap;font-size:7.5pt;" data-key="127">Khoảng ${ff('es_salaryTotal')} yen (tổng)</span>
+  </div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P7</div>
+<div style="font-size:8.5pt;font-weight:bold;margin-top:6px;">４．賃金支払時に控除する項目<br><span style="font-size:8pt;font-weight:normal;">4. Các mục khấu trừ khi thanh toán tiền lương</span></div>
+  <table style="width:100%;font-size:8pt;border-collapse:collapse;">
+    <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
+    <tr>
+      <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;" data-key="128">(a) Tiền thuế</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;" data-key="129">(b) Tiền bảo hiểm xã hội</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;" data-key="130">(c) Tiền bảo hiểm tuyển dụng</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;" data-key="131">(d) Tiền ăn</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;" data-key="132">(e) Tiền nhà</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;" data-key="133">(f) Tiền khác (Tiền nước, điện, ga)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;" data-key="134">(${f('es_deductOther1NameEn')})</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;width:2em;'>約</td><td style='text-align:right;'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>khoảng</td><td style='text-align:right;font-size:7pt;' class='id'>${ff('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>yen</td></tr></table></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="135">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="136">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="137">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="138">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="139">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="140">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="141">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;" data-key="142">khoảng &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; yen</span></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td style="padding-top:3px;"></td>
+      <td style="padding-top:3px;">控除する金額<br><span class="id" style="font-size:7pt;" data-key="143">Số tiền khấu trừ</span></td>
+      <td style="padding-top:3px;text-align:right;">
+        <table style="border-collapse:collapse;width:100%;"><tr>
+          <td style="white-space:nowrap;text-align:right;width:2em;">約</td>
+          <td style="text-align:right;">${ff('es_deductTotal')}</td>
+          <td style="white-space:nowrap;width:4em;">円（合計）</td>
+        </tr><tr>
+          <td style="white-space:nowrap;text-align:right;font-size:7pt;" class="id" data-key="144">Khoảng</td>
+          <td style="text-align:right;font-size:7pt;" class="id" data-key="145">${ff('es_deductTotal')}</td>
+          <td style="white-space:nowrap;font-size:7pt;" class="id" data-key="146">yen (tổng)</td>
+        </tr></table>
+      </td>
+    </tr>
+  </table>
+
+  <div style="display:flex;justify-content:space-between;margin-top:12px;">
+    <span style="font-size:8.5pt;font-weight:bold;">５．手取り支給額（３－４）</span>
+    <table style="border-collapse:collapse;"><tr>
+      <td style="white-space:nowrap;text-align:right;width:2em;">約</td>
+      <td style="text-align:right;">${ff('es_netPay')}</td>
+      <td style="white-space:nowrap;width:4em;">円（合計）</td>
+    </tr><tr>
+      <td style="white-space:nowrap;text-align:right;font-size:7.5pt;" class="id" data-key="147">Khoảng</td>
+      <td style="text-align:right;font-size:7.5pt;" class="id" data-key="148">${ff('es_netPay')}</td>
+      <td style="white-space:nowrap;font-size:7.5pt;" class="id" data-key="149">yen (tổng)</td>
+    </tr></table>
+  </div>
+  <div style="display:flex;justify-content:space-between;">
+    <span class="id" style="font-size:7.5pt;" data-key="150">5. Số tiền thực nhận (3-4)</span>
+    <span></span>
+  </div>
+  <div style="font-size:7.5pt;margin-top:2px;">※欠勤等がない場合であって，時間外労働の割増賃金等は除く。<br>
+  <span class="id" style="font-size:7pt;" data-key="151">*Đây là trường hợp không nghỉ việc, loại trừ tiền tăng ca ngoài giờ.</span></div>
+</div>
+
+`;
+  // フォントサイズを再適用（p()でDOMが再生成されるため）
+  if(_fontSize !== 8.5) _applyFontSize();
+}
+
+// フォームID → DBキーのマッピング（1_6.htmlのフォームID → empSets内のキー名）
+const _FORM_TO_DB = {
+  // officeAddress系
+  'officeAddress':'officeAddr','officeAddressEn':'officeAddrEn',
+  // allowance: フォームはCalc、DBはCond
+  'allowance1Calc':'allowance1Cond','allowance1CalcEn':'allowance1CondEn',
+  'allowance2Calc':'allowance2Cond','allowance2CalcEn':'allowance2CondEn',
+  'allowance3Calc':'allowance3Cond','allowance3CalcEn':'allowance3CondEn',
+  'allowance4Calc':'allowance4Cond','allowance4CalcEn':'allowance4CondEn',
+  // allowance: フォームはAmt、DBはAmount（動的フォームの場合Amtを使用）
+  'allowance1Amount':'allowance1Amt',
+  'allowance2Amount':'allowance2Amt',
+  'allowance3Amount':'allowance3Amt',
+  'allowance4Amount':'allowance4Amt',
+  // deduct
+  'deductSocialIns':'deductSocial','deductEmpIns':'deductEmployment',
+  // fixedOT: DBキーは fixedOTAmount そのまま（変換不要）
+  // salary合計
+  'salaryTotal':'totalMonthly',
+  // 割増率
+  'ot60under':'otRate60','ot60underEn':'otRate60En',
+  'ot60over':'otRate60over','ot60overEn':'otRate60overEn',
+  'otPrescribed':'otRateOver','otPrescribedEn':'otRateOverEn',
+  'nightPremium':'nightRate','nightPremiumEn':'nightRateEn',
+  'holidayLegal':'holidayRateLegal','holidayLegalEn':'holidayRateLegalEn',
+  'holidayNonLegal':'holidayRateNon','holidayNonLegalEn':'holidayRateNonEn',
+  // 諸条件
+  'bonusCondition':'bonusCond','bonusConditionEn':'bonusCondEn',
+  'raiseCondition':'salaryRaiseCond','raiseConditionEn':'salaryRaiseCondEn',
+  // 支払日
+  'payCutoff':'payCutoffDay','payCutoffEn':'payCutoffDayEn',
+  // 休日
+  'otherHolidays':'otherHoliday',
+  // 分フィールド（フォームはMin、DBはMins）
+  'weeklyMin':'weeklyMins','weeklyMinEn':'weeklyMinsEn',
+  'monthlyMin':'monthlyMins','monthlyMinEn':'monthlyMinsEn',
+  'yearlyMin':'yearlyMins','yearlyMinEn':'yearlyMinsEn',
+};
+// DB→フォームの逆引き
+const _DB_TO_FORM = {};
+Object.keys(_FORM_TO_DB).forEach(k=>{ _DB_TO_FORM[_FORM_TO_DB[k]] = k; });
+
+function formKeyToDb(formKey){ return _FORM_TO_DB[formKey] || formKey; }
+function dbKeyToForm(dbKey){ return _DB_TO_FORM[dbKey] || dbKey; }
+
+// すべてのフォームフィールドIDをリストアップ
+function getAllFormFields(){
+  return Array.from(document.querySelectorAll('[id^="es_"]'))
+    .filter(el=>!el.id.includes('${'))
+    .map(el=>el.id.replace('es_',''));
+}
+
+// フォームに値をセット
+function setFormValues(esData){
+  if(!esData) return;
+
+  // ヘルパー：要素に値をセット
+  const set = (id, val) => { const e=document.getElementById(id); if(e && val!=null) e.value=val; };
+  // 日付文字列（YYYY-MM-DD or YYYY/MM/DD）をY/M/Dに分割してセット
+  const setDate = (prefix, val) => {
+    if(!val) return;
+    const m = String(val).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if(m){ set('es_'+prefix+'Y',m[1]); set('es_'+prefix+'M',String(parseInt(m[2]))); set('es_'+prefix+'D',String(parseInt(m[3]))); }
+  };
+
+  // 1. 各DBキーをフォームにマッピング
+  Object.keys(esData).forEach(dbKey=>{
+    let val = esData[dbKey];
+    if(val==null || val==='') return;
+    const formKey = dbKeyToForm(dbKey);
+
+    // 日付系は分割セット
+    if(dbKey==='contractStart'){ setDate('contractStart',val); return; }
+    if(dbKey==='contractEnd')  { setDate('contractEnd',val); return; }
+
+    // 分野・区分: 末尾の（特定技能１号）等を除去
+    if(dbKey==='applicantField'||dbKey==='category'||dbKey==='applicantFieldEn'||dbKey==='categoryEn'){
+      val = String(val).replace(/[（(][^）)]*[）)]/g,'').trim();
+    }
+
+    // allowance動的フォーム（DBキー: allowance1Name → フォームID: es_a1Name）
+    const am = dbKey.match(/^allowance(\d)(Name|NameEn|Amt|Amount|Cond|CondEn)$/);
+    if(am){
+      const n=am[1], part=am[2];
+      const partMap = {Name:'Name',NameEn:'NameEn',Amt:'Amt',Amount:'Amt',Cond:'Calc',CondEn:'CalcEn'};
+      set('es_a'+n+(partMap[part]||part), val);
+      return;
+    }
+
+    // 通常フォーム
+    set('es_'+formKey, val);
+  });
+
+  // 2. 給与形態別セット
+  if(esData.salaryAmt || esData.salaryMonthly){
+    const amt = esData.salaryAmt || esData.salaryMonthly;
+    const st = esData.salaryType || '月給';
+    if(st==='時給'||st==='hourly') set('es_salaryHourly', amt);
+    else if(st==='日給'||st==='daily') set('es_salaryDaily', amt);
+    else set('es_salaryMonthly', amt);
+  }
+
+  // 3. 契約更新（renewal）
+  if(esData.contractRenewal){
+    const rv = esData.contractRenewal;
+    const renewMap = {'自動':'auto','possible':'possible','更新する場合':'possible','なし':'none','none':'none'};
+    const mapped = renewMap[rv] || (rv.includes('自動')?'auto':rv.includes('可能')||rv.includes('あり')?'possible':'none');
+    set('es_renewal', mapped);
+  }
+
+  // 4. applicantName は persons から別途セット済みのため上書きしない
+  p();
+}
+
+// フォームから値を収集してDB用オブジェクトに変換
+function collectFormValues(){
+  const data = {};
+  getAllFormFields().forEach(formKey=>{
+    const el = document.getElementById('es_'+formKey);
+    if(el && el.value.trim()!==''){
+      // 動的手当フォーム (a1Name→allowance1Name, a1Amt→allowance1Amt 等)
+      const am = formKey.match(/^a(\d)(Name|NameEn|Amt|Calc|CalcEn)$/);
+      if(am){
+        const n=am[1], part=am[2];
+        const partMap={Name:'Name',NameEn:'NameEn',Amt:'Amt',Calc:'Cond',CalcEn:'CondEn'};
+        data['allowance'+n+(partMap[part]||part)] = el.value.trim();
+        return;
+      }
+      const dbKey = formKeyToDb(formKey);
+      data[dbKey] = el.value.trim();
+    }
+  });
+  const nameEl = document.getElementById('applicantName');
+  if(nameEl && nameEl.value.trim()) data.applicantName = nameEl.value.trim();
+  return data;
+}
+
+// ===== 案件一覧・絞り込み =====
+// 案件選択時にDBからデータ読込
+async function loadFromDB(){
+  if(_currentDoc==='iko'){ await loadFromDB_iko(); return; }
+  const sel=document.getElementById('caseSelect');
+  if(!sel.value) return;
+  let info;
+  try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  const {caseId, companyId, companyName, empSetIdx, applicantField, applicantFieldEn} = info;
+
+  // ローディング表示
+  const pageArea = document.getElementById('pageArea');
+  if(pageArea){ const old=pageArea.querySelector('.db-loading'); if(old) old.remove(); }
+
+  try{
+    // 1. 案件基本情報 + 人材データ（persons）を同時取得
+    const [cases, persons] = await Promise.all([
+      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx&id=eq.'+caseId),
+      sb('persons?select=*&case_id=eq.'+caseId)
+    ]);
+    const cas = cases && cases[0];
+    const _pdRaw = persons && persons[0];
+    // personsはdataカラム（JSONB）かフラット形式かを両方対応
+    const pd = (_pdRaw && _pdRaw.data) || _pdRaw;
+    // 申請人名（パスポート英語氏名）= persons内 > cases.applicant の順で取得
+    const personName = (pd && (pd.applicant_name_en || pd.applicantNameEn || pd.nameEn)) || (cas && cas.applicant) || '';
+
+    // 2. 所属機関（企業）情報 → emp_sets
+    let esData = null;
+    // companyIdがあればid検索、なければ会社名で検索
+    const _coQuery = companyId
+      ? 'companies?select=id,name,name_en,pref,city,address,address_en,tel,rep_name,rep_title,rep_name_en,rep_title_en,emp_sets&id=eq.'+companyId
+      : companyName
+        ? 'companies?select=id,name,name_en,pref,city,address,address_en,tel,rep_name,rep_title,rep_name_en,rep_title_en,emp_sets&name=eq.'+encodeURIComponent(companyName)
+        : null;
+    if(_coQuery){
+      const cos = await sb(_coQuery);
+      const co = cos && cos[0];
+      if(co){
+        // 所属機関基本情報をセット
+        const _s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+        _s('es_orgName',    co.name||'');
+        _s('es_orgNameEn',  co.name_en||'');
+        _s('es_orgAddress', (co.pref||'')+(co.city||'')+(co.address||''));
+        _s('es_orgAddressEn', co.address_en||'');
+        _s('es_orgTel',     co.tel||'');
+        _s('es_repName',    co.rep_name||'');
+        _s('es_repTitle',   co.rep_title||'');
+        _s('es_repNameEn',  co.rep_name_en||'');
+        _s('es_repTitleEn', co.rep_title_en||'');
+
+        // empSets から指定インデックスの雇用条件を取得
+        const empSets = co.emp_sets || [];
+        const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
+        esData = empSets[idx] || empSets[0] || null;
+
+      }
+    }
+
+    // 3. 申請人名・分野・契約期間
+    const nameEl=document.getElementById('applicantName');
+    if(nameEl && personName) nameEl.value=personName;
+    if(cas){
+      const _stripParens = s => s ? s.replace(/[（(][^）)]*[）)]/g, '').trim() : '';
+      const fieldEl=document.getElementById('es_applicantField'); if(fieldEl && cas.applicant_field) fieldEl.value=_stripParens(cas.applicant_field);
+      const fieldEnEl=document.getElementById('es_applicantFieldEn'); if(fieldEnEl && cas.applicant_field_en) fieldEnEl.value=_stripParens(cas.applicant_field_en);
+    }
+    // personsから契約期間を分割セット（empSetsに入っていないケースの補完）
+    const _setDate=(prefix,val)=>{
+      if(!val) return;
+      const m=String(val).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+      if(!m) return;
+      const _si=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=v;};
+      _si('es_'+prefix+'Y',m[1]);
+      _si('es_'+prefix+'M',String(parseInt(m[2])));
+      _si('es_'+prefix+'D',String(parseInt(m[3])));
+    };
+    if(pd){
+      _setDate('contractStart', pd.contractStart||pd.contract_start);
+      _setDate('contractEnd',   pd.contractEnd||pd.contract_end);
+      _setDate('entry',         pd.entryDate||pd.entry_date);
+    }
+
+    // 4. 雇用条件データをフォームにセット
+    if(esData) setFormValues(esData);
+
+    // 5. 今日の日付を作成日にセット（未入力の場合）
+    const today = new Date();
+    const cyEl=document.getElementById('es_createY'); if(cyEl && !cyEl.value) cyEl.value=today.getFullYear();
+    const cmEl=document.getElementById('es_createM'); if(cmEl && !cmEl.value) cmEl.value=today.getMonth()+1;
+    const cdEl=document.getElementById('es_createD'); if(cdEl && !cdEl.value) cdEl.value=today.getDate();
+
+    p(); // プレビュー更新
+    showToast('✅ データを読み込みました');
+  }catch(e){
+    console.error('DB読込エラー:',e);
+    showToast('⚠️ 読込エラー: '+e.message);
+  }
+}
+
+// DB保存（companies.emp_sets に上書き保存）
+async function saveForm(){
+  const sel=document.getElementById('caseSelect');
+  let info;
+  try{ info=JSON.parse(sel.value); }catch(e){ alert('案件情報が不正です'); return; }
+  const {companyId, empSetIdx} = info;
+
+  try{
+    // 現在のemp_setsを取得
+    const cos = await sb('companies?select=id,emp_sets&id=eq.'+companyId);
+    const co = cos && cos[0];
+
+    const empSets = co.emp_sets ? JSON.parse(JSON.stringify(co.emp_sets)) : [];
+    const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
+
+    // 現在のフォーム値を収集
+    const newData = collectFormValues();
+    newData.setName = (empSets[idx] && empSets[idx].setName) || 'ヒアリング取込';
+    newData._savedAt = new Date().toISOString();
+
+    // 指定インデックスを更新（なければ追加）
+    while(empSets.length <= idx) empSets.push({setName:'条件'+(empSets.length+1)});
+    Object.assign(empSets[idx], newData);
+
+    // Supabaseに保存
+    const res = await sb('companies?id=eq.'+companyId, {
+      method:'PATCH',
+      headers:{'Prefer':'return=minimal'},
+      body:JSON.stringify({emp_sets: empSets})
+    });
+
+    showToast('✅ 保存しました');
+  }catch(e){
+    console.error('DB保存エラー:',e);
+    alert('保存エラー: '+e.message);
+  }
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+// ===== 書類切替 =====
+let _currentDoc = '1_6';
+
+const _DOC_CONFIG = {
+  '1_6': {
+    title: '📄 参考様式第１－６号　雇用条件書（カンボジア語版）',
+    navLabel: '1-6号',
+    pages: ['P1','P2','P3','P4','P5','P6','P7'],
+    tabId: 'tab-1_6',
+    fpId: 'fp-1_6',
+  },
+  'iko': {
+    title: '📄 移行準備説明書（特定活動→特定技能１号）',
+    navLabel: '移行準備',
+    pages: ['P1'],
+    tabId: 'tab-iko',
+    fpId: 'fp-iko',
+  }
+};
+
+function switchDoc(key){
+  if(_currentDoc===key) return;
+  _currentDoc=key;
+  const cfg=_DOC_CONFIG[key];
+
+  // タイトル更新
+  const titleEl=document.getElementById('docTitle');
+  if(titleEl) titleEl.textContent=cfg.title;
+  const navLbl=document.getElementById('docNavLabel');
+  if(navLbl) navLbl.textContent=cfg.navLabel;
+
+  // タブ見た目
+  Object.keys(_DOC_CONFIG).forEach(k=>{
+    const btn=document.getElementById(_DOC_CONFIG[k].tabId);
+    if(btn){ btn.style.background=k===key?'#1a2e4a':'#e2e8f0'; btn.style.color=k===key?'white':'#555'; }
+  });
+
+  // フォームパネル切替
+  Object.keys(_DOC_CONFIG).forEach(k=>{
+    const el=document.getElementById(_DOC_CONFIG[k].fpId);
+    if(el) el.style.display=k===key?'':'none';
+  });
+
+  // ページナビ更新
+  const pnav=document.getElementById('pageNav');
+  if(pnav){
+    const existing=pnav.querySelectorAll('.pn-btn-page');
+    existing.forEach(b=>b.remove());
+    const afterLabel=pnav.querySelector('.page-nav-label');
+    cfg.pages.forEach((pg,i)=>{
+      const btn=document.createElement('button');
+      btn.className='pn-btn pn-btn-page'+(i===0?' active':'');
+      btn.textContent=pg;
+      btn.onclick=()=>scrollToPage(i+1);
+      afterLabel.after(btn);
+    });
+    // activeをリセット
+    pnav.querySelectorAll('.pn-btn-page').forEach((b,i)=>b.classList.toggle('active',i===0));
+  }
+
+  // 保存ボタン表示切替
+  const saveBtn=document.querySelector('.btn-save');
+  if(saveBtn) saveBtn.style.display=key==='1_6'?'':'none';
+
+  // プレビュー再描画
+  p();
+}
+
+function p_iko(){
+  if(_editMode) return; // 直接編集中はブロック
+  const w=document.getElementById('pageArea');
+  if(!w) return;
+  const skillVal = document.getElementById('f_skill')?.value||'';
+
+  w.innerHTML=`
+<div class="doc">
+<div style="text-align:center;font-size:9pt;margin-bottom:4px;">＜特定技能１号への申請予定者のための「特定活動」用＞</div>
+<div style="text-align:center;font-size:14pt;font-weight:bold;letter-spacing:8px;margin:8px 0 16px;">説　　明　　書</div>
+
+<div style="padding-left:2em;margin-bottom:12px;">
+  <div>国籍・地域　　　${f('f_nationality')}</div>
+  <div>氏　　　名　　　${f('f_name')}</div>
+  <div style="margin-top:8px;">上記の者を受け入れるに当たって，下記のとおりの事実に相違ありません。</div>
+  <div style="text-align:center;margin:4px 0;">記</div>
+</div>
+
+<div style="margin-bottom:10px;">
+  <div style="font-weight:bold;">１　在留期間の満了日までに「特定技能１号」への在留資格変更許可申請をすることができない事情</div>
+  <div style="border:1px solid #555;padding:8px 12px;margin-top:6px;font-size:10pt;line-height:1.9;">
+    この度弊社で特定技能１号として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（書類準備等）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考えております。<br>
+    また、弊社で${f('f_field')}に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。
+  </div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">２　今次の受入れ機関において特定技能外国人として在留資格「特定技能１号」に該当する業務に従事するために同在留資格への在留資格変更許可申請を予定していること</div>
+  <div class="indent1">
+    <div>${cb(true)}　該当　${cb(false)}　非該当</div>
+    <div>※　特定産業分野名：${ul('　'+f('f_field')+'　')}　／　業務区分：${ul('　'+f('f_category')+'　')}</div>
+    <div style="font-size:9pt;">（注）特定技能制度における特定産業分野及び業務区分を記載すること。</div>
+  </div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">３　申請人が今次の受入れ機関との契約に基づいて在留資格「特定技能１号」で従事する予定の業務と同様のものに従事すること</div>
+  <div class="indent1">${cb(true)}　該当　${cb(false)}　非該当</div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">４　申請人が特定技能外国人として就労する場合に支払われる予定の報酬と同額，かつ，日本人が従事する場合と同等額以上の報酬を受けること</div>
+  <div class="indent1">${cb(true)}　該当　${cb(false)}　非該当</div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">５　申請人が特定技能外国人として業務に従事するために必要な技能試験及び日本語試験に合格していること（技能実習２号良好修了者等として試験免除となる場合を含む。）（次の（１）から（４）までのいずれかに該当していること）</div>
+  <div class="indent1">
+    ${cb(!!skillVal)}　該当（該当する番号：${f('f_skill')}　）　${cb(false)}　非該当
+  </div>
+  <div class="indent1 note">
+    <div>（１）試験（技能試験及び日本語試験）合格者</div>
+    <div>（２）技能実習２号良好修了者</div>
+    <div>（３）介護福祉士養成施設卒業者</div>
+    <div>（４）ＥＰＡ介護福祉士候補者（４年間満了）</div>
+  </div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">６　今次の受入れ機関又は支援委託予定先が申請人の在留中の日常生活等に係る支援を適切に行うことが見込まれること（次の（１）から（３）までのいずれかに該当していること）</div>
+  <div class="indent1 note">
+    <div style="margin-top:4px;">（１）過去２年間に外国人の受入れ又は管理を適正に行った実績があること</div>
+    <div class="indent1">${cb(false)}　該当　${cb(false)}　非該当</div>
+    <div style="margin-top:4px;">（２）今次の受入れ機関の役職員の中から，過去２年間に外国人の生活相談に従事した経験がある者を選任していること</div>
+    <div class="indent1">${cb(false)}　該当　${cb(false)}　非該当</div>
+    <div style="margin-top:4px;">（３）申請人の在留中の日常生活等に係る支援を行うことについて，登録支援機関に委託していること</div>
+    <div class="indent1">
+      ${cb(true)}　該当　${cb(false)}　非該当
+    </div>
+    <div class="indent1">
+      登録支援機関　名称：${ul('　'+f('f_soName')+'　')}　登録番号：${ul(f('f_soNo')+'　')}
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom:8px;">
+  <div style="font-weight:bold;">７　今次の受入れ機関が，申請人を適正に受け入れることが見込まれること</div>
+  <div class="indent1">${cb(true)}　該当　${cb(false)}　非該当</div>
+</div>
+
+<div style="font-size:8.5pt;margin-top:8px;border-top:1px solid #333;padding-top:6px;">
+  <div>（注１）上記２から７までについて該当するものにチェックマークを付し，必要な事項を記入してください。</div>
+  <div>（注２）本説明書に虚偽の記載があった場合には，入管法に関し，不正又は著しく不当な行為を行ったものとして，特定技能外国人等の受入れができないこととなることがあります。</div>
+  <div>（注３）本件申請に対して許可される在留資格「特定活動」は，あくまで在留資格「特定技能１号」への在留資格変更許可申請に係る準備のための在留資格であることから，許可がされたからといって在留資格「特定技能１号」への許可の基準に適合していることを確認するものではありません。</div>
+</div>
+
+<div style="margin-top:16px;text-align:right;">
+  <div>${f('f_date')}</div>
+  <div>受入れ機関名　　　　　${f('f_orgName')}</div>
+</div>
+</div>`;
+}
+
+
+
+console.log('%c OFUSA 書類作成システム %c ver.20260415.68 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+initCaseSelect();
+p();
+
+setupPageTracker();
+
+</script>
+
+
+
+</body>
+</html>
