@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－３号別紙（英語）受診者の申告書</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776316942">
+<style>
+.doc{padding:20mm!important;line-height:1.8!important;min-height:auto!important}
+.id{color:#555;font-size:0.88em;}
+.doc-title{text-align:center;font-size:14pt;font-weight:bold;margin-bottom:15mm;}
+.section-title{font-size:12pt;font-weight:bold;margin:8mm 0 5mm 0;text-align:center;}
+.body-text{font-size:11pt;line-height:2;margin-bottom:15mm;}
+.date-line{font-size:11pt;margin-bottom:8mm;}
+.date-field{display:inline-block;min-width:3em;border-bottom:1px solid #000;text-align:center;padding:0 4px;}
+.sig-line{font-size:11pt;border-bottom:1px solid #000;display:inline-block;min-width:60%;padding-bottom:3mm;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－３号別紙（英語）　受診者の申告書</div>
+    <div class="ver">ver.20260419.001</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷</button>
+  </div>
+</div>
+
+<div class="main">
+<div class="fp">
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>作成年月日</label><input id="f_docDate" type="date" oninput="p()"></div>
+      <div class="fg"><label>申請人氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs-note">
+      <small>※ 作成年月日と氏名は案件管理システムから自動取得されます。必要に応じて編集してください。</small>
+    </div>
+  </div>
+</div>
+
+<div class="doc">
+
+<div class="doc-title">
+  参考様式第１－３号（別紙）<br>
+  <span class="id" style="font-size:11pt;">Reference Form No. 1-3 (Attachment)</span>
+</div>
+
+<div class="section-title">
+  受診者の申告書<br>
+  <span class="id" style="font-size:10pt;font-weight:normal;">Examiner's declaration form</span>
+</div>
+
+<div class="body-text">
+  私は，通院歴，入院歴，手術歴，投薬歴の全てを医師に申告した上で，医師の診断を受けました。<br>
+  <span class="id">I reported the history of hospitalization, hospitalization, surgery, and medication to the doctor, and then received a diagnosis from the doctor.</span>
+</div>
+
+<div class="date-line" style="text-align:right;margin-right:10mm;">
+  作成年月日
+  <span class="date-field" id="p_docYear">&nbsp;</span> 年
+  <span class="date-field" id="p_docMonth">&nbsp;</span> 月
+  <span class="date-field" id="p_docDay">&nbsp;</span> 日
+  <br>
+  <span class="id">Date of creation: Day Month Year</span>
+</div>
+
+<div style="margin-top:20mm;">
+  <div style="margin-bottom:3mm;">
+    申請人の署名<br>
+    <span class="id">Applicant's signature</span>
+  </div>
+  <div style="display:flex;align-items:flex-end;">
+    <div style="width:30mm;font-size:10pt;">氏名：</div>
+    <div class="sig-line" id="p_applicant">&nbsp;</div>
+  </div>
+</div>
+
+</div><!-- /.doc -->
+</div><!-- /.main -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
+const IDX_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+const _sb = window.supabase.createClient(IDX_URL, IDX_KEY);
+
+// 親index.htmlからの案件選択を受信
+var currentCase = null;
+
+window.addEventListener("message", async function(e){
+  var d = e.data;
+  if(!d || d.type !== "SELECT_CASE" || !d.info) return;
+  var info = d.info;
+  try {
+    // 案件取得
+    var caseRes = await _sb.from("cases").select("*").eq("id", info.caseId).single();
+    if(caseRes.error) throw new Error(caseRes.error.message);
+    currentCase = caseRes.data;
+
+    // 人材データ（氏名用）
+    var pRes = await _sb.from("persons").select("*").eq("case_id", info.caseId).limit(1);
+    var pRow = (pRes.data && pRes.data.length) ? pRes.data[0] : null;
+
+    // フォームに反映
+    var docDate = currentCase.doc_create_date || '';
+    if(docDate){
+      // YYYY-MM-DD または YYYY/MM/DD 形式を date input に
+      docDate = docDate.replace(/\//g, '-').substring(0, 10);
+      document.getElementById('f_docDate').value = docDate;
+    }
+
+    // 申請人氏名（ローマ字優先）
+    var name = '';
+    if(pRow){
+      name = pRow.applicant_name_en || currentCase.applicant || '';
+    } else {
+      name = currentCase.applicant || '';
+    }
+    document.getElementById('f_applicant').value = name;
+
+    p(); // プレビュー更新
+  } catch(err){
+    console.error(err);
+    alert("案件データ取得失敗: " + err.message);
+  }
+});
+
+// プレビュー更新
+function p(){
+  var docDate = document.getElementById('f_docDate').value;
+  var y='', m='', d='';
+  if(docDate){
+    var parts = docDate.split('-');
+    y = parts[0] || '';
+    m = parts[1] ? String(parseInt(parts[1], 10)) : '';
+    d = parts[2] ? String(parseInt(parts[2], 10)) : '';
+  }
+  document.getElementById('p_docYear').textContent = y || '\u3000\u3000';
+  document.getElementById('p_docMonth').textContent = m || '\u3000\u3000';
+  document.getElementById('p_docDay').textContent = d || '\u3000\u3000';
+
+  var name = document.getElementById('f_applicant').value;
+  document.getElementById('p_applicant').textContent = name || '\u00a0';
+}
+
+function doPrint(){
+  window.print();
+}
+
+// 初回プレビュー描画
+p();
+</script>
+</body>
+</html>
