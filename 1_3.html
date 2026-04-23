@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３号（別紙）　受診者の申告書</div>
-    <div class="ver">ver.20260423.002</div>
+    <div class="ver">ver.20260423.003</div>
   </div>
 </div>
 
@@ -89,6 +89,13 @@ function downloadCurrent(){
 
 // 初期表示
 showLang('id');
+
+// 親index.htmlからのグローバル言語変更メッセージを受信
+window.addEventListener('message', function(e){
+  const d = e.data;
+  if(!d || d.type !== 'SET_LANG' || !d.lang) return;
+  if(PDF_FILES[d.lang]) showLang(d.lang);
+});
 </script>
 
 </body>

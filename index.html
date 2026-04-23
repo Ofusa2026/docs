@@ -39,6 +39,11 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .case-panel label{font-size:9px;font-weight:700;color:#64748b;display:block;margin-bottom:2px;margin-top:6px;}
 .case-panel select,.case-panel input{width:100%;padding:4px;border:1px solid #334155;border-radius:3px;font-size:11px;background:#1e293b;color:#e2e8f0;box-sizing:border-box;}
 .case-badge{display:inline-block;background:#3b82f6;color:white;border-radius:10px;padding:1px 7px;font-size:9px;margin-left:4px;font-weight:700;}
+.global-lang-btns{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;}
+.glbtn{background:#334155;border:1px solid #475569;color:#e2e8f0;padding:3px 5px;border-radius:3px;cursor:pointer;font-size:14px;line-height:1;transition:all 0.15s;min-width:28px;}
+.glbtn:hover{background:#475569;}
+.glbtn.active{background:#3b82f6;border-color:#2563eb;box-shadow:0 0 0 1px rgba(59,130,246,0.4);}
+.glbtn.unsupported{opacity:0.35;}
 </style>
 </head>
 <body>
@@ -57,6 +62,19 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <input id="idx_filterText" placeholder="案件名・申請人・所属機関・国籍" oninput="idxFilterCases()">
       <label>👤 案件選択 <span class="case-badge" id="idx_caseCount">-</span></label>
       <select id="idx_caseSelect" size="1" onchange="idxCaseSelected()"></select>
+      <label style="margin-top:6px;">🌐 言語（書類全体に適用）</label>
+      <div class="global-lang-btns" id="globalLangBtns">
+        <button class="glbtn" data-lang="ja" onclick="setGlobalLang('ja')" title="日本語">🇯🇵</button>
+        <button class="glbtn active" data-lang="id" onclick="setGlobalLang('id')" title="インドネシア語">🇮🇩</button>
+        <button class="glbtn" data-lang="vi" onclick="setGlobalLang('vi')" title="ベトナム語">🇻🇳</button>
+        <button class="glbtn" data-lang="th" onclick="setGlobalLang('th')" title="タイ語">🇹🇭</button>
+        <button class="glbtn" data-lang="ne" onclick="setGlobalLang('ne')" title="ネパール語">🇳🇵</button>
+        <button class="glbtn" data-lang="my" onclick="setGlobalLang('my')" title="ミャンマー語">🇲🇲</button>
+        <button class="glbtn" data-lang="km" onclick="setGlobalLang('km')" title="カンボジア語">🇰🇭</button>
+        <button class="glbtn" data-lang="en" onclick="setGlobalLang('en')" title="英語">🇬🇧</button>
+        <button class="glbtn" data-lang="ko" onclick="setGlobalLang('ko')" title="韓国語">🇰🇷</button>
+        <button class="glbtn" data-lang="zh" onclick="setGlobalLang('zh')" title="中国語">🇨🇳</button>
+      </div>
     </div>
     <div class="section">特定技能</div>
     <div class="item" id="nav-1_3" onclick="open_doc('1_3')">
@@ -67,49 +85,17 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>参考様式第１－４号<span class="item-sub">報酬に関する説明書</span></div>
     </div>
-    <div class="item" id="nav-1_5" onclick="open_1_5('id')">
+    <div class="item" id="nav-1_5" onclick="open_1_5()">
       <span class="item-icon">📝</span>
       <div>参考様式第１－５号<span class="item-sub">雇用契約書</span></div>
     </div>
-    <div class="lang-btns-side" id="langbtns-1_5">
-      <button class="lbtn active" onclick="open_1_5('id');event.stopPropagation()">🇮🇩</button>
-      <button class="lbtn" onclick="open_1_5('vi');event.stopPropagation()">🇻🇳</button>
-      <button class="lbtn" onclick="open_1_5('th');event.stopPropagation()">🇹🇭</button>
-      <button class="lbtn" onclick="open_1_5('ne');event.stopPropagation()">🇳🇵</button>
-      <button class="lbtn" onclick="open_1_5('my');event.stopPropagation()">🇲🇲</button>
-      <button class="lbtn" onclick="open_1_5('km');event.stopPropagation()">🇰🇭</button>
-      <button class="lbtn" onclick="open_1_5('en');event.stopPropagation()">🇬🇧</button>
-      <button class="lbtn" onclick="open_1_5('ko');event.stopPropagation()">🇰🇷</button>
-      <button class="lbtn" onclick="open_1_5('zh');event.stopPropagation()">🇨🇳</button>
-    </div>
-    <div class="item" id="nav-1_6" onclick="open_1_6('id')">
+    <div class="item" id="nav-1_6" onclick="open_1_6()">
       <span class="item-icon">📋</span>
       <div>参考様式第１－６号<span class="item-sub">雇用条件書</span></div>
     </div>
-    <div class="lang-btns-side" id="langbtns-1_6">
-      <button class="lbtn active" onclick="open_1_6('id');event.stopPropagation()">🇮🇩</button>
-      <button class="lbtn" onclick="open_1_6('vi');event.stopPropagation()">🇻🇳</button>
-      <button class="lbtn" onclick="open_1_6('th');event.stopPropagation()">🇹🇭</button>
-      <button class="lbtn" onclick="open_1_6('ne');event.stopPropagation()">🇳🇵</button>
-      <button class="lbtn" onclick="open_1_6('my');event.stopPropagation()">🇲🇲</button>
-      <button class="lbtn" onclick="open_1_6('km');event.stopPropagation()">🇰🇭</button>
-      <button class="lbtn" onclick="open_1_6('en');event.stopPropagation()">🇬🇧</button>
-      <button class="lbtn" onclick="open_1_6('ko');event.stopPropagation()">🇰🇷</button>
-    </div>
-    <div class="item" id="nav-1_16" onclick="open_1_16('id')">
+    <div class="item" id="nav-1_16" onclick="open_1_16()">
       <span class="item-icon">💼</span>
       <div>参考様式第１－１６号<span class="item-sub">雇用の経緯に係る説明書</span></div>
-    </div>
-    <div class="lang-btns-side" id="langbtns-1_16">
-      <button class="lbtn active" onclick="open_1_16('id');event.stopPropagation()">🇮🇩</button>
-      <button class="lbtn" onclick="open_1_16('vi');event.stopPropagation()">🇻🇳</button>
-      <button class="lbtn" onclick="open_1_16('th');event.stopPropagation()">🇹🇭</button>
-      <button class="lbtn" onclick="open_1_16('ne');event.stopPropagation()">🇳🇵</button>
-      <button class="lbtn" onclick="open_1_16('my');event.stopPropagation()">🇲🇲</button>
-      <button class="lbtn" onclick="open_1_16('km');event.stopPropagation()">🇰🇭</button>
-      <button class="lbtn" onclick="open_1_16('en');event.stopPropagation()">🇬🇧</button>
-      <button class="lbtn" onclick="open_1_16('ko');event.stopPropagation()">🇰🇷</button>
-      <button class="lbtn" onclick="open_1_16('zh');event.stopPropagation()">🇨🇳</button>
     </div>
     <div class="item" id="nav-1_17" onclick="open_doc('1_17')">
       <span class="item-icon">📖</span>
@@ -139,14 +125,9 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="divider"></div>
     <div class="section">国交省</div>
-    <div class="item" id="nav-juuyou" onclick="open_juuyou('id')">
+    <div class="item" id="nav-juuyou" onclick="open_juuyou()">
       <span class="item-icon">📑</span>
       <div>様式第２（第３条関係）<span class="item-sub">重要事項事前説明書</span></div>
-    </div>
-    <div class="lang-btns-side" id="langbtns-juuyou">
-      <button class="lbtn active" onclick="open_juuyou('id');event.stopPropagation()">🇮🇩</button>
-      <button class="lbtn" onclick="open_juuyou('vi');event.stopPropagation()">🇻🇳</button>
-      <button class="lbtn" onclick="open_juuyou('my');event.stopPropagation()">🇲🇲</button>
     </div>
     <div class="divider"></div>
     <div class="section">その他</div>
@@ -221,7 +202,7 @@ const docs={
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1776316942'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1776316942'},
   '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1776316942'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1776908908'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1776925182'},
   '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1776316942'},
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1776317436'},
   '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1776321090'},
@@ -239,6 +220,49 @@ const docs={
   '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1776392009'},
   '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1776392009'},
 };
+
+/* ========== グローバル言語管理 ========== */
+// 全書類で共有する現在の言語。書類ごとに対応していない言語はフォールバック
+let currentLang = 'id';
+// 各書類の対応言語リスト（LANG_FILES_xxx に存在するキーと対応）
+// この順で先頭を「デフォルト/フォールバック言語」とする
+const DOC_LANG_SUPPORT = {
+  '1_3':  ['id','vi','th','km','my','en'],     // PDF方式
+  '1_5':  ['id','vi','th','ne','my','km','en','ko','zh'],
+  '1_6':  ['id','vi','th','ne','my','km','en','ko'],
+  '1_16': ['id','vi','th','ne','my','km','en','ko','zh'],
+  'juuyou':['id','vi','my'],
+};
+// 日本語(ja) は多くの書類でデフォルト版（ID版）を流用表示する扱い
+// → resolveLangForDoc で 'ja' → その書類の先頭言語 にフォールバック
+function resolveLangForDoc(docKey, lang){
+  const supported = DOC_LANG_SUPPORT[docKey] || [];
+  if(supported.includes(lang)) return lang;
+  // フォールバック優先順: en → id → 先頭
+  if(supported.includes('en')) return 'en';
+  if(supported.includes('id')) return 'id';
+  return supported[0];
+}
+// グローバル言語を変更し、現在開いている書類に即時反映
+function setGlobalLang(lang){
+  currentLang = lang;
+  // ボタンのアクティブ状態更新
+  document.querySelectorAll('#globalLangBtns .glbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang===lang);
+  });
+  // 現在開いている書類を再ロード
+  if(cur==='1_3') open_doc('1_3');
+  else if(cur==='1_5') open_1_5();
+  else if(cur==='1_6') open_1_6();
+  else if(cur==='1_16') open_1_16();
+  else if(cur==='juuyou') open_juuyou();
+  // 1_3 は postMessage でも通知（PDFプレビュー切替用）
+  const fr1_3=document.getElementById('frame-1_3');
+  if(fr1_3 && fr1_3.style.display!=='none'){
+    try{fr1_3.contentWindow.postMessage({type:'SET_LANG',lang:resolveLangForDoc('1_3',lang)},'*');}catch(e){}
+  }
+}
+
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
   'id':'1_5.html?v=1776404437',
@@ -252,12 +276,9 @@ const LANG_FILES_1_5={
   'zh':'1_5_zh.html?v=1776404437',
 };
 function open_1_5(lang){
-  cur1_5Lang=lang;
-  // ボタンのactive切り替え（1_5関連のみ）
-  document.querySelectorAll('#langbtns-1_5 .lbtn,.lbtn-card').forEach(b=>{
-    if(b.getAttribute('onclick')?.includes('open_1_5')) b.classList.remove('active');
-  });
-  document.querySelectorAll(`#langbtns-1_5 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_5('${lang}')"]`).forEach(b=>b.classList.add('active'));
+  lang = lang || currentLang;
+  const resolvedLang = resolveLangForDoc('1_5', lang);
+  cur1_5Lang=resolvedLang;
   // サイドバーactive
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-1_5')?.classList.add('active');
@@ -278,7 +299,7 @@ function open_1_5(lang){
   if(frJ) frJ.style.display='none';
   // 1_5 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_5');
-  fr.src=LANG_FILES_1_5[lang];
+  fr.src=LANG_FILES_1_5[resolvedLang];
   fr.style.display='block';
   cur='1_5';
   // 案件選択済みなら送信
@@ -299,12 +320,9 @@ const LANG_FILES={
   'ko':'1_6_ko.html?v=1776356990',
 };
 function open_1_6(lang){
-  cur1_6Lang=lang;
-  // ボタンのactive切り替え（1_6関連のみ）
-  document.querySelectorAll('#langbtns-1_6 .lbtn,.lbtn-card').forEach(b=>{
-    if(b.getAttribute('onclick')?.includes('open_1_6')) b.classList.remove('active');
-  });
-  document.querySelectorAll(`#langbtns-1_6 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_6('${lang}')"]`).forEach(b=>b.classList.add('active'));
+  lang = lang || currentLang;
+  const resolvedLang = resolveLangForDoc('1_6', lang);
+  cur1_6Lang=resolvedLang;
   // サイドバーactive
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-1_6')?.classList.add('active');
@@ -325,7 +343,7 @@ function open_1_6(lang){
   if(frJ) frJ.style.display='none';
   // 1_6 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_6');
-  fr.src=LANG_FILES[lang];
+  fr.src=LANG_FILES[resolvedLang];
   fr.style.display='block';
   cur='1_6';
   // 案件選択済みなら送信
@@ -347,12 +365,9 @@ const LANG_FILES_1_16={
   'zh':'1_16_zh.html?v=1776908908',
 };
 function open_1_16(lang){
-  cur1_16Lang=lang;
-  // ボタンのactive切り替え（1_16関連のみ）
-  document.querySelectorAll('#langbtns-1_16 .lbtn,.lbtn-card').forEach(b=>{
-    if(b.getAttribute('onclick')?.includes('open_1_16')) b.classList.remove('active');
-  });
-  document.querySelectorAll(`#langbtns-1_16 .lbtn[onclick*="'${lang}'"],.lbtn-card[onclick*="open_1_16('${lang}')"]`).forEach(b=>b.classList.add('active'));
+  lang = lang || currentLang;
+  const resolvedLang = resolveLangForDoc('1_16', lang);
+  cur1_16Lang=resolvedLang;
   // サイドバーactive
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-1_16')?.classList.add('active');
@@ -369,7 +384,7 @@ function open_1_16(lang){
   });
   // 1_16 iframeを表示・言語ファイルをセット
   const fr=document.getElementById('frame-1_16');
-  fr.src=LANG_FILES_1_16[lang];
+  fr.src=LANG_FILES_1_16[resolvedLang];
   fr.style.display='block';
   cur='1_16';
   // 案件選択済みなら送信
@@ -385,10 +400,9 @@ const LANG_FILES_JUUYOU={
   'my':'juuyou_my.html',
 };
 function open_juuyou(lang){
-  curJuuyouLang=lang;
-  // ボタンのactive切り替え（juuyou関連のみ）
-  document.querySelectorAll('#langbtns-juuyou .lbtn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll(`#langbtns-juuyou .lbtn[onclick*="'${lang}'"]`).forEach(b=>b.classList.add('active'));
+  lang = lang || currentLang;
+  const resolvedLang = resolveLangForDoc('juuyou', lang);
+  curJuuyouLang=resolvedLang;
   // サイドバーactive
   document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
   document.getElementById('nav-juuyou')?.classList.add('active');
@@ -407,7 +421,7 @@ function open_juuyou(lang){
   if(fr1_16_c) fr1_16_c.style.display='none';
   // juuyou iframeを表示
   const fr=document.getElementById('frame-juuyou');
-  fr.src=LANG_FILES_JUUYOU[lang];
+  fr.src=LANG_FILES_JUUYOU[resolvedLang];
   fr.style.display='block';
   cur='juuyou';
   if(idxSelectedCase){
