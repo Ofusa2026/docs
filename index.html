@@ -49,7 +49,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260423.001</span></div>
+  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260423.002</span></div>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -525,7 +525,7 @@ function idxFilterCases(){
     (c.nationality||'').toLowerCase().includes(text)
   );
   const sel=document.getElementById('idx_caseSelect');
-  if(sel) sel.innerHTML='<option value="">← 案件を選択</option>'+filtered.map(c=>`<option value='${JSON.stringify({caseId:c.id,companyId:c.company_id,companyName:c.org,empSetIdx:c.emp_set_idx||0})}'>${c.applicant||c.name||c.id}</option>`).join('');
+  if(sel) sel.innerHTML='<option value="">← 案件を選択</option>'+filtered.map(c=>`<option value='${JSON.stringify({caseId:c.id,companyId:c.company_id,companyName:c.company||c.org,orgName:c.org,empSetIdx:c.emp_set_idx||0})}'>${c.applicant||c.name||c.id}</option>`).join('');
   const badge=document.getElementById('idx_caseCount');
   if(badge) badge.textContent=filtered.length+'件';
 }
