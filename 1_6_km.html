@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.003</div>
+    <div class="ver">ver.20260423.004</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -372,8 +372,8 @@ function p(){
     const nEn=v('es_a'+i+'NameEn');
     const nEnVal=nEn||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}NameEn</span>`;
     const nEnSpan=`<span class="f">${nEnVal}</span>`;
-    if(i<=2) allowLineId1+=`（Trợ cấp　${nEnSpan}），`;
-    else allowLineId2+=`（Trợ cấp　${nEnSpan}），`;
+    if(i<=2) allowLineId1+=`（ប្រាក់ឧបត្ថម្ភ　${nEnSpan}），`;
+    else allowLineId2+=`（ប្រាក់ឧបត្ថម្ភ　${nEnSpan}），`;
   }
 
   // 手当（別紙用）
