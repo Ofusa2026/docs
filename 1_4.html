@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260423.002</div>
+    <div class="ver">ver.20260423.003</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -189,11 +189,16 @@ function fitDocToPreview(){
 }
 window.addEventListener('resize', fitDocToPreview);
 
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info||!info.caseId){ console.warn('[1_4] no caseId'); return; }
   const {caseId,companyId,companyName}=info;
+  console.log('[1_4] loadFromDB: caseId='+caseId+' companyId='+companyId+' companyName='+companyName);
   try{
     const [cases,cos]=await Promise.all([
       sb('cases?select=applicant,company,org,emp_set_idx&id=eq.'+caseId),
@@ -245,10 +250,10 @@ window.addEventListener('message', function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
   const info=e.data.info;
   if(!info||!info.caseId) return;
-  // caseSelectに値をセットしてloadFromDB()を呼ぶ
+  console.log('[1_4] SELECT_CASE received:', info);
+  // caseSelect にも一応セット（UI整合のため）
   const sel=document.getElementById('caseSelect');
   if(sel){
-    // 既存のoptionを探すかなければ追加
     let found=false;
     for(let o of sel.options){
       try{
@@ -264,7 +269,8 @@ window.addEventListener('message', function(e){
       sel.value=opt.value;
     }
   }
-  if(typeof loadFromDB==='function') loadFromDB();
+  // info を直接渡して loadFromDB
+  if(typeof loadFromDB==='function') loadFromDB(info);
 });
 </script>
 </body>
