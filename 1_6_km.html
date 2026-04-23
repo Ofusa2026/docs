@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.004</div>
+    <div class="ver">ver.20260423.005</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -639,15 +639,15 @@ function p(){
           <td colspan="3" style="vertical-align:top;padding-bottom:0;">３．所定時間外，休日又は深夜労働に対して支払われる割増賃金率</td>
         </tr>
         <tr>
-          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">3. Tỷ suất lương ngoài giờ trả cho lao động vào ngày nghỉ hoặc ban đêm ngoài thời gian quy định</td>
+          <td colspan="3" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="71">3. អត្រាប្រាក់ឈ្នួលបន្ថែមដែលបង់សម្រាប់ការងារខាងក្រៅម៉ោងកំណត់ ថ្ងៃឈប់សម្រាក ឬការងារពេលយប់</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(1) 所定時間外</td>
           <td colspan="2">法定超月60時間以内（${f('es_ot60under')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">(1) Làm thêm ngoài giờ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">Vượt thời gian luật định dưới 60 tiếng trong tháng (${f('es_ot60under')}) ％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="72">(1) ការងារខាងក្រៅម៉ោងកំណត់</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="73">ហួសម៉ោងកំណត់តាមច្បាប់មិនលើសពី 60 ម៉ោងក្នុងមួយខែ (${f('es_ot60under')}) ％</td>
         </tr>
         <tr>
           <td></td>
@@ -655,22 +655,22 @@ function p(){
         </tr>
         <tr>
           <td></td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">Vượt thời gian luật định trên 60 tiếng trong tháng (${f('es_ot60over')}) ％&emsp;Vượt thời gian quy định (${f('es_otPrescribed')}) ％</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="74">ហួសម៉ោងកំណត់តាមច្បាប់លើសពី 60 ម៉ោងក្នុងមួយខែ (${f('es_ot60over')}) ％&emsp;ហួសម៉ោងកំណត់ (${f('es_otPrescribed')}) ％</span></td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(2) 休日</td>
           <td colspan="2">法定休日（${f('es_holidayLegal')}％）&emsp;法定外休日（${f('es_holidayNonLegal')}％）</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">(2) Làm việc ngày nghỉ</td>
-          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">Ngày nghỉ luật định(${f('es_holidayLegal')})％，ngày nghỉ ngoài luật định(${f('es_holidayNonLegal')})％</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="75">(2) ការងារនៅថ្ងៃឈប់សម្រាក</td>
+          <td colspan="2" class="id" style="font-size:7pt;padding-bottom:2px;" data-key="76">ថ្ងៃឈប់សម្រាកតាមច្បាប់(${f('es_holidayLegal')})％, ថ្ងៃឈប់សម្រាកខាងក្រៅច្បាប់(${f('es_holidayNonLegal')})％</td>
         </tr>
         <tr>
           <td style="padding-left:8px;vertical-align:top;">(3) 深夜</td>
           <td colspan="2">（${f('es_nightPremium')}）％</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">(3) Làm việc ban đêm</td>
+          <td class="id" style="font-size:7pt;padding-left:8px;" data-key="77">(3) ការងារពេលយប់</td>
           <td colspan="2" class="id" style="font-size:7pt;padding-bottom:4px;" data-key="78">(${f('es_nightPremium')}) ％</td>
         </tr>
         <tr>
@@ -679,9 +679,9 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="79">4. Ngày kết lương</td>
-          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} Hàng tháng ngày ${f('es_payCutoffEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} Hàng tháng ngày</td>
+          <td class="id" style="font-size:7pt;" data-key="79">4. ថ្ងៃបិទប្រាក់ឈ្នួល</td>
+          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} រៀងរាល់ខែថ្ងៃទី ${f('es_payCutoffEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} រៀងរាល់ខែថ្ងៃទី</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
@@ -689,9 +689,9 @@ function p(){
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="82">5. Ngày trả lương</td>
-          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} Hàng tháng ngày ${f('es_payDayEn')}</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} Hàng tháng ngày</td>
+          <td class="id" style="font-size:7pt;" data-key="82">5. ថ្ងៃបើកប្រាក់ឈ្នួល</td>
+          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} រៀងរាល់ខែថ្ងៃទី ${f('es_payDayEn')}</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} រៀងរាល់ខែថ្ងៃទី</td>
         </tr>
         <tr>
           <td style="vertical-align:top;">６．賃金支払方法</td>
@@ -699,44 +699,44 @@ function p(){
           <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;" data-key="85">6. Cách thanh toán lương</td>
-          <td class="id" style="font-size:7pt;" data-key="86">${cb(true,"pay_bank_id")} Chuyển khoản</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(false,"pay_cash_id")} Trả tiền mặt tiền Yên</td>
+          <td class="id" style="font-size:7pt;" data-key="85">6. វិធីបើកប្រាក់ឈ្នួល</td>
+          <td class="id" style="font-size:7pt;" data-key="86">${cb(true,"pay_bank_id")} ផ្ទេរទៅគណនីធនាគារ</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(false,"pay_cash_id")} បើកជាសាច់ប្រាក់យ៉េន</td>
         </tr>
         <tr>
-          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">7. Khấu trừ khi thanh toán lương dựa trên hiệp định sử dụng lao động</span></td>
+          <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">7. ការកាត់កងនៅពេលបើកប្រាក់ឈ្នួលផ្អែកលើកិច្ចព្រមព្រៀងរវាងនិយោជក និងកម្មករ</span></td>
           <td style="vertical-align:top;">
             <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
               <tr><td style="white-space:nowrap;">${cb(false,"taisho_none")}&nbsp;無</td><td style="white-space:nowrap;">${cb(true,"taisho_yes")}&nbsp;有</td></tr>
-              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">${cb(false,"taisho_none_id")} Không</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">${cb(true,"taisho_yes_id")} Có</td></tr>
+              <tr><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="89">${cb(false,"taisho_none_id")} គ្មាន</td><td class="id" style="font-size:7pt;white-space:nowrap;" data-key="90">${cb(true,"taisho_yes_id")} មាន</td></tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* Chi tiết như trong văn bản đi kèm</td>
+          <td colspan="3" style="font-size:7.5pt;padding-bottom:2px;">※詳細は別紙のとおり&emsp;* ព័ត៌មានលម្អិតដូចក្នុងឯកសារភ្ជាប់</td>
         </tr>
       </table>
       <table style="width:100%;border-collapse:collapse;font-size:8.5pt;">
         <colgroup><col style="width:22%"><col style="width:53%"><col style="width:25%"></colgroup>
         <tr>
-          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">8. Tăng lương</span></td>
-          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">${cb(true,"cb_auto_013")} Có (thời điểm, số tiền,… ${f('es_raiseConditionEn')} )</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">${cb(false,"cb_auto_015")} Không</span></td>
+          <td style="vertical-align:top;">８．昇給<br><span class="id" style="font-size:7pt;" data-key="91">8. ការតម្លើងប្រាក់ឈ្នួល</span></td>
+          <td style="vertical-align:top;">${cb(true,"raise_yes")}&nbsp;有（時期，金額等&emsp;${f('es_raiseCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="92">${cb(true,"cb_auto_013")} មាន (ពេលវេលា, ចំនួនទឹកប្រាក់... ${f('es_raiseConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_014")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="93">${cb(false,"cb_auto_015")} គ្មាន</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">9. Tiền thưởng</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">${cb(true,"cb_auto_017")} Có (thời điểm, số tiền,… ${f('es_bonusConditionEn')} )</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">${cb(false,"cb_auto_019")} Không</span></td>
+          <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;" data-key="94">9. ប្រាក់រង្វាន់</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="95">${cb(true,"cb_auto_017")} មាន (ពេលវេលា, ចំនួនទឹកប្រាក់... ${f('es_bonusConditionEn')} )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="96">${cb(false,"cb_auto_019")} គ្មាន</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">10. Tiền nghỉ việc</span></td>
-          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} Có (thời điểm, số tiền,… )</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(true,"cb_auto_022")} Không</span></td>
+          <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">10. ប្រាក់ឈប់ការងារ</span></td>
+          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} មាន (ពេលវេលា, ចំនួនទឹកប្រាក់... )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(true,"cb_auto_022")} គ្មាន</span></td>
         </tr>
         <tr>
-          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">11. Trợ cấp khi nghỉ phép</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">${cb(true,"cb_auto_024")} Có (tỷ lệ 60%)</span></td>
-          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">${cb(false,"cb_auto_026")} Không</span></td>
+          <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">11. ប្រាក់ឧបត្ថម្ភនៅពេលឈប់សម្រាក</span></td>
+          <td style="vertical-align:top;">${cb(true,"cb_auto_023")}&nbsp;有（率&emsp;60%&emsp;）<br><span class="id" style="font-size:7pt;" data-key="101">${cb(true,"cb_auto_024")} មាន (អត្រា 60%)</span></td>
+          <td style="vertical-align:top;padding-left:8em;">${cb(false,"cb_auto_025")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="102">${cb(false,"cb_auto_026")} គ្មាន</span></td>
         </tr>
       </table>
     </div>
@@ -744,12 +744,12 @@ function p(){
 
   <div style="border-top:1px solid #333;padding:6px 12px;">
   <!-- Ⅷ 退職 -->
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">VIII. Các nội dung liên quan đến việc nghỉ việc</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅷ．退職に関する事項<br><span style="font-size:8pt;font-weight:normal;">Ⅷ. ខ្លឹមសារអំពីការឈប់ការងារ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">1. Thủ tục nghỉ việc do lý do cá nhân (Báo cáo cho giám đốc/xưởng trưởng ${f('es_resignNoticeDays')} ngày trước khi nghỉ việc)</span></div>
-      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">2. Lý do và thủ tục sa thải</span></div>
-      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">Việc sa thải phải báo trước ít nhất 30 ngày, hoặc phải thanh toán tiền lương trung bình của trên 30 ngày rồi mới sa thải.${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">◦Chi tiết xem trong Nội quy lao động Điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;),điều (&emsp;〜&emsp;)</span></div>
+      <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;" data-key="103">1. នីតិវិធីឈប់ការងារតាមការសម្រេចផ្ទាល់ខ្លួន (ត្រូវជូនដំណឹងដល់អគ្គនាយក/ប្រធានរោងចក្រ ${f('es_resignNoticeDays')} ថ្ងៃមុនការឈប់ការងារ)</span></div>
+      <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;" data-key="104">2. មូលហេតុ និងនីតិវិធីបណ្តេញចេញ</span></div>
+      <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="105">ការបណ្តេញចេញពីការងារ ត្រូវជូនដំណឹងជាមុនយ៉ាងហោចណាស់ 30 ថ្ងៃ ឬត្រូវបង់ប្រាក់ឈ្នួលមធ្យមសម្រាប់រយៈពេលលើសពី 30 ថ្ងៃមុននឹងបណ្តេញចេញ។${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="106">◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;), មាត្រា(&emsp;〜&emsp;)</span></div>
     </div>
   </div>
 </div>
@@ -761,21 +761,21 @@ function p(){
 <div style="border:1px solid #333;">
 <!-- Ⅸ その他 -->
   <div style="border-top:1px solid #333;padding:6px 12px;">
-    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. Các nội dung khác</span></div>
+    <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">Ⅸ. ខ្លឹមសារផ្សេងៗ</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
-      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. Tình trạng tham gia bảo hiểm xã hội/tình trạng áp dụng bảo hiểm lao động (${cb(true,"ins_kousei_id")} Tiền lương hưu người lao động, ${cb(true,"ins_kenko_id")} Bảo hiểm sức khỏe, ${cb(true,"ins_koyo_id")} Bảo hiểm tuyển dụng, ${cb(true,"ins_rousai_id")} Bảo hiểm tai nạn lao động,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} Tiền lương hưu quốc gia, ${cb(false,"ins_kokumin_kenko_id")} Bảo hiểm sức khỏe quốc gia, ${cb(false,"ins_other_id")} Khác (</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. Khám sức khỏe khi tuyển dụng:&emsp;tháng ${f('es_healthCheckM')} năm ${f('es_healthCheckY')}</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. Khám sức khỏe định kỳ lần đầu:&emsp;tháng ${f('es_healthCheckM2')} năm ${f('es_healthCheckY2')} (sau đó thực hiện mỗi năm 1 lần)</span></div>
-      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. Đầu mối tư vấn về các nội dung liên quan đến việc cải thiện quản lý tuyển dụng, v.v.</span></div>
-      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">Tên phòng ban&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Chức danh và họ tên người phụ trách&emsp;${f('es_contactPersonEn')}&emsp;(Địa chỉ liên lạc&emsp;${f('es_contactTel')})</span></div>
-      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. Khi bên B về nước sau khi kết thúc hợp đồng này, nếu bên B không thể chi trả chi phí về nước, bên A ngoài việc chịu chi phí về nước đó, còn thực hiện các biện pháp cần thiết để việc về nước được thuận lợi.</span></div>
+      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. ស្ថានភាពចូលរួមធានារ៉ាប់រងសង្គម/ស្ថានភាពអនុវត្តធានារ៉ាប់រងការងារ (${cb(true,"ins_kousei_id")} ប្រាក់សោធននិវត្តន៍កម្មករ, ${cb(true,"ins_kenko_id")} ធានារ៉ាប់រងសុខភាព, ${cb(true,"ins_koyo_id")} ធានារ៉ាប់រងការជួល, ${cb(true,"ins_rousai_id")} ធានារ៉ាប់រងគ្រោះថ្នាក់ការងារ,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} ប្រាក់សោធននិវត្តន៍ជាតិ, ${cb(false,"ins_kokumin_kenko_id")} ធានារ៉ាប់រងសុខភាពជាតិ, ${cb(false,"ins_other_id")} ផ្សេងៗ (</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. ការពិនិត្យសុខភាពពេលទទួលការងារ:&emsp;ខែ ${f('es_healthCheckM')} ឆ្នាំ ${f('es_healthCheckY')}</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. ការពិនិត្យសុខភាពទៀងទាត់លើកដំបូង:&emsp;ខែ ${f('es_healthCheckM2')} ឆ្នាំ ${f('es_healthCheckY2')} (បន្ទាប់មកអនុវត្តម្តងក្នុងមួយឆ្នាំ)</span></div>
+      <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. ច្រកព័ត៌មានផ្តល់ប្រឹក្សាអំពីខ្លឹមសារដែលពាក់ព័ន្ធនឹងការកែលម្អការគ្រប់គ្រងការជួល ។ល។</span></div>
+      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">ឈ្មោះផ្នែក&emsp;${f('es_contactDeptEn')}&emsp;&emsp;ឈ្មោះ និងតួនាទីអ្នកទទួលខុសត្រូវ&emsp;${f('es_contactPersonEn')}&emsp;(ទំនាក់ទំនង&emsp;${f('es_contactTel')})</span></div>
+      <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. នៅពេលភាគីខត្រលប់ទៅស្រុកកំណើតបន្ទាប់ពីបញ្ចប់កិច្ចសន្យានេះ ប្រសិនបើភាគីខមិនអាចទទួលបន្ទុកចំណាយធ្វើដំណើរត្រលប់ទៅស្រុកកំណើតបាន ភាគីកនឹងទទួលបន្ទុកចំណាយនោះ និងនឹងធ្វើការចាត់វិធានការចាំបាច់ដើម្បីឲ្យការវិលត្រលប់ទៅស្រុកកំណើតប្រព្រឹត្តទៅដោយរលូន។</span></div>
     </div>
   </div>
 
   <!-- 受取人 -->
   <div style="margin-top:12px;border:2px solid #333;padding:6px 12px;" class="sign-field" data-signer="applicant" data-label="受取人署名">
-    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">Người nhận (ký tên)</span></div>
+    <div style="font-size:8.5pt;">受取人（署名）<br><span class="id" style="font-size:7.5pt;" data-key="114">អ្នកទទួល (ហត្ថលេខា)</span></div>
     <div class="sign-field-area" style="height:60px;position:relative;">
       <span class="sign-field-placeholder">← ここに署名</span>
       <img class="sign-field-img" style="display:none;max-height:56px;">
@@ -786,7 +786,7 @@ function p(){
 
 <div style="margin-top:6px;font-size:8pt;">
   以上のほかは、当社就業規則による。就業規則を確認できる場所や方法（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;本社もしくは各事業所にて確認可能&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br>
-  <span class="id" style="font-size:7.5pt;" data-key="115">Ngoài những điều khoản nêu trên, các điều khoản khác dựa theo Nội quy lao động của công ty. Nơi và phương pháp có thể xác nhận Nội quy lao động</span>
+  <span class="id" style="font-size:7.5pt;" data-key="115">ក្រៅពីខ្លឹមសារខាងលើ ផ្នែកដទៃត្រូវអនុវត្តតាមបទបញ្ជាការងាររបស់ក្រុមហ៊ុន។ ទីកន្លែង និងវិធីដែលអាចពិនិត្យបទបញ្ជាការងារ</span>
 </div>
 </div>
 <div class="doc">
