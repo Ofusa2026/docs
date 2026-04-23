@@ -1406,7 +1406,7 @@ setupPageTracker();
 // index.htmlからの案件選択を受信（自動追加）
 if(!window._selectCaseListenerAdded){
   window._selectCaseListenerAdded=true;
-  window.addEventListener('message', function(e){
+  window.addEventListener('message', async function(e){
     if(!e.data||e.data.type!=='SELECT_CASE') return;
     const info=e.data.info;
     if(!info||!info.caseId) return;
@@ -1425,6 +1425,9 @@ if(!window._selectCaseListenerAdded){
         sel.value=opt.value;
       }
     }
+    // まず共通関数で全入力欄を埋める
+    if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info); }
+    // 書類固有の追加処理があれば loadFromDB で補完
     if(typeof loadFromDB==='function'){ loadFromDB(info); }
   });
 }
