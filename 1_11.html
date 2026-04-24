@@ -80,7 +80,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1776985876"></script>
+<script src="ofusa_common.js?v=1776997950"></script>
 <script>
 const MAX_OFF=5;
 function p(){
@@ -377,7 +377,7 @@ async function loadFromDB(){
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 
-window.addEventListener('message', function(e){
+window.addEventListener('message', async function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
   const info=e.data.info; if(!info||!info.caseId) return;
   const sel=document.getElementById('caseSelect');
@@ -386,7 +386,10 @@ window.addEventListener('message', function(e){
     for(let o of sel.options){try{const d=JSON.parse(o.value);if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}}catch(e2){}}
     if(!found){const opt=document.createElement('option');opt.value=JSON.stringify(info);opt.textContent='（indexから選択）';sel.appendChild(opt);sel.value=opt.value;}
   }
-  if(typeof loadFromDB==='function') loadFromDB();
+  // まず共通関数で全入力欄を埋める
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info); }
+  // 書類固有の追加処理があれば loadFromDB で補完
+  if(typeof loadFromDB==='function') loadFromDB(info);
 });
 
 initCaseSelect(); p();
