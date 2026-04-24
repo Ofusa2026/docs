@@ -211,6 +211,9 @@ window.addEventListener('message', async function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
   const info=e.data.info;
   if(!info||!info.caseId) return;
+  // デバッグ
+  if(typeof showToast==='function') showToast('📥 1_23受信 caseId='+info.caseId.substring(0,20));
+  console.log('[1_23] SELECT_CASE received:', info);
   // caseSelectに値をセットしてloadFromDB()を呼ぶ
   const sel=document.getElementById('caseSelect');
   if(sel){
