@@ -487,10 +487,108 @@ async function loadCaseToForm(info){
 
     // プレビュー再描画
     if(typeof p==='function') p();
+    // 金額系フィールドにカンマ整形を適用
+    applyMoneyFormatting();
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
     if(typeof showToast==='function') showToast('⚠️ 読込エラー: ' + e.message);
   }
 }
+
+/* ==========================================================
+   金額系フィールドに3桁カンマ整形を適用
+   - 既存の値にカンマを付与
+   - oninput で手入力時もリアルタイム整形
+   - text型inputのみ対象（number型は対象外：カンマが入らない）
+   ========================================================== */
+const MONEY_FIELD_PATTERNS = [
+  // 賃金
+  /salary(Monthly|Daily|Hourly|Total)?(En)?$/i,
+  /totalMonthly(En)?$/i,
+  /netPay(En)?$/i,
+  /calc(Hourly|Monthly)(En)?$/i,
+  // 控除
+  /^(es_|f_)?deduct/i,
+  // 手当
+  /allowance\d*Amount(En)?$/i,
+  /fixedOT?Amount(En)?$/i,
+  // 日本人比較報酬
+  /jpCompSalary(En)?$/i,
+  /jpCompAllow\d+Amt(En)?$/i,
+  /jpSalary$/i,
+  // 1_4系
+  /^f_salaryM$/,
+  /^f_salaryH$/,
+  /^f_jpSalary$/,
+];
+
+function isMoneyField(id){
+  if(!id) return false;
+  // es_xxx / f_xxx プレフィックスと中身の部分でマッチ
+  const stripped = id.replace(/^(es_|f_)/,'');
+  return MONEY_FIELD_PATTERNS.some(p => p.test(id) || p.test(stripped));
+}
+
+// カンマ付き文字列にする（数値以外はそのまま）
+function formatMoney(val){
+  if(val===null || val===undefined || val==='') return '';
+  const raw = String(val).replace(/,/g,'');
+  const num = Number(raw);
+  if(isNaN(num)) return String(val);
+  return num.toLocaleString('ja-JP');
+}
+
+// 単一input要素に整形を適用
+function formatMoneyInput(el){
+  if(!el) return;
+  if(el.type === 'number') return; // number型は不可
+  const cur = el.value;
+  if(!cur) return;
+  const formatted = formatMoney(cur);
+  if(formatted !== cur){
+    el.value = formatted;
+  }
+}
+
+// 画面上の全金額フィールドに整形＋oninputハンドラ装着
+function applyMoneyFormatting(){
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(el => {
+    if(!isMoneyField(el.id)) return;
+    // 既存値を整形
+    formatMoneyInput(el);
+    // 装着済みならスキップ
+    if(el.dataset.moneyFmtAttached === '1') return;
+    el.dataset.moneyFmtAttached = '1';
+    // 入力時にも整形（カーソル位置は近似維持）
+    el.addEventListener('input', function(){
+      const before = el.value;
+      const selStart = el.selectionStart;
+      const digitsBefore = (before.slice(0, selStart).match(/\d/g)||[]).length;
+      const formatted = formatMoney(before);
+      if(formatted !== before){
+        el.value = formatted;
+        // カーソル位置調整：整形後の同じ桁数に対応する位置へ
+        let count = 0, pos = 0;
+        for(; pos < formatted.length && count < digitsBefore; pos++){
+          if(/\d/.test(formatted[pos])) count++;
+        }
+        el.setSelectionRange(pos, pos);
+      }
+      // プレビュー再描画（pが定義されていれば）
+      if(typeof p === 'function') p();
+    });
+    // blurでも整形
+    el.addEventListener('blur', function(){ formatMoneyInput(el); });
+  });
+}
+
+// ページ読み込み時にも適用（既存の手入力欄対応）
+if(typeof window !== 'undefined'){
+  window.addEventListener('load', function(){
+    setTimeout(applyMoneyFormatting, 300);
+  });
+}
+
 
