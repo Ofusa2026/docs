@@ -336,86 +336,6 @@ function loadEditedHTML(){
   input.click();
 }
 
-// ===== 署名依頼 =====
-async function sendSignRequest(){
-  const area = document.getElementById('pageArea');
-  if(!area){ showToast('⚠️ プレビューがありません'); return; }
-
-  // 署名フィールドがあるか確認
-  const signFields = area.querySelectorAll('.sign-field');
-  if(!signFields.length){ showToast('⚠️ 署名フィールドがありません'); return; }
-
-  // 案件情報を取得：caseSelect → window._lastCaseInfo → 親から問い合わせ
-  let info = null;
-  const sel = document.getElementById('caseSelect');
-  if(sel && sel.value){
-    try{ info = JSON.parse(sel.value); }catch(e){}
-  }
-  // SELECT_CASE 受信時に保存された最新infoを使う
-  if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId){
-    info = window._lastCaseInfo;
-  }
-  if(!info || !info.caseId){
-    info = await new Promise((resolve) => {
-      const handler = (e) => {
-        if(e.data && e.data.type === 'CASE_INFO_RESPONSE'){
-          window.removeEventListener('message', handler);
-          resolve(e.data.info || null);
-        }
-      };
-      window.addEventListener('message', handler);
-      try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(e){}
-      setTimeout(() => {
-        window.removeEventListener('message', handler);
-        resolve(null);
-      }, 1000);
-    });
-  }
-  const caseId = (info && info.caseId) || '';
-  if(!caseId){
-    showToast('⚠️ 案件が選択されていません');
-    return;
-  }
-
-  // 念のためプレビューを再描画してから取得（最新の入力値を確実に反映）
-  if(typeof p === 'function') p();
-  // HTMLを取得
-  const html = area.innerHTML;
-  if(!html || html.length < 100){
-    showToast('⚠️ 書類内容が空です');
-    return;
-  }
-
-  // トークン生成
-  const token = crypto.randomUUID();
-
-  // doc_type
-  const docTitle = document.getElementById('docTitle')?.textContent || 'doc';
-
-  try{
-    const res = await sb('sign_requests', {
-      method: 'POST',
-      headers: { 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        case_id: caseId,
-        token: token,
-        doc_type: docTitle.trim(),
-        doc_content: html,
-        status: 'pending',
-        expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
-      })
-    });
-
-    // URLをクリップボードにコピー
-    const url = `https://ofusa2026.github.io/docs/sign.html?token=${token}`;
-    await navigator.clipboard.writeText(url);
-    showToast('✅ 署名依頼URLをコピーしました');
-    console.log('署名URL:', url);
-  }catch(e){
-    showToast('⚠️ 署名依頼エラー: ' + e.message);
-    console.error(e);
-  }
-}
 
 /* ==========================================================
    汎用: 親index.htmlからのSELECT_CASE受信＆案件データ展開
@@ -424,7 +344,7 @@ async function sendSignRequest(){
    ========================================================== */
 async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
-  // グローバルに最新の案件情報を保存（DB保存・署名依頼で使う）
+  // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
   window._lastCaseInfo = info;
   console.log('[doc] loadCaseToForm:', info);
   const {caseId, companyId, companyName, empSetIdx} = info;
