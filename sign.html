@@ -72,11 +72,70 @@ input:focus{border-color:var(--accent);background:white;}
 .error-title{font-size:18px;font-weight:700;margin-bottom:6px;}
 .error-msg{font-size:14px;color:var(--muted);}
 .notice{background:#fffbf0;border:1px solid #f0d080;border-radius:8px;padding:11px 13px;font-size:12px;color:#7a6010;line-height:1.6;margin-top:10px;}
+
+/* ===== PC用レイアウト (901px以上) ===== */
+@media (min-width: 901px){
+  body{padding-bottom:60px;}
+  .header{padding:18px 32px;}
+  .header-logo{font-size:11px;}
+  .header-title{font-size:18px;margin-top:4px;}
+  .container{max-width:1100px;padding:0 32px;}
+  .step-indicator{padding:24px 0 8px;}
+  .step-dot{width:10px;height:10px;}
+  .step-dot.active{width:30px;}
+  .step-label{font-size:13px;}
+  .section{margin-top:28px;}
+  .section-label{font-size:12px;}
+  .case-card{padding:24px;}
+  .case-meta{grid-template-columns:repeat(3, 1fr);gap:12px;}
+  .case-meta-item{padding:12px 14px;}
+  .case-meta-key{font-size:11px;}
+  .case-meta-value{font-size:15px;}
+  /* 書類プレビューを大きく */
+  #docFrame{height:80vh;}
+  .doc-preview-label{padding:12px 18px;font-size:13px;}
+  .sign-tap-notice{padding:14px 18px;font-size:13px;}
+  /* 署名キャンバスを横長＆高さ大きく */
+  canvas#signCanvas{height:280px;cursor:crosshair;}
+  .sign-area-header{padding:14px 20px;}
+  .sign-area-label{font-size:14px;}
+  .sign-guide{font-size:14px;bottom:24px;}
+  /* ボタンを横並びにして大きさを抑える */
+  .btn-primary{max-width:480px;margin:30px auto 0;font-size:17px;padding:18px;}
+  .btn-back{max-width:240px;margin:14px auto 0;}
+  /* 本人確認入力欄 */
+  .verify-section{padding:24px;}
+  .input-group{margin-bottom:16px;}
+  .input-label{font-size:13px;}
+  input[type="text"]{padding:14px 16px;font-size:15px;}
+  /* 完了画面 */
+  .complete-screen{padding:60px 32px;}
+  .complete-icon{width:100px;height:100px;font-size:44px;}
+  .complete-title{font-size:26px;}
+  .complete-sub{font-size:15px;}
+  .complete-card{padding:20px;max-width:520px;margin:30px auto 0;}
+  .complete-card-row{font-size:13px;padding:7px 0;}
+  /* ローディング・エラー */
+  .loading-screen,.error-screen{padding:120px 20px;}
+  .spinner{width:48px;height:48px;border-width:4px;}
+  .error-icon{font-size:60px;}
+  .error-title{font-size:22px;}
+  .error-msg{font-size:15px;}
+  .notice{font-size:13px;padding:14px 18px;}
+}
+
+/* ===== ワイドスクリーン (1280px以上): 書類確認ステップを2カラムに ===== */
+@media (min-width: 1280px){
+  /* ステップ2(書類確認・署名)で書類プレビューと署名エリアを横並び */
+  #step2 .two-col{display:grid;grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr);gap:28px;align-items:start;}
+  #step2 .two-col .col-left{position:sticky;top:90px;}
+  #step2 #docFrame{height:75vh;}
+}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260415.01</span></div>
+  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260504.001</span></div>
   <div class="header-title" id="headerTitle">電子署名</div>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
