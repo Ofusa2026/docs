@@ -49,7 +49,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260504.003</span></div>
+  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260504.004</span></div>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -195,7 +195,7 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1777009937'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1777861394'},
   '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1777009937'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1777009937'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1777009937'},
@@ -317,14 +317,14 @@ function open_1_5(lang){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1777009937',
-  'vi':'1_6_vi.html?v=1776955487',
-  'th':'1_6_th.html?v=1776955487',
-  'ne':'1_6_ne.html?v=1776955487',
-  'my':'1_6_my.html?v=1776955487',
-  'km':'1_6_km.html?v=1776955487',
-  'en':'1_6_en.html?v=1776955487',
-  'ko':'1_6_ko.html?v=1776955487',
+  'id':'1_6.html?v=1777861394',
+  'vi':'1_6_vi.html?v=1777861394',
+  'th':'1_6_th.html?v=1777861394',
+  'ne':'1_6_ne.html?v=1777861394',
+  'my':'1_6_my.html?v=1777861394',
+  'km':'1_6_km.html?v=1777861394',
+  'en':'1_6_en.html?v=1777861394',
+  'ko':'1_6_ko.html?v=1777861394',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -582,21 +582,30 @@ function idxSendToVisible(info){
 
 // 子iframe からの DOC_READY 通知を受信して、選択中の案件があれば送り直す
 window.addEventListener('message', function(e){
-  if(!e.data || e.data.type !== 'DOC_READY') return;
-  if(!idxSelectedCase) return;
-  // 送信元のiframeを特定して、そこに案件情報を送る
-  try {
-    const allIframes = document.querySelectorAll('iframe');
-    for(const fr of allIframes){
-      if(fr.contentWindow === e.source){
-        // 表示中のiframeのみ送信
-        if(fr.style.display !== 'none' && fr.src && fr.src !== location.href){
-          fr.contentWindow.postMessage({type:'SELECT_CASE', info: idxSelectedCase}, '*');
+  if(!e.data) return;
+  // DOC_READY: 子の準備完了通知
+  if(e.data.type === 'DOC_READY'){
+    if(!idxSelectedCase) return;
+    try {
+      const allIframes = document.querySelectorAll('iframe');
+      for(const fr of allIframes){
+        if(fr.contentWindow === e.source){
+          if(fr.style.display !== 'none' && fr.src && fr.src !== location.href){
+            fr.contentWindow.postMessage({type:'SELECT_CASE', info: idxSelectedCase}, '*');
+          }
+          break;
         }
-        break;
       }
-    }
-  } catch(err){}
+    } catch(err){}
+    return;
+  }
+  // GET_CASE_INFO: 子から案件情報を要求された(DB保存等)
+  if(e.data.type === 'GET_CASE_INFO'){
+    try {
+      e.source.postMessage({type:'CASE_INFO_RESPONSE', info: idxSelectedCase || null}, '*');
+    } catch(err){}
+    return;
+  }
 });
 
 idxInit();

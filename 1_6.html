@@ -1190,10 +1190,33 @@ async function loadFromDB(passedInfo){
 
 // DB保存（companies.emp_sets に上書き保存）
 async function saveForm(){
-  const sel=document.getElementById('caseSelect');
-  let info;
-  try{ info=JSON.parse(sel.value); }catch(e){ alert('案件情報が不正です'); return; }
+  // 案件情報を取得：caseSelect → 親から問い合わせ
+  let info = null;
+  const sel = document.getElementById('caseSelect');
+  if(sel && sel.value){
+    try{ info = JSON.parse(sel.value); }catch(e){}
+  }
+  // caseSelect が空なら親に問い合わせ
+  if(!info || !info.caseId){
+    info = await new Promise((resolve) => {
+      const handler = (e) => {
+        if(e.data && e.data.type === 'CASE_INFO_RESPONSE'){
+          window.removeEventListener('message', handler);
+          resolve(e.data.info || null);
+        }
+      };
+      window.addEventListener('message', handler);
+      try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(e){}
+      // 1秒で諦め
+      setTimeout(() => {
+        window.removeEventListener('message', handler);
+        resolve(null);
+      }, 1000);
+    });
+  }
+  if(!info || !info.caseId){ alert('案件情報が不正です'); return; }
   const {companyId, empSetIdx} = info;
+  if(!companyId){ alert('会社IDが取得できませんでした'); return; }
 
   try{
     // 現在のemp_setsを取得
