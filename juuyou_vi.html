@@ -202,19 +202,19 @@ function p(){
 <div class="sec">
   <div class="sec-h">１．基本賃金</div>
   <div class="sec-h-vi">Tiền lương cơ bản</div>
-  <div class="row ja">月額（<span class="under">${f('f_salaryMonthly')}</span>円　手当<span class="under">&nbsp;</span>円、手当<span class="under">&nbsp;</span>円を含む。）</div>
-  <div class="row vi">Lương tháng（<span class="under">${f('f_salaryMonthly')}</span> Yên　Bao gồm phụ cấp <span class="under">&nbsp;</span> Yên, phụ cấp <span class="under">&nbsp;</span> Yên.）</div>
+  <div class="row ja">月額（<span class="under">${ff('f_salaryMonthly')}</span>円　手当<span class="under">&nbsp;</span>円、手当<span class="under">&nbsp;</span>円を含む。）</div>
+  <div class="row vi">Lương tháng（<span class="under">${ff('f_salaryMonthly')}</span> Yên　Bao gồm phụ cấp <span class="under">&nbsp;</span> Yên, phụ cấp <span class="under">&nbsp;</span> Yên.）</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）</div>
   <div class="sec-h-vi">Các khoản phụ cấp và cách tính (Không bao gồm tiền tăng ca làm việc ngoài giờ.)</div>
-  <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${f('f_allowance1Amount')}</span>円／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
-  <div class="row vi">(a)（Phụ cấp <span class="under">${f('f_allowance1NameEn')}</span>,　<span class="under">${f('f_allowance1Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
-  <div class="row ja">(b)（<span class="under">${f('f_allowance2Name')}</span>手当　<span class="under">${f('f_allowance2Amount')}</span>円／計算方法：<span class="under">${f('f_allowance2Calc')}</span>）</div>
-  <div class="row vi">(b)（Phụ cấp <span class="under">${f('f_allowance2NameEn')}</span>,　<span class="under">${f('f_allowance2Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
-  <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${f('f_allowance3Amount')}</span>円／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
-  <div class="row vi">(c)（Phụ cấp <span class="under">${f('f_allowance3NameEn')}</span>,　<span class="under">${f('f_allowance3Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
+  <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${ff('f_allowance1Amount')}</span>円／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
+  <div class="row vi">(a)（Phụ cấp <span class="under">${f('f_allowance1NameEn')}</span>,　<span class="under">${ff('f_allowance1Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
+  <div class="row ja">(b)（<span class="under">${f('f_allowance2Name')}</span>手当　<span class="under">${ff('f_allowance2Amount')}</span>円／計算方法：<span class="under">${f('f_allowance2Calc')}</span>）</div>
+  <div class="row vi">(b)（Phụ cấp <span class="under">${f('f_allowance2NameEn')}</span>,　<span class="under">${ff('f_allowance2Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
+  <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${ff('f_allowance3Amount')}</span>円／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
+  <div class="row vi">(c)（Phụ cấp <span class="under">${f('f_allowance3NameEn')}</span>,　<span class="under">${ff('f_allowance3Amount')}</span> Yên／Cách tính：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
 </div>
 
 <div class="sec">
@@ -222,8 +222,8 @@ function p(){
   <div class="sec-h-vi">Tiền tăng ca cố định　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> Có　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> Không）</div>
   <div class="row ja" style="font-size:9.5pt;">（固定残業代が有る場合は以下に記入）</div>
   <div class="row vi">(Điền vào bên dưới nếu có tiền tăng ca cố định)</div>
-  <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${f('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
-  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> tiếng　<span class="under">${f('f_fixedOTAmount')}</span> Yên【Cách tính】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
+  <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${ff('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
+  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> tiếng　<span class="under">${ff('f_fixedOTAmount')}</span> Yên【Cách tính】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
   <div class="row ja" style="font-size:9.5pt;">固定残業代を超えた労働時間分については割増賃金を追加で支払う。</div>
   <div class="row vi">Tiền tăng ca sẽ được chi trả thêm cho số giờ làm việc vượt quá thời gian tăng ca cố định.</div>
 </div>
@@ -232,8 +232,8 @@ function p(){
   <div class="sec-h">４．１か月当たりの支払概算額（１＋２＋３）</div>
   <div class="row ja" style="font-size:9.5pt;">（１．基本賃金の月額に算入した手当については、二重に計上しないように注意すること。）</div>
   <div class="row vi">(1. Chú ý không tính hai lần phụ cấp vào lương cơ bản hàng tháng.)</div>
-  <div class="row ja" style="text-align:right;">約　<span class="under">${f('f_salaryTotal')}</span>　円（合計）</div>
-  <div class="row vi" style="text-align:right;">Số tiền thanh toán ước tính cho 1 tháng (1+2+3)　khoảng　<span class="under">${f('f_salaryTotal')}</span>　Yên（Tổng）</div>
+  <div class="row ja" style="text-align:right;">約　<span class="under">${ff('f_salaryTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">Số tiền thanh toán ước tính cho 1 tháng (1+2+3)　khoảng　<span class="under">${ff('f_salaryTotal')}</span>　Yên（Tổng）</div>
 </div>
 </div>
 
@@ -246,68 +246,68 @@ function p(){
   <table class="tbl-amt">
     <tr>
       <td style="width:45%;" class="ja">(a)税　　　金</td>
-      <td style="width:55%;" class="ja">（<span class="under">${f('f_deductTax')}</span>円）</td>
+      <td style="width:55%;" class="ja">（<span class="under">${ff('f_deductTax')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(a) Tiền thuế</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductTax')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductTax')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(b)社会保険料</td>
-      <td class="ja">（<span class="under">${f('f_deductSocialIns')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductSocialIns')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(b) Tiền bảo hiểm xã hội</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductSocialIns')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductSocialIns')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(c)雇用保険料</td>
-      <td class="ja">（<span class="under">${f('f_deductEmpIns')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductEmpIns')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(c) Tiền bảo hiểm việc làm</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductEmpIns')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductEmpIns')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(d)食　　　費</td>
-      <td class="ja">（<span class="under">${f('f_deductFood')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductFood')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(d) Tiền ăn</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductFood')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductFood')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(e)居　住　費</td>
-      <td class="ja">（<span class="under">${f('f_deductHousing')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductHousing')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(e) Tiền nhà</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductHousing')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductHousing')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(f)その他（水道光熱費）</td>
-      <td class="ja">（<span class="under">${f('f_deductUtility')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductUtility')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(f) Tiền khác (Tiền nước, điện, ga)</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductUtility')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductUtility')}</span> Yên）</td>
     </tr>
     <tr>
       <td class="ja">(g)その他（<span class="under">${f('f_deductOther1Name')}</span>）</td>
-      <td class="ja">（<span class="under">${f('f_deductOther1Amount')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）</td>
     </tr>
     <tr>
       <td class="vi">(g) Tiền khác（<span class="under">${f('f_deductOther1Name')}</span>）</td>
-      <td class="vi">（khoảng <span class="under">${f('f_deductOther1Amount')}</span> Yên）</td>
+      <td class="vi">（khoảng <span class="under">${ff('f_deductOther1Amount')}</span> Yên）</td>
     </tr>
   </table>
-  <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${f('f_deductTotal')}</span>　円（合計）</div>
-  <div class="row vi" style="text-align:right;">Số tiền khấu trừ　khoảng　<span class="under">${f('f_deductTotal')}</span>　Yên（Tổng）</div>
+  <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${ff('f_deductTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">Số tiền khấu trừ　khoảng　<span class="under">${ff('f_deductTotal')}</span>　Yên（Tổng）</div>
 </div>
 
 <div class="sec">
-  <div class="sec-h">６．手取り支給額（４－５）　約　<span class="under">${f('f_netPay')}</span>　円（合計）</div>
-  <div class="sec-h-vi">Số tiền thực lĩnh (4-5)　khoảng　<span class="under">${f('f_netPay')}</span>　Yên（Tổng）</div>
+  <div class="sec-h">６．手取り支給額（４－５）　約　<span class="under">${ff('f_netPay')}</span>　円（合計）</div>
+  <div class="sec-h-vi">Số tiền thực lĩnh (4-5)　khoảng　<span class="under">${ff('f_netPay')}</span>　Yên（Tổng）</div>
   <div class="row ja" style="font-size:9pt;">※欠勤等がない場合であって、時間外労働の割増賃金等は除く。</div>
   <div class="row vi" style="font-size:8.5pt;">※Đây là trường hợp không nghỉ làm không lương, v.v… và chưa bao gồm tiền làm thêm ngoài giờ v.v…</div>
 </div>

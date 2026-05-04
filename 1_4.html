@@ -96,7 +96,7 @@ function p(){
   <tr><td style="width:38%;">①申請人の氏名</td><td>${f('f_applicant')}</td></tr>
   <tr><td>②申請人の役職、職務内容、責任の程度</td><td>${f('f_jobDesc')}</td></tr>
   <tr><td>③申請人の年齢、性別及び経験年数</td><td>（${f('f_age')}歳）（${f('f_gender')}）（経験　${f('f_exp')}　年）</td></tr>
-  <tr><td>④申請人に対する報酬</td><td>月給　${f('f_salaryM')}　円　／　時間給　${f('f_salaryH')}　円</td></tr>
+  <tr><td>④申請人に対する報酬</td><td>月給　${ff('f_salaryM')}　円　／　時間給　${ff('f_salaryH')}　円</td></tr>
   <tr><td>⑤その他</td><td></td></tr>
 </table>
 <div style="font-size:9pt;margin-bottom:3mm;">
@@ -110,9 +110,9 @@ function p(){
 <table class="tbl2" style="margin-bottom:3mm;">
   <tr><td style="width:38%;">①比較対象となる日本人労働者の役職、職務内容、責任の程度</td><td colspan="2">${f('f_jpJobDesc')}</td></tr>
   <tr><td>②比較対象となる日本人労働者の年齢、性別及び経験年数</td><td colspan="2">（${f('f_jpAge')}歳）（${f('f_jpGender')}）（${f('f_jpExp')}）</td></tr>
-  <tr><td>③比較対象となる日本人労働者の報酬</td><td colspan="2">月額　${f('f_jpSalary')}　円</td></tr>
+  <tr><td>③比較対象となる日本人労働者の報酬</td><td colspan="2">月額　${ff('f_jpSalary')}　円</td></tr>
   <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>${f('f_wageReg')}</td></tr>
-  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${f('f_salaryRule')}　円</td></tr>
+  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${ff('f_salaryRule')}　円</td></tr>
   <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2">${f('f_jpReason')}</td></tr>
   <tr><td>⑥その他</td><td colspan="2"></td></tr>
 </table>
