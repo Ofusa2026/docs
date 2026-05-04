@@ -592,3 +592,33 @@ if(typeof window !== 'undefined'){
 }
 
 
+
+/* ==========================================================
+   iframe側: 親へ「準備完了」を通知し、案件情報の再送を要求
+   - 各書類のリスナー登録より後で読み込まれるよう配置
+   - 親が SELECT_CASE を送り損ねていても、こちらから要求して再送させる
+   ========================================================== */
+if(typeof window !== 'undefined' && window.parent && window.parent !== window){
+  // 親に DOC_READY 通知（複数回送信 = 読み込みタイミングのバラツキ吸収）
+  function _notifyDocReady(){
+    try {
+      window.parent.postMessage({type:'DOC_READY'}, '*');
+    } catch(e){}
+  }
+  // DOMContentLoaded 直後 + 少し遅延 + load 後 にも送信
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => {
+      _notifyDocReady();
+      setTimeout(_notifyDocReady, 300);
+      setTimeout(_notifyDocReady, 1000);
+    });
+  } else {
+    _notifyDocReady();
+    setTimeout(_notifyDocReady, 300);
+    setTimeout(_notifyDocReady, 1000);
+  }
+  window.addEventListener('load', () => {
+    _notifyDocReady();
+    setTimeout(_notifyDocReady, 200);
+  });
+}
