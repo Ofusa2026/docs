@@ -327,7 +327,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1777861091"></script>
+<script src="ofusa_common.js?v=1777861843"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -1448,7 +1448,7 @@ if(!window._selectCaseListenerAdded){
       }
     }
     // まず共通関数で全入力欄を埋める
-    if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info); }
+    if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_6'); }
     // 書類固有の追加処理があれば loadFromDB で補完
     if(typeof loadFromDB==='function'){ loadFromDB(info); }
   });

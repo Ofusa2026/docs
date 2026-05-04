@@ -383,7 +383,7 @@ async function sendSignRequest(){
    各書類の入力欄プレフィックスに幅広く対応
    (es_*, f_*, 接頭辞なし) すべて試して存在するものだけセット
    ========================================================== */
-async function loadCaseToForm(info){
+async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
   console.log('[doc] loadCaseToForm:', info);
   const {caseId, companyId, companyName, empSetIdx} = info;
@@ -489,6 +489,10 @@ async function loadCaseToForm(info){
     if(typeof p==='function') p();
     // 金額系フィールドにカンマ整形を適用
     applyMoneyFormatting();
+    // 書類固有DB保存データがあれば上書き読込
+    if(docKey && typeof loadFormGenericFromDB === 'function'){
+      await loadFormGenericFromDB(docKey, info);
+    }
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
@@ -621,4 +625,153 @@ if(typeof window !== 'undefined' && window.parent && window.parent !== window){
     _notifyDocReady();
     setTimeout(_notifyDocReady, 200);
   });
+}
+
+/* ==========================================================
+   汎用DB保存: companies.extra に書類ごとのフォーム値を保存
+   - 書類ID は引数で渡す（'1_4', '1_23', '2_1' 等）
+   - 各書類HTMLから saveFormGeneric('1_4') のように呼び出す
+   ========================================================== */
+async function saveFormGeneric(docKey, opts){
+  opts = opts || {};
+  // 案件情報を取得：caseSelect → 親から問い合わせ
+  let info = null;
+  const sel = document.getElementById('caseSelect');
+  if(sel && sel.value){
+    try{ info = JSON.parse(sel.value); }catch(e){}
+  }
+  if(!info || !info.caseId){
+    info = await new Promise((resolve) => {
+      const handler = (e) => {
+        if(e.data && e.data.type === 'CASE_INFO_RESPONSE'){
+          window.removeEventListener('message', handler);
+          resolve(e.data.info || null);
+        }
+      };
+      window.addEventListener('message', handler);
+      try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(e){}
+      setTimeout(() => {
+        window.removeEventListener('message', handler);
+        resolve(null);
+      }, 1000);
+    });
+  }
+  if(!info || !info.caseId){
+    if(typeof showToast==='function') showToast('⚠️ 案件が選択されていません');
+    else alert('案件が選択されていません');
+    return;
+  }
+  let {companyId, companyName, empSetIdx} = info;
+
+  // companyId が無ければ、name で探す（cas.companyにフォールバック）
+  if(!companyId){
+    try {
+      const cases = await sb('cases?select=company,company_id&id=eq.'+info.caseId);
+      const cas = cases && cases[0];
+      if(cas){
+        if(cas.company_id) companyId = cas.company_id;
+        else if(cas.company){
+          const cos = await sb('companies?select=id&name=eq.'+encodeURIComponent(cas.company));
+          if(cos && cos[0]) companyId = cos[0].id;
+        }
+      }
+    } catch(e){}
+  }
+  if(!companyId){
+    if(typeof showToast==='function') showToast('⚠️ 会社情報が取得できません');
+    else alert('会社情報が取得できません');
+    return;
+  }
+
+  try{
+    // 全 input/select/textarea の値を収集（id が es_xxx, f_xxx, applicantName 等）
+    const values = collectAllFormValues();
+    const idx = parseInt(empSetIdx||0)||0;
+
+    // 既存の extra を取得
+    const cos = await sb('companies?select=id,extra&id=eq.'+companyId);
+    const co = cos && cos[0];
+    if(!co){ throw new Error('会社レコードが見つかりません'); }
+
+    const extra = co.extra && typeof co.extra === 'object' ? JSON.parse(JSON.stringify(co.extra)) : {};
+    if(!extra[docKey]) extra[docKey] = {};
+    extra[docKey][String(idx)] = {
+      ...values,
+      _savedAt: new Date().toISOString(),
+    };
+
+    // PATCH で保存
+    await sb('companies?id=eq.'+companyId, {
+      method: 'PATCH',
+      headers: {'Prefer':'return=minimal'},
+      body: JSON.stringify({ extra })
+    });
+    if(typeof showToast==='function') showToast('✅ DBに保存しました');
+    else alert('DBに保存しました');
+  } catch(err){
+    console.error('[saveFormGeneric]', err);
+    if(typeof showToast==='function') showToast('⚠️ 保存エラー: ' + err.message);
+    else alert('保存エラー: ' + err.message);
+  }
+}
+
+// 画面上の全入力欄を { id: value } で収集
+function collectAllFormValues(){
+  const result = {};
+  const els = document.querySelectorAll('input, select, textarea');
+  els.forEach(el => {
+    if(!el.id) return;
+    // フィルタ系の id は除外
+    if(/^(filterOrg|filterCompany|filterText|caseSelect|caseCount|fontSizeLabel)$/.test(el.id)) return;
+    if(el.type === 'checkbox' || el.type === 'radio'){
+      result[el.id] = el.checked;
+    } else {
+      result[el.id] = el.value;
+    }
+  });
+  return result;
+}
+
+// DBから書類別データを取得して入力欄に反映
+async function loadFormGenericFromDB(docKey, info){
+  if(!info || !info.caseId) return;
+  let {companyId, empSetIdx} = info;
+  if(!companyId){
+    try {
+      const cases = await sb('cases?select=company,company_id&id=eq.'+info.caseId);
+      const cas = cases && cases[0];
+      if(cas){
+        if(cas.company_id) companyId = cas.company_id;
+        else if(cas.company){
+          const cos = await sb('companies?select=id&name=eq.'+encodeURIComponent(cas.company));
+          if(cos && cos[0]) companyId = cos[0].id;
+        }
+      }
+    } catch(e){}
+  }
+  if(!companyId) return;
+  try {
+    const cos = await sb('companies?select=extra&id=eq.'+companyId);
+    const co = cos && cos[0];
+    if(!co || !co.extra) return;
+    const idx = parseInt(empSetIdx||0)||0;
+    const data = co.extra && co.extra[docKey] && co.extra[docKey][String(idx)];
+    if(!data) return;
+    // 既存の値を上書きしない（loadCaseToFormで既にセットされている可能性）
+    Object.keys(data).forEach(id => {
+      if(id.startsWith('_')) return; // _savedAt等
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(el.type === 'checkbox' || el.type === 'radio'){
+        el.checked = !!data[id];
+      } else {
+        // 既に値があってもDBの値で上書き(DBが正)
+        el.value = data[id] || '';
+      }
+    });
+    if(typeof p === 'function') p();
+    if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting();
+  } catch(e){
+    console.warn('[loadFormGenericFromDB]', e);
+  }
 }
