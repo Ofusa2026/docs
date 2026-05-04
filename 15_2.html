@@ -179,8 +179,8 @@ async function loadFromDB(){
   try{
     const [cases,cos,orgs]=await Promise.all([
       caseId?sb('cases?select=applicant,applicant_en,support_org_id&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,full_address,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,full_address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       orgId?sb(`support_orgs?select=name,address,support_manager&id=eq.${orgId}`):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; let org=orgs&&orgs[0];
@@ -197,7 +197,7 @@ async function loadFromDB(){
     }
     if(co){
       s('f_coName',co.name||'');
-      s('f_coAddr',co.full_address||'');
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
     }
     if(cas){
       s('f_applicant',cas.applicant_en||cas.applicant||'');

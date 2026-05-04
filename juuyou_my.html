@@ -465,14 +465,14 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cos]=await Promise.all([
-      companyId?sb(`companies?select=name,full_address,author_name,author_title,tel&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,full_address,author_name,author_title,tel&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
     const co=cos&&cos[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
       s('f_orgName',co.name||'');
-      s('f_orgAddress',co.full_address||'');
+      s('f_orgAddress',((co.pref||'')+(co.city||'')+(co.address||''))||'');
       s('f_orgTel',co.tel||'');
       s('f_repTitle',co.author_title||'');
       s('f_repName',co.author_name||'');
