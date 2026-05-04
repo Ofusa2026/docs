@@ -179,7 +179,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName,orgId}=info;
   try{
     const [cases,cos,orgs]=await Promise.all([
-      caseId?sb('cases?select=applicant,applicant_en,support_org_id&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('cases?select=applicant,support_org_id&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       orgId?sb(`support_orgs?select=name,address,support_manager&id=eq.${orgId}`):Promise.resolve([])
@@ -201,7 +201,7 @@ async function loadFromDB(){
       s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
     }
     if(cas){
-      s('f_applicant',cas.applicant_en||cas.applicant||'');
+      s('f_applicant',cas.applicant||'');
     }
     if(caseId){
       const persons=await sb('persons?select=gender,nationality,birthdate&case_id=eq.'+caseId);
