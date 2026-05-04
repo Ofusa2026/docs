@@ -135,7 +135,7 @@ input:focus{border-color:var(--accent);background:white;}
 </head>
 <body>
 <div class="header">
-  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260504.002</span></div>
+  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260504.003</span></div>
   <div class="header-title" id="headerTitle">電子署名</div>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -305,21 +305,20 @@ async function loadSignRequest(token){
         try{
           const fdoc = frame.contentDocument || frame.contentWindow.document;
           // インラインstyleで識別: color:#aaa は未入力プレースホルダー
-          const candidates = fdoc.querySelectorAll('span.f[style*="color:#aaa"], span.f[style*="color: #aaa"]');
+          // span.f だけでなく、入れ子の <span style="color:#aaa">es.xxx</span> も対象
+          const candidates = fdoc.querySelectorAll('span[style*="color:#aaa"], span[style*="color: #aaa"]');
           candidates.forEach(el => {
             // 中身がプレースホルダーラベル(es.xxx, f_xxx, applicantName等英数字のみ)なら空白化
             const txt = el.textContent.trim();
             if(/^[a-zA-Z][a-zA-Z0-9_.]*$/.test(txt)){
               el.textContent = '';
-              el.style.borderBottom = '1px dotted #ddd';
-              el.style.minWidth = '4em';
-              el.style.display = 'inline-block';
             }
           });
-          // 追加CSS差し込み: 印刷時もプレースホルダーが透明
+          // 追加CSS差し込み: 残りのプレースホルダーも全て透明に
           const style = fdoc.createElement('style');
           style.textContent = `
-            span.f[style*="color:#aaa"], span.f[style*="color: #aaa"] {
+            span[style*="color:#aaa"],
+            span[style*="color: #aaa"] {
               color: transparent !important;
             }
           `;
