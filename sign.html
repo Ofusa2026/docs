@@ -135,7 +135,7 @@ input:focus{border-color:var(--accent);background:white;}
 </head>
 <body>
 <div class="header">
-  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260504.001</span></div>
+  <div class="header-logo">OFUSA 行政書士法人 <span style="opacity:.4;font-size:9px;">ver.20260504.002</span></div>
   <div class="header-title" id="headerTitle">電子署名</div>
 </div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -300,6 +300,32 @@ async function loadSignRequest(token){
       const frame=document.getElementById('docFrame');
       const blob=new Blob([req.doc_content],{type:'text/html'});
       frame.src=URL.createObjectURL(blob);
+      // ロード後、未入力欄のプレースホルダー(es.xxx 等のラベル)を隠す
+      frame.addEventListener('load', () => {
+        try{
+          const fdoc = frame.contentDocument || frame.contentWindow.document;
+          // インラインstyleで識別: color:#aaa は未入力プレースホルダー
+          const candidates = fdoc.querySelectorAll('span.f[style*="color:#aaa"], span.f[style*="color: #aaa"]');
+          candidates.forEach(el => {
+            // 中身がプレースホルダーラベル(es.xxx, f_xxx, applicantName等英数字のみ)なら空白化
+            const txt = el.textContent.trim();
+            if(/^[a-zA-Z][a-zA-Z0-9_.]*$/.test(txt)){
+              el.textContent = '';
+              el.style.borderBottom = '1px dotted #ddd';
+              el.style.minWidth = '4em';
+              el.style.display = 'inline-block';
+            }
+          });
+          // 追加CSS差し込み: 印刷時もプレースホルダーが透明
+          const style = fdoc.createElement('style');
+          style.textContent = `
+            span.f[style*="color:#aaa"], span.f[style*="color: #aaa"] {
+              color: transparent !important;
+            }
+          `;
+          fdoc.head && fdoc.head.appendChild(style);
+        }catch(err){ console.warn('プレースホルダー処理エラー:', err); }
+      });
     }
 
     goStep(1);
