@@ -7,10 +7,18 @@
 const SB_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
 const SB_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 async function sb(path,opts={}){
-  const r=await fetch(SB_URL+'/rest/v1/'+path,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json',...(opts.headers||{})},...opts});
-  const t=await r.text();
-  if(!r.ok){const e=t?JSON.parse(t):{};throw new Error(e.message||e.hint||('HTTP '+r.status));}
-  return t?JSON.parse(t):null;
+  const headers = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    ...(opts.headers || {})
+  };
+  // opts から headers を除外してから spread（headers が上書きされないように）
+  const { headers: _hdr, ...restOpts } = opts;
+  const r = await fetch(SB_URL + '/rest/v1/' + path, { ...restOpts, headers });
+  const t = await r.text();
+  if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
+  return t ? JSON.parse(t) : null;
 }
 
 // ===== ユーティリティ =====
