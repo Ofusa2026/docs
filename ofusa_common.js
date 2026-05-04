@@ -345,11 +345,15 @@ async function sendSignRequest(){
   const signFields = area.querySelectorAll('.sign-field');
   if(!signFields.length){ showToast('⚠️ 署名フィールドがありません'); return; }
 
-  // 案件情報を取得：caseSelect → 親から問い合わせ
+  // 案件情報を取得：caseSelect → window._lastCaseInfo → 親から問い合わせ
   let info = null;
   const sel = document.getElementById('caseSelect');
   if(sel && sel.value){
     try{ info = JSON.parse(sel.value); }catch(e){}
+  }
+  // SELECT_CASE 受信時に保存された最新infoを使う
+  if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId){
+    info = window._lastCaseInfo;
   }
   if(!info || !info.caseId){
     info = await new Promise((resolve) => {
@@ -420,6 +424,8 @@ async function sendSignRequest(){
    ========================================================== */
 async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
+  // グローバルに最新の案件情報を保存（DB保存・署名依頼で使う）
+  window._lastCaseInfo = info;
   console.log('[doc] loadCaseToForm:', info);
   const {caseId, companyId, companyName, empSetIdx} = info;
   try {
@@ -669,11 +675,15 @@ if(typeof window !== 'undefined' && window.parent && window.parent !== window){
    ========================================================== */
 async function saveFormGeneric(docKey, opts){
   opts = opts || {};
-  // 案件情報を取得：caseSelect → 親から問い合わせ
+  // 案件情報を取得：caseSelect → window._lastCaseInfo → 親から問い合わせ
   let info = null;
   const sel = document.getElementById('caseSelect');
   if(sel && sel.value){
     try{ info = JSON.parse(sel.value); }catch(e){}
+  }
+  // SELECT_CASE 受信時に保存された最新infoを使う
+  if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId){
+    info = window._lastCaseInfo;
   }
   if(!info || !info.caseId){
     info = await new Promise((resolve) => {
