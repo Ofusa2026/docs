@@ -345,18 +345,45 @@ async function sendSignRequest(){
   const signFields = area.querySelectorAll('.sign-field');
   if(!signFields.length){ showToast('⚠️ 署名フィールドがありません'); return; }
 
+  // 案件情報を取得：caseSelect → 親から問い合わせ
+  let info = null;
+  const sel = document.getElementById('caseSelect');
+  if(sel && sel.value){
+    try{ info = JSON.parse(sel.value); }catch(e){}
+  }
+  if(!info || !info.caseId){
+    info = await new Promise((resolve) => {
+      const handler = (e) => {
+        if(e.data && e.data.type === 'CASE_INFO_RESPONSE'){
+          window.removeEventListener('message', handler);
+          resolve(e.data.info || null);
+        }
+      };
+      window.addEventListener('message', handler);
+      try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(e){}
+      setTimeout(() => {
+        window.removeEventListener('message', handler);
+        resolve(null);
+      }, 1000);
+    });
+  }
+  const caseId = (info && info.caseId) || '';
+  if(!caseId){
+    showToast('⚠️ 案件が選択されていません');
+    return;
+  }
+
+  // 念のためプレビューを再描画してから取得（最新の入力値を確実に反映）
+  if(typeof p === 'function') p();
   // HTMLを取得
   const html = area.innerHTML;
+  if(!html || html.length < 100){
+    showToast('⚠️ 書類内容が空です');
+    return;
+  }
 
   // トークン生成
   const token = crypto.randomUUID();
-
-  // 案件ID取得
-  const sel = document.getElementById('caseSelect');
-  let caseId = '';
-  if(sel && sel.value){
-    try{ caseId = JSON.parse(sel.value).caseId || ''; }catch(e){}
-  }
 
   // doc_type
   const docTitle = document.getElementById('docTitle')?.textContent || 'doc';
