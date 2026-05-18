@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>申請ご依頼から審査完了までの流れ｜大房行政書士法人</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    background: #f6f7f9;
+    color: #2a2a2a;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    color: #fff;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  header .logo-area {
+    font-size: 12px;
+    opacity: 0.85;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+  header .subtitle { margin-top: 8px; font-size: 14px; opacity: 0.9; }
+
+  .intro {
+    background: #fff;
+    padding: 24px;
+    border-bottom: 1px solid #e6e9ee;
+  }
+  .intro-inner { max-width: 760px; margin: 0 auto; }
+  .intro-inner p { margin: 0 0 10px 0; font-size: 15px; }
+  .intro-inner .system-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #c4894a 0%, #d49c5a 100%);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* 凡例 */
+  .legend {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12.5px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-tag {
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .tag-company { background: #e8f4ea; color: #2d5f2d; }
+  .tag-ofusa { background: #e8f0fa; color: #1e3a5f; }
+
+  /* ステップカード */
+  .step {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    padding: 22px 24px 22px 90px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-left: 4px solid #c9d3df;
+  }
+  .step::before {
+    content: attr(data-num);
+    position: absolute;
+    left: 22px;
+    top: 22px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .step.by-company { border-left-color: #5c8a5c; }
+  .step.by-company::before { background: #5c8a5c; }
+  .step.by-ofusa { border-left-color: #2c5282; }
+  .step.by-ofusa::before { background: #2c5282; }
+
+  .step h3 {
+    margin: 0 0 6px 0;
+    font-size: 17px;
+    color: #1e3a5f;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .step .who-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .step p { margin: 8px 0 0 0; font-size: 14px; color: #444; }
+
+  /* リンクボタン */
+  .link-buttons {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .link-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 2px solid #2c5282;
+    color: #2c5282 !important;
+    padding: 12px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .link-btn:hover {
+    background: #2c5282;
+    color: #fff !important;
+  }
+  .link-btn .icon {
+    flex: 0 0 32px;
+    height: 32px;
+    background: #eef2f7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .link-btn:hover .icon { background: rgba(255,255,255,0.25); }
+  .link-btn .label { flex: 1; }
+  .link-btn .label small {
+    display: block;
+    font-weight: normal;
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+  .sample-mark {
+    display: inline-block;
+    background: #f5b7b7;
+    color: #8a1f1f;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* 必要書類リスト */
+  .doc-list-box {
+    background: #f8fafc;
+    border: 1px solid #dde4ec;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+  }
+  .doc-list-title {
+    font-weight: 700;
+    color: #1e3a5f;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .doc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    columns: 2;
+    column-gap: 18px;
+    font-size: 13px;
+    color: #444;
+  }
+  .doc-list li {
+    padding: 3px 0 3px 18px;
+    position: relative;
+    break-inside: avoid;
+  }
+  .doc-list li::before {
+    content: "□";
+    position: absolute;
+    left: 0;
+    color: #2c5282;
+    font-weight: 700;
+  }
+
+  /* 新システムボックス */
+  .system-box {
+    background: linear-gradient(135deg, #fff8ed 0%, #fff3dd 100%);
+    border: 2px solid #e8b870;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .system-box .sb-title {
+    color: #8a5a00;
+    font-weight: 700;
+    font-size: 13.5px;
+    margin-bottom: 6px;
+  }
+  .system-box .sb-title::before { content: "✨ "; }
+  .system-box p { margin: 0; color: #5a3a00; font-size: 13px; }
+
+  /* フェーズ仕切り */
+  .phase-divider {
+    display: flex;
+    align-items: center;
+    margin: 28px 0 14px;
+    color: #666;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+  }
+  .phase-divider::before, .phase-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #ccd3db;
+  }
+  .phase-divider span { padding: 0 14px; }
+
+  /* スプシバナー */
+  .sheet-banner {
+    background: linear-gradient(135deg, #1a7e3a 0%, #2ba055 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 8px rgba(26,126,58,0.25);
+  }
+  .sheet-banner .sb-step {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .sheet-banner h3 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+  }
+  .sheet-banner p {
+    margin: 0 0 12px 0;
+    font-size: 13.5px;
+    opacity: 0.95;
+  }
+  .sheet-banner .sheet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #1a7e3a !important;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .sheet-banner .sb-detail {
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 12.5px;
+  }
+  .sheet-banner .sb-detail strong { display: block; margin-bottom: 4px; font-size: 12px; }
+  .sheet-banner .sb-detail ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12.5px;
+  }
+  .sheet-banner .sb-detail li { margin-bottom: 2px; }
+
+  /* メール見本 */
+  .mail-sample {
+    margin-top: 14px;
+    border: 1px solid #d4dbe3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .mail-sample summary {
+    background: #f0f4f9;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2c5282;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mail-sample summary::-webkit-details-marker { display: none; }
+  .mail-sample summary::before {
+    content: "▶";
+    font-size: 10px;
+    transition: transform 0.2s;
+    color: #2c5282;
+  }
+  .mail-sample[open] summary::before {
+    transform: rotate(90deg);
+  }
+  .mail-sample summary:hover { background: #e6eef7; }
+  .mail-sample .mail-body {
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #333;
+    white-space: pre-wrap;
+    background: #fafbfc;
+    border-top: 1px solid #e6e9ee;
+  }
+  .mail-sample .mail-body a {
+    color: #2c5282;
+    word-break: break-all;
+    text-decoration: underline;
+  }
+  .mail-sample .mail-divider {
+    color: #888;
+    font-family: monospace;
+    font-size: 11px;
+    letter-spacing: -1px;
+  }
+  .mail-sample .mail-label {
+    font-weight: 700;
+    color: #1e3a5f;
+  }
+
+  /* フッター */
+  footer {
+    background: #1e3a5f;
+    color: #fff;
+    text-align: center;
+    padding: 28px 16px;
+    margin-top: 30px;
+  }
+  footer .company { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  footer .tel { font-size: 15px; }
+  footer .tel a { color: #fff; text-decoration: none; }
+  footer .note { font-size: 12px; opacity: 0.7; margin-top: 14px; }
+
+  @media (max-width: 600px) {
+    header { padding: 24px 16px; }
+    header h1 { font-size: 19px; }
+    .step { padding: 18px 16px 18px 70px; }
+    .step::before { left: 14px; top: 18px; width: 40px; height: 40px; font-size: 15px; }
+    .step h3 { font-size: 15px; }
+    .doc-list { columns: 1; }
+    main { padding: 18px 12px 50px; }
+    .intro { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">OFUSA GYOSEISHOSHI HOJIN</div>
+  <h1>申請ご依頼から審査完了までの流れ</h1>
+  <div class="subtitle">特定技能ビザ申請サポート</div>
+</header>
+
+<div class="intro">
+  <div class="intro-inner">
+    <span class="system-badge">🆕 NEW システム導入</span>
+    <p>いつも大変お世話になっております。<strong>大房行政書士法人</strong>です。</p>
+    <p>このたび案件管理システムの導入により、<strong>進捗の見える化・書類の一元管理・スムーズな情報共有</strong>が可能となりました。</p>
+    <p>下記の流れでお手続きを進めてまいりますので、ご確認のほどよろしくお願いいたします。</p>
+  </div>
+</div>
+
+<main>
+
+  <!-- ★ ⓪ 案件進捗確認システム ★ -->
+  <div class="sheet-banner">
+    <div class="sb-step">⓪ FIRST STEP</div>
+    <h3>📊 案件進捗確認システムで申請進捗を管理</h3>
+    <p>貴社と弊社の申請の進捗状況については、すべて下記URLにて今後管理させていただきます。</p>
+    <a href="https://ofusa2026.github.io/org-view/share.html?token=0e1d3b61-9dfd-4b42-a3ce-12c945c34aa2" target="_blank" class="sheet-link">案件進捗確認システムを開く →</a>
+    <div class="sb-detail">
+      <strong>📌 このシステムで管理する内容</strong>
+      <ul>
+        <li>案件の進捗状況の管理</li>
+        <li>審査状況の管理</li>
+        <li>申請受付番号の格納</li>
+        <li>審査完了の格納</li>
+        <li>申請中証明書・預かり証の格納</li>
+        <li>状況に合わせてコメント追記可能</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-tag tag-company">貴社対応</span> 貴社にお願いするステップ</div>
+    <div class="legend-item"><span class="legend-tag tag-ofusa">弊社対応</span> 弊社が対応するステップ</div>
+  </div>
+
+
+  <div class="phase-divider"><span>STEP 1 - 3  ｜  ご依頼・お繋ぎ（貴社対応）</span></div>
+
+  <div class="step by-company" data-num="①">
+    <h3>依頼用スプレッドシートへのご記載 <span class="who-tag tag-company">貴社</span></h3>
+    <p>新規案件発生時、まず<strong>依頼用スプレッドシート</strong>に必要情報をご記載ください。</p>
+
+    <div class="link-buttons">
+      <a href="#" target="_blank" class="link-btn">
+        <div class="icon">📋</div>
+        <div class="label">
+          依頼用スプレッドシート<span class="sample-mark">URL差替</span>
+          <small>新規案件のご依頼用シート</small>
+        </div>
+      </a>
+    </div>
+
+    <p style="font-size:13px;color:#a8281f;margin-top:10px;"><strong>※ 分かる範囲を全て埋めていただくようお願いいたします！</strong></p>
+  </div>
+
+  <div class="step by-company" data-num="②">
+    <h3>「貴社×大房行政書士法人」ご依頼の旨をLINEでご連絡 <span class="who-tag tag-company">貴社</span></h3>
+    <p>依頼用スプレッドシートご記載後、LINEなどにて「ご依頼します」の旨をお送りください。</p>
+  </div>
+
+  <div class="step by-company" data-num="③">
+    <h3>企業様と人材をお繋ぎ <span class="who-tag tag-company">貴社</span></h3>
+    <p>LINEグループ／Facebook／メールなどで、貴社・人材様・弊社の3者をお繋ぎください。</p>
+  </div>
+
+
+  <div class="phase-divider"><span>STEP 4 - 5  ｜  必要書類のご案内（弊社対応）</span></div>
+
+  <div class="step by-ofusa" data-num="④">
+    <h3>企業様へ必要書類のご案内 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>弊社よりLINE／メールなどにて、貴社専用URLをお送りいたします。下記2点をご対応ください。</p>
+
+    <div class="link-buttons">
+      <a href="https://ofusa2026.github.io/form/form.html?case=co_c1773981844911&type=company&name=%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE" target="_blank" class="link-btn">
+        <div class="icon">📝</div>
+        <div class="label">
+          ヒアリングフォーム<span class="sample-mark">SAMPLE</span>
+          <small>企業情報を入力するフォーム</small>
+        </div>
+      </a>
+      <a href="https://ofusa2026.github.io/upload/company_dataup.html?folder=15FYBrNAg6cIhPsVZFRwppYKX85d1W2hz&company=c1773981844911&name=%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE" target="_blank" class="link-btn">
+        <div class="icon">📤</div>
+        <div class="label">
+          書類アップロードURL<span class="sample-mark">SAMPLE</span>
+          <small>スマホ・PCから直接アップロード可能</small>
+        </div>
+      </a>
+    </div>
+
+    <div class="doc-list-box">
+      <div class="doc-list-title">📋 ご用意いただく書類（一例）</div>
+      <ul class="doc-list">
+        <li>決算文書（損益計算書・貸借対照表）</li>
+        <li>登記事項証明書（履歴事項全部証明書）</li>
+        <li>役員（代表1名分）の住民票の写し</li>
+        <li>労働保険料等納付証明書（未納なし）</li>
+        <li>社会保険料納入状況照会回答票</li>
+        <li>納税証明書（その3）</li>
+        <li>納税証明書（地方税・法人住民税）</li>
+        <li>就業規則</li>
+        <li>賃金規定</li>
+        <li>36協定届出書</li>
+        <li>変形労働届出書</li>
+        <li>年間カレンダー</li>
+        <li>居住予定物件の物件資料</li>
+      </ul>
+    </div>
+
+    <p style="margin-top:12px;font-size:12.5px;color:#666;">
+      ※ 既に特定技能受入実績のある企業様には、現行の雇用条件書をいただき、変更点と不足書類のみご案内させていただきます。
+    </p>
+
+    <details class="mail-sample">
+      <summary>📧 ご案内メール見本（企業様向け）を見る</summary>
+      <div class="mail-body"><span class="mail-label">【サンプル株式会社】様</span>
+
+お世話になっております。大房行政書士法人の町田と申します。
+特定技能の申請に必要な書類をご案内いたしますので、ご準備のほどよろしくお願い申し上げます。
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+📋 ご用意いただく書類
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+
+□ 決算文書の写し（損益計算書及び貸借対照表）
+□ 登記事項証明書（履歴事項全部証明書）
+□ 役員（代表で1名分）の住民票の写し
+□ 労働保険料等納付証明書（未納なし証明）
+□ 社会保険料納入状況照会回答票
+□ 納税証明書（その３）源泉所得税及び復興特別所得税・法人税・消費税及び地方消費税　＊税務署発行
+□ 納税証明書（地方税）法人住民税　＊市町村発行
+□ 就業規則
+□ 賃金規定
+□ 36協定届出書
+□ 変形労働届出書
+□ 年間カレンダー
+□ 居住予定物件の物件資料
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+📁 書類アップロード先
+<a href="https://ofusa2026.github.io/upload/company_dataup.html?folder=15FYBrNAg6cIhPsVZFRwppYKX85d1W2hz&company=c1773981844911&name=%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE" target="_blank">https://ofusa2026.github.io/upload/company_dataup.html?folder=15FYBrNAg6cIhPsVZFRwppYKX85d1W2hz&company=c1773981844911&name=%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE</a>
+
+上記URLよりアップロードをお願いいたします。
+携帯からでもアップロード可能です。
+（ドライブへのアクセスが難しい場合はメールまたは郵送でも対応可能です）
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+
+ご不明な点はお気軽にご連絡ください。
+引き続きよろしくお願いいたします。
+
+大房行政書士法人
+TEL：03-6424-8849</div>
+    </details>
+  </div>
+
+  <div class="step by-ofusa" data-num="⑤">
+    <h3>人材様へ必要書類のご案内 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>人材様にも、LINE等で個別の専用URLをお送りいたします。</p>
+
+    <div class="link-buttons">
+      <a href="https://ofusa2026.github.io/form/form.html?case=case_1778196971439&type=tokutei_henkou&name=AKIRA%20OFUSA" target="_blank" class="link-btn">
+        <div class="icon">📝</div>
+        <div class="label">
+          ヒアリングフォーム<span class="sample-mark">SAMPLE</span>
+          <small>人材様の情報を入力するフォーム</small>
+        </div>
+      </a>
+      <a href="https://ofusa2026.github.io/upload/zinzai_dataup.html?folder=1EGt07Jcmr8aoABVyxi1TEZD9G6PHh0x2&case=case_1778196971439&appType=%E5%A4%89%E6%9B%B4&nationality=%E6%97%A5%E6%9C%AC" target="_blank" class="link-btn">
+        <div class="icon">📤</div>
+        <div class="label">
+          書類アップロードURL<span class="sample-mark">SAMPLE</span>
+          <small>スマホで写真撮影してそのままアップ</small>
+        </div>
+      </a>
+    </div>
+
+    <div class="doc-list-box">
+      <div class="doc-list-title">📋 必要書類リスト（一例）</div>
+      <ul class="doc-list">
+        <li>顔写真</li>
+        <li>所得・課税証明書（令和6年度）</li>
+        <li>納税証明書（令和6年度）</li>
+        <li>源泉徴収票（令和5年分）</li>
+        <li>在留カード</li>
+        <li>パスポート</li>
+        <li>合格証（技能）</li>
+        <li>合格証（日本語）</li>
+        <li>健康診断票</li>
+        <li>住民票</li>
+      </ul>
+    </div>
+
+    <details class="mail-sample">
+      <summary>📧 ご案内メール見本（人材様向け）を見る</summary>
+      <div class="mail-body"><span class="mail-label">AKIRA OFUSA様</span>
+
+お疲れ様です。大房行政書士法人です。
+変更のお手続きに必要な書類をご案内いたします。
+以下のURLから書類の写真をアップロードしてください。
+
+📤 書類アップロード
+<a href="https://ofusa2026.github.io/upload/zinzai_dataup.html?folder=1EGt07Jcmr8aoABVyxi1TEZD9G6PHh0x2&case=case_1778196971439&appType=%E5%A4%89%E6%9B%B4&nationality=%E6%97%A5%E6%9C%AC" target="_blank">https://ofusa2026.github.io/upload/zinzai_dataup.html?folder=1EGt07Jcmr8aoABVyxi1TEZD9G6PHh0x2&case=case_1778196971439&appType=%E5%A4%89%E6%9B%B4&nationality=%E6%97%A5%E6%9C%AC</a>
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+📋 必要書類リスト&必要情報リスト
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+
+□ 顔写真
+□ 所得・課税証明書　令和6年度
+□ 納税証明書　令和6年度
+□ 源泉徴収票　令和5年分
+□ 在留カード
+□ パスポート
+□ 合格証（技能）
+□ 合格証（日本語）
+□ 健康診断票
+□ 住民票
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+📝 ヒアリングフォーム
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+
+以下のフォームにもご記入ください：
+<a href="https://ofusa2026.github.io/form/form.html?case=case_1778196971439&type=tokutei_henkou&name=AKIRA%20OFUSA" target="_blank">https://ofusa2026.github.io/form/form.html?case=case_1778196971439&type=tokutei_henkou&name=AKIRA%20OFUSA</a>
+
+<span class="mail-divider">━━━━━━━━━━━━━━━</span>
+
+ご不明な点がございましたら、お気軽にこのLINEグループでご連絡ください。
+よろしくお願いいたします。
+
+大房行政書士法人
+TEL：03-6424-8849</div>
+    </details>
+  </div>
+
+
+  <div class="phase-divider"><span>STEP 6 - 7  ｜  契約書類の作成・署名（弊社対応）</span></div>
+
+  <div class="step by-ofusa" data-num="⑥">
+    <h3>雇用条件書・雇用契約書の作成 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>情報収集と並行して、弊社にて雇用契約書・雇用条件書の作成を進めます。<br>
+    確定次第、貴社へ押印のご依頼をLINE／メールなどにてお送りいたします。</p>
+    <p style="font-size:12.5px;color:#666;">※ データでのやり取りとなります。</p>
+  </div>
+
+  <div class="step by-ofusa" data-num="⑦">
+    <h3>サイン書類のご依頼 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>貴社の押印をいただき次第、人材様へ必要なサイン書類をご依頼いたします。</p>
+    <p style="font-size:12.5px;color:#666;">※ LINE・Facebook・メールなどでデータ対応いただきます。</p>
+  </div>
+
+
+  <div class="phase-divider"><span>STEP 8 - 10  ｜  申請・審査・完了（弊社対応）</span></div>
+
+  <div class="step by-ofusa" data-num="⑧">
+    <h3>入管へ申請 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>書類が揃い次第、入管へ申請いたします。</p>
+    <div class="system-box">
+      <div class="sb-title">申請後すぐに受付番号を案件進捗確認システムへ格納</div>
+      <p>申請完了後、入管から発行される受付番号を案件進捗確認システムに格納し、リアルタイムで確認可能です。</p>
+    </div>
+  </div>
+
+  <div class="step by-ofusa" data-num="⑨">
+    <h3>審査中 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>入管によって追加資料の提出が求められる場合がございます。その際は速やかにご連絡いたしますので、ご対応のほどお願いいたします。</p>
+  </div>
+
+  <div class="step by-ofusa" data-num="⑩">
+    <h3>審査完了・新しい在留カード受領 <span class="who-tag tag-ofusa">弊社</span></h3>
+    <p>審査完了後、新しい在留カードの受け取りについてLINEなどにてやり取りさせていただきます。</p>
+    <p style="font-size:12.5px;color:#666;">※ 基本的に郵送交付での対応を行っております。</p>
+  </div>
+
+
+  <div style="background:#fff;border-radius:10px;padding:20px 22px;margin-top:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+    <h3 style="margin:0 0 10px 0;color:#1e3a5f;font-size:16px;">✨ 新システムでこう変わります</h3>
+    <ul style="margin:0;padding-left:20px;color:#444;font-size:14px;">
+      <li><strong>専用URLでラクラク提出</strong>：スマホからも直接アップロード可能</li>
+      <li><strong>進捗の見える化</strong>：案件進捗確認システムで現在の段階がいつでも確認可能</li>
+      <li><strong>受付番号もリアルタイム共有</strong>：申請後すぐに格納</li>
+      <li><strong>追完対応も漏れなし</strong>：システムで管理し対応漏れを防止</li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  <div class="company">大房行政書士法人</div>
+  <div class="tel">📞 <a href="tel:03-6424-8849">03-6424-8849</a></div>
+  <div class="note">ご不明な点はお気軽にお問い合わせください</div>
+</footer>
+
+</body>
+</html>
