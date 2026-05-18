@@ -253,29 +253,81 @@
   }
   .phase-divider span { padding: 0 14px; }
 
-  /* ⓪セクション（ステップとは別の色合い・ティール系） */
+  /* ⓪セクション（細いバナー版） */
   .sheet-banner {
+    background: linear-gradient(135deg, #f0f8f7 0%, #e3f0ee 100%);
+    border: 1px solid #14807a;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .sheet-banner .sb-icon {
+    flex: 0 0 auto;
+    font-size: 22px;
+  }
+  .sheet-banner .sb-text {
+    flex: 1;
+    min-width: 200px;
+  }
+  .sheet-banner .sb-text strong {
+    display: block;
+    color: #0f5e6e;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .sheet-banner .sb-text small {
+    display: block;
+    color: #2c6863;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .sheet-banner .sheet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #0f5e6e 0%, #14807a 100%);
+    color: #fff !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(20,128,122,0.25);
+    transition: transform 0.15s;
+    white-space: nowrap;
+  }
+  .sheet-banner .sheet-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 7px rgba(20,128,122,0.35);
+  }
+
+  /* ⑧の中の詳細システムボックス（ティール系） */
+  .system-detail-box {
     background: #fff;
     border: 2px solid #14807a;
-    border-radius: 12px;
-    padding: 22px 24px;
-    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 12px;
     box-shadow: 0 2px 6px rgba(20,128,122,0.10);
   }
-  .sheet-banner h3 {
-    margin: 0 0 10px 0;
-    font-size: 18px;
+  .system-detail-box h4 {
+    margin: 0 0 8px 0;
     color: #0f5e6e;
+    font-size: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  .sheet-banner p {
+  .system-detail-box p {
     margin: 0 0 14px 0;
-    font-size: 14px;
+    font-size: 13.5px;
     color: #333;
   }
-  .sheet-banner .sheet-link {
+  .system-detail-box .system-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -289,20 +341,20 @@
     box-shadow: 0 2px 6px rgba(20,128,122,0.30);
     transition: transform 0.15s;
   }
-  .sheet-banner .sheet-link:hover {
+  .system-detail-box .system-link:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(20,128,122,0.40);
   }
-  .sheet-banner .sb-detail {
+  .system-detail-box .detail-list {
     background: #f0f8f7;
     border: 1px solid #b8dbd7;
     border-radius: 8px;
     padding: 14px 18px;
-    margin-top: 16px;
+    margin-top: 14px;
     font-size: 13px;
     color: #0f5e6e;
   }
-  .sheet-banner .sb-detail strong {
+  .system-detail-box .detail-list strong {
     display: block;
     margin-bottom: 8px;
     font-size: 13px;
@@ -310,12 +362,11 @@
     padding-bottom: 6px;
     border-bottom: 1px dashed #b8dbd7;
   }
-  .sheet-banner .sb-detail ul {
+  .system-detail-box .detail-list ul {
     margin: 0;
     padding-left: 20px;
-    font-size: 13px;
   }
-  .sheet-banner .sb-detail li {
+  .system-detail-box .detail-list li {
     margin-bottom: 4px;
     color: #0f5e6e;
   }
@@ -421,22 +472,14 @@
 
 <main>
 
-  <!-- ★ ⓪ 案件進捗確認システム ★ -->
+  <!-- ⓪ 案件進捗確認システム（細いバナー） -->
   <div class="sheet-banner">
-    <h3>📊 案件進捗確認システムで申請進捗を管理</h3>
-    <p>貴社と弊社の申請の進捗状況については、すべて下記URLにて今後管理させていただきます。</p>
-    <a href="https://ofusa2026.github.io/org-view/share.html?token=0e1d3b61-9dfd-4b42-a3ce-12c945c34aa2" target="_blank" class="sheet-link">案件進捗確認システムを開く →</a>
-    <div class="sb-detail">
-      <strong>📌 このシステムで管理する内容</strong>
-      <ul>
-        <li>案件の進捗状況の管理</li>
-        <li>審査状況の管理</li>
-        <li>申請受付番号の格納</li>
-        <li>審査完了の格納</li>
-        <li>申請中証明書・預かり証の格納</li>
-        <li>状況に合わせてコメント追記可能</li>
-      </ul>
+    <div class="sb-icon">📊</div>
+    <div class="sb-text">
+      <strong>案件進捗確認システムで申請進捗を管理</strong>
+      <small>進捗・受付番号・審査状況をリアルタイムで確認できます（詳細は⑧をご参照ください）</small>
     </div>
+    <a href="https://ofusa2026.github.io/org-view/share.html?token=0e1d3b61-9dfd-4b42-a3ce-12c945c34aa2" target="_blank" class="sheet-link">システムを開く →</a>
   </div>
 
 
@@ -667,10 +710,22 @@ TEL：03-6424-8849</div>
   <div class="step by-ofusa" data-num="⑧">
     <h3>入管へ申請 <span class="who-tag tag-ofusa">弊社</span></h3>
     <p>書類が揃い次第、入管へ申請いたします。</p>
-    <div class="system-box">
-      <div class="sb-title">申請後すぐに受付番号を案件進捗確認システムへ格納</div>
-      <p>申請完了後、入管から発行される受付番号を案件進捗確認システムに格納し、リアルタイムで確認可能です。</p>
-      <a href="https://ofusa2026.github.io/org-view/share.html?token=0e1d3b61-9dfd-4b42-a3ce-12c945c34aa2" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:#fff;color:#8a5a00 !important;padding:8px 14px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #e8b870;">📊 案件進捗確認システムを開く →</a>
+    <div class="system-detail-box">
+      <h4>📊 案件進捗確認システムで進捗をリアルタイム確認</h4>
+      <p>申請完了後、入管から発行される受付番号を<strong>案件進捗確認システム</strong>に格納します。<br>
+      下記URLから、いつでも申請の進捗状況をご確認いただけます。</p>
+      <a href="https://ofusa2026.github.io/org-view/share.html?token=0e1d3b61-9dfd-4b42-a3ce-12c945c34aa2" target="_blank" class="system-link">📊 案件進捗確認システムを開く →</a>
+      <div class="detail-list">
+        <strong>📌 このシステムで管理する内容</strong>
+        <ul>
+          <li>案件の進捗状況の管理</li>
+          <li>審査状況の管理</li>
+          <li>申請受付番号の格納</li>
+          <li>審査完了の格納</li>
+          <li>申請中証明書・預かり証の格納</li>
+          <li>状況に合わせてコメント追記可能</li>
+        </ul>
+      </div>
     </div>
   </div>
 
