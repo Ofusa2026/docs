@@ -97,7 +97,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.17</div>
+    <div class="ver">ver.20260519.18</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -680,6 +680,15 @@ async function importPerson(slot){
       s('f_p'+i+'Pass',pd.passport||'');
       s('f_p'+i+'Prev',pd.residence_status||'');
       s('f_p'+i+'Job',pd.occupation||'');
+      // extra JSONB から推薦状用カスタムフィールドを取得
+      // ankenの推薦状タブで追加された sendingOrgOrSchool / homeRelativeInfo は extra に保存される
+      let extra=pd.extra;
+      if(typeof extra==='string'){
+        try{ extra=JSON.parse(extra); }catch(e){ extra={}; }
+      }
+      extra=extra||{};
+      s('f_p'+i+'School', extra.sendingOrgOrSchool||'');
+      s('f_p'+i+'VnContact', extra.homeRelativeInfo||'');
       filled=true;
     }
   }catch(e){ console.warn('persons取得スキップ:',e.message); }
