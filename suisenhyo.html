@@ -59,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.12</div>
+    <div class="ver">ver.20260519.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -281,7 +281,7 @@ function p(){
   <div style="text-align:left;margin-bottom:3mm;">　この推薦状は、署名日から1年間有効</div>
   <div class="sh-foot-date">${f('f_signPlace')}、${v('f_signDate')?f('f_signDate'):'　　　年　　月　　日'}</div>
   <div class="sh-foot-sign">駐日ベトナム社会主義共和国労働管理部長</div>
-  <div class="sh-foot-sign" style="margin-top:1mm;">（署名及び印）</div>
+  <div class="sh-foot-sign" style="margin-top:1mm;margin-right:5em;">（署名及び印）</div>
 </div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
@@ -358,11 +358,11 @@ async function _loadCaseInfo(info){
   if(!caseId && !companyId && !companyName && !orgName){ return; }
   const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
 
-  // 1. case → applicant・org
+  // 1. case → applicant・org・emp_set_idx・契約期間
   let cas=null, orgFromCase='';
   if(caseId){
     try{
-      const rows=await sb('cases?select=applicant,org,company,company_id&id=eq.'+encodeURIComponent(caseId));
+      const rows=await sb('cases?select=applicant,org,company,company_id,emp_set_idx,contract_start,contract_end&id=eq.'+encodeURIComponent(caseId));
       cas=rows&&rows[0];
       if(cas) orgFromCase=cas.org||'';
     }catch(e){ console.warn('cases取得スキップ:',e.message); }
@@ -414,16 +414,10 @@ async function _loadCaseInfo(info){
     // Fax: companies テーブルに該当カラムなしのため未設定（手入力）
   }
 
-  // 4. 契約期間（persons.contract_start / contract_end）— 案件の人材から取得
-  if(caseId){
-    try{
-      const persons=await sb('persons?select=contract_start,contract_end&case_id=eq.'+encodeURIComponent(caseId));
-      const pd=persons&&persons[0];
-      if(pd){
-        s('f_workFrom',_ymd(pd.contract_start||''));
-        s('f_workTo',_ymd(pd.contract_end||''));
-      }
-    }catch(e){ console.warn('persons(契約期間)取得スキップ:',e.message); }
+  // 4. 契約期間：cases.contract_start / cases.contract_end
+  if(cas){
+    s('f_workFrom',_ymd(cas.contract_start||''));
+    s('f_workTo',_ymd(cas.contract_end||''));
   }
 
   if(!v('f_signPlace')){
