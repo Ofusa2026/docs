@@ -59,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.11</div>
+    <div class="ver">ver.20260519.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -489,11 +489,11 @@ async function importPerson(slot){
       const pd=(rec&&rec.data)||rec||{};
       const pNm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
       if(pNm){ nm=pNm; s('f_p'+i+'Name',nm); }
-      s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
+      s('f_p'+i+'Birth',_ymd(pd.birthdate||''));
       s('f_p'+i+'Gender',_gender(pd.gender||''));
-      s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
-      s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
-      s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
+      s('f_p'+i+'Pass',pd.passport||'');
+      s('f_p'+i+'Prev',pd.residence_status||'');
+      s('f_p'+i+'Job',pd.occupation||'');
       filled=true;
     }
   }catch(e){ console.warn('persons取得スキップ:',e.message); }
