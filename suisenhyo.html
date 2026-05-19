@@ -59,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.09</div>
+    <div class="ver">ver.20260519.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -394,21 +394,21 @@ async function _loadCaseInfo(info){
   let co=null;
   if(coId){
     try{
-      const rows=await sb(`companies?select=name,pref,city,address,repName,repTitle,corpNo,tel&id=eq.${coId}`);
+      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&id=eq.${coId}`);
       co=rows&&rows[0];
     }catch(e){ console.warn('companies(id)取得スキップ:',e.message); }
   }
   if(!co && coN){
     try{
-      const rows=await sb(`companies?select=name,pref,city,address,repName,repTitle,corpNo,tel&name=eq.${encodeURIComponent(coN)}`);
+      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&name=eq.${encodeURIComponent(coN)}`);
       co=rows&&rows[0];
     }catch(e){ console.warn('companies(name)取得スキップ:',e.message); }
   }
   if(co){
     s('f_coName',co.name||'');
-    s('f_coLicense',co.corpNo||'');
+    s('f_coLicense',co.corp_no||'');
     s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
-    s('f_coRep',co.repName||'');
+    s('f_coRep',co.rep_name||'');
     s('f_coTel',co.tel||'');
     // Fax: companies テーブルに該当カラムなしのため未設定（手入力）
   }
