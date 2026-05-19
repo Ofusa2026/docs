@@ -69,15 +69,16 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 table.kf-tbl{width:100%;border-collapse:collapse;font-size:8pt;margin-top:2mm;table-layout:fixed}
 table.kf-tbl th,table.kf-tbl td{border:1px solid #000;padding:2px 3px;text-align:center;vertical-align:middle;word-wrap:break-word;line-height:1.25}
 table.kf-tbl th{font-weight:normal;font-size:7.5pt}
-table.kf-tbl td.kf-no{width:5%}
-table.kf-tbl td.kf-name{width:14%;text-align:left;font-size:8pt}
+table.kf-tbl th.kf-h-multi{font-size:6.5pt;line-height:1.2;padding:2px 2px}
+table.kf-tbl td.kf-no{width:4%}
+table.kf-tbl td.kf-name{width:13%;text-align:left;font-size:8pt}
 table.kf-tbl td.kf-birth{width:9%}
-table.kf-tbl td.kf-sex{width:6%}
+table.kf-tbl td.kf-sex{width:5%}
 table.kf-tbl td.kf-pass{width:10%}
-table.kf-tbl td.kf-school{width:16%;text-align:left;font-size:7.5pt}
+table.kf-tbl td.kf-school{width:17%;text-align:left;font-size:7.5pt}
 table.kf-tbl td.kf-job{width:9%}
 table.kf-tbl td.kf-period{width:14%}
-table.kf-tbl td.kf-addr{width:17%;text-align:left;font-size:7.5pt}
+table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 .kf-confirm{margin-top:5mm;font-size:10pt;line-height:1.5}
 .kf-sign-row{margin-top:6mm;font-size:10pt;line-height:1.8}
 .kf-sign-row .applicant{display:inline-block;border-bottom:1px solid #000;min-width:40mm;padding:0 0.5em}
@@ -96,7 +97,7 @@ table.kf-tbl td.kf-addr{width:17%;text-align:left;font-size:7.5pt}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.15</div>
+    <div class="ver">ver.20260519.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -112,7 +113,7 @@ table.kf-tbl td.kf-addr{width:17%;text-align:left;font-size:7.5pt}
   <div class="fp-inner">
 
     <div class="fs"><div class="fs-title">📄 交付申請書（P1）</div>
-      <div class="fg"><label>受付番号</label><input id="f_receiptNo" placeholder="入管庁発行の受付番号" oninput="p()"></div>
+      <div class="fg"><label>受付番号</label><input id="f_receiptNo" placeholder="空のまま提出（ベトナム側で記入）" oninput="p()"></div>
       <div class="fg"><label>申請者氏名又は名称</label><input id="f_applicantName" value="大房明良" oninput="p()"></div>
       <div class="fg" style="display:block;">
         <label style="display:block;margin-bottom:4px;">申請者と人材の関係</label>
@@ -387,20 +388,15 @@ function p(){
 <table class="kf-tbl">
   <thead>
     <tr>
-      <th rowspan="2">STT<br>順番</th>
-      <th rowspan="2">Họ và tên<br>氏名</th>
-      <th rowspan="2">Ngày sinh<br>生年月日</th>
-      <th rowspan="2">Giới tính<br>性別</th>
-      <th rowspan="2">Số Hộ chiếu<br>旅券番号</th>
-      <th>Tên Công ty phái cử/Tên trường học</th>
-      <th rowspan="2">Ngành nghề<br>特定技能職業</th>
-      <th>Thời hạn lao động</th>
-      <th>Địa chỉ, SĐT gia đình tại VN</th>
-    </tr>
-    <tr>
-      <th style="font-size:6.5pt;line-height:1.15;">従前の実習生のベトナム送出機関名/留学生の日本学校名</th>
-      <th style="font-size:7pt;line-height:1.15;">特定技能の雇用契約書の労働期間 (○○から○○まで)</th>
-      <th style="font-size:7pt;line-height:1.15;">母国の親族の連絡先（住所・電話番号）</th>
+      <th>STT<br>順番</th>
+      <th>Họ và tên<br>氏名</th>
+      <th>Ngày sinh<br>生年月日</th>
+      <th>Giới tính<br>性別</th>
+      <th>Số Hộ chiếu<br>旅券番号</th>
+      <th class="kf-h-multi">Tên Công ty phái cử đối với Thực tập sinh/<br>Tên trường học tại Nhật đối với Du học sinh<br>従前の実習生のベトナムにおける送出機関名/<br>留学生の日本における学校名</th>
+      <th>Ngành nghề<br>特定技能職業</th>
+      <th class="kf-h-multi">Thời hạn lao động<br>(từ...đến...)<br>特定技能とする雇用契約書の労働期間<br>(○○から○○まで)</th>
+      <th class="kf-h-multi">Địa chỉ, số điện thoại của gia đình tại Việt Nam<br>母国での親族の連絡先（住所、電話番号）</th>
     </tr>
   </thead>
   <tbody>
