@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>特定技能外国人表（添付2）</title>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:15mm!important;line-height:1.4!important;min-height:auto!important;font-size:10.5pt!important}
+.sh-title{font-size:14pt;font-weight:bold;text-align:center;margin:2mm 0 6mm}
+.sh-attach{text-align:right;font-size:10.5pt;margin-bottom:2mm}
+.sh-sec{margin-bottom:5mm}
+.sh-secnum{font-weight:bold;margin-bottom:1.5mm}
+.sh-row{display:flex;margin-bottom:1mm;padding-left:1em}
+.sh-label{flex:0 0 auto;white-space:nowrap}
+.sh-val{flex:1;padding-left:0.5em}
+.sh-cb{margin:3mm 0 2mm 1em;font-size:10.5pt}
+.sh-cb span{margin-right:2em}
+table.sh-tbl{width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:2mm}
+table.sh-tbl th,table.sh-tbl td{border:1px solid #000;padding:3px 4px;text-align:center;vertical-align:middle}
+table.sh-tbl th{background:#f5f5f5;font-weight:normal;white-space:nowrap}
+table.sh-tbl td.col-no{width:6%;}
+table.sh-tbl td.col-name{width:20%;text-align:left}
+table.sh-tbl td.col-birth{width:14%}
+table.sh-tbl td.col-gender{width:8%}
+table.sh-tbl td.col-pass{width:14%}
+table.sh-tbl td.col-prev{width:18%}
+table.sh-tbl td.col-job{width:20%;text-align:left}
+.sh-note{font-size:9.5pt;margin-top:2mm}
+.sh-foot{margin-top:8mm;font-size:10.5pt}
+.sh-foot-date{margin:3mm 0 6mm 2em}
+.sh-foot-sign{margin-top:2mm;text-align:left}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
+    <div class="ver">ver.20260519.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('suisenhyo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+
+    <div class="fs"><div class="fs-title">1. 登録支援機関に関する情報</div>
+      <div class="fg"><label>名称</label><input id="f_supName" value="株式会社アイデム" oninput="p()"></div>
+      <div class="fg"><label>認可番号</label><input id="f_supLicense" value="19登-000325" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名</label><input id="f_supRep" value="椛山亮" oninput="p()"></div>
+      <div class="fg"><label>所在地</label><input id="f_supAddr" value="東京都新宿区新宿1-4-10" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_supTel" value="03-5369-8711" oninput="p()"></div>
+      <div class="fg"><label>Fax番号</label><input id="f_supFax" value="03-6850-5600" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">2. 日本の受入機関に関する情報</div>
+      <div class="fg"><label>名称</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>認可番号</label><input id="f_coLicense" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名</label><input id="f_coRep" oninput="p()"></div>
+      <div class="fg"><label>所在地</label><input id="f_coAddr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_coTel" oninput="p()"></div>
+      <div class="fg"><label>Fax番号</label><input id="f_coFax" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">3. 労働期間</div>
+      <div class="fg"><label>開始（西暦）</label><input id="f_workFrom" placeholder="2026年4月1日" oninput="p()"></div>
+      <div class="fg"><label>終了（西暦）</label><input id="f_workTo" placeholder="2031年3月31日" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">4. 特定技能外国人</div>
+      <div class="fg"><label>区分</label>
+        <select id="f_visaType" onchange="p()">
+          <option value="1">1号特定技能外国人</option>
+          <option value="2">2号特定技能外国人</option>
+        </select>
+      </div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※案件選択でDBから人材を最大5名まで自動投入。手動で上書き可能。</div>
+    </div>
+
+    <div class="fs"><div class="fs-title">人材1</div>
+      <div class="fg"><label>氏名(英字)</label><input id="f_p1Name" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_p1Birth" placeholder="1995/04/01" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_p1Gender" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
+      <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_p1Job" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">人材2</div>
+      <div class="fg"><label>氏名(英字)</label><input id="f_p2Name" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_p2Birth" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_p2Gender" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
+      <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_p2Job" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">人材3</div>
+      <div class="fg"><label>氏名(英字)</label><input id="f_p3Name" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_p3Birth" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_p3Gender" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
+      <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_p3Job" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">人材4</div>
+      <div class="fg"><label>氏名(英字)</label><input id="f_p4Name" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_p4Birth" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_p4Gender" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
+      <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_p4Job" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">人材5</div>
+      <div class="fg"><label>氏名(英字)</label><input id="f_p5Name" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_p5Birth" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_p5Gender" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
+      <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_p5Job" oninput="p()"></div>
+    </div>
+
+    <div class="fs"><div class="fs-title">署名情報</div>
+      <div class="fg"><label>署名地</label><input id="f_signPlace" value="東京" oninput="p()"></div>
+      <div class="fg"><label>署名年月日</label><input id="f_signDate" placeholder="2026年5月19日" oninput="p()"></div>
+    </div>
+
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1777875849"></script>
+<script>
+function _row(i){
+  // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
+  const ids=['Name','Birth','Gender','Pass','Prev','Job'];
+  const any=ids.some(k=>v('f_p'+i+k));
+  const cell=k=>any?f('f_p'+i+k):'&nbsp;';
+  return `<tr>
+    <td class="col-no">${i}</td>
+    <td class="col-name">${cell('Name')}</td>
+    <td class="col-birth">${cell('Birth')}</td>
+    <td class="col-gender">${cell('Gender')}</td>
+    <td class="col-pass">${cell('Pass')}</td>
+    <td class="col-prev">${cell('Prev')}</td>
+    <td class="col-job">${cell('Job')}</td>
+  </tr>`;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const visa=document.getElementById('f_visaType');
+  const v1=visa&&visa.value==='1'?'■':'□';
+  const v2=visa&&visa.value==='2'?'■':'□';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="sh-attach">添付2</div>
+<div class="sh-title">特定技能外国人表</div>
+
+<div class="sh-sec">
+  <div class="sh-secnum">1．登録支援機関に関する情報</div>
+  <div class="sh-row"><div class="sh-label">（名称）：</div><div class="sh-val">${f('f_supName')}</div></div>
+  <div class="sh-row"><div class="sh-label">（認可番号）：</div><div class="sh-val">${f('f_supLicense')}</div></div>
+  <div class="sh-row"><div class="sh-label">（代表者の氏名）：</div><div class="sh-val">${f('f_supRep')}</div></div>
+  <div class="sh-row"><div class="sh-label">（所在地）：</div><div class="sh-val">${f('f_supAddr')}</div></div>
+  <div class="sh-row">
+    <div class="sh-label">（電話番号）：</div><div style="padding-left:0.5em;padding-right:2em;">${f('f_supTel')}</div>
+    <div class="sh-label">Fax ファックス番号：</div><div class="sh-val">${f('f_supFax')}</div>
+  </div>
+</div>
+
+<div class="sh-sec">
+  <div class="sh-secnum">2．日本の受入機関に関する情報</div>
+  <div class="sh-row"><div class="sh-label">（名称）：</div><div class="sh-val">${f('f_coName')}</div></div>
+  <div class="sh-row"><div class="sh-label">（認可番号）：</div><div class="sh-val">${f('f_coLicense')}</div></div>
+  <div class="sh-row"><div class="sh-label">（代表者の氏名）：</div><div class="sh-val">${f('f_coRep')}</div></div>
+  <div class="sh-row"><div class="sh-label">（所在地）：</div><div class="sh-val">${f('f_coAddr')}</div></div>
+  <div class="sh-row">
+    <div class="sh-label">（電話番号）：</div><div style="padding-left:0.5em;padding-right:2em;">${f('f_coTel')}</div>
+    <div class="sh-label">Fax ファックス番号：</div><div class="sh-val">${f('f_coFax')}</div>
+  </div>
+</div>
+
+<div class="sh-sec">
+  <div class="sh-secnum">3．労働期間</div>
+  <div class="sh-row"><div class="sh-val">${f('f_workFrom')}　から　${f('f_workTo')}　まで</div></div>
+</div>
+
+<div class="sh-sec">
+  <div class="sh-secnum">4．特定技能外国人に関する情報</div>
+  <div class="sh-cb"><span>${v1}　1号特定技能外国人</span><span>${v2}　2号特定技能外国人</span></div>
+  <table class="sh-tbl">
+    <thead>
+      <tr>
+        <th>項番</th><th>氏名</th><th>生年月日</th><th>性別</th>
+        <th>旅券番号</th><th>従前の在留資格<sup>(*)</sup></th><th>職業</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${_row(1)}${_row(2)}${_row(3)}${_row(4)}${_row(5)}
+    </tbody>
+  </table>
+  <div class="sh-note">（*）「特定技能」へ在留資格を変更する以前の在留資格に関する情報を明記とすること。</div>
+</div>
+
+<div class="sh-foot">
+  <div>　この推薦状は、署名日から1年間有効</div>
+  <div class="sh-foot-date">${f('f_signPlace')}、${f('f_signDate')}</div>
+  <div class="sh-foot-sign">駐日ベトナム社会主義共和国労働管理部長</div>
+  <div class="sh-foot-sign" style="margin-top:1mm;">（署名及び印）</div>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  _applySuisenhyoFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applySuisenhyoFontSize(){
+  const st=document.getElementById('_suisenhyoFontStyle')||document.createElement('style');
+  st.id='_suisenhyoFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc .sh-title{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc .sh-tbl{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.doc .sh-note{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+function _ymd(d){
+  if(!d) return '';
+  // 2025-04-01 → 2025/04/01
+  const m=String(d).match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if(m) return `${m[1]}/${String(m[2]).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;
+  return d;
+}
+function _gender(g){
+  if(!g) return '';
+  const s=String(g);
+  if(/男|male|^M$/i.test(s)) return '男';
+  if(/女|female|^F$/i.test(s)) return '女';
+  return s;
+}
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel||!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId,companyId,companyName}=info;
+  try{
+    // 会社情報
+    const q=companyId?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&id=eq.${companyId}`
+      :companyName?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&name=eq.${encodeURIComponent(companyName)}`:null;
+    const cos=q?await sb(q):null;
+    const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
+    if(co){
+      s('f_coName',co.name||'');
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_coRep',co.author_name||'');
+      s('f_coTel',co.phone||'');
+      s('f_coFax',co.fax||'');
+    }
+    // 人材（case_idで取得・最大5名）
+    if(caseId){
+      const persons=await sb('persons?select=*&case_id=eq.'+caseId);
+      if(Array.isArray(persons)){
+        persons.slice(0,5).forEach((rec,idx)=>{
+          const pd=(rec&&rec.data)||rec||{};
+          const i=idx+1;
+          // 氏名は英字優先（ローマ字 / applicant_name_en / name_en / 漢字name の順）
+          const nm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
+          s('f_p'+i+'Name',nm);
+          s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
+          s('f_p'+i+'Gender',_gender(pd.gender||''));
+          s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
+          // 従前の在留資格（よく使われる候補）
+          s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
+          s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
+        });
+      }
+    }
+    if(!v('f_signDate')){
+      const n=new Date();
+      document.getElementById('f_signDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'suisenhyo'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
