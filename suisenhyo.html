@@ -59,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.10</div>
+    <div class="ver">ver.20260519.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -372,15 +372,16 @@ async function _loadCaseInfo(info){
   const orgN=orgName||orgFromCase;
   if(orgN){
     try{
-      // 確実に存在するカラム: name, address, support_manager, reg_no
-      const sos=await sb('support_orgs?select=name,address,support_manager,reg_no&name=eq.'+encodeURIComponent(orgN));
+      // DB実カラム: name, address, support_manager, reg_no, tel, rep_name
+      const sos=await sb('support_orgs?select=name,address,support_manager,reg_no,tel,rep_name&name=eq.'+encodeURIComponent(orgN));
       const org=sos&&sos[0];
       if(org){
         s('f_supName',org.name||'');
         s('f_supLicense',org.reg_no||'');
-        s('f_supRep',org.support_manager||'');
+        s('f_supRep',org.rep_name||org.support_manager||'');
         s('f_supAddr',org.address||'');
-        // 電話・Fax は support_orgs に該当カラムなしのため未設定（手入力）
+        s('f_supTel',org.tel||'');
+        // Fax は support_orgs に該当カラムなしのため未設定（手入力）
       } else {
         // 名前だけは入れておく
         s('f_supName',orgN);
@@ -461,33 +462,54 @@ async function importPerson(slot){
   if(!inp) return;
   const cid=(inp.value||'').trim();
   if(!cid){ if(st){st.textContent='case IDを貼り付けてください';st.className='cid-status warn';} return; }
-  // 形式チェックは警告のみで、処理は継続する
   if(st){ st.textContent='取得中...'; st.className='cid-status'; }
+  const s=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val||'';};
+  const i=slot;
+  let nm='', filled=false;
+
+  // 1. まずcasesから申請人名を取得（最低限の情報）
+  let cas=null;
+  try{
+    const rows=await sb('cases?select=applicant&id=eq.'+encodeURIComponent(cid));
+    cas=rows&&rows[0];
+    if(cas && cas.applicant){
+      nm=cas.applicant;
+      s('f_p'+i+'Name',nm);
+      filled=true;
+    }
+  }catch(e){ console.warn('cases取得スキップ:',e.message); }
+
+  // 2. personsから詳細情報を取得（あれば上書き）
+  let foundPersons=false;
   try{
     const persons=await sb('persons?select=*&case_id=eq.'+encodeURIComponent(cid));
     const rec=persons&&persons[0];
-    if(!rec){
-      if(st){ st.textContent='⚠️ 該当する人材が見つかりません'; st.className='cid-status err'; }
-      return;
+    if(rec){
+      foundPersons=true;
+      const pd=(rec&&rec.data)||rec||{};
+      const pNm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
+      if(pNm){ nm=pNm; s('f_p'+i+'Name',nm); }
+      s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
+      s('f_p'+i+'Gender',_gender(pd.gender||''));
+      s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
+      s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
+      s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
+      filled=true;
     }
-    const pd=(rec&&rec.data)||rec||{};
-    const s=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val||'';};
-    const i=slot;
-    const nm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
-    s('f_p'+i+'Name',nm);
-    s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
-    s('f_p'+i+'Gender',_gender(pd.gender||''));
-    s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
-    s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
-    s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
-    if(btn) btn.classList.add('has-data');
-    if(st){ st.textContent='✅ 投入: '+(nm||'(名無し)'); st.className='cid-status ok'; }
-    p();
-    showToast('✅ 人材'+slot+'に投入しました');
-  }catch(e){
-    if(st){ st.textContent='⚠️ エラー: '+e.message; st.className='cid-status err'; }
-    console.error(e);
+  }catch(e){ console.warn('persons取得スキップ:',e.message); }
+
+  if(!filled){
+    if(st){ st.textContent='⚠️ caseIDに該当する人材データが見つかりません'; st.className='cid-status err'; }
+    return;
   }
+  if(btn) btn.classList.add('has-data');
+  if(st){
+    const note=foundPersons?'':'（personsレコードなし。氏名のみ取得）';
+    st.textContent='✅ 投入: '+(nm||'(名無し)')+note;
+    st.className=foundPersons?'cid-status ok':'cid-status warn';
+  }
+  p();
+  showToast('✅ 人材'+slot+'に投入しました');
 }
 function clearPerson(slot){
   const i=slot;
