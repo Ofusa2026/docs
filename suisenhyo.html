@@ -30,11 +30,35 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 .sh-foot{margin-top:8mm;font-size:10.5pt}
 .sh-foot-date{margin:3mm 0 6mm 2em}
 .sh-foot-sign{margin-top:2mm;text-align:left}
+
+/* 人材枠の case選択ボタン */
+.person-pick-btn{display:inline-block;margin:4px 6px 6px;padding:4px 10px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600}
+.person-pick-btn:hover{background:#1d4ed8}
+.person-pick-btn.has-data{background:#16a34a}
+.person-clear-btn{display:inline-block;margin:4px 0 6px;padding:4px 8px;background:#f3f4f6;color:#666;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;font-size:11px}
+.person-clear-btn:hover{background:#e5e7eb}
+
+/* 人材選択モーダル */
+.pp-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;padding:40px 20px}
+.pp-modal-bg.open{display:flex}
+.pp-modal{background:#fff;border-radius:8px;width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.pp-modal-head{padding:14px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;background:#f9fafb}
+.pp-modal-title{font-weight:700;font-size:14px;flex:1}
+.pp-modal-close{cursor:pointer;background:none;border:none;font-size:22px;color:#666;line-height:1}
+.pp-modal-search{padding:12px 18px;border-bottom:1px solid #e5e7eb;display:flex;gap:8px;flex-wrap:wrap}
+.pp-modal-search input,.pp-modal-search select{padding:6px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;flex:1;min-width:120px}
+.pp-modal-list{flex:1;overflow-y:auto;padding:4px 0}
+.pp-modal-row{padding:9px 18px;cursor:pointer;border-bottom:1px solid #f3f4f6;font-size:13px}
+.pp-modal-row:hover{background:#eff6ff}
+.pp-modal-row .name{font-weight:600;color:#111}
+.pp-modal-row .sub{color:#6b7280;font-size:11px;margin-top:2px}
+.pp-modal-foot{padding:10px 18px;border-top:1px solid #e5e7eb;font-size:11px;color:#888;text-align:right}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
   .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
+  .pp-modal-bg{display:none!important}
 }
 </style>
 </head>
@@ -42,7 +66,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.01</div>
+    <div class="ver">ver.20260519.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -65,12 +89,12 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
   <div class="fp-inner">
 
     <div class="fs"><div class="fs-title">1. 登録支援機関に関する情報</div>
-      <div class="fg"><label>名称</label><input id="f_supName" value="株式会社アイデム" oninput="p()"></div>
-      <div class="fg"><label>認可番号</label><input id="f_supLicense" value="19登-000325" oninput="p()"></div>
-      <div class="fg"><label>代表者氏名</label><input id="f_supRep" value="椛山亮" oninput="p()"></div>
-      <div class="fg"><label>所在地</label><input id="f_supAddr" value="東京都新宿区新宿1-4-10" oninput="p()"></div>
-      <div class="fg"><label>電話番号</label><input id="f_supTel" value="03-5369-8711" oninput="p()"></div>
-      <div class="fg"><label>Fax番号</label><input id="f_supFax" value="03-6850-5600" oninput="p()"></div>
+      <div class="fg"><label>名称</label><input id="f_supName" oninput="p()"></div>
+      <div class="fg"><label>認可番号</label><input id="f_supLicense" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名</label><input id="f_supRep" oninput="p()"></div>
+      <div class="fg"><label>所在地</label><input id="f_supAddr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_supTel" oninput="p()"></div>
+      <div class="fg"><label>Fax番号</label><input id="f_supFax" oninput="p()"></div>
     </div>
 
     <div class="fs"><div class="fs-title">2. 日本の受入機関に関する情報</div>
@@ -94,10 +118,12 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
           <option value="2">2号特定技能外国人</option>
         </select>
       </div>
-      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※案件選択でDBから人材を最大5名まで自動投入。手動で上書き可能。</div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※各人材枠の「📋case選択」を押すと、その枠だけに人材情報を投入します。</div>
     </div>
 
     <div class="fs"><div class="fs-title">人材1</div>
+      <button class="person-pick-btn" id="pick1Btn" onclick="openPersonPicker(1)">📋 case選択</button>
+      <button class="person-clear-btn" onclick="clearPerson(1)">クリア</button>
       <div class="fg"><label>氏名(英字)</label><input id="f_p1Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p1Birth" placeholder="1995/04/01" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_p1Gender" oninput="p()"></div>
@@ -107,6 +133,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
     </div>
 
     <div class="fs"><div class="fs-title">人材2</div>
+      <button class="person-pick-btn" id="pick2Btn" onclick="openPersonPicker(2)">📋 case選択</button>
+      <button class="person-clear-btn" onclick="clearPerson(2)">クリア</button>
       <div class="fg"><label>氏名(英字)</label><input id="f_p2Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p2Birth" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_p2Gender" oninput="p()"></div>
@@ -116,6 +144,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
     </div>
 
     <div class="fs"><div class="fs-title">人材3</div>
+      <button class="person-pick-btn" id="pick3Btn" onclick="openPersonPicker(3)">📋 case選択</button>
+      <button class="person-clear-btn" onclick="clearPerson(3)">クリア</button>
       <div class="fg"><label>氏名(英字)</label><input id="f_p3Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p3Birth" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_p3Gender" oninput="p()"></div>
@@ -125,6 +155,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
     </div>
 
     <div class="fs"><div class="fs-title">人材4</div>
+      <button class="person-pick-btn" id="pick4Btn" onclick="openPersonPicker(4)">📋 case選択</button>
+      <button class="person-clear-btn" onclick="clearPerson(4)">クリア</button>
       <div class="fg"><label>氏名(英字)</label><input id="f_p4Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p4Birth" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_p4Gender" oninput="p()"></div>
@@ -134,6 +166,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
     </div>
 
     <div class="fs"><div class="fs-title">人材5</div>
+      <button class="person-pick-btn" id="pick5Btn" onclick="openPersonPicker(5)">📋 case選択</button>
+      <button class="person-clear-btn" onclick="clearPerson(5)">クリア</button>
       <div class="fg"><label>氏名(英字)</label><input id="f_p5Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p5Birth" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_p5Gender" oninput="p()"></div>
@@ -161,6 +195,24 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
   <div id="pageArea"></div>
 </div>
 </div>
+
+<!-- 人材選択モーダル -->
+<div class="pp-modal-bg" id="personPickerBg" onclick="if(event.target===this)closePersonPicker()">
+  <div class="pp-modal">
+    <div class="pp-modal-head">
+      <div class="pp-modal-title" id="ppModalTitle">人材を選択</div>
+      <button class="pp-modal-close" onclick="closePersonPicker()">×</button>
+    </div>
+    <div class="pp-modal-search">
+      <select id="ppOrgSel" onchange="renderPersonList()"></select>
+      <select id="ppCoSel" onchange="renderPersonList()"></select>
+      <input id="ppTxt" placeholder="氏名・所属機関で絞り込み" oninput="renderPersonList()">
+    </div>
+    <div class="pp-modal-list" id="ppList"></div>
+    <div class="pp-modal-foot" id="ppFoot">　</div>
+  </div>
+</div>
+
 <script src="ofusa_common.js?v=1777875849"></script>
 <script>
 function _row(i){
@@ -281,14 +333,35 @@ async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel||!sel.value) return;
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
-  const {caseId,companyId,companyName}=info;
+  const {caseId,companyId,companyName,orgId}=info;
   try{
-    // 会社情報
-    const q=companyId?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&id=eq.${companyId}`
+    // 受入機関情報と登録支援機関情報のみを取得（人材は別UIで個別指定）
+    const coQ=companyId?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&id=eq.${companyId}`
       :companyName?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&name=eq.${encodeURIComponent(companyName)}`:null;
-    const cos=q?await sb(q):null;
+    const [cases,cos,orgs]=await Promise.all([
+      caseId?sb('cases?select=applicant,support_org_id&id=eq.'+caseId):Promise.resolve([]),
+      coQ?sb(coQ):Promise.resolve([]),
+      orgId?sb(`support_orgs?select=*&id=eq.${orgId}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0];
     const co=cos&&cos[0];
+    let org=orgs&&orgs[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
+
+    if(!org && cas && cas.support_org_id){
+      const orgs2=await sb(`support_orgs?select=*&id=eq.${cas.support_org_id}`);
+      org=orgs2&&orgs2[0];
+    }
+    // 1. 登録支援機関
+    if(org){
+      s('f_supName',org.name||'');
+      s('f_supLicense',org.reg_no||org.license_no||'');
+      s('f_supRep',org.representative||org.rep_name||org.support_manager||'');
+      s('f_supAddr',org.address||'');
+      s('f_supTel',org.phone||org.tel||'');
+      s('f_supFax',org.fax||'');
+    }
+    // 2. 受入機関（companies）
     if(co){
       s('f_coName',co.name||'');
       s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
@@ -296,32 +369,126 @@ async function loadFromDB(){
       s('f_coTel',co.phone||'');
       s('f_coFax',co.fax||'');
     }
-    // 人材（case_idで取得・最大5名）
-    if(caseId){
-      const persons=await sb('persons?select=*&case_id=eq.'+caseId);
-      if(Array.isArray(persons)){
-        persons.slice(0,5).forEach((rec,idx)=>{
-          const pd=(rec&&rec.data)||rec||{};
-          const i=idx+1;
-          // 氏名は英字優先（ローマ字 / applicant_name_en / name_en / 漢字name の順）
-          const nm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
-          s('f_p'+i+'Name',nm);
-          s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
-          s('f_p'+i+'Gender',_gender(pd.gender||''));
-          s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
-          // 従前の在留資格（よく使われる候補）
-          s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
-          s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
-        });
-      }
-    }
     if(!v('f_signDate')){
       const n=new Date();
       document.getElementById('f_signDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;
     }
-    p(); showToast('✅ データを読み込みました');
+    p(); showToast('✅ 受入機関・登録支援機関を読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
+
+/* ========== 人材選択モーダル ========== */
+let _ppTargetSlot=0;        // 1-5
+let _ppFilterCache=null;    // {orgs:[], companies:[]}
+
+function openPersonPicker(slot){
+  _ppTargetSlot=slot;
+  document.getElementById('ppModalTitle').textContent=`人材${slot}を選択 — caseから人材情報を投入`;
+  // フィルタ用 select を初回だけ構築
+  _buildPpFilters();
+  document.getElementById('ppTxt').value='';
+  renderPersonList();
+  document.getElementById('personPickerBg').classList.add('open');
+  setTimeout(()=>document.getElementById('ppTxt').focus(),50);
+}
+function closePersonPicker(){
+  document.getElementById('personPickerBg').classList.remove('open');
+}
+function _buildPpFilters(){
+  const cases = (typeof _allCases !== 'undefined' && _allCases) ? _allCases : [];
+  // キャッシュは案件数が変わったら作り直す
+  if(_ppFilterCache && _ppFilterCache.count===cases.length) return;
+  const orgs=[...new Set(cases.map(r=>r.org||'').filter(Boolean))].sort();
+  const cos =[...new Set(cases.map(r=>r.company||'').filter(Boolean))].sort();
+  const oSel=document.getElementById('ppOrgSel');
+  const cSel=document.getElementById('ppCoSel');
+  oSel.innerHTML='<option value="">── 登録支援機関 すべて ──</option>'+orgs.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  cSel.innerHTML='<option value="">── 所属機関 すべて ──</option>'+cos.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+  _ppFilterCache={count:cases.length, orgs, companies:cos};
+}
+function renderPersonList(){
+  const cases = (typeof _allCases !== 'undefined' && _allCases) ? _allCases : [];
+  const orgV=document.getElementById('ppOrgSel').value||'';
+  const coV=document.getElementById('ppCoSel').value||'';
+  const txt=(document.getElementById('ppTxt').value||'').trim().toLowerCase();
+  const words=txt?txt.split(/\s+/).filter(Boolean):[];
+  const MAX=200;
+  let filtered=cases.filter(r=>{
+    if(orgV && (r.org||'')!==orgV) return false;
+    if(coV && (r.company||'')!==coV) return false;
+    if(words.length){
+      const hay=((r.name||'')+' '+(r.applicant||'')+' '+(r.company||'')+' '+(r.org||'')).toLowerCase();
+      if(!words.every(w=>hay.includes(w))) return false;
+    }
+    return true;
+  });
+  const list=document.getElementById('ppList');
+  const foot=document.getElementById('ppFoot');
+  if(filtered.length>MAX && !coV && !words.length){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:#888;font-size:13px;">登録支援機関・所属機関で絞り込むか、名前を入力してください</div>';
+    foot.textContent=`(${filtered.length}件・絞り込んでください)`;
+    return;
+  }
+  if(!filtered.length){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:#888;font-size:13px;">該当する案件がありません</div>';
+    foot.textContent='(0件)';
+    return;
+  }
+  const rows=filtered.slice(0,MAX).map(r=>{
+    const nm=esc(r.applicant||r.name||'(名前なし)');
+    const co=esc(r.company||'');
+    const orgN=esc(r.org||'');
+    const cid=esc(String(r.id||''));
+    return `<div class="pp-modal-row" data-case-id="${cid}" onclick="selectPersonForSlot(this.dataset.caseId)">
+      <div class="name">${nm}</div>
+      <div class="sub">${co}${orgN?' / '+orgN:''}</div>
+    </div>`;
+  }).join('');
+  list.innerHTML=rows;
+  foot.textContent=`(${filtered.length>MAX?MAX+'/'+filtered.length:filtered.length}件)`;
+}
+async function selectPersonForSlot(caseId){
+  const slot=_ppTargetSlot;
+  if(!slot){return;}
+  if(!caseId){closePersonPicker();return;}
+  try{
+    const persons=await sb('persons?select=*&case_id=eq.'+caseId);
+    const rec=persons&&persons[0];
+    const pd=(rec&&rec.data)||rec||{};
+    const s=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val||'';};
+    const i=slot;
+    const nm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
+    s('f_p'+i+'Name',nm);
+    s('f_p'+i+'Birth',_ymd(pd.birthdate||pd.birth||''));
+    s('f_p'+i+'Gender',_gender(pd.gender||''));
+    s('f_p'+i+'Pass',pd.passport||pd.passport_no||pd.passportNumber||'');
+    s('f_p'+i+'Prev',pd.previous_residence||pd.prev_residence||pd.former_residence||pd.former_status||pd.residence||'');
+    s('f_p'+i+'Job',pd.occupation||pd.profession||pd.job||'');
+    // ボタン色を緑（投入済み）に
+    const btn=document.getElementById('pick'+i+'Btn');
+    if(btn) btn.classList.add('has-data');
+    closePersonPicker();
+    p();
+    showToast('✅ 人材'+slot+'に投入しました');
+  }catch(e){showToast('⚠️ 投入エラー: '+e.message);console.error(e);}
+}
+function clearPerson(slot){
+  const i=slot;
+  ['Name','Birth','Gender','Pass','Prev','Job'].forEach(k=>{
+    const el=document.getElementById('f_p'+i+k);
+    if(el) el.value='';
+  });
+  const btn=document.getElementById('pick'+i+'Btn');
+  if(btn) btn.classList.remove('has-data');
+  p();
+}
+// ESCで閉じる
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const bg=document.getElementById('personPickerBg');
+    if(bg && bg.classList.contains('open')) closePersonPicker();
+  }
+});
 initCaseSelect(); p();
 
 function fitDocToPreview(){
