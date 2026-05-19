@@ -44,6 +44,9 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 .cid-status.ok{color:#16a34a}
 .cid-status.warn{color:#d97706}
 .cid-status.err{color:#dc2626}
+/* fp-case は共通CSSで display:none だが、ここでは表示する */
+.fp-case{display:block!important;padding:10px!important;background:#1e293b!important;color:#e2e8f0!important;border-bottom:1px solid #475569!important}
+.fp-case label{color:#cbd5e0!important;font-size:11px!important;font-weight:600!important;display:block;margin-bottom:4px;}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -56,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.05</div>
+    <div class="ver">ver.20260519.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -69,13 +72,6 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 </div>
 <div class="main">
 <div class="fp">
-  <div class="fp-case">
-    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
-    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
-    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
-    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
-    <select id="caseSelect" onchange="loadFromDB()"></select>
-  </div>
   <div class="fp-inner">
 
     <div class="fs"><div class="fs-title">1. 登録支援機関に関する情報</div>
@@ -322,52 +318,106 @@ function _gender(g){
   return s;
 }
 
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel||!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
-  const {caseId,companyId,companyName,orgId}=info;
-  try{
-    // 受入機関情報と登録支援機関情報のみを取得（人材は別UIで個別指定）
-    const coQ=companyId?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&id=eq.${companyId}`
-      :companyName?`companies?select=name,pref,city,address,author_name,author_title,phone,fax&name=eq.${encodeURIComponent(companyName)}`:null;
-    const [cases,cos,orgs]=await Promise.all([
-      caseId?sb('cases?select=applicant,support_org_id&id=eq.'+caseId):Promise.resolve([]),
-      coQ?sb(coQ):Promise.resolve([]),
-      orgId?sb(`support_orgs?select=*&id=eq.${orgId}`):Promise.resolve([])
-    ]);
-    const cas=cases&&cases[0];
-    const co=cos&&cos[0];
-    let org=orgs&&orgs[0];
-    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
+/* ========== UUID形式チェック ========== */
+const _UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function _isUuid(s){ return typeof s==='string' && _UUID_RE.test(s); }
 
-    if(!org && cas && cas.support_org_id){
-      const orgs2=await sb(`support_orgs?select=*&id=eq.${cas.support_org_id}`);
-      org=orgs2&&orgs2[0];
-    }
-    // 1. 登録支援機関
-    if(org){
-      s('f_supName',org.name||'');
-      s('f_supLicense',org.reg_no||org.license_no||'');
-      s('f_supRep',org.representative||org.rep_name||org.support_manager||'');
-      s('f_supAddr',org.address||'');
-      s('f_supTel',org.phone||org.tel||'');
-      s('f_supFax',org.fax||'');
-    }
-    // 2. 受入機関（companies）
-    if(co){
-      s('f_coName',co.name||'');
-      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
-      s('f_coRep',co.author_name||'');
-      s('f_coTel',co.phone||'');
-      s('f_coFax',co.fax||'');
-    }
-    if(!v('f_signDate')){
-      const n=new Date();
-      document.getElementById('f_signDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;
-    }
-    p(); showToast('✅ 受入機関・登録支援機関を読み込みました');
-  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+/* ========== メイン case ID 貼り付け（書類全体：登録支援機関+受入機関） ========== */
+function onMainCidInput(){
+  const inp=document.getElementById('caseIdPaste');
+  const st=document.getElementById('mainCidStatus');
+  if(!inp||!st) return;
+  const cid=(inp.value||'').trim();
+  if(!cid){ st.textContent=''; st.style.color='#888'; return; }
+  if(_isUuid(cid)){ st.textContent='UUID形式OK・Enterまたは取得で反映'; st.style.color='#16a34a'; }
+  else { st.textContent='※ UUID形式ではない可能性があります'; st.style.color='#d97706'; }
+}
+async function importMainCase(){
+  const inp=document.getElementById('caseIdPaste');
+  const st=document.getElementById('mainCidStatus');
+  if(!inp) return;
+  const cid=(inp.value||'').trim();
+  if(!cid){ if(st){st.textContent='case IDを貼り付けてください';st.style.color='#d97706';} return; }
+  if(!_isUuid(cid)){ if(st){st.textContent='⚠️ UUID形式ではありません';st.style.color='#dc2626';} return; }
+  if(st){ st.textContent='取得中...'; st.style.color='#888'; }
+  await _loadCaseInfo({caseId:cid});
+  if(st){ st.textContent='✅ 取得完了'; st.style.color='#16a34a'; }
+}
+
+/* ========== 案件情報をDBから引いてフォームに反映 ========== */
+async function _loadCaseInfo(info){
+  if(!info) return;
+  const {caseId,companyId,companyName,orgName}=info;
+  if(!_isUuid(caseId) && !companyId){ return; } // 無効IDは何もしない
+  const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
+
+  // 1. case → applicant・org
+  let cas=null, orgFromCase='';
+  if(_isUuid(caseId)){
+    try{
+      // support_org_id はDBに存在しないので外す
+      const rows=await sb('cases?select=applicant,org,company,company_id&id=eq.'+caseId);
+      cas=rows&&rows[0];
+      if(cas) orgFromCase=cas.org||'';
+    }catch(e){ console.warn('cases取得スキップ:',e.message); }
+  }
+
+  // 2. 登録支援機関：orgName(渡された値) または cas.org から名前検索
+  const orgN=orgName||orgFromCase;
+  if(orgN){
+    try{
+      const sos=await sb('support_orgs?select=*&name=eq.'+encodeURIComponent(orgN));
+      const org=sos&&sos[0];
+      if(org){
+        s('f_supName',org.name||'');
+        s('f_supLicense',org.reg_no||org.license_no||'');
+        s('f_supRep',org.representative||org.rep_name||org.support_manager||'');
+        s('f_supAddr',org.address||'');
+        s('f_supTel',org.phone||org.tel||'');
+        s('f_supFax',org.fax||'');
+      } else {
+        // 名前だけは入れておく
+        s('f_supName',orgN);
+      }
+    }catch(e){ console.warn('support_orgs取得スキップ:',e.message); }
+  }
+
+  // 3. 受入機関（companies）
+  const coId=companyId||(cas&&cas.company_id);
+  const coN=(cas&&cas.company)||companyName||'';
+  let co=null;
+  if(coId){
+    try{
+      const rows=await sb(`companies?select=name,pref,city,address,author_name,author_title,phone,fax&id=eq.${coId}`);
+      co=rows&&rows[0];
+    }catch(e){ console.warn('companies(id)取得スキップ:',e.message); }
+  }
+  if(!co && coN){
+    try{
+      const rows=await sb(`companies?select=name,pref,city,address,author_name,author_title,phone,fax&name=eq.${encodeURIComponent(coN)}`);
+      co=rows&&rows[0];
+    }catch(e){ console.warn('companies(name)取得スキップ:',e.message); }
+  }
+  if(co){
+    s('f_coName',co.name||'');
+    s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+    s('f_coRep',co.author_name||'');
+    s('f_coTel',co.phone||'');
+    s('f_coFax',co.fax||'');
+  }
+
+  if(!v('f_signDate')){
+    const n=new Date();
+    document.getElementById('f_signDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;
+  }
+  p();
+}
+
+/* 旧loadFromDB互換（postMessageから呼ばれる場合）— UUIDなcaseIdのみ受け付け */
+async function loadFromDB(info){
+  if(info && info.caseId){
+    await _loadCaseInfo(info);
+  }
 }
 
 /* ========== case ID 貼り付け方式 ========== */
@@ -392,6 +442,7 @@ async function importPerson(slot){
   if(!inp) return;
   const cid=(inp.value||'').trim();
   if(!cid){ if(st){st.textContent='case IDを貼り付けてください';st.className='cid-status warn';} return; }
+  if(!_isUuid(cid)){ if(st){st.textContent='⚠️ UUID形式ではありません';st.className='cid-status err';} return; }
   if(st){ st.textContent='取得中...'; st.className='cid-status'; }
   try{
     const persons=await sb('persons?select=*&case_id=eq.'+encodeURIComponent(cid));
@@ -431,7 +482,7 @@ function clearPerson(slot){
   if(st){ st.textContent=''; st.className='cid-status'; }
   p();
 }
-initCaseSelect(); p();
+p();
 
 function fitDocToPreview(){
   requestAnimationFrame(()=>{
@@ -455,25 +506,14 @@ window.addEventListener('message', async function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
   const info=e.data.info;
   if(!info||!info.caseId) return;
-  const sel=document.getElementById('caseSelect');
-  if(sel){
-    let found=false;
-    for(let o of sel.options){
-      try{
-        const d=JSON.parse(o.value);
-        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
-      }catch(e2){}
-    }
-    if(!found){
-      const opt=document.createElement('option');
-      opt.value=JSON.stringify(info);
-      opt.textContent='（indexから選択）';
-      sel.appendChild(opt);
-      sel.value=opt.value;
-    }
-  }
-  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'suisenhyo'); }
-  if(typeof loadFromDB==='function') loadFromDB(info);
+  // UUID形式でない（テスト用ダミーIDなど）は無視
+  if(!_isUuid(info.caseId)){ console.log('[suisenhyo] non-UUID caseId ignored:', info.caseId); return; }
+  // 入力欄にも反映
+  const inp=document.getElementById('caseIdPaste');
+  if(inp) inp.value=info.caseId;
+  await _loadCaseInfo(info);
+  const st=document.getElementById('mainCidStatus');
+  if(st){ st.textContent='✅ indexから取得'; st.style.color='#16a34a'; }
 });
 </script>
 </body>
