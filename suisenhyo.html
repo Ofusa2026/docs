@@ -97,7 +97,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.16</div>
+    <div class="ver">ver.20260519.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -173,8 +173,8 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
       <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p1Job" oninput="p()"></div>
-      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p1School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
-      <div class="fg"><label>ベトナム連絡先</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
+      <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p1School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材2</div>
@@ -190,8 +190,8 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
       <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p2Job" oninput="p()"></div>
-      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p2School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
-      <div class="fg"><label>ベトナム連絡先</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
+      <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p2School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材3</div>
@@ -207,8 +207,8 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
       <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p3Job" oninput="p()"></div>
-      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p3School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
-      <div class="fg"><label>ベトナム連絡先</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
+      <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p3School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材4</div>
@@ -224,8 +224,8 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
       <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p4Job" oninput="p()"></div>
-      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p4School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
-      <div class="fg"><label>ベトナム連絡先</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
+      <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p4School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材5</div>
@@ -241,13 +241,15 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
       <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p5Job" oninput="p()"></div>
-      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p5School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
-      <div class="fg"><label>ベトナム連絡先</label><input id="f_p5VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
+      <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p5School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p5VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">署名情報</div>
-      <div class="fg"><label>署名地</label><input id="f_signPlace" value="東京" oninput="p()"></div>
-      <div class="fg"><label>署名年月日</label><input id="f_signDate" placeholder="2026年5月19日" oninput="p()"></div>
+      <div style="font-size:10px;color:#888;font-family:sans-serif;padding:6px 8px;line-height:1.5;">
+        ※ P2推薦状の署名日は<b>ベトナム大使館側で記入</b>するため、自動入力されません。<br>
+        署名地は<b>「東京」</b>固定です（変更不要）。
+      </div>
     </div>
 
   </div>
@@ -472,7 +474,7 @@ function p(){
 
 <div class="sh-foot">
   <div style="text-align:left;margin-bottom:3mm;">　この推薦状は、署名日から1年間有効</div>
-  <div class="sh-foot-date">${f('f_signPlace')}、${v('f_signDate')?f('f_signDate'):'　　　年　　月　　日'}</div>
+  <div class="sh-foot-date">東京、${v('f_signDate')?f('f_signDate'):'　　　年　　月　　日'}</div>
   <div class="sh-foot-sign">駐日ベトナム社会主義共和国労働管理部長</div>
   <div class="sh-foot-sign" style="margin-top:1mm;margin-right:5em;">（署名及び印）</div>
 </div>
@@ -613,9 +615,6 @@ async function _loadCaseInfo(info){
     s('f_workTo',_ymd(cas.contract_end||''));
   }
 
-  if(!v('f_signPlace')){
-    document.getElementById('f_signPlace').value='東京';
-  }
   // 署名日付は自動入力しない（ベトナム大使館側で入れる）
   p();
 }
@@ -710,6 +709,16 @@ function clearPerson(slot){
   if(st){ st.textContent=''; st.className='cid-status'; }
   p();
 }
+// 初期化：申請書作成年月日に当日をデフォルト挿入
+(function _initApplyDate(){
+  const el=document.getElementById('f_applyDate');
+  if(el && !el.value){
+    const n=new Date();
+    const mm=String(n.getMonth()+1).padStart(2,'0');
+    const dd=String(n.getDate()).padStart(2,'0');
+    el.value=`${n.getFullYear()}/${mm}/${dd}`;
+  }
+})();
 p();
 
 function fitDocToPreview(){
