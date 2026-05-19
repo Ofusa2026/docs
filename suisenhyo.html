@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>特定技能外国人表（添付2）</title>
+<title>特定技能外国人表 交付申請書+推薦状（ベトナム）</title>
 <link rel="stylesheet" href="ofusa_common.css?v=1776949489">
 <style>
 .doc{padding:15mm!important;line-height:1.4!important;min-height:auto!important;font-size:10.5pt!important}
@@ -47,6 +47,43 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 /* fp-case は共通CSSで display:none だが、ここでは表示する */
 .fp-case{display:block!important;padding:10px!important;background:#1e293b!important;color:#e2e8f0!important;border-bottom:1px solid #475569!important}
 .fp-case label{color:#cbd5e0!important;font-size:11px!important;font-weight:600!important;display:block;margin-bottom:4px;}
+
+/* === 交付申請書（P1）専用 === */
+.kf-receipt{text-align:right;font-size:10pt;margin-bottom:4mm}
+.kf-receipt-line{display:inline-block;border-bottom:1px solid #000;min-width:50mm;padding:0 6px}
+.kf-title{text-align:center;margin:2mm 0 4mm}
+.kf-title-vi{font-weight:bold;font-size:12pt;letter-spacing:0.5pt}
+.kf-title-ja{font-weight:bold;font-size:13pt;margin-top:1mm}
+.kf-to{text-align:center;margin:3mm 0 4mm;font-size:10.5pt;line-height:1.5}
+.kf-row{display:flex;margin-bottom:2mm;font-size:10.5pt;align-items:baseline;gap:0.5em}
+.kf-row .lbl{flex:0 0 auto;white-space:nowrap}
+.kf-row .val{flex:1;border-bottom:1px dotted #888;min-height:1.3em;padding-left:0.3em}
+.kf-rel{margin:2mm 0 4mm;font-size:10.5pt;line-height:1.7}
+.kf-rel span{margin-right:1.5em;white-space:nowrap}
+.kf-intro{font-size:9.5pt;line-height:1.4;margin:3mm 0 3mm;text-align:justify}
+.kf-secnum{font-weight:bold;margin:3mm 0 1.5mm;font-size:10.5pt}
+.kf-info-row{font-size:10pt;line-height:1.6;padding-left:1em}
+.kf-info-row .pair{display:inline-block;margin-right:2em}
+.kf-info-row .pair .lbl{color:#000;margin-right:0.3em}
+.kf-info-row .pair .val{display:inline-block;border-bottom:1px dotted #888;min-width:50mm;padding:0 0.3em}
+table.kf-tbl{width:100%;border-collapse:collapse;font-size:8pt;margin-top:2mm;table-layout:fixed}
+table.kf-tbl th,table.kf-tbl td{border:1px solid #000;padding:2px 3px;text-align:center;vertical-align:middle;word-wrap:break-word;line-height:1.25}
+table.kf-tbl th{font-weight:normal;font-size:7.5pt}
+table.kf-tbl td.kf-no{width:5%}
+table.kf-tbl td.kf-name{width:14%;text-align:left;font-size:8pt}
+table.kf-tbl td.kf-birth{width:9%}
+table.kf-tbl td.kf-sex{width:6%}
+table.kf-tbl td.kf-pass{width:10%}
+table.kf-tbl td.kf-school{width:16%;text-align:left;font-size:7.5pt}
+table.kf-tbl td.kf-job{width:9%}
+table.kf-tbl td.kf-period{width:14%}
+table.kf-tbl td.kf-addr{width:17%;text-align:left;font-size:7.5pt}
+.kf-confirm{margin-top:5mm;font-size:10pt;line-height:1.5}
+.kf-sign-row{margin-top:6mm;font-size:10pt;line-height:1.8}
+.kf-sign-row .applicant{display:inline-block;border-bottom:1px solid #000;min-width:40mm;padding:0 0.5em}
+.kf-sign-row .stamp{margin-left:0.5em;display:inline-block;border:1px solid #d00;color:#d00;padding:1px 6px;font-size:9pt;border-radius:2px}
+.kf-page-break{page-break-after:always}
+
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -58,8 +95,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.14</div>
+    <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
+    <div class="ver">ver.20260519.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -73,6 +110,21 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="main">
 <div class="fp">
   <div class="fp-inner">
+
+    <div class="fs"><div class="fs-title">📄 交付申請書（P1）</div>
+      <div class="fg"><label>受付番号</label><input id="f_receiptNo" placeholder="入管庁発行の受付番号" oninput="p()"></div>
+      <div class="fg"><label>申請者氏名又は名称</label><input id="f_applicantName" value="大房明良" oninput="p()"></div>
+      <div class="fg" style="display:block;">
+        <label style="display:block;margin-bottom:4px;">申請者と人材の関係</label>
+        <div style="font-size:11px;line-height:1.7;font-family:sans-serif;padding-left:4px;">
+          <label style="font-weight:normal;display:block;"><input type="checkbox" id="f_relCo" onchange="p()"> 特定技能所属機関</label>
+          <label style="font-weight:normal;display:block;"><input type="checkbox" id="f_relSup" onchange="p()"> 登録支援機関</label>
+          <label style="font-weight:normal;display:block;"><input type="checkbox" id="f_relSelf" onchange="p()"> 本人</label>
+          <label style="font-weight:normal;display:block;"><input type="checkbox" id="f_relOther" checked onchange="p()"> その他：<input id="f_relOtherText" value="申請取次行政書士" style="width:50%;font-family:sans-serif;" oninput="p()"></label>
+        </div>
+      </div>
+      <div class="fg"><label>申請書作成年月日</label><input id="f_applyDate" placeholder="2026/05/19" oninput="p()"></div>
+    </div>
 
     <div class="fs"><div class="fs-title">1. 登録支援機関に関する情報</div>
       <div class="fg"><label>名称</label><input id="f_supName" oninput="p()"></div>
@@ -120,6 +172,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
       <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p1Job" oninput="p()"></div>
+      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p1School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>ベトナム連絡先</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材2</div>
@@ -135,6 +189,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
       <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p2Job" oninput="p()"></div>
+      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p2School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>ベトナム連絡先</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材3</div>
@@ -150,6 +206,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
       <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p3Job" oninput="p()"></div>
+      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p3School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>ベトナム連絡先</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材4</div>
@@ -165,6 +223,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
       <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p4Job" oninput="p()"></div>
+      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p4School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>ベトナム連絡先</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">人材5</div>
@@ -180,6 +240,8 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
       <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
       <div class="fg"><label>職業</label><input id="f_p5Job" oninput="p()"></div>
+      <div class="fg"><label>派遣機関名/学校名</label><input id="f_p5School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
+      <div class="fg"><label>ベトナム連絡先</label><input id="f_p5VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
     <div class="fs"><div class="fs-title">署名情報</div>
@@ -193,6 +255,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
@@ -219,15 +282,149 @@ function _row(i){
     <td class="col-job">${cell('Job')}</td>
   </tr>`;
 }
+function _kfRow(i){
+  // 交付申請書用の人材行（10カラム）
+  const ids=['Name','Birth','Gender','Pass','Prev','Job','School','VnContact'];
+  const any=ids.some(k=>v('f_p'+i+k));
+  const cell=k=>any?f('f_p'+i+k):'&nbsp;';
+  // 派遣機関/学校名は従前在留資格と組み合わせて出す（docxは「実習生のベトナム送出機関名/留学生の日本学校名」）
+  return `<tr>
+    <td class="kf-no">${i}</td>
+    <td class="kf-name">${cell('Name')}</td>
+    <td class="kf-birth">${cell('Birth')}</td>
+    <td class="kf-sex">${cell('Gender')}</td>
+    <td class="kf-pass">${cell('Pass')}</td>
+    <td class="kf-school">${cell('School')}</td>
+    <td class="kf-job">${cell('Job')}</td>
+    <td class="kf-period">${any?`${f('f_workFrom')}<br>～<br>${f('f_workTo')}`:'&nbsp;'}</td>
+    <td class="kf-addr">${cell('VnContact')}</td>
+  </tr>`;
+}
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
   const visa=document.getElementById('f_visaType');
   const v1=visa&&visa.value==='1'?'■':'□';
   const v2=visa&&visa.value==='2'?'■':'□';
+  // 申請者と人材の関係
+  const cb=id=>{const e=document.getElementById(id);return e&&e.checked?'■':'☐';};
+  const rCo=cb('f_relCo'), rSup=cb('f_relSup'), rSelf=cb('f_relSelf'), rOther=cb('f_relOther');
+  const rOtherText=f('f_relOtherText');
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
+
+<div class="kf-receipt">Mã hồ sơ 受付番号: <span class="kf-receipt-line">${f('f_receiptNo')}</span></div>
+
+<div class="kf-title">
+  <div class="kf-title-vi">ĐỀ NGHỊ CẤP DANH SÁCH XÁC NHẬN</div>
+  <div class="kf-title-ja">特定技能外国人表交付申請書</div>
+</div>
+
+<div class="kf-to">
+  Kính gửi: BAN QUẢN LÝ LAO ĐỘNG, ĐẠI SỨ QUÁN VIỆT NAM TẠI NHẬT BẢN<br>
+  駐日ベトナム社会主義共和国大使館 労働部 御中
+</div>
+
+<div class="kf-row">
+  <div class="lbl">Tên người/tổ chức đề nghị xác nhận 申請者の氏名又は名称:</div>
+  <div class="val">${f('f_applicantName')}</div>
+</div>
+
+<div class="kf-row" style="margin-bottom:1mm;">
+  <div class="lbl">Quan hệ với lao động kỹ năng đặc định 特定技能外国人との関係:</div>
+</div>
+<div class="kf-rel">
+  <span>${rCo} Cơ quan tiếp nhận 特定技能所属機関</span>
+  <span>${rSup} Cơ quan hỗ trợ đăng ký 登録支援機関</span><br>
+  <span>${rSelf} Người lao động kỹ năng đặc định 本人</span>
+  <span>${rOther} Khác その他：${rOtherText||''}</span>
+</div>
+
+<div class="kf-intro">
+  Căn cứ Bản ghi nhớ hợp tác về lao động kỹ năng đặc định giữa Việt Nam và Nhật Bản, đề nghị cấp Danh sách xác nhận lao động kỹ năng đặc định theo nội dung sau<br>
+  特定技能に関する両国間の協力覚書に基づき、次のとおり特定技能外国人表の交付を申請します。
+</div>
+
+<div class="kf-secnum">1. Thông tin cơ quan hỗ trợ đăng ký 登録支援機関に関する情報</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Tên 名称:</span><span class="val">${f('f_supName')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Số giấy phép 認可番号（登録番号）:</span><span class="val">${f('f_supLicense')}</span></div>
+  <div class="pair"><span class="lbl">Tên người đại diện 代表者の氏名:</span><span class="val">${f('f_supRep')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Địa chỉ 所在地:</span><span class="val" style="min-width:120mm;">${f('f_supAddr')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Tel 電話番号:</span><span class="val">${f('f_supTel')}</span></div>
+  <div class="pair"><span class="lbl">Fax ファックス番号:</span><span class="val">${f('f_supFax')}</span></div>
+</div>
+
+<div class="kf-secnum">2. Thông tin cơ quan tiếp nhận Nhật Bản 特定技能所属機関に関する情報</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Tên 名称:</span><span class="val">${f('f_coName')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Số giấy phép 認可番号（法人番号）:</span><span class="val">${f('f_coLicense')}</span></div>
+  <div class="pair"><span class="lbl">Tên người đại diện 代表者の氏名:</span><span class="val">${f('f_coRep')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Địa chỉ 所在地:</span><span class="val" style="min-width:120mm;">${f('f_coAddr')}</span></div>
+</div>
+<div class="kf-info-row">
+  <div class="pair"><span class="lbl">Tel 電話番号:</span><span class="val">${f('f_coTel')}</span></div>
+  <div class="pair"><span class="lbl">Fax ファックス番号:</span><span class="val">${f('f_coFax')||'なし'}</span></div>
+</div>
+
+<div class="kf-secnum">3. Thông tin lao động 特定技能外国人に関する情報:</div>
+<div class="sh-cb" style="font-size:10pt;margin:1mm 0 2mm 1em;">
+  <span style="margin-right:2em;">${v1} Kỹ năng đặc định số 1 / 1号特定技能外国人</span>
+  <span>${v2} Kỹ năng đặc định số 2 / 2号特定技能外国人</span>
+</div>
+<table class="kf-tbl">
+  <thead>
+    <tr>
+      <th rowspan="2">STT<br>順番</th>
+      <th rowspan="2">Họ và tên<br>氏名</th>
+      <th rowspan="2">Ngày sinh<br>生年月日</th>
+      <th rowspan="2">Giới tính<br>性別</th>
+      <th rowspan="2">Số Hộ chiếu<br>旅券番号</th>
+      <th>Tên Công ty phái cử/Tên trường học</th>
+      <th rowspan="2">Ngành nghề<br>特定技能職業</th>
+      <th>Thời hạn lao động</th>
+      <th>Địa chỉ, SĐT gia đình tại VN</th>
+    </tr>
+    <tr>
+      <th style="font-size:6.5pt;line-height:1.15;">従前の実習生のベトナム送出機関名/留学生の日本学校名</th>
+      <th style="font-size:7pt;line-height:1.15;">特定技能の雇用契約書の労働期間 (○○から○○まで)</th>
+      <th style="font-size:7pt;line-height:1.15;">母国の親族の連絡先（住所・電話番号）</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${_kfRow(1)}${_kfRow(2)}${_kfRow(3)}${_kfRow(4)}${_kfRow(5)}
+  </tbody>
+</table>
+
+<div class="kf-confirm">
+  Tôi cam kết những thông tin trên là chính xác.<br>
+  以上の記載内容は事実と相違ありません。
+</div>
+
+<div class="kf-sign-row" style="text-align:right;">
+  Ký tên, đóng dấu (ghi rõ tên đơn vị, cá nhân...) / Ngày lập giấy đề nghị<br>
+  申請者（特定技能所属機関、登録支援機関、本人等）の記名及び押印 / 申請書作成年月日<br>
+  <div style="margin-top:3mm;">
+    <span class="applicant">${f('f_applicantName')}</span><span class="stamp">印</span>
+    <span style="margin-left:1.5em;">${v('f_applyDate')?f('f_applyDate'):'　　　年　　月　　日'}</span>
+  </div>
+</div>
+</div>
+
+<div class="doc" style="margin-top:8mm;">
+<div class="page-num-label">P2</div>
 <div class="sh-attach">添付2</div>
 <div class="sh-title">特定技能外国人表</div>
 
