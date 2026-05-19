@@ -49,20 +49,19 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260519.02</span></div>
+  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260519.05</span></div>
 </div>
 <div class="body">
   <div class="sidebar">
     <div class="case-panel">
-      <label>🔍 登録支援機関</label>
-      <select id="idx_filterOrg" onchange="idxFilterCases()"></select>
-      <label>🏢 所属機関</label>
-      <select id="idx_filterCompany" onchange="idxFilterCases()"></select>
-      <label>🔤 検索</label>
-      <input id="idx_filterText" placeholder="案件名・申請人・所属機関・国籍" oninput="idxFilterCases()">
-      <label>👤 案件選択 <span class="case-badge" id="idx_caseCount">-</span></label>
-      <select id="idx_caseSelect" size="1" onchange="idxCaseSelected()"></select>
-      <label style="margin-top:6px;">🌐 言語（書類全体に適用）</label>
+      <label>📋 case ID 貼り付け</label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input id="idx_caseIdPaste" placeholder="case IDを貼り付けて Enter" oninput="idxOnPasteInput()" onkeydown="if(event.key==='Enter')idxJumpByPaste()" style="flex:1;padding:5px 8px;border-radius:4px;border:1px solid #4a5568;background:#1a202c;color:#e2e8f0;font-size:12px;font-family:monospace;">
+        <button onclick="idxJumpByPaste()" style="padding:5px 12px;background:#2563eb;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;">ジャンプ</button>
+      </div>
+      <div id="idx_jumpStatus" style="margin-top:6px;font-size:11px;color:#a0aec0;min-height:14px;"></div>
+      <div id="idx_jumpedInfo" style="margin-top:4px;padding:6px 8px;background:rgba(34,197,94,0.15);border-radius:4px;font-size:12px;color:#86efac;display:none;line-height:1.4;"></div>
+      <label style="margin-top:10px;">🌐 言語（書類全体に適用）</label>
       <div class="global-lang-btns" id="globalLangBtns">
         <button class="glbtn" data-lang="ja" onclick="setGlobalLang('ja')" title="日本語">🇯🇵</button>
         <button class="glbtn active" data-lang="id" onclick="setGlobalLang('id')" title="インドネシア語">🇮🇩</button>
@@ -212,7 +211,7 @@ const docs={
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1777861843'},
   '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1777861843'},
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1777861843'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1779150875'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1779156327'},
   '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1777861843'},
   '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1777861843'},
   '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1777861843'},
@@ -542,6 +541,63 @@ function idxBuildCompanyFilter(){
   const companies=[...new Set(idxAllCases.map(c=>c.org).filter(Boolean))].sort();
   const sel=document.getElementById('idx_filterCompany');
   if(sel) sel.innerHTML='<option value="">— すべて —</option>'+companies.map(c=>`<option>${c}</option>`).join('');
+}
+
+/* ===== case ID 貼り付けジャンプ ===== */
+function idxOnPasteInput(){
+  const st=document.getElementById('idx_jumpStatus');
+  const inp=document.getElementById('idx_caseIdPaste');
+  if(!st||!inp) return;
+  const v=(inp.value||'').trim();
+  if(!v){ st.textContent=''; return; }
+  // UUID形式チェック
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)){
+    st.textContent='UUID形式OK・Enterまたはジャンプボタンで反映';
+    st.style.color='#86efac';
+  } else {
+    st.textContent='※ UUID形式ではない可能性があります';
+    st.style.color='#fbbf24';
+  }
+}
+async function idxJumpByPaste(){
+  const inp=document.getElementById('idx_caseIdPaste');
+  const st=document.getElementById('idx_jumpStatus');
+  const info_el=document.getElementById('idx_jumpedInfo');
+  if(!inp) return;
+  const cid=(inp.value||'').trim();
+  if(!cid){ if(st)st.textContent='case IDを貼り付けてください'; return; }
+  if(st){ st.textContent='検索中...'; st.style.color='#a0aec0'; }
+  try{
+    // まず idxAllCases から探す（高速）
+    let row=idxAllCases.find(c=>String(c.id)===cid);
+    // なければDBから直接取得
+    if(!row){
+      const rows=await idxSb('cases?select=id,name,applicant,org,nationality,company_id,emp_set_idx&id=eq.'+encodeURIComponent(cid));
+      row=rows&&rows[0];
+    }
+    if(!row){
+      if(st){ st.textContent='⚠️ 該当するcaseが見つかりません'; st.style.color='#fca5a5'; }
+      if(info_el){ info_el.style.display='none'; }
+      return;
+    }
+    const info={
+      caseId:row.id,
+      companyId:row.company_id,
+      companyName:row.company||row.org||'',
+      orgName:row.org||'',
+      empSetIdx:row.emp_set_idx||0
+    };
+    idxSelectedCase=info;
+    idxSendToVisible(info);
+    if(st){ st.textContent='✅ ジャンプしました'; st.style.color='#86efac'; }
+    if(info_el){
+      info_el.style.display='block';
+      info_el.innerHTML=`<strong>${row.applicant||row.name||'(名前なし)'}</strong><br>${row.org||''}${row.org&&row.company?' / ':''}${row.company||''}`;
+    }
+  }catch(e){
+    if(st){ st.textContent='⚠️ エラー: '+e.message; st.style.color='#fca5a5'; }
+    console.error(e);
+  }
 }
 
 function idxFilterCases(){
