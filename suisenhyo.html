@@ -59,7 +59,7 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表（添付2・ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260519.06</div>
+    <div class="ver">ver.20260519.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -318,9 +318,16 @@ function _gender(g){
   return s;
 }
 
-/* ========== UUID形式チェック ========== */
+/* ========== case ID 形式チェック（緩い判定） ========== */
+// case_<数字> 形式 または UUID形式 を許可。それ以外は警告のみで処理は継続
 const _UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function _isUuid(s){ return typeof s==='string' && _UUID_RE.test(s); }
+const _CASE_RE=/^case_\d+$/;
+function _isValidCid(s){
+  if(typeof s!=='string') return false;
+  return _UUID_RE.test(s) || _CASE_RE.test(s);
+}
+// 後方互換用エイリアス（コード内の他箇所が _isUuid を呼んでいる場合に備え）
+function _isUuid(s){ return _isValidCid(s); }
 
 /* ========== メイン case ID 貼り付け（書類全体：登録支援機関+受入機関） ========== */
 function onMainCidInput(){
@@ -348,15 +355,14 @@ async function importMainCase(){
 async function _loadCaseInfo(info){
   if(!info) return;
   const {caseId,companyId,companyName,orgName}=info;
-  if(!_isUuid(caseId) && !companyId){ return; } // 無効IDは何もしない
+  if(!caseId && !companyId && !companyName && !orgName){ return; }
   const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
 
   // 1. case → applicant・org
   let cas=null, orgFromCase='';
-  if(_isUuid(caseId)){
+  if(caseId){
     try{
-      // support_org_id はDBに存在しないので外す
-      const rows=await sb('cases?select=applicant,org,company,company_id&id=eq.'+caseId);
+      const rows=await sb('cases?select=applicant,org,company,company_id&id=eq.'+encodeURIComponent(caseId));
       cas=rows&&rows[0];
       if(cas) orgFromCase=cas.org||'';
     }catch(e){ console.warn('cases取得スキップ:',e.message); }
@@ -427,11 +433,11 @@ function onCidInput(slot){
   if(!inp||!st) return;
   const cid=(inp.value||'').trim();
   if(!cid){ st.textContent=''; st.className='cid-status'; return; }
-  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cid)){
-    st.textContent='UUID形式OK・Enterまたは投入で取得';
+  if(_isValidCid(cid)){
+    st.textContent='case ID OK・Enterまたは投入で取得';
     st.className='cid-status ok';
   } else {
-    st.textContent='※ UUID形式ではない可能性があります';
+    st.textContent='※ case ID 形式ではない可能性があります（投入は試みます）';
     st.className='cid-status warn';
   }
 }
@@ -442,7 +448,7 @@ async function importPerson(slot){
   if(!inp) return;
   const cid=(inp.value||'').trim();
   if(!cid){ if(st){st.textContent='case IDを貼り付けてください';st.className='cid-status warn';} return; }
-  if(!_isUuid(cid)){ if(st){st.textContent='⚠️ UUID形式ではありません';st.className='cid-status err';} return; }
+  // 形式チェックは警告のみで、処理は継続する
   if(st){ st.textContent='取得中...'; st.className='cid-status'; }
   try{
     const persons=await sb('persons?select=*&case_id=eq.'+encodeURIComponent(cid));
@@ -506,8 +512,6 @@ window.addEventListener('message', async function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
   const info=e.data.info;
   if(!info||!info.caseId) return;
-  // UUID形式でない（テスト用ダミーIDなど）は無視
-  if(!_isUuid(info.caseId)){ console.log('[suisenhyo] non-UUID caseId ignored:', info.caseId); return; }
   // 入力欄にも反映
   const inp=document.getElementById('caseIdPaste');
   if(inp) inp.value=info.caseId;
