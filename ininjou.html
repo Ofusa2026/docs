@@ -8,10 +8,21 @@
 <link rel="stylesheet" href="ofusa_common.css?v=1776949489">
 <style>
 .doc{padding:35mm 30mm 30mm 30mm!important;line-height:1.7!important;min-height:auto!important}
+/* ver.20260521.12: 印刷時の余白を縮小して1ページに収まりやすくする */
+@page{
+  size: A4 portrait;
+  margin: 0;
+}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important}
+  body{margin:0!important;padding:0!important}
+  .doc{
+    box-shadow:none!important;
+    margin:0!important;
+    padding:15mm 15mm 12mm 15mm!important;
+    page-break-inside: avoid;
+  }
 }
 </style>
 </head>
@@ -19,7 +30,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260416.11</div>
+    <div class="ver">ver.20260521.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
