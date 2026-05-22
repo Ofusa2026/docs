@@ -85,8 +85,22 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 .kf-sign-row .stamp{margin-left:0.5em;display:inline-block;border:1px solid #d00;color:#d00;padding:1px 6px;font-size:9pt;border-radius:2px}
 .kf-page-break{page-break-after:always}
 
-/* ver.20260521.21: 印刷・PDF時の設定
-   元のレイアウトを維持しつつ、1ページに収まるよう page-break-inside: avoid のみ追加 */
+/* ver.20260521.24: 画面表示とPDFのレイアウトを統一（旧 @media print の縮小ルールを常時適用）
+   大使館側「1ページに収める」要請に対応。
+   推薦表（添付1）の冒頭〜情報セクションのフォントを縮小。 */
+.kf-receipt{font-size:9pt!important;margin-bottom:2mm!important}
+.kf-title-vi{font-size:11pt!important}
+.kf-title-ja{font-size:12pt!important}
+.kf-title{margin:1mm 0 3mm!important}
+.kf-to{font-size:9.5pt!important;line-height:1.4!important;margin:2mm 0 3mm!important}
+.kf-row{font-size:9.5pt!important;margin-bottom:1.5mm!important}
+.kf-rel{font-size:9.5pt!important;line-height:1.5!important;margin:1.5mm 0 3mm!important}
+.kf-intro{font-size:8.5pt!important;line-height:1.3!important;margin:2mm 0!important}
+.kf-secnum{font-size:9.5pt!important;margin:2mm 0 1mm!important}
+.kf-info-row{font-size:9pt!important;line-height:1.45!important}
+.sh-cb{font-size:9pt!important;margin:0.8mm 0 1.5mm 1em!important}
+
+/* ver.20260521.21: 印刷・PDF時の追加設定（ページ区切り保証など） */
 @page{
   size: A4 portrait;
   margin: 0;
@@ -104,21 +118,6 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
   }
   .doc:last-of-type{page-break-after: auto;}
   .f[style*="color:#aaa"]{visibility:hidden}
-
-  /* ver.20260521.22: 推薦表（添付1）の冒頭〜情報セクションのフォントを縮小
-     大使館側「1ページに収める」要請に対応するため、本文ボリュームの大きい kf系を縮小 */
-  .kf-receipt{font-size:9pt!important;margin-bottom:2mm!important}
-  .kf-title-vi{font-size:11pt!important}
-  .kf-title-ja{font-size:12pt!important}
-  .kf-title{margin:1mm 0 3mm!important}
-  .kf-to{font-size:9.5pt!important;line-height:1.4!important;margin:2mm 0 3mm!important}
-  .kf-row{font-size:9.5pt!important;margin-bottom:1.5mm!important}
-  .kf-rel{font-size:9.5pt!important;line-height:1.5!important;margin:1.5mm 0 3mm!important}
-  .kf-intro{font-size:8.5pt!important;line-height:1.3!important;margin:2mm 0!important}
-  .kf-secnum{font-size:9.5pt!important;margin:2mm 0 1mm!important}
-  .kf-info-row{font-size:9pt!important;line-height:1.45!important}
-  /* ver.20260521.23: 「1号/2号特定技能外国人」の行も縮小 */
-  .sh-cb{font-size:9pt!important;margin:0.8mm 0 1.5mm 1em!important}
 }
 </style>
 </head>
@@ -126,7 +125,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260521.23</div>
+    <div class="ver">ver.20260521.24</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>

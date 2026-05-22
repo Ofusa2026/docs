@@ -7,8 +7,9 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1776949489">
 <style>
-.doc{padding:35mm 30mm 30mm 30mm!important;line-height:1.7!important;min-height:auto!important}
-/* ver.20260521.12: 印刷時の余白を縮小して1ページに収まりやすくする */
+.doc{padding:15mm 15mm 12mm 15mm!important;line-height:1.7!important;min-height:auto!important}
+/* ver.20260521.14: 画面表示とPDFのレイアウトを統一
+   旧 @media print 内の padding 縮小ルールを常時適用に変更 */
 @page{
   size: A4 portrait;
   margin: 0;
@@ -20,10 +21,10 @@
   .doc{
     box-shadow:none!important;
     margin:0!important;
-    padding:15mm 15mm 12mm 15mm!important;
     page-break-inside: avoid;
   }
-  /* ver.20260521.13: 印刷時はチェックボックス行の編集用装飾（背景色・縦線）を消す */
+  /* チェックボックス行の編集用装飾（背景色・縦線）はPDFでのみ消す
+     画面では「選択中」のフィードバックとして残す */
   .doc div[onclick*="toggleAppType"]{
     background:transparent!important;
     border-left:none!important;
@@ -37,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260521.13</div>
+    <div class="ver">ver.20260521.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
