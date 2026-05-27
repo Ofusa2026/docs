@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 申請内容変更申出書</div>
-    <div class="ver">ver.20260527.01</div>
+    <div class="ver">ver.20260527.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -164,10 +164,20 @@ async function loadFromDB(){
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {caseId}=info;
   try{
-    const cases=await sb('cases?select=receipt_no,org&id=eq.'+caseId);
+    const cases=await sb('cases?select=receipt_no,receipt_date,org&id=eq.'+caseId);
     const cas=cases&&cases[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    if(cas) s('f_appNo',cas.receipt_no||'');
+    if(cas){
+      s('f_appNo',cas.receipt_no||'');
+      if(cas.receipt_date){
+        const m=String(cas.receipt_date).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if(m){
+          s('f_year',m[1]);
+          s('f_month',String(parseInt(m[2],10)));
+          s('f_day',String(parseInt(m[3],10)));
+        }
+      }
+    }
     if(!v('f_applyDate')){const n=new Date();s('f_applyDate',`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
