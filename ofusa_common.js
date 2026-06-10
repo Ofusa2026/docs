@@ -1,15 +1,37 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260415.09
+ * ver.20260611.01
  */
 
 // ===== Supabase =====
 const SB_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
 const SB_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+// ver.20260611: 親index.htmlのSupabase Authログインで保存されたセッショントークンを使う。
+// cases/companies等がRLS(authenticated限定)のため、anonキーのままだと読めず会社が(none)になる。
+// 同一オリジンなのでlocalStorageのsupabase-jsセッションを共有して読み取る。
+function _sbToken(){
+  try{ if(window.__OFUSA_SB_TOKEN) return window.__OFUSA_SB_TOKEN; }catch(e){}
+  try{
+    // supabase-jsのセッション保存キー（sb-<ref>-auth-token）。キー名の揺れに備えて走査も行う。
+    var keys = ['sb-ehwlgbwpycglmopiqyty-auth-token'];
+    for(var i=0;i<localStorage.length;i++){
+      var k=localStorage.key(i);
+      if(k && k.indexOf('sb-')===0 && k.indexOf('-auth-token')>=0 && keys.indexOf(k)<0) keys.push(k);
+    }
+    for(var j=0;j<keys.length;j++){
+      var raw = localStorage.getItem(keys[j]);
+      if(!raw) continue;
+      var p = JSON.parse(raw);
+      var tok = (p && p.access_token) || (p && p.currentSession && p.currentSession.access_token);
+      if(tok) return tok;
+    }
+  }catch(e){}
+  return SB_KEY;
+}
 async function sb(path,opts={}){
   const headers = {
     'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + SB_KEY,
+    'Authorization': 'Bearer ' + _sbToken(),
     'Content-Type': 'application/json',
     ...(opts.headers || {})
   };
@@ -344,6 +366,8 @@ function loadEditedHTML(){
    ========================================================== */
 async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
+  // ver.20260611: 親から渡されたログイントークンを保持（RLS用）
+  try{ if(info.token) window.__OFUSA_SB_TOKEN = info.token; }catch(e){}
   // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
   window._lastCaseInfo = info;
   console.log('[doc] loadCaseToForm:', info);

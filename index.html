@@ -636,6 +636,8 @@ function idxCaseSelected(){
 
 function idxSendToVisible(info){
   if(!info) return;
+  // ver.20260611: ログイントークンを同梱（受け側ofusa_common.jsがRLS用に使う）
+  info = Object.assign({}, info, {token: IDX_TOKEN});
   // docs オブジェクト内のiframe
   Object.keys(docs).forEach(k=>{
     const fr=document.getElementById(docs[k].frameId);
