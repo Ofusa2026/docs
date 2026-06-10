@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>OFUSA 書類作成システム</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column;}
@@ -49,7 +50,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260527.03</span></div>
+  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260611.01</span></div>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -498,9 +499,15 @@ open_doc('1_4');
 // ===== index案件選択 =====
 const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
 const IDX_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
+// ver.20260611: 案件管理(anken)と同じ Supabase Auth ログイン。RLSが authenticated 限定のため、
+// ログイン後のアクセストークンで cases 等を読む（未ログインだと「該当するcaseが見つかりません」になる）
+const _sbDocs = (window.supabase && window.supabase.createClient)
+  ? window.supabase.createClient('https://ehwlgbwpycglmopiqyty.supabase.co', IDX_KEY)
+  : null;
+let IDX_TOKEN = IDX_KEY; // ログイン後に access_token へ差し替え
 async function idxSb(path, allPages=false){
   if(!allPages){
-    const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY}});
+    const r=await fetch(IDX_URL+path,{headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN}});
     const d=await r.json();
     return Array.isArray(d)?d:[];
   }
@@ -510,7 +517,7 @@ async function idxSb(path, allPages=false){
   while(true){
     const sep=path.includes('?')?'&':'?';
     const r=await fetch(IDX_URL+path+sep+`limit=${pageSize}&offset=${offset}`,{
-      headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Range-Unit':'items','Range':`${offset}-${offset+pageSize-1}`}
+      headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Range-Unit':'items','Range':`${offset}-${offset+pageSize-1}`}
     });
     const d=await r.json();
     if(!Array.isArray(d)||d.length===0) break;
@@ -671,7 +678,60 @@ window.addEventListener('message', function(e){
   }
 });
 
-idxInit();
+// ===== ver.20260611: Auth ログインゲート（anken と同じ Supabase Auth）=====
+function _docsShowLogin(msg){
+  var ov=document.getElementById('docsLoginOverlay');
+  if(ov){ ov.style.display='flex'; if(msg){ var m=document.getElementById('docsLoginMsg'); if(m){ m.textContent=msg; m.style.display='block'; } } return; }
+  ov=document.createElement('div'); ov.id='docsLoginOverlay';
+  ov.style.cssText='position:fixed;inset:0;background:#0f172a;z-index:100000;display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML=''
+   +'<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px 26px;width:320px;max-width:90vw;box-shadow:0 10px 40px rgba(0,0,0,.5);">'
+   +'<div style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">📁 OFUSA 書類作成</div>'
+   +'<div style="font-size:12px;color:#94a3b8;margin-bottom:16px;">案件管理と同じID（メール）でログイン</div>'
+   +'<input id="docsLoginEmail" type="email" placeholder="メールアドレス" autocomplete="username" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#e2e8f0;font-size:14px;">'
+   +'<input id="docsLoginPw" type="password" placeholder="パスワード" autocomplete="current-password" style="width:100%;padding:10px 12px;margin-bottom:14px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#e2e8f0;font-size:14px;">'
+   +'<button id="docsLoginBtn" style="width:100%;padding:11px;border:none;border-radius:8px;background:#2563eb;color:white;font-size:15px;font-weight:700;cursor:pointer;">ログイン</button>'
+   +'<div id="docsLoginMsg" style="display:none;margin-top:12px;font-size:12px;color:#fca5a5;text-align:center;">'+(msg||'')+'</div>'
+   +'</div>';
+  document.body.appendChild(ov);
+  if(msg){ var mm=document.getElementById('docsLoginMsg'); if(mm) mm.style.display='block'; }
+  var go=function(){ _docsDoLogin(); };
+  document.getElementById('docsLoginBtn').addEventListener('click', go);
+  document.getElementById('docsLoginPw').addEventListener('keydown', function(e){ if(e.key==='Enter') go(); });
+  document.getElementById('docsLoginEmail').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('docsLoginPw').focus(); });
+  setTimeout(function(){ var el=document.getElementById('docsLoginEmail'); if(el) el.focus(); }, 50);
+}
+function _docsHideLogin(){ var ov=document.getElementById('docsLoginOverlay'); if(ov) ov.style.display='none'; }
+async function _docsDoLogin(){
+  if(!_sbDocs){ _docsShowLogin('認証ライブラリの読み込みに失敗しました。再読み込みしてください。'); return; }
+  var email=(document.getElementById('docsLoginEmail')||{}).value||'';
+  var pw=(document.getElementById('docsLoginPw')||{}).value||'';
+  var btn=document.getElementById('docsLoginBtn'); var msg=document.getElementById('docsLoginMsg');
+  if(!email||!pw){ if(msg){ msg.style.display='block'; msg.textContent='メールとパスワードを入力してください'; } return; }
+  if(btn){ btn.disabled=true; btn.textContent='ログイン中…'; }
+  try{
+    var res=await _sbDocs.auth.signInWithPassword({email:email.trim(), password:pw});
+    if(res.error){ throw res.error; }
+    var token=res.data && res.data.session && res.data.session.access_token;
+    if(!token){ throw new Error('セッションを取得できませんでした'); }
+    IDX_TOKEN=token;
+    _docsHideLogin();
+    idxInit();
+  }catch(e){
+    if(msg){ msg.style.display='block'; msg.textContent='ログイン失敗：'+((e&&e.message)||'メールまたはパスワードが違います'); }
+    if(btn){ btn.disabled=false; btn.textContent='ログイン'; }
+  }
+}
+async function _docsAuthGateInit(){
+  if(!_sbDocs){ _docsShowLogin('認証ライブラリを読み込めませんでした。ページを再読み込みしてください。'); return; }
+  try{
+    var s=await _sbDocs.auth.getSession();
+    var token=s && s.data && s.data.session && s.data.session.access_token;
+    if(token){ IDX_TOKEN=token; idxInit(); }
+    else { _docsShowLogin(); }
+  }catch(e){ _docsShowLogin(); }
+}
+_docsAuthGateInit();
 </script>
 </body>
 </html>
