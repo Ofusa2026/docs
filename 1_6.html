@@ -26,13 +26,15 @@
   font-size:8px;color:#bbb;font-family:sans-serif;letter-spacing:0.05em;
   background:white;padding:0 2px;
 }
+/* P1は内容が密でA4高さギリギリのため、印刷時のみ行間を詰めて1枚に収める */
+@media print{ #docP1{ line-height:1.5 !important; } }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260423.007</div>
+    <div class="ver">ver.20260611.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -390,7 +392,7 @@ function p(){
   });
 
   w.innerHTML=`
-<div class="doc">
+<div class="doc" id="docP1">
 <div class="page-num-label">P1</div>
 <div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">Format Referensi 1-6</span></div>
 
@@ -400,8 +402,8 @@ function p(){
 <div style="border:1px solid #333;">
 
   <!-- 日付・宛先・所属機関 -->
-  <div style="padding:8px 12px 10px;">
-    <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
+  <div style="padding:6px 12px 6px;">
+    <div style="text-align:right;font-size:8.5pt;margin-bottom:3px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
       <span class="id" style="font-size:7.5pt;">Tanggal ${f('es_createD')} Bulan ${f('es_createM')} Tahun ${f('es_createY')}</span>
     </div>
@@ -428,7 +430,7 @@ function p(){
       <div style="margin-left:8px;font-size:8.5pt;">
         <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">(Dari tanggal ${f('es_contractStartD')} Bulan ${f('es_contractStartM')} Tahun ${f('es_contractStartY')} hingga Tanggal ${f('es_contractEndD')} Bulan ${f('es_contractEndM')} Tahun ${f('es_contractEndY')}) Tanggal rencana masuk: Tanggal ${f('es_entryD')} Bulan ${f('es_entryM')} Tahun ${f('es_entryY')}</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2. Pembaruan perjanjian</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;margin-bottom:1px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2. Pembaruan perjanjian</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -456,8 +458,8 @@ function p(){
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Apakah ada batasan perpanjangan? (Tidak ada/Ada (maksimal&nbsp;&nbsp;&nbsp;&nbsp;kali perpanjangan/total periode kontrak maksimal&nbsp;&nbsp;&nbsp;&nbsp;tahun))</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[Jika dibuat perjanjian kerja waktu tertentu dengan perusahaan yang sama sebagaimana diatur dalam Undang-Undang Perjanjian Kerja, dengan total periode kontrak lebih dari 5 tahun]</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Apakah ada batasan perpanjangan? (Tidak ada/Ada (maksimal&nbsp;&nbsp;&nbsp;&nbsp;kali perpanjangan/total periode kontrak maksimal&nbsp;&nbsp;&nbsp;&nbsp;tahun))</span></div>
+      <div style="font-size:7.5pt;margin-top:2px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[Jika dibuat perjanjian kerja waktu tertentu dengan perusahaan yang sama sebagaimana diatur dalam Undang-Undang Perjanjian Kerja, dengan total periode kontrak lebih dari 5 tahun]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
       <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">Dengan mengajukan permohonan untuk membuat perjanjian kerja tanpa periode yang ditetapkan (perjanjian kerja waktu tidak tertentu)dengan perusahaan selama periode perjanjian ini konversi</span><br><span class="id" style="font-size:6.5pt;">ke pekerjaan berdasarkan perjanjian kerja waktu tidak tertentu akan dimulaipada keesokan hari dari tanggal terakhir periode perjanjian ini (tanggal&nbsp;&nbsp;&nbsp;bulan&nbsp;&nbsp;&nbsp;tahun&nbsp;&nbsp;&nbsp;)<br><span class="id" style="font-size:6.5pt;">Dalam hal ini, apakah ada perubahan syarat kerja dari perjanjian ini? (Tidak ada/Ada (seperti yang ditunjukkan pada Lampiran 2))</span></span></div>
     </div>

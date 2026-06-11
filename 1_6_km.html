@@ -26,13 +26,15 @@
   font-size:8px;color:#bbb;font-family:sans-serif;letter-spacing:0.05em;
   background:white;padding:0 2px;
 }
+/* P1は内容が密でA4高さギリギリのため、印刷時のみ行間を詰めて1枚に収める */
+@media print{ #docP1{ line-height:1.5 !important; } }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260423.006</div>
+    <div class="ver">ver.20260611.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -390,7 +392,7 @@ function p(){
   });
 
   w.innerHTML=`
-<div class="doc">
+<div class="doc" id="docP1">
 <div class="page-num-label">P1</div>
 <div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id" data-key="2">ទម្រង់ឯកសារយោង លេខ 1 – 6</span></div>
 
@@ -400,8 +402,8 @@ function p(){
 <div style="border:1px solid #333;">
 
   <!-- 日付・宛先・所属機関 -->
-  <div style="padding:8px 12px 10px;">
-    <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
+  <div style="padding:6px 12px 6px;">
+    <div style="text-align:right;font-size:8.5pt;margin-bottom:3px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
       <span class="id" style="font-size:7.5pt;" data-key="3">${f('es_createY')} ឆ្នាំ ${f('es_createM')} ខែ ${f('es_createD')} ថ្ងៃ</span>
     </div>
@@ -428,7 +430,7 @@ function p(){
       <div style="margin-left:8px;font-size:8.5pt;">
         <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">(${f('es_contractStartY')} ឆ្នាំ ${f('es_contractStartM')} ខែ ${f('es_contractStartD')} ថ្ងៃ ～ ${f('es_contractEndY')} ឆ្នាំ ${f('es_contractEndM')} ខែ ${f('es_contractEndD')} ថ្ងៃ) ថ្ងៃគ្រោងចូលប្រទេសជប៉ុន ${f('es_entryY')} ឆ្នាំ ${f('es_entryM')} ខែ ${f('es_entryD')} ថ្ងៃ</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">2. ការពន្យារកិច្ចសន្យាជាថ្មី</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;margin-bottom:1px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">2. ការពន្យារកិច្ចសន្យាជាថ្មី</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -456,8 +458,8 @@ function p(){
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">3. ចំនួនអតិបរមានៃការពន្យារកិច្ចសន្យាការងារ (គ្មាន・មាន (ពន្យារបាន&nbsp;&nbsp;&nbsp;&nbsp;ដង/សរុបនៃអំឡុងពេលនៃកិច្ចសន្យាការងារ ត្រឹម&nbsp;&nbsp;&nbsp;&nbsp;ឆ្នាំ))</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">【ករណីចុះកិច្ចសន្យាការងារមានកំណត់ដែលសរុបអំឡុងពេលនៃកិច្ចសន្យាជាមួយក្រុមហ៊ុនតែមួយលើសពី 5 ឆ្នាំ ដែលបានកំណត់ក្នុងច្បាប់ស្តីពីកិច្ចសន្យាការងារ】</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;" data-key="27">3. ចំនួនអតិបរមានៃការពន្យារកិច្ចសន្យាការងារ (គ្មាន・មាន (ពន្យារបាន&nbsp;&nbsp;&nbsp;&nbsp;ដង/សរុបនៃអំឡុងពេលនៃកិច្ចសន្យាការងារ ត្រឹម&nbsp;&nbsp;&nbsp;&nbsp;ឆ្នាំ))</span></div>
+      <div style="font-size:7.5pt;margin-top:2px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;" data-key="28">【ករណីចុះកិច្ចសន្យាការងារមានកំណត់ដែលសរុបអំឡុងពេលនៃកិច្ចសន្យាជាមួយក្រុមហ៊ុនតែមួយលើសពី 5 ឆ្នាំ ដែលបានកំណត់ក្នុងច្បាប់ស្តីពីកិច្ចសន្យាការងារ】</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
       <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;" data-key="29">ក្នុងអំឡុងពេលនៃកិច្ចសន្យានេះ អ្នកអាចដាក់ពាក្យស្នើសុំចុះកិច្ចសន្យាការងារគ្មានកំណត់រយៈពេល (កិច្ចសន្យាគ្មានកំណត់) ជាមួយក្រុមហ៊ុន</span><br><span class="id" style="font-size:6.5pt;" data-key="30">ហើយចាប់ពីថ្ងៃបន្ទាប់ពីថ្ងៃចុងក្រោយនៃរយៈពេលកិច្ចសន្យានេះ (&nbsp;&nbsp;ឆ្នាំ&nbsp;&nbsp;ខែ&nbsp;&nbsp;ថ្ងៃ) អ្នកអាចប្តូរទៅជាការងារតាមកិច្ចសន្យាគ្មានកំណត់។<br><span class="id" style="font-size:6.5pt;">ក្នុងករណីនេះ តើមានការផ្លាស់ប្តូរលក្ខខណ្ឌការងារពីកិច្ចសន្យានេះឬទេ? (គ្មាន・មាន (ដូចក្នុងឯកសារភ្ជាប់លេខ 2))</span></span></span></div>
     </div>

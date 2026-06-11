@@ -26,13 +26,15 @@
   font-size:8px;color:#bbb;font-family:sans-serif;letter-spacing:0.05em;
   background:white;padding:0 2px;
 }
+/* P1は内容が密でA4高さギリギリのため、印刷時のみ行間を詰めて1枚に収める */
+@media print{ #docP1{ line-height:1.5 !important; } }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260417.29</div>
+    <div class="ver">ver.20260611.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -390,7 +392,7 @@ function p(){
   });
 
   w.innerHTML=`
-<div class="doc">
+<div class="doc" id="docP1">
 <div class="page-num-label">P1</div>
 <div style="font-size:8pt;margin-bottom:4px;">参考様式第１－６号<br><span class="id">आधार फारम १ भाग – १</span></div>
 
@@ -400,8 +402,8 @@ function p(){
 <div style="border:1px solid #333;">
 
   <!-- 日付・宛先・所属機関 -->
-  <div style="padding:8px 12px 10px;">
-    <div style="text-align:right;font-size:8.5pt;margin-bottom:6px;">
+  <div style="padding:6px 12px 6px;">
+    <div style="text-align:right;font-size:8.5pt;margin-bottom:3px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
       <span class="id" style="font-size:7.5pt;">${f('es_createY')} वर्ष ${f('es_createM')} महिना ${f('es_createD')} गते</span>
     </div>
@@ -428,7 +430,7 @@ function p(){
       <div style="margin-left:8px;font-size:8.5pt;">
         <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">${f('es_contractStartY')} वर्ष ${f('es_contractStartM')} महिना ${f('es_contractStartD')} गते ～ ${f('es_contractEndY')} वर्ष ${f('es_contractEndM')} महिना ${f('es_contractEndD')} गते जापान प्रवेशको योजना ${f('es_entryY')} वर्ष ${f('es_entryM')} महिना ${f('es_entryD')} गते</span></div>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;margin-bottom:2px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">२. सम्झौताको नवीकरण स्थिति</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;margin-bottom:1px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">२. सम्झौताको नवीकरण स्थिति</span></div>
       <div style="margin-left:8px;">
         <table style="width:100%;font-size:8.5pt;border-collapse:collapse;">
           <tr>
@@ -456,8 +458,8 @@ function p(){
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:5px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">३. नबिकरण सिमितता (छैन / छ (नवीकरण&nbsp;&nbsp;&nbsp;&nbsp;पटकसम्म / कुल करार अवधि&nbsp;&nbsp;&nbsp;&nbsp;बर्षसम्म))</span></div>
-      <div style="font-size:7.5pt;margin-top:4px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">【श्रम करार ऐनले तोकेको उही कम्पनीको बिचमा कुल करार अवधि ५ वर्ष भन्दा बढीको आवधिक रोजगार करार गरेको खण्डमा】</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">३. नबिकरण सिमितता (छैन / छ (नवीकरण&nbsp;&nbsp;&nbsp;&nbsp;पटकसम्म / कुल करार अवधि&nbsp;&nbsp;&nbsp;&nbsp;बर्षसम्म))</span></div>
+      <div style="font-size:7.5pt;margin-top:2px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">【श्रम करार ऐनले तोकेको उही कम्पनीको बिचमा कुल करार अवधि ५ वर्ष भन्दा बढीको आवधिक रोजगार करार गरेको खण्डमा】</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
       <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">यस सम्झौताको अवधिमा कम्पनीलाई अनिश्चितकालीन रोजगार सम्झौता गर्ने अनुरोध गरेमा</span><br><span class="id" style="font-size:6.5pt;">यस सम्झौताको अन्तिम मितिको भोलिपल्ट (साल&nbsp;&nbsp;&nbsp;महिना&nbsp;&nbsp;&nbsp;गते) देखि अनिश्चितकालीन रोजगार सम्झौतामा रूपान्तरण गर्न सकिन्छ।<br><span class="id" style="font-size:6.5pt;">यस अवस्थामा यस सम्झौताबाट कामका सर्तहरूमा परिवर्तन छ वा छैन? (छैन / छ (संलग्न पत्र २ अनुसार))</span></span></div>
     </div>
