@@ -45,7 +45,9 @@ async function sb(path,opts={}){
 
 // ===== ユーティリティ =====
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
-const v=id=>document.getElementById(id)?.value||'';
+// ver.20260612: 入力欄が無い書類でも、DBから読み込んだ翻訳等をプレビューに出せるようフォールバック保持
+window._fieldData=window._fieldData||{};
+const v=id=>{const el=document.getElementById(id);if(el&&el.value!=='')return el.value;return (window._fieldData&&window._fieldData[id])||'';};
 const fmt=n=>n?Number(String(n).replace(/,/g,'')).toLocaleString('ja-JP'):'';
 const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f">${val}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
 const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/,'');if(raw){const num=Number(String(raw).replace(/,/g,''));return`<span class="f">${isNaN(num)?esc(raw):num.toLocaleString('ja-JP')}</span>`;}return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
@@ -370,6 +372,7 @@ async function loadCaseToForm(info, docKey){
   try{ if(info.token) window.__OFUSA_SB_TOKEN = info.token; }catch(e){}
   // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
   window._lastCaseInfo = info;
+  window._fieldData = {}; // ver.20260612: 案件読込ごとにDBフォールバック値をリセット
   console.log('[doc] loadCaseToForm:', info);
   const {caseId, companyId, companyName, empSetIdx} = info;
   try {
@@ -410,9 +413,11 @@ async function loadCaseToForm(info, docKey){
     const setValMulti = (ids, val) => {
       if(val===undefined || val===null || String(val)==='') return;
       const list = Array.isArray(ids) ? ids : [ids];
+      let elSet = false;
       for(const id of list){
-        const el = document.getElementById(id);
-        if(el){ el.value = val; break; }
+        // ver.20260612: 入力欄の有無に関わらず全候補idをフォールバックへ。要素があれば先頭の1つに値もセット
+        window._fieldData[id] = val;
+        if(!elSet){ const el = document.getElementById(id); if(el){ el.value = val; elSet = true; } }
       }
     };
 
@@ -449,6 +454,9 @@ async function loadCaseToForm(info, docKey){
     const applicantNameEn = pd.name_en || pd.applicant_name_en || '';
     setValMulti(['es_applicantName','applicantName','f_applicant','f_applicantName'], applicantNameJp);
     setValMulti(['es_applicantNameEn','f_applicantEn','f_applicantNameEn'], applicantNameEn);
+    // ver.20260612: 職種(分野)の和文・翻訳。emp_sets優先、無ければ案件情報(info)から補完
+    setValMulti(['es_applicantField','f_applicantField'], es.applicantField || info.applicantField);
+    setValMulti(['es_applicantFieldEn','f_applicantFieldEn'], es.applicantFieldEn || info.applicantFieldEn);
 
     // 性別・年齢・経験（persons由来）
     setValMulti(['f_age','es_age'], pd.age);
