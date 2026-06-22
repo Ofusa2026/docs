@@ -514,7 +514,13 @@ async function loadCaseToForm(info, docKey){
       setValMulti(['es_'+k, 'f_'+k], es[k]);
     });
 
-    // 業務区分・分野: 括弧除去＋カンマ区切りで category2 に分割
+    // 業務区分・分野: Object.keys(es)ループ後にまとめて括弧除去
+    // applicantField / applicantFieldEn は単純除去
+    ['applicantField','applicantFieldEn'].forEach(k=>{
+      const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
+      if(raw) setValMulti(['es_'+k,'f_'+k], _stripP(raw));
+    });
+    // category / categoryEn は括弧除去＋カンマ区切りで category2 に分割
     ['category','categoryEn'].forEach(k=>{
       const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
       if(!raw) return;
