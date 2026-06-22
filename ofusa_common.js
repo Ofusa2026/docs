@@ -123,8 +123,7 @@ function enableDocEditing(on){
       doc.setAttribute('contenteditable','true');
       doc.classList.add('doc-editable');
       doc.querySelectorAll('.cb-click').forEach(cb=>cb.setAttribute('contenteditable','false'));
-      // 変数ラベル（未入力フィールド）を空にする
-      doc.querySelectorAll('.f[style*="color:#aaa"]').forEach(el=>{el.textContent='';el.style='';});
+      // ※ 変数スパン(.f)は空にしない → data-bind で applyBindings() が値を流せるようにする
     }else{
       doc.removeAttribute('contenteditable');
       doc.classList.remove('doc-editable');
