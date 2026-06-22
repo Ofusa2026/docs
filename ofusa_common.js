@@ -65,9 +65,11 @@ function toggleCb(id){if(!id)return;window.cbState[id]=!window.cbState[id];docum
    ============================================================ */
 function applyBindings(){
   const area=document.getElementById('pageArea');if(!area)return;
-  area.querySelectorAll('[data-bind]').forEach(span=>{
+  const spans=area.querySelectorAll('[data-bind]');
+  spans.forEach(span=>{
     const id=span.getAttribute('data-bind');
-    const raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';    const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
+    const raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';
+    const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
     if(raw){
       span.style.color='';span.style.fontSize='';span.style.fontFamily='';
       const isMoney=span.getAttribute('data-bind-fmt')==='1';
@@ -78,6 +80,7 @@ function applyBindings(){
       span.textContent=label;
     }
   });
+  return spans.length; // data-bind スパン数を返す（0=旧形式）
 }
 /* 編集呼び出し後のフリーズ管理 */
 window._htmlFrozen=window._htmlFrozen||false;
@@ -506,9 +509,14 @@ async function loadCaseToForm(info, docKey){
       setValMulti(['f_docDate'], `令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);
     }
 
-    // プレビュー再描画（フリーズ中はapplyBindingsで変数スパンのみ更新）
-    if(window._htmlFrozen && typeof applyBindings==='function') applyBindings();
-    else if(typeof p==='function') p();
+    // プレビュー再描画（直接編集中・フリーズ中はapplyBindingsで変数スパンのみ更新）
+    if((window._htmlFrozen||_editMode) && typeof applyBindings==='function'){
+      const updated=applyBindings();
+      // 旧形式（data-bind なし）なら _editMode を一時解除して p() を実行
+      if(updated===0 && typeof p==='function'){
+        const prev=_editMode; _editMode=false; p(); _editMode=prev;
+      }
+    }else if(typeof p==='function') p();
     // 金額系フィールドにカンマ整形を適用
     applyMoneyFormatting();
     // 書類固有DB保存データがあれば上書き読込
