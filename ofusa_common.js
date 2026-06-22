@@ -500,8 +500,9 @@ async function loadCaseToForm(info, docKey){
     setValMulti(['es_applicantName','applicantName','f_applicant','f_applicantName'], applicantNameJp);
     setValMulti(['es_applicantNameEn','f_applicantEn','f_applicantNameEn'], applicantNameEn);
     // ver.20260612: 職種(分野)の和文・翻訳。emp_sets優先、無ければ案件情報(info)から補完
-    setValMulti(['es_applicantField','f_applicantField'], es.applicantField || info.applicantField);
-    setValMulti(['es_applicantFieldEn','f_applicantFieldEn'], es.applicantFieldEn || info.applicantFieldEn);
+    const _stripP=s=>s?String(s).replace(/[（(][^）)]*[）)]/g,'').trim():'';
+    setValMulti(['es_applicantField','f_applicantField'], _stripP(es.applicantField || info.applicantField));
+    setValMulti(['es_applicantFieldEn','f_applicantFieldEn'], _stripP(es.applicantFieldEn || info.applicantFieldEn));
 
     // 性別・年齢・経験（persons由来）
     setValMulti(['f_age','es_age'], pd.age);
@@ -511,6 +512,15 @@ async function loadCaseToForm(info, docKey){
     // === emp_sets 全フィールドを自動で es_xxx / f_xxx にセット ===
     Object.keys(es).forEach(k => {
       setValMulti(['es_'+k, 'f_'+k], es[k]);
+    });
+
+    // 業務区分・分野: 括弧除去＋カンマ区切りで category2 に分割
+    ['category','categoryEn'].forEach(k=>{
+      const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
+      if(!raw) return;
+      const parts=raw.split(/[,、]\s*/).map(s=>_stripP(s)).filter(Boolean);
+      setValMulti(['es_'+k,'f_'+k], parts[0]||'');
+      if(parts[1]) setValMulti(['es_'+k+'2','f_'+k+'2'], parts[1]);
     });
 
     // === 作成日 ===

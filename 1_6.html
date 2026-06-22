@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260622.01</div>
+    <div class="ver">ver.20260622.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -120,8 +120,10 @@
     <div class="fs"><div class="fs-title">Ⅲ 業務内容</div>
       <div class="fg"><label>分野（日）<span class="fid">es.applicantField</span></label><input id="es_applicantField" oninput="p()"></div>
       <div class="fg"><label>分野（ID）<span class="fid">es.applicantFieldEn</span></label><input id="es_applicantFieldEn" oninput="p()"></div>
-      <div class="fg"><label>業務区分（日）<span class="fid">es.category</span></label><input id="es_category" oninput="p()"></div>
-      <div class="fg"><label>業務区分（ID）<span class="fid">es.categoryEn</span></label><input id="es_categoryEn" oninput="p()"></div>
+      <div class="fg"><label>業務区分１（日）<span class="fid">es.category</span></label><input id="es_category" oninput="p()"></div>
+      <div class="fg"><label>業務区分１（ID）<span class="fid">es.categoryEn</span></label><input id="es_categoryEn" oninput="p()"></div>
+      <div class="fg"><label>業務区分２（日）<span class="fid">es.category2</span></label><input id="es_category2" oninput="p()" placeholder="複数ある場合のみ"></div>
+      <div class="fg"><label>業務区分２（ID）<span class="fid">es.category2En</span></label><input id="es_category2En" oninput="p()" placeholder="複数ある場合のみ"></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅳ 労働時間</div>
       <div class="fg2">
@@ -328,7 +330,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1782098492"></script>
+<script src="ofusa_common.js?v=1782101131"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -515,7 +517,7 @@ function p(){
           </tr>
           <tr>
             <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id">2. Kategori pekerjaan</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id">（${f('es_categoryEn')}）</span></td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_category')}<br><span class="id">（${f('es_categoryEn')}）</span>${v('es_category2')?`<br>${f('es_category2')}<br><span class="id">（${f('es_category2En')}）</span>`:''}</td>
           </tr>
         </table>
       </div>
@@ -1023,9 +1025,20 @@ function setFormValues(esData){
     if(dbKey==='contractStart'){ setDate('contractStart',val); return; }
     if(dbKey==='contractEnd')  { setDate('contractEnd',val); return; }
 
-    // 分野・区分: 末尾の（特定技能１号）等を除去
-    if(dbKey==='applicantField'||dbKey==='category'||dbKey==='applicantFieldEn'||dbKey==='categoryEn'){
+    // 分野・区分: 括弧除去（短いバージョン）＋カンマ区切りで複数区分に分割
+    if(dbKey==='applicantField'||dbKey==='applicantFieldEn'){
       val = String(val).replace(/[（(][^）)]*[）)]/g,'').trim();
+    }
+    if(dbKey==='category'||dbKey==='categoryEn'){
+      const parts=String(val).split(/[,、・]\s*/).map(s=>s.replace(/[（(][^）)]*[）)]/g,'').trim()).filter(Boolean);
+      // 1つ目はcategory、2つ目はcategory2にセット
+      const fKey=dbKey==='category'?'category':'categoryEn';
+      const f2Key=dbKey==='category'?'category2':'category2En';
+      const el1=document.getElementById('es_'+fKey);
+      const el2=document.getElementById('es_'+f2Key);
+      if(el1) el1.value=parts[0]||'';
+      if(el2) el2.value=parts[1]||'';
+      p();return;
     }
 
     // allowance動的フォーム（DBキー: allowance1Name → フォームID: es_a1Name）
