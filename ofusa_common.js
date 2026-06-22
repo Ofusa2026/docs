@@ -82,6 +82,16 @@ function applyBindings(){
   });
   return spans.length; // data-bind スパン数を返す（0=旧形式）
 }
+/* data-bind スパンをプレースホルダー（変数名）に戻す */
+function resetBindings(){
+  const area=document.getElementById('pageArea');if(!area)return;
+  area.querySelectorAll('[data-bind]').forEach(span=>{
+    const id=span.getAttribute('data-bind');
+    const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
+    span.style.color='#aaa';span.style.fontSize='0.85em';span.style.fontFamily='monospace';
+    span.textContent=label;
+  });
+}
 /* 編集呼び出し後のフリーズ管理 */
 window._htmlFrozen=window._htmlFrozen||false;
 function freezeLoadedHtml(){window._htmlFrozen=true;}
@@ -362,7 +372,9 @@ function loadEditedHTML(){
         try{
           const data = JSON.parse(text);
           if(data.html) area.innerHTML = data.html;
-          // 入力フォームの値を復元
+          // ① 読込直後にデータ入り変数スパンをプレースホルダーに戻す
+          resetBindings();
+          // ② 入力フォームの値を復元（給与・手当等の設定値を保持）
           if(data.formData){
             Object.entries(data.formData).forEach(([id,val])=>{
               const el = document.getElementById(id);
@@ -371,28 +383,22 @@ function loadEditedHTML(){
           }
         }catch(err){
           area.innerHTML = text;
+          resetBindings();
         }
       } else {
         // 旧形式（.html）
         area.innerHTML = text;
+        resetBindings();
       }
       // 編集モードをONに
       _editMode = true;
       const btn = document.getElementById('editModeBtn');
       if(btn){ btn.textContent='✏️ 編集中（クリックで終了）'; btn.classList.add('edit-mode-on'); }
       enableDocEditing(true);
-      // 呼び出し後フリーズ＋変数スパンに現在値を再適用
+      // フリーズ＋現在フォーム値でスパンを更新（案件選択済みならデータが入る）
       freezeLoadedHtml();
-      const _bindCount = applyBindings();
-      // 旧形式（data-bind なし）で空スパンが残っている場合はp()で再生成
-      if(_bindCount === 0){
-        const area2 = document.getElementById('pageArea');
-        const hasEmptyF = area2 && area2.querySelectorAll('.f:empty').length > 0;
-        if(hasEmptyF && typeof p === 'function'){
-          const prev = _editMode; _editMode = false; p(); _editMode = prev;
-        }
-      }
-      showToast('📂 読み込みました（案件を選ぶと変数欄のみ自動更新されます）');
+      applyBindings();
+      showToast('📂 読み込みました（案件を選ぶと変数欄が自動更新されます）');
     };
     reader.readAsText(file);
   };
