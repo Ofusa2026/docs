@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260611.01
+ * ver.20260622.01
  */
 
 // ===== Supabase =====
@@ -49,8 +49,8 @@ const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 window._fieldData=window._fieldData||{};
 const v=id=>{const el=document.getElementById(id);if(el&&el.value!=='')return el.value;return (window._fieldData&&window._fieldData[id])||'';};
 const fmt=n=>n?Number(String(n).replace(/,/g,'')).toLocaleString('ja-JP'):'';
-const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f">${val}</span>`:`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
-const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/,'');if(raw){const num=Number(String(raw).replace(/,/g,''));return`<span class="f">${isNaN(num)?esc(raw):num.toLocaleString('ja-JP')}</span>`;}return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
+const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
+const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/,'');if(raw){const num=Number(String(raw).replace(/,/g,''));return`<span class="f" data-bind="${id}" data-bind-fmt="1">${isNaN(num)?esc(raw):num.toLocaleString('ja-JP')}</span>`;}return`<span class="f" data-bind="${id}" data-bind-fmt="1" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
 
 // ===== チェックボックス =====
 window.cbState=window.cbState||{};
@@ -58,6 +58,31 @@ let _cbSeq=0;
 function resetCbSeq(){_cbSeq=0;}
 const cb=(on,id)=>{const state=id&&window.cbState[id]!==undefined?window.cbState[id]:on;return`<span class="cb-click" onclick="toggleCb('${id||''}')" data-cbid="${id||''}">${state?'■':'□'}</span>`;};
 function toggleCb(id){if(!id)return;window.cbState[id]=!window.cbState[id];document.querySelectorAll(`[data-cbid="${id}"]`).forEach(el=>{el.textContent=window.cbState[id]?'■':'□';});}
+
+/* ============================================================
+   applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
+   p()（全再描画）を使わずに変数スパンだけ更新する
+   ============================================================ */
+function applyBindings(){
+  const area=document.getElementById('pageArea');if(!area)return;
+  area.querySelectorAll('[data-bind]').forEach(span=>{
+    const id=span.getAttribute('data-bind');
+    const raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';    const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
+    if(raw){
+      span.style.color='';span.style.fontSize='';span.style.fontFamily='';
+      const isMoney=span.getAttribute('data-bind-fmt')==='1';
+      if(isMoney){const num=Number(String(raw).replace(/,/g,''));span.innerHTML=isNaN(num)?esc(raw):num.toLocaleString('ja-JP');}
+      else{span.innerHTML=esc(raw).replace(/\n/g,'<br>');}
+    }else{
+      span.style.color='#aaa';span.style.fontSize='0.85em';span.style.fontFamily='monospace';
+      span.textContent=label;
+    }
+  });
+}
+/* 編集呼び出し後のフリーズ管理 */
+window._htmlFrozen=window._htmlFrozen||false;
+function freezeLoadedHtml(){window._htmlFrozen=true;}
+function unfreezeLoadedHtml(){window._htmlFrozen=false;if(typeof p==='function')p();}
 
 // ===== 印刷・トースト =====
 function doPrint(){window.print();}
@@ -353,7 +378,10 @@ function loadEditedHTML(){
       const btn = document.getElementById('editModeBtn');
       if(btn){ btn.textContent='✏️ 編集中（クリックで終了）'; btn.classList.add('edit-mode-on'); }
       enableDocEditing(true);
-      showToast('📂 読み込みました');
+      // 呼び出し後フリーズ＋変数スパンに現在値を再適用
+      freezeLoadedHtml();
+      applyBindings();
+      showToast('📂 読み込みました（案件を選ぶと変数欄のみ自動更新されます）');
     };
     reader.readAsText(file);
   };
@@ -478,8 +506,9 @@ async function loadCaseToForm(info, docKey){
       setValMulti(['f_docDate'], `令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);
     }
 
-    // プレビュー再描画
-    if(typeof p==='function') p();
+    // プレビュー再描画（フリーズ中はapplyBindingsで変数スパンのみ更新）
+    if(window._htmlFrozen && typeof applyBindings==='function') applyBindings();
+    else if(typeof p==='function') p();
     // 金額系フィールドにカンマ整形を適用
     applyMoneyFormatting();
     // 書類固有DB保存データがあれば上書き読込
