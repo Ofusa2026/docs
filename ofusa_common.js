@@ -111,7 +111,8 @@ function toggleEditMode(){
     if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}
     if(area)area.classList.remove('edit-mode');
     enableDocEditing(false);
-    // 編集モードOFF時はp()を呼ばない（直接編集内容を維持）
+    // フリーズ中（編集呼び出しで読んだ内容）は維持、それ以外はp()で再描画
+    if(!window._htmlFrozen && typeof p==='function') p();
   }
 }
 function enableDocEditing(on){
@@ -383,7 +384,15 @@ function loadEditedHTML(){
       enableDocEditing(true);
       // 呼び出し後フリーズ＋変数スパンに現在値を再適用
       freezeLoadedHtml();
-      applyBindings();
+      const _bindCount = applyBindings();
+      // 旧形式（data-bind なし）で空スパンが残っている場合はp()で再生成
+      if(_bindCount === 0){
+        const area2 = document.getElementById('pageArea');
+        const hasEmptyF = area2 && area2.querySelectorAll('.f:empty').length > 0;
+        if(hasEmptyF && typeof p === 'function'){
+          const prev = _editMode; _editMode = false; p(); _editMode = prev;
+        }
+      }
       showToast('📂 読み込みました（案件を選ぶと変数欄のみ自動更新されます）');
     };
     reader.readAsText(file);
