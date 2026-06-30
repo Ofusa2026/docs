@@ -144,6 +144,12 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <div>特定技能外国人表<span class="item-sub">交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</span></div>
     </div>
     <div class="divider"></div>
+    <div class="section">窓口受付</div>
+    <div class="item" id="nav-madoguchi" onclick="open_doc('madoguchi')">
+      <span class="item-icon">🪪</span>
+      <div>オンライン申請（窓口受領用）<span class="item-sub">案件ID貼り付けで申請受付番号を自動反映</span></div>
+    </div>
+    <div class="divider"></div>
     <div class="section">分野別誓約書</div>
     <div class="item" id="nav-2_1" onclick="open_doc('2_1')"><span class="item-icon">📄</span><div>ビルクリーニング<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-3_1" onclick="open_doc('3_1')"><span class="item-icon">📄</span><div>工業製品製造業<span class="item-sub">受入れ誓約書</span></div></div>
@@ -177,6 +183,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-henkou"></iframe>
     <iframe id="frame-ininjou"></iframe>
     <iframe id="frame-suisenhyo"></iframe>
+    <iframe id="frame-madoguchi"></iframe>
     <iframe id="frame-1_11"></iframe>
     <iframe id="frame-2_1"></iframe>
     <iframe id="frame-3_1"></iframe>
@@ -213,6 +220,7 @@ const docs={
   '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1777861843'},
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1777861843'},
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1779181822'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1782827140'},
   '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1777861843'},
   '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1777861843'},
   '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1777861843'},
