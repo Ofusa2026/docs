@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>オンライン申請（窓口受領用）</title>
 <style>.fp-case{display:none!important;}</style>
-<link rel="stylesheet" href="ofusa_common.css?v=1782829616">
+<link rel="stylesheet" href="ofusa_common.css?v=1782830899">
 <style>
   /* ══ 窓口の紙 専用スタイル ══ */
   .fp-case{display:block!important;}
@@ -13,6 +13,20 @@
   .fp-case .hint{color:#888;font-size:9.5px;margin-top:6px;line-height:1.5;}
   .fp-case .addBtn{margin-top:6px;width:100%;background:#16a34a;color:#fff;border:none;border-radius:3px;padding:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:sans-serif;}
   .fp-case .rowCount{font-size:9.5px;color:#555;margin-top:8px;font-family:sans-serif;}
+
+  .slot-pagehead{font-size:10px;font-weight:700;color:#333;margin:10px 0 4px;font-family:sans-serif;border-bottom:1px solid #ccc;padding-bottom:2px;}
+  .slot-pagehead:first-child{margin-top:0;}
+  .slot-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+  .slot-no{width:18px;flex-shrink:0;font-size:10px;color:#888;font-family:sans-serif;text-align:right;}
+  .slot-input{flex:1;min-width:0;padding:4px 5px;border:1px solid #bbb;border-radius:3px;font-size:10.5px;box-sizing:border-box;}
+  .slot-input.filled{background:#eafaf0;border-color:#16a34a;}
+  .slot-input.error{background:#fef2f2;border-color:#dc2626;}
+  .slot-input.loading{background:#fffbeb;border-color:#d97706;}
+  .slot-del{flex-shrink:0;width:20px;height:20px;border:none;background:transparent;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;border-radius:3px;}
+  .slot-del:hover{background:#fee2e2;}
+  .slot-del:disabled{color:#ccc;cursor:default;}
+  .slot-del:disabled:hover{background:transparent;}
+  .slot-errtext{font-size:9px;color:#dc2626;margin:-2px 0 4px 22px;line-height:1.4;}
 
   .doc{padding:7mm 12mm!important;line-height:1.35!important;min-height:auto!important;background:#fff;}
   @media print{
@@ -30,7 +44,7 @@
   .madoguchi-page .top-right { text-align: right; font-size: 8pt; margin-bottom: 2px; }
   .madoguchi-page .form-title {
     text-align: center; font-size: 17pt; font-weight: bold;
-    letter-spacing: 0.1em; margin: 2px 0 6px;
+    letter-spacing: 0.1em; margin: 2px 0 12px;
   }
 
   .madoguchi-page .htbl { margin-left: auto; border-collapse: collapse; font-size: 9pt; margin-bottom: 6px; width: 480px; }
@@ -118,16 +132,6 @@
   .madoguchi-page .note-li  { padding-left: 4px; }
   .madoguchi-page .note-li2 { padding-left: 14px; }
 
-  /* 削除ボタン列 */
-  .madoguchi-page .del-cell { width: 18px; padding: 0 !important; }
-  .madoguchi-page .del-btn {
-    width: 100%; height: 100%; border: none; background: transparent;
-    color: #dc2626; font-size: 11px; font-weight: 700; cursor: pointer;
-    line-height: 1;
-  }
-  .madoguchi-page .del-btn:hover { background: #fee2e2; }
-  @media print { .madoguchi-page .del-cell, .madoguchi-page .del-th { display: none !important; } }
-
   /* 2ページ目以降：表ヘッダーを各ページ先頭に repeat させる */
   .madoguchi-page .mtbl thead { display: table-header-group; }
   .madoguchi-page .mtbl tbody tr { page-break-inside: avoid; }
@@ -147,7 +151,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 オンライン申請（窓口受領用）</div>
-    <div class="ver">ver.20260630.02</div>
+    <div class="ver">ver.20260630.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -157,22 +161,21 @@
 <div class="fp">
   <div class="fp-case">
     <label>案件ID貼り付け</label>
-    <input id="caseIdInput" placeholder="案シスの詳細URLのcaseId=...の値" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();addCaseRow();}">
-    <button class="addBtn" onclick="addCaseRow()">＋ 行に追加</button>
-    <div class="err" id="caseIdError"></div>
+    <div id="slotList"></div>
+    <button class="addBtn" id="addPageBtn" onclick="addPage()">＋ ページ追加（次の10件）</button>
     <div class="rowCount" id="rowCountLabel">0件登録済み</div>
     <div class="hint">
-      ・案シスの案件詳細を開いたときのURLに含まれる <code>caseId=...</code> の値をコピーして貼り付けてください。<br>
-      ・最初から項番1〜10の空欄が表示されています。貼り付けるたびに上から順に埋まります。<br>
+      ・案シスの案件詳細を開いたときのURLに含まれる <code>caseId=...</code> の値を、各枠に貼り付けてください。<br>
       ・対応する申請受付番号は「東オン」「横オン」のみです。それ以外の拠点の案件はエラー表示になります。<br>
-      ・11件目以降は次のページ（例行＋項番1〜10）が自動で増えます。<br>
-      ・行右端の「✕」で削除できます（画面表示のみ、印刷時は表示されません）。
+      ・11件目以降は「＋ページ追加」を押すと次の10件分の枠が増えます（2ページ目は1ページ目と同じ構成で印刷されます）。<br>
+      ・各枠の「✕」で取り消せます。
     </div>
   </div>
   <div class="fp-inner" style="display:none;"></div>
 </div>
 <div class="pp">
 <div id="ppOuter">
+
 <div id="pageArea">
 <!-- ページ全体はJSで生成（renderMadoguchiPages） -->
 </div>
@@ -181,15 +184,21 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1782829616"></script>
+<script src="ofusa_common.js?v=1782830899"></script>
 <script>
 // ===========================================================
 // 窓口の紙：案件ID貼り付け → 申請受付番号・担当部門 自動反映
-// 10行を1ページとして、11件目以降は新しいページ（例行+項番1〜10）を繰り返す
+// サイドバーに常に10件単位の入力枠（スロット）を表示し、各枠に貼り付けると該当行が埋まる。
+// 「＋ページ追加」で次の10件分の枠を増やす。11件目以降は新ページ（例行+項番1〜10）が増える。
 // ===========================================================
 
 const ROWS_PER_PAGE = 10;
-let _madoguchiRows = []; // 埋まった枠のみ保持。{caseId, receiptNoRaw, residenceStatus, parsed, deptKey}
+// _slots: 常に10の倍数の長さを保つ配列。各要素は以下のいずれか
+//   null                                            … 未入力
+//   {status:'loading', caseId}                       … 取得中
+//   {status:'filled', caseId, receiptNoRaw, residenceStatus, parsed, deptKey}
+//   {status:'error', caseId, message}                … ID不正・取得失敗等
+let _slots = new Array(ROWS_PER_PAGE).fill(null);
 
 // ---- 担当部門マッピング ----
 // 労1: 技術・人文知識・国際業務／法律・会計業務／研究／企業内転勤／高度専門職1号イ・ロ・ハ
@@ -236,45 +245,58 @@ function parseReceiptNo(raw){
   return { branch: m[1], code: m[2], number: m[3] };
 }
 
-async function addCaseRow(){
-  const idInput = document.getElementById('caseIdInput');
-  const caseId = idInput.value.trim();
-  const errEl = document.getElementById('caseIdError');
-  errEl.textContent = '';
-  if(!caseId) return;
-
-  if(_madoguchiRows.some(r => r.caseId === caseId)){
-    errEl.textContent = 'この案件IDは既に追加されています';
+// スロットslotIdx（0始まり、全体通し番号）にIDを貼り付けたときの処理
+async function loadSlot(slotIdx, caseId){
+  caseId = (caseId || '').trim();
+  if(!caseId){
+    _slots[slotIdx] = null;
+    renderAll();
     return;
   }
+  const dup = _slots.some((s, i) => i !== slotIdx && s && s.caseId === caseId);
+  if(dup){
+    _slots[slotIdx] = { status: 'error', caseId: caseId, message: 'この案件IDは既に他の枠で使われています' };
+    renderAll();
+    return;
+  }
+
+  _slots[slotIdx] = { status: 'loading', caseId: caseId };
+  renderSlotList();
 
   try{
     const cases = await sb('cases?select=id,receipt_no,applicant,residence_status&id=eq.' + encodeURIComponent(caseId));
     const cas = cases && cases[0];
     if(!cas){
-      errEl.textContent = '該当する案件が見つかりません（ID: ' + esc(caseId) + '）';
+      _slots[slotIdx] = { status: 'error', caseId: caseId, message: '該当する案件が見つかりません' };
+      renderAll();
       return;
     }
     const parsed = parseReceiptNo(cas.receipt_no);
     const deptKey = judgeDept(cas.residence_status);
-    _madoguchiRows.push({
+    _slots[slotIdx] = {
+      status: 'filled',
       caseId: cas.id,
       applicant: cas.applicant || '',
       receiptNoRaw: cas.receipt_no || '',
       residenceStatus: cas.residence_status || '',
       parsed: parsed,
       deptKey: deptKey
-    });
-    idInput.value = '';
-    renderMadoguchiPages();
+    };
+    renderAll();
   }catch(e){
-    errEl.textContent = '取得に失敗しました: ' + e.message;
+    _slots[slotIdx] = { status: 'error', caseId: caseId, message: '取得に失敗しました: ' + e.message };
+    renderAll();
   }
 }
 
-function removeCaseRow(idx){
-  _madoguchiRows.splice(idx, 1);
-  renderMadoguchiPages();
+function removeSlot(slotIdx){
+  _slots[slotIdx] = null;
+  renderAll();
+}
+
+function addPage(){
+  for(let i = 0; i < ROWS_PER_PAGE; i++) _slots.push(null);
+  renderAll();
 }
 
 function deptCheckboxHtml(deptKey){
@@ -296,9 +318,9 @@ function deptCheckboxHtml(deptKey){
     + '</div>';
 }
 
-// 1行分（項番itemNo、rowデータ。rowがnullなら空枠）のtr HTMLを生成
-function buildRowHtml(itemNo, row, globalIdx){
-  if(!row){
+// 1行分（項番itemNo、slotデータ。slotがnull/undefinedなら空枠）のtr HTMLを生成
+function buildRowHtml(itemNo, slot, globalIdx){
+  if(!slot){
     // 空枠（未入力）
     return ''
       + '<tr>'
@@ -312,29 +334,44 @@ function buildRowHtml(itemNo, row, globalIdx){
       + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
       + '<td></td>'
       + '<td class="knin-cell"></td>'
-      + '<td class="del-cell"></td>'
       + '</tr>';
   }
 
-  if(row.parsed.error){
-    // エラー行：番号セルにエラーメッセージを表示し、担当部門・再入国は空欄のまま
+  if(slot.status === 'loading'){
     return ''
       + '<tr>'
       + '<td>' + itemNo + '</td>'
-      + '<td class="ofc-cell" style="color:#dc2626;font-weight:700;">⚠</td>'
+      + '<td class="ofc-cell" style="color:#999;">…</td>'
       + '<td class="en-cell"></td>'
-      + '<td class="num-cell" style="color:#dc2626;font-size:6.3pt;text-align:left;padding-left:4px;">' + esc(row.parsed.error) + '</td>'
+      + '<td class="num-cell" style="color:#999;font-size:6.5pt;">取得中…</td>'
       + '<td class="dept-cell">' + deptCheckboxHtml(null) + '</td>'
       + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし" checked><span>なし</span></div></td>'
       + '<td class="chk-cell"><input type="checkbox"></td>'
       + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
       + '<td></td>'
       + '<td class="knin-cell"></td>'
-      + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + globalIdx + ')">✕</button></td>'
       + '</tr>';
   }
 
-  const p = row.parsed;
+  if(slot.status === 'error' || (slot.parsed && slot.parsed.error)){
+    // エラー行：番号セルにエラーメッセージを表示し、担当部門・再入国は空欄のまま
+    const msg = slot.status === 'error' ? slot.message : slot.parsed.error;
+    return ''
+      + '<tr>'
+      + '<td>' + itemNo + '</td>'
+      + '<td class="ofc-cell" style="color:#dc2626;font-weight:700;">⚠</td>'
+      + '<td class="en-cell"></td>'
+      + '<td class="num-cell" style="color:#dc2626;font-size:6.3pt;text-align:left;padding-left:4px;">' + esc(msg) + '</td>'
+      + '<td class="dept-cell">' + deptCheckboxHtml(null) + '</td>'
+      + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし" checked><span>なし</span></div></td>'
+      + '<td class="chk-cell"><input type="checkbox"></td>'
+      + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
+      + '<td></td>'
+      + '<td class="knin-cell"></td>'
+      + '</tr>';
+  }
+
+  const p = slot.parsed;
   const ofcHtml = (p.branch === '東オン')
     ? '<label style="display:block;text-align:center;"><span class="ex-sel">東オン</span></label><label style="display:block;text-align:center;">横オン</label>'
     : '<label style="display:block;text-align:center;">東オン</label><label style="display:block;text-align:center;"><span class="ex-sel">横オン</span></label>';
@@ -345,13 +382,12 @@ function buildRowHtml(itemNo, row, globalIdx){
     + '<td class="ofc-cell">' + ofcHtml + '</td>'
     + '<td class="en-cell">' + esc(p.code) + '</td>'
     + '<td class="num-cell"><input type="text" value="' + esc(p.number) + '"></td>'
-    + '<td class="dept-cell">' + deptCheckboxHtml(row.deptKey) + '</td>'
+    + '<td class="dept-cell">' + deptCheckboxHtml(slot.deptKey) + '</td>'
     + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし" checked><span>なし</span></div></td>'
     + '<td class="chk-cell"><input type="checkbox"></td>'
     + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
     + '<td></td>'
     + '<td class="knin-cell"></td>'
-    + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + globalIdx + ')">✕</button></td>'
     + '</tr>';
 }
 
@@ -372,7 +408,6 @@ const EXAMPLE_ROW_HTML = ''
   +   '<div class="re-opt">&#9744;なし</div>'
   + '</td>'
   + '<td colspan="4" class="diag" style="background:#e8e8e8;"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#000" stroke-width="1"/></svg></td>'
-  + '<td style="background:#e8e8e8;"></td>'
   + '</tr>';
 
 // 1ページ分（ヘッダーテーブル＋メインテーブル＋注釈）のHTMLを生成
@@ -407,9 +442,9 @@ function buildPageHtml(pageIdx, rowsForThisPage){
     + '</table>'
     + '<div class="instruction">太枠内を記入してください。</div>'
     + '<table class="mtbl">'
-    + '<colgroup><col style="width:4%"><col style="width:9%"><col style="width:4%"><col style="width:21%"><col style="width:19%"><col style="width:8%"><col style="width:9%"><col style="width:13%"><col style="width:5%"><col style="width:5%"><col style="width:3%"></colgroup>'
+    + '<colgroup><col style="width:4%"><col style="width:9%"><col style="width:4%"><col style="width:22%"><col style="width:19%"><col style="width:8%"><col style="width:9%"><col style="width:14%"><col style="width:5.5%"><col style="width:5.5%"></colgroup>'
     + '<thead>'
-    + '<tr><th rowspan="2">項番</th><th colspan="3" rowspan="2">申請受付番号</th><th rowspan="2">担当部門<br>（※1）</th><th rowspan="2" style="font-size:6.5pt;">再入国<br>許可<br>申請<br>（※2）</th><th colspan="2">職員記入欄</th><th rowspan="2" style="font-size:6.5pt;">証印等<br>発行者</th><th rowspan="2">確認者</th><th rowspan="2" class="del-th"></th></tr>'
+    + '<tr><th rowspan="2">項番</th><th colspan="3" rowspan="2">申請受付番号</th><th rowspan="2">担当部門<br>（※1）</th><th rowspan="2" style="font-size:6.5pt;">再入国<br>許可<br>申請<br>（※2）</th><th colspan="2">職員記入欄</th><th rowspan="2" style="font-size:6.5pt;">証印等<br>発行者</th><th rowspan="2">確認者</th></tr>'
     + '<tr><th style="font-size:6.5pt;">みなし<br>再入国<br>の説明</th><th style="font-size:6.5pt;">備考欄</th></tr>'
     + '</thead>'
     + '<tbody>' + rowsHtml + '</tbody>'
@@ -461,12 +496,12 @@ function renderMadoguchiPages(){
     if(el) savedHeader[name] = el.value;
   });
 
-  const pageCount = Math.max(1, Math.ceil(_madoguchiRows.length / ROWS_PER_PAGE));
+  const pageCount = Math.max(1, Math.ceil(_slots.length / ROWS_PER_PAGE));
   let html = '';
   for(let pageIdx = 0; pageIdx < pageCount; pageIdx++){
     const start = pageIdx * ROWS_PER_PAGE;
-    const rowsForThisPage = _madoguchiRows.slice(start, start + ROWS_PER_PAGE);
-    html += buildPageHtml(pageIdx, rowsForThisPage);
+    const slotsForThisPage = _slots.slice(start, start + ROWS_PER_PAGE);
+    html += buildPageHtml(pageIdx, slotsForThisPage);
   }
   document.getElementById('pageArea').innerHTML = html;
 
@@ -486,14 +521,58 @@ function renderMadoguchiPages(){
 
   attachHeaderSyncListeners();
   syncHeaderToOtherPages();
+}
 
-  document.getElementById('rowCountLabel').textContent = _madoguchiRows.length + '件登録済み';
+// サイドバーのスロット入力欄一覧を描画
+function renderSlotList(){
+  const wrap = document.getElementById('slotList');
+  const pageCount = Math.ceil(_slots.length / ROWS_PER_PAGE);
+  let html = '';
+  for(let p = 0; p < pageCount; p++){
+    html += '<div class="slot-pagehead">' + (p === 0 ? '1ページ目（項番1〜10）' : (p + 1) + 'ページ目（項番1〜10）') + '</div>';
+    for(let i = 0; i < ROWS_PER_PAGE; i++){
+      const idx = p * ROWS_PER_PAGE + i;
+      const slot = _slots[idx];
+      let cls = 'slot-input';
+      let val = '';
+      let errMsg = '';
+      if(slot){
+        val = slot.caseId || '';
+        if(slot.status === 'loading') cls += ' loading';
+        else if(slot.status === 'error'){ cls += ' error'; errMsg = slot.message; }
+        else if(slot.status === 'filled'){
+          if(slot.parsed && slot.parsed.error){ cls += ' error'; errMsg = slot.parsed.error; }
+          else cls += ' filled';
+        }
+      }
+      html += '<div class="slot-row">'
+        + '<span class="slot-no">' + (i + 1) + '</span>'
+        + '<input type="text" class="' + cls + '" data-idx="' + idx + '" value="' + esc(val) + '" placeholder="caseId=...の値" autocomplete="off"'
+        + " onkeydown=\"if(event.key==='Enter'){this.blur();}\""
+        + ' onchange="loadSlot(' + idx + ', this.value)">'
+        + '<button type="button" class="slot-del" data-idx="' + idx + '" onclick="removeSlot(' + idx + ')"' + (slot ? '' : ' disabled') + '>✕</button>'
+        + '</div>';
+      if(errMsg) html += '<div class="slot-errtext">' + esc(errMsg) + '</div>';
+    }
+  }
+  wrap.innerHTML = html;
+
+  const filledCount = _slots.filter(s => s && s.status === 'filled' && !(s.parsed && s.parsed.error)).length;
+  const errorCount = _slots.filter(s => s && (s.status === 'error' || (s.parsed && s.parsed.error))).length;
+  let label = filledCount + '件登録済み';
+  if(errorCount > 0) label += '（エラー' + errorCount + '件）';
+  document.getElementById('rowCountLabel').textContent = label;
+}
+
+function renderAll(){
+  renderSlotList();
+  renderMadoguchiPages();
 }
 
 function doPrint(){ window.print(); }
 
 // 初期描画
-renderMadoguchiPages();
+renderAll();
 </script>
 </body>
 </html>
