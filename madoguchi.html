@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>オンライン申請（窓口受領用）</title>
 <style>.fp-case{display:none!important;}</style>
-<link rel="stylesheet" href="ofusa_common.css?v=1782827140">
+<link rel="stylesheet" href="ofusa_common.css?v=1782829616">
 <style>
   /* ══ 窓口の紙 専用スタイル ══ */
   .fp-case{display:block!important;}
@@ -14,11 +14,11 @@
   .fp-case .addBtn{margin-top:6px;width:100%;background:#16a34a;color:#fff;border:none;border-radius:3px;padding:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:sans-serif;}
   .fp-case .rowCount{font-size:9.5px;color:#555;margin-top:8px;font-family:sans-serif;}
 
-  .doc{padding:18mm 12mm!important;line-height:1.35!important;min-height:auto!important;background:#fff;}
+  .doc{padding:7mm 12mm!important;line-height:1.35!important;min-height:auto!important;background:#fff;}
   @media print{
     .app-bar,.fp{display:none!important}
     .main{display:block!important}
-    .doc{box-shadow:none!important;margin:0!important;padding:18mm 12mm!important}
+    .doc{box-shadow:none!important;margin:0!important;padding:7mm 12mm!important}
   }
 
   /* ── 以下、元の「オンライン申請（窓口受領用）」テンプレートのスタイルをベースに移植 ── */
@@ -29,11 +29,11 @@
   }
   .madoguchi-page .top-right { text-align: right; font-size: 8pt; margin-bottom: 2px; }
   .madoguchi-page .form-title {
-    text-align: center; font-size: 18pt; font-weight: bold;
-    letter-spacing: 0.1em; margin: 4px 0 10px;
+    text-align: center; font-size: 17pt; font-weight: bold;
+    letter-spacing: 0.1em; margin: 2px 0 6px;
   }
 
-  .madoguchi-page .htbl { margin-left: auto; border-collapse: collapse; font-size: 9pt; margin-bottom: 10px; width: 480px; }
+  .madoguchi-page .htbl { margin-left: auto; border-collapse: collapse; font-size: 9pt; margin-bottom: 6px; width: 480px; }
   .madoguchi-page .htbl tr { display: block; margin-bottom: 3px; white-space: nowrap; }
   .madoguchi-page .htbl td { display: inline-block; }
   .madoguchi-page .htbl .uline {
@@ -53,7 +53,7 @@
     font-size: 7pt; table-layout: fixed;
   }
   .madoguchi-page .mtbl th, .madoguchi-page .mtbl td {
-    border: 1px solid #000; padding: 2px 3px;
+    border: 1px solid #000; padding: 1.5px 3px;
     vertical-align: middle; text-align: center;
   }
   .madoguchi-page .mtbl th { background: #e0e0e0; font-size: 6.8pt; font-weight: bold; line-height: 1.4; }
@@ -111,9 +111,9 @@
     padding: 0px 4px;
   }
 
-  .madoguchi-page .notes { margin-top: 8px; font-size: 7.5pt; }
-  .madoguchi-page .note-blk { padding: 2px 0 6px; margin-bottom: 5px; line-height: 1.6; }
-  .madoguchi-page .note-box { border: 1px solid #000; padding: 5px 8px 6px; }
+  .madoguchi-page .notes { margin-top: 5px; font-size: 7.3pt; }
+  .madoguchi-page .note-blk { padding: 1px 0 4px; margin-bottom: 3px; line-height: 1.45; }
+  .madoguchi-page .note-box { border: 1px solid #000; padding: 4px 7px 5px; }
   .madoguchi-page .note-ttl { font-weight: bold; margin-bottom: 2px; }
   .madoguchi-page .note-li  { padding-left: 4px; }
   .madoguchi-page .note-li2 { padding-left: 14px; }
@@ -132,6 +132,14 @@
   .madoguchi-page .mtbl thead { display: table-header-group; }
   .madoguchi-page .mtbl tbody tr { page-break-inside: avoid; }
 
+  /* ページ単位の改ページ */
+  .madoguchi-page-block { page-break-after: always; }
+  .madoguchi-page-block:last-child { page-break-after: auto; }
+  .madoguchi-page-block + .madoguchi-page-block { margin-top: 30px; }
+  @media print {
+    .madoguchi-page-block { margin-top: 0 !important; }
+  }
+
   @media print { body { padding: 0; } }
 </style>
 </head>
@@ -139,7 +147,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 オンライン申請（窓口受領用）</div>
-    <div class="ver">ver.20260630.01</div>
+    <div class="ver">ver.20260630.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -155,8 +163,10 @@
     <div class="rowCount" id="rowCountLabel">0件登録済み</div>
     <div class="hint">
       ・案シスの案件詳細を開いたときのURLに含まれる <code>caseId=...</code> の値をコピーして貼り付けてください。<br>
+      ・最初から項番1〜10の空欄が表示されています。貼り付けるたびに上から順に埋まります。<br>
       ・対応する申請受付番号は「東オン」「横オン」のみです。それ以外の拠点の案件はエラー表示になります。<br>
-      ・行右端の「✕」で削除できます。
+      ・11件目以降は次のページ（例行＋項番1〜10）が自動で増えます。<br>
+      ・行右端の「✕」で削除できます（画面表示のみ、印刷時は表示されません）。
     </div>
   </div>
   <div class="fp-inner" style="display:none;"></div>
@@ -164,125 +174,22 @@
 <div class="pp">
 <div id="ppOuter">
 <div id="pageArea">
-
-<div class="doc madoguchi-page">
-<div class="page">
-
-  <div class="top-right">受付担当者</div>
-  <div class="form-title">オンライン申請（窓口受領用）</div>
-
-  <!-- ヘッダーテーブル -->
-  <table class="htbl">
-    <tr>
-      <td class="uline" style="width:480px;">年(YEAR)<input type="text" style="width:90px;flex:none;">　　月(MONTH)<input type="text" style="width:65px;flex:none;">　　日(DAY)<input type="text" style="width:65px;flex:none;"></td>
-    </tr>
-    <tr>
-      <td class="uline" style="width:480px;">受領者名 (NAME)<input type="text"></td>
-    </tr>
-    <tr>
-      <td class="uline" style="width:480px;">電話番号 (TEL)<input type="text"></td>
-    </tr>
-    <tr style="position:relative;">
-      <td style="position:absolute; left:-78px; bottom:1px; font-size:8pt; white-space:nowrap; border:none; padding:0;">（取次の場合）</td>
-      <td class="uline" style="width:480px;">所属機関名<input type="text"></td>
-    </tr>
-  </table>
-
-  <div class="instruction">太枠内を記入してください。</div>
-
-  <!-- ══ メインテーブル ══ -->
-  <table class="mtbl">
-    <colgroup>
-      <col style="width:4%">
-      <col style="width:9%">
-      <col style="width:4%">
-      <col style="width:21%">
-      <col style="width:19%">
-      <col style="width:8%">
-      <col style="width:9%">
-      <col style="width:13%">
-      <col style="width:5%">
-      <col style="width:5%">
-      <col style="width:3%">
-    </colgroup>
-    <thead>
-      <tr>
-        <th rowspan="2">項番</th>
-        <th colspan="3" rowspan="2">申請受付番号</th>
-        <th rowspan="2">担当部門<br>（※1）</th>
-        <th rowspan="2" style="font-size:6.5pt;">再入国<br>許可<br>申請<br>（※2）</th>
-        <th colspan="2">職員記入欄</th>
-        <th rowspan="2" style="font-size:6.5pt;">証印等<br>発行者</th>
-        <th rowspan="2">確認者</th>
-        <th rowspan="2" class="del-th"></th>
-      </tr>
-      <tr>
-        <th style="font-size:6.5pt;">みなし<br>再入国<br>の説明</th>
-        <th style="font-size:6.5pt;">備考欄</th>
-      </tr>
-    </thead>
-    <tbody id="madoguchiBody">
-
-      <!-- 例行（固定） -->
-      <tr>
-        <td style="font-size:8pt; font-weight:bold; background:#e8e8e8;">例</td>
-        <td style="font-size:6.5pt; background:#e8e8e8;"><span class="ex-sel">東オン</span><br>横オン</td>
-        <td style="font-size:8pt; font-weight:bold; background:#e8e8e8;">EN</td>
-        <td style="font-size:8pt; background:#e8e8e8;">24000×××</td>
-        <td class="dept-cell" style="background:#e8e8e8; font-size:7pt;">
-          <div class="dept-row"><span>&#9745;労1</span><span>&#9744;労2</span><span>&#9744;労3</span></div>
-          <div class="dept-row"><span>&#9744;留学</span><span>&#9744;研・短</span></div>
-          <div class="dept-row"><span>&#9744;永住</span><span>&#9744;その他</span></div>
-        </td>
-        <td style="background:#e8e8e8;">
-          <div class="re-opt">&#9745;あり</div>
-          <div class="re-opt">&#9744;なし</div>
-        </td>
-        <td colspan="4" class="diag" style="background:#e8e8e8;"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#000" stroke-width="1"/></svg></td>
-        <td style="background:#e8e8e8;"></td>
-      </tr>
-      <!-- ここから下、JSで行を動的追加 -->
-
-    </tbody>
-  </table>
-
-  <!-- 注釈 -->
-  <div class="notes">
-    <div class="note-blk">
-      <div class="note-ttl">※1　担当部門一覧</div>
-      <div class="note-box">
-        <div class="note-li">【労１】技術・人文知識・国際業務／法律・会計業務／研究／企業内転勤／高度専門職１号イ・ロ・ハ</div>
-        <div class="note-li">【労２】技能／経営・管理／興行／公用／教授／教育／芸術／宗教／報道／医療／介護</div>
-        <div class="note-li">【労３】特定技能１号　　　　　【研・短】技能実習１号・２号・３号／文化活動／研修</div>
-        <div class="note-li">【留学】留学　　　　　　　　【永住】日本人の配偶者等／永住者の配偶者等／定住者</div>
-        <div class="note-li2">◆「家族滞在」の期間更新または資格変更の方は、扶養者の在留資格に該当する担当部門に☑してください。</div>
-        <div class="note-li2">◆「特定活動」の期間更新または資格変更の方で、担当部門がご不明の場合は職員にお声かけください。</div>
-      </div>
-    </div>
-    <div class="note-blk">
-      <div class="note-ttl">※2　みなし再入国許可とは</div>
-      <div class="note-box">
-        <div class="note-li">出国後１年が経過する日又は在留期間が満了する日のいずれか早い日までに再入国を予定する方は、出国の際にその旨申し出ることにより再入国許可を受けることなく出国し、再入国することができます。</div>
-      </div>
-    </div>
-  </div>
-
-</div>
-</div>
-
+<!-- ページ全体はJSで生成（renderMadoguchiPages） -->
 </div>
 </div>
 </div>
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1782827140"></script>
+<script src="ofusa_common.js?v=1782829616"></script>
 <script>
 // ===========================================================
 // 窓口の紙：案件ID貼り付け → 申請受付番号・担当部門 自動反映
+// 10行を1ページとして、11件目以降は新しいページ（例行+項番1〜10）を繰り返す
 // ===========================================================
 
-let _madoguchiRows = []; // {caseId, receiptNoRaw, branch, code, number, deptKey, error}
+const ROWS_PER_PAGE = 10;
+let _madoguchiRows = []; // 埋まった枠のみ保持。{caseId, receiptNoRaw, residenceStatus, parsed, deptKey}
 
 // ---- 担当部門マッピング ----
 // 労1: 技術・人文知識・国際業務／法律・会計業務／研究／企業内転勤／高度専門職1号イ・ロ・ハ
@@ -359,7 +266,7 @@ async function addCaseRow(){
       deptKey: deptKey
     });
     idInput.value = '';
-    renderMadoguchiRows();
+    renderMadoguchiPages();
   }catch(e){
     errEl.textContent = '取得に失敗しました: ' + e.message;
   }
@@ -367,7 +274,7 @@ async function addCaseRow(){
 
 function removeCaseRow(idx){
   _madoguchiRows.splice(idx, 1);
-  renderMadoguchiRows();
+  renderMadoguchiPages();
 }
 
 function deptCheckboxHtml(deptKey){
@@ -389,54 +296,196 @@ function deptCheckboxHtml(deptKey){
     + '</div>';
 }
 
-function renderMadoguchiRows(){
-  const tbody = document.getElementById('madoguchiBody');
-  // 例行（最初の<tr>）は残し、それ以降を作り直す
-  const exampleRow = tbody.querySelector('tr');
-  tbody.innerHTML = '';
-  tbody.appendChild(exampleRow);
-
-  _madoguchiRows.forEach((row, idx) => {
-    const itemNo = idx + 1;
-    const tr = document.createElement('tr');
-
-    if(row.parsed.error){
-      // エラー行：番号セルにエラーメッセージを表示し、担当部門・再入国は空欄のまま
-      tr.innerHTML = ''
-        + '<td>' + itemNo + '</td>'
-        + '<td class="ofc-cell" style="color:#dc2626;font-weight:700;">⚠</td>'
-        + '<td class="en-cell"></td>'
-        + '<td class="num-cell" style="color:#dc2626;font-size:6.3pt;text-align:left;padding-left:4px;">' + esc(row.parsed.error) + '</td>'
-        + '<td class="dept-cell">' + deptCheckboxHtml(null) + '</td>'
-        + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '" value="なし" checked><span>なし</span></div></td>'
-        + '<td class="chk-cell"><input type="checkbox"></td>'
-        + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
-        + '<td></td>'
-        + '<td class="knin-cell"></td>'
-        + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + idx + ')">✕</button></td>';
-      tbody.appendChild(tr);
-      return;
-    }
-
-    const p = row.parsed;
-    const ofcHtml = (p.branch === '東オン')
-      ? '<label style="display:block;text-align:center;font-weight:700;text-decoration:underline;">東オン</label><label style="display:block;text-align:center;">横オン</label>'
-      : '<label style="display:block;text-align:center;">東オン</label><label style="display:block;text-align:center;font-weight:700;text-decoration:underline;">横オン</label>';
-
-    tr.innerHTML = ''
+// 1行分（項番itemNo、rowデータ。rowがnullなら空枠）のtr HTMLを生成
+function buildRowHtml(itemNo, row, globalIdx){
+  if(!row){
+    // 空枠（未入力）
+    return ''
+      + '<tr>'
       + '<td>' + itemNo + '</td>'
-      + '<td class="ofc-cell">' + ofcHtml + '</td>'
-      + '<td class="en-cell">' + esc(p.code) + '</td>'
-      + '<td class="num-cell"><input type="text" value="' + esc(p.number) + '"></td>'
-      + '<td class="dept-cell">' + deptCheckboxHtml(row.deptKey) + '</td>'
-      + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '" value="なし" checked><span>なし</span></div></td>'
+      + '<td class="ofc-cell"><label style="display:block;text-align:center;">東オン</label><label style="display:block;text-align:center;">横オン</label></td>'
+      + '<td class="en-cell"></td>'
+      + '<td class="num-cell"><input type="text"></td>'
+      + '<td class="dept-cell">' + deptCheckboxHtml(null) + '</td>'
+      + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし"><span>なし</span></div></td>'
       + '<td class="chk-cell"><input type="checkbox"></td>'
       + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
       + '<td></td>'
       + '<td class="knin-cell"></td>'
-      + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + idx + ')">✕</button></td>';
-    tbody.appendChild(tr);
+      + '<td class="del-cell"></td>'
+      + '</tr>';
+  }
+
+  if(row.parsed.error){
+    // エラー行：番号セルにエラーメッセージを表示し、担当部門・再入国は空欄のまま
+    return ''
+      + '<tr>'
+      + '<td>' + itemNo + '</td>'
+      + '<td class="ofc-cell" style="color:#dc2626;font-weight:700;">⚠</td>'
+      + '<td class="en-cell"></td>'
+      + '<td class="num-cell" style="color:#dc2626;font-size:6.3pt;text-align:left;padding-left:4px;">' + esc(row.parsed.error) + '</td>'
+      + '<td class="dept-cell">' + deptCheckboxHtml(null) + '</td>'
+      + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし" checked><span>なし</span></div></td>'
+      + '<td class="chk-cell"><input type="checkbox"></td>'
+      + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
+      + '<td></td>'
+      + '<td class="knin-cell"></td>'
+      + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + globalIdx + ')">✕</button></td>'
+      + '</tr>';
+  }
+
+  const p = row.parsed;
+  const ofcHtml = (p.branch === '東オン')
+    ? '<label style="display:block;text-align:center;"><span class="ex-sel">東オン</span></label><label style="display:block;text-align:center;">横オン</label>'
+    : '<label style="display:block;text-align:center;">東オン</label><label style="display:block;text-align:center;"><span class="ex-sel">横オン</span></label>';
+
+  return ''
+    + '<tr>'
+    + '<td>' + itemNo + '</td>'
+    + '<td class="ofc-cell">' + ofcHtml + '</td>'
+    + '<td class="en-cell">' + esc(p.code) + '</td>'
+    + '<td class="num-cell"><input type="text" value="' + esc(p.number) + '"></td>'
+    + '<td class="dept-cell">' + deptCheckboxHtml(row.deptKey) + '</td>'
+    + '<td><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="あり"><span>あり</span></div><div class="re-opt"><input type="radio" name="r' + itemNo + '_' + globalIdx + '" value="なし" checked><span>なし</span></div></td>'
+    + '<td class="chk-cell"><input type="checkbox"></td>'
+    + '<td><label class="biko-lbl"><input type="checkbox">メール画面確認</label></td>'
+    + '<td></td>'
+    + '<td class="knin-cell"></td>'
+    + '<td class="del-cell"><button type="button" class="del-btn" onclick="removeCaseRow(' + globalIdx + ')">✕</button></td>'
+    + '</tr>';
+}
+
+// 例行（固定）のHTML
+const EXAMPLE_ROW_HTML = ''
+  + '<tr>'
+  + '<td style="font-size:8pt; font-weight:bold; background:#e8e8e8;">例</td>'
+  + '<td style="font-size:6.5pt; background:#e8e8e8;"><span class="ex-sel">東オン</span><br>横オン</td>'
+  + '<td style="font-size:8pt; font-weight:bold; background:#e8e8e8;">EN</td>'
+  + '<td style="font-size:8pt; background:#e8e8e8;">24000×××</td>'
+  + '<td class="dept-cell" style="background:#e8e8e8; font-size:7pt;">'
+  +   '<div class="dept-row"><span>&#9745;労1</span><span>&#9744;労2</span><span>&#9744;労3</span></div>'
+  +   '<div class="dept-row"><span>&#9744;留学</span><span>&#9744;研・短</span></div>'
+  +   '<div class="dept-row"><span>&#9744;永住</span><span>&#9744;その他</span></div>'
+  + '</td>'
+  + '<td style="background:#e8e8e8;">'
+  +   '<div class="re-opt">&#9745;あり</div>'
+  +   '<div class="re-opt">&#9744;なし</div>'
+  + '</td>'
+  + '<td colspan="4" class="diag" style="background:#e8e8e8;"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#000" stroke-width="1"/></svg></td>'
+  + '<td style="background:#e8e8e8;"></td>'
+  + '</tr>';
+
+// 1ページ分（ヘッダーテーブル＋メインテーブル＋注釈）のHTMLを生成
+// pageIdx: 0始まり。pageIdx===0 のときだけヘッダー欄が実体（id付き入力欄）、1以降は値表示用の複製（同期はJSで行う）
+function buildPageHtml(pageIdx, rowsForThisPage){
+  const isFirst = pageIdx === 0;
+  const idSuffix = isFirst ? '' : '_p' + pageIdx;
+
+  let rowsHtml = EXAMPLE_ROW_HTML;
+  for(let i = 0; i < ROWS_PER_PAGE; i++){
+    const itemNo = i + 1;
+    const globalIdx = pageIdx * ROWS_PER_PAGE + i;
+    const row = rowsForThisPage[i] || null;
+    rowsHtml += buildRowHtml(itemNo, row, globalIdx);
+  }
+
+  return ''
+    + '<div class="doc madoguchi-page madoguchi-page-block">'
+    + '<div class="page">'
+    + '<div class="top-right">受付担当者</div>'
+    + '<div class="form-title">オンライン申請（窓口受領用）</div>'
+    + '<table class="htbl">'
+    + '<tr><td class="uline" style="width:480px;">年(YEAR)<input type="text" class="f_year" id="f_year' + idSuffix + '" style="width:90px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　　月(MONTH)<input type="text" class="f_month" id="f_month' + idSuffix + '" style="width:65px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　　日(DAY)<input type="text" class="f_day" id="f_day' + idSuffix + '" style="width:65px;flex:none;" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
+    + '<tr><td class="uline" style="width:480px;">受領者名 (NAME)<input type="text" class="f_receiver" id="f_receiver' + idSuffix + '" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
+    + '<tr><td class="uline" style="width:480px;">電話番号 (TEL)<input type="text" class="f_tel" id="f_tel' + idSuffix + '" value="03-6424-8849" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
+    + '<tr style="position:relative;"><td style="position:absolute; left:-78px; bottom:1px; font-size:8pt; white-space:nowrap; border:none; padding:0;">（取次の場合）</td><td class="uline" style="width:480px;">所属機関名<input type="text" class="f_company" id="f_company' + idSuffix + '" value="大房行政書士法人" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
+    + '<tr><td class="uline" style="width:480px; border-bottom:1.5px solid #000;">取次者'
+    +   (isFirst
+          ? '<select class="f_toritsugisha" id="f_toritsugisha' + idSuffix + '" style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0 0 0 6px;"><option value="">-- 選択 --</option><option value="中林俊介">中林俊介</option><option value="田中綾美">田中綾美</option></select>'
+          : '<input type="text" class="f_toritsugisha" id="f_toritsugisha' + idSuffix + '" readonly style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0;">')
+    + '</td></tr>'
+    + '</table>'
+    + '<div class="instruction">太枠内を記入してください。</div>'
+    + '<table class="mtbl">'
+    + '<colgroup><col style="width:4%"><col style="width:9%"><col style="width:4%"><col style="width:21%"><col style="width:19%"><col style="width:8%"><col style="width:9%"><col style="width:13%"><col style="width:5%"><col style="width:5%"><col style="width:3%"></colgroup>'
+    + '<thead>'
+    + '<tr><th rowspan="2">項番</th><th colspan="3" rowspan="2">申請受付番号</th><th rowspan="2">担当部門<br>（※1）</th><th rowspan="2" style="font-size:6.5pt;">再入国<br>許可<br>申請<br>（※2）</th><th colspan="2">職員記入欄</th><th rowspan="2" style="font-size:6.5pt;">証印等<br>発行者</th><th rowspan="2">確認者</th><th rowspan="2" class="del-th"></th></tr>'
+    + '<tr><th style="font-size:6.5pt;">みなし<br>再入国<br>の説明</th><th style="font-size:6.5pt;">備考欄</th></tr>'
+    + '</thead>'
+    + '<tbody>' + rowsHtml + '</tbody>'
+    + '</table>'
+    + '<div class="notes">'
+    + '<div class="note-blk"><div class="note-ttl">※1　担当部門一覧</div><div class="note-box">'
+    +   '<div class="note-li">【労１】技術・人文知識・国際業務／法律・会計業務／研究／企業内転勤／高度専門職１号イ・ロ・ハ</div>'
+    +   '<div class="note-li">【労２】技能／経営・管理／興行／公用／教授／教育／芸術／宗教／報道／医療／介護</div>'
+    +   '<div class="note-li">【労３】特定技能１号　　　　　【研・短】技能実習１号・２号・３号／文化活動／研修</div>'
+    +   '<div class="note-li">【留学】留学　　　　　　　　【永住】日本人の配偶者等／永住者の配偶者等／定住者</div>'
+    +   '<div class="note-li2">◆「家族滞在」の期間更新または資格変更の方は、扶養者の在留資格に該当する担当部門に☑してください。</div>'
+    +   '<div class="note-li2">◆「特定活動」の期間更新または資格変更の方で、担当部門がご不明の場合は職員にお声かけください。</div>'
+    + '</div></div>'
+    + '<div class="note-blk"><div class="note-ttl">※2　みなし再入国許可とは</div><div class="note-box">'
+    +   '<div class="note-li">出国後１年が経過する日又は在留期間が満了する日のいずれか早い日までに再入国を予定する方は、出国の際にその旨申し出ることにより再入国許可を受けることなく出国し、再入国することができます。</div>'
+    + '</div></div>'
+    + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+// ヘッダー入力欄（1ページ目）の値を2ページ目以降の表示用欄にコピーする
+function syncHeaderToOtherPages(){
+  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'];
+  fields.forEach(name => {
+    const master = document.getElementById(name); // pageIdx 0（idSuffix無し）
+    if(!master) return;
+    const val = master.value;
+    document.querySelectorAll('.' + name).forEach(el => {
+      if(el.id !== name) el.value = val;
+    });
   });
+}
+
+function attachHeaderSyncListeners(){
+  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'];
+  fields.forEach(name => {
+    const master = document.getElementById(name);
+    if(master) master.addEventListener('input', syncHeaderToOtherPages);
+    if(master) master.addEventListener('change', syncHeaderToOtherPages);
+  });
+}
+
+function renderMadoguchiPages(){
+  // 1ページ目入力中の値を退避（再描画で消えないように）
+  const savedHeader = {};
+  ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'].forEach(name => {
+    const el = document.getElementById(name);
+    if(el) savedHeader[name] = el.value;
+  });
+
+  const pageCount = Math.max(1, Math.ceil(_madoguchiRows.length / ROWS_PER_PAGE));
+  let html = '';
+  for(let pageIdx = 0; pageIdx < pageCount; pageIdx++){
+    const start = pageIdx * ROWS_PER_PAGE;
+    const rowsForThisPage = _madoguchiRows.slice(start, start + ROWS_PER_PAGE);
+    html += buildPageHtml(pageIdx, rowsForThisPage);
+  }
+  document.getElementById('pageArea').innerHTML = html;
+
+  // 年(YEAR)は初回のみ今日の日付を自動セット（編集可能）
+  if(savedHeader.f_year === undefined || savedHeader.f_year === ''){
+    const today = new Date();
+    savedHeader.f_year = String(today.getFullYear());
+    savedHeader.f_month = String(today.getMonth() + 1);
+    savedHeader.f_day = String(today.getDate());
+  }
+
+  // 退避していた値を1ページ目に復元
+  Object.keys(savedHeader).forEach(name => {
+    const el = document.getElementById(name);
+    if(el && savedHeader[name] !== undefined) el.value = savedHeader[name];
+  });
+
+  attachHeaderSyncListeners();
+  syncHeaderToOtherPages();
 
   document.getElementById('rowCountLabel').textContent = _madoguchiRows.length + '件登録済み';
 }
@@ -444,7 +493,7 @@ function renderMadoguchiRows(){
 function doPrint(){ window.print(); }
 
 // 初期描画
-renderMadoguchiRows();
+renderMadoguchiPages();
 </script>
 </body>
 </html>
