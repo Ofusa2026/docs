@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>オンライン申請（窓口受領用）</title>
 <style>.fp-case{display:none!important;}</style>
-<link rel="stylesheet" href="ofusa_common.css?v=1782831356">
+<link rel="stylesheet" href="ofusa_common.css?v=1782831785">
 <style>
   /* ══ 窓口の紙 専用スタイル ══ */
   .fp-case{display:block!important;}
@@ -151,7 +151,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 オンライン申請（窓口受領用）</div>
-    <div class="ver">ver.20260630.04</div>
+    <div class="ver">ver.20260630.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -184,7 +184,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1782831356"></script>
+<script src="ofusa_common.js?v=1782831785"></script>
 <script>
 // ===========================================================
 // 窓口の紙：案件ID貼り付け → 申請受付番号・担当部門 自動反映
@@ -430,15 +430,14 @@ function buildPageHtml(pageIdx, rowsForThisPage){
     + '<div class="top-right">受付担当者</div>'
     + '<div class="form-title">オンライン申請（窓口受領用）</div>'
     + '<table class="htbl">'
-    + '<tr><td class="uline" style="width:480px;">年(YEAR)　　<input type="text" class="f_year" id="f_year' + idSuffix + '" style="width:90px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　　月(MONTH)　　<input type="text" class="f_month" id="f_month' + idSuffix + '" style="width:65px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　　日(DAY)　　<input type="text" class="f_day" id="f_day' + idSuffix + '" style="width:65px;flex:none;" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
-    + '<tr><td class="uline" style="width:480px;">受領者名 (NAME)　　<input type="text" class="f_receiver" id="f_receiver' + idSuffix + '" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
-    + '<tr><td class="uline" style="width:480px;">電話番号 (TEL)　　<input type="text" class="f_tel" id="f_tel' + idSuffix + '" value="03-6424-8849" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
-    + '<tr style="position:relative;"><td style="position:absolute; left:-78px; bottom:1px; font-size:8pt; white-space:nowrap; border:none; padding:0;">（取次の場合）</td><td class="uline" style="width:480px;">所属機関名　　<input type="text" class="f_company" id="f_company' + idSuffix + '" value="大房行政書士法人" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
-    + '<tr><td class="uline" style="width:480px; border-bottom:1.5px solid #000;">取次者　　'
+    + '<tr><td class="uline" style="width:480px;"><input type="text" class="f_year" id="f_year' + idSuffix + '" style="width:55px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　年(YEAR)　　<input type="text" class="f_month" id="f_month' + idSuffix + '" style="width:40px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　月(MONTH)　　<input type="text" class="f_day" id="f_day' + idSuffix + '" style="width:40px;flex:none;" ' + (isFirst ? '' : 'readonly') + '>　日(DAY)</td></tr>'
+    + '<tr><td class="uline" style="width:480px;">受領者名 (NAME)　　'
     +   (isFirst
-          ? '<select class="f_toritsugisha" id="f_toritsugisha' + idSuffix + '" style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0 0 0 6px;"><option value="">-- 選択 --</option><option value="中林俊介">中林俊介</option><option value="田中綾美">田中綾美</option></select>'
-          : '<input type="text" class="f_toritsugisha" id="f_toritsugisha' + idSuffix + '" readonly style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0;">')
+          ? '<select class="f_receiver" id="f_receiver' + idSuffix + '" style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0 0 0 6px;"><option value="">-- 選択 --</option><option value="中林俊介">中林俊介</option><option value="田中綾美">田中綾美</option></select>'
+          : '<input type="text" class="f_receiver" id="f_receiver' + idSuffix + '" readonly style="border:none;outline:none;font-family:inherit;font-size:9pt;background:transparent;flex:1;padding:0;">')
     + '</td></tr>'
+    + '<tr><td class="uline" style="width:480px;">電話番号 (TEL)　　<input type="text" class="f_tel" id="f_tel' + idSuffix + '" value="03-6424-8849" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
+    + '<tr style="position:relative;"><td style="position:absolute; left:-78px; bottom:1px; font-size:8pt; white-space:nowrap; border:none; padding:0;">（取次の場合）</td><td class="uline" style="width:480px; border-bottom:1.5px solid #000;">所属機関名　　<input type="text" class="f_company" id="f_company' + idSuffix + '" value="大房行政書士法人" ' + (isFirst ? '' : 'readonly') + '></td></tr>'
     + '</table>'
     + '<div class="instruction">太枠内を記入してください。</div>'
     + '<table class="mtbl">'
@@ -468,7 +467,7 @@ function buildPageHtml(pageIdx, rowsForThisPage){
 
 // ヘッダー入力欄（1ページ目）の値を2ページ目以降の表示用欄にコピーする
 function syncHeaderToOtherPages(){
-  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'];
+  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company'];
   fields.forEach(name => {
     const master = document.getElementById(name); // pageIdx 0（idSuffix無し）
     if(!master) return;
@@ -480,7 +479,7 @@ function syncHeaderToOtherPages(){
 }
 
 function attachHeaderSyncListeners(){
-  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'];
+  const fields = ['f_year','f_month','f_day','f_receiver','f_tel','f_company'];
   fields.forEach(name => {
     const master = document.getElementById(name);
     if(master) master.addEventListener('input', syncHeaderToOtherPages);
@@ -491,7 +490,7 @@ function attachHeaderSyncListeners(){
 function renderMadoguchiPages(){
   // 1ページ目入力中の値を退避（再描画で消えないように）
   const savedHeader = {};
-  ['f_year','f_month','f_day','f_receiver','f_tel','f_company','f_toritsugisha'].forEach(name => {
+  ['f_year','f_month','f_day','f_receiver','f_tel','f_company'].forEach(name => {
     const el = document.getElementById(name);
     if(el) savedHeader[name] = el.value;
   });
