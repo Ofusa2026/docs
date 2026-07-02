@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260622.02</div>
+    <div class="ver">ver.20260702.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -238,7 +238,52 @@
       <div class="fg"><label>時給（円）<span class="fid">es.salaryHourly</span></label><input id="es_salaryHourly" oninput="p()"></div>
       <div class="fg"><label>換算時給（円）<span class="fid">es.calcHourly</span></label><input id="es_calcHourly" oninput="p()"></div>
       <div class="fg"><label>換算月給（円）<span class="fid">es.calcMonthly</span></label><input id="es_calcMonthly" oninput="p()"></div>
-      <div id="allowanceInputs"></div>
+      <div id="allowanceInputs">
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当①</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance1Name</span></label><input id="es_a1Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance1NameEn</span></label><input id="es_a1NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance1Amount</span></label><input id="es_a1Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance1Calc</span></label><input id="es_a1Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance1CalcEn</span></label><input id="es_a1CalcEn" oninput="p()"></div>
+          </div>
+        </div>
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当②</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance2Name</span></label><input id="es_a2Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance2NameEn</span></label><input id="es_a2NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance2Amount</span></label><input id="es_a2Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance2Calc</span></label><input id="es_a2Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance2CalcEn</span></label><input id="es_a2CalcEn" oninput="p()"></div>
+          </div>
+        </div>
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当③</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance3Name</span></label><input id="es_a3Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance3NameEn</span></label><input id="es_a3NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance3Amount</span></label><input id="es_a3Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance3Calc</span></label><input id="es_a3Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance3CalcEn</span></label><input id="es_a3CalcEn" oninput="p()"></div>
+          </div>
+        </div>
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当④</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance4Name</span></label><input id="es_a4Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance4NameEn</span></label><input id="es_a4NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance4Amount</span></label><input id="es_a4Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance4Calc</span></label><input id="es_a4Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance4CalcEn</span></label><input id="es_a4CalcEn" oninput="p()"></div>
+          </div>
+        </div>
+      </div>
       <div class="fg"><label>所定外60H以内割増率(%)<span class="fid">es.ot60under</span></label><input id="es_ot60under" placeholder="25" oninput="p()"></div>
       <div class="fg"><label>所定外60H超割増率(%)<span class="fid">es.ot60over</span></label><input id="es_ot60over" placeholder="50" oninput="p()"></div>
       <div class="fg"><label>所定超割増率(%)<span class="fid">es.otPrescribed</span></label><input id="es_otPrescribed" oninput="p()"></div>
