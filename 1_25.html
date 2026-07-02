@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260415.21</div>
+    <div class="ver">ver.20260702.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -152,7 +152,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
-      sb('cases?select=applicant,emp_set_idx&id=eq.'+caseId),
+      sb('cases?select=applicant,emp_set_idx,contract_end,contract_start&id=eq.'+caseId),
       companyId?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
@@ -168,9 +168,15 @@ async function loadFromDB(){
       const es=(co.emp_sets||[])[idx]||{};
       if(es.supportFee) s('f_supportFee',es.supportFee);
     }
-    const persons=await sb('persons?select=contract_end&case_id=eq.'+caseId);
-    const pd=persons&&persons[0];
-    if(pd?.contract_end){const m=String(pd.contract_end).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)s('f_contractEnd',`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`);}
+    const fmtJDate=(v)=>{const m=String(v||'').match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);return m?`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`:'';};
+    // 契約終了日: 案件(cases.contract_end)を優先、無ければ人材(persons.contract_end)を使う
+    let _cEnd = cas && cas.contract_end ? fmtJDate(cas.contract_end) : '';
+    if(!_cEnd){
+      const persons=await sb('persons?select=contract_end&case_id=eq.'+caseId);
+      const pd=persons&&persons[0];
+      if(pd&&pd.contract_end) _cEnd=fmtJDate(pd.contract_end);
+    }
+    if(_cEnd) s('f_contractEnd',_cEnd);
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
