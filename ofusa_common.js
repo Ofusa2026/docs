@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260622.01
+ * ver.20260702.01
  */
 
 // ===== Supabase =====
@@ -121,8 +121,10 @@ function toggleEditMode(){
     if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}
     if(area)area.classList.remove('edit-mode');
     enableDocEditing(false);
-    // フリーズ中（編集呼び出しで読んだ内容）は維持、それ以外はp()で再描画
-    if(!window._htmlFrozen && typeof p==='function') p();
+    // 直接編集した内容を破棄しないよう、終了時にHTMLをフリーズして保持する。
+    // （以前はここで p() を呼んでフォーム値から作り直していたため、手編集が消えていた）
+    // フリーズ後もフォームの変数(data-bind)は applyBindings() 経由で更新される。
+    window._htmlFrozen=true;
   }
 }
 function enableDocEditing(on){
