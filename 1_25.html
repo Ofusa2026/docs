@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260703.01</div>
+    <div class="ver">ver.20260703.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -152,7 +152,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
-      sb('cases?select=applicant,emp_set_idx,contract_end,contract_start,support_fee&id=eq.'+caseId),
+      sb('cases?select=applicant,emp_set_idx,contract_end,contract_start,support_fee,org,doc_create_date&id=eq.'+caseId),
       companyId?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
@@ -162,8 +162,7 @@ async function loadFromDB(){
     if(co){
       s('f_company',co.name||'');
       s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
-      s('f_soName',co.support_org_name||'');
-      s('f_soNo',co.support_org_no||'');
+      s('f_soName',(cas&&cas.org)||co.support_org_name||'');
       const idx=parseInt((cas&&cas.emp_set_idx)||0)||0;
       const es=(co.emp_sets||[])[idx]||{};
       // 支援委託費は案件(cases.support_fee)に保存されている。旧データ用にemp_setsもフォールバック
@@ -179,7 +178,24 @@ async function loadFromDB(){
       if(pd&&pd.contract_end) _cEnd=fmtJDate(pd.contract_end);
     }
     if(_cEnd) s('f_contractEnd',_cEnd);
-    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    // 登録番号(soNo): 所属機関に無ければ、同じ登録支援機関名を持つ他社レコードから補完
+    let _soNo=(co&&co.support_org_no)||'';
+    const _soNm=(cas&&cas.org)||(co&&co.support_org_name)||'';
+    if(!_soNo && _soNm){
+      try{
+        const rows=await sb('companies?select=support_org_no&support_org_name=eq.'+encodeURIComponent(_soNm)+'&support_org_no=not.is.null');
+        const cnt={};
+        (rows||[]).forEach(r=>{const x=((r&&r.support_org_no)||'').trim();if(x) cnt[x]=(cnt[x]||0)+1;});
+        const best=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+        if(best) _soNo=best; // 表記ゆれ・誤入力対策として最頻値を採用
+      }catch(_e){}
+    }
+    if(_soNo) s('f_soNo',_soNo);
+    // 契約年月日(docDate): 案件のcontract_start(→無ければdoc_create_date)を西暦で。どちらも無ければ今日(西暦)
+    let _dd=(cas&&cas.contract_start)?fmtJDate(cas.contract_start):'';
+    if(!_dd && cas && cas.doc_create_date) _dd=fmtJDate(cas.doc_create_date);
+    if(!_dd){const n=new Date();_dd=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
+    document.getElementById('f_docDate').value=_dd;
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
