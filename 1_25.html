@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260702.01</div>
+    <div class="ver">ver.20260703.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -152,7 +152,7 @@ async function loadFromDB(){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
-      sb('cases?select=applicant,emp_set_idx,contract_end,contract_start&id=eq.'+caseId),
+      sb('cases?select=applicant,emp_set_idx,contract_end,contract_start,support_fee&id=eq.'+caseId),
       companyId?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,support_org_name,support_org_no,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
@@ -166,7 +166,9 @@ async function loadFromDB(){
       s('f_soNo',co.support_org_no||'');
       const idx=parseInt((cas&&cas.emp_set_idx)||0)||0;
       const es=(co.emp_sets||[])[idx]||{};
-      if(es.supportFee) s('f_supportFee',es.supportFee);
+      // 支援委託費は案件(cases.support_fee)に保存されている。旧データ用にemp_setsもフォールバック
+      const _sf=(cas&&cas.support_fee)||es.supportFee||'';
+      if(_sf) s('f_supportFee',_sf);
     }
     const fmtJDate=(v)=>{const m=String(v||'').match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);return m?`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`:'';};
     // 契約終了日: 案件(cases.contract_end)を優先、無ければ人材(persons.contract_end)を使う
