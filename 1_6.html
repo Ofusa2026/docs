@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260709.01</div>
+    <div class="ver">ver.20260709.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -376,7 +376,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1783728000"></script>
+<script src="ofusa_common.js?v=1783593939"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -1117,6 +1117,19 @@ function setFormValues(esData){
     set('es_renewal', mapped);
   }
 
+
+  // ===== 定例休日テキスト自動生成（fixedHolidayXxx フラグ → fixedDay1）=====
+  const _dayJa={Mon:'月',Tue:'火',Wed:'水',Thu:'木',Fri:'金',Sat:'土',Sun:'日',Hol:'祝日'};
+  const _fixedDays=Object.entries(_dayJa).filter(([k])=>esData['fixedHoliday'+k]).map(([,v])=>v);
+  if(_fixedDays.length>0){
+    const _fdEl=document.getElementById('es_fixedDay1');
+    if(_fdEl && !_fdEl.value) _fdEl.value='毎週'+_fixedDays.join('・');
+  }
+  // 非定例日: nonRegWeeklyDays / nonRegMonthlyDays → es_nonRegDays
+  if(esData.nonRegWeeklyDays||esData.nonRegMonthlyDays){
+    const _nrEl=document.getElementById('es_nonRegDays');
+    if(_nrEl && !_nrEl.value) _nrEl.value=esData.nonRegWeeklyDays||esData.nonRegMonthlyDays||'';
+  }
   // 4. applicantName は persons から別途セット済みのため上書きしない
   p();
 }
@@ -1229,6 +1242,18 @@ async function loadFromDB(passedInfo){
       _setDate('contractStart', pd.contractStart||pd.contract_start);
       _setDate('contractEnd',   pd.contractEnd||pd.contract_end);
       _setDate('entry',         pd.entryDate||pd.entry_date);
+      if(pd.contractStartY){
+        const _si2=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=String(v);};
+        _si2('es_contractStartY',pd.contractStartY); _si2('es_contractStartM',pd.contractStartM||''); _si2('es_contractStartD',pd.contractStartD||'');
+      }
+      if(pd.contractEndY){
+        const _si2=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=String(v);};
+        _si2('es_contractEndY',pd.contractEndY); _si2('es_contractEndM',pd.contractEndM||''); _si2('es_contractEndD',pd.contractEndD||'');
+      }
+      if(pd.entryY){
+        const _si2=(id,v)=>{const e=document.getElementById(id);if(e&&!e.value)e.value=String(v);};
+        _si2('es_entryY',pd.entryY); _si2('es_entryM',pd.entryM||''); _si2('es_entryD',pd.entryD||'');
+      }
     }
 
     // 4. 雇用条件データをフォームにセット
@@ -1240,7 +1265,7 @@ async function loadFromDB(passedInfo){
     const cmEl=document.getElementById('es_createM'); if(cmEl && !cmEl.value) cmEl.value=today.getMonth()+1;
     const cdEl=document.getElementById('es_createD'); if(cdEl && !cdEl.value) cdEl.value=today.getDate();
 
-    p(); // プレビュー更新
+    if((window._htmlFrozen||_editMode)&&typeof applyBindings==='function') applyBindings(); else p();
     showToast('✅ データを読み込みました');
   }catch(e){
     console.error('DB読込エラー:',e);
