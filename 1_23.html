@@ -170,7 +170,14 @@ async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
-  const {caseId,companyId,companyName}=info;
+  let {caseId,companyId,companyName}=info;
+  // companyIdが未設定の場合、会社名でDB検索して補完
+  if(!companyId && companyName){
+    try{
+      const found=await sb('companies?select=id&name=eq.'+encodeURIComponent(companyName));
+      if(found&&found[0]) companyId=found[0].id;
+    }catch(e){}
+  }
   try{
     const q=companyId?`companies?select=name,author_name,author_title,officers&id=eq.${companyId}`
       :companyName?`companies?select=name,author_name,author_title,officers&name=eq.${encodeURIComponent(companyName)}`:null;

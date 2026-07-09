@@ -577,7 +577,7 @@ async function idxInit(){
     const orgSel=document.getElementById('idx_filterOrg');
     if(orgSel) orgSel.innerHTML='<option value="">— すべて —</option>'+(orgs||[]).map(o=>`<option>${o.name}</option>`).join('');
     // 全案件
-    const cases=await idxSb('cases?select=id,name,applicant,org,nationality,company_id,emp_set_idx&order=applicant',true);
+    const cases=await idxSb('cases?select=id,name,applicant,org,company,nationality,company_id,emp_set_idx&order=applicant',true);
     idxAllCases=cases||[];
     idxBuildCompanyFilter();
     idxFilterCases();
@@ -620,7 +620,7 @@ async function idxJumpByPaste(){
     let row=idxAllCases.find(c=>String(c.id)===cid);
     // なければDBから直接取得
     if(!row){
-      const rows=await idxSb('cases?select=id,name,applicant,org,nationality,company_id,emp_set_idx&id=eq.'+encodeURIComponent(cid));
+      const rows=await idxSb('cases?select=id,name,applicant,org,company,nationality,company_id,emp_set_idx&id=eq.'+encodeURIComponent(cid));
       row=rows&&rows[0];
     }
     if(!row){

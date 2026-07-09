@@ -374,7 +374,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1783594365"></script>
+<script src="ofusa_common.js?v=1783595291"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -1289,7 +1289,7 @@ async function saveForm(){
   let {companyId, companyName, orgName, empSetIdx} = info;
   // companyIdが未設定の場合、会社名でDBを検索して補完
   if(!companyId){
-    const name = orgName||companyName||'';
+    const name = companyName||orgName||'';
     if(name){
       try{
         const found = await sb('companies?select=id&name=eq.'+encodeURIComponent(name));
