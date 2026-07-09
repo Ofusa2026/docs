@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１４－２号（外食業 登録支援機関）　受入れに関する誓約書</div>
-    <div class="ver">ver.20260417.101</div>
+    <div class="ver">ver.20260709.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -73,7 +73,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1782980282"></script>
+<script src="ofusa_common.js?v=1783728000"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -175,20 +175,22 @@ async function loadFromDB(){
   const sel=document.getElementById('caseSelect');
   if(!sel.value) return;
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
-  const {caseId,companyId,companyName,orgId}=info;
+  const {caseId,companyId,companyName,orgName}=info;
   try{
-    const [cases,cos,orgs]=await Promise.all([
-      caseId?sb('cases?select=applicant,support_org_id&id=eq.'+caseId):Promise.resolve([]),
+    const [cases,cos]=await Promise.all([
+      caseId?sb('cases?select=applicant,org&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
-      orgId?sb(`support_orgs?select=name,address,support_manager&id=eq.${orgId}`):Promise.resolve([])
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const co=cos&&cos[0]; let org=orgs&&orgs[0];
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    // orgIdが無ければcase.support_org_idから再取得
-    if(!org && cas && cas.support_org_id){
-      const orgs2=await sb(`support_orgs?select=name,address,support_manager&id=eq.${cas.support_org_id}`);
-      org=orgs2&&orgs2[0];
+    // 登録支援機関は名前(cases.org または info.orgName)で support_orgs を引く
+    // ※ cases に support_org_id 列は存在しないため名前照合で取得する
+    let org=null;
+    const _soName=(cas&&cas.org)||orgName||'';
+    if(_soName){
+      const orgs=await sb(`support_orgs?select=name,address,support_manager&name=eq.${encodeURIComponent(_soName)}`);
+      org=orgs&&orgs[0];
     }
     if(org){
       s('f_soName',org.name||'');

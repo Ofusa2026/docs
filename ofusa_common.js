@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260702.01
+ * ver.20260709.01
  */
 
 // ===== Supabase =====
@@ -532,13 +532,23 @@ async function loadCaseToForm(info, docKey){
     });
 
     // === 作成日 ===
+    // ver.20260709: 全書類の作成日を「1-6で入力・保存した作成日」(emp_sets.createY/M/D)に統一する。
+    // emp_setsは上のObject.keys(es)ループで es_createY/M/D (および_fieldData) に展開済み。
+    // f_docDate(令和形式)も今日ではなくこの保存値から生成し、保存が無い場合のみ今日にフォールバック。
     const n = new Date();
-    if(isEmpty(['es_createY','f_createY','f_docYear'])) setValMulti(['es_createY','f_createY','f_docYear'], String(n.getFullYear()));
-    if(isEmpty(['es_createM','f_createM','f_docMonth'])) setValMulti(['es_createM','f_createM','f_docMonth'], String(n.getMonth()+1));
-    if(isEmpty(['es_createD','f_createD','f_docDay'])) setValMulti(['es_createD','f_createD','f_docDay'], String(n.getDate()));
-    // f_docDate(令和形式)
+    const _cy = v('es_createY') || v('f_createY') || v('f_docYear');
+    const _cm = v('es_createM') || v('f_createM') || v('f_docMonth');
+    const _cd = v('es_createD') || v('f_createD') || v('f_docDay');
+    const _hasSaved = _cy && _cm && _cd;
+    const _y = _hasSaved ? parseInt(_cy,10) : n.getFullYear();
+    const _m = _hasSaved ? parseInt(_cm,10) : (n.getMonth()+1);
+    const _d = _hasSaved ? parseInt(_cd,10) : n.getDate();
+    if(isEmpty(['es_createY','f_createY','f_docYear'])) setValMulti(['es_createY','f_createY','f_docYear'], String(_y));
+    if(isEmpty(['es_createM','f_createM','f_docMonth'])) setValMulti(['es_createM','f_createM','f_docMonth'], String(_m));
+    if(isEmpty(['es_createD','f_createD','f_docDay'])) setValMulti(['es_createD','f_createD','f_docDay'], String(_d));
+    // f_docDate(令和形式) — 1-6で保存した作成日から生成（無ければ今日）
     if(isEmpty(['f_docDate'])){
-      setValMulti(['f_docDate'], `令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`);
+      setValMulti(['f_docDate'], `令和${_y-2018}年${_m}月${_d}日`);
     }
 
     // プレビュー再描画（直接編集中・フリーズ中はapplyBindingsで変数スパンのみ更新）
