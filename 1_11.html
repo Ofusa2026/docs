@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260709.01</div>
+    <div class="ver">ver.20260709.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -81,7 +81,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1783728000"></script>
+<script src="ofusa_common.js?v=1783594785"></script>
 <script>
 const MAX_OFF=5;
 function p(){
@@ -358,10 +358,23 @@ async function loadFromDB(){
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {caseId,companyId,companyName}=info;
   try{
-    const q=companyId?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fgn_voluntary_quit,fgn_involuntary_quit,officers&id=eq.${companyId}`
-      :companyName?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fgn_voluntary_quit,fgn_involuntary_quit,officers&name=eq.${encodeURIComponent(companyName)}`:null;
+    const q=companyId?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra&id=eq.${companyId}`
+      :companyName?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra&name=eq.${encodeURIComponent(companyName)}`:null;
     if(!q) return;
     const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
+    // extraフィールドに保存された財務データを展開（anken互換フォールバック）
+    if(co.extra && typeof co.extra === 'object'){
+      const _eKeys=['salesY1','salesY2','salesY3','ordinaryPLY1','ordinaryPLY2','ordinaryPLY3',
+        'netPLY1','netPLY2','netPLY3','netAssetsY1','netAssetsY2','netAssetsY3',
+        'jpVoluntaryQuit','jpInvoluntaryQuit','fnVoluntaryQuit','fnInvoluntaryQuit'];
+      const _kMap={'salesY1':'sales_y1','salesY2':'sales_y2','salesY3':'sales_y3',
+        'ordinaryPLY1':'ordinary_pl_y1','ordinaryPLY2':'ordinary_pl_y2','ordinaryPLY3':'ordinary_pl_y3',
+        'netPLY1':'net_pl_y1','netPLY2':'net_pl_y2','netPLY3':'net_pl_y3',
+        'netAssetsY1':'net_assets_y1','netAssetsY2':'net_assets_y2','netAssetsY3':'net_assets_y3',
+        'jpVoluntaryQuit':'jp_voluntary_quit','jpInvoluntaryQuit':'jp_involuntary_quit',
+        'fnVoluntaryQuit':'fn_voluntary_quit','fnInvoluntaryQuit':'fn_involuntary_quit'};
+      _eKeys.forEach(k=>{ const col=_kMap[k]; if(!co[col] && co.extra[k]) co[col]=co.extra[k]; });
+    }
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null)e.value=val;};
     s('f_company',co.name||'');
     s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
@@ -370,7 +383,7 @@ async function loadFromDB(){
     s('f_netY1',co.net_pl_y1||'');s('f_netY2',co.net_pl_y2||'');s('f_netY3',co.net_pl_y3||'');
     s('f_assetsY1',co.net_assets_y1||'');s('f_assetsY2',co.net_assets_y2||'');s('f_assetsY3',co.net_assets_y3||'');
     s('f_jpVQ',co.jp_voluntary_quit||'');s('f_jpIQ',co.jp_involuntary_quit||'');
-    s('f_fgnVQ',co.fgn_voluntary_quit||'');s('f_fgnIQ',co.fgn_involuntary_quit||'');
+    s('f_fgnVQ',co.fn_voluntary_quit||'');s('f_fgnIQ',co.fn_involuntary_quit||'');
     const officers=Array.isArray(co.officers)?co.officers:[];
     officers.forEach((o,i)=>{if(i>=10)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');s(`off${i+1}Title`,o.title||'');});
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
