@@ -45,12 +45,42 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .glbtn:hover{background:#475569;}
 .glbtn.active{background:#3b82f6;border-color:#2563eb;box-shadow:0 0 0 1px rgba(59,130,246,0.4);}
 .glbtn.unsupported{opacity:0.35;}
+
+/* ===== What's New ===== */
+.notif-btn{position:relative;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:4px;line-height:1;border-radius:6px;transition:color .2s;}
+.notif-btn:hover{color:#60a5fa;}
+.notif-badge{position:absolute;top:-3px;right:-3px;background:#dc2626;color:white;min-width:15px;height:15px;border-radius:99px;font-size:9px;font-weight:800;padding:0 3px;display:flex;align-items:center;justify-content:center;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.wn-toast{position:fixed;top:16px;right:16px;z-index:9999;background:#1e293b;border:1px solid #3b82f6;border-radius:10px;padding:12px 16px;max-width:340px;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateY(-80px);opacity:0;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s;pointer-events:none;}
+.wn-toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.wn-toast-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.wn-toast-title{font-size:12px;font-weight:700;color:#60a5fa;}
+.wn-toast-close{background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:0 2px;}
+.wn-toast-body{font-size:11px;color:#cbd5e1;line-height:1.5;margin-bottom:8px;}
+.wn-toast-link{font-size:11px;color:#60a5fa;cursor:pointer;text-decoration:underline;border:none;background:none;}
+.wn-modal-bg{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;}
+.wn-modal-bg.open{display:flex;}
+.wn-modal{background:#1e293b;border-radius:14px;width:100%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;}
+.wn-modal-head{padding:16px 20px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;}
+.wn-modal-title{font-size:14px;font-weight:800;color:#e2e8f0;}
+.wn-modal-close{background:none;border:none;color:#64748b;cursor:pointer;font-size:18px;}
+.wn-modal-body{padding:16px 20px;overflow-y:auto;}
+.wn-section{margin-bottom:20px;}
+.wn-version{font-size:11px;font-weight:700;color:#3b82f6;margin-bottom:6px;}
+.wn-date{font-size:10px;color:#64748b;margin-left:8px;font-weight:400;}
+.wn-section ul{list-style:none;padding:0;}
+.wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
+.wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#3b82f6;}
 </style>
 </head>
 <body>
 <div class="top-bar">
   <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260709.05</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260709.05</span></div>
+  <div style="flex:1;"></div>
+  <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
+    🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
+  </button>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -774,6 +804,139 @@ async function _docsAuthGateInit(){
   }catch(e){ _docsShowLogin(); }
 }
 _docsAuthGateInit();
+
+// ===== What's New (docs) =====
+var DOCS_WN_KEY = 'docs_whats_new_seen';
+var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20260709.05',
+    date: '2026-07-09',
+    notify: true,
+    items: [
+      '🔧 書類作成システムのアップデート履歴通知機能を追加しました。右上の🔔から確認できます。',
+      '🏢 会社IDが未設定の案件でもDB保存・読み込みができるようになりました（会社名で自動補完）。',
+      '📋 1-11号：決算状況・役員情報がankenシステムの最新データを正しく取得できるよう修正。',
+      '📋 1-23号：役員情報の取得・company ID補完に対応。'
+    ]
+  },
+  {
+    version: 'ver.20260709.02',
+    date: '2026-07-09',
+    notify: true,
+    items: [
+      '📅 1-6号系（全言語）：雇用開始・終了・入国予定日が案件管理システムから自動反映されるよう修正。',
+      '🗓️ 定例休日が「fixedHolidaySat/Sun」等のフラグから「毎週土・日」のようなテキストに自動変換されるようになりました。',
+      '🔄 編集モード中に案件を選択しても、プレビューが正しく更新されるよう修正。'
+    ]
+  },
+  {
+    version: 'ver.20260622.05',
+    date: '2026-06-22',
+    notify: true,
+    items: [
+      '📝 「編集呼び出し」機能を改善：呼び出し後に変数欄が消える問題を修正。案件を選ぶと変数欄が自動更新されます。',
+      '🏷️ 業務区分・分野の括弧内テキスト（（外食業分野・特定技能１号）等）を自動で除去し短縮表示にしました。',
+      '🔢 業務区分が複数ある場合、フォームに「業務区分２」欄が追加されカンマ区切りで自動分割されます。'
+    ]
+  }
+];
+
+function _docsWnCurrent(){
+  return (DOCS_WHATS_NEW && DOCS_WHATS_NEW.length) ? DOCS_WHATS_NEW[0].version : '';
+}
+
+function checkDocsWhatsNew(){
+  try{
+    var current = _docsWnCurrent(); if(!current) return;
+    var lastSeen = ''; try{ lastSeen = localStorage.getItem(DOCS_WN_KEY)||''; }catch(e){}
+    var badge = document.getElementById('docsNotifBadge');
+    if(current !== lastSeen){
+      if(badge){ badge.style.display='flex'; badge.textContent=''; }
+      setTimeout(function(){
+        var toast = document.getElementById('docsWnToast');
+        var body = document.getElementById('docsWnToastBody');
+        if(!toast || !body) return;
+        var first = (DOCS_WHATS_NEW[0].items||[])[0]||'書類作成システムが更新されました。';
+        first = first.replace(/<[^>]+>/g,'');
+        if(first.length>65) first = first.slice(0,62)+'...';
+        body.textContent = first;
+        toast.classList.add('show');
+      }, 800);
+    } else {
+      if(badge) badge.style.display='none';
+    }
+  }catch(e){}
+}
+
+function dismissDocsWn(){
+  var toast = document.getElementById('docsWnToast');
+  if(toast) toast.classList.remove('show');
+  try{ var c=_docsWnCurrent(); if(c) localStorage.setItem(DOCS_WN_KEY,c); }catch(e){}
+  var badge = document.getElementById('docsNotifBadge');
+  if(badge) badge.style.display='none';
+}
+
+function openDocsWnFromToast(){
+  var toast = document.getElementById('docsWnToast');
+  if(toast) toast.classList.remove('show');
+  openDocsWhatsNew(true);
+}
+
+function openDocsWhatsNew(auto){
+  var bodyEl = document.getElementById('docsWnBody');
+  if(!bodyEl) return;
+  var entries = (DOCS_WHATS_NEW||[]).filter(function(e){ return e.notify!==false; });
+  if(auto){
+    var lastSeen=''; try{ lastSeen=localStorage.getItem(DOCS_WN_KEY)||''; }catch(e){}
+    if(lastSeen){
+      var idx = entries.findIndex(function(e){ return e.version===lastSeen; });
+      entries = idx>0 ? entries.slice(0,idx) : entries.slice(0,3);
+    } else { entries = entries.slice(0,3); }
+  }
+  var h = '';
+  if(!entries.length){ h='<div style="text-align:center;padding:30px;color:#64748b;font-size:13px;">最近のアップデートはありません</div>'; }
+  else {
+    if(auto) h+='<div style="font-size:12px;color:#64748b;margin-bottom:14px;">書類作成システムが更新されました。</div>';
+    entries.forEach(function(e){
+      h+='<div class="wn-section">';
+      h+='<div class="wn-version">'+e.version+'<span class="wn-date">'+e.date+'</span></div>';
+      h+='<ul>'; (e.items||[]).forEach(function(it){ h+='<li>'+it+'</li>'; }); h+='</ul>';
+      h+='</div>';
+    });
+  }
+  bodyEl.innerHTML = h;
+  document.getElementById('docsWnModalBg').classList.add('open');
+  try{ var c=_docsWnCurrent(); if(c) localStorage.setItem(DOCS_WN_KEY,c); }catch(e){}
+  var badge=document.getElementById('docsNotifBadge'); if(badge) badge.style.display='none';
+}
+
+function closeDocsWhatsNew(){
+  document.getElementById('docsWnModalBg').classList.remove('open');
+  try{ var c=_docsWnCurrent(); if(c) localStorage.setItem(DOCS_WN_KEY,c); }catch(e){}
+  var badge=document.getElementById('docsNotifBadge'); if(badge) badge.style.display='none';
+}
+
 </script>
+
+<!-- What's New トースト -->
+<div class="wn-toast" id="docsWnToast">
+  <div class="wn-toast-head">
+    <span class="wn-toast-title">🔔 書類作成システム更新</span>
+    <button class="wn-toast-close" onclick="dismissDocsWn()">✕</button>
+  </div>
+  <div class="wn-toast-body" id="docsWnToastBody"></div>
+  <button class="wn-toast-link" onclick="openDocsWnFromToast()">詳細を見る →</button>
+</div>
+
+<!-- What's New モーダル -->
+<div class="wn-modal-bg" id="docsWnModalBg" onclick="if(event.target===this)closeDocsWhatsNew()">
+  <div class="wn-modal">
+    <div class="wn-modal-head">
+      <span class="wn-modal-title">🔔 書類作成システム アップデート履歴</span>
+      <button class="wn-modal-close" onclick="closeDocsWhatsNew()">✕</button>
+    </div>
+    <div class="wn-modal-body" id="docsWnBody"></div>
+  </div>
+</div>
 </body>
 </html>
