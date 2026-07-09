@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260709.02</div>
+    <div class="ver">ver.20260709.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -374,7 +374,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1783593939"></script>
+<script src="ofusa_common.js?v=1783594365"></script>
 <script>
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
@@ -1285,8 +1285,18 @@ async function saveForm(){
     });
   }
   if(!info || !info.caseId){ alert('案件情報が不正です'); return; }
-  const {companyId, empSetIdx} = info;
-  if(!companyId){ alert('会社IDが取得できませんでした'); return; }
+  let {companyId, companyName, orgName, empSetIdx} = info;
+  // companyIdが未設定の場合、会社名でDBを検索して補完
+  if(!companyId){
+    const name = orgName||companyName||'';
+    if(name){
+      try{
+        const found = await sb('companies?select=id&name=eq.'+encodeURIComponent(name));
+        if(found&&found[0]) companyId = found[0].id;
+      }catch(e){}
+    }
+  }
+  if(!companyId){ alert('会社IDが取得できませんでした\n（案件管理で会社を紐付けてください）'); return; }
 
   try{
     // 現在のemp_setsを取得
