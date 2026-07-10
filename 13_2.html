@@ -213,7 +213,7 @@ async function loadFromDB(){
         s('f_birthdate',pd.birthdate||'');
       }
     }
-    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    // ver.20260709: 作成日は共通処理(ofusa_common.jsのloadCaseToForm)が1-6の保存作成日を反映するため、ここで今日を入れる処理は廃止
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
