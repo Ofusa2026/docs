@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260710.06</div>
+    <div class="ver">ver.20260710.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -369,10 +369,14 @@ function fitDocToPreview(){
 }
 window.addEventListener('resize', fitDocToPreview);
 
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel||!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
   const {caseId,companyId,companyName}=info;
   try{
     const SEL='name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra';
