@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260710.03
+ * ver.20260710.05
  */
 
 // ===== Supabase =====
@@ -9,10 +9,15 @@ const SB_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
 // ver.20260611: 親index.htmlのSupabase Authログインで保存されたセッショントークンを使う。
 // cases/companies等がRLS(authenticated限定)のため、anonキーのままだと読めず会社が(none)になる。
 // 同一オリジンなのでlocalStorageのsupabase-jsセッションを共有して読み取る。
-function _sbToken(){
-  try{ if(window.__OFUSA_SB_TOKEN) return window.__OFUSA_SB_TOKEN; }catch(e){}
+function _b64urlJson(seg){
+  var b=String(seg).replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='=';
+  var bin=atob(b), pct=''; for(var i=0;i<bin.length;i++){ pct+='%'+('00'+bin.charCodeAt(i).toString(16)).slice(-2); }
+  return JSON.parse(decodeURIComponent(pct));
+}
+function _jwtExpMs(t){ try{ var p=_b64urlJson(String(t).split('.')[1]); return (p&&p.exp)?p.exp*1000:0; }catch(e){ return 0; } }
+// localStorageのsupabase-jsセッション（親index.htmlが自動更新）から最新access_tokenを取得
+function _sbTokenFromLS(){
   try{
-    // supabase-jsのセッション保存キー（sb-<ref>-auth-token）。キー名の揺れに備えて走査も行う。
     var keys = ['sb-ehwlgbwpycglmopiqyty-auth-token'];
     for(var i=0;i<localStorage.length;i++){
       var k=localStorage.key(i);
@@ -26,7 +31,18 @@ function _sbToken(){
       if(tok) return tok;
     }
   }catch(e){}
-  return SB_KEY;
+  return '';
+}
+// ver.20260710: window.__OFUSA_SB_TOKEN は案件読込時の一度きりのスナップショットで更新されない。
+// 約1時間で失効すると、時間が経ってからの保存(PATCH)が401で失敗する。
+// window側が有効期限内ならそれを、失効/期限間近なら localStorage(supabase-jsが自動更新する最新)を使う。
+function _sbToken(){
+  var now = Date.now();
+  var wt=''; try{ wt = window.__OFUSA_SB_TOKEN || ''; }catch(e){}
+  if(wt && _jwtExpMs(wt) > now + 30000) return wt;   // window側トークンが有効
+  var lt = _sbTokenFromLS();                          // 失効/不明 → 最新セッションへ
+  if(lt) return lt;
+  return wt || SB_KEY;                                // 最後の手段
 }
 async function sb(path,opts={}){
   const headers = {
