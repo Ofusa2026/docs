@@ -38,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260710.02</div>
+    <div class="ver">ver.20260710.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -178,13 +178,13 @@ async function loadFromDB(){
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {companyId,companyName}=info;
   try{
-    const q=companyId?`companies?select=name,address,tel,rep_title,rep_name&id=eq.${companyId}`
-      :companyName?`companies?select=name,address,tel,rep_title,rep_name&name=eq.${encodeURIComponent(companyName)}`:null;
+    const q=companyId?`companies?select=name,pref,city,address,tel,rep_title,rep_name&id=eq.${companyId}`
+      :companyName?`companies?select=name,pref,city,address,tel,rep_title,rep_name&name=eq.${encodeURIComponent(companyName)}`:null;
     if(!q) return;
     const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     s('f_company',co.name||'');
-    s('f_addr',co.address||'');
+    s('f_addr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
     s('f_tel',co.tel||'');
     s('f_title',co.rep_title||'');
     s('f_rep',co.rep_name||'');
