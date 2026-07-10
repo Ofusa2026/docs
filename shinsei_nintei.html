@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格認定証明書交付申請書（申請人等作成用1）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:12mm 12mm 10mm 12mm!important;line-height:1.5!important;min-height:auto!important;font-size:9pt;}
+.mform{width:100%;border-collapse:collapse;}
+.mform td,.mform th{border:1px solid #333;padding:2px 4px;vertical-align:top;font-size:8.5pt;}
+.mform .no{width:22px;text-align:center;font-weight:bold;}
+.mform .lbl{width:150px;}
+.en{font-size:6.5pt;color:#333;}
+.cbx{font-family:monospace;}
+.doc-title{font-size:13pt;font-weight:bold;text-align:center;margin:2mm 0;}
+@page{ size: A4 portrait; margin: 0; }
+@media print{
+  /* 作成中：印刷時は様式を出さず、作成中メッセージのみ表示 */
+  .app-bar,.fp,#pageArea{display:none!important}
+  .main{display:block!important}
+  body{margin:0!important;padding:0!important}
+  body::after{content:"🚧 この様式は作成中のため印刷・提出できません。";display:block;font-size:16pt;font-weight:bold;color:#dc2626;text-align:center;margin-top:40mm;}
+}
+</style>
+<script>
+// 作成中：ブラウザ印刷(Ctrl+P)もブロック
+window.addEventListener('beforeprint', function(){ /* @media print で様式は非表示 */ });
+</script>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 在留資格認定証明書交付申請書 🚧【作成中・使用不可】</div>
+    <div class="ver">ver.20260710.01（作成中）</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" onclick="alert('この様式は作成中です。まだ使用できません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🚧 作成中（使用不可）</button>
+    <button class="btn btn-print" onclick="alert('この様式は作成中のため、印刷・PDF出力はできません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🖨️ 印刷・PDF（停止中）</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>案件選択</label><select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">申請人情報（自動差込）</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_name" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
+      <div class="fg"><label>出生地</label><input id="f_birthPlace" oninput="p()"></div>
+      <div class="fg"><label>配偶者の有無</label><input id="f_spouse" oninput="p()"></div>
+      <div class="fg"><label>職業</label><input id="f_occupation" oninput="p()"></div>
+      <div class="fg"><label>本国における居住地</label><input id="f_homeAddr" oninput="p()"></div>
+      <div class="fg"><label>日本における連絡先</label><input id="f_jpAddr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_tel" oninput="p()"></div>
+      <div class="fg"><label>携帯電話番号</label><input id="f_cel" oninput="p()"></div>
+      <div class="fg"><label>旅券番号</label><input id="f_passport" oninput="p()"></div>
+      <div class="fg"><label>旅券有効期限</label><input id="f_passExp" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">入国目的・申請内容</div>
+      <div class="fg"><label>入国目的（在留資格）</label>
+        <select id="f_purpose" onchange="p()">
+          <option value="ssw1">特定技能（1号）</option>
+          <option value="ssw2">特定技能（2号）</option>
+          <option value="gijinkoku">技術・人文知識・国際業務</option>
+        </select>
+      </div>
+      <div class="fg"><label>入国予定年月日</label><input id="f_entryDate" oninput="p()"></div>
+      <div class="fg"><label>上陸予定港</label><input id="f_arrivalPort" oninput="p()"></div>
+      <div class="fg"><label>滞在予定期間</label><input id="f_stayPeriod" oninput="p()"></div>
+      <div class="fg"><label>査証申請予定地</label><input id="f_visaPlace" oninput="p()"></div>
+      <div class="fg"><label>過去の出入国歴（回数）</label><input id="f_pastEntry" oninput="p()"></div>
+      <div class="fg"><label>過去の認定申請歴（回数）</label><input id="f_pastCoe" oninput="p()"></div>
+      <div class="fg"><label>（うち不交付回数）</label><input id="f_pastCoeDenied" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1783920000"></script>
+<script>
+// 入国目的チェック（■=選択, □=非選択）
+function pk(val){ return (document.getElementById('f_purpose')||{}).value===val ? '■' : '□'; }
+
+function p(){
+  if(typeof _editMode!=='undefined' && _editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div style="background:#dc2626;color:#fff;text-align:center;font-weight:bold;font-size:12pt;padding:8px;margin-bottom:6px;border-radius:4px;">🚧 この様式は作成中です。まだ使用しないでください（印刷・提出不可） 🚧</div>
+<div class="page-num-label">P1</div>
+<div style="font-size:7.5pt;">別記第六号の三様式（第六条の二関係）／申請人等作成用 1</div>
+<div class="doc-title">在留資格認定証明書交付申請書</div>
+<div style="font-size:8pt;">法務大臣　殿　<span class="en">To the Minister of Justice</span></div>
+<div style="font-size:8pt;margin-bottom:2mm;">出入国管理及び難民認定法第7条の2の規定に基づき，次のとおり同法第7条第1項第2号に掲げる条件に適合している旨の証明書の交付を申請します。</div>
+<table class="mform">
+  <tr><td class="no">1</td><td class="lbl">国籍・地域<br><span class="en">Nationality/Region</span></td><td colspan="3">${f('f_nationality')}</td></tr>
+  <tr><td class="no">2</td><td class="lbl">生年月日<br><span class="en">Date of birth</span></td><td colspan="3">${f('f_birthdate')}</td></tr>
+  <tr><td class="no">3</td><td class="lbl">氏名<br><span class="en">Name</span></td><td colspan="3">${f('f_name')}</td></tr>
+  <tr><td class="no">4</td><td class="lbl">性別<br><span class="en">Sex</span></td><td>${f('f_gender')}</td><td class="lbl">5 出生地<br><span class="en">Place of birth</span></td><td>${f('f_birthPlace')}</td></tr>
+  <tr><td class="no">6</td><td class="lbl">配偶者の有無<br><span class="en">Marital status</span></td><td>${f('f_spouse')}</td><td class="lbl">7 職業<br><span class="en">Occupation</span></td><td>${f('f_occupation')}</td></tr>
+  <tr><td class="no">8</td><td class="lbl">本国における居住地<br><span class="en">Home town/city</span></td><td colspan="3">${f('f_homeAddr')}</td></tr>
+  <tr><td class="no">9</td><td class="lbl">日本における連絡先<br><span class="en">Address in Japan</span></td><td colspan="3">${f('f_jpAddr')}<br>電話 ${f('f_tel')}　携帯 ${f('f_cel')}</td></tr>
+  <tr><td class="no">10</td><td class="lbl">旅券<br><span class="en">Passport</span></td><td colspan="3">番号 ${f('f_passport')}　有効期限 ${f('f_passExp')}</td></tr>
+  <tr><td class="no">11</td><td class="lbl">入国目的<br><span class="en">Purpose of entry</span></td><td colspan="3">
+     <span class="cbx">${pk('ssw1')}</span> 特定技能（1号）　
+     <span class="cbx">${pk('ssw2')}</span> 特定技能（2号）　
+     <span class="cbx">${pk('gijinkoku')}</span> 技術・人文知識・国際業務</td></tr>
+  <tr><td class="no">12</td><td class="lbl">入国予定年月日<br><span class="en">Date of entry</span></td><td>${f('f_entryDate')}</td><td class="lbl">13 上陸予定港<br><span class="en">Port of entry</span></td><td>${f('f_arrivalPort')}</td></tr>
+  <tr><td class="no">14</td><td class="lbl">滞在予定期間<br><span class="en">Intended length of stay</span></td><td>${f('f_stayPeriod')}</td><td class="lbl">15 同伴者の有無</td><td>有 ・ 無</td></tr>
+  <tr><td class="no">16</td><td class="lbl">査証申請予定地<br><span class="en">Intended place to apply for visa</span></td><td colspan="3">${f('f_visaPlace')}</td></tr>
+  <tr><td class="no">17</td><td class="lbl">過去の出入国歴<br><span class="en">Past entry/departure</span></td><td colspan="3">回数 ${f('f_pastEntry')} 回</td></tr>
+  <tr><td class="no">18</td><td class="lbl">過去の認定申請歴<br><span class="en">Past COE application</span></td><td colspan="3">回数 ${f('f_pastCoe')} 回　（うち不交付 ${f('f_pastCoeDenied')} 回）</td></tr>
+  <tr><td class="no">19</td><td class="lbl">犯罪を理由とする処分の有無</td><td colspan="3">有（具体的内容　　　　　　　　） ・ 無</td></tr>
+  <tr><td class="no">20</td><td class="lbl">退去強制又は出国命令による出国の有無</td><td colspan="3">有 ・ 無</td></tr>
+  <tr><td class="no">21</td><td class="lbl">在日親族及び同居者<br><span class="en">Family in Japan</span></td><td colspan="3">有（別紙に記入） ・ 無</td></tr>
+</table>
+<div style="font-size:7.5pt;margin-top:2mm;">※本様式はSaysayが案件データから自動差込したものです。提出前に入管の公式様式・記載内容を必ずご確認ください。</div>
+</div>`;
+  if(typeof setupPageTracker==='function') setupPageTracker();
+  if(typeof fitDocToPreview==='function') fitDocToPreview();
+}
+
+async function loadFromDB(){
+  const sel=document.getElementById('caseSelect');
+  if(!sel||!sel.value) return;
+  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+  const {caseId}=info;
+  if(!caseId) return;
+  try{
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null&&val!=='')e.value=val;};
+    const fmtJDate=(v)=>{const m=String(v||'').match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);return m?`${m[1]}年${parseInt(m[2])}月${parseInt(m[3])}日`:(v||'');};
+    const persons=await sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,entry_date,arrival_port,stay_period,hoped_stay_period,visa_place,past_entry_count,past_coe_count,past_coe_denied&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_name',pd.applicant_name_en);
+      s('f_nationality',pd.nationality);
+      s('f_birthdate',fmtJDate(pd.birthdate));
+      s('f_gender',pd.gender);
+      s('f_birthPlace',pd.birth_place);
+      s('f_spouse',pd.spouse);
+      s('f_occupation',pd.occupation);
+      s('f_homeAddr',pd.home_country_address);
+      s('f_jpAddr',[pd.jp_address,pd.jp_detail_address].filter(Boolean).join(' '));
+      s('f_tel',pd.tel_num||pd.phone);
+      s('f_cel',pd.cel_phone);
+      s('f_passport',pd.passport);
+      s('f_passExp',fmtJDate(pd.passport_expiry));
+      s('f_entryDate',fmtJDate(pd.entry_date));
+      s('f_arrivalPort',pd.arrival_port);
+      s('f_stayPeriod',pd.stay_period||pd.hoped_stay_period);
+      s('f_visaPlace',pd.visa_place);
+      s('f_pastEntry',pd.past_entry_count);
+      s('f_pastCoe',pd.past_coe_count);
+      s('f_pastCoeDenied',pd.past_coe_denied);
+    }
+    // 案件から在留資格区分を推定して入国目的を初期選択
+    const cases=await sb('cases?select=applicant,category,status_type&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    if(cas && !document.getElementById('f_name').value && cas.applicant) s('f_name',cas.applicant);
+    if(cas){
+      const cat=(cas.category||'')+(cas.status_type||'');
+      const sel2=document.getElementById('f_purpose');
+      if(sel2){ if(/技術|人文|国際|技人国/.test(cat)) sel2.value='gijinkoku'; else if(/特定技能/.test(cat)) sel2.value='ssw1'; }
+    }
+    p(); if(typeof showToast==='function') showToast('✅ データを読み込みました');
+  }catch(e){ if(typeof showToast==='function') showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
+}
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info; if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){ try{ if(JSON.parse(o.value).caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){} }
+    if(!found){ const opt=document.createElement('option'); opt.value=JSON.stringify(info); opt.textContent='（indexから選択）'; sel.appendChild(opt); sel.value=opt.value; }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info,'shinsei_nintei'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+
+p();
+</script>
+</body>
+</html>
