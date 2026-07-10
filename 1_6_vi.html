@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260710.07</div>
+    <div class="ver">ver.20260710.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1244,6 +1244,8 @@ async function loadFromDB(passedInfo){
 
     // 4. 雇用条件データをフォームにセット
     if(esData) setFormValues(esData);
+    // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
+    ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
 
     // 5. 今日の日付を作成日にセット（未入力の場合）
     const today = new Date();
