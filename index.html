@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>OFUSA 書類作成システム</title>
+<title>O-Link Saysay</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -81,8 +81,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 </head>
 <body>
 <div class="top-bar">
-  <div class="logo">📁 OFUSA 書類作成</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260709.07</span></div>
+  <div class="logo">📁 O-Link Saysay</div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260710.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -764,7 +764,7 @@ function _docsShowLogin(msg){
   ov.style.cssText='position:fixed;inset:0;background:#0f172a;z-index:100000;display:flex;align-items:center;justify-content:center;';
   ov.innerHTML=''
    +'<div style="background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px 26px;width:320px;max-width:90vw;box-shadow:0 10px 40px rgba(0,0,0,.5);">'
-   +'<div style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">📁 OFUSA 書類作成</div>'
+   +'<div style="font-size:18px;font-weight:800;color:#e2e8f0;margin-bottom:4px;">📁 O-Link Saysay</div>'
    +'<div style="font-size:12px;color:#94a3b8;margin-bottom:16px;">案件管理と同じID（メール）でログイン</div>'
    +'<input id="docsLoginEmail" type="email" placeholder="メールアドレス" autocomplete="username" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#e2e8f0;font-size:14px;">'
    +'<input id="docsLoginPw" type="password" placeholder="パスワード" autocomplete="current-password" style="width:100%;padding:10px 12px;margin-bottom:14px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#e2e8f0;font-size:14px;">'
@@ -819,7 +819,7 @@ var DOCS_WHATS_NEW = [
     date: '2026-07-09',
     notify: true,
     items: [
-      '🔧 書類作成システムのアップデート履歴通知機能を追加しました。右上の🔔から確認できます。',
+      '🔧 O-Link Saysayのアップデート履歴通知機能を追加しました。右上の🔔から確認できます。',
       '🏢 会社IDが未設定の案件でもDB保存・読み込みができるようになりました（会社名で自動補完）。',
       '📋 1-11号：決算状況・役員情報がankenシステムの最新データを正しく取得できるよう修正。',
       '📋 1-23号：役員情報の取得・company ID補完に対応。'
@@ -862,7 +862,7 @@ function checkDocsWhatsNew(){
         var toast = document.getElementById('docsWnToast');
         var body = document.getElementById('docsWnToastBody');
         if(!toast || !body) return;
-        var first = (DOCS_WHATS_NEW[0].items||[])[0]||'書類作成システムが更新されました。';
+        var first = (DOCS_WHATS_NEW[0].items||[])[0]||'O-Link Saysayが更新されました。';
         first = first.replace(/<[^>]+>/g,'');
         if(first.length>65) first = first.slice(0,62)+'...';
         body.textContent = first;
@@ -902,7 +902,7 @@ function openDocsWhatsNew(auto){
   var h = '';
   if(!entries.length){ h='<div style="text-align:center;padding:30px;color:#64748b;font-size:13px;">最近のアップデートはありません</div>'; }
   else {
-    if(auto) h+='<div style="font-size:12px;color:#64748b;margin-bottom:14px;">書類作成システムが更新されました。</div>';
+    if(auto) h+='<div style="font-size:12px;color:#64748b;margin-bottom:14px;">O-Link Saysayが更新されました。</div>';
     entries.forEach(function(e){
       h+='<div class="wn-section">';
       h+='<div class="wn-version">'+e.version+'<span class="wn-date">'+e.date+'</span></div>';
@@ -931,7 +931,7 @@ function closeDocsWhatsNew(){
     <div class="wn-toast-title">アップデートのお知らせ</div>
     <button class="wn-toast-close" onclick="dismissDocsWn()" title="閉じる">✕</button>
   </div>
-  <div class="wn-toast-body" id="docsWnToastBody">書類作成システムが更新されました。</div>
+  <div class="wn-toast-body" id="docsWnToastBody">O-Link Saysayが更新されました。</div>
   <div class="wn-toast-actions">
     <button class="wn-toast-btn" onclick="openDocsWnFromToast()">詳細を見る</button>
   </div>
@@ -941,7 +941,7 @@ function closeDocsWhatsNew(){
 <div class="wn-modal-bg" id="docsWnModalBg" onclick="if(event.target===this)closeDocsWhatsNew()">
   <div class="wn-modal">
     <div class="wn-modal-head">
-      <span class="wn-modal-title">🔔 書類作成システム アップデート履歴</span>
+      <span class="wn-modal-title">🔔 O-Link Saysay アップデート履歴</span>
       <button class="wn-modal-close" onclick="closeDocsWhatsNew()">✕</button>
     </div>
     <div class="wn-modal-body" id="docsWnBody"></div>
