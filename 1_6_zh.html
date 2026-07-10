@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260709.03</div>
+    <div class="ver">ver.20260709.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1286,13 +1286,17 @@ async function saveForm(){
   }
   if(!info || !info.caseId){ alert('案件情報が不正です'); return; }
   let {companyId, companyName, orgName, empSetIdx} = info;
-  // companyIdが未設定の場合、会社名でDBを検索して補完
+  // companyIdが未設定の場合、会社名でDBを検索して補完する。
+  // ※ info.companyName が空/登録支援機関名になる場合や、案件一覧の再構築で
+  //   caseSelectの値が入れ替わる場合があるため、フォームの特定技能所属機関名
+  //   (es_orgName) を最優先候補にして会社を解決する。
   if(!companyId){
-    const name = companyName||orgName||'';
-    if(name){
+    const _formOrg = (document.getElementById('es_orgName')||{}).value || '';
+    const _cands = [_formOrg, companyName, orgName].map(s=>(s||'').trim()).filter(Boolean);
+    for(const nm of _cands){
       try{
-        const found = await sb('companies?select=id&name=eq.'+encodeURIComponent(name));
-        if(found&&found[0]) companyId = found[0].id;
+        const found = await sb('companies?select=id&name=eq.'+encodeURIComponent(nm));
+        if(found&&found[0]){ companyId = found[0].id; break; }
       }catch(e){}
     }
   }
