@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260709.01
+ * ver.20260710.02
  */
 
 // ===== Supabase =====
@@ -98,6 +98,18 @@ function freezeLoadedHtml(){window._htmlFrozen=true;}
 function unfreezeLoadedHtml(){window._htmlFrozen=false;if(typeof p==='function')p();}
 
 // ===== 印刷・トースト =====
+// ver.20260710: 空欄フィールドのプレースホルダ(es.xxx / f_xxx 等の変数名)は
+//   画面編集用の目印であり、PDF/印刷には出さない。
+//   f()/ff()/applyBindings/resetBindings が空欄時に付与する monospace スパンを印刷時のみ隠す。
+(function(){
+  try{
+    if(document.getElementById('__ph_print_style')) return;
+    var st=document.createElement('style');
+    st.id='__ph_print_style';
+    st.textContent='@media print{span.f[style*="monospace"]{visibility:hidden!important;}}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+})();
 function doPrint(){window.print();}
 function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
