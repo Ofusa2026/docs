@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260710.08</div>
+    <div class="ver">ver.20260710.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -301,6 +301,7 @@
       </div>
       <div class="fg"><label>昇給条件（日）<span class="fid">es.raiseCondition</span></label><input id="es_raiseCondition" oninput="p()"></div>
       <div class="fg"><label>昇給条件（ID）<span class="fid">es.raiseConditionEn</span></label><input id="es_raiseConditionEn" oninput="p()"></div>
+      <div class="fg"><label>賞与　有無<span class="fid">es.bonus</span></label><select id="es_bonus" onchange="p()"><option value="">（未設定）</option><option value="有">有</option><option value="無">無</option></select></div>
       <div class="fg"><label>賞与条件（日）<span class="fid">es.bonusCondition</span></label><input id="es_bonusCondition" oninput="p()"></div>
       <div class="fg"><label>賞与条件（ID）<span class="fid">es.bonusConditionEn</span></label><input id="es_bonusConditionEn" oninput="p()"></div>
     </div>
@@ -774,8 +775,8 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;">9. Bonus</span></td>
-          <td style="vertical-align:top;">${cb(true,"cb_auto_016")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(true,"cb_auto_017")} Ada (masa, jumlah kenaikan, dll.&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(false,"cb_auto_018")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(false,"cb_auto_019")} Tidak ada</span></td>
+          <td style="vertical-align:top;">${v('es_bonus')==='有'?'■':'□'}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${v('es_bonus')==='有'?'■':'□'} Ada (masa, jumlah kenaikan, dll.&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${v('es_bonus')==='無'?'■':'□'}&nbsp;無<br><span class="id" style="font-size:7pt;">${v('es_bonus')==='無'?'■':'□'} Tidak ada</span></td>
         </tr>
         <tr>
           <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;">10. Uang pesangon</span></td>
