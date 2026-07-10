@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260710.05</div>
+    <div class="ver">ver.20260710.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -40,6 +40,23 @@
       <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
       <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
       <div class="fg"><label>作成責任者役職・氏名</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">所属役員（最大5名）</div>
+      <div class="fg"><label>役員①　役職</label><input id="off1Title" oninput="p()"></div>
+      <div class="fg"><label>役員①　氏名</label><input id="off1Name" oninput="p()"></div>
+      <div class="fg"><label>役員①　ふりがな</label><input id="off1Kana" oninput="p()"></div>
+      <div class="fg"><label>役員②　役職</label><input id="off2Title" oninput="p()"></div>
+      <div class="fg"><label>役員②　氏名</label><input id="off2Name" oninput="p()"></div>
+      <div class="fg"><label>役員②　ふりがな</label><input id="off2Kana" oninput="p()"></div>
+      <div class="fg"><label>役員③　役職</label><input id="off3Title" oninput="p()"></div>
+      <div class="fg"><label>役員③　氏名</label><input id="off3Name" oninput="p()"></div>
+      <div class="fg"><label>役員③　ふりがな</label><input id="off3Kana" oninput="p()"></div>
+      <div class="fg"><label>役員④　役職</label><input id="off4Title" oninput="p()"></div>
+      <div class="fg"><label>役員④　氏名</label><input id="off4Name" oninput="p()"></div>
+      <div class="fg"><label>役員④　ふりがな</label><input id="off4Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑤　役職</label><input id="off5Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑤　氏名</label><input id="off5Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑤　ふりがな</label><input id="off5Kana" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">決算状況</div>
       <div class="fg"><label>売上高（前年度）</label><input id="f_salesY1" oninput="p()"></div>
@@ -358,10 +375,20 @@ async function loadFromDB(){
   let info; try{info=JSON.parse(sel.value);}catch(e){return;}
   const {caseId,companyId,companyName}=info;
   try{
-    const q=companyId?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra&id=eq.${companyId}`
-      :companyName?`companies?select=name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra&name=eq.${encodeURIComponent(companyName)}`:null;
-    if(!q) return;
-    const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
+    const SEL='name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra';
+    // 会社解決: companyId → companyName → cases.company_id/company フォールバック
+    // ※ company_id未設定の案件でも cases.company（会社名）から会社を引けるようにする
+    let co=null;
+    if(companyId){ const r=await sb(`companies?select=${SEL}&id=eq.${companyId}`); co=r&&r[0]; }
+    if(!co && companyName){ const r=await sb(`companies?select=${SEL}&name=eq.${encodeURIComponent(companyName)}`); co=r&&r[0]; }
+    if(!co && caseId){
+      const _cs=await sb(`cases?select=company,company_id&id=eq.${caseId}`); const _cas=_cs&&_cs[0];
+      if(_cas){
+        if(_cas.company_id){ const r=await sb(`companies?select=${SEL}&id=eq.${_cas.company_id}`); co=r&&r[0]; }
+        if(!co && _cas.company){ const r=await sb(`companies?select=${SEL}&name=eq.${encodeURIComponent(_cas.company)}`); co=r&&r[0]; }
+      }
+    }
+    if(!co) return;
     // extraフィールドに保存された財務データを展開（anken互換フォールバック）
     if(co.extra && typeof co.extra === 'object'){
       const _eKeys=['salesY1','salesY2','salesY3','ordinaryPLY1','ordinaryPLY2','ordinaryPLY3',
