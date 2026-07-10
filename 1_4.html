@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260710.03</div>
+    <div class="ver">ver.20260710.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -55,6 +55,7 @@
       <div class="fg"><label>経験年数</label><input id="f_exp" oninput="p()"></div>
       <div class="fg"><label>月給（円）</label><input id="f_salaryM" oninput="p()"></div>
       <div class="fg"><label>時間給（円）</label><input id="f_salaryH" oninput="p()"></div>
+      <div class="fg"><label>⑤その他（諸手当等）</label><textarea id="f_other1" oninput="p()"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">比較日本人（いる場合）</div>
       <div class="fg"><label>役職・職務内容</label><input id="f_jpJobDesc" oninput="p()"></div>
@@ -65,6 +66,7 @@
       <div class="fg"><label>賃金規程の有無</label><input id="f_wageReg" oninput="p()"></div>
       <div class="fg"><label>規程に基づく報酬（円）</label><input id="f_salaryRule" oninput="p()"></div>
       <div class="fg"><label>同等以上と考える理由</label><textarea id="f_jpReason" oninput="p()"></textarea></div>
+      <div class="fg"><label>⑥その他（諸手当等）</label><textarea id="f_other2" oninput="p()"></textarea></div>
     </div>
   </div>
 </div>
@@ -98,7 +100,7 @@ function p(){
   <tr><td>②申請人の役職、職務内容、責任の程度</td><td>${f('f_jobDesc')}</td></tr>
   <tr><td>③申請人の年齢、性別及び経験年数</td><td>（${f('f_age')}歳）（${f('f_gender')}）（経験　${f('f_exp')}　年）</td></tr>
   <tr><td>④申請人に対する報酬</td><td>月給　${ff('f_salaryM')}　円　／　時間給　${ff('f_salaryH')}　円</td></tr>
-  <tr><td>⑤その他</td><td></td></tr>
+  <tr><td>⑤その他</td><td>${f('f_other1')}</td></tr>
 </table>
 <div style="font-size:9pt;margin-bottom:3mm;">
 （注意）<br>
@@ -115,7 +117,7 @@ function p(){
   <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>${f('f_wageReg')}</td></tr>
   <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${ff('f_salaryRule')}　円</td></tr>
   <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2">${f('f_jpReason')}</td></tr>
-  <tr><td>⑥その他</td><td colspan="2"></td></tr>
+  <tr><td>⑥その他</td><td colspan="2">${f('f_other2')}</td></tr>
 </table>
 <div style="font-size:9pt;">
 （注意）<br>
