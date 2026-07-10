@@ -28,13 +28,15 @@
 }
 /* P1は内容が密でA4高さギリギリのため、印刷時のみ行間を詰めて1枚に収める */
 @media print{ #docP1{ line-height:1.5 !important; } }
+/* ヘッダー差込値に下線 */
+.doc .hdr-ul .f{border-bottom:1px solid #333;}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260710.09</div>
+    <div class="ver">ver.20260710.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -450,13 +452,13 @@ function p(){
 
   <!-- 日付・宛先・所属機関 -->
   <div style="padding:6px 12px 6px;">
-    <div style="text-align:right;font-size:8.5pt;margin-bottom:3px;">
+    <div class="hdr-ul" style="text-align:right;font-size:8.5pt;margin-bottom:3px;">
       ${f('es_createY')}年　${f('es_createM')}月　${f('es_createD')}日<br>
       <span class="id" style="font-size:7.5pt;">${f('es_createY')} ปี ${f('es_createM')} เดือน ${f('es_createD')} วัน</span>
     </div>
-    <div style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">(เรียน)&nbsp;&nbsp;${f('applicantName')}</span></div>
+    <div class="hdr-ul" style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">(เรียน)&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
-      <table style="font-size:8pt;border-collapse:collapse;width:55%;">
+      <table class="hdr-ul" style="font-size:8pt;border-collapse:collapse;width:55%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">ชื่อองค์กรที่แรงงานเฉพาะทางสังกัด</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
@@ -475,7 +477,7 @@ function p(){
     <div style="margin-left:8px;">
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;">1. ระยะเวลาสัญญาว่าจ้าง</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">${f('es_contractStartY')} ปี ${f('es_contractStartM')} เดือน ${f('es_contractStartD')} วัน 〜 ${f('es_contractEndY')} ปี ${f('es_contractEndM')} เดือน ${f('es_contractEndD')} วัน วันกำหนดเข้าประเทศญี่ปุ่น ${f('es_entryY')} ปี ${f('es_entryM')} เดือน ${f('es_entryD')} วัน</span></div>
+        <div class="hdr-ul" style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;">${f('es_contractStartY')} ปี ${f('es_contractStartM')} เดือน ${f('es_contractStartD')} วัน 〜 ${f('es_contractEndY')} ปี ${f('es_contractEndM')} เดือน ${f('es_contractEndD')} วัน วันกำหนดเข้าประเทศญี่ปุ่น ${f('es_entryY')} ปี ${f('es_entryM')} เดือน ${f('es_entryD')} วัน</span></div>
       </div>
       <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;margin-bottom:1px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;">2.มีการต่อสัญญาหรือไม่</span></div>
       <div style="margin-left:8px;">
