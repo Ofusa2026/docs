@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260713.01</div>
+    <div class="ver">ver.20260713.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1165,7 +1165,7 @@ async function loadFromDB(passedInfo){
   try{
     // 1. 案件基本情報 + 人材データ（persons）を同時取得
     const [cases, persons] = await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     const cas = cases && cases[0];
@@ -1194,6 +1194,7 @@ async function loadFromDB(passedInfo){
         _s('es_orgAddress', (co.pref||'')+(co.city||'')+(co.address||''));
         _s('es_orgAddressEn', co.address_en||'');
         _s('es_orgTel',     co.tel||'');
+        _s('es_officeTel',  String(co.tel||'').trim());
         _s('es_repName',    co.rep_name||'');
         _s('es_repTitle',   co.rep_title||'');
         _s('es_repNameEn',  co.rep_name_en||'');
@@ -1225,6 +1226,10 @@ async function loadFromDB(passedInfo){
       _si('es_'+prefix+'M',String(parseInt(m[2])));
       _si('es_'+prefix+'D',String(parseInt(m[3])));
     };
+    if(cas){
+      _setDate('contractStart', cas.contract_start);
+      _setDate('contractEnd',   cas.contract_end);
+    }
     if(pd){
       _setDate('contractStart', pd.contractStart||pd.contract_start);
       _setDate('contractEnd',   pd.contractEnd||pd.contract_end);
