@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260713.04</div>
+    <div class="ver">ver.20260713.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -222,7 +222,7 @@
     <div class="fs"><div class="fs-title">Ⅴ 休日</div>
       <div class="fg"><label>定例休日（日）<span class="fid">es.fixedDay1</span></label><input id="es_fixedDay1" oninput="p()"></div>
       <div class="fg"><label>定例休日（ID）<span class="fid">es.fixedDay1En</span></label><input id="es_fixedDay1En" oninput="p()"></div>
-      <div class="fg"><label>その他休日<span class="fid">es.otherHolidays</span></label><input id="es_otherHolidays" oninput="p()"></div>
+      <div class="fg"><label>その他休日（非定例日等）<span class="fid">es.otherHolidays</span></label><input id="es_otherHolidays" oninput="p()"></div>
       <div class="fg"><label>その他休日（翻訳）<span class="fid">es.otherHolidaysEn</span></label><input id="es_otherHolidaysEn" oninput="p()"></div>
       <div class="fg"><label>年間合計休日(日)<span class="fid">es.annualHolidays</span></label><input id="es_annualHolidays" oninput="p()"></div>
     </div>
@@ -411,6 +411,7 @@ function p(){
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
   const _ff=v('es_flexFlg'); const flexOn = !!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff);
+  const _sf=v('es_shiftFlg'); const shiftOn = !!_sf && !/^なし$|^無$|しない/.test(_sf);
   let allowLine1='',allowLine2='';
   for(let i=1;i<=4;i++){
     const n=v('es_a'+i+'Name');
@@ -597,7 +598,7 @@ function p(){
         ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${v('es_flexType')?'：<span class="f">'+esc(v('es_flexType'))+'</span>':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
         <span class="id" style="font-size:7pt;">${cb(false,'flex_work_id')} 변형 노동 시간제: (${f('es_flexUnitEn')}) 단위의 변형시간 노동제</span>
         <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;">※1년 단위의 변형 노동 시간제를 채용하고 있는 경우에는, 을이 충분히 이해할 수 있는 언어로 병기한 연간 캘린더의 사본 및 노동 기준 감독서에 신고한 변형 노동 시간제에 관한 협정서의 사본을 첨부한다.</span></div>
-        <div style="margin-top:2px;">${cb(false,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;">${cb(false,'shift_work_id')} 교대제로서 다음 근무시간의 조합에 따른다.</span></div>
+        <div style="margin-top:2px;">${cb(shiftOn,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;">${cb(false,'shift_work_id')} 교대제로서 다음 근무시간의 조합에 따른다.</span></div>
         ${(()=>{
           // シフトデータがあれば実データ、なければ空欄行を5行表示
           const rows = shifts.length > 0 ? shifts : [{start:'',end:'',h:'',min:'',days:'',daysEn:''}];
@@ -644,8 +645,8 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅴ．休日<br><span style="font-size:8pt;font-weight:normal;">Ⅴ. 휴일</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（${f('es_otherHolidays')}）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">1. 정례일: (${f('es_fixedDay1En')}), 기타（${f('es_otherHolidaysEn')||f('es_otherHolidays')}）(연간 총 휴일 일수: ${f('es_annualHolidays')} 일)</span></div>
-      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7.5pt;">2. 비정례일: 주·월당 일, 기타 (                    )</span></div>
+      <div>１．定例日：${f('es_fixedDay1')}&emsp;その他（&emsp;&emsp;&emsp;&emsp;）&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">1. 정례일: (${f('es_fixedDay1En')}), 기타（&emsp;&emsp;）(연간 총 휴일 일수: ${f('es_annualHolidays')} 일)</span></div>
+      <div style="margin-top:3px;">２．非定例日：週・月当たり&emsp;&emsp;日，その他（${f('es_otherHolidays')}）<br><span class="id" style="font-size:7.5pt;">2. 비정례일: 주·월당 일, 기타 (                    )</span></div>
       <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○ 자세한 내용은 취업 규칙 제 조~제 조, 제 조~제 조, 제 조~제 조</span></div>
     </div>
   </div>
