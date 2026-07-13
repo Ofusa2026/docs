@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>参考様式第１－１６号（韓国語）斡旋無</title>
+<title>参考様式第１－１６号（韓国語）斡旋有無切替</title>
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1776949489">
 <style>
@@ -29,8 +29,8 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋無】</div>
-    <div class="ver">ver.20260710.05</div>
+    <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
+    <div class="ver">ver.20260713.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -58,6 +58,16 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     </div>
     <div class="fs"><div class="fs-title">特定技能外国人</div>
       <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">職業紹介（あっせん）</div>
+      <div class="fg"><label>あっせんの有無</label><select id="es_assen" onchange="p()"><option value="無">無</option><option value="有">有</option></select></div>
+      <div class="fg"><label>許可・届出受理番号</label><input id="f_ag_license" oninput="p()"></div>
+      <div class="fg"><label>職業紹介事業者の区分</label><select id="f_ag_type" onchange="p()"><option value=""></option><option value="有料">有料職業紹介事業者</option><option value="無料">無料職業紹介事業者</option></select></div>
+      <div class="fg"><label>職業紹介事業者の氏名</label><input id="f_ag_name" oninput="p()"></div>
+      <div class="fg"><label>職業紹介事業者の住所</label><input id="f_ag_addr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_ag_tel" oninput="p()"></div>
+      <div class="fg"><label>支払費用（求職者）</label><input id="f_ag_fee_seeker" oninput="p()"></div>
+      <div class="fg"><label>支払費用（求人者）</label><input id="f_ag_fee_employer" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">事前ガイダンス</div>
       <div class="fg"><label>計画通り実施</label>
@@ -146,38 +156,38 @@ function p(){
   <tr>
     <td class="lbl">１　あっせんの有無<br><span class="id">알선의 유무</span></td>
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box">有<br><span class="id">유</span>
+      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">유</span>
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box" checked>無<br><span class="id">무</span>
+      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">무</span>
     </td>
   </tr>
   <tr>
     <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">허가・신고 접수번호</span><br><span class="id">(접수 접수 연월일)</span></td>
-    <td colspan="3">－－－－－　　<br>（　　年　　月　　日）</td>
+    <td colspan="3">${f('f_ag_license')}</td>
   </tr>
   <tr>
     <td>３　職業紹介事業者の区分<br><span class="id">직업소개사업자의 구분</span></td>
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box">有料職業紹介事業者<br><span class="id">유료 직업소개사업자</span>
+      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">유료 직업소개사업자</span>
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box">無料職業紹介事業者<br><span class="id">무료 직업소개사업자</span>
+      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">무료 직업소개사업자</span>
     </td>
   </tr>
   <tr>
     <td>４　職業紹介事業者の氏名<br><span class="id">직업소개사업자의 성명</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="3">${f('f_ag_name')}</td>
   </tr>
   <tr>
     <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">직업소개사업자의 주소(전화번호)</span></td>
-    <td colspan="3">〒<span class="id"> / 우편번호</span>　　－　　<br>（電話番号 <span class="id">전화번호</span>　　　－　　　－　　　）</td>
+    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>
   </tr>
   <tr>
     <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">직업소개사업자에게 지불한 비용</span></td>
     <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">구직자(신청인)</span></td>
     <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>
-    <td class="dashed-bottom">（　　　　　　円 <span class="id">엔</span>）</td>
+    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">엔</span>）</td>
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">명목</span></td>
@@ -186,7 +196,7 @@ function p(){
   <tr>
     <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">구인자(특정기능소속기관)</span></td>
     <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>
-    <td class="dashed-bottom">（　　　　　　円 <span class="id">엔</span>）</td>
+    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">엔</span>）</td>
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">명목</span></td>
@@ -390,12 +400,13 @@ async function loadFromDB(passedInfo){
   console.log('[doc] loadFromDB caseId='+info.caseId+' companyId='+info.companyId+' companyName='+info.companyName);
   const {caseId,companyId,companyName}=info;
   try{
-    const [cases,cos]=await Promise.all([
+    const [cases,cos,intakes]=await Promise.all([
       caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+        :companyName?sb(`companies?select=name,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
       s('f_company',co.name||'');
@@ -403,6 +414,12 @@ async function loadFromDB(passedInfo){
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
+    }
+    if(ir && ir.agency_name){
+      s('f_ag_name', ir.agency_name);
+      if(ir.agency_office) s('f_ag_addr', ir.agency_office);
+      if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
+      const _as=document.getElementById('es_assen'); if(_as) _as.value='有';
     }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
