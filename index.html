@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260710.02</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260713.03</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -190,6 +190,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-2_1" onclick="open_doc('2_1')"><span class="item-icon">📄</span><div>ビルクリーニング<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-3_1" onclick="open_doc('3_1')"><span class="item-icon">📄</span><div>工業製品製造業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-6_1" onclick="open_doc('6_1')"><span class="item-icon">📄</span><div>建設<span class="item-sub">受入れ誓約書</span></div></div>
+    <div class="item" id="nav-6_2" onclick="open_doc('6_2')"><span class="item-icon">📄</span><div>建設<span class="item-sub">2号機関 基準誓約書</span></div></div>
     <div class="item" id="nav-7_1" onclick="open_doc('7_1')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-8_1" onclick="open_doc('8_1')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-9_1" onclick="open_doc('9_1')"><span class="item-icon">📄</span><div>航空<span class="item-sub">受入れ誓約書</span></div></div>
@@ -236,6 +237,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-2_1"></iframe>
     <iframe id="frame-3_1"></iframe>
     <iframe id="frame-6_1"></iframe>
+    <iframe id="frame-6_2"></iframe>
     <iframe id="frame-7_1"></iframe>
     <iframe id="frame-8_1"></iframe>
     <iframe id="frame-9_1"></iframe>
@@ -282,6 +284,7 @@ const docs={
   '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1782976942'},
   '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1782976942'},
   '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1782976942'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1783932000'},
   '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1782976942'},
   '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1782976942'},
   '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1782976942'},
@@ -814,6 +817,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20260713.03',
+    date: '2026-07-13',
+    notify: true,
+    items: [
+      '📄 建設分野の書類に「6_2号：2号機関 基準誓約書」を追加しました。左メニューの「建設 受入れ誓約書（6_1）」の下から開けます。'
+    ]
+  },
   {
     version: 'ver.20260709.05',
     date: '2026-07-09',
