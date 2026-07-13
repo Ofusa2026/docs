@@ -30,7 +30,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（英語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260713.02</div>
+    <div class="ver">ver.20260713.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -402,15 +402,15 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos,intakes]=await Promise.all([
       caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
       s('f_company',co.name||'');
-      s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+      s('f_author',[co.author_title||co.rep_title,co.author_name||co.rep_name].filter(Boolean).join('　'));
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
