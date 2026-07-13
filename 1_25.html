@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260710.06</div>
+    <div class="ver">ver.20260713.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -146,10 +146,14 @@ function _apply1_25FontSize(){
     `.doc [style*="font-size:11pt;margin-bottom:16px"]{font-size:${(11*s).toFixed(2)}pt!important}`,
   ].join('');
 }
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([

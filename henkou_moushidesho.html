@@ -19,7 +19,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 申請内容変更申出書</div>
-    <div class="ver">ver.20260710.05</div>
+    <div class="ver">ver.20260713.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -158,10 +158,14 @@ function fitDocToPreview(){
 }
 window.addEventListener('resize', fitDocToPreview);
 
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
   const {caseId}=info;
   try{
     const cases=await sb('cases?select=receipt_no,receipt_date,org&id=eq.'+caseId);

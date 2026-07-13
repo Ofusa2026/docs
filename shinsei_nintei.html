@@ -33,7 +33,7 @@ window.addEventListener('beforeprint', function(){ /* @media print で様式は�
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 在留資格認定証明書交付申請書 🚧【作成中・使用不可】</div>
-    <div class="ver">ver.20260710.01（作成中）</div>
+    <div class="ver">ver.20260713.01（作成中）</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="alert('この様式は作成中です。まだ使用できません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🚧 作成中（使用不可）</button>
@@ -135,10 +135,14 @@ function p(){
   if(typeof fitDocToPreview==='function') fitDocToPreview();
 }
 
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel||!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
   const {caseId}=info;
   if(!caseId) return;
   try{

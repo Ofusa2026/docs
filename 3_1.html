@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第３－１号（工業製品製造業）　受入れに関する誓約書</div>
-    <div class="ver">ver.20260710.05</div>
+    <div class="ver">ver.20260713.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -232,10 +232,14 @@ function _apply3_1FontSize(){
     `.doc [style*="font-size:9.5pt"]{font-size:${(9.5*s).toFixed(2)}pt!important}`,
   ].join('');
 }
-async function loadFromDB(){
-  const sel=document.getElementById('caseSelect');
-  if(!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos]=await Promise.all([
