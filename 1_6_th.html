@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260710.10</div>
+    <div class="ver">ver.20260710.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -412,16 +412,14 @@ function p(){
   let allowLine1='',allowLine2='';
   for(let i=1;i<=4;i++){
     const n=v('es_a'+i+'Name');
-    const nVal=n||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}Name</span>`;
-    const nSpan=`<span class="f">${nVal}</span>`;
+    const nSpan=n?`<span class="f">${esc(n)}</span>`:'';
     if(i<=2) allowLine1+=`（${nSpan}　手当），`;
     else allowLine2+=`（${nSpan}　手当），`;
   }
   let allowLineId1='',allowLineId2='';
   for(let i=1;i<=4;i++){
     const nEn=v('es_a'+i+'NameEn');
-    const nEnVal=nEn||`<span style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${i}NameEn</span>`;
-    const nEnSpan=`<span class="f">${nEnVal}</span>`;
+    const nEnSpan=nEn?`<span class="f">${esc(nEn)}</span>`:'';
     if(i<=2) allowLineId1+=`（　${nEnSpan}），`;
     else allowLineId2+=`（　${nEnSpan}），`;
   }
@@ -434,7 +432,7 @@ function p(){
     const amt=v('es_a'+idx+'Amt'),calc=v('es_a'+idx+'Calc'),calcEn=v('es_a'+idx+'CalcEn');
     const ph=(val,key,isMoney=false)=>{
       if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
-      return`<span class="f" style="color:#aaa;font-size:0.85em;font-family:monospace;">es.allowance${idx}${key}</span>`;
+      return'';
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
     annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（เงินช่วยเหลือค่า ${ph(nEn,'NameEn')} , ${ph(amt,'Amount',true)} เยน / วิธีคำนวณ : ${ph(calc,'Calc')}）</div>`;
