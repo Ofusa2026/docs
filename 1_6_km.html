@@ -36,12 +36,12 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260714.28</div>
+    <div class="ver">ver.20260714.30</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
-    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button><button class="btn" onclick="discardEditedFromDB()" title="保存済みの直接編集版を破棄して初期表示に戻す">♻️ 編集版破棄</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
   </div>
 </div>
@@ -1326,6 +1326,19 @@ async function loadFromDB(passedInfo){
 
     if((window._htmlFrozen||_editMode)&&typeof applyBindings==='function') applyBindings(); else p();
     showToast('✅ データを読み込みました');
+    // 保存済みの直接編集版があれば復元
+    try{
+      let _cid=companyId;
+      if(!_cid){ try{ const _q=await sb('cases?select=company_id&id=eq.'+caseId); if(_q&&_q[0]&&_q[0].company_id)_cid=_q[0].company_id; }catch(_e){} }
+      if(_cid){
+        const _r=await sb('companies?select=extra&id=eq.'+_cid);
+        const _ed=_r&&_r[0]&&_r[0].extra&&_r[0].extra['_edited']&&_r[0].extra['_edited']['1_6']&&_r[0].extra['_edited']['1_6'][caseId];
+        if(_ed&&_ed.html){
+          const _a=document.getElementById('pageArea');
+          if(_a){ _a.innerHTML=_ed.html; window._htmlFrozen=true; showToast('📝 直接編集版を復元しました'); }
+        }
+      }
+    }catch(_e){ console.warn('[restoreEdited]',_e); }
   }catch(e){
     console.error('DB読込エラー:',e);
     showToast('⚠️ 読込エラー: '+e.message);
@@ -1399,13 +1412,53 @@ async function saveForm(){
       body:JSON.stringify({emp_sets: empSets})
     });
 
-    showToast('✅ 保存しました');
+    // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6'][caseId] に保存
+    let _editedSaved=false;
+    try{
+      if(window._htmlFrozen || _editMode){
+        const _area=document.getElementById('pageArea');
+        if(_area && info.caseId){
+          const _cs=await sb('companies?select=id,extra&id=eq.'+companyId);
+          const _c=_cs&&_cs[0];
+          const _ex=_c&&_c.extra&&typeof _c.extra==='object'?JSON.parse(JSON.stringify(_c.extra)):{};
+          if(!_ex['_edited'])_ex['_edited']={};
+          if(!_ex['_edited']['1_6'])_ex['_edited']['1_6']={};
+          _ex['_edited']['1_6'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString()};
+          await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({extra:_ex})});
+          _editedSaved=true;
+        }
+      }
+    }catch(_e){ console.warn('[saveEditedToDB]',_e); }
+    showToast(_editedSaved?'✅ 保存しました（直接編集版も保存）':'✅ 保存しました');
   }catch(e){
     console.error('DB保存エラー:',e);
     alert('保存エラー: '+e.message);
   }
 }
 
+async function discardEditedFromDB(){
+  let info=null;
+  const sel=document.getElementById('caseSelect');
+  if(sel&&sel.value){ try{info=JSON.parse(sel.value)}catch(e){} }
+  if((!info||!info.caseId)&&window._lastCaseInfo&&window._lastCaseInfo.caseId) info=window._lastCaseInfo;
+  if(!info||!info.caseId){ showToast('⚠️ 案件が選択されていません'); return; }
+  if(!confirm('保存済みの直接編集版を破棄して、初期表示に戻します。よろしいですか？')) return;
+  let cid=info.companyId;
+  try{
+    if(!cid){ const q=await sb('cases?select=company_id&id=eq.'+info.caseId); if(q&&q[0])cid=q[0].company_id; }
+    if(!cid){ showToast('⚠️ 会社情報が取得できません'); return; }
+    const r=await sb('companies?select=id,extra&id=eq.'+cid);
+    const c=r&&r[0];
+    const ex=c&&c.extra&&typeof c.extra==='object'?JSON.parse(JSON.stringify(c.extra)):{};
+    if(ex['_edited']&&ex['_edited']['1_6']&&ex['_edited']['1_6'][info.caseId]){
+      delete ex['_edited']['1_6'][info.caseId];
+      await sb('companies?id=eq.'+cid,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({extra:ex})});
+    }
+    window._htmlFrozen=false;
+    if(typeof p==='function') p();
+    showToast('♻️ 編集版を破棄しました');
+  }catch(e){ console.error('[discardEdited]',e); showToast('⚠️ エラー: '+e.message); }
+}
 function showToast(msg){
   const t=document.createElement('div');
   t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';
