@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260714.14</div>
+    <div class="ver">ver.20260714.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1159,8 +1159,8 @@ function collectFormValues(){
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
 function _isKensetsu(){ return ((v('es_applicantField')||'')+(v('es_applicantFieldEn')||'')).includes('建設'); }
-function _jSuf(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '（約'+(v(fld+'Est')||'3,000')+'円）'; }
-function _jSufE(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '（≈'+(v(fld+'Est')||'3,000')+'）'; }
+function _jSuf(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '&emsp;&emsp;&emsp;&emsp;（約'+(v(fld+'Est')||'3,000')+'円）'; }
+function _jSufE(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '&emsp;&emsp;&emsp;&emsp;（≈'+(v(fld+'Est')||'3,000')+'）'; }
 function _jippiDefault(){
   if(!_isKensetsu()) return;
   ['es_deductTax','es_deductSocialIns','es_deductEmpIns','es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(id){
@@ -1187,7 +1187,7 @@ function maybeApplyKensetsuFormat(){
     const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
     if(!fld.includes('建設')) return;
     const rc=document.getElementById('es_raiseCondition');
-    if(rc && rc.value) return;
+    if(rc && /入社月に1,000円以上/.test(rc.value||'')) return;
     if(!confirm('分野が「建設」です。昇給・賞与・退職金を建設用フォーマットにしますか？')) return;
     if(rc) rc.value='年１回、入社月に1,000円以上。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
     const be=document.getElementById('es_bonusCondition'); if(be) be.value=_kensetsuBonus(be.value);
@@ -1300,7 +1300,7 @@ async function loadFromDB(passedInfo){
     // 4. 雇用条件データをフォームにセット
     if(esData) setFormValues(esData);
     _jippiDefault();
-    maybeApplyKensetsuFormat();
+    setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
     ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
 
