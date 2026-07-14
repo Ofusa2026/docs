@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260714.19</div>
+    <div class="ver">ver.20260714.22</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1160,8 +1160,8 @@ function collectFormValues(){
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
 function _isKensetsu(){ return ((v('es_applicantField')||'')+(v('es_applicantFieldEn')||'')).includes('建設'); }
-function _jSuf(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '&emsp;&emsp;&emsp;&emsp;（約'+(v(fld+'Est')||'3,000')+'円）'; }
-function _jSufE(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '&emsp;&emsp;&emsp;&emsp;（≈'+(v(fld+'Est')||'3,000')+'）'; }
+function _jSuf(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '<span style="white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（約'+(v(fld+'Est')||'3,000')+'円）</span>'; }
+function _jSufE(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '<span style="white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（≈'+(v(fld+'Est')||'3,000')+'）</span>'; }
 function _jippiDefault(){
   if(!_isKensetsu()) return;
   ['es_deductTax','es_deductSocialIns','es_deductEmpIns','es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(id){
@@ -1188,13 +1188,18 @@ function maybeApplyKensetsuFormat(){
     const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
     if(!fld.includes('建設')) return;
     const rc=document.getElementById('es_raiseCondition');
-    if(rc && /入社月に1,000円以上/.test(rc.value||'')) return;
-    var kr=document.getElementById('km_raise'); if(kr) kr.value='年１回、入社月に1,000円以上。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
+    if(rc && /経験年数に応じて昇給する/.test(rc.value||'')) return;
+    var kr=document.getElementById('km_raise'); if(kr) kr.value='経験年数に応じて昇給する';
     var kb=document.getElementById('km_bonus'); if(kb){ var _be=document.getElementById('es_bonusCondition'); kb.value=_kensetsuBonus(_be?_be.value:''); }
     var kt=document.getElementById('km_retire'); if(kt) kt.value='退職金共済による';
+    var _es=window._lastEmpSet||{};
+    var rr=document.getElementById('km_raise_ref'); if(rr) rr.textContent=_es.salaryRaiseCond||'（なし）';
+    var rb=document.getElementById('km_bonus_ref'); if(rb) rb.textContent=_es.bonusCond||'（なし）';
+    var rt2=document.getElementById('km_retire_ref'); if(rt2) rt2.textContent=_es.retirementDetail||'（なし）';
     var mo=document.getElementById('kensetsuModal'); if(mo) mo.style.display='flex';
   }catch(e){}
 }
+function km_use(fid,rid){ var f=document.getElementById(fid),r=document.getElementById(rid); if(f&&r&&r.textContent&&r.textContent!=='（なし）') f.value=r.textContent; }
 function closeKensetsuModal(){ var mo=document.getElementById('kensetsuModal'); if(mo) mo.style.display='none'; }
 function applyKensetsuModal(){
   try{
@@ -1307,7 +1312,7 @@ async function loadFromDB(passedInfo){
     }
 
     // 4. 雇用条件データをフォームにセット
-    if(esData) setFormValues(esData);
+    if(esData){ setFormValues(esData); window._lastEmpSet=esData; }
     _jippiDefault();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
@@ -1617,10 +1622,13 @@ if(!window._selectCaseListenerAdded){
     <div style="font-size:12px;color:#64748b;margin-bottom:14px;">建設用フォーマットを確認・編集し、OKで反映します。</div>
     <label style="font-size:12px;font-weight:bold;color:#334155;">昇給条件</label>
     <textarea id="km_raise" style="width:100%;height:64px;margin:4px 0 10px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5;">雇用条件書セット：<span id="km_raise_ref" style="color:#334155;">－</span> <button type="button" onclick="km_use('km_raise','km_raise_ref')" style="font-size:10px;padding:1px 8px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:4px;cursor:pointer;">これを使う</button></div>
     <label style="font-size:12px;font-weight:bold;color:#334155;">賞与条件</label>
     <textarea id="km_bonus" style="width:100%;height:44px;margin:4px 0 10px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5;">雇用条件書セット：<span id="km_bonus_ref" style="color:#334155;">－</span> <button type="button" onclick="km_use('km_bonus','km_bonus_ref')" style="font-size:10px;padding:1px 8px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:4px;cursor:pointer;">これを使う</button></div>
     <label style="font-size:12px;font-weight:bold;color:#334155;">退職金詳細</label>
     <input id="km_retire" style="width:100%;margin:4px 0 16px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
+    <div style="font-size:11px;color:#64748b;margin:-4px 0 10px;line-height:1.5;">雇用条件書セット：<span id="km_retire_ref" style="color:#334155;">－</span> <button type="button" onclick="km_use('km_retire','km_retire_ref')" style="font-size:10px;padding:1px 8px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:4px;cursor:pointer;">これを使う</button></div>
     <div style="text-align:right;">
       <button onclick="closeKensetsuModal()" style="padding:7px 16px;margin-right:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button>
       <button onclick="applyKensetsuModal()" style="padding:7px 22px;font-size:13px;border:none;background:#2563eb;color:#fff;border-radius:6px;cursor:pointer;">OK</button>
