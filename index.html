@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260713.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260714.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -152,6 +152,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-1_29" onclick="open_doc('1_29')">
       <span class="item-icon">📄</span>
       <div>参考様式第１－２９号<span class="item-sub">書類省略に当たっての誓約書</span></div>
+    </div>
+    <div class="item" id="nav-1_30" onclick="open_doc('1_30')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－３０号<span class="item-sub">休業期間に関する申立書</span></div>
+    </div>
+    <div class="item" id="nav-1_31" onclick="open_doc('1_31')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－３１号<span class="item-sub">通算在留期間を超える在留に関する申立書</span></div>
     </div>
     <div class="divider"></div>
     <div class="section">特定活動</div>
@@ -228,6 +236,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-1_25"></iframe>
     <iframe id="frame-1_27"></iframe>
     <iframe id="frame-1_29"></iframe>
+    <iframe id="frame-1_30"></iframe>
+    <iframe id="frame-1_31"></iframe>
     <iframe id="frame-1_4"></iframe>
     <iframe id="frame-henkou"></iframe>
     <iframe id="frame-ininjou"></iframe>
@@ -274,6 +284,8 @@ const docs={
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1783920000'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1777861843'},
   '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1777861843'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1784000379'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1784000379'},
   '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1776925182'},
   '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1783920000'},
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1779855161'},
