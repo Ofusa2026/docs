@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－３１号</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:15mm!important;line-height:1.52!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－３１号　通算在留期間を超える在留に関する申立書</div>
+    <div class="ver">ver.20260714.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_31')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">１ 身分事項</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別</label><select id="f_gender" onchange="p()"><option value=""></option><option value="男">男</option><option value="女">女</option></select></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthDate" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">２ 不合格となった試験等</div>
+      <div class="fg"><label>特定産業分野・業務区分</label><input id="f_field" oninput="p()"></div>
+      <div class="fg"><label>試験等の名称</label><input id="f_examName" oninput="p()"></div>
+      <div class="fg"><label>受験年月日</label><input id="f_examDate" oninput="p()"></div>
+      <div class="fg"><label>試験結果通知書の発行年月日</label><input id="f_noticeDate" oninput="p()"></div>
+      <div class="fg"><label>総得点</label><input id="f_score" oninput="p()"></div>
+      <div class="fg"><label>合格基準点の8割の点数又は80%</label><input id="f_passLine" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">４ 特定技能所属機関</div>
+      <div class="fg"><label>機関の氏名又は名称</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※誓約事項は既定で■。該当しない項目は「直接編集」で□にしてください。</div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1783920000"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const g=v('f_gender');
+  const gm=g==='男'?'<u>男</u>・女':g==='女'?'男・<u>女</u>':'男・女';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:11pt;margin-bottom:8px;">参考様式第１－３１号</div>
+<div style="font-size:18pt;font-weight:bold;text-align:center;margin:4mm 0;">通算在留期間を超える在留に関する申立書</div>
+<div style="margin-bottom:12px;">　私は、特定技能の在留資格に係る制度の運用に関する方針に定められている在留資格「特定技能２号」の技能水準として必要な試験等に別添の試験結果通知書の写しのとおり不合格となったところ、当該試験等の再受験のため、在留資格「特定技能１号」での在留を希望しますので、下記のとおり申し立てます。</div>
+<div style="text-align:center;margin-bottom:10px;">記</div>
+<div style="margin-bottom:6px;">１　身分事項</div>
+<div style="margin-left:2em;margin-bottom:2px;">氏名・性別（ローマ字）：${f('f_applicant')}　　${gm}</div>
+<div style="margin-left:2em;margin-bottom:2px;">生年月日：${f('f_birthDate')}</div>
+<div style="margin-left:2em;margin-bottom:14px;">国籍・地域：${f('f_nationality')}</div>
+<div style="margin-bottom:6px;">２　不合格となった試験等（複数ある場合は全て記載）</div>
+<div style="margin-left:2em;margin-bottom:2px;">特定産業分野・業務区分：${f('f_field')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">試験等の名称：${f('f_examName')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">受験年月日：${f('f_examDate')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">試験結果通知書の発行年月日：${f('f_noticeDate')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">総得点：${f('f_score')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">合格基準点の８割の点数又は８０パーセント：${f('f_passLine')}</div>
+<div style="margin-left:2em;margin-bottom:14px;font-size:9pt;">※総得点が合格基準点の８割の点数又は８０パーセントを上回っているものが対象。</div>
+<div style="margin-bottom:6px;">３　誓約事項</div>
+<div style="margin-left:2em;margin-bottom:4px;">　私は以下の事項について誓約します。</div>
+<div style="margin-left:2em;margin-bottom:3px;">■　合格基準点の８割以上の得点を取得した上記２の試験等の合格に向けて精励し、かつ、同試験等を受験します。</div>
+<div style="margin-left:2em;margin-bottom:3px;">■　上記２の試験等に合格した場合、速やかに「特定技能２号」又は「介護」の在留資格変更許可申請を行います。</div>
+<div style="margin-left:2em;margin-bottom:10px;">■　上記２の試験等に合格できなかった場合、速やかに帰国します。</div>
+<div style="text-align:right;margin-bottom:2px;">${f('f_docDate')}</div>
+<div style="text-align:right;margin-bottom:14px;">申請人の署名　　　${f('f_applicant')}</div>
+<div style="margin-bottom:6px;">４　特定技能所属機関の誓約事項（特定技能所属機関において記載）</div>
+<div style="margin-left:2em;margin-bottom:4px;">　特定技能所属機関として、以下の事項について誓約します。</div>
+<div style="margin-left:2em;margin-bottom:3px;">■　当機関において、引き続き上記１の申請人を雇用します。</div>
+<div style="margin-left:2em;margin-bottom:10px;">■　当機関では、上記２の試験等の合格に向けた指導・研修・支援等を行う体制を有しています。</div>
+<div style="text-align:right;margin-bottom:2px;">${f('f_docDate')}</div>
+<div style="text-align:right;margin-bottom:2px;">特定技能所属機関の氏名又は名称　　　${f('f_company')}</div>
+<div style="text-align:right;">作成責任者の署名　　　${f('f_author')}</div>`;
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applyFontSize();
+  _apply1_31FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply1_31FontSize(){
+  const st=document.getElementById('_1_31FontStyle')||document.createElement('style');
+  st.id='_1_31FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=`.doc [style*="font-size:18pt"]{font-size:${(18*s).toFixed(2)}pt!important}`;
+}
+function _wareki(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,persons,cos]=await Promise.all([
+      caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('persons?select=applicant_name_en,nationality,birthdate,gender&case_id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,rep_name,rep_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const pe=persons&&persons[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){ s('f_applicant',cas.applicant||''); }
+    if(pe){
+      s('f_applicant',pe.applicant_name_en||v('f_applicant'));
+      s('f_nationality',pe.nationality||'');
+      s('f_birthDate',_wareki(pe.birthdate));
+      const gsel=document.getElementById('f_gender'); if(gsel&&pe.gender){ if(/女|female|f/i.test(pe.gender))gsel.value='女'; else if(/男|male|m/i.test(pe.gender))gsel.value='男'; }
+    }
+    if(co){
+      s('f_company',co.name||'');
+      s('f_author',[co.author_name||co.rep_name].filter(Boolean).join(''));
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_31'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

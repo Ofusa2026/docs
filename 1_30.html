@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－３０号</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:15mm!important;line-height:1.52!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－３０号　休業期間に関する申立書</div>
+    <div class="ver">ver.20260714.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_30')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>申請人氏名</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">休業期間</div>
+      <div class="fg"><label>開始（例：令和6年4月1日）</label><input id="f_start" oninput="p()"></div>
+      <div class="fg"><label>終了（現在も休業中は予定）</label><input id="f_end" oninput="p()"></div>
+      <div class="fg"><label>日数</label><input id="f_days" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">休業理由</div>
+      <div class="fg"><label>理由</label><select id="f_reason" onchange="p()"><option value=""></option><option value="産前産後休業">産前産後休業</option><option value="育児休業">育児休業</option><option value="病気・怪我">病気・怪我（労災を含む）</option></select></div>
+      <div class="fg"><label>出産種別（産前産後のみ）</label><select id="f_birthType" onchange="p()"><option value=""></option><option value="単胎">単胎</option><option value="多胎">多胎（双子以上）</option></select></div>
+      <div class="fg"><label>出産年月日（産前産後のみ）</label><input id="f_birthDate" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">休業時の特定技能所属機関</div>
+      <div class="fg"><label>法人番号</label><input id="f_corpNo" oninput="p()"></div>
+      <div class="fg"><label>機関の氏名・名称</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>機関の住所</label><input id="f_address" oninput="p()"></div>
+      <div class="fg"><label>事業主名</label><input id="f_owner" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_tel" oninput="p()"></div>
+    </div>
+    <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※４の疎明資料のチェックは「直接編集」で該当項目に■を付けてください。</div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1783920000"></script>
+<script>
+function ck(on){return on?'■':'□';}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const r=v('f_reason');
+  const sanzen=r==='産前産後休業', ikuji=r==='育児休業', byoki=r==='病気・怪我';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:11pt;margin-bottom:8px;">参考様式第１－３０号</div>
+<div style="font-size:18pt;font-weight:bold;text-align:center;margin:4mm 0;">休業期間に関する申立書</div>
+<div style="margin-bottom:14px;">　私は、在留資格「特定技能１号」で在留中、下記の理由により休業期間があったので、申し立てます。</div>
+<div style="text-align:center;margin-bottom:10px;">記</div>
+<div style="margin-bottom:6px;">１．休業期間（現在も休業中の場合は予定期間）</div>
+<div style="margin-left:2em;margin-bottom:14px;">${f('f_start')}から${f('f_end')}まで（${f('f_days')}日間）</div>
+<div style="margin-bottom:6px;">２．休業した理由</div>
+<div style="margin-left:2em;margin-bottom:4px;">${ck(sanzen)}　産前産後休業</div>
+<div style="margin-left:3em;margin-bottom:4px;">出産種別：${ck(v('f_birthType')==='単胎')}　単胎　　${ck(v('f_birthType')==='多胎')}　多胎（出産した子の人数が２人（双子）以上の場合）</div>
+<div style="margin-left:3em;margin-bottom:6px;">出産年月日：${f('f_birthDate')}</div>
+<div style="margin-left:2em;margin-bottom:4px;">${ck(ikuji)}　育児休業</div>
+<div style="margin-left:2em;margin-bottom:14px;">${ck(byoki)}　病気・怪我（労災を含む）</div>
+<div style="margin-bottom:6px;">３．休業時の特定技能所属機関</div>
+<div style="margin-left:2em;margin-bottom:2px;">法人番号：${f('f_corpNo')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">機関の氏名・名称：${f('f_company')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">機関の住所：${f('f_address')}</div>
+<div style="margin-left:2em;margin-bottom:2px;">事業主名：${f('f_owner')}</div>
+<div style="margin-left:2em;margin-bottom:14px;">電話番号：${f('f_tel')}</div>
+<div style="margin-bottom:6px;">４．休業期間を疎明する資料（（１）又は（２）のいずれかの資料を合わせて添付すること）</div>
+<div style="margin-left:2em;margin-bottom:4px;">（１）産前産後休業・育児休業の場合</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　母子健康手帳の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　産前産後休業・育児休業を取得したことを疎明する資料</div>
+<div style="margin-left:3em;margin-bottom:8px;">□　休業期間中のタイムカードの写し又は出勤簿の写し</div>
+<div style="margin-left:2em;margin-bottom:4px;">（２）病気・怪我による休業の場合</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　医師の診断書、病院から発行された治療・入院等の事実を証明する資料（治療期間や入院期間が記載されているもの）</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　労災保険の支給決定通知書の写し（労災の場合に限る）</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中のタイムカードの写し又は出勤簿の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中の給与明細書の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中の給与が振り込まれている口座の通帳（直近の預貯金額を記帳しているもの）の写し</div>
+<div style="margin-left:3em;margin-bottom:16px;">□　休業期間中の給与振込口座指定・同意書の写し</div>
+<div style="text-align:right;margin-bottom:4px;">${f('f_docDate')}</div>
+<div style="text-align:right;">申請人の署名　　　${f('f_applicant')}</div>`;
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applyFontSize();
+  _apply1_30FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply1_30FontSize(){
+  const st=document.getElementById('_1_30FontStyle')||document.createElement('style');
+  st.id='_1_30FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=`.doc [style*="font-size:18pt"]{font-size:${(18*s).toFixed(2)}pt!important}`;
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,corp_no,address,detail_address,tel,rep_name&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,corp_no,address,detail_address,tel,rep_name&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){ s('f_applicant',cas.applicant||''); }
+    if(co){
+      s('f_company',co.name||'');
+      s('f_corpNo',co.corp_no||'');
+      s('f_address',[co.address,co.detail_address].filter(Boolean).join('　'));
+      s('f_tel',co.tel||'');
+      s('f_owner',co.rep_name||'');
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_30'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
