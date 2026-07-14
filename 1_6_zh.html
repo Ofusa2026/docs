@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260714.26</div>
+    <div class="ver">ver.20260714.27</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -346,11 +346,11 @@
     </div>
     <div class="fs"><div class="fs-title">Ⅸ その他</div>
       <div class="fg2">
-        <div class="fg"><label>雇入時健診（年）<span class="fid">es.healthCheckY</span></label><input id="es_healthCheckY" oninput="p()"></div>
+        <div class="fg"><label>初回定期健診（年）<span class="fid">es.healthCheckY</span></label><input id="es_healthCheckY" oninput="p()"></div>
         <div class="fg"><label>（月）<span class="fid">es.healthCheckM</span></label><input id="es_healthCheckM" oninput="p()"></div>
       </div>
       <div class="fg2">
-        <div class="fg"><label>定期健診（年）<span class="fid">es.healthCheckY2</span></label><input id="es_healthCheckY2" oninput="p()"></div>
+        <div class="fg"><label>雇入時健診（年）<span class="fid">es.healthCheckY2</span></label><input id="es_healthCheckY2" oninput="p()"></div>
         <div class="fg"><label>（月）<span class="fid">es.healthCheckM2</span></label><input id="es_healthCheckM2" oninput="p()"></div>
       </div>
       <div class="fg"><label>相談窓口部署（日）<span class="fid">es.contactDept</span></label><input id="es_contactDept" oninput="p()"></div>
@@ -825,8 +825,8 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(true,"ins_kousei")}&nbsp;厚生年金，${cb(true,"ins_kenko")}&nbsp;健康保険，${cb(true,"ins_koyo")}&nbsp;雇用保険，${cb(true,"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;" data-key="107">1. Tình trạng tham gia bảo hiểm xã hội/tình trạng áp dụng bảo hiểm lao động (${cb(true,"ins_kousei_id")} Tiền lương hưu người lao động, ${cb(true,"ins_kenko_id")} Bảo hiểm sức khỏe, ${cb(true,"ins_koyo_id")} Bảo hiểm tuyển dụng, ${cb(true,"ins_rousai_id")} Bảo hiểm tai nạn lao động,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} Tiền lương hưu quốc gia, ${cb(false,"ins_kokumin_kenko_id")} Bảo hiểm sức khỏe quốc gia, ${cb(false,"ins_other_id")} Khác (</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. Khám sức khỏe khi tuyển dụng:&emsp;tháng ${f('es_healthCheckM')} năm ${f('es_healthCheckY')}</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. Khám sức khỏe định kỳ lần đầu:&emsp;tháng ${f('es_healthCheckM2')} năm ${f('es_healthCheckY2')} (sau đó thực hiện mỗi năm 1 lần)</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. Khám sức khỏe khi tuyển dụng:&emsp;tháng ${f('es_healthCheckM2')} năm ${f('es_healthCheckY2')}</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${f('es_healthCheckY')}年&emsp;${f('es_healthCheckM')}月（その後１年ごとに実施）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. Khám sức khỏe định kỳ lần đầu:&emsp;tháng ${f('es_healthCheckM')} năm ${f('es_healthCheckY')} (sau đó thực hiện mỗi năm 1 lần)</span></div>
       <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. Đầu mối tư vấn về các nội dung liên quan đến việc cải thiện quản lý tuyển dụng, v.v.</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">Tên phòng ban&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Chức danh và họ tên người phụ trách&emsp;${f('es_contactPersonEn')}&emsp;(Địa chỉ liên lạc&emsp;${f('es_contactTel')})</span></div>
       <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. Khi bên B về nước sau khi kết thúc hợp đồng này, nếu bên B không thể chi trả chi phí về nước, bên A ngoài việc chịu chi phí về nước đó, còn thực hiện các biện pháp cần thiết để việc về nước được thuận lợi.</span></div>
@@ -1314,7 +1314,6 @@ async function loadFromDB(passedInfo){
     // 4. 雇用条件データをフォームにセット
     if(esData){ setFormValues(esData); window._lastEmpSet=esData; }
     _jippiDefault();
-    (function(){var g=function(id){return document.getElementById(id);};var fd=window._fieldData=window._fieldData||{};function gv(id){var e=g(id);return (e&&e.value)||fd[id]||'';}function mv(a,b){var va=gv(a),vb=gv(b);if(va&&!vb){var eb=g(b);if(eb)eb.value=va;fd[b]=va;var ea=g(a);if(ea)ea.value='';fd[a]='';}}mv('es_healthCheckY','es_healthCheckY2');mv('es_healthCheckM','es_healthCheckM2');})();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
     ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
