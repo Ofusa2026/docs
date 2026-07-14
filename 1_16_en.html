@@ -32,7 +32,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（英語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260714.06</div>
+    <div class="ver">ver.20260714.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -132,6 +132,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
@@ -292,6 +293,9 @@ function p(){
   <div style="padding-left:1.5em;" class="id">If you have a written contract exchanged with the agent organization, please attach a copy of it.</div>
 </div>
 
+</div>
+<div class="doc">
+<div class="page-num-label">P3</div>
 <div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pre-Departure Orientation</span></div>
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
@@ -316,7 +320,7 @@ function p(){
 </div>
 
 <div class="doc">
-<div class="page-num-label">P3</div>
+<div class="page-num-label">P4</div>
 <div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Expenses paid by the job seeker (the applicant) to organizations in his/her own country</span></div>
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
