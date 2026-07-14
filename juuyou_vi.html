@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260714.07</div>
+    <div class="ver">ver.20260714.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -484,6 +484,8 @@ async function loadFromDB(passedInfo){
     S('f_allowance3Amount', _es.allowance3Amount);
     S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
     S('f_workType', _es.category); S('f_workTypeEn', _es.categoryEn);
+    S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
+    S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
     if(co){
       s('f_orgName',co.name||'');
       s('f_orgAddress',((co.pref||'')+(co.city||'')+(co.address||''))||'');
