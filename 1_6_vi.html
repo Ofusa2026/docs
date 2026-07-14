@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260713.09</div>
+    <div class="ver">ver.20260714.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -306,6 +306,7 @@
       <div class="fg"><label>賞与　有無<span class="fid">es.bonus</span></label><select id="es_bonus" onchange="p()"><option value="">（未設定）</option><option value="有">有</option><option value="無">無</option></select></div>
       <div class="fg"><label>賞与条件（日）<span class="fid">es.bonusCondition</span></label><input id="es_bonusCondition" oninput="p()"></div>
       <div class="fg"><label>賞与条件（ID）<span class="fid">es.bonusConditionEn</span></label><input id="es_bonusConditionEn" oninput="p()"></div>
+      <div class="fg"><label>退職金詳細<span class="fid">es.retirementDetail</span></label><input id="es_retirementDetail" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">別紙 固定残業代</div>
       <div class="fg"><label>手当名称（日）<span class="fid">es.fixedOTName</span></label><input id="es_fixedOTName" oninput="p()"></div>
@@ -413,6 +414,7 @@ function p(){
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
   const _ff=v('es_flexFlg'); const flexOn = !!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff);
+  const retOn = v('es_retirement')==='有' || !!v('es_retirementDetail');
   const _sf=v('es_shiftFlg'); const shiftOn = !!_sf && !/^なし$|^無$|しない/.test(_sf);
   let allowLine1='',allowLine2='';
   for(let i=1;i<=4;i++){
@@ -783,8 +785,8 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;" data-key="97">10. Tiền nghỉ việc</span></td>
-          <td style="vertical-align:top;">${cb(false,"keicho_yes")}&nbsp;有（時期，金額等&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} Có (thời điểm, số tiền,… )</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(true,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(true,"cb_auto_022")} Không</span></td>
+          <td style="vertical-align:top;">${cb(retOn,"keicho_yes")}&nbsp;有（時期，金額等&emsp;${f('es_retirementDetail')}&emsp;）<br><span class="id" style="font-size:7pt;" data-key="98">${cb(false,"cb_auto_020")} Có (thời điểm, số tiền,… )</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(!retOn,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;" data-key="99">${cb(!retOn,"cb_auto_022")} Không</span></td>
         </tr>
         <tr>
           <td style="vertical-align:top;">１１．休業手当<br><span class="id" style="font-size:7pt;" data-key="100">11. Trợ cấp khi nghỉ phép</span></td>
@@ -1151,6 +1153,19 @@ function collectFormValues(){
 
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
+function maybeApplyKensetsuFormat(){
+  try{
+    const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
+    if(!fld.includes('建設')) return;
+    const rc=document.getElementById('es_raiseCondition');
+    if(rc && rc.value) return;
+    if(!confirm('分野が「建設」です。昇給・賞与・退職金を建設用フォーマットにしますか？')) return;
+    if(rc) rc.value='年１回、入社月に1,000円以上。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
+    const be=document.getElementById('es_bonusCondition'); if(be && !be.value) be.value='業績による';
+    const rd=document.getElementById('es_retirementDetail'); if(rd) rd.value='退職金共済による';
+    p();
+  }catch(e){}
+}
 async function loadFromDB(passedInfo){
   if(_currentDoc==='iko'){ await loadFromDB_iko(); return; }
   let info = passedInfo;
@@ -1255,6 +1270,7 @@ async function loadFromDB(passedInfo){
 
     // 4. 雇用条件データをフォームにセット
     if(esData) setFormValues(esData);
+    maybeApplyKensetsuFormat();
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
     ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
 
