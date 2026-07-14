@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</div>
-    <div class="ver">ver.20260714.06</div>
+    <div class="ver">ver.20260714.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -479,6 +479,12 @@ async function loadFromDB(passedInfo){
     S('f_raiseCond', _es.salaryRaiseCond);
     S('f_raiseCondEn', _es.salaryRaiseCondEn);
     S('f_salaryTotal', _es.totalMonthly);
+    S('f_allowance1Calc', _es.allowance1Cond); S('f_allowance1CalcEn', _es.allowance1CondEn);
+    S('f_allowance2Calc', _es.allowance2Cond); S('f_allowance2CalcEn', _es.allowance2CondEn);
+    S('f_allowance3Calc', _es.allowance3Cond); S('f_allowance3CalcEn', _es.allowance3CondEn);
+    S('f_allowance3Amount', _es.allowance3Amount);
+    S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
+    S('f_workType', _es.category); S('f_workTypeEn', _es.categoryEn);
     if(co){
       s('f_orgName',co.name||'');
       s('f_orgAddress',((co.pref||'')+(co.city||'')+(co.address||''))||'');
