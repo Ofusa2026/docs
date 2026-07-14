@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260714.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260714.07</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -632,7 +632,29 @@ async function idxInit(){
     idxAllCases=cases||[];
     idxBuildCompanyFilter();
     idxFilterCases();
+    await idxAutoSelectFromUrl(); // ver.20260714.07: ?caseId= / ?doc= で自動選択
   }catch(e){console.error('idxInit',e);}
+}
+// ver.20260714.07: anken等から ?caseId=◯◯（+任意 &doc=1_6 等）で開かれたら、案件を自動選択し必要なら書類を開く
+async function idxAutoSelectFromUrl(){
+  try{
+    var q=new URLSearchParams(location.search||'');
+    var cid=(q.get('caseId')||'').trim();
+    if(!cid) return;
+    var inp=document.getElementById('idx_caseIdPaste');
+    if(inp) inp.value=cid;
+    await idxJumpByPaste();
+    if(!idxSelectedCase) return;
+    var doc=(q.get('doc')||'').trim();
+    if(!doc) return;
+    var openerMap={'1_5':'open_1_5','1_6':'open_1_6','1_16':'open_1_16','juuyou':'open_juuyou'};
+    setTimeout(function(){
+      try{
+        if(openerMap[doc] && typeof window[openerMap[doc]]==='function'){ window[openerMap[doc]](); }
+        else if(typeof open_doc==='function'){ open_doc(doc); }
+      }catch(e){ console.error('autoOpenDoc',e); }
+    }, 350);
+  }catch(e){ console.error('idxAutoSelectFromUrl',e); }
 }
 
 function idxBuildCompanyFilter(){
