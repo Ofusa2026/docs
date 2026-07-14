@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260714.24</div>
+    <div class="ver">ver.20260714.25</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1338,6 +1338,7 @@ async function loadFromDB(passedInfo){
     // 4. 雇用条件データをフォームにセット
     if(esData){ setFormValues(esData); window._lastEmpSet=esData; }
     _jippiDefault();
+    (function(){var g=function(id){return document.getElementById(id);};var hy=g('es_healthCheckY'),hy2=g('es_healthCheckY2'),hm=g('es_healthCheckM'),hm2=g('es_healthCheckM2');if(hy&&hy2&&hy.value&&!hy2.value){hy2.value=hy.value;hy.value='';}if(hm&&hm2&&hm.value&&!hm2.value){hm2.value=hm.value;hm.value='';}})();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
     ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
