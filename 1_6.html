@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260713.09</div>
+    <div class="ver">ver.20260714.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1137,6 +1137,13 @@ function setFormValues(esData){
     if(_nrEl && !_nrEl.value) _nrEl.value=esData.nonRegWeeklyDays||esData.nonRegMonthlyDays||'';
   }
   // 4. applicantName は persons から別途セット済みのため上書きしない
+  // 5. プレビューの全チェック状態を復元。p()描画前にcbStateへ入れると、cb()が
+  //    cbState[id]を優先するため保存済みの手動チェックが再現される。保存されていない
+  //    チェックはフォーム値から自動判定される。別案件の状態が残らないよう一旦全クリア。
+  Object.keys(window.cbState||{}).forEach(k=>delete window.cbState[k]);
+  if(esData.cbState && typeof esData.cbState==='object'){
+    Object.keys(esData.cbState).forEach(k=>{ window.cbState[k]=esData.cbState[k]; });
+  }
   p();
 }
 
@@ -1160,6 +1167,9 @@ function collectFormValues(){
   });
   const nameEl = document.getElementById('applicantName');
   if(nameEl && nameEl.value.trim()) data.applicantName = nameEl.value.trim();
+  // プレビューの全チェック状態（cbState）をDBへ保存。
+  // 手動でON/OFFしたチェック（更新の判断基準・社会保険・賞与・退職金・昇給などの手動変更）を保持する。
+  data.cbState = Object.assign({}, (window.cbState||{}));
   return data;
 }
 
