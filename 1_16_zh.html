@@ -11,13 +11,15 @@
 .id{color:#555;font-size:0.88em;}
 .tbl{width:100%;border-collapse:collapse;font-size:10pt;}
 .tbl td,.tbl th{border:1px solid #000;padding:3px 5px;vertical-align:top;}
+.tbl tr{page-break-inside:avoid;}
+.doc{page-break-inside:avoid;}
 .tbl td.dashed-bottom{border-bottom:1px dashed #888;}
 .tbl .lbl{width:28%;}
 .chk{display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1em;margin-right:4px;}
 .chk-on{background:#000;color:#fff;font-weight:bold;}
-input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
-input.chk-box:checked{background:#000;}
-input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+input.chk-box:checked{background:#fff;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #000;border-width:0 2px 2px 0;transform:rotate(45deg);}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -30,7 +32,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考格式第１－１６号（中国語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260714.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -68,6 +70,17 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>電話番号</label><input id="f_ag_tel" oninput="p()"></div>
       <div class="fg"><label>支払費用（求職者）</label><input id="f_ag_fee_seeker" oninput="p()"></div>
       <div class="fg"><label>支払費用（求人者）</label><input id="f_ag_fee_employer" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">取次機関（国外）</div>
+      <div class="fg"><label>取次ぎの有無</label><select id="es_toritsugi" onchange="p()"><option value="無">無</option><option value="有">有</option></select></div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_tt_name" oninput="p()"></div>
+      <div class="fg"><label>所在国</label><input id="f_tt_country" oninput="p()"></div>
+      <div class="fg"><label>所在地</label><input id="f_tt_addr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_tt_tel" oninput="p()"></div>
+      <div class="fg"><label>費用(求職者)額</label><input id="f_tt_fee_seeker" oninput="p()"></div>
+      <div class="fg"><label>費用(求職者)名目</label><input id="f_tt_nom_seeker" oninput="p()"></div>
+      <div class="fg"><label>費用(求人者)額</label><input id="f_tt_fee_employer" oninput="p()"></div>
+      <div class="fg"><label>費用(求人者)名目</label><input id="f_tt_nom_employer" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">事前ガイダンス</div>
       <div class="fg"><label>計画通り実施</label>
@@ -191,7 +204,7 @@ function p(){
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">名目</span></td>
-    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">作为</span></td>
+    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">作为</span></td>
   </tr>
   <tr>
     <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">招聘者（特定技能所属机构）</span></td>
@@ -200,7 +213,7 @@ function p(){
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">名目</span></td>
-    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">作为</span></td>
+    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">作为</span></td>
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
@@ -229,29 +242,29 @@ function p(){
   <tr>
     <td class="lbl">１　取次ぎの有無<br><span class="id">有无中介</span></td>
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box">有<br><span class="id">有</span>
+      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">有</span>
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box">無<br><span class="id">无</span>
+      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">无</span>
     </td>
   </tr>
   <tr>
     <td>２　氏名又は名称<br><span class="id">姓名或名称</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="3">${f('f_tt_name')}</td>
   </tr>
   <tr>
     <td>３　所在国<br><span class="id">所在国</span></td>
-    <td colspan="3">&nbsp;</td>
+    <td colspan="3">${f('f_tt_country')}</td>
   </tr>
   <tr>
     <td>４　所在地<br><span class="id">所在地</span></td>
-    <td colspan="3">（電話番号 <span class="id">电话号码</span>　　　－　　　－　　　）</td>
+    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>
   </tr>
   <tr>
     <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">支付给中介机构的费用</span></td>
     <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">求职者（申请人）</span></td>
     <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>
-    <td class="dashed-bottom">（　　　　　　円 <span class="id">日元</span>）</td>
+    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">日元</span>）</td>
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">名目</span></td>
@@ -260,7 +273,7 @@ function p(){
   <tr>
     <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">招聘者（特定技能所属机构）</span></td>
     <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>
-    <td class="dashed-bottom">（　　　　　　円 <span class="id">日元</span>）</td>
+    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">日元</span>）</td>
   </tr>
   <tr>
     <td style="text-align:center;">名目<br><span class="id">名目</span></td>
@@ -389,6 +402,9 @@ function _apply1_16_zhFontSize(){
     `.tbl{font-size:${(10*s).toFixed(2)}pt!important}`,
   ].join('');
 }
+const AGENCY_MASTER = {
+  '株式会社マックス':{addr:'東京都大田区蒲田５丁目２８番４号　ＥＣＳ第２７ビル２０２', tel:'03-5711-0805', license:'13-ユ-302361', type:'有料'},
+};
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -401,7 +417,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos,intakes]=await Promise.all([
-      caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
@@ -414,11 +430,14 @@ async function loadFromDB(passedInfo){
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
+      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`;}}
     }
     if(ir && ir.agency_name){
       s('f_ag_name', ir.agency_name);
       if(ir.agency_office) s('f_ag_addr', ir.agency_office);
       if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
+      const _am=AGENCY_MASTER[ir.agency_name];
+      if(_am){ s('f_ag_addr',_am.addr); s('f_ag_tel',_am.tel); s('f_ag_license',_am.license); const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value)_t.value=_am.type; }
       const _as=document.getElementById('es_assen'); if(_as) _as.value='有';
     }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
