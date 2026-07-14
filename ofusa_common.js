@@ -819,8 +819,37 @@ async function saveFormGeneric(docKey, opts){
       headers: {'Prefer':'return=minimal'},
       body: JSON.stringify({ extra })
     });
-    if(typeof showToast==='function') showToast('✅ DBに保存しました');
-    else alert('DBに保存しました');
+
+    // opts.revMap があれば、確認済みマップの欄だけ emp_sets（案件マスタ）にも反映
+    // ルール: ホワイトリストのみ / 空欄はスキップ / 差分のみ書込（破損防止）
+    let nShared = 0;
+    if(opts.revMap){
+      try{
+        const cos2 = await sb('companies?select=id,emp_sets&id=eq.'+companyId);
+        const co2 = cos2 && cos2[0];
+        if(co2){
+          const empSets = co2.emp_sets ? JSON.parse(JSON.stringify(co2.emp_sets)) : [];
+          while(empSets.length <= idx) empSets.push({setName:'条件'+(empSets.length+1)});
+          const es = empSets[idx];
+          Object.keys(opts.revMap).forEach(fid => {
+            const key = opts.revMap[fid];
+            [[fid, key], [fid+'En', key+'En']].forEach(([f,k]) => {
+              const el = document.getElementById(f);
+              if(!el) return;
+              const val = (el.type === 'checkbox') ? el.checked : el.value;
+              if(val === '' || val == null) return;
+              if(es[k] !== val){ es[k] = val; nShared++; }
+            });
+          });
+          if(nShared > 0){
+            await sb('companies?id=eq.'+companyId, { method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({ emp_sets: empSets }) });
+          }
+        }
+      }catch(e){ console.warn('[saveFormGeneric empSets]', e); }
+    }
+    const msg = nShared > 0 ? ('✅ DBに保存しました（アンシスにも'+nShared+'項目反映）') : '✅ DBに保存しました';
+    if(typeof showToast==='function') showToast(msg);
+    else alert(msg);
   } catch(err){
     console.error('[saveFormGeneric]', err);
     if(typeof showToast==='function') showToast('⚠️ 保存エラー: ' + err.message);
