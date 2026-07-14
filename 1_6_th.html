@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260714.10</div>
+    <div class="ver">ver.20260714.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1154,6 +1154,20 @@ function collectFormValues(){
 
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
+function _kensetsuBonus(txt){
+  txt=(txt||'').trim();
+  if(!txt) return '業績による';
+  if(txt.length>26 || /自\s*\d|至\s*\d|期間|在職|在籍|以降|勤続|号給/.test(txt)) return txt;
+  var t=txt.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});
+  var months=[],mre=/(\d{1,2}(?:\s*[,，、]\s*\d{1,2})*)\s*月/g,m;
+  while((m=mre.exec(t))!==null){m[1].split(/[,，、]/).forEach(function(n){var mm=parseInt(n);if(mm>=1&&mm<=12&&months.indexOf(mm)<0)months.push(mm);});}
+  var count=null,cm=t.match(/年\s*(\d+)\s*回/)||t.match(/(\d+)\s*回\s*[／\/]\s*年/);
+  if(cm)count=cm[1];
+  var ms=months.map(function(x){return x+'月';}).join('・');
+  if(count&&months.length>=1) return '年'+count+'回（'+ms+'）業績による。';
+  if(!count&&months.length>=2) return '年'+months.length+'回（'+ms+'）業績による。';
+  return txt;
+}
 function maybeApplyKensetsuFormat(){
   try{
     const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
@@ -1162,7 +1176,7 @@ function maybeApplyKensetsuFormat(){
     if(rc && rc.value) return;
     if(!confirm('分野が「建設」です。昇給・賞与・退職金を建設用フォーマットにしますか？')) return;
     if(rc) rc.value='年１回、入社月に1,000円以上。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
-    const be=document.getElementById('es_bonusCondition'); if(be && !be.value) be.value='業績による';
+    const be=document.getElementById('es_bonusCondition'); if(be) be.value=_kensetsuBonus(be.value);
     const rd=document.getElementById('es_retirementDetail'); if(rd) rd.value='退職金共済による';
     p();
   }catch(e){}
