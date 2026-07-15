@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260714.14</div>
+    <div class="ver">ver.20260714.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -464,12 +464,13 @@ async function loadFromDB(passedInfo){
   if(!info||!info.caseId){ console.warn('[doc] no caseId'); return; }
   const {caseId,companyId,companyName}=info;
   try{
-    const [cas0,cos]=await Promise.all([
+    const [cas0,cos,per0]=await Promise.all([
       caseId?sb('cases?select=emp_set_idx,job_category,job_category_en&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      caseId?sb('persons?select=kokko_jyuji_koujigyo&case_id=eq.'+caseId):Promise.resolve([])
     ]);
-    const co=cos&&cos[0]; const cas=cas0&&cas0[0];
+    const co=cos&&cos[0]; const cas=cas0&&cas0[0]; const per=per0&&per0[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     let _es={};
     if(co && Array.isArray(co.emp_sets)){ const _i=parseInt((cas&&cas.emp_set_idx)||'0',10)||0; _es=co.emp_sets[_i]||{}; }
@@ -485,6 +486,7 @@ async function loadFromDB(passedInfo){
     S('f_allowance3Amount', _es.allowance3Amount);
     S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
     S('f_workType', _es.category || (cas&&cas.job_category)); S('f_workTypeEn', _es.categoryEn || (cas&&cas.job_category_en));
+    S('f_workCat', (per&&per.kokko_jyuji_koujigyo)?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
     S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
     S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
     if(co){
