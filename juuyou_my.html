@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</div>
-    <div class="ver">ver.20260714.15</div>
+    <div class="ver">ver.20260715.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -453,6 +453,55 @@ function _applyJuuyouMyFontSize(){
     `.tbl-amt{font-size:${(10*s).toFixed(2)}pt!important}`,
   ].join('');
 }
+
+// ===== 建設分野の昇給フォーマット（ver.20260715） =====
+// 1-6号の建設モーダルと同じ流儀。重説は昇給3欄のみ扱う。
+// アンシス(emp_sets)には昇給額/昇給時期に対応するキーが無く、salaryRaiseCond の文章1件のみ。
+// そのため参照(雇用条件書セット)は昇給条件にだけ付ける。
+// OKで入れた値は setAutoDefault で印を付け、DB保存時 emp_sets には書き戻さない（実データ保護）。
+var _JK_JA={amt:"1,000円以上/月", cond:"経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。", time:"１年１回入社月頃"};
+var _JK_TR={amt:"တစ်လလျှင် ၁,၀၀၀ ယန်းအထက်", cond:"လုပ်သက်နှစ်အလိုက် မဖြစ်မနေဆောင်ရွက်ပြီး ကျွမ်းကျင်မှုအဆင့်နှင့် အလုပ်လုပ်ကိုင်မှုသဘောထားကို ထည့်သွင်းစဉ်းစားသည်။", time:"တစ်နှစ်လျှင် တစ်ကြိမ်၊ အလုပ်ဝင်သည့်လခန့်"};
+function _jKensetsuModal(){
+  try{
+    var _es=window._lastEmpSet||{};
+    var cat=(_es.category||window._lastJobCategory||'');
+    // 判定は「建設分野」。『土木』『建築』だと「建築物内部の清掃(ビルクリーニング分野)」を誤検出するため使わない。
+    if(!/建設分野/.test(cat)) return;
+    var rc=document.getElementById('f_raiseCond');
+    if(rc && rc.value===_JK_JA.cond) return;           // 既に適用済みなら出さない
+    var a=document.getElementById('jm_amt');  if(a) a.value=_JK_JA.amt;
+    var c=document.getElementById('jm_cond'); if(c) c.value=_JK_JA.cond;
+    var t=document.getElementById('jm_time'); if(t) t.value=_JK_JA.time;
+    var r=document.getElementById('jm_ref');  if(r) r.textContent=_es.salaryRaiseCond||'（なし）';
+    var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='flex';
+  }catch(e){}
+}
+function jm_use(){
+  var f=document.getElementById('jm_cond'), r=document.getElementById('jm_ref');
+  if(f&&r&&r.textContent&&r.textContent!=='（なし）') f.value=r.textContent;
+}
+function closeJKensetsu(){ var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='none'; }
+function applyJKensetsu(){
+  try{
+    var _es=window._lastEmpSet||{};
+    var vals={amt:document.getElementById('jm_amt').value, cond:document.getElementById('jm_cond').value, time:document.getElementById('jm_time').value};
+    var map={amt:['f_raiseAmount','f_raiseAmountEn'], cond:['f_raiseCond','f_raiseCondEn'], time:['f_raiseTime','f_raiseTimeEn']};
+    var noTr=[];
+    Object.keys(map).forEach(function(k){
+      var ja=map[k][0], en=map[k][1], val=(vals[k]||'').trim();
+      setAutoDefault(ja, val);
+      var tr='';
+      if(val===_JK_JA[k]) tr=_JK_TR[k];                                        // 既定値のまま → 用意した訳
+      else if(k==='cond' && val===(_es.salaryRaiseCond||'')) tr=_es.salaryRaiseCondEn||''; // 「これを使う」→ アンシスの訳
+      if(tr) setAutoDefault(en, tr);
+      else if(val) { var e=document.getElementById(en); if(e){ e.value=''; delete e.dataset.autofill; } noTr.push(k); }
+    });
+    closeJKensetsu(); p();
+    if(noTr.length && typeof showToast==='function') showToast('⚠️ 文言を変更したため訳が入りません（'+noTr.length+'欄）。訳は手入力してください');
+    else if(typeof showToast==='function') showToast('✅ 建設フォーマットを反映しました');
+  }catch(e){ closeJKensetsu(); }
+}
+
 const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
 async function loadFromDB(passedInfo){
   let info = passedInfo;
@@ -517,7 +566,9 @@ async function loadFromDB(passedInfo){
       while(i<n.length&&cnt<t.length){ if(!/[\s\u3000]/.test(n[i]))cnt++; i++; }
       ne.value=n.slice(i).replace(/^[\s\u3000]+/,'');
     })();
+    window._lastEmpSet=_es; window._lastJobCategory=(cas&&cas.job_category)||'';
     p(); showToast('✅ データを読み込みました');
+    setTimeout(_jKensetsuModal, 300);
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 initCaseSelect(); p();
@@ -566,5 +617,22 @@ window.addEventListener('message', async function(e){
   if(typeof loadFromDB==='function') loadFromDB(info);
 });
 </script>
+<div id="jKensetsuModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;max-width:540px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-family:sans-serif;box-sizing:border-box;">
+    <div style="font-size:15px;font-weight:bold;margin-bottom:4px;color:#1e293b;">🏗️ 分野が「建設」です</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:14px;">建設用フォーマットを確認・編集し、OKで反映します。</div>
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給額</label>
+    <input id="jm_amt" style="width:100%;margin:4px 0 12px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給条件</label>
+    <textarea id="jm_cond" style="width:100%;height:56px;margin:4px 0 6px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#64748b;margin:0 0 12px;line-height:1.5;">雇用条件書セット：<span id="jm_ref" style="color:#334155;">－</span> <button type="button" onclick="jm_use()" style="font-size:10px;padding:1px 8px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:4px;cursor:pointer;">これを使う</button></div>
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給時期</label>
+    <input id="jm_time" style="width:100%;margin:4px 0 14px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
+    <div style="text-align:right;">
+      <button onclick="closeJKensetsu()" style="padding:7px 16px;margin-right:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button>
+      <button onclick="applyJKensetsu()" style="padding:7px 22px;font-size:13px;border:none;background:#2563eb;color:#fff;border-radius:6px;cursor:pointer;">OK</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

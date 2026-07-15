@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260715.02
+ * ver.20260715.05
  */
 
 // ===== Supabase =====
@@ -117,6 +117,22 @@ const fPay=(id,defPrefix)=>{
   if(!raw) return f(id);                           // 未入力ならプレースホルダ表示のまま
   return `<span class="f" data-bind="${id}">${esc(payPhrase(raw,defPrefix))}</span>`;
 };
+
+// ===== 自動補完（既定値）の管理 =====
+// ver.20260715: 重説の昇給額/条件/時期のように、アンシスに元データが無く書類側で既定値を
+// 補完する欄がある。これをそのまま emp_sets に書き戻すと企業の実データを潰し、
+// 1-6号など他書類にも波及するため、「自動補完した値は emp_sets に書かない」ことを保証する。
+// 利用者が手で直したときだけ書き戻す（input で印を外す）。
+function setAutoDefault(id, val){
+  const e = document.getElementById(id);
+  if(!e || val == null || val === '') return;
+  e.value = val;
+  e.dataset.autofill = '1';   // 自動補完の印
+}
+document.addEventListener('input', function(ev){
+  const t = ev.target;
+  if(t && t.dataset && t.dataset.autofill === '1') delete t.dataset.autofill;  // 手入力されたら印を外す
+}, true);
 
 // ===== ユーティリティ =====
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
@@ -909,6 +925,8 @@ async function saveFormGeneric(docKey, opts){
             [[fid, key], [fid+'En', key+'En']].forEach(([f,k]) => {
               const el = document.getElementById(f);
               if(!el) return;
+              // ver.20260715: 書類側で自動補完した既定値は emp_sets に書き戻さない（実データ保護）
+              if(el.dataset && el.dataset.autofill === '1') return;
               const val = (el.type === 'checkbox') ? el.checked : el.value;
               if(val === '' || val == null) return;
               if(es[k] !== val){ es[k] = val; nShared++; }
