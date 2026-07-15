@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</div>
-    <div class="ver">ver.20260715.05</div>
+    <div class="ver">ver.20260715.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -134,7 +134,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     <div class="fs"><div class="fs-title">７．業務内容</div>
       <div class="fg"><label>従事させる業務区分（日）</label><input id="f_workType" oninput="p()"></div>
       <div class="fg"><label>လုပ်ငန်းအပိုင်းအခြား (my)</label><input id="f_workTypeEn" oninput="p()"></div>
-      <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="p()"></div>
+      <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="_koujiSync()" placeholder="例：とび・土工工事業,舗装工事業"></div>
       <div class="fg"><label>ဆောက်လုပ်ရေးလုပ်ငန်းအမျိုးအစား (my)</label><input id="f_workCatEn" oninput="p()"></div>
       <div class="fg"><label>具体的職種・作業内容（日）</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
       <div class="fg"><label>လုပ်ငန်းအမျိုးအစားနှင့် အကြောင်းအရာ (my)</label><textarea id="f_workDetailEn" oninput="p()" rows="3"></textarea></div>
@@ -502,6 +502,25 @@ function applyJKensetsu(){
   }catch(e){ closeJKensetsu(); }
 }
 
+var _KOUJI_TR={"土木工事業": "မြို့ပြအင်ဂျင်နီယာလုပ်ငန်း", "建築工事業": "အဆောက်အအုံဆောက်လုပ်ရေးလုပ်ငန်း", "大工工事業": "လက်သမားလုပ်ငန်း", "左官工事業": "အင်္ဂတေလုပ်ငန်း", "とび・土工工事業": "စင်ဖွဲ့ခြင်းနှင့် မြေလုပ်ငန်း", "石工事業": "ကျောက်လုပ်ငန်း", "屋根工事業": "အမိုးလုပ်ငန်း", "電気工事業": "လျှပ်စစ်လုပ်ငန်း", "管工事業": "ပိုက်လိုင်းလုပ်ငန်း", "タイル・れんが・ブロック工事業": "ကြွေပြား၊ အုတ်နှင့် ဘလောက်လုပ်ငန်း", "鋼構造物工事業": "သံမဏိတည်ဆောက်မှုလုပ်ငန်း", "鉄筋工事業": "သံချောင်းလုပ်ငန်း", "舗装工事業": "ကတ္တရာခင်းလုပ်ငန်း", "しゅんせつ工事業": "ရေတိမ်တူးဖော်ရေးလုပ်ငန်း", "板金工事業": "သွပ်ပြားလုပ်ငန်း", "ガラス工事業": "မှန်လုပ်ငန်း", "塗装工事業": "ဆေးသုတ်လုပ်ငန်း", "防水工事業": "ရေစိမ့်ကာကွယ်ရေးလုပ်ငန်း", "内装仕上工事業": "အတွင်းခန်းအပြီးသတ်လုပ်ငန်း", "機械器具設置工事業": "စက်ပစ္စည်းတပ်ဆင်ရေးလုပ်ငန်း", "熱絶縁工事業": "အပူကာရံလုပ်ငန်း", "電気通信工事業": "ဆက်သွယ်ရေးလုပ်ငန်း", "造園工事業": "ဥယျာဉ်ခြံမြေလုပ်ငန်း", "さく井工事業": "ရေတွင်းတူးလုပ်ငန်း", "建具工事業": "တံခါးလုပ်ငန်း", "水道施設工事業": "ရေပေးဝေရေးလုပ်ငန်း", "消防施設工事業": "မီးသတ်ပစ္စည်းလုပ်ငန်း", "清掃施設工事業": "သန့်ရှင်းရေးပစ္စည်းလုပ်ငန်း", "解体工事業": "ဖြိုဖျက်ရေးလုပ်ငန်း"};
+// ver.20260715: 従事させる工事業の種類の訳欄(f_workCatEn)は値をセットする処理が無く常に空だった。
+// 建設業許可29業種は固定語彙なので辞書で訳す。辞書に無い語は原文のままにする（誤訳を出さない）。
+// ver.20260715: 従事工事業はアンシス未入力が9割のため手入力が前提。
+// 日本語欄に打った内容を辞書で訳し、訳欄へ自動反映する。
+// 訳欄を手で直した場合は上書きしない（setAutoDefault の印で判定）。
+function _koujiSync(){
+  var ja=document.getElementById('f_workCat'), en=document.getElementById('f_workCatEn');
+  if(!ja||!en) return;
+  if(en.value && en.dataset.autofill!=='1') return;   // 手入力済みの訳は尊重
+  var tr=_koujiTr(ja.value);
+  if(tr){ setAutoDefault('f_workCatEn', tr); } else { en.value=''; delete en.dataset.autofill; }
+  p();
+}
+function _koujiTr(s){
+  if(!s) return '';
+  return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||t):'';})
+         .filter(Boolean).join('、');
+}
 const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
 async function loadFromDB(passedInfo){
   let info = passedInfo;
@@ -537,6 +556,8 @@ async function loadFromDB(passedInfo){
     S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
     S('f_workType', _es.category || (cas&&cas.job_category)); S('f_workTypeEn', _es.categoryEn || (cas&&cas.job_category_en));
     S('f_workCat', (per&&per.kokko_jyuji_koujigyo)?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
+    if(per&&per.kokko_jyuji_koujigyo){ var _e=document.getElementById('f_workCatEn');
+      if(_e && !_e.value) setAutoDefault('f_workCatEn', _koujiTr(per.kokko_jyuji_koujigyo)); }
     S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
     S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
     if(co){
