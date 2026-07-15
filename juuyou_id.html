@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20260714.11</div>
+    <div class="ver">ver.20260714.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -466,7 +466,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cas0,cos]=await Promise.all([
-      caseId?sb('cases?select=emp_set_idx&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
@@ -486,7 +486,7 @@ async function loadFromDB(passedInfo){
     S('f_allowance3Calc', _es.allowance3Cond); S('f_allowance3CalcEn', _es.allowance3CondEn);
     S('f_allowance3Amount', _es.allowance3Amount);
     S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
-    S('f_workType', _es.category); S('f_workTypeEn', _es.categoryEn);
+    S('f_workType', _es.category || (cas&&cas.job_category)); S('f_workTypeEn', _es.categoryEn || (cas&&cas.job_category_en));
     S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
     S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
     if(co){
@@ -494,7 +494,9 @@ async function loadFromDB(passedInfo){
       s('f_orgAddress',((co.pref||'')+(co.city||'')+(co.address||''))||'');
       s('f_orgTel',co.tel||'');
       s('f_repTitle',co.author_title||'');
-      s('f_repName',co.author_name||'');
+      (function(){var t=co.author_title||'',n=co.author_name||'';
+        if(t&&n.indexOf(t)===0){ n=n.slice(t.length).replace(/^[\s　]+/,''); }
+        s('f_repName',n);})();
     }
     if(!v('f_createY')){
       const n=new Date();
