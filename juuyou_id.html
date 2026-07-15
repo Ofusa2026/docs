@@ -34,7 +34,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20260714.13</div>
+    <div class="ver">ver.20260714.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -504,6 +504,18 @@ async function loadFromDB(passedInfo){
       document.getElementById('f_createM').value=String(n.getMonth()+1);
       document.getElementById('f_createD').value=String(n.getDate());
     }
+    // 代表者氏名の先頭に役職が重複していれば除去（ソース問わず・空白無視）
+    (function(){
+      var te=document.getElementById('f_repTitle'),ne=document.getElementById('f_repName');
+      if(!ne||!ne.value) return;
+      var t=((te&&te.value)||'').replace(/[\s\u3000]/g,'');
+      if(!t) return;
+      var n=ne.value.replace(/^[\s\u3000]+/,'');
+      if(n.replace(/[\s\u3000]/g,'').indexOf(t)!==0) return;
+      var i=0,cnt=0;
+      while(i<n.length&&cnt<t.length){ if(!/[\s\u3000]/.test(n[i]))cnt++; i++; }
+      ne.value=n.slice(i).replace(/^[\s\u3000]+/,'');
+    })();
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
