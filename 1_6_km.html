@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260715.02</div>
+    <div class="ver">ver.20260715.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -740,7 +740,7 @@ function p(){
         </tr>
         <tr>
           <td class="id" style="font-size:7pt;" data-key="79">4. ថ្ងៃបិទប្រាក់ឈ្នួល</td>
-          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} រៀងរាល់ខែថ្ងៃទី ${f('es_payCutoffEn')}</td>
+          <td class="id" style="font-size:7pt;" data-key="80">${cb(true,"cb_auto_008")} ${fPayL('es_payCutoff','es_payCutoffEn')}</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="81">${cb(false,"cb_auto_009")} រៀងរាល់ខែថ្ងៃទី</td>
         </tr>
         <tr>
@@ -750,7 +750,7 @@ function p(){
         </tr>
         <tr>
           <td class="id" style="font-size:7pt;" data-key="82">5. ថ្ងៃបើកប្រាក់ឈ្នួល</td>
-          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} រៀងរាល់ខែថ្ងៃទី ${f('es_payDayEn')}</td>
+          <td class="id" style="font-size:7pt;" data-key="83">${cb(true,"cb_auto_011")} ${fPayL('es_payDay','es_payDayEn')}</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="84">${cb(false,"cb_auto_012")} រៀងរាល់ខែថ្ងៃទី</td>
         </tr>
         <tr>
@@ -1158,6 +1158,27 @@ function collectFormValues(){
 
 // ===== 案件一覧・絞り込み =====
 // 案件選択時にDBからデータ読込
+// ===== 賃金締切日/支払日の訳（ver.20260715） =====
+// payCutoffDayEn / payDayEn は1フィールドを全言語で共有しているため、
+// 「akhir」等を入れるとベトナム語版にもインドネシア語が出てしまっていた。
+// 日本語の値(毎月末日/翌月5日 等)から各言語で組み立て、フィールドの中身に依存しないようにする。
+// 解析できない値・説明文つきの値だけ、従来どおり訳欄をそのまま出す。
+var _PAY_L={"everyD": "ថ្ងៃទី {d} រៀងរាល់ខែ", "everyEnd": "ថ្ងៃចុងក្រោយនៃខែនីមួយៗ", "nextD": "ថ្ងៃទី {d} ខែបន្ទាប់", "nextEnd": "ថ្ងៃចុងក្រោយនៃខែបន្ទាប់", "curD": "ថ្ងៃទី {d} ខែនេះ", "curEnd": "ថ្ងៃចុងក្រោយនៃខែនេះ"};
+function fPayL(jaId, enId){
+  var ja=String(v(jaId)||'').trim().replace(/[\s\u3000]/g,'');
+  var en=String(v(enId)||'').trim();
+  if(!ja) return f(enId);
+  if(ja.length>12) return en?('<span class="f" data-bind="'+enId+'">'+esc(en)+'</span>'):f(enId);
+  var m=ja.match(/^(毎月|翌月|当月|翌)/);
+  var pre=m?(m[1]==='翌'?'翌月':m[1]):'毎月';
+  var body=m?ja.slice(m[1].length):ja;
+  if(body==='月末') body='末';
+  var t='';
+  if(/^(末|末日)$/.test(body)) t=(pre==='翌月')?_PAY_L.nextEnd:(pre==='当月'?_PAY_L.curEnd:_PAY_L.everyEnd);
+  else { var mm=body.match(/^(\d+)日?$/); if(mm) t=((pre==='翌月')?_PAY_L.nextD:(pre==='当月'?_PAY_L.curD:_PAY_L.everyD)).replace('{d}',mm[1]); }
+  if(!t) return en?('<span class="f" data-bind="'+enId+'">'+esc(en)+'</span>'):f(enId);
+  return '<span class="f" data-bind="'+enId+'">'+esc(t)+'</span>';
+}
 function _isKensetsu(){ return ((v('es_applicantField')||'')+(v('es_applicantFieldEn')||'')).includes('建設'); }
 function _jAmt(fld){ if(_isKensetsu()&&/実費/.test(v(fld)||'')) return (v(fld+'Est')||'3,000'); return ff(fld); }
 function _jT(fld){ if(/実費/.test(v(fld)||'')){ if(_isKensetsu()) return (v(fld+'Est')||'3,000'); return 'ថ្លៃពិតប្រាកដ'; } return ff(fld); }
