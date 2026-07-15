@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260715.01
+ * ver.20260715.02
  */
 
 // ===== Supabase =====
@@ -91,6 +91,32 @@ async function findSupportOrg(name, cols){
   }catch(e){}
   return null;
 }
+
+// ===== 賃金締切日／支払日の文言組み立て =====
+// ver.20260715: アンシスの値が「毎月末日」「25」「末」「翌月5日」等と揺れており、
+// テンプレ側で「毎月」＋値＋「日」と組み立てると「毎月毎月末日日」のように二重になっていた。
+// 値から完成した文言を作り、テンプレ側は接頭辞・接尾辞を付けない方式に変更する。
+// ※12文字超（説明文つき）や入力ミスは触らずそのまま返す（書類側で勝手に補正しない）。
+function payPhrase(raw, defPrefix){
+  var s=String(raw||'').trim().replace(/[\s\u3000]/g,'');
+  if(!s) return '';
+  if(s.length>12) return s;                        // 「翌月25日（金融機関休業日の…）」等はそのまま
+  var m=s.match(/^(毎月|翌月|当月|翌)/);
+  var prefix = m ? (m[1]==='翌'?'翌月':m[1]) : (defPrefix||'毎月');
+  var body   = m ? s.slice(m[1].length) : s;
+  if(body==='月末') body='末';
+  if(!body) return prefix;                         // 値が「毎月」だけ
+  if(/日$/.test(body))   return prefix+body;       // 既に「…日」で終わる
+  if(body==='末')        return prefix+'末日';
+  if(/^\d+$/.test(body)) return prefix+body+'日';  // 数字だけ
+  return prefix+body;
+}
+// f() と同じく data-bind を保持し、直接編集・連動ジャンプが効く状態で整形値を出す
+const fPay=(id,defPrefix)=>{
+  const raw=v(id);
+  if(!raw) return f(id);                           // 未入力ならプレースホルダ表示のまま
+  return `<span class="f" data-bind="${id}">${esc(payPhrase(raw,defPrefix))}</span>`;
+};
 
 // ===== ユーティリティ =====
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';

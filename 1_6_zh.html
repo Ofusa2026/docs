@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260714.34</div>
+    <div class="ver">ver.20260715.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -487,7 +487,7 @@ function p(){
     <div style="margin-left:8px;">
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．雇用契約期間<br><span class="id" style="font-size:7.5pt;margin-bottom:3px;margin-left:8px;" data-key="14">1. Thời hạn hợp đồng lao động</span></div>
       <div style="margin-left:8px;font-size:8.5pt;">
-        <div class="hdr-ul" style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">(Ngày ${f('es_contractStartD')} tháng ${f('es_contractStartM')} năm ${f('es_contractStartY')} đến Ngày ${f('es_contractEndD')} tháng ${f('es_contractEndM')} năm ${f('es_contractEndY')}) Ngày nhập cảnh dự kiến: Ngày ${f('es_entryD')} tháng ${f('es_entryM')} năm ${f('es_entryY')}</span></div>
+        <div style="font-size:7.5pt;">（${f('es_contractStartY')}年&nbsp;${f('es_contractStartM')}月&nbsp;${f('es_contractStartD')}日&nbsp;〜&nbsp;${f('es_contractEndY')}年&nbsp;${f('es_contractEndM')}月&nbsp;${f('es_contractEndD')}日）&emsp;入国予定日&nbsp;${f('es_entryY')}年&nbsp;${f('es_entryM')}月&nbsp;${f('es_entryD')}日<br><span class="id" style="font-size:6.5pt;" data-key="15">(Ngày ${f('es_contractStartD')} tháng ${f('es_contractStartM')} năm ${f('es_contractStartY')} đến Ngày ${f('es_contractEndD')} tháng ${f('es_contractEndM')} năm ${f('es_contractEndY')}) Ngày nhập cảnh dự kiến: Ngày ${f('es_entryD')} tháng ${f('es_entryM')} năm ${f('es_entryY')}</span></div>
       </div>
       <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;margin-bottom:1px;">２．契約の更新の有無<br><span class="id" style="font-size:7.5pt;margin-left:8px;margin-bottom:2px;" data-key="16">2. Có gia hạn hợp đồng hay không</span></div>
       <div style="margin-left:8px;">
@@ -735,7 +735,7 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">４．賃金締切日</td>
-          <td>${cb(true,"pay_cutoff_main")}&nbsp;毎月${f('es_payCutoff')}日</td>
+          <td>${cb(true,"pay_cutoff_main")}&nbsp;${fPay('es_payCutoff','毎月')}</td>
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
@@ -745,7 +745,7 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">５．賃金支払日</td>
-          <td>${cb(true,"pay_day_main")}&nbsp;毎月${f('es_payDay')}日</td>
+          <td>${cb(true,"pay_day_main")}&nbsp;${fPay('es_payDay','毎月')}</td>
           <td>${cb(false,"cb_auto_010")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
