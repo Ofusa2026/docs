@@ -813,6 +813,20 @@ async function saveFormGeneric(docKey, opts){
       _savedAt: new Date().toISOString(),
     };
 
+    // 直接編集版HTMLも保存（編集中/フリーズ時のみ・ファイル名単位のキーで言語別に分離）
+    try{
+      if(window._htmlFrozen || (typeof _editMode !== 'undefined' && _editMode)){
+        const _area = document.getElementById('pageArea');
+        if(_area && info.caseId){
+          const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
+          if(!extra['_edited']) extra['_edited'] = {};
+          if(!extra['_edited'][_edKey]) extra['_edited'][_edKey] = {};
+          extra['_edited'][_edKey][info.caseId] = { html: _area.innerHTML, _savedAt: new Date().toISOString() };
+          window._editedJustSaved = true;
+        }
+      }
+    }catch(_e){ console.warn('[edited save]', _e); }
+
     // PATCH で保存
     await sb('companies?id=eq.'+companyId, {
       method: 'PATCH',
@@ -847,7 +861,8 @@ async function saveFormGeneric(docKey, opts){
         }
       }catch(e){ console.warn('[saveFormGeneric empSets]', e); }
     }
-    const msg = nShared > 0 ? ('✅ DBに保存しました（アンシスにも'+nShared+'項目反映）') : '✅ DBに保存しました';
+    let msg = nShared > 0 ? ('✅ DBに保存しました（アンシスにも'+nShared+'項目反映）') : '✅ DBに保存しました';
+    if(window._editedJustSaved){ msg += '＋直接編集版も保存'; window._editedJustSaved = false; }
     if(typeof showToast==='function') showToast(msg);
     else alert(msg);
   } catch(err){
@@ -913,7 +928,64 @@ async function loadFormGenericFromDB(docKey, info){
     });
     if(typeof p === 'function') p();
     if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting();
+    // 直接編集版があれば復元（案件ID・ファイル名単位）
+    try{
+      const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
+      const _ed = co.extra && co.extra['_edited'] && co.extra['_edited'][_edKey] && info && info.caseId && co.extra['_edited'][_edKey][info.caseId];
+      const _area = document.getElementById('pageArea');
+      if(_ed && _ed.html && _area){
+        _area.innerHTML = _ed.html;
+        window._htmlFrozen = true; window._editedRestored = true;
+        if(typeof showToast === 'function') showToast('📝 直接編集版を復元しました');
+      } else if(window._editedRestored && _area){
+        window._htmlFrozen = false; window._editedRestored = false;
+        if(typeof p === 'function') p();
+      }
+    }catch(_e){ console.warn('[edited restore]', _e); }
   } catch(e){
     console.warn('[loadFormGenericFromDB]', e);
   }
 }
+
+// ===== 直接編集版の破棄（saveFormGeneric系の全書類共通） =====
+async function discardEditedGeneric(){
+  let info = null;
+  const sel = document.getElementById('caseSelect');
+  if(sel && sel.value){ try{ info = JSON.parse(sel.value); }catch(e){} }
+  if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId) info = window._lastCaseInfo;
+  if(!info || !info.caseId){ if(typeof showToast==='function') showToast('⚠️ 案件が選択されていません'); return; }
+  if(!confirm('保存済みの直接編集版を破棄して、初期表示に戻します。よろしいですか？')) return;
+  let cid = info.companyId;
+  try{
+    if(!cid){ const q = await sb('cases?select=company_id&id=eq.'+info.caseId); if(q && q[0]) cid = q[0].company_id; }
+    if(!cid){ if(typeof showToast==='function') showToast('⚠️ 会社情報が取得できません'); return; }
+    const _edKey = (location.pathname.split('/').pop()||'').replace(/\.html.*$/,'');
+    const r = await sb('companies?select=id,extra&id=eq.'+cid);
+    const c = r && r[0];
+    const ex = c && c.extra && typeof c.extra === 'object' ? JSON.parse(JSON.stringify(c.extra)) : {};
+    if(ex['_edited'] && ex['_edited'][_edKey] && ex['_edited'][_edKey][info.caseId]){
+      delete ex['_edited'][_edKey][info.caseId];
+      await sb('companies?id=eq.'+cid, { method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({ extra: ex }) });
+    }
+    window._htmlFrozen = false; window._editedRestored = false;
+    if(typeof p === 'function') p();
+    if(typeof showToast==='function') showToast('♻️ 編集版を破棄しました');
+  }catch(e){ console.error('[discardEditedGeneric]', e); if(typeof showToast==='function') showToast('⚠️ エラー: '+e.message); }
+}
+// 破棄ボタンの自動追加（DB保存(saveFormGeneric)ボタンの隣・対象書類のみ）
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    if(document.getElementById('discardEditedBtn')) return;
+    const btn = document.querySelector('button[onclick*="saveFormGeneric"]');
+    const area = document.getElementById('pageArea');
+    if(btn && area){
+      const b = document.createElement('button');
+      b.id = 'discardEditedBtn';
+      b.className = btn.className || 'btn';
+      b.textContent = '♻️ 編集版破棄';
+      b.title = '保存済みの直接編集版を破棄して初期表示に戻す';
+      b.onclick = discardEditedGeneric;
+      btn.parentNode.insertBefore(b, btn.nextSibling);
+    }
+  }catch(e){}
+});

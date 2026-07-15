@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260714.30</div>
+    <div class="ver">ver.20260714.31</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1333,7 +1333,7 @@ async function loadFromDB(passedInfo){
       if(!_cid){ try{ const _q=await sb('cases?select=company_id&id=eq.'+caseId); if(_q&&_q[0]&&_q[0].company_id)_cid=_q[0].company_id; }catch(_e){} }
       if(_cid){
         const _r=await sb('companies?select=extra&id=eq.'+_cid);
-        const _ed=_r&&_r[0]&&_r[0].extra&&_r[0].extra['_edited']&&_r[0].extra['_edited']['1_6']&&_r[0].extra['_edited']['1_6'][caseId];
+        const _ed=_r&&_r[0]&&_r[0].extra&&_r[0].extra['_edited']&&_r[0].extra['_edited']['1_6_ne']&&_r[0].extra['_edited']['1_6_ne'][caseId];
         if(_ed&&_ed.html){
           const _a=document.getElementById('pageArea');
           if(_a){ _a.innerHTML=_ed.html; window._htmlFrozen=true; showToast('📝 直接編集版を復元しました'); }
@@ -1413,7 +1413,7 @@ async function saveForm(){
       body:JSON.stringify({emp_sets: empSets})
     });
 
-    // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6'][caseId] に保存
+    // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6_ne'][caseId] に保存
     let _editedSaved=false;
     try{
       if(window._htmlFrozen || _editMode){
@@ -1423,8 +1423,8 @@ async function saveForm(){
           const _c=_cs&&_cs[0];
           const _ex=_c&&_c.extra&&typeof _c.extra==='object'?JSON.parse(JSON.stringify(_c.extra)):{};
           if(!_ex['_edited'])_ex['_edited']={};
-          if(!_ex['_edited']['1_6'])_ex['_edited']['1_6']={};
-          _ex['_edited']['1_6'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString()};
+          if(!_ex['_edited']['1_6_ne'])_ex['_edited']['1_6_ne']={};
+          _ex['_edited']['1_6_ne'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString()};
           await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({extra:_ex})});
           _editedSaved=true;
         }
@@ -1451,8 +1451,8 @@ async function discardEditedFromDB(){
     const r=await sb('companies?select=id,extra&id=eq.'+cid);
     const c=r&&r[0];
     const ex=c&&c.extra&&typeof c.extra==='object'?JSON.parse(JSON.stringify(c.extra)):{};
-    if(ex['_edited']&&ex['_edited']['1_6']&&ex['_edited']['1_6'][info.caseId]){
-      delete ex['_edited']['1_6'][info.caseId];
+    if(ex['_edited']&&ex['_edited']['1_6_ne']&&ex['_edited']['1_6_ne'][info.caseId]){
+      delete ex['_edited']['1_6_ne'][info.caseId];
       await sb('companies?id=eq.'+cid,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({extra:ex})});
     }
     window._htmlFrozen=false;
