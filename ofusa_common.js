@@ -989,3 +989,41 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   }catch(e){}
 });
+
+// ===== 入力欄⇔書類の連動ジャンプ =====
+function _flashEl(el){
+  const o1=el.style.outline, o2=el.style.backgroundColor;
+  el.style.outline='2px solid #f59e0b'; el.style.backgroundColor='#fef3c7';
+  setTimeout(()=>{ el.style.outline=o1; el.style.backgroundColor=o2; }, 1200);
+}
+// 入力欄フォーカス → 書類の該当箇所へスクロール
+document.addEventListener('focusin', function(e){
+  try{
+    if(window._noJump) return;
+    const el=e.target;
+    if(!el || !el.id || !(el.matches && el.matches('input,select,textarea'))) return;
+    const area=document.getElementById('pageArea');
+    if(!area) return;
+    const span=area.querySelector('[data-bind="'+el.id+'"]');
+    if(span){ span.scrollIntoView({behavior:'smooth',block:'center'}); _flashEl(span); }
+  }catch(_e){}
+});
+// 書類の項目クリック → 入力欄へスクロール＆フォーカス（直接編集中は無効）
+document.addEventListener('click', function(e){
+  try{
+    if(typeof _editMode!=='undefined' && _editMode) return;
+    const area=document.getElementById('pageArea');
+    if(!area || !area.contains(e.target)) return;
+    const span=e.target.closest && e.target.closest('[data-bind]');
+    if(!span) return;
+    const id=span.getAttribute('data-bind');
+    const input=document.getElementById(id);
+    if(input){
+      window._noJump=true;
+      input.scrollIntoView({behavior:'smooth',block:'center'});
+      _flashEl(input);
+      try{ input.focus({preventScroll:true}); }catch(_e2){}
+      setTimeout(()=>{ window._noJump=false; }, 600);
+    }
+  }catch(_e){}
+});
