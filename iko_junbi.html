@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260715.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -249,7 +249,8 @@ async function loadFromDB(passedInfo){
     if(_coQuery){ const cos=await sb(_coQuery); if(cos&&cos[0]){ coName=cos[0].name||coName; empSets=cos[0].emp_sets||[]; } }
     const orgName=(cas&&cas.org)||'';
     let soNo='';
-    if(orgName){ const sos=await sb('support_orgs?select=name,reg_no&name=eq.'+encodeURIComponent(orgName)); if(sos&&sos[0]) soNo=sos[0].reg_no||''; }
+    // ver.20260715: 完全一致だけだと「株式会社KMT(82)」等で引けないため共通関数で3段照合
+    if(orgName){ const _so=await findSupportOrg(orgName,'name,reg_no'); if(_so) soNo=_so.reg_no||''; }
     const stripParens=s=>s?s.replace(/[（(][^）)]*[）)]/g,'').trim():s;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(personName) s('f_name',personName);

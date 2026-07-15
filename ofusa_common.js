@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260710.05
+ * ver.20260715.01
  */
 
 // ===== Supabase =====
@@ -57,6 +57,39 @@ async function sb(path,opts={}){
   const t = await r.text();
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
   return t ? JSON.parse(t) : null;
+}
+
+// ===== 登録支援機関(support_orgs)の名前照合 =====
+// ver.20260715: cases.org は「株式会社KMT(82)」のように末尾に括弧サフィックスが付いたり、
+// 「JHesperus Japan株式会社」のように空白の有無が support_orgs.name と揃わないことがある。
+// 従来は name=eq.（完全一致）のみだったため、これらの案件で登録支援機関が空欄になっていた。
+// ①完全一致 → ②正規化一致（末尾括弧・空白・大小文字を無視／候補が1件のときのみ採用）の順で引く。
+// ※誤った支援機関名を誓約書等に載せないため、正規化して2件以上ヒットした場合は採用しない（空欄のまま）。
+const _soCache={};
+function _soNorm(s){
+  return String(s||'')
+    .replace(/[（(][^）)]*[）)]\s*$/,'')   // 末尾の括弧サフィックス（(82)等）を除去
+    .replace(/[\s\u3000]/g,'')            // 半角/全角スペースを除去
+    .toUpperCase();
+}
+async function findSupportOrg(name, cols){
+  const raw=String(name||'').trim();
+  if(!raw) return null;
+  const sel=cols||'name,address,support_manager';
+  // ① 完全一致（従来どおり）
+  try{
+    const r=await sb('support_orgs?select='+sel+'&name=eq.'+encodeURIComponent(raw));
+    if(r&&r[0]) return r[0];
+  }catch(e){}
+  // ② 正規化一致（selごとにキャッシュ）
+  try{
+    const key=_soNorm(raw);
+    if(!key) return null;
+    if(!_soCache[sel]) _soCache[sel]=await sb('support_orgs?select='+sel+'&limit=500');
+    const hits=(_soCache[sel]||[]).filter(o=>_soNorm(o.name)===key);
+    if(hits.length===1) return hits[0];
+  }catch(e){}
+  return null;
 }
 
 // ===== ユーティリティ =====

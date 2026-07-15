@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１０－２号（宿泊 登録支援機関）　受入れに関する誓約書</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260715.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -193,8 +193,8 @@ async function loadFromDB(passedInfo){
     let org=null;
     const _soName=(cas&&cas.org)||orgName||'';
     if(_soName){
-      const orgs=await sb(`support_orgs?select=name,address,support_manager&name=eq.${encodeURIComponent(_soName)}`);
-      org=orgs&&orgs[0];
+      // ver.20260715: 完全一致だけだと「株式会社KMT(82)」等で引けないため共通関数で3段照合
+      org=await findSupportOrg(_soName,'name,address,support_manager');
     }
     if(org){
       s('f_soName',org.name||'');

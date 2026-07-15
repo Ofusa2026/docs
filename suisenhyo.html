@@ -85,7 +85,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 .kf-sign-row .stamp{margin-left:0.5em;display:inline-block;border:1px solid #d00;color:#d00;padding:1px 6px;font-size:9pt;border-radius:2px}
 .kf-page-break{page-break-after:always}
 
-/* ver.20260521.24: 画面表示とPDFのレイアウトを統一（旧 @media print の縮小ルールを常時適用）
+/* ver.20260715.01: 画面表示とPDFのレイアウトを統一（旧 @media print の縮小ルールを常時適用）
    大使館側「1ページに収める」要請に対応。
    推薦表（添付1）の冒頭〜情報セクションのフォントを縮小。 */
 .kf-receipt{font-size:9pt!important;margin-bottom:2mm!important}
@@ -596,8 +596,8 @@ async function _loadCaseInfo(info){
   if(orgN){
     try{
       // DB実カラム: name, address, support_manager, reg_no, tel, rep_name
-      const sos=await sb('support_orgs?select=name,address,support_manager,reg_no,tel,rep_name&name=eq.'+encodeURIComponent(orgN));
-      const org=sos&&sos[0];
+      // ver.20260715: 完全一致だけだと「株式会社KMT(82)」等で引けないため共通関数で3段照合
+      const org=await findSupportOrg(orgN,'name,address,support_manager,reg_no,tel,rep_name');
       if(org){
         s('f_supName',org.name||'');
         s('f_supLicense',org.reg_no||'');
