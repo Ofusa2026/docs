@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260715.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260716.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -193,6 +193,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">🪪</span>
       <div>オンライン申請（窓口受領用）<span class="item-sub">案件ID貼り付けで申請受付番号を自動反映</span></div>
     </div>
+    <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
+      <span class="item-icon">📝</span>
+      <div>🚧【作成中】窓口申請書（変更）<span class="item-sub">在留資格変更許可申請書 申請人等作成用1</span></div>
+    </div>
     <div class="divider"></div>
     <div class="section">分野別誓約書</div>
     <div class="item" id="nav-1_1" onclick="open_doc('1_1')"><span class="item-icon">📄</span><div>介護<span class="item-sub">受入れ誓約書</span></div></div>
@@ -247,6 +251,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-ininjou"></iframe>
     <iframe id="frame-suisenhyo"></iframe>
     <iframe id="frame-madoguchi"></iframe>
+    <iframe id="frame-shinsei_henkou"></iframe>
     <iframe id="frame-1_11"></iframe>
     <iframe id="frame-1_1"></iframe>
     <iframe id="frame-2_1"></iframe>
@@ -301,6 +306,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1783920000'},
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1779181822'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1782832385'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1784186000'},
   '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1784170592'},
   '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1782976942'},
   '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1782976942'},
