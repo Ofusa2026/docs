@@ -28,7 +28,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
-    <div class="ver">ver.20260715.02</div>
+    <div class="ver">ver.20260715.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -65,8 +65,8 @@
       <div class="fg"><label>7 職業</label><input id="f_occupation" oninput="p()"></div>
       <div class="fg"><label>8 本国における居住地</label><input id="f_homeAddr" oninput="p()"></div>
       <div class="fg"><label>9 住居地（日本）</label><textarea id="f_jpAddr" oninput="p()" rows="2"></textarea></div>
-      <div class="fg"><label>　電話番号</label><input id="f_tel" oninput="p()"></div>
-      <div class="fg"><label>　携帯電話番号</label><input id="f_cel" oninput="p()"></div>
+      <div class="fg"><label>　電話番号</label><input id="f_perTel" oninput="p()"></div>
+      <div class="fg"><label>　携帯電話番号</label><input id="f_perCel" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">10　旅券</div>
       <div class="fg"><label>(1) 番号</label><input id="f_passport" oninput="p()"></div>
@@ -210,9 +210,9 @@ function p(){
 </tr>
 <tr>
   <td class="lbl">　電話番号<div class="en">Telephone No.</div></td>
-  <td class="val">${f('f_tel')}</td>
+  <td class="val">${f('f_perTel')}</td>
   <td class="lbl">　携帯電話番号<div class="en">Cellular phone No.</div></td>
-  <td class="val">${f('f_cel')}</td>
+  <td class="val">${f('f_perCel')}</td>
 </tr>
 <tr>
   <td class="lbl">10　旅券<div class="en">Passport</div></td>
@@ -308,7 +308,7 @@ async function loadFromDB(passedInfo){
   const {caseId}=info;
   try{
     const [persons,cases]=await Promise.all([
-      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,expire,residence_card&case_id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,expire,residence_card&case_id=eq.'+caseId),
       sb('cases?select=applicant,expire&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -320,12 +320,17 @@ async function loadFromDB(passedInfo){
       s('f_gender',pd.gender||'');
       s('f_birthPlace',pd.birth_place||'');
       s('f_spouse',pd.spouse||'');
-      s('f_occupation',pd.occupation||'');
+      // ver.20260715: 職業はアンシス未入力が多いため在留資格から補完する。
+      // 「留学」なら学生、それ以外は会社員。アンシスに値があればそちらを優先。
+      s('f_occupation', pd.occupation || (/留学/.test(pd.residence_status||'') ? '学生' : (pd.residence_status ? '会社員' : '')));
       // 8 本国における居住地：未入力なら出生地で代用（様式も =出生地 を参照している）
       s('f_homeAddr',pd.home_country_address||pd.birth_place||'');
-      s('f_jpAddr',((pd.jp_postal_code?'〒'+pd.jp_postal_code+'　':'')+(pd.jp_address||'')+(pd.jp_detail_address||'')).trim());
-      s('f_tel',pd.phone||pd.tel_num||'');
-      s('f_cel',pd.cel_phone||'');
+      // ver.20260715: 住居地の本命は persons.address（3,096件）。
+      // jp_address は5,393件中15件しか無いため、address を優先し jp_* はフォールバックに回す。
+      const _addr = pd.address || ((pd.jp_address||'')+(pd.jp_detail_address||''));
+      s('f_jpAddr',((pd.jp_postal_code?'〒'+pd.jp_postal_code+'　':'')+(_addr||'')).trim());
+      s('f_perTel',pd.phone||pd.tel_num||'');
+      s('f_perCel',pd.cel_phone||'');
       s('f_passport',pd.passport||'');
       const pe=_ymd(pd.passport_expiry); s('f_passExpY',pe[0]); s('f_passExpM',pe[1]); s('f_passExpD',pe[2]);
       s('f_curStatus',pd.residence_status||'');
