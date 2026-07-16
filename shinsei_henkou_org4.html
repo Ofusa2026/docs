@@ -75,9 +75,9 @@
       <div class="fg"><label>(13) 支援委託手数料（月額／人・円）</label><input id="f_roFee" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">記名／申請書作成年月日</div>
-      <div class="fg"><label>特定技能所属機関名</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>特定技能所属機関名</label><input id="f_o4coName" oninput="p()"></div>
       <div class="fg"><label>代表者氏名</label><input id="f_coRep" oninput="p()"></div>
-      <div class="fg"><label>作成年月日</label><div style="display:flex;gap:4px;"><input id="f_sigY" oninput="p()" placeholder="年"><input id="f_sigM" oninput="p()" placeholder="月"><input id="f_sigD" oninput="p()" placeholder="日"></div></div>
+      <div class="fg"><label>作成年月日</label><div style="display:flex;gap:4px;"><input id="f_oSigY" oninput="p()" placeholder="年"><input id="f_oSigM" oninput="p()" placeholder="月"><input id="f_oSigD" oninput="p()" placeholder="日"></div></div>
     </div>
   </div>
 </div>
@@ -252,8 +252,8 @@ ${SP.map(([k,ja,en])=>row([k,ja,en,''])).join('')}
 <table class="frm" style="margin-top:1px;">
   <colgroup><col style="width:60%"><col style="width:40%"></colgroup>
   <tr>
-    <td class="val" style="height:9mm;">${f('f_coName')}　${f('f_coRep')}</td>
-    <td class="val" style="text-align:center;">${f('f_sigY')} <span style="font-size:6.4pt;">年 Year</span> ${f('f_sigM')} <span style="font-size:6.4pt;">月 Month</span> ${f('f_sigD')} <span style="font-size:6.4pt;">日 Day</span></td>
+    <td class="val" style="height:9mm;">${f('f_o4coName')}　${f('f_coRep')}</td>
+    <td class="val" style="text-align:center;">${f('f_oSigY')} <span style="font-size:6.4pt;">年 Year</span> ${f('f_oSigM')} <span style="font-size:6.4pt;">月 Month</span> ${f('f_oSigD')} <span style="font-size:6.4pt;">日 Day</span></td>
   </tr>
 </table>
 <div style="font-size:6pt;margin-top:1mm;line-height:1.3;">注意　申請書作成後申請までに記載内容に変更が生じた場合，特定技能所属機関が変更箇所を訂正すること。<br>
@@ -270,7 +270,7 @@ Attention : In cases where descriptions have changed after filling in this appli
 function resetForm(){
   const ids=['f_roName','f_roCorp','f_roEi','f_roAddr','f_roTel','f_roRep','f_roRegNo',
     'f_roRegY','f_roRegM','f_roRegD','f_roOffice','f_roOfficeAddr','f_roSm','f_roSs','f_roLang','f_roFee',
-    'f_coName','f_coRep','f_sigY','f_sigM','f_sigD'];
+    'f_o4coName','f_coRep','f_oSigY','f_oSigM','f_oSigD'];
   G38.forEach(([k,ja,en,dl])=>{ ids.push('f_'+k); if(dl) ids.push('f_'+k+'d'); });
   SP.forEach(([k])=>ids.push('f_'+k));
   ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
@@ -328,11 +328,11 @@ async function loadFromDB(passedInfo){
       if(nm){ const r=await sb('companies?select=name,rep_name,rep_title,author_name,author_title&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; }
     }
     if(co){
-      s('f_coName',co.name||'');
+      s('f_o4coName',co.name||'');
       s('f_coRep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
     }
     const n=new Date();
-    s('f_sigY',String(n.getFullYear())); s('f_sigM',String(n.getMonth()+1)); s('f_sigD',String(n.getDate()));
+    s('f_oSigY',String(n.getFullYear())); s('f_oSigM',String(n.getMonth()+1)); s('f_oSigD',String(n.getDate()));
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }

@@ -56,7 +56,7 @@
       <div class="fg"><label>電話番号</label><input id="f_imTel" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">3　特定技能所属機関 (1)〜(10)</div>
-      <div class="fg"><label>(1) 氏名又は名称</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>(1) 氏名又は名称</label><input id="f_o2coName" oninput="p()"></div>
       <div class="fg"><label>(2) 法人番号（13桁）</label><input id="f_coCorp" oninput="p()" maxlength="13"></div>
       <div class="fg"><label>(3) 雇用保険適用事業所番号（11桁）</label><input id="f_coEi" oninput="p()" maxlength="11"></div>
       <div class="fg"><label>(4) 主たる業種（番号1つ）</label><input id="f_bizMain" oninput="p()"></div>
@@ -194,7 +194,7 @@ function p(){
 <table class="frm" style="margin-top:1px;">
   <colgroup><col style="width:16%"><col style="width:34%"><col style="width:16%"><col style="width:34%"></colgroup>
   <tr>
-    <td class="lbl">(1)氏名又は名称<div class="en">Name of person or organization ※本店又は主たる事務所のものを記入</div></td><td class="val">${f('f_coName')}</td>
+    <td class="lbl">(1)氏名又は名称<div class="en">Name of person or organization ※本店又は主たる事務所のものを記入</div></td><td class="val">${f('f_o2coName')}</td>
     <td class="lbl">(2)法人番号（13桁）<div class="en">Corporation no.</div></td><td class="val">${digits('f_coCorp',13)}</td>
   </tr>
   <tr>
@@ -255,7 +255,7 @@ ${ng}
 
 // 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
 function resetForm(){
-  const ids=['f_imName','f_imAddr','f_imTel','f_coName','f_coCorp','f_coEi','f_bizMain','f_bizSub',
+  const ids=['f_imName','f_imAddr','f_imTel','f_o2coName','f_coCorp','f_coEi','f_bizMain','f_bizSub',
     'f_coAddr','f_coTel','f_capital','f_sales','f_staff','f_rep','f_office','f_officeAddr',
     'f_ins1','f_ins2','f_li1','f_li2','f_li3','f_li4','f_li5'];
   NG.forEach(([k])=>ids.push('f_'+k+'d'));
@@ -288,7 +288,7 @@ async function loadFromDB(passedInfo){
     }
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
-      s('f_coName',co.name||'');
+      s('f_o2coName',co.name||'');
       s('f_coCorp',co.corp_no||'');
       s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
       s('f_coTel',co.tel||'');

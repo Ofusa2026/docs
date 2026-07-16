@@ -83,7 +83,7 @@
       <div class="fg"><label>(8) 分野特有の告示基準に適合</label><select id="f_q8" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
       <div class="fg"><label>(9) 帰国旅費の負担・出国措置</label><select id="f_q9" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
       <div class="fg"><label>(10) 健康・生活状況の把握措置</label><select id="f_q10" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
-      <div class="fg"><label>(11) 適正な在留の告示基準に適合</label><select id="f_q11" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>(11) 適正な在留の告示基準に適合</label><select id="f_o1q11" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
     </div>
     <div class="fs"><div class="fs-title">2 (12)　派遣先<span style="font-weight:normal;font-size:9px;color:#aaa;">（労働者派遣の場合）</span></div>
       <div class="fg"><label>氏名又は名称</label><input id="f_dpName" oninput="p()"></div>
@@ -224,7 +224,7 @@ ${yn('f_q7','(7)外国人が一時帰国を希望した場合には，必要な�
 ${yn('f_q8','(8)雇用関係につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）','Are the criteria, which are stipulated in a public notice in light of circumstances specific to the specified industrial field, met with regard to the employment relationship?')}
 ${yn('f_q9','(9)外国人が特定技能雇用契約終了後の帰国に要する旅費を負担することができないときは，当該旅費を負担するとともに，出国が円滑になされるよう必要な措置を講ずることとしていることの有無','If a foreign national cannot afford the travel expenses required to return home after the employment contract ends, will the organization bear those expenses and take the necessary measures?')}
 ${yn('f_q10','(10)外国人の健康の状況その他の生活の状況を把握するために必要な措置を講ずることとしていることの有無','Is the organization of affiliation taking the necessary measures to understand the health and other living conditions of the foreign national?')}
-${yn('f_q11','(11)外国人の適正な在留に資するために必要な事項につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）','Are the criteria, which are stipulated in a public notice in light of circumstances specific to the specified industrial field, met with regard to matters necessary for the appropriate residence of the foreign national?')}
+${yn('f_o1q11','(11)外国人の適正な在留に資するために必要な事項につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）','Are the criteria, which are stipulated in a public notice in light of circumstances specific to the specified industrial field, met with regard to matters necessary for the appropriate residence of the foreign national?')}
 
 <div class="q ind1">(12)派遣先（労働者派遣の対象とする場合に記入）
   <div class="en">Dispatch site (Fill in this section if the foreign national is subject to worker dispatch)</div></div>
@@ -286,7 +286,7 @@ ${yn('f_q11','(11)外国人の適正な在留に資するために必要な事�
 function resetForm(){
   ['f_fname','f_csY','f_csM','f_csD','f_ceY','f_ceM','f_ceD','f_field','f_cat','f_occMain','f_occSub',
    'f_hoursW','f_hoursM','f_hoursEq','f_pay','f_payH','f_payJp','f_payEq','f_payWay',
-   'f_q6','f_q6d','f_q7','f_q8','f_q9','f_q10','f_q11',
+   'f_q6','f_q6d','f_q7','f_q8','f_q9','f_q10','f_o1q11',
    'f_dpName','f_dpCorp','f_dpEi','f_dpAddr','f_dpTel','f_dpRep','f_dpsY','f_dpsM','f_dpsD','f_dpeY','f_dpeM','f_dpeD',
    'f_jaName','f_jaCorp','f_jaEi','f_jaAddr','f_jaTel','f_jaNo','f_jaY','f_jaM','f_jaD']
    .forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
