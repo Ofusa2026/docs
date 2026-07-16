@@ -14,6 +14,7 @@
 .doc .lbl{font-size:7.6pt;}
 .doc .val{font-size:8.4pt;min-height:1.2em;}
 .doc .nb{border:none!important;}
+.doc .ymd{font-size:5.4pt;color:#333;display:inline-block;line-height:1.05;vertical-align:middle;}
 .doc table.kzk{width:100%;border-collapse:collapse;table-layout:fixed;}
 .doc table.kzk td,.doc table.kzk th{border:0.6pt solid #000;padding:1px 2px;font-weight:normal;font-size:6.4pt;height:14px;}
 @media print{
@@ -28,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
-    <div class="ver">ver.20260715.04</div>
+    <div class="ver">ver.20260715.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -177,74 +178,79 @@ function p(){
 <div class="en">　Pursuant to the provisions of Paragraph 2 of Article 20 of the Immigration Control and Refugee Recognition Act, I hereby apply for a change of status of residence.</div></div>
 
 <table class="frm">
-<colgroup><col style="width:19%"><col style="width:31%"><col style="width:19%"><col style="width:31%"></colgroup>
+<colgroup>${'<col style="width:2.777%">'.repeat(36)}</colgroup>
 <tr>
-  <td class="lbl">1　国　籍・地　域<div class="en">Nationality/Region</div></td>
-  <td class="val">${f('f_nationality')}</td>
-  <td class="lbl">2　生年月日<div class="en">Date of birth</div></td>
-  <td class="val">${f('f_birthY')} <span style="font-size:6pt;">年 Year</span> ${f('f_birthM')} <span style="font-size:6pt;">月 Month</span> ${f('f_birthD')} <span style="font-size:6pt;">日 Day</span></td>
+  <td class="lbl" colspan="6">1　国　籍・地　域<div class="en">Nationality/Region</div></td>
+  <td class="val" colspan="11">${f('f_nationality')}</td>
+  <td class="lbl" colspan="5">2　生年月日<div class="en">Date of birth</div></td>
+  <td class="val" colspan="14">${f('f_birthY')} <span class="ymd">年<br>Year</span> ${f('f_birthM')} <span class="ymd">月<br>Month</span> ${f('f_birthD')} <span class="ymd">日<br>Day</span></td>
 </tr>
 <tr>
-  <td class="lbl">3　氏　名<div class="en">Name</div></td>
-  <td class="val" colspan="3">${f('f_name')}<div class="en">Family name／Given name</div></td>
+  <td class="lbl" colspan="6">3　氏　名<div class="en">Name</div></td>
+  <td class="val" colspan="30">${f('f_name')}
+    <div class="en" style="display:flex;"><span style="width:40%;">Family name</span><span>Given name</span></div></td>
 </tr>
 <tr>
-  <td class="lbl">4　性　別<div class="en">Sex</div></td>
-  <td class="val" style="text-align:center;">${pick('f_gender','男','女','Male','Female')}</td>
-  <td class="lbl">5　出生地<div class="en">Place of birth</div></td>
-  <td class="val">${f('f_birthPlace')}</td>
+  <td class="lbl" colspan="4">4　性　別<div class="en">Sex</div></td>
+  <td class="val" colspan="5" style="text-align:center;">${pick('f_gender','男','女','Male','Female')}</td>
+  <td class="lbl" colspan="5">5　出生地<div class="en">Place of birth</div></td>
+  <td class="val" colspan="12">${f('f_birthPlace')}</td>
+  <td class="lbl" colspan="6">6　配偶者の有無<div class="en">Marital status</div></td>
+  <td class="val" colspan="4" style="text-align:center;">${pick('f_spouse','有','無','Married','Single')}</td>
 </tr>
 <tr>
-  <td class="lbl">6　配偶者の有無<div class="en">Marital status</div></td>
-  <td class="val" style="text-align:center;">${pick('f_spouse','有','無','Married','Single')}</td>
-  <td class="lbl">7　職　業<div class="en">Occupation</div></td>
-  <td class="val">${f('f_occupation')}</td>
+  <td class="lbl" colspan="4">7　職　業<div class="en">Occupation</div></td>
+  <td class="val" colspan="8">${f('f_occupation')}</td>
+  <td class="lbl" colspan="8">8　本国における居住地<div class="en">Home town/city</div></td>
+  <td class="val" colspan="16">${f('f_homeAddr')}</td>
 </tr>
 <tr>
-  <td class="lbl">8　本国における居住地<div class="en">Home town/city</div></td>
-  <td class="val" colspan="3">${f('f_homeAddr')}</td>
+  <td class="lbl" colspan="6">9　住居地<div class="en">Address in Japan</div></td>
+  <td class="val" colspan="30">${f('f_jpAddr')}</td>
 </tr>
 <tr>
-  <td class="lbl">9　住居地<div class="en">Address in Japan</div></td>
-  <td class="val" colspan="3">${f('f_jpAddr')}</td>
+  <td class="lbl" colspan="6">　電話番号<div class="en">Telephone No.</div></td>
+  <td class="val" colspan="13">${f('f_perTel')}</td>
+  <td class="lbl" colspan="7">　携帯電話番号<div class="en">Cellular phone No.</div></td>
+  <td class="val" colspan="10">${f('f_perCel')}</td>
 </tr>
 <tr>
-  <td class="lbl">　電話番号<div class="en">Telephone No.</div></td>
-  <td class="val">${f('f_perTel')}</td>
-  <td class="lbl">　携帯電話番号<div class="en">Cellular phone No.</div></td>
-  <td class="val">${f('f_perCel')}</td>
+  <td class="lbl" colspan="4">10　旅券<div class="en">Passport</div></td>
+  <td class="lbl" colspan="4">(1)番　号<div class="en">Number</div></td>
+  <td class="val" colspan="9">${f('f_passport')}</td>
+  <td class="lbl" colspan="6">(2)有効期限<div class="en">Date of expiration</div></td>
+  <td class="val" colspan="13">${f('f_passExpY')} <span class="ymd">年<br>Year</span> ${f('f_passExpM')} <span class="ymd">月<br>Month</span> ${f('f_passExpD')} <span class="ymd">日<br>Day</span></td>
 </tr>
 <tr>
-  <td class="lbl">10　旅券<div class="en">Passport</div></td>
-  <td class="val">(1) 番　号 <span class="en">Number</span><br>${f('f_passport')}</td>
-  <td class="val" colspan="2">(2) 有効期限 <span class="en">Date of expiration</span><br>${f('f_passExpY')} <span style="font-size:6pt;">年 Year</span> ${f('f_passExpM')} <span style="font-size:6pt;">月 Month</span> ${f('f_passExpD')} <span style="font-size:6pt;">日 Day</span></td>
+  <td class="lbl" colspan="8">11　現に有する在留資格<div class="en">Status of residence</div></td>
+  <td class="val" colspan="12">${f('f_curStatus')}</td>
+  <td class="lbl" colspan="5">在留期間<div class="en">Period of stay</div></td>
+  <td class="val" colspan="11">${f('f_curPeriod')}</td>
 </tr>
 <tr>
-  <td class="lbl">11　現に有する在留資格<div class="en">Status of residence</div></td>
-  <td class="val">${f('f_curStatus')}</td>
-  <td class="lbl">　在留期間<div class="en">Period of stay</div></td>
-  <td class="val">${f('f_curPeriod')}</td>
+  <td class="lbl" colspan="8">　在留期間の満了日<div class="en">Date of expiration</div></td>
+  <td class="val" colspan="28">${f('f_expY')} <span class="ymd">年<br>Year</span> ${f('f_expM')} <span class="ymd">月<br>Month</span> ${f('f_expD')} <span class="ymd">日<br>Day</span></td>
 </tr>
 <tr>
-  <td class="lbl">　在留期間の満了日<div class="en">Date of expiration</div></td>
-  <td class="val" colspan="3">${f('f_expY')} <span style="font-size:6pt;">年 Year</span> ${f('f_expM')} <span style="font-size:6pt;">月 Month</span> ${f('f_expD')} <span style="font-size:6pt;">日 Day</span></td>
+  <td class="lbl" colspan="8">12　在留カード番号<div class="en">Residence card number</div></td>
+  <td class="val" colspan="28">${f('f_card')}</td>
 </tr>
 <tr>
-  <td class="lbl">12　在留カード番号<div class="en">Residence card number</div></td>
-  <td class="val" colspan="3">${f('f_card')}</td>
+  <td class="lbl" colspan="8">13　希望する在留資格<div class="en">Desired status of residence</div></td>
+  <td class="val" colspan="28">${f('f_newStatus')}</td>
 </tr>
 <tr>
-  <td class="lbl">13　希望する在留資格<div class="en">Desired status of residence</div></td>
-  <td class="val">${f('f_newStatus')}</td>
-  <td class="lbl">　在留期間<div class="en">Period of stay</div></td>
-  <td class="val">${f('f_newPeriod')}　<span style="font-size:5.6pt;">（審査の結果によって希望の期間とならない場合があります。）<br>( It may not be as desired after examination.)</span></td>
+  <td class="lbl" colspan="8">　在留期間<div class="en">Period of stay</div></td>
+  <td class="val" colspan="10">${f('f_newPeriod')}</td>
+  <td class="val" colspan="18" style="font-size:6pt;">（審査の結果によって希望の期間とならない場合があります。）
+    <div class="en">( It may not be as desired after examination.)</div></td>
 </tr>
 <tr>
-  <td class="lbl">14　変更の理由<div class="en">Reason for change of status of residence</div></td>
-  <td class="val" colspan="3">${f('f_reason')}</td>
+  <td class="lbl" colspan="11">14　変更の理由<div class="en">Reason for change of status of residence</div></td>
+  <td class="val" colspan="25">${f('f_reason')}</td>
 </tr>
 <tr>
-  <td colspan="4" class="lbl">15　犯罪を理由とする処分を受けたことの有無 （日本国外におけるものを含む。）※交通違反等による処分を含む。
+  <td colspan="36" class="lbl">15　犯罪を理由とする処分を受けたことの有無 （日本国外におけるものを含む。）※交通違反等による処分を含む。
     <div class="en">　Criminal record (in Japan / overseas)※Including dispositions due to traffic violations, etc.</div>
     <div style="font-size:7.6pt;margin-top:1px;display:flex;align-items:flex-start;gap:6px;">
       <div>${pick('f_crime','有','無','Yes','No')}</div>
@@ -253,7 +259,7 @@ function p(){
   </td>
 </tr>
 <tr>
-  <td colspan="4" class="lbl">16　在日親族（父・母・配偶者・子・兄弟姉妹・祖父母・叔(伯)父・叔(伯)母など）及び同居者
+  <td colspan="36" class="lbl">16　在日親族（父・母・配偶者・子・兄弟姉妹・祖父母・叔(伯)父・叔(伯)母など）及び同居者
     <div class="en">　Family in Japan (father, mother, spouse, children, siblings, grandparents, uncle, aunt or others) and cohabitants</div>
     <div style="font-size:7.6pt;margin:1px 0;display:flex;align-items:flex-start;gap:6px;">
       <div>${pick('f_famYN','有','無','Yes','No')}</div>

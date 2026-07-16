@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書（所属機関等作成用4・特定技能）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
+.doc .en{font-size:5.4pt;color:#333;line-height:1.1;}
+.doc table.frm{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.frm td{border:0.6pt solid #000;padding:2px 3px;vertical-align:top;}
+.doc .lbl{font-size:7.4pt;}
+.doc .val{font-size:8.2pt;}
+.doc .sec{font-size:8pt;font-weight:bold;margin:1.5mm 0 0.8mm;}
+.doc .q{font-size:7.4pt;margin-top:1.2mm;}
+.doc .digit{display:inline-block;border:0.6pt solid #000;width:3.2mm;height:3.6mm;text-align:center;font-size:7pt;line-height:3.6mm;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用4）　特定技能</div>
+    <div class="ver">ver.20260715.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shinsei_henkou_org4')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">(38)〜(41)</div>
+      <div id="g38"></div>
+    </div>
+    <div class="fs"><div class="fs-title">4　1号特定技能外国人支援計画 (1)〜(16)</div>
+      <div style="font-size:10px;color:#888;padding:2px 0;">
+        <button type="button" onclick="allYes()" style="font-size:10px;padding:2px 8px;">すべて「有」にする</button>
+      </div>
+      <div id="gsp"></div>
+    </div>
+    <div class="fs"><div class="fs-title">5　登録支援機関<span style="font-weight:normal;font-size:9px;color:#aaa;">（全部委託する場合）</span></div>
+      <div class="fg"><label>(1) 氏名又は名称</label><input id="f_roName" oninput="p()"></div>
+      <div class="fg"><label>(2) 法人番号（13桁）</label><input id="f_roCorp" oninput="p()" maxlength="13"></div>
+      <div class="fg"><label>(3) 雇用保険適用事業所番号（11桁）</label><input id="f_roEi" oninput="p()" maxlength="11"></div>
+      <div class="fg"><label>(4) 住所（所在地）</label><textarea id="f_roAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>　電話番号</label><input id="f_roTel" oninput="p()"></div>
+      <div class="fg"><label>(5) 代表者の氏名</label><input id="f_roRep" oninput="p()"></div>
+      <div class="fg"><label>(6) 登録番号</label><input id="f_roRegNo" oninput="p()"></div>
+      <div class="fg"><label>(7) 登録年月日</label><div style="display:flex;gap:4px;"><input id="f_roRegY" oninput="p()" placeholder="年"><input id="f_roRegM" oninput="p()" placeholder="月"><input id="f_roRegD" oninput="p()" placeholder="日"></div></div>
+      <div class="fg"><label>(8) 支援を行う事業所の名称</label><input id="f_roOffice" oninput="p()"></div>
+      <div class="fg"><label>(9) 所在地</label><textarea id="f_roOfficeAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>(10) 支援責任者名</label><input id="f_roSm" oninput="p()"></div>
+      <div class="fg"><label>(11) 支援担当者名</label><input id="f_roSs" oninput="p()"></div>
+      <div class="fg"><label>(12) 対応可能言語</label><input id="f_roLang" oninput="p()"></div>
+      <div class="fg"><label>(13) 支援委託手数料（月額／人・円）</label><input id="f_roFee" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">記名／申請書作成年月日</div>
+      <div class="fg"><label>特定技能所属機関名</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名</label><input id="f_coRep" oninput="p()"></div>
+      <div class="fg"><label>作成年月日</label><div style="display:flex;gap:4px;"><input id="f_sigY" oninput="p()" placeholder="年"><input id="f_sigM" oninput="p()" placeholder="月"><input id="f_sigD" oninput="p()" placeholder="日"></div></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784081370"></script>
+<script>
+// (38)〜(41)  [キー, 設問, 訳, 内容欄のラベル（''なら無し）]
+const G38=[
+ ['q38','(38)支援責任者及び支援担当者が，1号特定技能外国人支援計画の中立な実施を行うことができる立場の者であることの有無',
+  'Are the support manager and support staff in a position where they can carry out the support plan for specified skilled workers (i) in a neutral manner?',''],
+ ['q39','(39)特定技能雇用契約締結の日前5年以内又は契約締結の日以後に適合1号特定技能外国人支援計画に基づく1号特定技能外国人支援を怠ったことの有無',
+  'Has the organization failed to implement support for specified skilled workers (i) based on a conforming support plan within five years prior to the date of conclusion of the employment contract or thereafter?','内容'],
+ ['q40','(40)支援責任者又は支援担当者が外国人及びその監督をする立場にある者と定期的な面談を実施できる体制を有していることの有無',
+  'Is there a system in place to ensure the support manager and support staff can conduct periodic interviews with the foreign national and their supervisor?',''],
+ ['q41','(41)適合1号特定技能外国人支援計画の適正な実施の確保につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）',
+  'Does the organization conform to the criteria stipulated in a public notice in light of circumstances specific to the specified industrial field regarding the proper implementation of the support plan?',''],
+];
+// 4 支援計画 (1)〜(16)  すべて「有・無」のみ
+const SP=[
+ ['sp1','(1)在留資格変更申請前に，特定技能雇用契約の内容，本邦において行うことができる活動の内容，上陸及び在留のための条件その他の本邦に上陸し在留するに当たって留意すべき事項に関する情報の提供を外国人が十分に理解することができる言語により実施することとしていることの有無',
+  'Will the organization be providing information to the specified skilled worker in a language they can sufficiently understand before applying for a change of status of residence?'],
+ ['sp2','(2)上記(1)について，対面により，又はテレビ電話装置その他の方法により行うこととしていることの有無',
+  'With regard to (1) above, will this be conducted face-to-face, using a video call device or by other means?'],
+ ['sp3','(3)出入国時に港又は飛行場への送迎をすることとしていることの有無',
+  'Will the organization be picking up and dropping off the foreign national at the port or airport upon entry and departure?'],
+ ['sp4','(4)適切な住居の確保に係る支援をすることとしていることの有無',
+  'Will the organization be providing support to secure suitable accommodation?'],
+ ['sp5','(5)金融機関における預金口座等の開設及び携帯電話の利用に関する契約その他の生活に必要な契約に係る支援をすることとしていることの有無',
+  'Will the organization be providing support related to contracts necessary for daily life, such as opening a bank account and a mobile phone contract?'],
+ ['sp6','(6)在留資格変更後に，本邦での生活一般に関する事項，国又は地方公共団体の機関への届出その他の手続，相談又は苦情の申出に関する連絡先，十分に理解することができる言語で医療を受けることができる医療機関に関する事項，防災・防犯に関する事項，緊急時における対応に必要な事項及び外国人の法的保護に必要な事項に関する情報の提供を外国人が十分に理解することができる言語により実施することとしていることの有無',
+  'Will the organization be providing information after the change of status of residence in a language the foreign national can sufficiently understand?'],
+ ['sp7','(7)外国人が国又は地方公共団体の機関への届出その他の手続を履行するに当たり，必要に応じ，関係機関への同行その他の必要な措置を講ずることとしていることの有無',
+  'Will the organization take necessary measures to accompany the foreign national to the relevant institutions as necessary?'],
+ ['sp8','(8)日本語を学習する機会を提供することとしていることの有無',
+  'Will the organization be providing the foreign national with opportunities to learn Japanese?'],
+ ['sp9','(9)外国人が十分に理解することができる言語により，相談又は苦情の申出に対して，遅滞なく，適切に応じるとともに，必要な措置を講ずることとしていることの有無',
+  'Will the organization respond appropriately to requests for consultation or complaints without delay in a language the foreign national can sufficiently understand?'],
+ ['sp10','(10)外国人と日本人の交流の促進に係る支援をすることとしていることの有無',
+  'Will the organization provide support for the promotion of exchange between the foreign national and Japanese nationals?'],
+ ['sp11','(11)外国人が，その責めに帰すべき事由によらずに特定技能雇用契約を解除される場合は，転職支援をすることとしていることの有無',
+  'Will the organization provide support to foreign nationals whose employment contract is terminated through no fault of their own to change jobs?'],
+ ['sp12','(12)支援責任者又は支援担当者が外国人及びその監督をする立場にある者と定期的な面談（外国人と行う場合には当該外国人が十分に理解することができる言語による面談）を実施し，問題の発生を知ったときは，その旨を関係行政機関に通報することとしていることの有無',
+  'Will the support manager or support staff conduct periodic interviews and report to the relevant administrative agency when they become aware of a problem?'],
+ ['sp13','(13)１号特定技能外国人支援計画を日本語及び外国人が十分に理解することができる言語により作成し，当該外国人にその写しを交付することとしていることの有無',
+  'Has a support plan for specified skilled workers (i) been prepared in Japanese and in a language the foreign national can sufficiently understand, and will a copy be given to them?'],
+ ['sp14','(14)特定産業分野に特有の事情に鑑みて告示で定められる事項を１号特定技能外国人支援計画に記載していることの有無（当該事項が定められている場合に記入）',
+  'Have the matters stipulated in a public notice in consideration of circumstances specific to the specified industrial field been stated in the support plan?'],
+ ['sp15','(15)支援の内容が外国人の適正な在留に資するものであって，かつ，支援を実施する者において適切に実施することができるものであることの有無',
+  'Will the contents of the support contribute to the proper residence of the foreign national and can they be properly implemented by the person providing the support?'],
+ ['sp16','(16)１号特定技能外国人支援計画の内容につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）',
+  'Will the organization conform to the criteria stipulated in a public notice in light of circumstances specific to the specified industrial field in terms of the contents of the support plan?'],
+];
+(function(){
+  let h='';
+  G38.forEach(([k,ja,en,dl])=>{
+    h+=`<div style="border-top:1px dashed #444;margin-top:4px;padding-top:3px;">
+      <div style="font-size:10px;color:#888;line-height:1.4;">${ja.slice(0,40)}…</div>
+      <div class="fg"><label>有無</label><select id="f_${k}" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>`;
+    if(dl) h+=`<div class="fg"><label>${dl}</label><input id="f_${k}d" oninput="p()"></div>`;
+    h+='</div>';
+  });
+  document.getElementById('g38').innerHTML=h;
+  let s='';
+  SP.forEach(([k,ja])=>{
+    s+=`<div class="fg" style="border-top:1px dashed #444;padding-top:3px;">
+      <label style="line-height:1.4;">${ja.slice(0,34)}…</label>
+      <select id="f_${k}" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>`;
+  });
+  document.getElementById('gsp').innerHTML=s;
+})();
+// 支援計画は通常すべて「有」。1つずつ選ぶのは現実的でないので一括ボタンを用意する。
+function allYes(){ SP.forEach(([k])=>{const e=document.getElementById('f_'+k); if(e) e.value='有';}); p(); }
+
+function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function setPick(id, val){
+  const e=document.getElementById(id); if(!e) return;
+  e.value = (String(e.value||'').trim()===val) ? '' : val;
+  p();
+}
+function pick(id, a, b, ea, eb){
+  const cur=v_(id);
+  const O=(txt,sel)=>`<span onclick="setPick('${id}','${a===txt||ea===txt?a:b}')" style="cursor:pointer;padding:0 3px;${sel?'border:1px solid #000;border-radius:45%;':''}">${txt}</span>`;
+  let h=`<span style="white-space:nowrap;">${O(a,cur===a)}・${O(b,cur===b)}</span>`;
+  if(ea&&eb) h+=`<span class="en" style="margin-left:3px;white-space:nowrap;">${O(ea,cur===a)}／${O(eb,cur===b)}</span>`;
+  return h;
+}
+function digits(id, n){
+  const s=v_(id).replace(/[^0-9A-Za-z]/g,'');
+  let h='';
+  for(let i=0;i<n;i++) h+=`<span class="digit">${s[i]||''}</span>`;
+  return `<span data-bind="${id}">${h}</span>`;
+}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const row=([k,ja,en,dl])=>`
+    <div class="q" style="display:flex;align-items:flex-start;gap:6px;">
+      <div style="flex:1;">${ja}<div class="en">${en}</div>
+        ${dl?`<div>（${dl}：${f('f_'+k+'d')}）<span class="en">(Details: )</span></div>`:''}</div>
+      <div style="white-space:nowrap;">${pick('f_'+k,'有','無','Yes','No')}</div>
+    </div>`;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:1.5mm;"><tr>
+  <td style="border:none;font-size:7.4pt;">所属機関等作成用 ４　　V　（「特定技能（1号）」・「特定技能（2号）」）
+    <div class="en">For organization, part 4　V ("Specified Skilled Worker (i)" / "Specified Skilled Worker (ii)")</div></td>
+  <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
+</tr></table>
+
+${G38.map(row).join('')}
+
+<div class="sec">4　1号特定技能外国人支援計画（申請人が「特定技能1号」での在留を希望する場合に記入）
+  <div class="en" style="font-weight:normal;">Support plan for specified skilled workers (i) (fill in this section if the applicant wishes to reside in Japan as a "Specified Skilled Worker (i)")</div></div>
+${SP.map(([k,ja,en])=>row([k,ja,en,''])).join('')}
+
+<div class="sec">5　登録支援機関（申請人が「特定技能1号」での在留を希望する場合であって，契約により登録支援機関に1号特定技能外国人支援計画の全部の実施を委託する場合に記入）
+  <div class="en" style="font-weight:normal;">Registered support organization (Fill in this section if the applicant wishes to reside in Japan as a "Specified Skilled Worker (i)" and all of the support plan is entrusted to a registered support organization by contract)</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:17%"><col style="width:35%"><col style="width:16%"><col style="width:32%"></colgroup>
+  <tr>
+    <td class="lbl">(1)氏名又は名称<div class="en">Name of person or organization</div></td><td class="val">${f('f_roName')}</td>
+    <td class="lbl">(2)法人番号（13桁）<div class="en">Corporation no.</div></td><td class="val">${digits('f_roCorp',13)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(3)雇用保険適用事業所番号（11桁）<div class="en">Employment insurance application office number (11 digits) *If not applicable, it should be omitted.</div></td>
+    <td class="val" colspan="3">${digits('f_roEi',11)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(4)住所（所在地）<div class="en">Address</div></td><td class="val">${f('f_roAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td><td class="val">${f('f_roTel')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(5)代表者の氏名<div class="en">Name of the representative</div></td><td class="val" colspan="3">${f('f_roRep')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(6)登録番号<div class="en">Registration no.</div></td><td class="val">${f('f_roRegNo')}</td>
+    <td class="lbl">(7)登録年月日<div class="en">Date of Registration</div></td>
+    <td class="val">${f('f_roRegY')} 年 ${f('f_roRegM')} 月 ${f('f_roRegD')} 日<div class="en">Year Month Day</div></td>
+  </tr>
+  <tr>
+    <td class="lbl">(8)支援を行う事業所の名称<div class="en">Name of place of business implementing support</div></td><td class="val">${f('f_roOffice')}</td>
+    <td class="lbl">(9)所在地<div class="en">Address</div></td><td class="val">${f('f_roOfficeAddr')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(10)支援責任者名<div class="en">Support manager</div></td><td class="val">${f('f_roSm')}</td>
+    <td class="lbl">(11)支援担当者名<div class="en">Support staff</div></td><td class="val">${f('f_roSs')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(12)対応可能言語<div class="en">Available languages</div></td><td class="val">${f('f_roLang')}</td>
+    <td class="lbl">(13)支援委託手数料（月額／人）<div class="en">Support commission fee (person per month)</div></td>
+    <td class="val">${f('f_roFee')} 円 <span class="en">Yen</span></td>
+  </tr>
+</table>
+
+<div class="q">以上の記載内容は事実と相違ありません。
+  <div class="en">I hereby declare that the statement given above is true and correct.</div></div>
+<div class="q">特定技能所属機関名，代表者氏名の記名／申請書作成年月日
+  <div class="en">Name of the organization and representative of the organization of affiliation / Date of filling in this form</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:60%"><col style="width:40%"></colgroup>
+  <tr>
+    <td class="val" style="height:9mm;">${f('f_coName')}　${f('f_coRep')}</td>
+    <td class="val" style="text-align:center;">${f('f_sigY')} <span style="font-size:6.4pt;">年 Year</span> ${f('f_sigM')} <span style="font-size:6.4pt;">月 Month</span> ${f('f_sigD')} <span style="font-size:6.4pt;">日 Day</span></td>
+  </tr>
+</table>
+<div style="font-size:6pt;margin-top:1mm;line-height:1.3;">注意　申請書作成後申請までに記載内容に変更が生じた場合，特定技能所属機関が変更箇所を訂正すること。<br>
+Attention : In cases where descriptions have changed after filling in this application form up until submission of this application, the organization of affiliation must correct the part concerned.</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
+function resetForm(){
+  const ids=['f_roName','f_roCorp','f_roEi','f_roAddr','f_roTel','f_roRep','f_roRegNo',
+    'f_roRegY','f_roRegM','f_roRegD','f_roOffice','f_roOfficeAddr','f_roSm','f_roSs','f_roLang','f_roFee',
+    'f_coName','f_coRep','f_sigY','f_sigM','f_sigD'];
+  G38.forEach(([k,ja,en,dl])=>{ ids.push('f_'+k); if(dl) ids.push('f_'+k+'d'); });
+  SP.forEach(([k])=>ids.push('f_'+k));
+  ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+}
+function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId, companyId, companyName}=info;
+  resetForm();
+  try{
+    const cases=await sb('cases?select=org,company,company_id&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // 5 登録支援機関：名前の揺れ（「株式会社KMT(82)」等）は findSupportOrg が3段照合で吸収する
+    if(cas&&cas.org&&typeof findSupportOrg==='function'){
+      const org=await findSupportOrg(cas.org,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages');
+      if(org){
+        s('f_roName',org.name||'');
+        s('f_roCorp',org.corp_no||'');
+        s('f_roEi',org.emp_ins_no||'');
+        s('f_roAddr',((org.pref||'')+(org.city||'')+(org.address||'')+(org.address_detail||''))||org.address||'');
+        s('f_roTel',org.tel||'');
+        s('f_roRep',org.rep_name||'');
+        s('f_roRegNo',org.reg_no||'');
+        const rd=_ymd(org.reg_date); if(rd[0]){ s('f_roRegY',rd[0]); s('f_roRegM',rd[1]); s('f_roRegD',rd[2]); }
+        s('f_roSm',org.support_manager||'');
+        s('f_roLang',org.languages||'');
+      }
+    }
+    // 記名欄は特定技能所属機関（雇用する企業）
+    let co=null;
+    const cid=companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb('companies?select=name,rep_name,rep_title,author_name,author_title&id=eq.'+cid); co=r&&r[0]; }
+    if(!co){
+      const nm=companyName||(cas&&cas.company);
+      if(nm){ const r=await sb('companies?select=name,rep_name,rep_title,author_name,author_title&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; }
+    }
+    if(co){
+      s('f_coName',co.name||'');
+      s('f_coRep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
+    }
+    const n=new Date();
+    s('f_sigY',String(n.getFullYear())); s('f_sigM',String(n.getMonth()+1)); s('f_sigD',String(n.getDate()));
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = (ppW<docW) ? (ppW/docW) : 1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou_org4'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
