@@ -30,7 +30,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用2）　特定技能</div>
-    <div class="ver">ver.20260715.06</div>
+    <div class="ver">ver.20260715.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -248,7 +248,7 @@ async function loadFromDB(passedInfo){
   resetForm();
   try{
     const [persons,cases]=await Promise.all([
-      sb('persons?select=jp_exam_1,jp_exam_loc_1,residence_status&case_id=eq.'+caseId),
+      sb('persons?select=jp_exam_1,jp_exam_loc_1,jp_eval_type,residence_status&case_id=eq.'+caseId),
       sb('cases?select=company,company_id&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -266,13 +266,27 @@ async function loadFromDB(passedInfo){
       s('f_soAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
       s('f_soTel',co.tel||'');
     }
-    // 19 日本語能力：アンシスに試験名・受験地があれば反映
+    // 19 日本語能力：アンシスの jp_eval_type(2,438件) が証明方法そのもの。
+    // 「技能実習２号を良好に修了」が1,248件あり、試験名の有無だけで判定すると
+    // 技能実習修了の人にも誤って「試験による証明」を選んでしまうため、評価方法を優先する。
     if(pd){
-      if(pd.jp_exam_1){ s('f_jp','policy'); s('f_jpSub','exam'); s('f_jpExam',pd.jp_exam_1); }
-      if(pd.jp_exam_loc_1) s('f_jpLoc', /日本|国内|Japan/i.test(pd.jp_exam_loc_1) ? 'jp' : 'fr');
-      if(pd.jp_exam_loc_1 && !/日本|国内|Japan/i.test(pd.jp_exam_loc_1)) s('f_jpCountry',pd.jp_exam_loc_1);
-      // 技能実習からの変更なら 18 は「技能実習2号を良好に修了」が既定
+      const ev = pd.jp_eval_type || '';
+      if(/技能実習/.test(ev)){
+        s('f_jp','jisshu');
+      } else if(ev || pd.jp_exam_1){
+        s('f_jp','policy');
+        s('f_jpSub','exam');
+        s('f_jpExam', pd.jp_exam_1 || (/試験/.test(ev) ? ev : ''));
+      }
+      const loc = pd.jp_exam_loc_1 || '';
+      if(loc){
+        const inJp = /日本|国内|Japan/i.test(loc);
+        s('f_jpLoc', inJp ? 'jp' : 'fr');
+        if(!inJp) s('f_jpCountry', loc);
+      }
+      // 18 技能水準：技能実習2号からの変更なら「技能実習2号を良好に修了」が既定
       if(/技能実習\s*2号/.test(pd.residence_status||'')) s('f_sk','jisshu');
+      else if(/技能実習/.test(ev)) s('f_sk','jisshu');
     }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}

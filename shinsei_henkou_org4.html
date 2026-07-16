@@ -28,7 +28,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用4）　特定技能</div>
-    <div class="ver">ver.20260715.02</div>
+    <div class="ver">ver.20260715.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -276,6 +276,15 @@ function resetForm(){
   ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
 }
 function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+// 登録年月日は「20190530」「2019-05-30」「2019/5/30」が混在するので全部受ける
+function _regYmd(s){
+  const t=String(s||'').trim();
+  let m=t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if(m) return [m[1],String(+m[2]),String(+m[3])];
+  m=t.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if(m) return [m[1],String(+m[2]),String(+m[3])];
+  return ['','',''];
+}
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -297,11 +306,15 @@ async function loadFromDB(passedInfo){
         s('f_roName',org.name||'');
         s('f_roCorp',org.corp_no||'');
         s('f_roEi',org.emp_ins_no||'');
-        s('f_roAddr',((org.pref||'')+(org.city||'')+(org.address||'')+(org.address_detail||''))||org.address||'');
+        // ver.20260715: support_orgs.address は既に都道府県から始まる完全な住所（66/66件で確認）。
+        // pref+city を足すと「東京都新宿区東京都新宿区新宿1-4-10新宿1-4-10」のように二重になる。
+        s('f_roAddr', org.address || ((org.pref||'')+(org.city||'')));
         s('f_roTel',org.tel||'');
         s('f_roRep',org.rep_name||'');
         s('f_roRegNo',org.reg_no||'');
-        const rd=_ymd(org.reg_date); if(rd[0]){ s('f_roRegY',rd[0]); s('f_roRegM',rd[1]); s('f_roRegD',rd[2]); }
+        // ver.20260715: reg_date は「20190530」の8桁数字が32件、「YYYY-MM-DD」が7件と混在する。
+        // _ymd() はハイフン形式しか解さないため、8桁数字だと年月日が空欄になっていた。
+        const rd=_regYmd(org.reg_date); if(rd[0]){ s('f_roRegY',rd[0]); s('f_roRegM',rd[1]); s('f_roRegD',rd[2]); }
         s('f_roSm',org.support_manager||'');
         s('f_roLang',org.languages||'');
       }

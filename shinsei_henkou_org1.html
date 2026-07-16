@@ -29,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用1）　特定技能</div>
-    <div class="ver">ver.20260715.02</div>
+    <div class="ver">ver.20260715.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -62,7 +62,7 @@
       <div class="fg"><label>業務区分</label><input id="f_cat" oninput="p()"></div>
       <div class="fg"><label>主たる職種（番号1つ）</label><input id="f_occMain" oninput="p()" placeholder="例：74"></div>
       <div class="fg"><label>他の職種（番号・複数可）</label><input id="f_occSub" oninput="p()" placeholder="カンマ区切り"></div>
-      <div style="font-size:10px;color:#888;padding:2px 0;">※ 別紙「職種一覧」の 1〜43, 45〜50, 55〜81, 100〜112, 999 から選択</div>
+      <div style="font-size:10px;color:#888;padding:2px 0;">※ 別紙「職種一覧」の 1～43, 45～50, 55～81, 100～112, 999 から選択</div>
     </div>
     <div class="fs"><div class="fs-title">2 (3)　所定労働時間</div>
       <div class="fg"><label>週平均（時間）</label><input id="f_hoursW" oninput="p()"></div>
@@ -188,7 +188,7 @@ function p(){
     <td class="val" colspan="3" style="font-size:7pt;">
       ○主たる職種を別紙「職種一覧」から選択して番号を記入（１つのみ）：${f('f_occMain')}<br>
       ○他に職種があれば別紙「職種一覧」から選択して番号を記入（複数選択可）：${f('f_occSub')}
-      <div class="en">（注意）※別紙「職種一覧」の1〜43,45〜50,55〜81,100〜112,999から選択してください。</div>
+      <div class="en">（注意）※別紙「職種一覧」の1～43,45～50,55～81,100～112,999から選択してください。</div>
     </td>
   </tr>
 </table>
@@ -324,9 +324,16 @@ async function loadFromDB(passedInfo){
     // 業務区分は emp_set.category → cases.job_category のフォールバック（重説と同じ流儀）
     s('f_field',es.applicantField||'');
     s('f_cat',es.category||(cas&&cas.job_category)||'');
-    s('f_hoursW',es.workHoursWeek||'');
-    s('f_hoursM',es.workHoursMonth||'');
-    s('f_pay',es.basicSalary||'');
+    // ver.20260715: emp_sets に workHoursWeek / workHoursMonth / basicSalary というキーは存在しない。
+    // 実在するのは weeklyH(2,282件) / monthlyH(2,284件) / salaryMonthly(2,293件)。
+    // 誤ったキーのままだと所定労働時間・月額報酬が永久に空欄になっていた。
+    s('f_hoursW',es.weeklyH||'');
+    s('f_hoursM',es.monthlyH||'');
+    s('f_pay',es.salaryMonthly||'');
+    s('f_payH',es.calcHourly||es.salaryHourly||'');   // 基本給の時間換算額(2,201件)
+    s('f_payJp',es.jpCompSalary||'');                 // 同等の業務に従事する日本人の月額報酬(2,121件)
+    // (5)報酬の支払方法：payMethod(2,280件) から通貨払/口座振込みを判定
+    if(es.payMethod) s('f_payWay', /口座|振込|bank/i.test(es.payMethod) ? 'bank' : 'cash');
     const ce=_ymd((pd&&pd.contract_end)||(cas&&cas.contract_end));
     if(ce[0]){ s('f_ceY',ce[0]); s('f_ceM',ce[1]); s('f_ceD',ce[2]); }
     p(); showToast('✅ データを読み込みました');

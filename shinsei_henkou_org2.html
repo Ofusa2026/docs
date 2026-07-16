@@ -29,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用2）　特定技能</div>
-    <div class="ver">ver.20260715.02</div>
+    <div class="ver">ver.20260715.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -239,6 +239,7 @@ function p(){
     <td class="val" colspan="3">
       ${digits('f_li1',2)}－${digits('f_li2',2)}－${digits('f_li3',6)}－${digits('f_li4',3)}－${digits('f_li5',4)}
       <div class="en">（末尾４桁は割り振られている場合のみ記入）(Enter the last four digits only when they have been assigned.)</div>
+      ${window._laborInsRaw?`<div style="font-size:6pt;color:#b45309;">※アンシス登録値：${esc(window._laborInsRaw)}（桁割りが様式と異なるため自動入力していません。上の枠へ手入力してください）</div>`:''}
     </td>
   </tr>
 </table>
@@ -295,13 +296,13 @@ async function loadFromDB(passedInfo){
       s('f_sales',co.sales||'');
       s('f_staff',co.employees||'');
       s('f_rep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
-      // 労働保険番号は 2-2-6-3-4 桁。区切り文字が入っていても数字だけ取り出して各枠に配る。
-      if(co.labor_ins_no){
-        const d=String(co.labor_ins_no).replace(/[^0-9]/g,'');
-        if(d.length>=13){
-          s('f_li1',d.slice(0,2)); s('f_li2',d.slice(2,4)); s('f_li3',d.slice(4,10));
-          s('f_li4',d.slice(10,13)); s('f_li5',d.slice(13,17));
-        }
+      // ver.20260715: 労働保険番号は自動分割しない。
+      // アンシスの実データは桁数がバラバラ（14桁1,135件/13桁69件/11桁60件/15桁21件/18桁17件…）で、
+      // しかも「01-3-13-101341-000」のように区切り済みの値が主流。数字だけを機械的に切ると
+      // 様式の枠(2-2-6-3-4)とズレて別の番号になる。法定書類なので誤りを出すより手入力に委ねる。
+      // 参考値として原文を最初の枠に入れ、運用者が見て配り直せるようにする。
+      if(co.labor_ins_no && !/^[―ー\-]+$/.test(String(co.labor_ins_no).trim())){
+        window._laborInsRaw = co.labor_ins_no;   // 画面下に原文を出す
       }
     }
     p(); showToast('✅ データを読み込みました');

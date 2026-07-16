@@ -29,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
-    <div class="ver">ver.20260715.05</div>
+    <div class="ver">ver.20260715.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -89,7 +89,7 @@
     </div>
     <div class="fs"><div class="fs-title">13〜14　変更内容</div>
       <div class="fg"><label>13 希望する在留資格</label><input id="f_newStatus" oninput="p()" value="特定技能1号"></div>
-      <div class="fg"><label>　希望する在留期間</label><input id="f_newPeriod" oninput="p()" value="1年"></div>
+      <div class="fg"><label>　希望する在留期間</label><input id="f_newPeriod" oninput="p()"></div>
       <div class="fg"><label>14 変更の理由</label><textarea id="f_reason" oninput="p()" rows="2"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">15　犯罪を理由とする処分</div>
@@ -171,11 +171,22 @@ function p(){
   <td class="nb" style="border:none;font-size:7.4pt;">申請人等作成用 １<div class="en">For applicant, part 1</div></td>
   <td class="nb" style="border:none;text-align:right;font-size:7.4pt;">日本国政府法務省<div class="en">Ministry of Justice, Government of Japan</div></td>
 </tr></table>
-<div style="text-align:center;font-size:12pt;font-weight:bold;letter-spacing:0.1em;">在留資格変更許可申請書</div>
-<div style="text-align:center;font-size:6.6pt;margin-bottom:2mm;">APPLICATION FOR CHANGE OF STATUS OF RESIDENCE</div>
-<div style="font-size:8pt;">法務大臣殿<div class="en">　To the Minister of Justice</div></div>
-<div style="font-size:7.6pt;margin:1.5mm 0 2mm;">　出入国管理及び難民認定法第２０条第２項の規定に基づき，次のとおり在留資格の変更を申請します。
-<div class="en">　Pursuant to the provisions of Paragraph 2 of Article 20 of the Immigration Control and Refugee Recognition Act, I hereby apply for a change of status of residence.</div></div>
+<div style="position:relative;">
+  <!-- 写真欄：実物では右上に 40mm(縦)×30mm(横) の枠がある -->
+  <div style="position:absolute;right:0;top:0;width:34mm;height:50mm;border:0.6pt solid #000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3mm;">
+    <div style="font-size:9pt;letter-spacing:0.3em;">写　真</div>
+    <div style="font-size:7pt;">Photo</div>
+    <div style="font-size:7pt;">40mm×30mm</div>
+  </div>
+  <div style="margin-right:37mm;">
+    <div style="text-align:center;font-size:12pt;font-weight:bold;letter-spacing:0.1em;">在留資格変更許可申請書</div>
+    <div style="text-align:center;font-size:6.6pt;margin-bottom:2mm;">APPLICATION FOR CHANGE OF STATUS OF RESIDENCE</div>
+    <div style="font-size:8pt;">法務大臣殿<div class="en">　To the Minister of Justice</div></div>
+    <div style="font-size:7.6pt;margin:1.5mm 0 2mm;">　出入国管理及び難民認定法第２０条第２項の規定に基づき，次のとおり在留資格の変更を申請します。
+    <div class="en">　Pursuant to the provisions of Paragraph 2 of Article 20 of the Immigration Control and Refugee Recognition Act, I hereby apply for a change of status of residence.</div></div>
+  </div>
+  <div style="clear:both;height:1mm;"></div>
+</div>
 
 <table class="frm">
 <colgroup>${'<col style="width:2.777%">'.repeat(36)}</colgroup>
@@ -308,7 +319,7 @@ function resetForm(){
   ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
   const d=(id,val)=>{const e=document.getElementById(id); if(e) e.value=val;};
   d('f_newStatus','特定技能1号');   // 13 希望する在留資格（既定値）
-  d('f_newPeriod','1年');           // 　 在留期間（既定値）
+  d('f_newPeriod','');              // 　 在留期間（アンシスから反映するため既定値なし）
   d('f_crime','無');                // 15 犯罪歴（既定値）
 }
 
@@ -332,7 +343,7 @@ async function loadFromDB(passedInfo){
   resetForm();
   try{
     const [persons,cases]=await Promise.all([
-      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,expire,residence_card&case_id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,hoped_stay_period,expire,residence_card&case_id=eq.'+caseId),
       sb('cases?select=applicant,expire&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -361,6 +372,9 @@ async function loadFromDB(passedInfo){
       s('f_curPeriod',pd.stay_period||'');
       const ex=_ymd(pd.expire||(cas&&cas.expire)); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
       s('f_card',pd.residence_card||'');
+      // ver.20260715: 13 希望する在留期間。固定「1年」にしていたが実データは「3年」が5,025件で大多数、
+      // 「1年」は92件しかない。アンシスの hoped_stay_period(5,394件)から反映する。
+      s('f_newPeriod',pd.hoped_stay_period||'');
     } else if(cas){
       s('f_name',cas.applicant||'');
       const ex=_ymd(cas.expire); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
