@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260715.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260715.04</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -195,6 +195,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="divider"></div>
     <div class="section">分野別誓約書</div>
+    <div class="item" id="nav-1_1" onclick="open_doc('1_1')"><span class="item-icon">📄</span><div>介護<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-2_1" onclick="open_doc('2_1')"><span class="item-icon">📄</span><div>ビルクリーニング<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-3_1" onclick="open_doc('3_1')"><span class="item-icon">📄</span><div>工業製品製造業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-6_1" onclick="open_doc('6_1')"><span class="item-icon">📄</span><div>建設<span class="item-sub">受入れ誓約書</span></div></div>
@@ -209,6 +210,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-14_1" onclick="open_doc('14_1')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-15_1" onclick="open_doc('15_1')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-16_1" onclick="open_doc('16_1')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">受入れ誓約書</span></div></div>
+    <div class="item" id="nav-17_1" onclick="open_doc('17_1')"><span class="item-icon">📄</span><div>林業<span class="item-sub">受入れ誓約書</span></div></div>
+    <div class="item" id="nav-18_1" onclick="open_doc('18_1')"><span class="item-icon">📄</span><div>木材産業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="divider"></div>
     <div class="section">分野別誓約書（登録支援機関）</div>
     <div class="item" id="nav-7_2" onclick="open_doc('7_2')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">登録支援機関 誓約書</span></div></div>
@@ -245,6 +248,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-suisenhyo"></iframe>
     <iframe id="frame-madoguchi"></iframe>
     <iframe id="frame-1_11"></iframe>
+    <iframe id="frame-1_1"></iframe>
     <iframe id="frame-2_1"></iframe>
     <iframe id="frame-3_1"></iframe>
     <iframe id="frame-6_1"></iframe>
@@ -259,6 +263,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-14_1"></iframe>
     <iframe id="frame-15_1"></iframe>
     <iframe id="frame-16_1"></iframe>
+    <iframe id="frame-17_1"></iframe>
+    <iframe id="frame-18_1"></iframe>
     <iframe id="frame-7_2"></iframe>
     <iframe id="frame-8_2"></iframe>
     <iframe id="frame-9_2"></iframe>
@@ -295,6 +301,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1783920000'},
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1779181822'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1782832385'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1784170592'},
   '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1782976942'},
   '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1782976942'},
   '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1782976942'},
@@ -309,6 +316,8 @@ const docs={
   '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1782976942'},
   '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1782976942'},
   '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1782976942'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1784170592'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1784170592'},
   '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1782926018'},
   '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1782926018'},
   '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1782926018'},
