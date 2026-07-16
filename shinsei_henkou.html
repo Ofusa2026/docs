@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書（申請人等作成用1）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
+.doc .en{font-size:5.6pt;color:#333;line-height:1.1;}
+.doc table.frm{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.frm td{border:0.6pt solid #000;padding:1px 3px;vertical-align:top;}
+.doc .lbl{font-size:7.6pt;}
+.doc .val{font-size:8.4pt;min-height:1.2em;}
+.doc .nb{border:none!important;}
+.doc table.kzk{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.kzk td,.doc table.kzk th{border:0.6pt solid #000;padding:1px 2px;font-weight:normal;font-size:6.4pt;height:14px;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
+    <div class="ver">ver.20260715.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shinsei_henkou')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">1〜6　申請人（基本）</div>
+      <div class="fg"><label>1 国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>2 生年月日</label>
+        <div style="display:flex;gap:4px;">
+          <input id="f_birthY" oninput="p()" placeholder="年"><input id="f_birthM" oninput="p()" placeholder="月"><input id="f_birthD" oninput="p()" placeholder="日">
+        </div>
+      </div>
+      <div class="fg"><label>3 氏名（ローマ字）</label><input id="f_name" oninput="p()"></div>
+      <div class="fg"><label>4 性別</label><select id="f_gender" onchange="p()"><option value=""></option><option>男</option><option>女</option></select></div>
+      <div class="fg"><label>5 出生地</label><input id="f_birthPlace" oninput="p()"></div>
+      <div class="fg"><label>6 配偶者の有無</label><select id="f_spouse" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+    </div>
+    <div class="fs"><div class="fs-title">7〜9　職業・住居</div>
+      <div class="fg"><label>7 職業</label><input id="f_occupation" oninput="p()"></div>
+      <div class="fg"><label>8 本国における居住地</label><input id="f_homeAddr" oninput="p()"></div>
+      <div class="fg"><label>9 住居地（日本）</label><textarea id="f_jpAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>　電話番号</label><input id="f_tel" oninput="p()"></div>
+      <div class="fg"><label>　携帯電話番号</label><input id="f_cel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">10　旅券</div>
+      <div class="fg"><label>(1) 番号</label><input id="f_passport" oninput="p()"></div>
+      <div class="fg"><label>(2) 有効期限</label>
+        <div style="display:flex;gap:4px;">
+          <input id="f_passExpY" oninput="p()" placeholder="年"><input id="f_passExpM" oninput="p()" placeholder="月"><input id="f_passExpD" oninput="p()" placeholder="日">
+        </div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">11〜12　現在の在留資格</div>
+      <div class="fg"><label>11 現に有する在留資格</label><input id="f_curStatus" oninput="p()"></div>
+      <div class="fg"><label>　在留期間</label><input id="f_curPeriod" oninput="p()"></div>
+      <div class="fg"><label>　在留期間の満了日</label>
+        <div style="display:flex;gap:4px;">
+          <input id="f_expY" oninput="p()" placeholder="年"><input id="f_expM" oninput="p()" placeholder="月"><input id="f_expD" oninput="p()" placeholder="日">
+        </div>
+      </div>
+      <div class="fg"><label>12 在留カード番号</label><input id="f_card" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">13〜14　変更内容</div>
+      <div class="fg"><label>13 希望する在留資格</label><input id="f_newStatus" oninput="p()" value="特定技能1号"></div>
+      <div class="fg"><label>　希望する在留期間</label><input id="f_newPeriod" oninput="p()" value="1年"></div>
+      <div class="fg"><label>14 変更の理由</label><textarea id="f_reason" oninput="p()" rows="2"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">15　犯罪を理由とする処分</div>
+      <div class="fg"><label>有無</label><select id="f_crime" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>具体的内容（「有」の場合）</label><input id="f_crimeDetail" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">16　在日親族及び同居者</div>
+      <div class="fg"><label>有無</label><select id="f_famYN" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div id="famRows"></div>
+      <div style="font-size:10px;color:#888;padding:2px 0;">※ 6行を超える場合は別紙に記入して添付</div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784081370"></script>
+<script>
+// 16 在日親族の入力欄（6行）
+const FAM_COLS=[['Rel','続柄'],['Nm','氏名'],['Bd','生年月日'],['Nat','国籍・地域'],['Liv','同居'],['Wk','勤務先・通学先'],['Cd','在留カード番号']];
+(function(){
+  let h='';
+  for(let i=1;i<=6;i++){
+    h+=`<div style="border-top:1px dashed #444;margin-top:4px;padding-top:3px;"><div style="font-size:10px;color:#888;">${i}人目</div>`;
+    FAM_COLS.forEach(([k,l])=>{
+      if(k==='Liv') h+=`<div class="fg"><label>${l}</label><select id="f_fam${i}${k}" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>`;
+      else h+=`<div class="fg"><label>${l}</label><input id="f_fam${i}${k}" oninput="p()"></div>`;
+    });
+    h+='</div>';
+  }
+  document.getElementById('famRows').innerHTML=h;
+})();
+
+// 「男 ・ 女」のように選択側だけ丸で囲む
+function pick(id, a, b){
+  const v=v_(id);
+  const w=s=>`<span style="${v===s?'border:1px solid #000;border-radius:50%;padding:0 3px;':''}">${s}</span>`;
+  return w(a)+' ・ '+w(b);
+}
+function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  let fam='';
+  for(let i=1;i<=6;i++){
+    fam+='<tr>';
+    FAM_COLS.forEach(([k])=>{
+      if(k==='Liv') fam+=`<td style="text-align:center;">${v_('f_fam'+i+k)?pick('f_fam'+i+k,'有','無'):'<span style="font-size:6pt;">有・無</span>'}</td>`;
+      else fam+=`<td>${f('f_fam'+i+k).replace('class="f"','class="f" style="font-size:6.4pt;"')}</td>`;
+    });
+    fam+='</tr>';
+  }
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:7pt;">別記第三十号様式（第二十条関係）</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:1mm;"><tr>
+  <td class="nb" style="border:none;font-size:7.4pt;">申請人等作成用 １<div class="en">For applicant, part 1</div></td>
+  <td class="nb" style="border:none;text-align:right;font-size:7.4pt;">日本国政府法務省<div class="en">Ministry of Justice, Government of Japan</div></td>
+</tr></table>
+<div style="text-align:center;font-size:12pt;font-weight:bold;letter-spacing:0.1em;">在留資格変更許可申請書</div>
+<div style="text-align:center;font-size:6.6pt;margin-bottom:2mm;">APPLICATION FOR CHANGE OF STATUS OF RESIDENCE</div>
+<div style="font-size:8pt;">法務大臣殿<div class="en">　To the Minister of Justice</div></div>
+<div style="font-size:7.6pt;margin:1.5mm 0 2mm;">　出入国管理及び難民認定法第２０条第２項の規定に基づき，次のとおり在留資格の変更を申請します。
+<div class="en">　Pursuant to the provisions of Paragraph 2 of Article 20 of the Immigration Control and Refugee Recognition Act, I hereby apply for a change of status of residence.</div></div>
+
+<table class="frm">
+<colgroup><col style="width:19%"><col style="width:31%"><col style="width:19%"><col style="width:31%"></colgroup>
+<tr>
+  <td class="lbl">1　国　籍・地　域<div class="en">Nationality/Region</div></td>
+  <td class="val">${f('f_nationality')}</td>
+  <td class="lbl">2　生年月日<div class="en">Date of birth</div></td>
+  <td class="val">${f('f_birthY')} <span style="font-size:6pt;">年 Year</span> ${f('f_birthM')} <span style="font-size:6pt;">月 Month</span> ${f('f_birthD')} <span style="font-size:6pt;">日 Day</span></td>
+</tr>
+<tr>
+  <td class="lbl">3　氏　名<div class="en">Name</div></td>
+  <td class="val" colspan="3">${f('f_name')}<div class="en">Family name／Given name</div></td>
+</tr>
+<tr>
+  <td class="lbl">4　性　別<div class="en">Sex</div></td>
+  <td class="val" style="text-align:center;">${pick('f_gender','男','女')}<div class="en" style="text-align:center;">Male／Female</div></td>
+  <td class="lbl">5　出生地<div class="en">Place of birth</div></td>
+  <td class="val">${f('f_birthPlace')}</td>
+</tr>
+<tr>
+  <td class="lbl">6　配偶者の有無<div class="en">Marital status</div></td>
+  <td class="val" style="text-align:center;">${pick('f_spouse','有','無')}<div class="en" style="text-align:center;">Married／Single</div></td>
+  <td class="lbl">7　職　業<div class="en">Occupation</div></td>
+  <td class="val">${f('f_occupation')}</td>
+</tr>
+<tr>
+  <td class="lbl">8　本国における居住地<div class="en">Home town/city</div></td>
+  <td class="val" colspan="3">${f('f_homeAddr')}</td>
+</tr>
+<tr>
+  <td class="lbl">9　住居地<div class="en">Address in Japan</div></td>
+  <td class="val" colspan="3">${f('f_jpAddr')}</td>
+</tr>
+<tr>
+  <td class="lbl">　電話番号<div class="en">Telephone No.</div></td>
+  <td class="val">${f('f_tel')}</td>
+  <td class="lbl">　携帯電話番号<div class="en">Cellular phone No.</div></td>
+  <td class="val">${f('f_cel')}</td>
+</tr>
+<tr>
+  <td class="lbl">10　旅券<div class="en">Passport</div></td>
+  <td class="val">(1) 番　号 <span class="en">Number</span><br>${f('f_passport')}</td>
+  <td class="val" colspan="2">(2) 有効期限 <span class="en">Date of expiration</span><br>${f('f_passExpY')} <span style="font-size:6pt;">年 Year</span> ${f('f_passExpM')} <span style="font-size:6pt;">月 Month</span> ${f('f_passExpD')} <span style="font-size:6pt;">日 Day</span></td>
+</tr>
+<tr>
+  <td class="lbl">11　現に有する在留資格<div class="en">Status of residence</div></td>
+  <td class="val">${f('f_curStatus')}</td>
+  <td class="lbl">　在留期間<div class="en">Period of stay</div></td>
+  <td class="val">${f('f_curPeriod')}</td>
+</tr>
+<tr>
+  <td class="lbl">　在留期間の満了日<div class="en">Date of expiration</div></td>
+  <td class="val" colspan="3">${f('f_expY')} <span style="font-size:6pt;">年 Year</span> ${f('f_expM')} <span style="font-size:6pt;">月 Month</span> ${f('f_expD')} <span style="font-size:6pt;">日 Day</span></td>
+</tr>
+<tr>
+  <td class="lbl">12　在留カード番号<div class="en">Residence card number</div></td>
+  <td class="val" colspan="3">${f('f_card')}</td>
+</tr>
+<tr>
+  <td class="lbl">13　希望する在留資格<div class="en">Desired status of residence</div></td>
+  <td class="val">${f('f_newStatus')}</td>
+  <td class="lbl">　在留期間<div class="en">Period of stay</div></td>
+  <td class="val">${f('f_newPeriod')}　<span style="font-size:5.6pt;">（審査の結果によって希望の期間とならない場合があります。）<br>( It may not be as desired after examination.)</span></td>
+</tr>
+<tr>
+  <td class="lbl">14　変更の理由<div class="en">Reason for change of status of residence</div></td>
+  <td class="val" colspan="3">${f('f_reason')}</td>
+</tr>
+<tr>
+  <td colspan="4" class="lbl">15　犯罪を理由とする処分を受けたことの有無 （日本国外におけるものを含む。）※交通違反等による処分を含む。
+    <div class="en">　Criminal record (in Japan / overseas)※Including dispositions due to traffic violations, etc.</div>
+    <div style="font-size:7.6pt;margin-top:1px;">${v_('f_crime')?pick('f_crime','有','無'):'有 ・ 無'}　（具体的内容 ${f('f_crimeDetail')} ）
+    <div class="en">　Yes ( Detail: ) ／ No</div></div>
+  </td>
+</tr>
+<tr>
+  <td colspan="4" class="lbl">16　在日親族（父・母・配偶者・子・兄弟姉妹・祖父母・叔(伯)父・叔(伯)母など）及び同居者
+    <div class="en">　Family in Japan (father, mother, spouse, children, siblings, grandparents, uncle, aunt or others) and cohabitants</div>
+    <div style="font-size:7.6pt;margin:1px 0;">${v_('f_famYN')?pick('f_famYN','有','無'):'有 ・ 無'}　（「有」の場合は，以下の欄に在日親族及び同居者を記入してください。）
+    <div class="en">　Yes (If yes, please fill in your family members in Japan and co-residents in the following columns) ／ No</div></div>
+    <table class="kzk">
+      <colgroup><col style="width:9%"><col style="width:22%"><col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:20%"><col style="width:15%"></colgroup>
+      <tr>
+        <th>続　柄<div class="en">Relationship</div></th>
+        <th>氏　名<div class="en">Name</div></th>
+        <th>生年月日<div class="en">Date of birth</div></th>
+        <th>国籍・地域<div class="en">Nationality/Region</div></th>
+        <th>同居の有無<div class="en">Residing with applicant or not</div></th>
+        <th>勤務先名称・通学先名称<div class="en">Place of employment/ school</div></th>
+        <th>在留カード番号<div class="en">Residence card number<br>特別永住者証明書番号</div></th>
+      </tr>
+      ${fam}
+    </table>
+  </td>
+</tr>
+</table>
+<div style="font-size:5.8pt;margin-top:1mm;line-height:1.3;">※　3について，有効な旅券を所持する場合は，旅券の身分事項ページのとおりに記載してください。<br>
+　　Regarding item 3, if you possess your valid passport, please fill in your name as shown in the passport.<br>
+　　16については，記載欄が不足する場合は別紙に記入して添付すること。なお,「研修」，「技能実習」に係る申請の場合は，「在日親族」のみ記載してください。<br>
+　　Regarding item 16, if there is not enough space in the given columns to write in all of your family in Japan, fill in and attach a separate sheet. In addition, take note that you are only required to fill in your family members in Japan for applications pertaining to “Trainee” or “Technical Intern Training”.</div>
+<div style="font-size:6.4pt;margin-top:1.5mm;line-height:1.3;">（注） 裏面参照の上，申請に必要な書類を作成して下さい。<br>
+Note : Please fill in forms required for application. (See notes on reverse side.)<br>
+（注） 申請書に事実に反する記載をしたことが判明した場合には，不利益な扱いを受けることがあります。<br>
+Note : In case of to be found that you have misrepresented the facts in an application, you will be unfavorably treated in the process.</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// 'YYYY-MM-DD' → [Y,M,D]
+function _ymd(s){
+  const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m?[m[1],String(+m[2]),String(+m[3])]:['','',''];
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const [persons,cases]=await Promise.all([
+      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,expire,residence_card&case_id=eq.'+caseId),
+      sb('cases?select=applicant,expire&id=eq.'+caseId)
+    ]);
+    const pd=persons&&persons[0], cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(pd){
+      s('f_nationality',pd.nationality||'');
+      const b=_ymd(pd.birthdate); s('f_birthY',b[0]); s('f_birthM',b[1]); s('f_birthD',b[2]);
+      s('f_name',pd.applicant_name_en||(cas&&cas.applicant)||'');
+      s('f_gender',pd.gender||'');
+      s('f_birthPlace',pd.birth_place||'');
+      s('f_spouse',pd.spouse||'');
+      s('f_occupation',pd.occupation||'');
+      // 8 本国における居住地：未入力なら出生地で代用（様式も =出生地 を参照している）
+      s('f_homeAddr',pd.home_country_address||pd.birth_place||'');
+      s('f_jpAddr',((pd.jp_postal_code?'〒'+pd.jp_postal_code+'　':'')+(pd.jp_address||'')+(pd.jp_detail_address||'')).trim());
+      s('f_tel',pd.phone||pd.tel_num||'');
+      s('f_cel',pd.cel_phone||'');
+      s('f_passport',pd.passport||'');
+      const pe=_ymd(pd.passport_expiry); s('f_passExpY',pe[0]); s('f_passExpM',pe[1]); s('f_passExpD',pe[2]);
+      s('f_curStatus',pd.residence_status||'');
+      s('f_curPeriod',pd.stay_period||'');
+      const ex=_ymd(pd.expire||(cas&&cas.expire)); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
+      s('f_card',pd.residence_card||'');
+    } else if(cas){
+      s('f_name',cas.applicant||'');
+      const ex=_ymd(cas.expire); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = (ppW<docW) ? (ppW/docW) : 1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
