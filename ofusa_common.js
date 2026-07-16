@@ -1045,6 +1045,11 @@ async function discardEditedGeneric(){
       await sb('companies?id=eq.'+cid, { method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({ extra: ex }) });
     }
     window._htmlFrozen = false; window._editedRestored = false;
+    // ver.20260716: 破棄後に_editModeを解除しないとp()が早期returnしてプレビューが空になるバグを修正
+    if(typeof _editMode !== 'undefined') _editMode = false;
+    try{ if(typeof enableDocEditing === 'function') enableDocEditing(false); }catch(e){}
+    const _eb = document.getElementById('editModeBtn');
+    if(_eb){ _eb.textContent = '✏️ 直接編集'; _eb.classList.remove('edit-mode-on'); }
     if(typeof p === 'function') p();
     if(typeof showToast==='function') showToast('♻️ 編集版を破棄しました');
   }catch(e){ console.error('[discardEditedGeneric]', e); if(typeof showToast==='function') showToast('⚠️ エラー: '+e.message); }
