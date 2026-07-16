@@ -28,7 +28,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
-    <div class="ver">ver.20260715.01</div>
+    <div class="ver">ver.20260715.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -92,7 +92,7 @@
       <div class="fg"><label>14 変更の理由</label><textarea id="f_reason" oninput="p()" rows="2"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">15　犯罪を理由とする処分</div>
-      <div class="fg"><label>有無</label><select id="f_crime" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>有無</label><select id="f_crime" onchange="p()"><option value=""></option><option>有</option><option selected>無</option></select></div>
       <div class="fg"><label>具体的内容（「有」の場合）</label><input id="f_crimeDetail" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">16　在日親族及び同居者</div>
@@ -131,13 +131,24 @@ const FAM_COLS=[['Rel','続柄'],['Nm','氏名'],['Bd','生年月日'],['Nat','�
   document.getElementById('famRows').innerHTML=h;
 })();
 
-// 「男 ・ 女」のように選択側だけ丸で囲む
-function pick(id, a, b){
-  const v=v_(id);
-  const w=s=>`<span style="${v===s?'border:1px solid #000;border-radius:50%;padding:0 3px;':''}">${s}</span>`;
-  return w(a)+' ・ '+w(b);
-}
 function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+
+// ver.20260715: プレビュー上の「男/女」「有/無」をクリックで選べるようにする。
+// 選んだ側は日本語・英訳の両方を丸で囲む。もう一度押すと解除。
+// 実体はサイドバーの select なので、DB保存・直接編集の作法は他書類と同じ。
+function setPick(id, val){
+  const e=document.getElementById(id); if(!e) return;
+  e.value = (String(e.value||'').trim()===val) ? '' : val;   // 同じものを再クリックで解除
+  p();
+}
+// a,b = 日本語の選択肢 ／ ea,eb = その訳（省略時は訳行を出さない）
+function pick(id, a, b, ea, eb){
+  const cur=v_(id);
+  const O=(txt,sel)=>`<span onclick="setPick('${id}','${a===txt||ea===txt?a:b}')" style="cursor:pointer;padding:0 3px;${sel?'border:1px solid #000;border-radius:45%;':''}">${txt}</span>`;
+  let h=`<span style="white-space:nowrap;">${O(a,cur===a)}・${O(b,cur===b)}</span>`;
+  if(ea&&eb) h+=`<div class="en" style="text-align:center;"><span style="white-space:nowrap;">${O(ea,cur===a)}／${O(eb,cur===b)}</span></div>`;
+  return h;
+}
 
 function p(){
   if(_editMode) return;
@@ -146,7 +157,7 @@ function p(){
   for(let i=1;i<=6;i++){
     fam+='<tr>';
     FAM_COLS.forEach(([k])=>{
-      if(k==='Liv') fam+=`<td style="text-align:center;">${v_('f_fam'+i+k)?pick('f_fam'+i+k,'有','無'):'<span style="font-size:6pt;">有・無</span>'}</td>`;
+      if(k==='Liv') fam+=`<td style="text-align:center;font-size:6.4pt;">${pick('f_fam'+i+k,'有','無')}</td>`;
       else fam+=`<td>${f('f_fam'+i+k).replace('class="f"','class="f" style="font-size:6.4pt;"')}</td>`;
     });
     fam+='</tr>';
@@ -179,13 +190,13 @@ function p(){
 </tr>
 <tr>
   <td class="lbl">4　性　別<div class="en">Sex</div></td>
-  <td class="val" style="text-align:center;">${pick('f_gender','男','女')}<div class="en" style="text-align:center;">Male／Female</div></td>
+  <td class="val" style="text-align:center;">${pick('f_gender','男','女','Male','Female')}</td>
   <td class="lbl">5　出生地<div class="en">Place of birth</div></td>
   <td class="val">${f('f_birthPlace')}</td>
 </tr>
 <tr>
   <td class="lbl">6　配偶者の有無<div class="en">Marital status</div></td>
-  <td class="val" style="text-align:center;">${pick('f_spouse','有','無')}<div class="en" style="text-align:center;">Married／Single</div></td>
+  <td class="val" style="text-align:center;">${pick('f_spouse','有','無','Married','Single')}</td>
   <td class="lbl">7　職　業<div class="en">Occupation</div></td>
   <td class="val">${f('f_occupation')}</td>
 </tr>
@@ -235,15 +246,20 @@ function p(){
 <tr>
   <td colspan="4" class="lbl">15　犯罪を理由とする処分を受けたことの有無 （日本国外におけるものを含む。）※交通違反等による処分を含む。
     <div class="en">　Criminal record (in Japan / overseas)※Including dispositions due to traffic violations, etc.</div>
-    <div style="font-size:7.6pt;margin-top:1px;">${v_('f_crime')?pick('f_crime','有','無'):'有 ・ 無'}　（具体的内容 ${f('f_crimeDetail')} ）
-    <div class="en">　Yes ( Detail: ) ／ No</div></div>
+    <div style="font-size:7.6pt;margin-top:1px;display:flex;align-items:flex-start;gap:6px;">
+      <div>${pick('f_crime','有','無','Yes','No')}</div>
+      <div style="flex:1;">（具体的内容 ${f('f_crimeDetail')} ）<div class="en">( Detail: )</div></div>
+    </div>
   </td>
 </tr>
 <tr>
   <td colspan="4" class="lbl">16　在日親族（父・母・配偶者・子・兄弟姉妹・祖父母・叔(伯)父・叔(伯)母など）及び同居者
     <div class="en">　Family in Japan (father, mother, spouse, children, siblings, grandparents, uncle, aunt or others) and cohabitants</div>
-    <div style="font-size:7.6pt;margin:1px 0;">${v_('f_famYN')?pick('f_famYN','有','無'):'有 ・ 無'}　（「有」の場合は，以下の欄に在日親族及び同居者を記入してください。）
-    <div class="en">　Yes (If yes, please fill in your family members in Japan and co-residents in the following columns) ／ No</div></div>
+    <div style="font-size:7.6pt;margin:1px 0;display:flex;align-items:flex-start;gap:6px;">
+      <div>${pick('f_famYN','有','無','Yes','No')}</div>
+      <div style="flex:1;">（「有」の場合は，以下の欄に在日親族及び同居者を記入してください。）
+      <div class="en">(If yes, please fill in your family members in Japan and co-residents in the following columns)</div></div>
+    </div>
     <table class="kzk">
       <colgroup><col style="width:9%"><col style="width:22%"><col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:20%"><col style="width:15%"></colgroup>
       <tr>
