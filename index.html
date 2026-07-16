@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260716.02</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260716.03</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -195,31 +195,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
       <span class="item-icon">📝</span>
-      <div>🚧【作成中】窓口申請書（変更）<span class="item-sub">在留資格変更許可申請書 申請人等作成用1</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou2" onclick="open_doc('shinsei_henkou2')">
-      <span class="item-icon">📝</span>
-      <div>🚧【作成中】窓口申請書（変更）2<span class="item-sub">申請人等作成用2　技能水準・日本語能力</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou3" onclick="open_doc('shinsei_henkou3')">
-      <span class="item-icon">📝</span>
-      <div>🚧【作成中】窓口申請書（変更）3<span class="item-sub">申請人等作成用3　職歴・署名・取次者</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou_org1" onclick="open_doc('shinsei_henkou_org1')">
-      <span class="item-icon">🏢</span>
-      <div>🚧【作成中】窓口申請書（変更）機関1<span class="item-sub">所属機関等作成用1　雇用契約・報酬</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou_org2" onclick="open_doc('shinsei_henkou_org2')">
-      <span class="item-icon">🏢</span>
-      <div>🚧【作成中】窓口申請書（変更）機関2<span class="item-sub">所属機関等作成用2　機関概要・欠格事由</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou_org3" onclick="open_doc('shinsei_henkou_org3')">
-      <span class="item-icon">🏢</span>
-      <div>🚧【作成中】窓口申請書（変更）機関3<span class="item-sub">所属機関等作成用3　支援体制</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou_org4" onclick="open_doc('shinsei_henkou_org4')">
-      <span class="item-icon">🏢</span>
-      <div>🚧【作成中】窓口申請書（変更）機関4<span class="item-sub">所属機関等作成用4　支援計画・登録支援機関</span></div>
+      <div>🚧【作成中】窓口申請書（変更）<span class="item-sub">全7ページ　申請人1〜3・所属機関1〜4</span></div>
     </div>
     <div class="divider"></div>
     <div class="section">分野別誓約書</div>
@@ -257,6 +233,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-1_11" onclick="open_doc('1_11')"><span class="item-icon">📊</span><div>参考様式第１－１１号<span class="item-sub">所属機関概要書</span></div></div>
   </div>
   <div class="content" id="content">
+    <!-- ver.20260716.03: 窓口申請書（変更）のページ切替タブ -->
+    <div id="shinseiTabBar" style="display:none;gap:4px;flex-wrap:wrap;padding:8px 10px;background:#f8fafc;border-bottom:1px solid #e2e8f0;"></div>
     <iframe id="frame-1_3"></iframe>
     <iframe id="frame-1_5"></iframe>
     <iframe id="frame-1_6"></iframe>
@@ -638,6 +616,30 @@ function open_doc(key){
     }
   });
   cur=key;
+  _shinseiTabs(key); // ver.20260716.03
+}
+// ver.20260716.03: 窓口申請書（変更）グループのページタブ
+const SHINSEI_GROUP=[
+  ['shinsei_henkou','申請人1'],
+  ['shinsei_henkou2','申請人2'],
+  ['shinsei_henkou3','申請人3'],
+  ['shinsei_henkou_org1','機関1'],
+  ['shinsei_henkou_org2','機関2'],
+  ['shinsei_henkou_org3','機関3'],
+  ['shinsei_henkou_org4','機関4'],
+];
+function _shinseiTabs(key){
+  const bar=document.getElementById('shinseiTabBar');
+  if(!bar) return;
+  const inGroup=SHINSEI_GROUP.some(x=>x[0]===key);
+  if(!inGroup){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  bar.innerHTML=SHINSEI_GROUP.map(x=>
+    '<button onclick="open_doc(\''+x[0]+'\')" style="font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;font-weight:700;border:1px solid '+(x[0]===key?'#2563eb;background:#2563eb;color:white':'#cbd5e1;background:white;color:#475569')+';">'+x[1]+'</button>'
+  ).join('');
+  // グループ内はサイドバーの統合項目をactiveに
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-shinsei_henkou')?.classList.add('active');
 }
 // 初期表示
 open_doc('1_4');
