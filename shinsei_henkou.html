@@ -131,7 +131,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260716.01</div>
+    <div class="ver">ver.20260716.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -500,7 +500,7 @@
 </div>
 <script src="ofusa_common.js?v=1784192200"></script>
 <script>
-// ===== 在留資格変更許可申請書 全7ページ統合版（ver.20260716.01） =====
+// ===== 在留資格変更許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
 // 統合にあたり、ページ間で重複していたID（f_q22-27, f_sigY/M/D, f_coName, f_q11）は
 // 別項目なので接頭辞を付けて分離済み（申請人3=f_a*, 機関4=f_o4*/f_oSig*, 機関1=f_o1q11, 機関2=f_o2coName）。
@@ -1260,7 +1260,7 @@ ${ng_o2}
   <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
 </tr></table>
 
-${G1.map(row).join('')}
+${G1.map(row_o3).join('')}
 
 <div class="note">（以下(27)，(28)は外国人を労働者派遣の対象とする場合に記入）
   <div class="en" style="font-weight:normal;">(Fill in sections (27) and (28) if the foreign national is likely to be subject to worker dispatch)</div></div>
@@ -1284,7 +1284,7 @@ ${G1.map(row).join('')}
   <div style="margin-top:1px;">${pick('f_q28','有','無','Yes','No')}　（内容：${f('f_q28d')}）<span class="en">(Details: )</span></div>
 </div>
 
-${G2.map(row).join('')}
+${G2.map(row_o3).join('')}
 
 <div class="note">（以下(33)から(41)は申請人が「特定技能1号」での在留を希望する場合であって，契約により登録支援機関に1号特定技能外国人支援計画の全部の実施を委託しない場合に記入）
   <div class="en" style="font-weight:normal;">(Fill in sections (33) to (41) if the applicant wishes to reside in Japan as a "Specified Skilled Worker (i)" and not all of the support plans for specified skilled workers (i) are entrusted to a registered support organization by contract)</div></div>
@@ -1341,11 +1341,11 @@ ${G2.map(row).join('')}
   <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
 </tr></table>
 
-${G38.map(row).join('')}
+${G38.map(row_o4).join('')}
 
 <div class="sec">4　1号特定技能外国人支援計画（申請人が「特定技能1号」での在留を希望する場合に記入）
   <div class="en" style="font-weight:normal;">Support plan for specified skilled workers (i) (fill in this section if the applicant wishes to reside in Japan as a "Specified Skilled Worker (i)")</div></div>
-${SP.map(([k,ja,en])=>row([k,ja,en,''])).join('')}
+${SP.map(([k,ja,en])=>row_o4([k,ja,en,''])).join('')}
 
 <div class="sec">5　登録支援機関（申請人が「特定技能1号」での在留を希望する場合であって，契約により登録支援機関に1号特定技能外国人支援計画の全部の実施を委託する場合に記入）
   <div class="en" style="font-weight:normal;">Registered support organization (Fill in this section if the applicant wishes to reside in Japan as a "Specified Skilled Worker (i)" and all of the support plan is entrusted to a registered support organization by contract)</div></div>
