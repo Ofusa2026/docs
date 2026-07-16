@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書（所属機関等作成用2・特定技能）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
+.doc .en{font-size:5.4pt;color:#333;line-height:1.1;}
+.doc table.frm{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.frm td{border:0.6pt solid #000;padding:2px 3px;vertical-align:top;}
+.doc .lbl{font-size:7.4pt;}
+.doc .val{font-size:8.2pt;}
+.doc .sec{font-size:8pt;font-weight:bold;margin:1.5mm 0 0.8mm;}
+.doc .q{font-size:7.4pt;margin-top:1.2mm;}
+.doc .ind1{padding-left:1.2em;}
+.doc .digit{display:inline-block;border:0.6pt solid #000;width:3.2mm;height:3.6mm;text-align:center;font-size:7pt;line-height:3.6mm;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用2）　特定技能</div>
+    <div class="ver">ver.20260715.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shinsei_henkou_org2')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">2 (14)　取次機関<span style="font-weight:normal;font-size:9px;color:#aaa;">（情報の取次ぎを行う者）</span></div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_imName" oninput="p()"></div>
+      <div class="fg"><label>住所（所在地）</label><textarea id="f_imAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>電話番号</label><input id="f_imTel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">3　特定技能所属機関 (1)〜(10)</div>
+      <div class="fg"><label>(1) 氏名又は名称</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>(2) 法人番号（13桁）</label><input id="f_coCorp" oninput="p()" maxlength="13"></div>
+      <div class="fg"><label>(3) 雇用保険適用事業所番号（11桁）</label><input id="f_coEi" oninput="p()" maxlength="11"></div>
+      <div class="fg"><label>(4) 主たる業種（番号1つ）</label><input id="f_bizMain" oninput="p()"></div>
+      <div class="fg"><label>(4) 他の業種（番号・複数可）</label><input id="f_bizSub" oninput="p()" placeholder="カンマ区切り"></div>
+      <div class="fg"><label>(5) 住所（本店・主たる事務所）</label><textarea id="f_coAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>　電話番号</label><input id="f_coTel" oninput="p()"></div>
+      <div class="fg"><label>(6) 資本金（円）</label><input id="f_capital" oninput="p()"></div>
+      <div class="fg"><label>(7) 年間売上金額（直近年度・円）</label><input id="f_sales" oninput="p()"></div>
+      <div class="fg"><label>(8) 常勤職員数（名）</label><input id="f_staff" oninput="p()"></div>
+      <div class="fg"><label>(9) 代表者の氏名</label><input id="f_rep" oninput="p()"></div>
+      <div class="fg"><label>(10) 勤務させる事業所名</label><input id="f_office" oninput="p()"></div>
+      <div class="fg"><label>　所在地</label><textarea id="f_officeAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>　健康保険・厚生年金の適用事業所</label><select id="f_ins1" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>　労災保険・雇用保険の適用事業所</label><select id="f_ins2" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>　労働保険番号（2-2-6-3-4桁）</label>
+        <div style="display:flex;gap:3px;">
+          <input id="f_li1" oninput="p()" maxlength="2" placeholder="2"><input id="f_li2" oninput="p()" maxlength="2" placeholder="2">
+          <input id="f_li3" oninput="p()" maxlength="6" placeholder="6"><input id="f_li4" oninput="p()" maxlength="3" placeholder="3">
+          <input id="f_li5" oninput="p()" maxlength="4" placeholder="4">
+        </div>
+        <div style="font-size:10px;color:#888;">※末尾4桁は割り振られている場合のみ</div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">3 (11)〜(21)　欠格事由</div>
+      <div style="font-size:10px;color:#888;padding:2px 0;">通常はすべて「無」。該当する場合のみ「有」＋内容を記入</div>
+      <div id="ngRows"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784081370"></script>
+<script>
+// (11)〜(21) 欠格事由。[キー, 設問, 訳, 内容欄のラベル]
+const NG=[
+ ['q11','(11)労働，社会保険及び租税に関する法令の規定に違反したことの有無',
+  'Has the organization ever been in violation of the provisions of laws and regulations concerning labor, social insurance and taxes?','内容'],
+ ['q12','(12)特定技能雇用契約の締結の日前1年以内又は締結の日以後に，外国人が従事する業務と同種の業務に従事していた労働者を非自発的に離職させたことの有無',
+  'Has a worker who engaged in work of the same type as the foreign national been made to leave their job involuntarily within one year prior to the date of conclusion of the employment contract or thereafter?','内容・理由'],
+ ['q13','(13)特定技能雇用契約の締結の日前1年以内又は締結の日以後に，特定技能所属機関の責めに帰すべき事由により外国人の行方不明者を発生させたことの有無',
+  'Has the organization ever caused a foreign national to go missing due to reasons attributable to the organization within one year prior to the date of conclusion of the employment contract or thereafter?','内容'],
+ ['q14','(14)特定技能所属機関・その役員・支援責任者・支援担当者が法令に違反して刑に処せられたことの有無',
+  'Has the organization of affiliation, its officer, the person responsible for support or the support staff ever been punished for violating laws and regulations?','内容・該当者名'],
+ ['q15','(15)特定技能所属機関・その役員・支援責任者・支援担当者が特定技能雇用契約の適正な履行に影響する精神の機能の障害を有することの有無',
+  'Does the organization of affiliation, its officer, the person responsible for support or the support staff have a mental disorder affecting the proper performance of the employment contract?','内容・該当者名'],
+ ['q16','(16)特定技能所属機関・その役員・支援責任者・支援担当者が破産手続開始の決定を受けて復権を得ないことの有無',
+  'Has the organization of affiliation, its officer, the person responsible for support or the support staff received a decision to commence bankruptcy proceedings and not been restored to their rights?','内容・該当者名'],
+ ['q17','(17)特定技能所属機関・その役員・支援責任者・支援担当者が技能実習法第16条第1項の規定により実習認定を取り消されたことの有無',
+  'Has the organization of affiliation, its officer, the person responsible for support or the support staff had its training accreditation revoked under Article 16, paragraph 1 of the Technical Intern Training Act?','内容・該当者名'],
+ ['q18','(18)特定技能所属機関・その役員・支援責任者・支援担当者が技能実習法第16条第1項の規定により実習認定を取り消された法人の役員であったことの有無',
+  'Was the organization of affiliation, its officer, the person responsible for support or the support staff an officer of a corporation whose training accreditation was revoked under Article 16, paragraph 1 of the Technical Intern Training Act?','内容・該当者名'],
+ ['q19','(19)特定技能所属機関・その役員・支援責任者・支援担当者が特定技能雇用契約の締結の日前5年以内又は締結の日以後に，出入国又は労働に関する法令に関し不正又は著しく不当な行為をしたことの有無',
+  'Has the organization of affiliation, its officer, the person responsible for support or the support staff committed an improper or grossly unjust act with regard to immigration or labor laws within five years prior to the date of conclusion of the employment contract or thereafter?','内容・該当者名'],
+ ['q20','(20)特定技能所属機関・その役員・支援責任者・支援担当者が暴力団員であること又は5年以内に暴力団員であったことの有無',
+  'Is the organization of affiliation, its officer, the person responsible for support or the support staff a member of an organized crime group, or were they a member within the past five years?','内容・該当者名'],
+ ['q21','(21)特定技能所属機関・その役員・支援責任者・支援担当者の法定代理人（法人である場合はその役員）が(14)から(20)に該当することの有無（特定技能所属機関・その役員・支援責任者・支援担当者が営業に関し成年者と同一の行為能力を有しない未成年者である場合に記入）',
+  'Does the statutory agent (its officer in the case of a corporation) of the organization of affiliation, its officer, the person responsible for support or the support staff fall under items (14) to (20)?','内容・該当者名'],
+];
+(function(){
+  let h='';
+  NG.forEach(([k,ja,en,dl])=>{
+    h+=`<div style="border-top:1px dashed #444;margin-top:4px;padding-top:3px;">
+      <div style="font-size:10px;color:#888;line-height:1.4;">${ja.slice(0,44)}…</div>
+      <div class="fg"><label>有無</label><select id="f_${k}" onchange="p()"><option value=""></option><option>有</option><option selected>無</option></select></div>
+      <div class="fg"><label>${dl}</label><input id="f_${k}d" oninput="p()"></div>
+    </div>`;
+  });
+  document.getElementById('ngRows').innerHTML=h;
+})();
+
+function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function setPick(id, val){
+  const e=document.getElementById(id); if(!e) return;
+  e.value = (String(e.value||'').trim()===val) ? '' : val;
+  p();
+}
+function pick(id, a, b, ea, eb){
+  const cur=v_(id);
+  const O=(txt,sel)=>`<span onclick="setPick('${id}','${a===txt||ea===txt?a:b}')" style="cursor:pointer;padding:0 3px;${sel?'border:1px solid #000;border-radius:45%;':''}">${txt}</span>`;
+  let h=`<span style="white-space:nowrap;">${O(a,cur===a)}・${O(b,cur===b)}</span>`;
+  if(ea&&eb) h+=`<span class="en" style="margin-left:3px;white-space:nowrap;">${O(ea,cur===a)}／${O(eb,cur===b)}</span>`;
+  return h;
+}
+// 法人番号13桁・雇用保険番号11桁のマス目
+function digits(id, n){
+  const s=v_(id).replace(/[^0-9A-Za-z]/g,'');
+  let h='';
+  for(let i=0;i<n;i++) h+=`<span class="digit">${s[i]||''}</span>`;
+  return `<span data-bind="${id}">${h}</span>`;
+}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  let ng='';
+  NG.forEach(([k,ja,en,dl])=>{
+    ng+=`<div class="q">${ja}<div class="en">${en}</div>
+      <div style="margin-top:1px;">${pick('f_'+k,'有','無','Yes','No')}　（${dl}：${f('f_'+k+'d')}）
+        <div class="en">(${dl==='内容'?'Details':dl==='内容・理由'?'Details / Reason':'Details / Name of applicable person'}: )</div></div>
+    </div>`;
+  });
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:1.5mm;"><tr>
+  <td style="border:none;font-size:7.4pt;">所属機関等作成用 ２　　V　（「特定技能（1号）」・「特定技能（2号）」）
+    <div class="en">For organization, part 2　V ("Specified Skilled Worker (i)" / "Specified Skilled Worker (ii)")</div></td>
+  <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
+</tr></table>
+
+<div class="q">(14)取次機関（職業紹介事業者があっせんを行うに際し，情報の取次ぎを行う者がある場合に記入）
+  <div class="en">Intermediary organization (fill in this section if there is a person who intermediates information when the employment placement service provider carries out the mediation)</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:16%"><col style="width:38%"><col style="width:14%"><col style="width:32%"></colgroup>
+  <tr><td class="lbl">氏名又は名称<div class="en">Name of person or organization</div></td><td class="val" colspan="3">${f('f_imName')}</td></tr>
+  <tr>
+    <td class="lbl">住所（所在地）<div class="en">Address</div></td><td class="val">${f('f_imAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td><td class="val">${f('f_imTel')}</td>
+  </tr>
+</table>
+
+<div class="sec">3　特定技能所属機関 <span class="en">Organization of affiliation of the specified skilled worker</span></div>
+<div style="font-size:6pt;">※(3)及び(8)については，主に勤務させる事業所について記載すること
+  <div class="en">For sub-items (3) and (8), fill in the information of principal place of business where foreign national is to work</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:17%"><col style="width:35%"><col style="width:16%"><col style="width:32%"></colgroup>
+  <tr>
+    <td class="lbl">(1)氏名又は名称<div class="en">Name of person or organization ※本店又は主たる事務所のものを記入</div></td><td class="val">${f('f_coName')}</td>
+    <td class="lbl">(2)法人番号（13桁）<div class="en">Corporation no.</div></td><td class="val">${digits('f_coCorp',13)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(3)雇用保険適用事業所番号（11桁）<div class="en">Employment insurance application office number (11 digits) *If not applicable, it should be omitted.</div></td>
+    <td class="val" colspan="3">${digits('f_coEi',11)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(4)業種<div class="en">Business type</div></td>
+    <td class="val" colspan="3" style="font-size:7pt;">
+      ○主たる業種を別紙「業種一覧」から選択して番号を記入（１つのみ）：${f('f_bizMain')}<br>
+      ○他に業種があれば別紙「業種一覧」から選択して番号を記入（複数選択可）：${f('f_bizSub')}
+    </td>
+  </tr>
+  <tr>
+    <td class="lbl">(5)住所（所在地）<div class="en">Address ※本店又は主たる事務所のものを記入</div></td><td class="val">${f('f_coAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td><td class="val">${f('f_coTel')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(6)資本金<div class="en">Capital</div></td><td class="val">${f('f_capital')} 円 <span class="en">Yen</span></td>
+    <td class="lbl">(7)年間売上金額（直近年度）<div class="en">Annual sales (latest year)</div></td><td class="val">${f('f_sales')} 円 <span class="en">Yen</span></td>
+  </tr>
+  <tr>
+    <td class="lbl">(8)常勤職員数<div class="en">Number of full-time employees</div></td><td class="val">${f('f_staff')} 名</td>
+    <td class="lbl">(9)代表者の氏名<div class="en">Name of the representative</div></td><td class="val">${f('f_rep')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(10)勤務させる事業所名<div class="en">Name of place of business where foreign national is to work</div></td><td class="val">${f('f_office')}</td>
+    <td class="lbl">所在地<div class="en">Address</div></td><td class="val">${f('f_officeAddr')}</td>
+  </tr>
+  <tr>
+    <td class="lbl" colspan="2">健康保険及び厚生年金保険の適用事業所であることの有無
+      <div class="en">Does the place of business apply health insurance and employees' pension insurance?</div></td>
+    <td class="val" colspan="2" style="text-align:center;">${pick('f_ins1','有','無','Yes','No')}</td>
+  </tr>
+  <tr>
+    <td class="lbl" colspan="2">労災保険及び雇用保険の適用事業所であることの有無
+      <div class="en">Does the place of business apply industrial accident insurance and employment insurance?</div></td>
+    <td class="val" colspan="2" style="text-align:center;">${pick('f_ins2','有','無','Yes','No')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">労働保険番号<div class="en">Labor insurance number</div></td>
+    <td class="val" colspan="3">
+      ${digits('f_li1',2)}－${digits('f_li2',2)}－${digits('f_li3',6)}－${digits('f_li4',3)}－${digits('f_li5',4)}
+      <div class="en">（末尾４桁は割り振られている場合のみ記入）(Enter the last four digits only when they have been assigned.)</div>
+    </td>
+  </tr>
+</table>
+
+${ng}
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
+function resetForm(){
+  const ids=['f_imName','f_imAddr','f_imTel','f_coName','f_coCorp','f_coEi','f_bizMain','f_bizSub',
+    'f_coAddr','f_coTel','f_capital','f_sales','f_staff','f_rep','f_office','f_officeAddr',
+    'f_ins1','f_ins2','f_li1','f_li2','f_li3','f_li4','f_li5'];
+  NG.forEach(([k])=>ids.push('f_'+k+'d'));
+  ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+  // 欠格事由は「無」が既定
+  NG.forEach(([k])=>{const e=document.getElementById('f_'+k); if(e) e.value='無';});
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId, companyId, companyName}=info;
+  resetForm();
+  try{
+    const cases=await sb('cases?select=company,company_id&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    let co=null;
+    const cid=companyId||(cas&&cas.company_id);
+    // ver.20260715: 実在する列のみ指定する。存在しない列を混ぜるとPostgRESTがエラーを返し反映が全部止まる。
+    // 実データ件数(2,032社中): corp_no=1466 / capital=1512 / sales=1488 / employees=1514 / labor_ins_no=1410 / rep_name=1540
+    const sel='name,corp_no,pref,city,address,tel,capital,sales,employees,labor_ins_no,author_name,author_title,rep_name,rep_title';
+    if(cid){ const r=await sb('companies?select='+sel+'&id=eq.'+cid); co=r&&r[0]; }
+    if(!co){
+      const nm=companyName||(cas&&cas.company);
+      if(nm){ const r=await sb('companies?select='+sel+'&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; }
+    }
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(co){
+      s('f_coName',co.name||'');
+      s('f_coCorp',co.corp_no||'');
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_coTel',co.tel||'');
+      s('f_capital',co.capital||'');
+      s('f_sales',co.sales||'');
+      s('f_staff',co.employees||'');
+      s('f_rep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
+      // 労働保険番号は 2-2-6-3-4 桁。区切り文字が入っていても数字だけ取り出して各枠に配る。
+      if(co.labor_ins_no){
+        const d=String(co.labor_ins_no).replace(/[^0-9]/g,'');
+        if(d.length>=13){
+          s('f_li1',d.slice(0,2)); s('f_li2',d.slice(2,4)); s('f_li3',d.slice(4,10));
+          s('f_li4',d.slice(10,13)); s('f_li5',d.slice(13,17));
+        }
+      }
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = (ppW<docW) ? (ppW/docW) : 1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou_org2'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

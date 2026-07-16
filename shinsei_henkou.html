@@ -28,7 +28,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用1）　特定技能1号</div>
-    <div class="ver">ver.20260715.03</div>
+    <div class="ver">ver.20260715.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -292,6 +292,20 @@ Note : In case of to be found that you have misrepresented the facts in an appli
   fitDocToPreview();
 }
 
+// 案件切替時の初期化。既定値のある欄（13・在留期間・犯罪歴）は既定値に戻す。
+function resetForm(){
+  const ids=['f_nationality','f_birthY','f_birthM','f_birthD','f_name','f_gender','f_birthPlace',
+    'f_spouse','f_occupation','f_homeAddr','f_jpAddr','f_perTel','f_perCel','f_passport',
+    'f_passExpY','f_passExpM','f_passExpD','f_curStatus','f_curPeriod','f_expY','f_expM','f_expD',
+    'f_card','f_reason','f_crimeDetail','f_famYN'];
+  for(let i=1;i<=6;i++) FAM_COLS.forEach(([k])=>ids.push('f_fam'+i+k));
+  ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+  const d=(id,val)=>{const e=document.getElementById(id); if(e) e.value=val;};
+  d('f_newStatus','特定技能1号');   // 13 希望する在留資格（既定値）
+  d('f_newPeriod','1年');           // 　 在留期間（既定値）
+  d('f_crime','無');                // 15 犯罪歴（既定値）
+}
+
 // 'YYYY-MM-DD' → [Y,M,D]
 function _ymd(s){
   const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -306,6 +320,10 @@ async function loadFromDB(passedInfo){
   }
   if(!info || !info.caseId) return;
   const {caseId}=info;
+  // ver.20260715: 案件を切り替えたとき、前の案件の値が残らないよう必ず初期化する。
+  // 「値があれば入れる」だけだと、旅券ありの案件→旅券なしの案件で前の旅券番号が残り、
+  // 別人の情報が載った申請書を印刷してしまう。法定書類なので白紙に戻してから入れる。
+  resetForm();
   try{
     const [persons,cases]=await Promise.all([
       sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,expire,residence_card&case_id=eq.'+caseId),

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書（申請人等作成用2・特定技能）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
+.doc .en{font-size:5.6pt;color:#333;line-height:1.1;}
+.doc table.frm{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.frm td{border:0.6pt solid #000;padding:2px 3px;vertical-align:top;}
+.doc .lbl{font-size:7.6pt;}
+.doc .val{font-size:8.4pt;}
+.doc .sec{font-size:8pt;font-weight:bold;margin:1.5mm 0 0.8mm;}
+.doc .ind1{padding-left:1.2em;}
+.doc .ind2{padding-left:2.6em;}
+.doc .ind3{padding-left:4em;}
+.doc .ul{display:inline-block;border-bottom:0.6pt solid #000;min-width:12em;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">🪪 在留資格変更許可申請書（申請人等作成用2）　特定技能</div>
+    <div class="ver">ver.20260715.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shinsei_henkou2')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">17　特定技能所属機関</div>
+      <div class="fg"><label>(1) 氏名又は名称</label><input id="f_soName" oninput="p()"></div>
+      <div class="fg"><label>(2) 住所（所在地）</label><textarea id="f_soAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>　電話番号</label><input id="f_soTel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">18　技能水準</div>
+      <div class="fg"><label>証明方法</label>
+        <select id="f_sk" onchange="p()"><option value=""></option>
+          <option value="policy">分野別運用方針に定める評価方法による証明</option>
+          <option value="jisshu">技能実習2号を良好に修了</option>
+        </select></div>
+      <div class="fg"><label>└ 運用方針の内訳</label>
+        <select id="f_skSub" onchange="p()"><option value=""></option>
+          <option value="exam">試験による証明</option>
+          <option value="other">その他の評価方法による証明</option>
+        </select></div>
+      <div class="fg"><label>合格した試験名</label><input id="f_skExam" oninput="p()"></div>
+      <div class="fg"><label>受験地</label>
+        <select id="f_skLoc" onchange="p()"><option value=""></option><option value="jp">日本国内</option><option value="fr">日本国外</option></select></div>
+      <div class="fg"><label>└ 国名（国外の場合）</label><input id="f_skCountry" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">19　日本語能力<span style="font-weight:normal;font-size:9px;color:#aaa;">（1号希望時）</span></div>
+      <div class="fg"><label>証明方法</label>
+        <select id="f_jp" onchange="p()"><option value=""></option>
+          <option value="policy">分野別運用方針に定める評価方法による証明</option>
+          <option value="jisshu">技能実習2号を良好に修了</option>
+        </select></div>
+      <div class="fg"><label>└ 運用方針の内訳</label>
+        <select id="f_jpSub" onchange="p()"><option value=""></option>
+          <option value="exam">試験による証明</option>
+          <option value="other">その他の評価方法による証明</option>
+        </select></div>
+      <div class="fg"><label>合格した試験名</label><input id="f_jpExam" oninput="p()"></div>
+      <div class="fg"><label>受験地</label>
+        <select id="f_jpLoc" onchange="p()"><option value=""></option><option value="jp">日本国内</option><option value="fr">日本国外</option></select></div>
+      <div class="fg"><label>└ 国名（国外の場合）</label><input id="f_jpCountry" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">20　良好に修了した技能実習2号<span style="font-weight:normal;font-size:9px;color:#aaa;">（18・19で選択時）</span></div>
+      <div class="fg"><label>(1) 職種</label><input id="f_ti1Occ" oninput="p()"></div>
+      <div class="fg"><label>(1) 作業</label><input id="f_ti1Ope" oninput="p()"></div>
+      <div class="fg"><label>(1) 修了の証明</label>
+        <select id="f_ti1Prf" onchange="p()"><option value=""></option>
+          <option value="test">3級の技能検定等の実技試験の合格による証明</option>
+          <option value="doc">実習状況に関する書面による証明</option>
+        </select></div>
+      <div class="fg"><label>(2) 職種</label><input id="f_ti2Occ" oninput="p()"></div>
+      <div class="fg"><label>(2) 作業</label><input id="f_ti2Ope" oninput="p()"></div>
+      <div class="fg"><label>(2) 修了の証明</label>
+        <select id="f_ti2Prf" onchange="p()"><option value=""></option>
+          <option value="test">3級の技能検定等の実技試験の合格による証明</option>
+          <option value="doc">実習状況に関する書面による証明</option>
+        </select></div>
+    </div>
+    <div class="fs"><div class="fs-title">21　通算在留期間</div>
+      <div class="fg"><label>特定技能1号での通算在留期間</label>
+        <div style="display:flex;gap:4px;"><input id="f_totalY" oninput="p()" placeholder="年"><input id="f_totalM" oninput="p()" placeholder="月"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784081370"></script>
+<script>
+function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+// プレビュー上のチェックボックスをクリックで切替。実体はサイドバーの select。
+// 同じものを再クリックで解除できる（未選択に戻す）。
+function setSel(id, val){
+  const e=document.getElementById(id); if(!e) return;
+  e.value = (String(e.value||'').trim()===val) ? '' : val;
+  p();
+}
+function ck(id, val){
+  const on = v_(id)===val;
+  return `<span onclick="setSel('${id}','${val}')" style="cursor:pointer;font-family:monospace;">${on?'☑':'□'}</span>`;
+}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  // 18/19 は同じ構造なので共通で組む
+  const block=(pfx)=>`
+    <div class="ind1">${ck('f_'+pfx,'policy')} 分野別運用方針に定める評価方法による証明
+      <div class="en ind1">Proof based on the evaluation method specified in the field-specific operational policy</div></div>
+    <div class="ind2" style="margin-top:1px;">${ck('f_'+pfx+'Sub','exam')} 試験による証明
+      <div class="en ind1">Proof based on ${pfx==='sk'?'the passing of an exam':'a Japanese language test'}</div>
+      <table class="frm" style="margin:1px 0 2px;">
+        <colgroup><col style="width:26%"><col style="width:40%"><col style="width:34%"></colgroup>
+        <tr>
+          <td class="lbl">合格した試験名<div class="en">Name of passed exam</div></td>
+          <td class="val">${f('f_'+pfx+'Exam')}</td>
+          <td class="lbl">受験地 <span class="en">Exam location</span><br>
+            ${ck('f_'+pfx+'Loc','jp')} 日本国内 <span class="en">Japan</span><br>
+            ${ck('f_'+pfx+'Loc','fr')} 日本国外（国名：${f('f_'+pfx+'Country')}）
+            <div class="en">Foreign country／Country name</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="ind2">${ck('f_'+pfx+'Sub','other')} その他の評価方法による証明
+      <div class="en ind1">Proof based on some other evaluation method</div></div>
+    <div class="ind1" style="margin-top:1px;">${ck('f_'+pfx,'jisshu')} 技能実習2号を良好に修了
+      <div class="en ind1">Successfully completed Technical Intern Training (ii)</div></div>`;
+  // 20 の (1)(2) は同じ構造
+  const ti=(n)=>`
+    <div class="ind1" style="margin-top:1px;">(${n})職種・作業（技能実習法施行規則別表第2の職種・作業を記入）
+      <div class="en ind1">Occupation / Operations (Fill in the occupation /operations under Appended Table 2 of the Ordinance for Enforcement of the Technical Intern Training Act)</div>
+      <table class="frm" style="margin:1px 0 2px;">
+        <colgroup><col style="width:12%"><col style="width:38%"><col style="width:12%"><col style="width:38%"></colgroup>
+        <tr>
+          <td class="lbl">職種<div class="en">Occupation</div></td><td class="val">${f('f_ti'+n+'Occ')}</td>
+          <td class="lbl">作業<div class="en">Operations</div></td><td class="val">${f('f_ti'+n+'Ope')}</td>
+        </tr>
+      </table>
+      <div class="ind1">良好に修了したことの証明 <span class="en">Proof of successful completion</span></div>
+      <div class="ind2">${ck('f_ti'+n+'Prf','test')} 3級の技能検定又はこれに相当する技能実習評価試験の実技試験の合格による証明
+        <div class="en ind1">Proof based on passing Grade 3 of the National Trade Skills Test or the practical test of an equivalent technical intern training evaluation exam</div></div>
+      <div class="ind2">${ck('f_ti'+n+'Prf','doc')} 実習状況に関する書面による証明
+        <div class="en ind1">Proof based on a document relating to the status of the technical intern training</div></div>
+    </div>`;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:1.5mm;"><tr>
+  <td style="border:none;font-size:7.4pt;">申請人等作成用 ２　　V　（「特定技能（１号）」・「特定技能（２号）」）
+    <div class="en">For applicant, part 2　V ("Specified Skilled Worker (i)" / "Specified Skilled Worker (ii)")</div></td>
+  <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
+</tr></table>
+
+<div class="sec">17　特定技能所属機関 <span class="en">Organization of affiliation of the specified skilled worker</span></div>
+<table class="frm">
+  <colgroup><col style="width:19%"><col style="width:47%"><col style="width:12%"><col style="width:22%"></colgroup>
+  <tr>
+    <td class="lbl">(1) 氏名又は名称<div class="en">Name of person or organization</div></td>
+    <td class="val" colspan="3">${f('f_soName')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">(2) 住所（所在地）<div class="en">Address</div></td>
+    <td class="val">${f('f_soAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td>
+    <td class="val">${f('f_soTel')}</td>
+  </tr>
+</table>
+
+<div class="sec">18　技能水準 <span class="en">Skill level</span></div>
+${block('sk')}
+
+<div class="sec">19　日本語能力（「特定技能1号」での在留を希望する場合に記入）
+  <div class="en" style="font-weight:normal;">Japanese language ability (Fill in this section if you wish to reside in Japan with the status of residence of "Specified Skilled Worker (i)")</div></div>
+${block('jp')}
+
+<div class="sec">20　良好に修了した技能実習2号（上記18，19において技能実習2号を良好に修了を選択した場合に記入）
+  <div class="en" style="font-weight:normal;">Technical Intern Training (ii) that was successfully completed</div></div>
+${ti(1)}
+<div class="ind1" style="font-size:6.4pt;">（複数ある場合には(2)に記入） <span class="en">(Fill in (2) if you have several forms of proof)</span></div>
+${ti(2)}
+
+<div class="sec">21　申請時における特定技能1号での通算在留期間（過去の在留歴を含む。「特定技能1号」での在留を希望する場合に記入）
+  <div class="en" style="font-weight:normal;">Cumulative period of stay with "Specified Skilled Worker (i)" at the time of application</div></div>
+<div class="ind1" style="margin-top:1px;">${f('f_totalY')} <span style="font-size:6.4pt;">年 Year</span>　${f('f_totalM')} <span style="font-size:6.4pt;">月 Month</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
+function resetForm(){
+  ['f_soName','f_soAddr','f_soTel','f_sk','f_skSub','f_skExam','f_skLoc','f_skCountry',
+   'f_jp','f_jpSub','f_jpExam','f_jpLoc','f_jpCountry','f_ti1Occ','f_ti1Ope','f_ti1Prf',
+   'f_ti2Occ','f_ti2Ope','f_ti2Prf','f_totalY','f_totalM']
+   .forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId, companyId, companyName}=info;
+  resetForm();
+  try{
+    const [persons,cases]=await Promise.all([
+      sb('persons?select=jp_exam_1,jp_exam_loc_1,residence_status&case_id=eq.'+caseId),
+      sb('cases?select=company,company_id&id=eq.'+caseId)
+    ]);
+    const pd=persons&&persons[0], cas=cases&&cases[0];
+    let co=null;
+    const cid=companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb('companies?select=name,pref,city,address,tel&id=eq.'+cid); co=r&&r[0]; }
+    if(!co){
+      const nm=companyName||(cas&&cas.company);
+      if(nm){ const r=await sb('companies?select=name,pref,city,address,tel&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; }
+    }
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // 17 特定技能所属機関 ＝ 雇用する側の企業（登録支援機関ではない）
+    if(co){
+      s('f_soName',co.name||'');
+      s('f_soAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_soTel',co.tel||'');
+    }
+    // 19 日本語能力：アンシスに試験名・受験地があれば反映
+    if(pd){
+      if(pd.jp_exam_1){ s('f_jp','policy'); s('f_jpSub','exam'); s('f_jpExam',pd.jp_exam_1); }
+      if(pd.jp_exam_loc_1) s('f_jpLoc', /日本|国内|Japan/i.test(pd.jp_exam_loc_1) ? 'jp' : 'fr');
+      if(pd.jp_exam_loc_1 && !/日本|国内|Japan/i.test(pd.jp_exam_loc_1)) s('f_jpCountry',pd.jp_exam_loc_1);
+      // 技能実習からの変更なら 18 は「技能実習2号を良好に修了」が既定
+      if(/技能実習\s*2号/.test(pd.residence_status||'')) s('f_sk','jisshu');
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = (ppW<docW) ? (ppW/docW) : 1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou2'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留資格変更許可申請書（所属機関等作成用1・特定技能）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
+.doc .en{font-size:5.4pt;color:#333;line-height:1.1;}
+.doc table.frm{width:100%;border-collapse:collapse;table-layout:fixed;}
+.doc table.frm td{border:0.6pt solid #000;padding:2px 3px;vertical-align:top;}
+.doc .lbl{font-size:7.4pt;}
+.doc .val{font-size:8.2pt;}
+.doc .sec{font-size:8pt;font-weight:bold;margin:1.5mm 0 0.8mm;}
+.doc .q{font-size:7.4pt;margin-top:1.2mm;}
+.doc .ind1{padding-left:1.2em;}
+.doc .digit{display:inline-block;border:0.6pt solid #000;width:3.2mm;height:3.6mm;text-align:center;font-size:7pt;line-height:3.6mm;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用1）　特定技能</div>
+    <div class="ver">ver.20260715.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shinsei_henkou_org1')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">1　雇用している外国人</div>
+      <div class="fg"><label>氏名</label><input id="f_fname" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (1)　雇用契約期間</div>
+      <div class="fg"><label>開始</label><div style="display:flex;gap:4px;"><input id="f_csY" oninput="p()" placeholder="年"><input id="f_csM" oninput="p()" placeholder="月"><input id="f_csD" oninput="p()" placeholder="日"></div></div>
+      <div class="fg"><label>終了</label><div style="display:flex;gap:4px;"><input id="f_ceY" oninput="p()" placeholder="年"><input id="f_ceM" oninput="p()" placeholder="月"><input id="f_ceD" oninput="p()" placeholder="日"></div></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (2)　従事すべき業務の内容</div>
+      <div class="fg"><label>特定産業分野</label><input id="f_field" oninput="p()"></div>
+      <div class="fg"><label>業務区分</label><input id="f_cat" oninput="p()"></div>
+      <div class="fg"><label>主たる職種（番号1つ）</label><input id="f_occMain" oninput="p()" placeholder="例：74"></div>
+      <div class="fg"><label>他の職種（番号・複数可）</label><input id="f_occSub" oninput="p()" placeholder="カンマ区切り"></div>
+      <div style="font-size:10px;color:#888;padding:2px 0;">※ 別紙「職種一覧」の 1〜43, 45〜50, 55〜81, 100〜112, 999 から選択</div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (3)　所定労働時間</div>
+      <div class="fg"><label>週平均（時間）</label><input id="f_hoursW" oninput="p()"></div>
+      <div class="fg"><label>月平均（時間）</label><input id="f_hoursM" oninput="p()"></div>
+      <div class="fg"><label>通常の労働者と同等</label><select id="f_hoursEq" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (4)　月額報酬</div>
+      <div class="fg"><label>月額報酬（円）</label><input id="f_pay" oninput="p()"></div>
+      <div class="fg"><label>基本給の時間換算額（円）</label><input id="f_payH" oninput="p()"></div>
+      <div class="fg"><label>同等の日本人の月額報酬（円）</label><input id="f_payJp" oninput="p()"></div>
+      <div class="fg"><label>日本人と同等以上</label><select id="f_payEq" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (5)〜(11)</div>
+      <div class="fg"><label>(5) 報酬の支払方法</label><select id="f_payWay" onchange="p()"><option value=""></option><option value="cash">通貨払</option><option value="bank">口座振込み</option></select></div>
+      <div class="fg"><label>(6) 日本人と異なった待遇</label><select id="f_q6" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>　└ 内容</label><input id="f_q6d" oninput="p()"></div>
+      <div class="fg"><label>(7) 一時帰国の有給休暇</label><select id="f_q7" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>(8) 分野特有の告示基準に適合</label><select id="f_q8" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>(9) 帰国旅費の負担・出国措置</label><select id="f_q9" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>(10) 健康・生活状況の把握措置</label><select id="f_q10" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>(11) 適正な在留の告示基準に適合</label><select id="f_q11" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (12)　派遣先<span style="font-weight:normal;font-size:9px;color:#aaa;">（労働者派遣の場合）</span></div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_dpName" oninput="p()"></div>
+      <div class="fg"><label>法人番号（13桁）</label><input id="f_dpCorp" oninput="p()" maxlength="13"></div>
+      <div class="fg"><label>雇用保険適用事業所番号（11桁）</label><input id="f_dpEi" oninput="p()" maxlength="11"></div>
+      <div class="fg"><label>住所（所在地）</label><textarea id="f_dpAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>電話番号</label><input id="f_dpTel" oninput="p()"></div>
+      <div class="fg"><label>代表者の氏名</label><input id="f_dpRep" oninput="p()"></div>
+      <div class="fg"><label>派遣期間（開始）</label><div style="display:flex;gap:4px;"><input id="f_dpsY" oninput="p()" placeholder="年"><input id="f_dpsM" oninput="p()" placeholder="月"><input id="f_dpsD" oninput="p()" placeholder="日"></div></div>
+      <div class="fg"><label>派遣期間（終了）</label><div style="display:flex;gap:4px;"><input id="f_dpeY" oninput="p()" placeholder="年"><input id="f_dpeM" oninput="p()" placeholder="月"><input id="f_dpeD" oninput="p()" placeholder="日"></div></div>
+    </div>
+    <div class="fs"><div class="fs-title">2 (13)　職業紹介事業者<span style="font-weight:normal;font-size:9px;color:#aaa;">（あっせんがある場合）</span></div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_jaName" oninput="p()"></div>
+      <div class="fg"><label>法人番号（13桁）</label><input id="f_jaCorp" oninput="p()" maxlength="13"></div>
+      <div class="fg"><label>雇用保険適用事業所番号（11桁）</label><input id="f_jaEi" oninput="p()" maxlength="11"></div>
+      <div class="fg"><label>住所（所在地）</label><textarea id="f_jaAddr" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>電話番号</label><input id="f_jaTel" oninput="p()"></div>
+      <div class="fg"><label>許可・届出番号</label><input id="f_jaNo" oninput="p()"></div>
+      <div class="fg"><label>受理年月日</label><div style="display:flex;gap:4px;"><input id="f_jaY" oninput="p()" placeholder="年"><input id="f_jaM" oninput="p()" placeholder="月"><input id="f_jaD" oninput="p()" placeholder="日"></div></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784081370"></script>
+<script>
+function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function setPick(id, val){
+  const e=document.getElementById(id); if(!e) return;
+  e.value = (String(e.value||'').trim()===val) ? '' : val;
+  p();
+}
+// 「有・無」＋訳。選んだ側は日英とも丸で囲む。再クリックで解除。
+function pick(id, a, b, ea, eb){
+  const cur=v_(id);
+  const O=(txt,sel)=>`<span onclick="setPick('${id}','${a===txt||ea===txt?a:b}')" style="cursor:pointer;padding:0 3px;${sel?'border:1px solid #000;border-radius:45%;':''}">${txt}</span>`;
+  let h=`<span style="white-space:nowrap;">${O(a,cur===a)}・${O(b,cur===b)}</span>`;
+  if(ea&&eb) h+=`<span class="en" style="margin-left:3px;white-space:nowrap;">${O(ea,cur===a)}／${O(eb,cur===b)}</span>`;
+  return h;
+}
+function ck(id, val){
+  const on=v_(id)===val;
+  return `<span onclick="setSel('${id}','${val}')" style="cursor:pointer;font-family:monospace;">${on?'■':'□'}</span>`;
+}
+function setSel(id,val){ setPick(id,val); }
+// 法人番号13桁・雇用保険番号11桁のマス目。1文字ずつ枠に入れる。
+function digits(id, n){
+  const s=v_(id).replace(/[^0-9A-Za-z]/g,'');
+  let h='';
+  for(let i=0;i<n;i++) h+=`<span class="digit">${s[i]||''}</span>`;
+  return `<span data-bind="${id}">${h}</span>`;
+}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const yn=(id,ja,en)=>`
+    <div class="q" style="display:flex;align-items:flex-start;gap:6px;">
+      <div style="flex:1;">${ja}<div class="en">${en}</div></div>
+      <div style="white-space:nowrap;">${pick(id,'有','無','Yes','No')}</div>
+    </div>`;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<table style="width:100%;border-collapse:collapse;margin-bottom:1.5mm;"><tr>
+  <td style="border:none;font-size:7.4pt;">所属機関等作成用 １　　V　（「特定技能（1号）」・「特定技能（2号）」）
+    <div class="en">For organization, part 1　V ("Specified Skilled Worker (i)" / "Specified Skilled Worker (ii)")</div></td>
+  <td style="border:none;text-align:right;font-size:7.4pt;white-space:nowrap;">在留資格変更用<div class="en">For change of status</div></td>
+</tr></table>
+
+<div class="sec">1　雇用している外国人の氏名 <span class="en">Name of foreign national being offered employment</span></div>
+<table class="frm"><tr><td class="val">${f('f_fname')}</td></tr></table>
+
+<div class="sec">2　特定技能雇用契約 <span class="en">Employment contract for a specified skilled worker</span></div>
+<div class="q ind1">(1)雇用契約期間 <span class="en">Period of employment contract</span></div>
+<div class="ind1" style="font-size:8pt;">
+  ${f('f_csY')} <span style="font-size:6.4pt;">年</span> ${f('f_csM')} <span style="font-size:6.4pt;">月</span> ${f('f_csD')} <span style="font-size:6.4pt;">日</span> から
+  　${f('f_ceY')} <span style="font-size:6.4pt;">年</span> ${f('f_ceM')} <span style="font-size:6.4pt;">月</span> ${f('f_ceD')} <span style="font-size:6.4pt;">日</span> まで
+  <div class="en">from　Year Month Day　to　Year Month Day</div>
+</div>
+
+<div class="q ind1">(2)従事すべき業務の内容（複数ある場合は全て記入）
+  <div class="en">Contents of work to be engaged in (if there are several, fill in all of them)</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:16%"><col style="width:34%"><col style="width:12%"><col style="width:38%"></colgroup>
+  <tr>
+    <td class="lbl">特定産業分野<div class="en">Specified industrial field</div></td><td class="val">${f('f_field')}</td>
+    <td class="lbl">業務区分<div class="en">Work category</div></td><td class="val">${f('f_cat')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">職種<div class="en">Occupation</div></td>
+    <td class="val" colspan="3" style="font-size:7pt;">
+      ○主たる職種を別紙「職種一覧」から選択して番号を記入（１つのみ）：${f('f_occMain')}<br>
+      ○他に職種があれば別紙「職種一覧」から選択して番号を記入（複数選択可）：${f('f_occSub')}
+      <div class="en">（注意）※別紙「職種一覧」の1〜43,45〜50,55〜81,100〜112,999から選択してください。</div>
+    </td>
+  </tr>
+</table>
+
+<div class="q ind1" style="display:flex;align-items:flex-start;gap:6px;">
+  <div style="flex:1;">(3)所定労働時間（週平均）${f('f_hoursW')} 時間　／　所定労働時間（月平均）${f('f_hoursM')} 時間
+    <div class="en">Prescribed working hours (weekly average) hours ／ (monthly average) hours</div>
+    <div style="margin-top:1px;">所定労働時間が通常の労働者の所定労働時間と同等であることの有無
+      <div class="en">Are the prescribed working hours equivalent to those of a regular worker?</div></div>
+  </div>
+  <div style="white-space:nowrap;padding-top:6mm;">${pick('f_hoursEq','有','無','Yes','No')}</div>
+</div>
+
+<div class="q ind1">(4)月額報酬　<span style="font-size:6.4pt;">※各種手当（通勤・住宅・扶養等）・実費弁償の性格を有するものを除く。</span>　${f('f_pay')} 円
+  <div class="en">Monthly remuneration　Excludes various types of allowances (commuting, housing, dependents, etc.)　Yen</div>
+  <div style="margin-top:1px;">基本給の時間換算額 ${f('f_payH')} 円　／　同等の業務に従事する日本人の月額報酬 ${f('f_payJp')} 円
+    <div class="en">Time converted amount of basic salary　Yen ／ Monthly remuneration of Japanese national engaging in the same work　Yen</div></div>
+</div>
+<div class="q ind1" style="display:flex;align-items:flex-start;gap:6px;">
+  <div style="flex:1;">報酬の額が日本人が従事する場合の報酬の額と同等以上であることの有無
+    <div class="en">Will the foreign national receive an equal or greater amount of remuneration than a Japanese national?</div></div>
+  <div style="white-space:nowrap;">${pick('f_payEq','有','無','Yes','No')}</div>
+</div>
+
+<div class="q ind1">(5)報酬の支払方法　${ck('f_payWay','cash')} 通貨払　　${ck('f_payWay','bank')} 口座振込み
+  <div class="en">Payment method of remuneration　Paid in cash ／ Paid into a bank account</div></div>
+
+<div class="q ind1">(6)外国人であることを理由として日本人と異なった待遇としている事項の有無
+  <div class="en">Are any matters stipulated related to treatment that differs from that of Japanese nationals due to being a foreign national?</div>
+  <div style="margin-top:1px;">${pick('f_q6','有','無','Yes','No')}　（内容：${f('f_q6d')}）<span class="en">(Details: )</span></div>
+</div>
+${yn('f_q7','(7)外国人が一時帰国を希望した場合には，必要な有給休暇を取得させるものとしていることの有無','Will the foreign national be given the necessary paid leave if they wish to temporarily return to their home country?')}
+${yn('f_q8','(8)雇用関係につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）','Are the criteria, which are stipulated in a public notice in light of circumstances specific to the specified industrial field, met with regard to the employment relationship?')}
+${yn('f_q9','(9)外国人が特定技能雇用契約終了後の帰国に要する旅費を負担することができないときは，当該旅費を負担するとともに，出国が円滑になされるよう必要な措置を講ずることとしていることの有無','If a foreign national cannot afford the travel expenses required to return home after the employment contract ends, will the organization bear those expenses and take the necessary measures?')}
+${yn('f_q10','(10)外国人の健康の状況その他の生活の状況を把握するために必要な措置を講ずることとしていることの有無','Is the organization of affiliation taking the necessary measures to understand the health and other living conditions of the foreign national?')}
+${yn('f_q11','(11)外国人の適正な在留に資するために必要な事項につき特定産業分野に特有の事情に鑑みて告示で定められる基準に適合していることの有無（当該基準が定められている場合に記入）','Are the criteria, which are stipulated in a public notice in light of circumstances specific to the specified industrial field, met with regard to matters necessary for the appropriate residence of the foreign national?')}
+
+<div class="q ind1">(12)派遣先（労働者派遣の対象とする場合に記入）
+  <div class="en">Dispatch site (Fill in this section if the foreign national is subject to worker dispatch)</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:16%"><col style="width:38%"><col style="width:14%"><col style="width:32%"></colgroup>
+  <tr>
+    <td class="lbl">氏名又は名称<div class="en">Name of person or organization</div></td><td class="val">${f('f_dpName')}</td>
+    <td class="lbl">法人番号（13桁）<div class="en">Corporation no.</div></td><td class="val">${digits('f_dpCorp',13)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">雇用保険適用事業所番号（11桁）<div class="en">Employment insurance application office number (11 digits) *If not applicable, it should be omitted.</div></td>
+    <td class="val" colspan="3">${digits('f_dpEi',11)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">住所（所在地）<div class="en">Address</div></td><td class="val">${f('f_dpAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td><td class="val">${f('f_dpTel')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">代表者の氏名<div class="en">Name of the representative</div></td><td class="val" colspan="3">${f('f_dpRep')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">派遣期間<div class="en">Period of dispatch</div></td>
+    <td class="val" colspan="3">${f('f_dpsY')} 年 ${f('f_dpsM')} 月 ${f('f_dpsD')} 日 から　${f('f_dpeY')} 年 ${f('f_dpeM')} 月 ${f('f_dpeD')} 日 まで
+      <div class="en">from Year Month Day to Year Month Day</div></td>
+  </tr>
+</table>
+
+<div class="q ind1">(13)職業紹介事業者（特定技能雇用契約の成立をあっせんする職業紹介事業者がある場合に記入）
+  <div class="en">Employment placement service provider (fill in this section if there is a provider that mediates the conclusion of the employment contract)</div></div>
+<table class="frm" style="margin-top:1px;">
+  <colgroup><col style="width:16%"><col style="width:38%"><col style="width:14%"><col style="width:32%"></colgroup>
+  <tr>
+    <td class="lbl">氏名又は名称<div class="en">Name of person or organization</div></td><td class="val">${f('f_jaName')}</td>
+    <td class="lbl">法人番号（13桁）<div class="en">Corporation no.</div></td><td class="val">${digits('f_jaCorp',13)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">雇用保険適用事業所番号（11桁）<div class="en">Employment insurance application office number (11 digits) *If not applicable, it should be omitted.</div></td>
+    <td class="val" colspan="3">${digits('f_jaEi',11)}</td>
+  </tr>
+  <tr>
+    <td class="lbl">住所（所在地）<div class="en">Address</div></td><td class="val">${f('f_jaAddr')}</td>
+    <td class="lbl">電話番号<div class="en">Telephone No.</div></td><td class="val">${f('f_jaTel')}</td>
+  </tr>
+  <tr>
+    <td class="lbl">許可・届出番号<div class="en">Permission / notification no.</div></td><td class="val">${f('f_jaNo')}</td>
+    <td class="lbl">受理年月日<div class="en">Date of receipt</div></td>
+    <td class="val">${f('f_jaY')} 年 ${f('f_jaM')} 月 ${f('f_jaD')} 日<div class="en">Year Month Day</div></td>
+  </tr>
+</table>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
+function resetForm(){
+  ['f_fname','f_csY','f_csM','f_csD','f_ceY','f_ceM','f_ceD','f_field','f_cat','f_occMain','f_occSub',
+   'f_hoursW','f_hoursM','f_hoursEq','f_pay','f_payH','f_payJp','f_payEq','f_payWay',
+   'f_q6','f_q6d','f_q7','f_q8','f_q9','f_q10','f_q11',
+   'f_dpName','f_dpCorp','f_dpEi','f_dpAddr','f_dpTel','f_dpRep','f_dpsY','f_dpsM','f_dpsD','f_dpeY','f_dpeM','f_dpeD',
+   'f_jaName','f_jaCorp','f_jaEi','f_jaAddr','f_jaTel','f_jaNo','f_jaY','f_jaM','f_jaD']
+   .forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+}
+function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId, companyId, companyName}=info;
+  resetForm();
+  try{
+    const [persons,cases]=await Promise.all([
+      sb('persons?select=applicant_name_en,contract_end&case_id=eq.'+caseId),
+      sb('cases?select=applicant,company,company_id,emp_set_idx,job_category,contract_end&id=eq.'+caseId)
+    ]);
+    const pd=persons&&persons[0], cas=cases&&cases[0];
+    let co=null;
+    const cid=companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb('companies?select=emp_sets&id=eq.'+cid); co=r&&r[0]; }
+    if(!co&&(companyName||(cas&&cas.company))){
+      const nm=companyName||cas.company;
+      const r=await sb('companies?select=emp_sets&name=eq.'+encodeURIComponent(nm)); co=r&&r[0];
+    }
+    // 雇用条件書セット（emp_sets）から契約条件を引く
+    let es={};
+    const idx=(info.empSetIdx!==undefined&&info.empSetIdx!=='')?info.empSetIdx:(cas&&cas.emp_set_idx);
+    if(co&&Array.isArray(co.emp_sets)&&/^[0-9]+$/.test(String(idx))) es=co.emp_sets[+idx]||{};
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    s('f_fname',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'');
+    // 業務区分は emp_set.category → cases.job_category のフォールバック（重説と同じ流儀）
+    s('f_field',es.applicantField||'');
+    s('f_cat',es.category||(cas&&cas.job_category)||'');
+    s('f_hoursW',es.workHoursWeek||'');
+    s('f_hoursM',es.workHoursMonth||'');
+    s('f_pay',es.basicSalary||'');
+    const ce=_ymd((pd&&pd.contract_end)||(cas&&cas.contract_end));
+    if(ce[0]){ s('f_ceY',ce[0]); s('f_ceM',ce[1]); s('f_ceD',ce[2]); }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = (ppW<docW) ? (ppW/docW) : 1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou_org1'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
