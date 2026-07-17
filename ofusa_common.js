@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260715.05
+ * ver.20260717.01
  */
 
 // ===== Supabase =====
@@ -615,7 +615,15 @@ async function loadCaseToForm(info, docKey){
     setValMulti(['f_exp','es_experience','es_exp'], pd.experience);
 
     // === emp_sets 全フィールドを自動で es_xxx / f_xxx にセット ===
+    // ver.20260717: emp_sets は「会社の雇用条件のひな形」で案件IDを持たず、複数案件で使い回される。
+    // そこに氏名が焼き付いていると、このループが上の「案件から入れた氏名」を後から上書きし、
+    // 別人の氏名が法定書類に載る事故が起きた（1-5号 case_1783414630377 で発覚）。
+    // 氏名は案件(cases.applicant / persons)からのみ引くべきなので、ここでは流し込まない。
+    // ※ nationality / birthdate / passport 等は persons 由来の経路が無く、
+    //   ここで流し込まないと31書類が空欄になるため、除外対象に含めない。
+    const _ES_SKIP = ['applicantName','applicantNameEn'];
     Object.keys(es).forEach(k => {
+      if(_ES_SKIP.includes(k)) return;   // 氏名はひな形から流さない
       setValMulti(['es_'+k, 'f_'+k], es[k]);
     });
 
