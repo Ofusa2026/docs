@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260716.01</div>
+    <div class="ver">ver.20260716.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -425,6 +425,8 @@ function p(){
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
   const _ff=v('es_flexFlg'); const flexOn = !!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff);
+  // ver.20260716: 賞与も退職金と同じく cb() でプレビュー上のクリック切替を効かせる
+  const bonusOn = v('es_bonus')==='有';
   const retOn = v('es_retirement')==='有' || !!v('es_retirementDetail');
   const _sf=v('es_shiftFlg'); const shiftOn = !!_sf && !/^なし$|^無$|しない/.test(_sf);
   let allowLine1='',allowLine2='';
@@ -791,8 +793,8 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">９．賞与<br><span class="id" style="font-size:7pt;">9. โบนัส</span></td>
-          <td style="vertical-align:top;">${v('es_bonus')==='有'?'■':'□'}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${v('es_bonus')==='有'?'■':'□'} มี   (ระยะเวลา, จำนวนเงิน ฯลฯ&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
-          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${v('es_bonus')==='無'?'■':'□'}&nbsp;無<br><span class="id" style="font-size:7pt;">${v('es_bonus')==='無'?'■':'□'} ไม่หัก</span></td>
+          <td style="vertical-align:top;">${cb(bonusOn,"bonus_yes")}&nbsp;有（時期，金額等&emsp;${f('es_bonusCondition')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(bonusOn,"bonus_yes_id")} มี   (ระยะเวลา, จำนวนเงิน ฯลฯ&emsp;${f('es_bonusConditionEn')}&emsp;)</span></td>
+          <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(!bonusOn,"bonus_no")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(!bonusOn,"bonus_no_id")} ไม่หัก</span></td>
         </tr>
         <tr>
           <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;">10. เงินชดเชยกรณีที่ให้เมื่อออกจากงาน มี</span></td>
