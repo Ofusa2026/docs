@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260717.01
+ * ver.20260717.03
  */
 
 // ===== Supabase =====
@@ -885,9 +885,43 @@ async function saveFormGeneric(docKey, opts){
     const idx = parseInt(empSetIdx||0)||0;
 
     // 既存の extra を取得
-    const cos = await sb('companies?select=id,extra&id=eq.'+companyId);
-    const co = cos && cos[0];
-    if(!co){ throw new Error('会社レコードが見つかりません'); }
+    let cos = await sb('companies?select=id,extra&id=eq.'+companyId);
+    let co = cos && cos[0];
+    // ver.20260717: cases.company_id が実在しない会社を指している案件が19件あり（会社の作り直し等が原因）、
+    // その場合ここで0件になり「会社レコードが見つかりません」で保存が丸ごと失敗していた。
+    // うち10件は会社名なら引けるので、id で駄目なら会社名にフォールバックする。
+    if(!co){
+      let _nm = (typeof companyName!=='undefined' && companyName) || '';
+      if(!_nm && info && info.caseId){
+        try{
+          const _cs = await sb('cases?select=company&id=eq.'+info.caseId);
+          if(_cs && _cs[0]) _nm = _cs[0].company || '';
+        }catch(e){}
+      }
+      if(_nm){
+        const _r = await sb('companies?select=id,extra&name=eq.'+encodeURIComponent(_nm));
+        if(_r && _r[0]){
+          co = _r[0];
+          companyId = co.id;   // 以降の更新も正しい会社に向ける
+          console.warn('[save] company_id が実在しないため会社名で解決:', _nm, '→', companyId);
+        }
+      }
+    }
+    if(!co){
+      // ver.20260717: ここに来る原因は2通りある。文言が「会社レコードが見つかりません」だけだと
+      // 認証切れなのかデータ不備なのか判別できず、原因究明に時間がかかったため切り分けて出す。
+      //  ① 認証トークンの失効 → RLSで0件が返る（画面を長時間開いたまま保存すると起きる）
+      //  ② cases.company_id が実在しない会社を指している（会社の作り直し等）
+      let _alive = null;
+      try{
+        const _probe = await sb('companies?select=id&limit=1');
+        _alive = !!(_probe && _probe.length);
+      }catch(e){ _alive = false; }
+      if(_alive === false){
+        throw new Error('ログインの有効期限が切れています。画面を再読み込み（Ctrl+Shift+R）してから、もう一度保存してください');
+      }
+      throw new Error('この案件の所属機関が見つかりません（会社ID: '+companyId+' / 会社名: '+(companyName||'不明')+'）。アンシスで所属機関を選び直してください');
+    }
 
     const extra = co.extra && typeof co.extra === 'object' ? JSON.parse(JSON.stringify(co.extra)) : {};
     if(!extra[docKey]) extra[docKey] = {};

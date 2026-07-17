@@ -32,7 +32,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 แบบอ้างอิงที่ 1-16（タイ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260714.12</div>
+    <div class="ver">ver.20260717.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -143,6 +143,20 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 </div>
 <script src="ofusa_common.js?v=1784081370"></script>
 <script>
+// 手数料として有効な値か判定する。
+// 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
+function _isRealFee(v){
+  if(v===null || v===undefined) return false;
+  const s=String(v).trim();
+  if(!s || s==='-' || s==='‐' || s==='ー' || s==='—') return false;
+  if(/待ち|済|完了|作成|中$|不要|なし|無し/.test(s)) return false;   // ステータス文言
+  if(/GMT|\d{4}-\d{2}-\d{2}|Mon |Tue |Wed |Thu |Fri |Sat |Sun /.test(s)) return false;  // 日付
+  let t=s.replace(/[，,\s]/g,'');
+  const man=t.match(/^([0-9.]+)万/);              // 「20万円」
+  if(man) return parseFloat(man[1])>0;
+  const num=t.match(/([0-9]+)/);                  // 「25000円」「25,000円」
+  return !!num && parseInt(num[1],10)>0;
+}
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -442,7 +456,14 @@ async function loadFromDB(passedInfo){
       if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
       const _am=AGENCY_MASTER[ir.agency_name];
       if(_am){ s('f_ag_addr',_am.addr); s('f_ag_tel',_am.tel); s('f_ag_license',_am.license); const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value)_t.value=_am.type; }
-      const _as=document.getElementById('es_assen'); if(_as) _as.value='有';
+      // ver.20260717: 以前は agency_name があれば無条件で「有」にしていたが、
+      // agency_name は intake_requests 2,388件すべてに入っており（＝登録支援機関名がそのまま入る）、
+      // 斡旋の有無を表す項目ではなかった。そのため手で「無」にしても読込のたびに「有」へ戻っていた。
+      // 実際に手数料が発生している場合のみ「有」とする。
+      // ※ intro_fee には「申請済み」等のステータスや日付が混入しているため（96件）、
+      //   金額として解釈できる値だけを採用する。「25,000円」「20万円」等の表記ゆれも拾う。
+      const _as=document.getElementById('es_assen');
+      if(_as && _isRealFee(ir.intro_fee)) _as.value='有';
     }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
