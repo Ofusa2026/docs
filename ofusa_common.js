@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260717.03
+ * ver.20260717.04
  */
 
 // ===== Supabase =====
@@ -188,6 +188,21 @@ window._htmlFrozen=window._htmlFrozen||false;
 function freezeLoadedHtml(){window._htmlFrozen=true;}
 function unfreezeLoadedHtml(){window._htmlFrozen=false;if(typeof p==='function')p();}
 
+// ===== 直接編集の未保存検知（ver.20260717） =====
+// 直接編集は「✏️直接編集 → 編集 → 💾DB保存」で companies.extra['_edited'] に保存される。
+// 保存せずにタブを閉じたり案件を切り替えると編集内容は消えるが、
+// 画面上は編集後の見た目のままなので気づけない。未保存のまま離脱する前に知らせる。
+window._editedDirty = false;
+function markEditedDirty(){ window._editedDirty = true; }
+function clearEditedDirty(){ window._editedDirty = false; }
+window.addEventListener('beforeunload', function(e){
+  if(window._editedDirty){
+    e.preventDefault();
+    e.returnValue = '直接編集した内容がまだ保存されていません。';
+    return e.returnValue;
+  }
+});
+
 // ===== 印刷・トースト =====
 // ver.20260710: 空欄フィールドのプレースホルダ(es.xxx / f_xxx 等の変数名)は
 //   画面編集用の目印であり、PDF/印刷には出さない。
@@ -233,6 +248,11 @@ function toggleEditMode(){
 function enableDocEditing(on){
   const area=document.getElementById('pageArea');
   if(!area)return;
+  // ver.20260717: 直接編集の未保存を検知する。editable 中の入力を1度だけ拾えばよい。
+  if(on && !area.dataset.dirtyHooked){
+    area.dataset.dirtyHooked='1';
+    area.addEventListener('input', function(){ if(_editMode) markEditedDirty(); });
+  }
   area.querySelectorAll('.doc').forEach(doc=>{
     if(on){
       doc.setAttribute('contenteditable','true');
@@ -518,6 +538,18 @@ function loadEditedHTML(){
    ========================================================== */
 async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
+  // ver.20260717: 直接編集が未保存のまま別の案件に切り替えると編集内容が失われる。
+  // 画面は編集後の見た目のままなので気づけないため、切り替える前に確認する。
+  // 同じ案件の再読込（言語切替など）では聞かない。
+  try{
+    const _prev = window._lastCaseInfo && window._lastCaseInfo.caseId;
+    if(window._editedDirty && _prev && _prev !== info.caseId){
+      if(!confirm('直接編集した内容がまだ保存されていません。\n案件を切り替えると編集内容は失われます。\n\n切り替えますか？\n（保存する場合は「キャンセル」を押して「💾 DB保存」）')){
+        return;
+      }
+    }
+    if(_prev !== info.caseId) clearEditedDirty();
+  }catch(e){}
   // ver.20260611: 親から渡されたログイントークンを保持（RLS用）
   try{ if(info.token) window.__OFUSA_SB_TOKEN = info.token; }catch(e){}
   // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
@@ -931,6 +963,8 @@ async function saveFormGeneric(docKey, opts){
     };
 
     // 直接編集版HTMLも保存（編集中/フリーズ時のみ・ファイル名単位のキーで言語別に分離）
+    // ※ toggleEditMode() は編集終了時に _htmlFrozen=true を立てるため、
+    //   「✏️直接編集をON→編集→OFF→DB保存」でも保存対象になる（検証済み）。
     try{
       if(window._htmlFrozen || (typeof _editMode !== 'undefined' && _editMode)){
         const _area = document.getElementById('pageArea');
@@ -984,6 +1018,7 @@ async function saveFormGeneric(docKey, opts){
     if(window._editedJustSaved){ msg += '＋直接編集版も保存'; window._editedJustSaved = false; }
     if(typeof showToast==='function') showToast(msg);
     else alert(msg);
+    clearEditedDirty();   // 保存できたので離脱警告を解除
   } catch(err){
     console.error('[saveFormGeneric]', err);
     if(typeof showToast==='function') showToast('⚠️ 保存エラー: ' + err.message);
@@ -1032,21 +1067,26 @@ async function loadFormGenericFromDB(docKey, info){
     if(!co || !co.extra) return;
     const idx = parseInt(empSetIdx||0)||0;
     const data = co.extra && co.extra[docKey] && co.extra[docKey][String(idx)];
-    if(!data) return;
-    // 既存の値を上書きしない（loadCaseToFormで既にセットされている可能性）
-    Object.keys(data).forEach(id => {
-      if(id.startsWith('_')) return; // _savedAt等
-      const el = document.getElementById(id);
-      if(!el) return;
-      if(el.type === 'checkbox' || el.type === 'radio'){
-        el.checked = !!data[id];
-      } else {
-        // 既に値があってもDBの値で上書き(DBが正)
-        el.value = data[id] || '';
-      }
-    });
-    if(typeof p === 'function') p();
-    if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting();
+    // ver.20260717: ここで `if(!data) return;` していたため、通常のフォーム値(extra[docKey])が
+    // 未保存の案件では、直接編集版(extra['_edited'])の復元処理まで到達せず、
+    // 「保存しました」と出るのにリロードすると元に戻る、という状態になっていた。
+    // フォーム値が無くても直接編集版の復元は行う。
+    if(data){
+      // 既存の値を上書きしない（loadCaseToFormで既にセットされている可能性）
+      Object.keys(data).forEach(id => {
+        if(id.startsWith('_')) return; // _savedAt等
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(el.type === 'checkbox' || el.type === 'radio'){
+          el.checked = !!data[id];
+        } else {
+          // 既に値があってもDBの値で上書き(DBが正)
+          el.value = data[id] || '';
+        }
+      });
+      if(typeof p === 'function') p();
+      if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting();
+    }
     // 直接編集版があれば復元（案件ID・ファイル名単位）
     try{
       const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
