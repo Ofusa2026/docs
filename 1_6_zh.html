@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260720.07</div>
+    <div class="ver">ver.20260720.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784554888"></script>
+<script src="ofusa_common.js?v=1784555328"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -439,7 +439,7 @@ function p(){
 
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
-  const _ff=v('es_flexFlg'); const flexOn = !!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff);
+  const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const flexTypeShown=v('es_flexType')||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && !!_vw);
   // ver.20260716: 賞与も退職金と同じく cb() でプレビュー上のクリック切替を効かせる
   const bonusOn = v('es_bonus')==='有';
   const retOn = v('es_retirement')==='有' || !!v('es_retirementDetail');
@@ -627,7 +627,7 @@ function p(){
       </div>
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【Trường hợp chế độ sau đây được áp dụng cho người lao động】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
-        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${v('es_flexType')?'：（<span class="f">'+esc(v('es_flexType').replace(/単位/g,''))+'</span>）単位の変形労働時間制':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
+        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${flexTypeShown?'：（<span class="f">'+esc(flexTypeShown.replace(/単位/g,''))+'</span>）単位の変形労働時間制':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
         <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} Chế độ thời gian làm việc biến hình: Chế độ thời gian làm việc biến hình đơn vị (${f('es_flexUnitEn')})</span>
         <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* Trường hợp đang sử dụng chế độ thời gian làm việc biến hình có đơn vị là 1 năm thì sẽ kèm theo bản sao lịch trong năm có ghi cả ngôn ngữ mà bên B có thể hiểu được đầy đủ và bản sao bản hiệp định liên quan.</span></div>
         <div style="margin-top:2px;">${cb(shiftOn,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} Kết hợp thời gian lao động sau đây như chế độ xen kẽ.</span></div>
