@@ -149,6 +149,16 @@ let _cbSeq=0;
 function resetCbSeq(){_cbSeq=0;}
 const cb=(on,id)=>{const state=id&&window.cbState[id]!==undefined?window.cbState[id]:on;return`<span class="cb-click" onclick="toggleCb('${id||''}')" data-cbid="${id||''}">${state?'■':'□'}</span>`;};
 function toggleCb(id){if(!id)return;window.cbState[id]=!window.cbState[id];document.querySelectorAll(`[data-cbid="${id}"]`).forEach(el=>{el.textContent=window.cbState[id]?'■':'□';});}
+// 保険の加入判定：読込済みemp_set(window._empLoadedSet)の値を見て、未加入系のみ false。
+// 未設定/空は従来どおり「加入(true)」を既定にする。プレビューの cb() の既定値に使う。
+function insEnrolled(dbKey){
+  try{
+    var s=window._empLoadedSet||{}; var v=s[dbKey];
+    if(v==null) return true;
+    v=String(v).trim(); if(v==='') return true;
+    return !/^(未加入|未加入です|なし|無|false|no|0|×|✕|x)$/i.test(v);
+  }catch(_e){ return true; }
+}
 
 /* ============================================================
    applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
