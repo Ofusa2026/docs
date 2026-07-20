@@ -590,6 +590,11 @@ async function loadCaseToForm(info, docKey){
     // emp_sets 取得
     const idx = parseInt(empSetIdx||0)||0;
     const es = (co.emp_sets||[])[idx] || {};
+    // ①: 雇用条件セットセレクタを描画（#empSetSelectorSlot がある書類のみ）
+    window._empDocKey = docKey;
+    window._empLoadedIdx = idx;
+    try{ window._empLoadedSet = JSON.parse(JSON.stringify(es)); }catch(_e){ window._empLoadedSet = {}; }
+    try{ if(typeof renderEmpSetSelector==='function') renderEmpSetSelector(co, idx, info); }catch(_e){}
 
     // 入力欄にセット：複数のID候補を試して存在するものにセット
     const setValMulti = (ids, val) => {
@@ -1191,3 +1196,127 @@ document.addEventListener('click', function(e){
     }
   }catch(_e){}
 });
+
+/* =========================================================================
+   雇用条件セット セレクタ＆保存モード（①②: ver.20260720 追加）
+   - ①: 書類上部でどの emp_sets を使うか選び、選択時に cases.emp_set_idx を保存
+   - ②: 保存時に編集の有無を見て「新セット作成＋紐付け(B)／元セット上書き(C)」を選ばせる
+   すべて追記のみ・#empSetSelectorSlot が無い書類では何もしない（既存挙動を変えない）
+   ========================================================================= */
+(function(){
+  function _empSetLabel(set,i){
+    var nm=(set&&set.setName)?String(set.setName):('条件セット'+(i+1));
+    return '['+i+'] '+nm;
+  }
+  // ① セレクタ描画（#empSetSelectorSlot がある書類でのみ）
+  window.renderEmpSetSelector=function(co,idx,info){
+    try{
+      var slot=document.getElementById('empSetSelectorSlot');
+      if(!slot) return;
+      var sets=(co&&co.emp_sets)||[];
+      window._empCtx={companyId:(co&&co.id)||info.companyId||'',empSets:sets,caseId:info.caseId};
+      window._empDocKey=window._empDocKey||'';
+      if(!co||!co.id||sets.length===0){
+        slot.innerHTML='<div style="font-size:10px;color:#b45309;margin-top:6px;">📑 雇用条件セット: 会社未解決またはセット未登録</div>';
+        return;
+      }
+      var empty=(info.empSetIdx===undefined||info.empSetIdx===null||String(info.empSetIdx)==='');
+      var opts=sets.map(function(s,i){
+        return '<option value="'+i+'"'+(i===idx?' selected':'')+'>'+_empSetLabel(s,i).replace(/</g,'&lt;')+'</option>';
+      }).join('');
+      slot.innerHTML=
+        '<label style="font-size:11px;font-weight:bold;color:#334155;display:block;margin-top:6px;">📑 雇用条件セット'+
+        (empty?' <span style="color:#b45309;">(未指定→仮に'+idx+'番)</span>':'')+'</label>'+
+        '<select id="empSetSelect" onchange="onEmpSetSelectChange()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">'+opts+'</select>';
+    }catch(e){ console.warn('[empSel] render',e); }
+  };
+  // ① セレクタ変更 → その idx で再読込 ＋ cases.emp_set_idx を保存
+  window.onEmpSetSelectChange=async function(){
+    try{
+      var sel=document.getElementById('empSetSelect'); if(!sel) return;
+      var newIdx=parseInt(sel.value,10)||0;
+      var info=window._lastCaseInfo; if(!info||!info.caseId) return;
+      await sb('cases?id=eq.'+info.caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
+      info=Object.assign({},info,{empSetIdx:String(newIdx)});
+      window._lastCaseInfo=info;
+      if(typeof showToast==='function') showToast('雇用条件セットを['+newIdx+']に切替・保存しました');
+      if(typeof loadCaseToForm==='function') await loadCaseToForm(info,window._empDocKey||'');
+    }catch(e){ alert('雇用条件セットの切替に失敗: '+(e&&e.message||e)); }
+  };
+  // ② 読込後のフォーム基準値スナップショット（es_* 欄）
+  window.snapshotEmpBaseline=function(){
+    var snap={};
+    document.querySelectorAll('[id^="es_"]').forEach(function(el){ snap[el.id]=el.value; });
+    window._empBaseline=snap;
+  };
+  // ② 基準値との差分（ユーザーが読込後に触ったか）
+  window.isEmpDirtyByForm=function(){
+    var snap=window._empBaseline; if(!snap) return false;
+    var dirty=false;
+    document.querySelectorAll('[id^="es_"]').forEach(function(el){
+      if((snap[el.id]||'')!==(el.value||'')) dirty=true;
+    });
+    return dirty;
+  };
+  // ② 保存モード選択モーダル → Promise<'new'|'overwrite'|null>
+  window.promptEmpSaveMode=function(companyId,idx){
+    return new Promise(function(resolve){
+      // フィル処理と同じ判定(parseInt(emp_set_idx||0)||0)で、この idx に化ける案件を数える
+      // ＝空欄/未設定の案件も idx===0 のときに正しくカウントされる
+      sb('cases?select=emp_set_idx&company_id=eq.'+encodeURIComponent(companyId))
+        .then(function(rows){
+          var cnt=(rows||[]).filter(function(r){ return (parseInt(r.emp_set_idx||0)||0)===idx; }).length;
+          _showEmpModal(cnt,resolve);
+        })
+        .catch(function(){ _showEmpModal(null,resolve); });
+    });
+  };
+  function _showEmpModal(cnt,resolve){
+    var wrap=document.createElement('div');
+    wrap.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100000;display:flex;align-items:center;justify-content:center;';
+    var cntTxt=(cnt==null)?'':('この条件セットを使う案件 '+cnt+'件に反映されます');
+    wrap.innerHTML=
+      '<div style="background:#fff;border-radius:12px;max-width:470px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-family:sans-serif;box-sizing:border-box;">'+
+        '<div style="font-size:15px;font-weight:bold;margin-bottom:6px;color:#1e293b;">雇用条件を変更しました</div>'+
+        '<div style="font-size:12px;color:#64748b;margin-bottom:16px;line-height:1.6;">保存方法を選んでください。</div>'+
+        '<button id="_emNew" style="display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 12px;border:1px solid #2563eb;background:#eff6ff;color:#1e3a8a;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">🆕 新しい雇用条件セットとして作成し、この案件に紐付け<br><span style="font-size:11px;color:#475569;">他の案件には影響しません</span></button>'+
+        '<button id="_emOver" style="display:block;width:100%;text-align:left;margin-bottom:14px;padding:11px 12px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">♻️ 元の雇用条件セットを上書き<br><span style="font-size:11px;color:#b45309;">'+cntTxt+'</span></button>'+
+        '<div style="text-align:right;"><button id="_emCancel" style="padding:7px 16px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button></div>'+
+      '</div>';
+    document.body.appendChild(wrap);
+    function done(v){ try{document.body.removeChild(wrap);}catch(e){} resolve(v); }
+    wrap.querySelector('#_emNew').onclick=function(){done('new');};
+    wrap.querySelector('#_emOver').onclick=function(){done('overwrite');};
+    wrap.querySelector('#_emCancel').onclick=function(){done(null);};
+    wrap.onclick=function(e){ if(e.target===wrap) done(null); };
+  }
+  // ② 保存本体（mode: 'overwrite'|'new'）
+  //   new: setNameを入力→emp_setsに追加→cases.emp_set_idxを新indexに更新
+  //   overwrite: emp_sets[idx]を上書き（従来挙動）
+  window.saveEmpSetWithMode=async function(companyId,caseId,values,mode,curIdx){
+    if(!companyId) throw new Error('会社IDが未解決です');
+    var cos=await sb('companies?select=id,emp_sets&id=eq.'+companyId);
+    var co=cos&&cos[0]; if(!co) throw new Error('会社が見つかりません');
+    var empSets=co.emp_sets?JSON.parse(JSON.stringify(co.emp_sets)):[];
+    var idx=parseInt(curIdx||0)||0;
+    if(mode==='new'){
+      var defName='条件セット'+(empSets.length+1);
+      var nm=window.prompt('新しい雇用条件セットの名前を入力してください',defName);
+      if(nm===null) return {saved:false};
+      var newSet=Object.assign({},values,{setName:(nm||defName),_savedAt:new Date().toISOString()});
+      empSets.push(newSet);
+      var newIdx=empSets.length-1;
+      await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
+      await sb('cases?id=eq.'+caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
+      if(window._empCtx) window._empCtx.empSets=empSets;
+      return {saved:true,mode:'new',newIdx:newIdx,setName:(nm||defName),empSets:empSets};
+    }else{
+      while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
+      var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
+      Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString()});
+      await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
+      if(window._empCtx) window._empCtx.empSets=empSets;
+      return {saved:true,mode:'overwrite',idx:idx,empSets:empSets};
+    }
+  };
+})();
