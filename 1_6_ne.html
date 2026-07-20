@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260720.06</div>
+    <div class="ver">ver.20260720.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -123,8 +123,6 @@
     <div class="fs"><div class="fs-title">Ⅲ 業務内容</div>
       <div class="fg"><label>分野（日）<span class="fid">es.applicantField</span></label><input id="es_applicantField" oninput="p()"></div>
       <div class="fg"><label>分野（ID）<span class="fid">es.applicantFieldEn</span></label><input id="es_applicantFieldEn" oninput="p()"></div>
-      <div class="fg"><label>分野２（日）<span class="fid">es.applicantField2</span></label><input id="es_applicantField2" oninput="p()" placeholder="複数分野の場合のみ"></div>
-      <div class="fg"><label>分野２（ID）<span class="fid">es.applicantField2En</span></label><input id="es_applicantField2En" oninput="p()" placeholder="複数分野の場合のみ"></div>
       <div class="fg"><label>業務区分（日）<span class="fid">es.category</span></label><input id="es_category" oninput="p()"></div>
       <div class="fg"><label>業務区分（ID）<span class="fid">es.categoryEn</span></label><input id="es_categoryEn" oninput="p()"></div>
     </div>
@@ -393,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784554332"></script>
+<script src="ofusa_common.js?v=1784554888"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -595,7 +593,7 @@ function p(){
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
             <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id">१. क्षेत्र</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id">${f('es_applicantFieldEn')}</span>${v('es_applicantField2')?`<br>${f('es_applicantField2')}<br><span class="id">${f('es_applicantField2En')}</span>`:''}</td>
+            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
             <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id">२. कामको विभाजन</span></td>
@@ -1109,7 +1107,7 @@ function setFormValues(esData){
     if(dbKey==='contractEnd')  { setDate('contractEnd',val); return; }
 
     // 分野・区分: 末尾の（特定技能１号）等を除去
-    if(dbKey==='applicantField'||dbKey==='category'||dbKey==='applicantFieldEn'||dbKey==='applicantField2'||dbKey==='applicantField2En'||dbKey==='categoryEn'){
+    if(dbKey==='applicantField'||dbKey==='category'||dbKey==='applicantFieldEn'||dbKey==='categoryEn'){
       val = String(val).replace(/[（(][^）)]*[）)]/g,'').trim();
     }
 
