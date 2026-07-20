@@ -141,6 +141,9 @@ window._fieldData=window._fieldData||{};
 const v=id=>{const el=document.getElementById(id);if(el&&el.value!=='')return el.value;return (window._fieldData&&window._fieldData[id])||'';};
 const fmt=n=>n?Number(String(n).replace(/,/g,'')).toLocaleString('ja-JP'):'';
 const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
+// 業務区分の冗長表示対策: 値の中の「（〜分野…）」「（〜特定技能…号）」など、分野名/号数の括弧書きを表示時に除去する。
+// 例「飲食料品製造業全般（飲食料品製造業分野・特定技能１号）」→「飲食料品製造業全般」。他の括弧は残す。
+const fBunya=id=>{const rawFull=v(id);const raw=String(rawFull||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/\s+$/,'').trim();const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
 const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/,'');if(raw){const num=Number(String(raw).replace(/,/g,''));return`<span class="f" data-bind="${id}" data-bind-fmt="1">${isNaN(num)?esc(raw):num.toLocaleString('ja-JP')}</span>`;}return`<span class="f" data-bind="${id}" data-bind-fmt="1" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
 
 // ===== チェックボックス =====
