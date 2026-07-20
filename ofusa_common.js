@@ -159,6 +159,14 @@ function insEnrolled(dbKey){
     return !/^(未加入|未加入です|なし|無|false|no|0|×|✕|x)$/i.test(v);
   }catch(_e){ return true; }
 }
+// 定期健診の頻度フレーズ（日本語）。healthCheckFreqが年2回/半年系のときだけ「半年ごと」。既定は「1年ごと」。
+function healthFreqJP(){
+  try{
+    var s=window._empLoadedSet||{}; var v=String(s.healthCheckFreq||'').trim();
+    if(/年\s*2\s*回|半年|2\s*回|半期|setengah|twice/i.test(v)) return 'その後半年ごとに実施';
+    return 'その後１年ごとに実施';
+  }catch(_e){ return 'その後１年ごとに実施'; }
+}
 
 /* ============================================================
    applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
