@@ -1224,10 +1224,21 @@ document.addEventListener('click', function(e){
       var opts=sets.map(function(s,i){
         return '<option value="'+i+'"'+(i===idx?' selected':'')+'>'+_empSetLabel(s,i).replace(/</g,'&lt;')+'</option>';
       }).join('');
-      slot.innerHTML=
-        '<label style="font-size:11px;font-weight:bold;color:#334155;display:block;margin-top:6px;">📑 雇用条件セット'+
-        (empty?' <span style="color:#b45309;">(未指定→仮に'+idx+'番)</span>':'')+'</label>'+
+      var curName=_empSetLabel(sets[idx]||{},idx).replace(/</g,'&lt;');
+      var html='';
+      // 未紐付けのときは「先頭を仮表示中・こちらでよいですか？」の確認バナーを出す
+      if(empty){
+        html+='<div style="background:#fee2e2;border:1px solid #dc2626;border-radius:6px;padding:8px;margin-bottom:6px;">'+
+          '<div style="font-size:12px;font-weight:bold;color:#b91c1c;">⚠️ 雇用条件が未紐付けです</div>'+
+          '<div style="font-size:11px;color:#7f1d1d;line-height:1.5;margin:3px 0 6px;">先頭のセットを仮表示しています（全'+sets.length+'件）。<br>この内容でよろしいですか？ 違う場合は下のリストから選んでください。</div>'+
+          '<div style="font-size:11px;color:#334155;margin-bottom:6px;">仮表示中：<b>'+curName+'</b></div>'+
+          '<button onclick="confirmEmpSet()" style="width:100%;padding:7px;border:none;background:#16a34a;color:#fff;border-radius:6px;font-size:12px;font-weight:bold;cursor:pointer;">✅ これで確定（この案件に紐付け）</button>'+
+          '</div>';
+      }
+      html+='<label style="font-size:11px;font-weight:bold;color:#334155;display:block;">📑 雇用条件セット'+
+        (empty?' <span style="color:#b45309;">(未紐付け)</span>':'')+'</label>'+
         '<select id="empSetSelect" onchange="onEmpSetSelectChange()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">'+opts+'</select>';
+      slot.innerHTML=html;
     }catch(e){ console.warn('[empSel] render',e); }
   };
   // ① セレクタ変更 → その idx で再読込 ＋ cases.emp_set_idx を保存
@@ -1242,6 +1253,20 @@ document.addEventListener('click', function(e){
       if(typeof showToast==='function') showToast('雇用条件セットを['+newIdx+']に切替・保存しました');
       if(typeof loadCaseToForm==='function') await loadCaseToForm(info,window._empDocKey||'');
     }catch(e){ alert('雇用条件セットの切替に失敗: '+(e&&e.message||e)); }
+  };
+  // ①: 「これで確定」＝いま仮表示中のセットをこの案件に紐付け保存（フォームはそのまま）
+  window.confirmEmpSet=async function(){
+    try{
+      var sel=document.getElementById('empSetSelect');
+      var idx=sel?(parseInt(sel.value,10)||0):0;
+      var info=window._lastCaseInfo; if(!info||!info.caseId) return;
+      await sb('cases?id=eq.'+info.caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(idx)})});
+      info=Object.assign({},info,{empSetIdx:String(idx)});
+      window._lastCaseInfo=info;
+      if(typeof showToast==='function') showToast('雇用条件セット['+idx+']をこの案件に紐付けました');
+      // 警告バナーを消すためセレクタだけ再描画（フォーム再読込は不要）
+      if(window._empCtx) renderEmpSetSelector({id:window._empCtx.companyId, emp_sets:window._empCtx.empSets}, idx, info);
+    }catch(e){ alert('紐付けの保存に失敗: '+(e&&e.message||e)); }
   };
   // ② 読込後のフォーム基準値スナップショット（es_* 欄）
   window.snapshotEmpBaseline=function(){

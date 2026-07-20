@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260720.01</div>
+    <div class="ver">ver.20260720.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -63,9 +63,9 @@
     <select id="caseSelect" onchange="loadFromDB()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">
       <option value="">── 選択 ──</option>
     </select>
-    <div id="empSetSelectorSlot"></div>
   </div>
   <div class="fp-inner">
+    <div id="empSetSelectorSlot" style="padding:8px 8px 6px;background:#eef4ff;border-bottom:1px solid #cdd6e4;"></div>
     <div class="fs"><div class="fs-title">作成日・宛先</div>
       <div class="fg3">
         <div class="fg"><label>年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
@@ -390,7 +390,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784539473"></script>
+<script src="ofusa_common.js?v=1784540407"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
