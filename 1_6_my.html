@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260716.03</div>
+    <div class="ver">ver.20260720.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -63,6 +63,7 @@
     <select id="caseSelect" onchange="loadFromDB()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;">
       <option value="">── 選択 ──</option>
     </select>
+    <div id="empSetSelectorSlot"></div>
   </div>
   <div class="fp-inner">
     <div class="fs"><div class="fs-title">作成日・宛先</div>
@@ -389,7 +390,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784081370"></script>
+<script src="ofusa_common.js?v=1784539473"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1310,6 +1311,12 @@ async function loadFromDB(passedInfo){
         const empSets = co.emp_sets || [];
         const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
         esData = empSets[idx] || empSets[0] || null;
+        // ①: 雇用条件セットセレクタを描画＋読込idx/セット記録（in-doc選択時のため）
+        try{
+          window._empLoadedIdx = idx;
+          window._empLoadedSet = esData ? JSON.parse(JSON.stringify(esData)) : {};
+          if(typeof renderEmpSetSelector==='function') renderEmpSetSelector(co, idx, info);
+        }catch(_e){ console.warn('[empSel] loadFromDB',_e); }
 
       }
     }
@@ -1369,6 +1376,8 @@ async function loadFromDB(passedInfo){
 
     if((window._htmlFrozen||_editMode)&&typeof applyBindings==='function') applyBindings(); else p();
     showToast('✅ データを読み込みました');
+    // ②: 読込直後の雇用条件欄を基準値として記録（以後の編集検知に使う）
+    try{ if(typeof snapshotEmpBaseline==='function') snapshotEmpBaseline(); }catch(_e){}
     // 保存済みの直接編集版があれば復元
     try{
       let _cid=companyId;
@@ -1432,28 +1441,17 @@ async function saveForm(){
   if(!companyId){ alert('会社IDが取得できませんでした\n（案件管理で会社を紐付けてください）'); return; }
 
   try{
-    // 現在のemp_setsを取得
-    const cos = await sb('companies?select=id,emp_sets&id=eq.'+companyId);
-    const co = cos && cos[0];
-
-    const empSets = co.emp_sets ? JSON.parse(JSON.stringify(co.emp_sets)) : [];
     const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
-
     // 現在のフォーム値を収集
     const newData = collectFormValues();
-    newData.setName = (empSets[idx] && empSets[idx].setName) || 'ヒアリング取込';
-    newData._savedAt = new Date().toISOString();
-
-    // 指定インデックスを更新（なければ追加）
-    while(empSets.length <= idx) empSets.push({setName:'条件'+(empSets.length+1)});
-    Object.assign(empSets[idx], newData);
-
-    // Supabaseに保存
-    const res = await sb('companies?id=eq.'+companyId, {
-      method:'PATCH',
-      headers:{'Prefer':'return=minimal'},
-      body:JSON.stringify({emp_sets: empSets})
-    });
+    // ②: 読込後に雇用条件を編集していたら保存モードを選ばせる（B:新セット / C:上書き）
+    let mode = 'overwrite';
+    if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
+      mode = await promptEmpSaveMode(companyId, idx);
+      if(mode===null){ return; }              // キャンセル
+    }
+    const res = await saveEmpSetWithMode(companyId, info.caseId, newData, mode, idx);
+    if(res && res.saved===false){ return; }    // 新セット名入力キャンセル
 
     // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6_my'][caseId] に保存
     let _editedSaved=false;
@@ -1472,7 +1470,15 @@ async function saveForm(){
         }
       }
     }catch(_e){ console.warn('[saveEditedToDB]',_e); }
-    showToast(_editedSaved?'✅ 保存しました（直接編集版も保存）':'✅ 保存しました');
+    // 保存後：新セット作成ならセレクタ更新＋案件情報更新、基準値を取り直す
+    let _msg = '✅ 保存しました';
+    if(res && res.mode==='new'){
+      _msg = '✅ 新セット['+res.newIdx+'] 「'+res.setName+'」を作成し、この案件に紐付けました';
+      window._lastCaseInfo = Object.assign({}, info, {empSetIdx:String(res.newIdx), companyId:companyId});
+      try{ if(typeof renderEmpSetSelector==='function') renderEmpSetSelector({id:companyId, emp_sets:(res.empSets||[])}, res.newIdx, window._lastCaseInfo); }catch(_e){}
+    }
+    try{ if(typeof snapshotEmpBaseline==='function') snapshotEmpBaseline(); }catch(_e){}
+    showToast(_editedSaved ? _msg+'（直接編集版も保存）' : _msg);
   }catch(e){
     console.error('DB保存エラー:',e);
     alert('保存エラー: '+e.message);
