@@ -1410,3 +1410,15 @@ document.addEventListener('click', function(e){
     }
   };
 })();
+
+/* ③: 未保存のまま離脱するときに警告（読み込み後にユーザーが雇用条件を編集していたら）
+   ※共有セットへの自動上書きは他案件を壊すため行わない。ここは「うっかり離脱で消える」防止。 */
+(function(){
+  window.addEventListener('beforeunload', function(e){
+    try{
+      if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
+        e.preventDefault(); e.returnValue=''; return '';
+      }
+    }catch(_e){}
+  });
+})();
