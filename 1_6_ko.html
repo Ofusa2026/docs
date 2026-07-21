@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260720.10</div>
+    <div class="ver">ver.20260720.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784556790"></script>
+<script src="ofusa_common.js?v=1784606092"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1453,7 +1453,14 @@ async function saveForm(){
       mode = await promptEmpSaveMode(companyId, idx);
       if(mode===null){ return; }              // キャンセル
     }
-    const res = await saveEmpSetWithMode(companyId, info.caseId, newData, mode, idx);
+    let res = await saveEmpSetWithMode(companyId, info.caseId, newData, mode, idx);
+    // ①: 上書き競合（読み込み後に他で変更）を検出したら選択させる
+    if(res && res.conflict){
+      const _choice = await promptEmpConflict();
+      if(_choice===null){ return; }
+      if(_choice==='overwrite'){ res = await saveEmpSetWithMode(companyId, info.caseId, newData, 'overwrite', idx, true); }
+      else if(_choice==='new'){ res = await saveEmpSetWithMode(companyId, info.caseId, newData, 'new', idx); }
+    }
     if(res && res.saved===false){ return; }    // 新セット名入力キャンセル
 
     // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6_ko'][caseId] に保存

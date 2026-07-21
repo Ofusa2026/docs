@@ -1339,7 +1339,34 @@ document.addEventListener('click', function(e){
   // ② 保存本体（mode: 'overwrite'|'new'）
   //   new: setNameを入力→emp_setsに追加→cases.emp_set_idxを新indexに更新
   //   overwrite: emp_sets[idx]を上書き（従来挙動）
-  window.saveEmpSetWithMode=async function(companyId,caseId,values,mode,curIdx){
+  // 読み込み後にDB上のセットが変わっていないか比較するための安定文字列化
+  function _empStableStr(o){
+    if(o==null) return '';
+    try{ return Object.keys(o).filter(function(k){return k!=='cbState';}).sort().map(function(k){return k+'='+(o[k]==null?'':String(o[k]));}).join('|'); }
+    catch(e){ return String(o); }
+  }
+  // ①: 上書き競合ダイアログ → Promise<'overwrite'|'new'|null>
+  window.promptEmpConflict=function(){
+    return new Promise(function(resolve){
+      var wrap=document.createElement('div');
+      wrap.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100001;display:flex;align-items:center;justify-content:center;';
+      wrap.innerHTML=
+        '<div style="background:#fff;border-radius:12px;max-width:480px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.3);font-family:sans-serif;box-sizing:border-box;">'+
+          '<div style="font-size:15px;font-weight:bold;color:#b91c1c;margin-bottom:6px;">⚠️ 他の場所で変更されています</div>'+
+          '<div style="font-size:12px;color:#475569;line-height:1.6;margin-bottom:16px;">この会社の雇用条件は、あなたが開いたあとに別の画面/担当者によって変更されています。このまま上書きすると相手の変更が消えます。</div>'+
+          '<button id="_ecNew" style="display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 12px;border:1px solid #2563eb;background:#eff6ff;color:#1e3a8a;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">🆕 新しいセットとして保存（相手の変更を残す・推奨）</button>'+
+          '<button id="_ecOver" style="display:block;width:100%;text-align:left;margin-bottom:14px;padding:11px 12px;border:1px solid #dc2626;background:#fef2f2;color:#b91c1c;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">⚠️ あなたの変更で上書き（相手の変更は消えます）</button>'+
+          '<div style="text-align:right;"><button id="_ecCancel" style="padding:7px 16px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button></div>'+
+        '</div>';
+      document.body.appendChild(wrap);
+      function done(v){ try{document.body.removeChild(wrap);}catch(e){} resolve(v); }
+      wrap.querySelector('#_ecNew').onclick=function(){done('new');};
+      wrap.querySelector('#_ecOver').onclick=function(){done('overwrite');};
+      wrap.querySelector('#_ecCancel').onclick=function(){done(null);};
+      wrap.onclick=function(e){ if(e.target===wrap) done(null); };
+    });
+  };
+  window.saveEmpSetWithMode=async function(companyId,caseId,values,mode,curIdx,force){
     if(!companyId) throw new Error('会社IDが未解決です');
     var cos=await sb('companies?select=id,emp_sets&id=eq.'+companyId);
     var co=cos&&cos[0]; if(!co) throw new Error('会社が見つかりません');
@@ -1355,13 +1382,24 @@ document.addEventListener('click', function(e){
       await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
       await sb('cases?id=eq.'+caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
       if(window._empCtx) window._empCtx.empSets=empSets;
+      window._empLoadedSet=JSON.parse(JSON.stringify(newSet)); window._empLoadedIdx=newIdx;
       return {saved:true,mode:'new',newIdx:newIdx,setName:(nm||defName),empSets:empSets};
     }else{
+      // ①: 楽観ロック（読み込み後にDB上のセットが変わっていたら競合として返す）
+      if(!force){
+        var loaded=window._empLoadedSet;
+        var idxMatch=(window._empLoadedIdx==null)||(parseInt(window._empLoadedIdx)===idx);
+        if(loaded && typeof loaded==='object' && Object.keys(loaded).length && idxMatch
+           && _empStableStr(empSets[idx]||{})!==_empStableStr(loaded)){
+          return {saved:false, conflict:true, currentSet:(empSets[idx]||{})};
+        }
+      }
       while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
       var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
       Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString()});
       await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
       if(window._empCtx) window._empCtx.empSets=empSets;
+      window._empLoadedSet=JSON.parse(JSON.stringify(empSets[idx])); window._empLoadedIdx=idx;
       return {saved:true,mode:'overwrite',idx:idx,empSets:empSets};
     }
   };
