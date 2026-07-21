@@ -1379,8 +1379,11 @@ document.addEventListener('click', function(e){
       var newSet=Object.assign({},values,{setName:(nm||defName),_savedAt:new Date().toISOString()});
       empSets.push(newSet);
       var newIdx=empSets.length-1;
-      await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
-      await sb('cases?id=eq.'+caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
+      var _rn=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
+      if(!_rn||!_rn.length) throw new Error('保存に失敗しました（対象の会社が見つからないか、権限がありません）');
+      if(_empStableStr((_rn[0].emp_sets||[])[newIdx]||{})!==_empStableStr(newSet)) throw new Error('保存後の確認で内容が一致しませんでした。もう一度お試しください');
+      var _rc=await sb('cases?id=eq.'+caseId+'&select=emp_set_idx',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
+      if(!_rc||!_rc.length) throw new Error('案件への紐付け保存に失敗しました');
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(newSet)); window._empLoadedIdx=newIdx;
       return {saved:true,mode:'new',newIdx:newIdx,setName:(nm||defName),empSets:empSets};
@@ -1397,7 +1400,10 @@ document.addEventListener('click', function(e){
       while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
       var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
       Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString()});
-      await sb('companies?id=eq.'+companyId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_sets:empSets})});
+      var _r2=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
+      // ②: 読み戻し確認（0行更新やサイレント失敗・内容不一致を検知）
+      if(!_r2||!_r2.length) throw new Error('保存に失敗しました（対象の会社が見つからないか、権限がありません）');
+      if(_empStableStr((_r2[0].emp_sets||[])[idx]||{})!==_empStableStr(empSets[idx])) throw new Error('保存後の確認で内容が一致しませんでした。もう一度お試しください');
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(empSets[idx])); window._empLoadedIdx=idx;
       return {saved:true,mode:'overwrite',idx:idx,empSets:empSets};
