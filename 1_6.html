@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260720.16</div>
+    <div class="ver">ver.20260720.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -393,7 +393,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784609761"></script>
+<script src="ofusa_common.js?v=1784611680"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1493,13 +1493,9 @@ async function saveForm(){
       if(window._htmlFrozen || _editMode){
         const _area=document.getElementById('pageArea');
         if(_area && info.caseId){
-          const _cs=await sb('companies?select=id,extra&id=eq.'+companyId);
-          const _c=_cs&&_cs[0];
-          const _ex=_c&&_c.extra&&typeof _c.extra==='object'?JSON.parse(JSON.stringify(_c.extra)):{};
-          if(!_ex['_edited'])_ex['_edited']={};
-          if(!_ex['_edited']['1_6'])_ex['_edited']['1_6']={};
-          _ex['_edited']['1_6'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString(),_savedBy:(typeof _currentUserId==='function'?_currentUserId():'')};
-          const _rex=await sb('companies?id=eq.'+companyId+'&select=extra',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({extra:_ex})});
+          // ⑦: read-modify-write競合を避け、DB側で該当パスのみ原子的に更新（jsonb_set RPC）
+          await sb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:companyId,p_doc:'1_6',p_case_id:info.caseId,p_html:_area.innerHTML,p_saved_at:new Date().toISOString(),p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
+          const _rex=await sb('companies?select=extra&id=eq.'+companyId);
           const _sv=_rex&&_rex[0]&&_rex[0].extra&&_rex[0].extra['_edited']&&_rex[0].extra['_edited']['1_6']&&_rex[0].extra['_edited']['1_6'][info.caseId];
           if(!_sv||!_sv.html) throw new Error('直接編集版の保存確認に失敗しました');
           _editedSaved=true;
