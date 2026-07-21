@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260720.14</div>
+    <div class="ver">ver.20260720.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784606382"></script>
+<script src="ofusa_common.js?v=1784606468"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1473,7 +1473,7 @@ async function saveForm(){
           const _ex=_c&&_c.extra&&typeof _c.extra==='object'?JSON.parse(JSON.stringify(_c.extra)):{};
           if(!_ex['_edited'])_ex['_edited']={};
           if(!_ex['_edited']['1_6_zh'])_ex['_edited']['1_6_zh']={};
-          _ex['_edited']['1_6_zh'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString()};
+          _ex['_edited']['1_6_zh'][info.caseId]={html:_area.innerHTML,_savedAt:new Date().toISOString(),_savedBy:(typeof _currentUserId==='function'?_currentUserId():'')};
           const _rex=await sb('companies?id=eq.'+companyId+'&select=extra',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({extra:_ex})});
           const _sv=_rex&&_rex[0]&&_rex[0].extra&&_rex[0].extra['_edited']&&_rex[0].extra['_edited']['1_6']&&_rex[0].extra['_edited']['1_6'][info.caseId];
           if(!_sv||!_sv.html) throw new Error('直接編集版の保存確認に失敗しました');

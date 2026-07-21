@@ -170,6 +170,10 @@ function healthFreqJP(){
     return 'その後１年ごとに実施';
   }catch(_e){ return 'その後１年ごとに実施'; }
 }
+// ⑤: 現在ログイン中のユーザー識別子（メール等）を認証トークンから取得（保存ログ用）
+function _currentUserId(){
+  try{ var t=_sbToken(); if(!t) return ''; var seg=t.split('.')[1]; if(!seg) return ''; var p=JSON.parse(decodeURIComponent(escape(atob(seg.replace(/-/g,'+').replace(/_/g,'/'))))); return p.email||p.sub||''; }catch(e){ return ''; }
+}
 
 /* ============================================================
    applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
@@ -1376,7 +1380,7 @@ document.addEventListener('click', function(e){
       var defName='条件セット'+(empSets.length+1);
       var nm=window.prompt('新しい雇用条件セットの名前を入力してください',defName);
       if(nm===null) return {saved:false};
-      var newSet=Object.assign({},values,{setName:(nm||defName),_savedAt:new Date().toISOString()});
+      var newSet=Object.assign({},values,{setName:(nm||defName),_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       empSets.push(newSet);
       var newIdx=empSets.length-1;
       var _rn=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
@@ -1399,7 +1403,7 @@ document.addEventListener('click', function(e){
       }
       while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
       var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
-      Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString()});
+      Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       var _r2=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
       // ②: 読み戻し確認（0行更新やサイレント失敗・内容不一致を検知）
       if(!_r2||!_r2.length) throw new Error('保存に失敗しました（対象の会社が見つからないか、権限がありません）');
