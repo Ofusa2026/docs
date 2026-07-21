@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260720.15</div>
+    <div class="ver">ver.20260720.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784606468"></script>
+<script src="ofusa_common.js?v=1784609761"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1703,6 +1703,14 @@ if(!window._selectCaseListenerAdded){
     if(!e.data||e.data.type!=='SELECT_CASE') return;
     const info=e.data.info;
     if(!info||!info.caseId) return;
+    // ⑥: 未保存のまま別案件へ切り替えようとしたら確認（キャンセルで現在の案件に留まる）
+    try{
+      const _cs=document.getElementById('caseSelect');
+      let _curId=''; if(_cs&&_cs.value){ try{ _curId=(JSON.parse(_cs.value)||{}).caseId||''; }catch(_x){} }
+      if(_curId && _curId!==info.caseId && typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
+        if(!confirm('未保存の変更があります。破棄して別の案件に切り替えますか？\n（キャンセルすると現在の案件に留まり、保存できます）')) return;
+      }
+    }catch(_e){}
     console.log('[doc] SELECT_CASE received:', info);
     const sel=document.getElementById('caseSelect');
     if(sel){
