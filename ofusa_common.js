@@ -1426,3 +1426,7 @@ document.addEventListener('click', function(e){
     }catch(_e){}
   });
 })();
+
+/* 休日の翻訳行用: 空なら空文字（プレースホルダを出さない） */
+function fB(id){ try{ return (typeof v==='function' && String(v(id)||'').trim()) ? f(id) : ''; }catch(e){ return ''; } }
+function fOr2B(){ try{ for(var i=0;i<arguments.length;i++){ if(String(v(arguments[i])||'').trim()) return f(arguments[i]); } }catch(e){} return ''; }
