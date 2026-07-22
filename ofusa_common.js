@@ -144,6 +144,24 @@ const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const labe
 // 業務区分の冗長表示対策: 値の中の「（〜分野…）」「（〜特定技能…号）」など、分野名/号数の括弧書きを表示時に除去する。
 // 例「飲食料品製造業全般（飲食料品製造業分野・特定技能１号）」→「飲食料品製造業全般」。他の括弧は残す。
 const fBunya=id=>{const rawFull=v(id);const raw=String(rawFull||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').replace(/\s+$/,'').trim();const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
+/* 業務区分は「土木・建築」のように1行にまとめて表示する。
+   ・分野名/号数の括弧書きは除去する
+   ・1つ目と2つ目が同じ内容なら1つだけ出す（データ側の重複登録を吸収）
+   ・どちらも空なら従来どおり空欄の目印を出す */
+const fBunyaPair=(idA,idB)=>{
+  var clean=function(s){
+    return String(s||'')
+      .replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'')
+      .replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'')
+      .trim();
+  };
+  var a=clean(v(idA)), b=clean(v(idB));
+  var list=[];
+  if(a) list.push({id:idA,t:a});
+  if(b && b!==a) list.push({id:idB,t:b});
+  if(!list.length) return fBunya(idA);
+  return list.map(function(x){ return '<span class="f" data-bind="'+x.id+'">'+esc(x.t)+'</span>'; }).join('・');
+};
 const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/,'');if(raw){const num=Number(String(raw).replace(/,/g,''));return`<span class="f" data-bind="${id}" data-bind-fmt="1">${isNaN(num)?esc(raw):num.toLocaleString('ja-JP')}</span>`;}return`<span class="f" data-bind="${id}" data-bind-fmt="1" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
 
 // ===== チェックボックス =====
