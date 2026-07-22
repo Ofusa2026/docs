@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260720.32</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260720.33</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -208,7 +208,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-8_1" onclick="open_doc('8_1')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-9_1" onclick="open_doc('9_1')"><span class="item-icon">📄</span><div>航空<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-10_1" onclick="open_doc('10_1')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">受入れ誓約書</span></div></div>
-    <div class="item" id="nav-11_1" onclick="open_doc('11_1')"><span class="item-icon">📄</span><div>農業<span class="item-sub">受入れ誓約書</span></div></div>
+    <div class="item" id="nav-11_1" onclick="open_doc('11_1')"><span class="item-icon">📄</span><div>農業<span class="item-sub">受入れ誓約書（直接雇用）</span></div></div>
+    <div class="item" id="nav-11_3" onclick="open_doc('11_3')"><span class="item-icon">📄</span><div>農業<span class="item-sub">受入れ誓約書（派遣形態）</span></div></div>
     <div class="item" id="nav-12_1" onclick="open_doc('12_1')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-13_1" onclick="open_doc('13_1')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">受入れ誓約書</span></div></div>
     <div class="item" id="nav-14_1" onclick="open_doc('14_1')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">受入れ誓約書</span></div></div>
@@ -269,6 +270,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-9_1"></iframe>
     <iframe id="frame-10_1"></iframe>
     <iframe id="frame-11_1"></iframe>
+    <iframe id="frame-11_3"></iframe>
     <iframe id="frame-12_1"></iframe>
     <iframe id="frame-13_1"></iframe>
     <iframe id="frame-14_1"></iframe>
@@ -329,6 +331,7 @@ const docs={
   '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1782976942'},
   '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1782976942'},
   '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1784089406'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1784721993'},
   '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1782976942'},
   '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1782976942'},
   '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1782976942'},
