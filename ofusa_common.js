@@ -1561,3 +1561,21 @@ function _cirAutoSave(groupId, value){
     })();
   }, 400);
 }
+
+/* 再読み込み時、ブラウザが入力欄の値を復元してもプレビューは更新されない
+   （値の復元では入力イベントが発生しないため）。読み込み完了後と、
+   戻る/進むでの復帰時に、値が入っていればプレビューを描き直す。 */
+(function(){
+  function _redrawIfRestored(){
+    try{
+      if(typeof p!=='function') return;
+      if(typeof _editMode!=='undefined' && _editMode) return;   // 直接編集中は触らない
+      var has=false;
+      var els=document.querySelectorAll('input[id^="es_"],textarea[id^="es_"],input[id^="f_"],textarea[id^="f_"]');
+      for(var i=0;i<els.length;i++){ if(String(els[i].value||'').trim()){ has=true; break; } }
+      if(has) p();
+    }catch(_e){}
+  }
+  window.addEventListener('load', function(){ setTimeout(_redrawIfRestored, 0); });
+  window.addEventListener('pageshow', function(e){ if(e.persisted) setTimeout(_redrawIfRestored, 0); });
+})();
