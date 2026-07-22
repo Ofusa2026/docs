@@ -40,8 +40,9 @@
 .doc .ul-label{vertical-align:top;line-height:1.4;padding-top:0;}
 .doc .ul-label .id{display:block;margin-top:7px;}
 /* 冒頭の所属機関ブロック：ラベルを折り返さない最小幅にし、値の欄を広く取る（中央寄せはしない） */
-.doc table.hdr-ul{width:60%;table-layout:auto;}
-.doc table.hdr-ul > tbody > tr > td:first-child{white-space:nowrap;width:1%;padding-right:12px;vertical-align:top;}
+.doc table.hdr-ul{width:72%;table-layout:fixed;margin-left:auto;}
+.doc table.hdr-ul > tbody > tr > td:first-child{width:42%;padding-right:10px;vertical-align:top;}
+.doc table.hdr-ul > tbody > tr > td:last-child{width:58%;vertical-align:top;}
 /* 記入欄の値だけ中央寄せ（下線なし）：分野・業務区分など */
 .doc .ctr-cell{text-align:center;}
 </style>
@@ -50,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260720.33</div>
+    <div class="ver">ver.20260720.34</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -405,7 +406,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784725950"></script>
+<script src="ofusa_common.js?v=1784732710"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
