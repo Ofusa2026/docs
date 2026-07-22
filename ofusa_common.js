@@ -1430,3 +1430,14 @@ document.addEventListener('click', function(e){
 /* 休日の翻訳行用: 空なら空文字（プレースホルダを出さない） */
 function fB(id){ try{ return (typeof v==='function' && String(v(id)||'').trim()) ? f(id) : ''; }catch(e){ return ''; } }
 function fOr2B(){ try{ for(var i=0;i<arguments.length;i++){ if(String(v(arguments[i])||'').trim()) return f(arguments[i]); } }catch(e){} return ''; }
+
+/* 印刷・PDF出力時は、空欄の目印（グレーのes.xxxラベル）を書類に出さない。
+   画面では従来どおり表示され、どこが空欄か分かる。 */
+(function(){
+  try{
+    var st=document.createElement('style');
+    st.id='_phPrintStyle';
+    st.textContent='@media print{ .doc [style*="color:#aaa"]{ display:none !important; } }';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(_e){}
+})();
