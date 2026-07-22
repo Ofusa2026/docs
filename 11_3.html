@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分野参考様式第１１－３号（特定技能所属機関：派遣形態）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1776949489">
+<style>
+.doc{padding:15mm!important;line-height:1.35!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 分野参考様式第１１－３号（農業 特定技能所属機関：派遣形態）　受入れに係る誓約書</div>
+    <div class="ver">ver.20260722.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('11_3')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>作成責任者</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_coName" oninput="p()"></div>
+      <div class="fg"><label>住所</label><textarea id="f_coAddr" oninput="p()" rows="2"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">農業支援外国人材の受入れ実績</div>
+      <div class="fg"><label>受入れ開始日</label><input id="f_ukeireStart" oninput="p()" placeholder="2024年8月1日"></div>
+      <div class="fg"><label>受入れ人数</label><input id="f_ukeireCount" oninput="p()" placeholder="30"></div>
+    </div>
+    <div class="fs"><div class="fs-title">誓約事項１の該当項目</div>
+      <div style="font-size:11px;color:#64748b;padding:4px 2px 6px;">プレビューの ①〜④ をクリックすると丸が付きます（もう一度押すと外れます）。</div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784700233"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10.5pt;margin-bottom:4px;">分野参考様式第１１－３号（特定技能所属機関：派遣形態）</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0;line-height:1.4;">農業分野において派遣形態で特定技能外国人の受入れを行う<br>特定技能所属機関に係る誓約書</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">出入国在留管理庁長官　殿</div>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
+  <tr>
+    <td style="width:40%;"></td>
+    <td colspan="2">特定技能所属機関</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="width:24%;padding-left:2em;">氏名又は名称</td>
+    <td>${f('f_coName')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:2mm;padding-left:2em;">住　　　　所</td>
+    <td style="padding-top:2mm;">${f('f_coAddr')}</td>
+  </tr>
+</table>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:3mm;">
+  <tr>
+    <td style="width:40%;"></td>
+    <td colspan="2">特定技能外国人</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="width:24%;padding-left:2em;">氏　　　　名</td>
+    <td>${f('f_applicant')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">性　　　　別</td>
+    <td style="padding-top:1.5mm;">${f('f_gender')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">国籍・地域</td>
+    <td style="padding-top:1.5mm;">${f('f_nationality')}</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td style="padding-top:1.5mm;padding-left:2em;">生 年 月 日</td>
+    <td style="padding-top:1.5mm;">${f('f_birthdate')}</td>
+  </tr>
+</table>
+<div style="text-align:center;font-size:12pt;margin:2mm 0;">記</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">　農業分野における上記の特定技能外国人を受け入れるに当たり、以下の事項について誓約します。</div>
+<div style="border:1px solid #000;padding:3mm 5mm;font-size:10.5pt;">
+  <div style="margin-bottom:2mm;">【誓約事項】</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">１　次のいずれかに該当すること（該当する項目を丸で囲むこと）。</div>
+  <div style="padding-left:1.5em;">
+    <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">${cir('①','bunya11_3','1')}　農業分野に係る業務又はこれに関連する業務を行っている者であること。</div>
+    <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">${cir('②','bunya11_3','2')}　地方公共団体又は①に掲げる者が資本金の過半数を出資していること。</div>
+    <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1mm;">${cir('③','bunya11_3','3')}　地方公共団体の職員又は①に掲げる者若しくはその役員若しくは職員が役員であることその他地方公共団体又は①に掲げる者が業務執行に実質的に関与していると認められる者であること。</div>
+    <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">${cir('④','bunya11_3','4')}　国家戦略特別区域法第１６条の５第１項に規定する特定機関であること。</div>
+    <div style="margin-bottom:1mm;">【農業支援外国人材の受入れ実績】</div>
+    <div style="padding-left:1em;">①受入れ開始日（　${f('f_ukeireStart')}　）</div>
+    <div style="padding-left:1em;margin-bottom:1.5mm;">②受入れ人数（　${f('f_ukeireCount')}　人）</div>
+  </div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">２　特定技能基準省令２条１項第１号から第４号までのいずれにも該当する者に当該外国人に係る労働者派遣をすることとしていること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">３　過去５年以内に同一の労働者を６か月以上継続して雇用した経験を有する者又は派遣先責任者講習その他これに準ずる講習を受講した者を派遣先責任者（労働者派遣法第４１条に規定する派遣先責任者をいう。）として選任している者に当該外国人に係る労働者派遣をすることとしていること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">４　農林水産省が設置する農業分野における特定技能外国人の受入れに関する協議会（以下「農業特定技能協議会」という。）の構成員であること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">５　農業特定技能協議会が行う情報の提供、意見の聴取、調査その他の活動に対し、必要な協力を行うこと。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">６　５に規定する必要な協力を行う者に当該外国人に係る労働者派遣をすることとしていること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:1.5mm;">７　登録支援機関に１号特定技能外国人支援計画の全部の実施を委託する場合にあっては、５に規定する必要な協力を行う登録支援機関に委託していること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;">８　特定技能外国人（出入国管理及び難民認定法（昭和２６年政令第３１９号）別表第１の２の表の特定技能の在留資格をもって在留する外国人をいう。）からの求めに応じ、実務経験を証明する書面（電磁的記録を含む。）を交付し、又は提供すること。</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;text-indent:-3.2em;padding-left:3.2em;">（注１）誓約事項を遵守することができなくなった場合は、その旨出入国在留管理庁長官及び当該分野を所管する関係行政機関の長に対し、報告を行うこと。</div>
+<div style="font-size:10.5pt;margin-bottom:1.5mm;text-indent:-3.2em;padding-left:3.2em;">（注２）添付書類として次の書類を提出すること。</div>
+<div style="font-size:10.5pt;padding-left:3.2em;">
+  <div style="margin-bottom:0.5mm;">【共通】</div>
+  <div style="text-indent:-1em;padding-left:1em;">・労働者派遣事業許可証の写し</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:1.5mm;">・農業特定技能協議会の構成員であることを確認できる書類</div>
+  <div style="margin-bottom:0.5mm;">【１①に該当する事業者】</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:1.5mm;">・定款、登記事項証明書、有価証券報告書、営農証明書、耕作証明書、農畜産物の出荷に係る伝票や納品書の写し等、農業又は農業に関連する業務を行っていることが確認できる書類</div>
+  <div style="margin-bottom:0.5mm;">【１②に該当する事業者】</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:1.5mm;">・有価証券報告書、株主名簿の写し等資本金の出資者を明らかにする書類</div>
+  <div style="margin-bottom:0.5mm;">【１③に該当する事業者】</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:1.5mm;">・役員名簿等、地方公共団体の職員又は①に掲げる者若しくはその役員若しくは職員が役員であることが確認できる書類又は業務方法書、組織体制図等、地方公共団体又は①に掲げる者が業務執行に実質的に関与していることが確認できる書類</div>
+  <div style="margin-bottom:0.5mm;">【１④に該当する事業者】</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:1.5mm;">・特定機関基準適合通知書の写し</div>
+  <div style="text-indent:-1em;padding-left:1em;margin-bottom:6mm;">・派遣契約書の写し、巡回指導・監査の結果報告書の写し等、適正に外国人農業支援人材を派遣したことがあることが確認できる書類</div>
+</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;text-align:right;">作成年月日　${f('f_docDate')}</div>
+<div style="font-size:10.5pt;text-align:right;">作成責任者　${f('f_author')}</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  _apply11_3FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply11_3FontSize(){
+  const st=document.getElementById('_11_3FontStyle')||document.createElement('style');
+  st.id='_11_3FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:12pt"]{font-size:${(12*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10.5pt"]{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      caseId?sb('cases?select=applicant,org&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // 11-3号は「特定技能所属機関（派遣形態）」の誓約書のため、作成責任者は所属機関側の代表者。
+    if(co){
+      s('f_coName',co.name||'');
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_author',((co.author_title||'')+' '+(co.author_name||'')).trim());
+    }
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+    }
+    if(caseId){
+      const persons=await sb('persons?select=gender,nationality,birthdate&case_id=eq.'+caseId);
+      const pd=persons&&persons[0];
+      if(pd){
+        s('f_gender',pd.gender||'');
+        s('f_nationality',pd.nationality||'');
+        s('f_birthdate',pd.birthdate||'');
+      }
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{
+        d.style.zoom = scale;
+      });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  // まず共通関数で全入力欄を埋める
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '11_3'); }
+  // 書類固有の追加処理があれば loadFromDB で補完
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

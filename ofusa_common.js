@@ -1459,4 +1459,44 @@ function toggleCir(groupId, value){
     var on = (el.getAttribute('data-cirval') === window.cbState[groupId]);
     el.style.border = on ? '1px solid #333' : '1px solid transparent';
   });
+  // onchange相当：クリック直後にこの選択だけをDBへ自動保存（フォーム全体は保存しない）
+  _cirAutoSave(groupId, window.cbState[groupId]);
+}
+/* 丸の選択だけをピンポイントでDB保存する。
+   雇用条件は会社共有のため、フォーム全体を自動保存すると他の申請者の条件まで書き換わる。
+   ここではDB側で該当箇所のみを書き換えるRPCを使い、影響範囲を最小にしている。 */
+var _cirSaveTimer = null;
+function _cirAutoSave(groupId, value){
+  if(_cirSaveTimer) clearTimeout(_cirSaveTimer);
+  _cirSaveTimer = setTimeout(function(){
+    (async function(){
+      try{
+        var ctx = window._empCtx;
+        var idx = window._empLoadedIdx;
+        if(!ctx || !ctx.companyId || idx === null || idx === undefined || idx === ''){
+          showToast('ℹ️ 案件が未選択のため保存していません（DB保存を押してください）');
+          return;
+        }
+        var i = parseInt(idx) || 0;
+        await sb('rpc/set_empset_cbstate', {method:'POST', body: JSON.stringify({
+          p_company_id: ctx.companyId, p_idx: i, p_key: groupId, p_value: String(value == null ? '' : value)
+        })});
+        var r = await sb('companies?select=emp_sets&id=eq.' + ctx.companyId);
+        var set = r && r[0] && r[0].emp_sets && r[0].emp_sets[i];
+        var got = (set && set.cbState && set.cbState[groupId]) || '';
+        if(String(got) !== String(value == null ? '' : value)) throw new Error('保存後の確認が一致しません');
+        if(window._empLoadedSet){
+          window._empLoadedSet.cbState = Object.assign({}, window._empLoadedSet.cbState || {});
+          window._empLoadedSet.cbState[groupId] = value;
+        }
+        if(ctx.empSets && ctx.empSets[i]){
+          ctx.empSets[i].cbState = Object.assign({}, ctx.empSets[i].cbState || {});
+          ctx.empSets[i].cbState[groupId] = value;
+        }
+        showToast('💾 保存しました');
+      }catch(e){
+        showToast('⚠️ 保存に失敗しました: ' + (e && e.message ? e.message : e));
+      }
+    })();
+  }, 400);
 }
