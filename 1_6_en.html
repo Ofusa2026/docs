@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260720.25</div>
+    <div class="ver">ver.20260720.26</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784685102"></script>
+<script src="ofusa_common.js?v=1784698737"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -540,7 +540,7 @@ function p(){
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Limit on contract renewal (No / Yes (Up to&nbsp;&nbsp;&nbsp;&nbsp;times / Total contract period of up to&nbsp;&nbsp;&nbsp;&nbsp;years))</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（${cir('無','renewLimit','none',true)}・${cir('有','renewLimit','yes')}（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. Limit on contract renewal (${cir('No','renewLimit','none',true)} / ${cir('Yes','renewLimit','yes')} (Up to&nbsp;&nbsp;&nbsp;&nbsp;times / Total contract period of up to&nbsp;&nbsp;&nbsp;&nbsp;years))</span></div>
       <div style="font-size:7.5pt;margin-top:2px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">[If the employee has executed a fixed-term employment contract with the same employer as specified under the Labor Contract Act, with a total contract period exceeding 5 years]</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
       <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">By requesting the employer to execute an employment contract with no fixed term (open-ended employment contract) during the period of this contract,</span><br><span class="id" style="font-size:6.5pt;">the employee may convert to employment based on an open-ended employment contract from the day following the last day of this contract period (day&nbsp;&nbsp;&nbsp;month&nbsp;&nbsp;&nbsp;year&nbsp;&nbsp;&nbsp;).<br><span class="id" style="font-size:6.5pt;">In this case, will there be any changes to the employment conditions from this contract? (No / Yes (as shown in Attachment 2))</span></span></div>

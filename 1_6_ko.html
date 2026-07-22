@@ -36,7 +36,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260720.25</div>
+    <div class="ver">ver.20260720.26</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +391,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784685102"></script>
+<script src="ofusa_common.js?v=1784698737"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -540,7 +540,7 @@ function p(){
           </tr>
         </table>
       </div>
-      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（無・有（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. 갱신 상한의 유무(무·유(갱신&nbsp;&nbsp;&nbsp;&nbsp;회까지/통산 계약 기간&nbsp;&nbsp;&nbsp;&nbsp;년까지))</span></div>
+      <div style="font-size:8.5pt;font-weight:bold;margin-top:3px;">３．更新上限の有無（${cir('無','renewLimit','none',true)}・${cir('有','renewLimit','yes')}（更新&emsp;&emsp;&emsp;回まで／通算契約期間&emsp;&emsp;&emsp;年まで））<br><span class="id" style="font-size:7pt;margin-left:8px;">3. 갱신 상한의 유무(${cir('무','renewLimit','none',true)}·${cir('유','renewLimit','yes')}(갱신&nbsp;&nbsp;&nbsp;&nbsp;회까지/통산 계약 기간&nbsp;&nbsp;&nbsp;&nbsp;년까지))</span></div>
       <div style="font-size:7.5pt;margin-top:2px;">【労働契約法に定める同一の企業との間での通算契約期間が５年を超える有期雇用契約の締結の場合】<br><span class="id" style="font-size:6.5pt;">【노동계약법에 정하는 동일한 기업과의 통산계약기간이 5년을 넘는 유기고용계약 체결의 경우】</span></div>
       <div style="font-size:7.5pt;">本契約期間中に会社に対して期間の定めのない雇用契約（無期雇用契約）の締結の申込みをすることにより、本契約期間の末日の翌日（&emsp;&emsp;年&emsp;月&emsp;日）</div>
       <div style="font-size:7.5pt;">から、無期雇用契約での雇用に転換することができる。この場合の本契約からの労働条件の変更の有無（ 無 ・ 有（別紙２のとおり））<br><span class="id" style="font-size:6.5pt;">본 계약기간중에 회사에 대하여 기간을 정하지 않은 고용계약(무기고용계약)의 체결 신청을 함으로써,</span><br><span class="id" style="font-size:6.5pt;">본계약기간의 말일 다음날( 년&nbsp;&nbsp;&nbsp;월&nbsp;&nbsp;&nbsp;일 )부터 무기고용계약에 의한 고용으로 전환할 수 있다.<br><span class="id" style="font-size:6.5pt;">이 경우, 본 계약으로부터의 노동 조건의 변경 유무(무·유(별지 2대로))</span></span></div>

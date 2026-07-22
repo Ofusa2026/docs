@@ -1441,3 +1441,22 @@ function fOr2B(){ try{ for(var i=0;i<arguments.length;i++){ if(String(v(argument
     (document.head||document.documentElement).appendChild(st);
   }catch(_e){}
 })();
+
+/* ○で囲む選択（無・有 のように、どちらかに丸を付ける欄用）
+   cbState に保存されるので、DB保存・再読込・印刷でも選択が残る。
+   使い方: ${cir('無','renewLimit','none',true)}・${cir('有','renewLimit','yes')} */
+function cir(text, groupId, value, defOn){
+  var cur = (window.cbState && window.cbState[groupId] !== undefined) ? window.cbState[groupId] : (defOn ? value : '');
+  var on = (cur === value);
+  var st = 'display:inline-block;padding:0 5px;cursor:pointer;'
+         + (on ? 'border:1px solid #333;border-radius:999px;' : 'border:1px solid transparent;border-radius:999px;');
+  return '<span class="cb-click" data-cirgrp="' + groupId + '" data-cirval="' + value + '" onclick="toggleCir(\'' + groupId + '\',\'' + value + '\')" style="' + st + '">' + text + '</span>';
+}
+function toggleCir(groupId, value){
+  if(!window.cbState) window.cbState = {};
+  window.cbState[groupId] = (window.cbState[groupId] === value) ? '' : value;
+  document.querySelectorAll('[data-cirgrp="' + groupId + '"]').forEach(function(el){
+    var on = (el.getAttribute('data-cirval') === window.cbState[groupId]);
+    el.style.border = on ? '1px solid #333' : '1px solid transparent';
+  });
+}
