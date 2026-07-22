@@ -30,13 +30,27 @@
 @media print{ #docP1{ line-height:1.5 !important; } }
 /* ヘッダー差込値に下線 */
 .doc .hdr-ul .f{border-bottom:1px solid #333;}
+/* 記入欄の体裁：日本語行・翻訳行それぞれに下線を引き、値は線のすぐ上に中央寄せ。
+   左のラベル（事業所名／Nama kantor）と2行ずつ対応して並ぶようにする。 */
+.doc .ul-cell{padding:0 4px;vertical-align:top;}
+.doc .ul-cell br{display:none;}
+.doc .ul-cell > .f,
+.doc .ul-cell > .id > .f{display:block;text-align:center;border-bottom:1px solid #333;padding-bottom:2px;margin-bottom:5px;min-height:1.2em;line-height:1.4;}
+.doc .ul-cell > .id{display:block;}
+.doc .ul-label{vertical-align:top;line-height:1.4;padding-top:0;}
+.doc .ul-label .id{display:block;margin-top:7px;}
+/* 冒頭の所属機関ブロック：ラベルを折り返さない最小幅にし、値の欄を広く取る（中央寄せはしない） */
+.doc table.hdr-ul{width:60%;table-layout:auto;}
+.doc table.hdr-ul > tbody > tr > td:first-child{white-space:nowrap;width:1%;padding-right:12px;vertical-align:top;}
+/* 記入欄の値だけ中央寄せ（下線なし）：分野・業務区分など */
+.doc .ctr-cell{text-align:center;}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260720.32</div>
+    <div class="ver">ver.20260720.33</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -391,7 +405,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784725776"></script>
+<script src="ofusa_common.js?v=1784725950"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -563,9 +577,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;">${cb(true,'hire_direct')}&nbsp;直接雇用（以下に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;" data-key="31">${cb(true,'hire_direct_id')} ការជួលផ្ទាល់ (បំពេញក្នុងផ្នែកខាងក្រោម)</span></div>
         <div style="font-size:7.5pt;">※受入れ機関の事業所を記載<br><span class="id" data-key="32">* កត់ត្រាការិយាល័យនៃស្ថាប័នទទួល</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ឈ្មោះក្រុមហ៊ុន</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">អាសយដ្ឋាន</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">ទំនាក់ទំនង</span></td><td style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id" data-key="33">ឈ្មោះក្រុមហ៊ុន</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_officeName')}<br><span class="id" data-key="34">${f('es_officeNameEn')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id" data-key="35">អាសយដ្ឋាន</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_officeAddress')}<br><span class="id" data-key="36">${f('es_officeAddressEn')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id" data-key="37">ទំនាក់ទំនង</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_officeTel')}<br><span class="id" style="font-size:7.5pt;" data-key="38">${f('es_officeTel')}</span></td></tr>
         </table>
       </div>
       <!-- 縦線 -->
@@ -593,11 +607,11 @@ function p(){
         <table style="width:100%;border-collapse:collapse;font-size:8pt;">
           <tr>
             <td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野<br><span class="id" data-key="44">1. វិស័យ</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
+            <td class="ctr-cell" style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
             <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">2. ប្រភេទនៃការងារ</span></td>
-            <td style="padding:2px 4px;vertical-align:top;">${fBunyaPair('es_category','es_category2')}<br><span class="id" data-key="47">（${fBunyaPair('es_categoryEn','es_category2En')}）</span></td>
+            <td class="ctr-cell" style="padding:2px 4px;vertical-align:top;">${fBunyaPair('es_category','es_category2')}<br><span class="id" data-key="47">（${fBunyaPair('es_categoryEn','es_category2En')}）</span></td>
           </tr>
         </table>
       </div>
