@@ -259,7 +259,50 @@ window.addEventListener('beforeunload', function(e){
     (document.head||document.documentElement).appendChild(st);
   }catch(e){}
 })();
-function doPrint(){window.print();}
+/* 印刷・PDF保存時のファイル名を「人材名_様式名」にする（例：IMROY SYAHPUTRA_1-6）。
+   ブラウザはPDF保存時のファイル名に document.title を使うため、印刷の間だけ書き換えて元に戻す。 */
+function _printApplicantName(){
+  try{
+    // ① 書類ごとの申請人欄（書類により名前が異なるので順に探す）
+    var ids=['es_applicantName','f_applicant','f_applicantName','es_applicant'];
+    for(var i=0;i<ids.length;i++){
+      var el=document.getElementById(ids[i]);
+      if(el && String(el.value||'').trim()) return String(el.value).trim();
+    }
+    // ② 案件選択（indexから渡された情報）
+    var sel=document.getElementById('caseSelect');
+    if(sel && sel.value){
+      try{ var d=JSON.parse(sel.value); if(d && d.applicant) return String(d.applicant).trim(); }catch(_e){}
+      var t=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].textContent:'';
+      t=String(t||'').split('　(')[0].replace(/^\d+\.\s*/,'').trim();
+      if(t && t!=='(名前なし)') return t;
+    }
+    if(window._empCtx && window._empCtx.applicant) return String(window._empCtx.applicant).trim();
+  }catch(_e){}
+  return '';
+}
+function _printDocLabel(){
+  // <title>「参考様式第１－６号 …」から「1-6」を作る。取れなければタイトルをそのまま使う。
+  var t=String(document.title||'').trim();
+  var zen='０１２３４５６７８９';
+  var norm=t.replace(/[０-９]/g,function(c){ return String(zen.indexOf(c)); });
+  var m=norm.match(/第\s*(\d+)\s*[－\-−ー]\s*(\d+)\s*号/);
+  if(m) return m[1]+'-'+m[2];
+  m=norm.match(/様式第\s*(\d+)\s*号?/);
+  if(m) return m[1];
+  return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
+}
+function doPrint(){
+  var orig=document.title;
+  try{
+    var who=_printApplicantName();
+    var doc=_printDocLabel();
+    var name=(who? who+'_' : '')+doc;
+    document.title=name.replace(/[\\\/:*?"<>|]/g,'_');
+  }catch(_e){}
+  try{ window.print(); }
+  finally{ setTimeout(function(){ document.title=orig; }, 1000); }
+}
 function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 // ===== 文字サイズ =====
