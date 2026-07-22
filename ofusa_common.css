@@ -71,4 +71,6 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
 .sign-field.signed .sign-field-placeholder { display:none; }
 @media print {
   .sign-field-placeholder { display:none; }
+  /* 署名位置を示すためのガイド点線は画面用。印刷・PDFには出さない（署名欄の外枠は残る） */
+  .sign-field-area { border-top: none !important; }
 }
