@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260720.35</div>
+    <div class="ver">ver.20260720.36</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -243,8 +243,8 @@
       <div class="fg"><label>定例日その他（翻訳）<span class="fid">es.holidayOtherEn</span></label><input id="es_holidayOtherEn" oninput="p()"></div>
       <div class="fg"><label>非定例日 週当たり（日）<span class="fid">es.nonRegWeeklyDays</span></label><input id="es_nonRegWeeklyDays" oninput="p()"></div>
       <div class="fg"><label>非定例日 月当たり（日）<span class="fid">es.nonRegMonthlyDays</span></label><input id="es_nonRegMonthlyDays" oninput="p()"></div>
-      <div class="fg"><label>非定例日 その他（DB）<span class="fid">es.nonRegOther</span></label><input id="es_nonRegOther" oninput="p()"></div>
-      <div class="fg"><label>非定例日 その他（DB訳）<span class="fid">es.nonRegOtherEn</span></label><input id="es_nonRegOtherEn" oninput="p()"></div>
+      <div class="fg" style="display:none;"><label>非定例日 その他（DB）<span class="fid">es.nonRegOther</span></label><input id="es_nonRegOther" oninput="p()"></div>
+      <div class="fg" style="display:none;"><label>非定例日 その他（DB訳）<span class="fid">es.nonRegOtherEn</span></label><input id="es_nonRegOtherEn" oninput="p()"></div>
       <div class="fg"><label>非定例日その他<span class="fid">es.otherHolidays</span></label><input id="es_otherHolidays" oninput="p()"></div>
       <div class="fg"><label>非定例日その他（翻訳）<span class="fid">es.otherHolidaysEn</span></label><input id="es_otherHolidaysEn" oninput="p()"></div>
       <div class="fg"><label>年間合計休日(日)<span class="fid">es.annualHolidays</span></label><input id="es_annualHolidays" oninput="p()"></div>
@@ -406,7 +406,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784767968"></script>
+<script src="ofusa_common.js?v=1784788146"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
