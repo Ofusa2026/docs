@@ -1588,3 +1588,17 @@ function _cirAutoSave(groupId, value){
   window.addEventListener('load', function(){ setTimeout(_redrawIfRestored, 0); });
   window.addEventListener('pageshow', function(e){ if(e.persisted) setTimeout(_redrawIfRestored, 0); });
 })();
+
+/* 休日日数の妥当性チェック（PDFのAI読取ミス対策）
+   「週当たり休日数」に労働時間(例39.8)や年間休日(例77)が誤って入るケースが実在するため、
+   ありえない値は書類に出さない。週は7日、月は31日が上限。
+   数値でない記述（「シフトによる」等）はそのまま通す。 */
+function _holidayDaysOK(val, max){
+  var s = String(val == null ? '' : val).trim();
+  if(!s) return false;
+  if(!/^[0-9]+(\.[0-9]+)?$/.test(s)) return true;   // 数値以外の記述は判定しない
+  var n = parseFloat(s);
+  return n > 0 && n <= max;
+}
+function isWeeklyHolidayOK(id){ return _holidayDaysOK(v(id), 7); }
+function isMonthlyHolidayOK(id){ return _holidayDaysOK(v(id), 31); }
