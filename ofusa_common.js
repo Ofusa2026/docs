@@ -155,10 +155,19 @@ const fBunyaPair=(idA,idB)=>{
       .replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'')
       .trim();
   };
-  var a=clean(v(idA)), b=clean(v(idB));
-  var list=[];
-  if(a) list.push({id:idA,t:a});
-  if(b && b!==a) list.push({id:idB,t:b});
+  // 1つの欄に「土木、建築」のように複数入っていることがあるので読点/カンマで分解する。
+  // 中点は「ライフライン・設備」のような正式名称に含まれるため分解しない。
+  // 重複判定だけは中点も含めて細かく見る（例:「土木・建築」と「建築」を重複扱いにする）。
+  var list=[], seen={};
+  [idA,idB].forEach(function(id){
+    clean(v(id)).split(/[,、]\s*/).forEach(function(t){
+      t=t.trim(); if(!t) return;
+      var tokens=t.split(/[・]\s*/).map(function(x){return x.trim();}).filter(Boolean);
+      var isNew=false;
+      tokens.forEach(function(tk){ if(!seen[tk]){ seen[tk]=1; isNew=true; } });
+      if(isNew) list.push({id:id,t:t});
+    });
+  });
   if(!list.length) return fBunya(idA);
   return list.map(function(x){ return '<span class="f" data-bind="'+x.id+'">'+esc(x.t)+'</span>'; }).join('・');
 };

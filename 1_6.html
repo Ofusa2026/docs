@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260720.34</div>
+    <div class="ver">ver.20260720.35</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -408,7 +408,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1784732710"></script>
+<script src="ofusa_common.js?v=1784767968"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1129,7 +1129,7 @@ function setFormValues(esData){
     }
     if(dbKey==='category'||dbKey==='categoryEn'){
       const _clean=String(val).replace(/[（(][^）)]*[）)]/g,'').replace(/[（(][^）)]*$/,'');
-      const parts=_clean.split(/[,、・]\s*/).map(s=>s.replace(/[（(][^）)]*[）)]/g,'').trim()).filter(Boolean);
+      const parts=_clean.split(/[,、]\s*/).map(s=>s.replace(/[（(][^）)]*[）)]/g,'').trim()).filter(Boolean);
       // 1つ目はcategory、2つ目はcategory2にセット
       const fKey=dbKey==='category'?'category':'categoryEn';
       const f2Key=dbKey==='category'?'category2':'category2En';
