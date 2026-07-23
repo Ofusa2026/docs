@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260723.01</div>
+    <div class="ver">ver.20260723.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -611,7 +611,7 @@ function p(){
             <td class="ctr-cell" style="padding:2px 4px;vertical-align:top;">${f('es_applicantField')}<br><span class="id" data-key="45">${f('es_applicantFieldEn')}</span></td>
           </tr>
           <tr>
-            <td style="padding:2px 4px;vertical-align:top;">２．業務区分<br><span class="id" data-key="46">၂။ လုပ်ငန်းအမျိုးအစား</span></td>
+            <td style="padding:2px 4px;vertical-align:top;white-space:nowrap;">２．業務区分<br><span class="id" data-key="46">၂။ လုပ်ငန်းအမျိုးအစား</span></td>
             <td class="ctr-cell" style="padding:2px 4px;vertical-align:top;">${fBunyaPair('es_category','es_category2')}<br><span class="id" data-key="47">（${fBunyaPair('es_categoryEn','es_category2En')}）</span></td>
           </tr>
         </table>
@@ -625,7 +625,7 @@ function p(){
           <tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野</td><td style="padding:2px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" data-key="49">၁။ နယ်ပယ်</td><td style="padding:0 4px 4px 4px;vertical-align:top;">&nbsp;</td></tr>
           <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
-          <tr><td style="padding:0;vertical-align:top;" class="id" data-key="50">၂။ လုပ်ငန်းအမျိုးအစား</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
+          <tr><td style="padding:0;vertical-align:top;white-space:nowrap;" class="id" data-key="50">၂။ လုပ်ငန်းအမျိုးအစား</td><td style="padding:0 4px;vertical-align:top;" class="id" data-key="51">（&emsp;&emsp;&emsp;&emsp;）</td></tr>
         </table>
       </div>
     </div>
@@ -777,7 +777,7 @@ function p(){
           <td>${cb(false,"cb_auto_007")}&nbsp;毎月&emsp;日</td>
         </tr>
         <tr>
-          <td class="id" style="font-size:7pt;">၄။ လုပ်အားခပေးသည့်နောက်ဆုံးရက်</td>
+          <td class="id" style="font-size:7pt;">၄။ လုပ်အားခတွက်သည့် နောက်ဆုံးရက်</td>
           <td class="id" style="font-size:7pt;">${cb(true,"cb_auto_008")} ${fPayL('es_payCutoff','es_payCutoffEn')}</td>
           <td class="id" style="font-size:7pt;padding-bottom:2px;">${cb(false,"cb_auto_009")} လစဥ်</td>
         </tr>
