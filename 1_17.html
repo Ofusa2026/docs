@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260714.001
+  ver.20260723.01
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -138,7 +138,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260714.001</span>
+  <span class="ver">ver.20260723.01</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -477,7 +477,8 @@ function dbRowToSupportOrg(r) {
     supportManagerName:r.support_manager_name||'', supportManagerNameEn:r.support_manager_name_en||'',
     supportManagerTitleEn:r.support_manager_title_en||'',
     folderNo:r.folder_no||'',
-    offices:r.offices||[]
+    offices:r.offices||[],
+    extra:r.extra||{}
   };
 }
 
@@ -734,6 +735,66 @@ window.PLACEHOLDER_MAP = {
   '｛｛登録支援機関支援事業所英語住所｝｝':'so.officeAddressEn',
   '｛｛登録支援機関支援事業所電話番号｝｝':'so.officeTel',
   '｛｛登録支援機関支援責任者ふりがな｝｝':'so.supportManagerKana',
+  // === フォーム収集の標準情報（support_orgs.extra）フェーズ3 ===
+  '｛｛登録支援機関対応時間_月｝｝':'so.ex_hourMon',
+  '｛｛登録支援機関対応時間_火｝｝':'so.ex_hourTue',
+  '｛｛登録支援機関対応時間_水｝｝':'so.ex_hourWed',
+  '｛｛登録支援機関対応時間_木｝｝':'so.ex_hourThu',
+  '｛｛登録支援機関対応時間_金｝｝':'so.ex_hourFri',
+  '｛｛登録支援機関対応時間_土｝｝':'so.ex_hourSat',
+  '｛｛登録支援機関対応時間_日｝｝':'so.ex_hourSun',
+  '｛｛登録支援機関対応時間_祝｝｝':'so.ex_hourHol',
+  '｛｛登録支援機関対応時間_平日｝｝':'so.ex_hourWeekday',
+  '｛｛登録支援機関相談方法_面談｝｝':'so.ex_consultF2f',
+  '｛｛登録支援機関相談方法_電話｝｝':'so.ex_consultTel',
+  '｛｛登録支援機関相談方法_メール｝｝':'so.ex_consultMail',
+  '｛｛登録支援機関相談方法_電話1｝｝':'so.ex_consultTel1',
+  '｛｛登録支援機関相談方法_電話2｝｝':'so.ex_consultTel2',
+  '｛｛登録支援機関相談方法_電話3｝｝':'so.ex_consultTel3',
+  '｛｛登録支援機関相談方法_メールアドレス｝｝':'so.ex_consultMailAddr',
+  '｛｛登録支援機関相談方法_その他｝｝':'so.ex_consultOther',
+  '｛｛登録支援機関緊急時_面談｝｝':'so.ex_emgF2f',
+  '｛｛登録支援機関緊急時_電話｝｝':'so.ex_emgTel',
+  '｛｛登録支援機関緊急時_メール｝｝':'so.ex_emgMail',
+  '｛｛登録支援機関緊急時_電話1｝｝':'so.ex_emgTel1',
+  '｛｛登録支援機関緊急時_電話2｝｝':'so.ex_emgTel2',
+  '｛｛登録支援機関緊急時_電話3｝｝':'so.ex_emgTel3',
+  '｛｛登録支援機関緊急時_メールアドレス｝｝':'so.ex_emgMailAddr',
+  '｛｛登録支援機関緊急時_その他｝｝':'so.ex_emgOther',
+  '｛｛登録支援機関適正性_有｝｝':'so.ex_properYes',
+  '｛｛登録支援機関適正性_無｝｝':'so.ex_properNo',
+  '｛｛登録支援機関実施言語｝｝':'so.ex_languages',
+  '｛｛登録支援機関通訳者言語｝｝':'so.ex_interpLang',
+  '｛｛登録支援機関通訳者所属｝｝':'so.ex_interpOrg',
+  '｛｛登録支援機関通訳者氏名｝｝':'so.ex_interpName',
+  '｛｛登録支援機関通訳者英語｝｝':'so.ex_interpNameEn',
+  '｛｛登録支援機関定期面談_対面｝｝':'so.ex_meetFace',
+  '｛｛登録支援機関定期面談_対面オンライン｝｝':'so.ex_meetFaceOnline',
+  '｛｛登録支援機関定期面談_無線｝｝':'so.ex_meetRadio',
+  '｛｛登録支援機関定期面談時期｝｝':'so.ex_meetSchedule',
+  '｛｛登録支援機関ガイダンス時間｝｝':'so.ex_hoursGuidance',
+  '｛｛登録支援機関オリエンテーション時間｝｝':'so.ex_hoursOrientation',
+  '｛｛登録支援機関実施予定_ガイダンス｝｝':'so.ex_sched_guidance',
+  '｛｛登録支援機関実施予定_送迎｝｝':'so.ex_sched_escort',
+  '｛｛登録支援機関実施予定_住居｝｝':'so.ex_sched_housing',
+  '｛｛登録支援機関実施予定_オリエンテーション｝｝':'so.ex_sched_orientation',
+  '｛｛登録支援機関実施予定_各種手続｝｝':'so.ex_sched_procedures',
+  '｛｛登録支援機関実施予定_日本語｝｝':'so.ex_sched_japanese',
+  '｛｛登録支援機関実施予定_相談｝｝':'so.ex_sched_consultation',
+  '｛｛登録支援機関実施予定_交流｝｝':'so.ex_sched_exchange',
+  '｛｛登録支援機関実施予定_転職支援｝｝':'so.ex_sched_jobchange',
+  '｛｛登録支援機関住居a｝｝':'so.ex_housingA',
+  '｛｛登録支援機関住居b｝｝':'so.ex_housingB',
+  '｛｛登録支援機関住居c｝｝':'so.ex_housingC',
+  '｛｛登録支援機関住居a_有｝｝':'so.ex_housingAYes',
+  '｛｛登録支援機関住居a_無｝｝':'so.ex_housingANo',
+  '｛｛登録支援機関住居b_有｝｝':'so.ex_housingBYes',
+  '｛｛登録支援機関住居b_無｝｝':'so.ex_housingBNo',
+  '｛｛登録支援機関住居c_有｝｝':'so.ex_housingCYes',
+  '｛｛登録支援機関住居c_無｝｝':'so.ex_housingCNo',
+  '｛｛登録支援機関住居補足｝｝':'so.ex_housingNote',
+  '｛｛登録支援機関共生_HP｝｝':'so.ex_symbiosisHp',
+  '｛｛登録支援機関共生_その他｝｝':'so.ex_symbiosisOther',
   '｛｛登録支援機関支援責任者役職｝｝':'so.supportManagerTitle',
   '｛｛登録支援機関支援責任者役職翻訳｝｝':'so.supportManagerTitleEn',
   '｛｛登録支援機関支援者数｝｝':'so.supporterCount',
@@ -1095,6 +1156,81 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     }
     if(field.indexOf('so.')===0){var _soName=co.supportOrgName||c.org||'';var _so=supportOrgs.find(function(x){return x.name===_soName;})||{};
       var _soF=field.substring(3);
+      // ===== フォームで収集した標準情報（support_orgs.extra）=====
+      // 対応時間: 対応なし→「-」、未入力→空
+      var _hourStr=function(h){ if(!h) return ''; if(h.none) return '-'; if(!h.from&&!h.to) return ''; return (h.from||'')+'〜'+(h.to||''); };
+      // 電話番号を3セルに分割
+      var _telSplit=function(t){ var p=String(t||'').split(/[-ー－\s]+/).filter(Boolean); while(p.length<3) p.push(''); return p.slice(0,3); };
+      var _cb=function(b){ return b?'■':'□'; };
+      var _ex=_so.extra||{};
+      if(_soF.indexOf('ex_')===0){
+        var k=_soF.substring(3);
+        var H=_ex.supportHours||{}, CM=_ex.consultMethods||{}, EC=_ex.emergencyContact||{};
+        var RM=_ex.regularMeeting||{}, IH=_ex.implHours||{}, IS=_ex.implSchedules||{};
+        var HP=_ex.housingPolicy||{}, SC=_ex.symbiosisCheck||{}, IP=(_ex.interpreters||[])[0]||{};
+        // 対応時間（曜日別）
+        var dayMap={hourMon:'mon',hourTue:'tue',hourWed:'wed',hourThu:'thu',hourFri:'fri',hourSat:'sat',hourSun:'sun',hourHol:'hol'};
+        if(dayMap[k]) return _hourStr(H[dayMap[k]]);
+        // 平日まとめ（月〜金が同値のときだけ返す）
+        if(k==='hourWeekday'){
+          var vals=['mon','tue','wed','thu','fri'].map(function(d){return _hourStr(H[d]);});
+          return vals.every(function(x){return x===vals[0];}) ? vals[0] : '';
+        }
+        // 相談方法／緊急時対応
+        if(k==='consultF2f') return _cb(CM.f2f);
+        if(k==='consultTel') return _cb(CM.tel);
+        if(k==='consultMail') return _cb(CM.mail);
+        if(k==='consultTel1') return _telSplit(CM.telNo)[0];
+        if(k==='consultTel2') return _telSplit(CM.telNo)[1];
+        if(k==='consultTel3') return _telSplit(CM.telNo)[2];
+        if(k==='consultMailAddr') return CM.mailAddr||'';
+        if(k==='consultOther') return CM.other||'';
+        if(k==='emgF2f') return _cb(EC.f2f);
+        if(k==='emgTel') return _cb(EC.tel);
+        if(k==='emgMail') return _cb(EC.mail);
+        if(k==='emgTel1') return _telSplit(EC.telNo)[0];
+        if(k==='emgTel2') return _telSplit(EC.telNo)[1];
+        if(k==='emgTel3') return _telSplit(EC.telNo)[2];
+        if(k==='emgMailAddr') return EC.mailAddr||'';
+        if(k==='emgOther') return EC.other||'';
+        // 支援の適正性
+        if(k==='properYes') return _cb(_ex.supportProperness==='有');
+        if(k==='properNo') return _cb(_ex.supportProperness==='無');
+        // 実施言語・通訳者
+        if(k==='languages') return _ex.supportLanguages||'';
+        if(k==='interpLang') return IP.language||'';
+        if(k==='interpOrg') return IP.org||'';
+        if(k==='interpName') return IP.name||'';
+        if(k==='interpNameEn') return IP.nameEn||'';
+        // 定期面談
+        if(k==='meetFace') return _cb(RM.method==='face');
+        if(k==='meetFaceOnline') return _cb(RM.method==='faceOnline');
+        if(k==='meetRadio') return _cb(RM.method==='radio');
+        if(k==='meetSchedule') return RM.schedule||'';
+        // 実施時間
+        if(k==='hoursGuidance') return IH.guidance||'';
+        if(k==='hoursOrientation') return IH.orientation||'';
+        // 実施予定（9本）
+        var schedKeys=['guidance','escort','housing','orientation','procedures','japanese','consultation','exchange','jobchange'];
+        for(var si=0; si<schedKeys.length; si++){
+          if(k==='sched_'+schedKeys[si]) return IS[schedKeys[si]]||'';
+        }
+        // 住居の方針
+        if(k==='housingA') return HP.a||'';
+        if(k==='housingB') return HP.b||'';
+        if(k==='housingC') return HP.c||'';
+        if(k==='housingAYes') return _cb(HP.a==='有');
+        if(k==='housingANo')  return _cb(HP.a==='無');
+        if(k==='housingBYes') return _cb(HP.b==='有');
+        if(k==='housingBNo')  return _cb(HP.b==='無');
+        if(k==='housingCYes') return _cb(HP.c==='有');
+        if(k==='housingCNo')  return _cb(HP.c==='無');
+        if(k==='housingNote') return HP.note||'';
+        // 共生社会
+        if(k==='symbiosisHp') return _cb(SC.hp);
+        if(k==='symbiosisOther') return SC.other||'';
+        return '';
+      }
       // 登録年月日の分割
       if(_soF==='regY'||_soF==='regM'||_soF==='regD'){var _rd=(_so.regDate||'').split('-');if(_soF==='regY')return _rd[0]||'';if(_soF==='regM')return _rd[1]?String(parseInt(_rd[1])):'';if(_soF==='regD')return _rd[2]?String(parseInt(_rd[2])):'';}
       // 代表者ふりがな
