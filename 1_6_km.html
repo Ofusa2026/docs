@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260720.37</div>
+    <div class="ver">ver.20260724.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1768,5 +1768,69 @@ if(!window._selectCaseListenerAdded){
     </div>
   </div>
 </div>
+<script>
+/* 合計自動計算（es_salaryTotal / es_deductTotal / es_netPay） ver.20260724.02 */
+(function(){
+  var PAY=['es_salaryMonthly','es_a1Amt','es_a2Amt','es_a3Amt','es_a4Amt','es_fixedOTAmount'];
+  var DED=[['es_deductTax'],['es_deductSocialIns'],['es_deductEmpIns'],
+           ['es_deductFood','es_deductFoodEst'],['es_deductHousing','es_deductHousingEst'],
+           ['es_deductUtility','es_deductUtilityEst'],
+           ['es_deductOther1Amount','es_deductOther1AmountEst'],
+           ['es_deductOther2Amount','es_deductOther2AmountEst']];
+  var TOTALS=['es_salaryTotal','es_deductTotal','es_netPay'];
+  function el(id){return document.getElementById(id);}
+  function num(v){
+    if(v==null) return 0;
+    v=String(v).replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});
+    v=v.replace(/[^0-9.\-]/g,'');
+    var n=parseFloat(v); return isFinite(n)?n:0;
+  }
+  function val(ids){
+    /* 実費（金額が確定しないもの）は合計に含めない */
+    for(var i=0;i<ids.length;i++){
+      var e=el(ids[i]);
+      if(e&&/実費|実\s*費/.test(String(e.value))) return 0;
+    }
+    for(var i=0;i<ids.length;i++){
+      var e=el(ids[i]);
+      if(e&&String(e.value).trim()!=='') return num(e.value);
+    }
+    return 0;
+  }
+  function calc(){
+    var pay=0; PAY.forEach(function(id){pay+=val([id]);});
+    var ded=0; DED.forEach(function(g){ded+=val(g);});
+    var net=pay-ded;
+    set('es_salaryTotal',pay); set('es_deductTotal',ded); set('es_netPay',net);
+  }
+  function set(id,v){
+    var e=el(id); if(!e) return;
+    if(e.dataset.manual==='1') return;
+    var s=(v===0?'':String(Math.round(v)));
+    if(e.value!==s){ e.value=s; e.dispatchEvent(new Event('input',{bubbles:true})); }
+  }
+  function init(){
+    if(!el('es_salaryTotal')) return;
+    TOTALS.forEach(function(id){
+      var e=el(id); if(!e) return;
+      e.addEventListener('input',function(ev){
+        if(ev.isTrusted) e.dataset.manual = (String(e.value).trim()===''?'':'1');
+      });
+      e.title='自動計算されます（手入力で上書き可・空にすると自動計算に戻ります）';
+    });
+    document.addEventListener('input',function(ev){
+      var id=ev.target&&ev.target.id;
+      if(!id) return;
+      if(TOTALS.indexOf(id)>=0) return;
+      if(id.indexOf('es_')!==0) return;
+      calc();
+    },true);
+    calc();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
 </body>
 </html>
