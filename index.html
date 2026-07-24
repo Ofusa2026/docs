@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260724.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260724.04</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -262,7 +262,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-shinsei_henkou_org3"></iframe>
     <iframe id="frame-shinsei_henkou_org4"></iframe>
     <iframe id="frame-1_11"></iframe>
-    <!-- ver.20260724.03: 署名欄設置エディタ -->
+    <!-- ver.20260724.04: 署名欄設置エディタ -->
     <div id="ssPanel" style="display:none;position:absolute;inset:0;background:#f1f5f9;z-index:50;flex-direction:column;">
       <div style="padding:10px 14px;background:#0f2040;color:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <b style="font-size:14px;">🖊 署名欄設定</b>
@@ -649,7 +649,7 @@ function open_doc(key){
 // 初期表示
 open_doc('1_4');
 
-/* ===== ver.20260724.03: 署名欄設置エディタ =====
+/* ===== ver.20260724.04: 署名欄設置エディタ =====
    位置は用紙(.doc)に対する％で sign_slots に保存する。
    日本語版で決めて他言語へ流用し、ズレた言語だけその言語の行を作って上書きする方針。 */
 var _ssSlots=[], _ssFrame=null;
@@ -693,7 +693,7 @@ async function ssLoad(){
   fr.src=_ssFile(doc,lang);
   fr.onload=function(){
     _ssFrame=fr;
-    // ver.20260724.03: 存在しない言語版(404)を検知して知らせる
+    // ver.20260724.04: 存在しない言語版(404)を検知して知らせる
     try{
       var t=(fr.contentDocument&&fr.contentDocument.title)||'';
       if(/404|not found/i.test(t)){ ssMsg('⚠️ この言語版のファイルがありません（'+_ssFile(doc,lang)+'）'); return; }
@@ -706,6 +706,16 @@ function _ssAttach(){
   try{
     var d=_ssFrame.contentDocument; if(!d) return;
     if(idxSelectedCase){ try{ _ssFrame.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*'); }catch(e){} }
+    // ver.20260724.04: 位置決めに集中できるよう、用紙以外のUIを隠す（この画面のiframe内だけ）
+    try{
+      if(!d.getElementById('_ssHideUI')){
+        var _st=d.createElement('style'); _st.id='_ssHideUI';
+        _st.textContent='.fp,.fp-inner,.fp-case,.pn,.page-nav,.pn-btn,.doc-toolbar,.toolbar,.btns,.btn-row{display:none !important;}'
+          +'body{margin:0 !important;padding:0 !important;background:#e2e8f0 !important;}'
+          +'.pp,#pageArea{margin:0 auto !important;padding:10px 0 !important;}';
+        d.head.appendChild(_st);
+      }
+    }catch(e){}
     var pages=d.querySelectorAll('.doc');
     if(!pages.length){ ssMsg('用紙(.doc)が見つかりません'); return; }
     pages.forEach(function(pg,pi){
@@ -851,7 +861,7 @@ async function idxAutoSelectFromUrl(){
     await idxJumpByPaste();
     if(!idxSelectedCase) return;
     var doc=(q.get('doc')||'').trim();
-    // ver.20260724.03: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
+    // ver.20260724.04: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
     if((q.get('mode')||'')==='slot'){
       setTimeout(function(){ try{ openSignSlotEditor(doc||'1_5'); }catch(e){ console.error('ssOpen',e); } }, 400);
       return;
