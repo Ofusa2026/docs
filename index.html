@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260720.41</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260724.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -230,6 +230,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-15_2" onclick="open_doc('15_2')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-2号 登録支援機関 誓約書</span></div></div>
     <div class="item" id="nav-16_2" onclick="open_doc('16_2')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-2号 登録支援機関 誓約書</span></div></div>
     <div class="divider"></div>
+    <div class="section">設定</div>
+    <div class="item" id="nav-signslot" onclick="openSignSlotEditor()"><span class="item-icon">🖊</span><div>署名欄設定<span class="item-sub">電子署名の位置を書類ごとに決める</span></div></div>
     <div class="section">準備中</div>
     <div class="item" id="nav-1_11" onclick="open_doc('1_11')"><span class="item-icon">📊</span><div>参考様式第１－１１号<span class="item-sub">1-11号 所属機関概要書</span></div></div>
   </div>
@@ -260,6 +262,31 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-shinsei_henkou_org3"></iframe>
     <iframe id="frame-shinsei_henkou_org4"></iframe>
     <iframe id="frame-1_11"></iframe>
+    <!-- ver.20260724.01: 署名欄設置エディタ -->
+    <div id="ssPanel" style="display:none;position:absolute;inset:0;background:#f1f5f9;z-index:50;flex-direction:column;">
+      <div style="padding:10px 14px;background:#0f2040;color:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <b style="font-size:14px;">🖊 署名欄設定</b>
+        <select id="ssDoc" onchange="ssLoad()" style="padding:5px 8px;border-radius:6px;border:none;font-size:12px;">
+          <option value="1_5">1-5 雇用契約書</option><option value="1_6">1-6 雇用条件書</option>
+          <option value="1_3">1-3 受診者の申告書別紙</option><option value="1_16">1-16 雇用経緯</option>
+          <option value="1_17">1-17 支援計画書</option><option value="juuyou">重要事項説明書</option>
+        </select>
+        <select id="ssLang" onchange="ssLoad()" style="padding:5px 8px;border-radius:6px;border:none;font-size:12px;">
+          <option value="ja">日本語（基準）</option><option value="en">英語</option><option value="id">インドネシア語</option>
+          <option value="km">カンボジア語</option><option value="ko">韓国語</option><option value="my">ミャンマー語</option>
+          <option value="ne">ネパール語</option><option value="th">タイ語</option><option value="vi">ベトナム語</option><option value="zh">中国語</option>
+        </select>
+        <span id="ssMsg" style="font-size:11px;opacity:.85;"></span>
+        <span style="margin-left:auto;display:flex;gap:6px;">
+          <button onclick="ssSave()" style="padding:6px 14px;border:none;border-radius:6px;background:#10b981;color:#fff;font-weight:800;font-size:12px;cursor:pointer;">保存</button>
+          <button onclick="ssClose()" style="padding:6px 12px;border:none;border-radius:6px;background:#475569;color:#fff;font-size:12px;cursor:pointer;">閉じる</button>
+        </span>
+      </div>
+      <div style="padding:6px 14px;background:#fff7ed;color:#9a3412;font-size:11px;border-bottom:1px solid #fed7aa;">
+        書類の上を<b>ドラッグ</b>すると署名欄を置けます。既存の枠はドラッグで置き直し、枠内の×で削除。位置は用紙に対する％で保存するので、拡大縮小しても崩れません。
+      </div>
+      <div id="ssBody" style="flex:1;overflow:auto;position:relative;background:#e2e8f0;padding:10px;"></div>
+    </div>
     <iframe id="frame-1_1"></iframe>
     <iframe id="frame-2_1"></iframe>
     <iframe id="frame-3_1"></iframe>
@@ -621,6 +648,136 @@ function open_doc(key){
 // 初期表示
 open_doc('1_4');
 
+/* ===== ver.20260724.01: 署名欄設置エディタ =====
+   位置は用紙(.doc)に対する％で sign_slots に保存する。
+   日本語版で決めて他言語へ流用し、ズレた言語だけその言語の行を作って上書きする方針。 */
+var _ssSlots=[], _ssFrame=null;
+function ssMsg(t){ var e=document.getElementById('ssMsg'); if(e) e.textContent=t||''; }
+function openSignSlotEditor(doc){
+  document.querySelectorAll('.item').forEach(function(el){el.classList.remove('active');});
+  var nv=document.getElementById('nav-signslot'); if(nv) nv.classList.add('active');
+  var hs=document.getElementById('home-screen'); if(hs) hs.style.display='none';
+  document.querySelectorAll('#content iframe').forEach(function(f){ f.style.display='none'; });
+  var p=document.getElementById('ssPanel'); if(p) p.style.display='flex';
+  if(doc){ var sel=document.getElementById('ssDoc'); if(sel) sel.value=doc; }
+  ssLoad();
+}
+function ssClose(){
+  var p=document.getElementById('ssPanel'); if(p) p.style.display='none';
+  open_doc(cur||'1_4');
+}
+function _ssFile(doc, lang){ return doc + (lang && lang!=='ja' ? ('_'+lang) : '') + '.html'; }
+async function ssLoad(){
+  var doc=document.getElementById('ssDoc').value, lang=document.getElementById('ssLang').value;
+  var body=document.getElementById('ssBody');
+  body.innerHTML='<div style="padding:20px;color:#64748b;font-size:13px;">読み込み中…</div>';
+  ssMsg('');
+  // スロット定義（無ければ ja を流用して表示だけする）
+  _ssSlots=[];
+  try{
+    var r=await _sbDocs.from('sign_slots').select('*').eq('doc_code',doc).eq('lang',lang).order('slot_no');
+    if(r.error) throw r.error;
+    _ssSlots=r.data||[];
+    if(!_ssSlots.length && lang!=='ja'){
+      var rj=await _sbDocs.from('sign_slots').select('*').eq('doc_code',doc).eq('lang','ja').order('slot_no');
+      _ssSlots=(rj.data||[]).map(function(x){ return {doc_code:doc, lang:lang, slot_no:x.slot_no, label:x.label, signer:x.signer, page_no:x.page_no, x_pct:x.x_pct, y_pct:x.y_pct, w_pct:x.w_pct, h_pct:x.h_pct, _fromJa:true}; });
+      ssMsg('日本語の位置を流用中（保存するとこの言語専用になります）');
+    }
+  }catch(e){ ssMsg('スロット取得エラー: '+(e.message||e)); }
+  // 書類をiframeで表示
+  body.innerHTML='';
+  var fr=document.createElement('iframe');
+  fr.id='ssFrame';
+  fr.style.cssText='width:100%;height:100%;border:none;background:#fff;display:block;';
+  fr.src=_ssFile(doc,lang);
+  fr.onload=function(){ _ssFrame=fr; setTimeout(_ssAttach,400); };
+  body.appendChild(fr);
+}
+function _ssAttach(){
+  try{
+    var d=_ssFrame.contentDocument; if(!d) return;
+    if(idxSelectedCase){ try{ _ssFrame.contentWindow.postMessage({type:'SELECT_CASE',info:idxSelectedCase},'*'); }catch(e){} }
+    var pages=d.querySelectorAll('.doc');
+    if(!pages.length){ ssMsg('用紙(.doc)が見つかりません'); return; }
+    pages.forEach(function(pg,pi){
+      if(getComputedStyle(pg).position==='static') pg.style.position='relative';
+      var ov=pg.querySelector('.ss-ov');
+      if(!ov){
+        ov=d.createElement('div'); ov.className='ss-ov';
+        ov.style.cssText='position:absolute;inset:0;z-index:9999;cursor:crosshair;';
+        pg.appendChild(ov);
+        ov.addEventListener('mousedown', function(ev){ _ssDrag(ev, pg, ov, pi+1, d); });
+      }
+      _ssPaint(pg, ov, pi+1, d);
+    });
+    ssMsg((ssMsgBase()||'')+'　用紙 '+pages.length+'ページ / スロット '+_ssSlots.length+'件');
+  }catch(e){ ssMsg('読み込みエラー: '+(e.message||e)); }
+}
+function ssMsgBase(){ return (_ssSlots.some(function(s){return s._fromJa;}))?'日本語の位置を流用中':''; }
+function _ssPaint(pg, ov, pageNo, d){
+  Array.prototype.forEach.call(ov.querySelectorAll('.ss-box'), function(b){ b.remove(); });
+  _ssSlots.filter(function(s){ return (s.page_no||1)===pageNo && s.x_pct!=null; }).forEach(function(s){
+    var b=d.createElement('div'); b.className='ss-box';
+    b.style.cssText='position:absolute;left:'+s.x_pct+'%;top:'+s.y_pct+'%;width:'+s.w_pct+'%;height:'+s.h_pct+'%;'
+      +'border:2px solid #7F77DD;background:rgba(127,119,221,.12);box-sizing:border-box;';
+    b.innerHTML='<span style="position:absolute;top:-16px;left:0;font-size:10px;background:#7F77DD;color:#fff;padding:1px 5px;border-radius:3px;white-space:nowrap;">'
+      +(s.label||('署名欄'+s.slot_no))+'</span>'
+      +'<span data-del="'+s.slot_no+'" style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;line-height:16px;text-align:center;background:#ef4444;color:#fff;border-radius:50%;font-size:12px;cursor:pointer;">×</span>';
+    b.querySelector('[data-del]').addEventListener('mousedown', function(ev){
+      ev.stopPropagation(); ev.preventDefault();
+      var no=Number(ev.target.getAttribute('data-del'));
+      _ssSlots.forEach(function(x){ if(x.slot_no===no){ x.x_pct=x.y_pct=x.w_pct=x.h_pct=null; } });
+      _ssAttach();
+    });
+    ov.appendChild(b);
+  });
+}
+function _ssDrag(ev, pg, ov, pageNo, d){
+  ev.preventDefault();
+  var r=pg.getBoundingClientRect(), x0=ev.clientX-r.left, y0=ev.clientY-r.top;
+  var box=d.createElement('div');
+  box.style.cssText='position:absolute;border:2px dashed #7F77DD;background:rgba(127,119,221,.15);box-sizing:border-box;';
+  ov.appendChild(box);
+  function mv(e2){
+    var x=Math.min(x0,e2.clientX-r.left), y=Math.min(y0,e2.clientY-r.top);
+    var w=Math.abs(e2.clientX-r.left-x0), h=Math.abs(e2.clientY-r.top-y0);
+    box.style.left=x+'px'; box.style.top=y+'px'; box.style.width=w+'px'; box.style.height=h+'px';
+  }
+  function up(e2){
+    d.removeEventListener('mousemove',mv); d.removeEventListener('mouseup',up);
+    var x=Math.min(x0,e2.clientX-r.left), y=Math.min(y0,e2.clientY-r.top);
+    var w=Math.abs(e2.clientX-r.left-x0), h=Math.abs(e2.clientY-r.top-y0);
+    box.remove();
+    if(w<12||h<8){ return; }   // 誤クリック無視
+    var empty=_ssSlots.filter(function(s){ return s.x_pct==null; });
+    var target=empty.length?empty[0]:null;
+    if(!target){ ssMsg('置ける署名欄がありません（この書類のスロットはすべて配置済みです）'); return; }
+    target.page_no=pageNo;
+    target.x_pct=+(x/r.width*100).toFixed(3);
+    target.y_pct=+(y/r.height*100).toFixed(3);
+    target.w_pct=+(w/r.width*100).toFixed(3);
+    target.h_pct=+(h/r.height*100).toFixed(3);
+    _ssAttach();
+  }
+  d.addEventListener('mousemove',mv); d.addEventListener('mouseup',up);
+}
+async function ssSave(){
+  var doc=document.getElementById('ssDoc').value, lang=document.getElementById('ssLang').value;
+  var rows=_ssSlots.map(function(s){
+    return { doc_code:doc, lang:lang, slot_no:s.slot_no, signer:s.signer||'applicant', label:s.label,
+             page_no:s.page_no||1, x_pct:s.x_pct, y_pct:s.y_pct, w_pct:s.w_pct, h_pct:s.h_pct,
+             enabled:true, updated_at:new Date().toISOString() };
+  });
+  if(!rows.length){ ssMsg('保存するスロットがありません'); return; }
+  ssMsg('保存中…');
+  try{
+    var r=await _sbDocs.from('sign_slots').upsert(rows,{onConflict:'doc_code,lang,slot_no'});
+    if(r.error) throw r.error;
+    ssMsg('✅ 保存しました（'+rows.length+'件）');
+    _ssSlots.forEach(function(s){ delete s._fromJa; });
+  }catch(e){ ssMsg('❌ 保存失敗: '+(e.message||e)); }
+}
+
 // ===== index案件選択 =====
 const IDX_URL='https://ehwlgbwpycglmopiqyty.supabase.co/rest/v1/';
 const IDX_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -674,12 +831,22 @@ async function idxAutoSelectFromUrl(){
   try{
     var q=new URLSearchParams(location.search||'');
     var cid=(q.get('caseId')||'').trim();
-    if(!cid) return;
+    if(!cid){
+      if((q.get('mode')||'')==='slot'){
+        setTimeout(function(){ try{ openSignSlotEditor((q.get('doc')||'1_5').trim()); }catch(e){} }, 400);
+      }
+      return;
+    }
     var inp=document.getElementById('idx_caseIdPaste');
     if(inp) inp.value=cid;
     await idxJumpByPaste();
     if(!idxSelectedCase) return;
     var doc=(q.get('doc')||'').trim();
+    // ver.20260724.01: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
+    if((q.get('mode')||'')==='slot'){
+      setTimeout(function(){ try{ openSignSlotEditor(doc||'1_5'); }catch(e){ console.error('ssOpen',e); } }, 400);
+      return;
+    }
     if(!doc) return;
     var openerMap={'1_5':'open_1_5','1_6':'open_1_6','1_16':'open_1_16','juuyou':'open_juuyou'};
     setTimeout(function(){
