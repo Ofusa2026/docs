@@ -1,6 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260717.04
+ * ver.20260727.01
+ * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
  */
 
 // ===== Supabase =====
@@ -1399,8 +1400,8 @@ document.addEventListener('click', function(e){
       '<div style="background:#fff;border-radius:12px;max-width:470px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-family:sans-serif;box-sizing:border-box;">'+
         '<div style="font-size:15px;font-weight:bold;margin-bottom:6px;color:#1e293b;">雇用条件を変更しました</div>'+
         '<div style="font-size:12px;color:#64748b;margin-bottom:16px;line-height:1.6;">保存方法を選んでください。</div>'+
-        '<button id="_emNew" style="display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 12px;border:1px solid #2563eb;background:#eff6ff;color:#1e3a8a;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">🆕 新しい雇用条件セットとして作成し、この案件に紐付け<br><span style="font-size:11px;color:#475569;">他の案件には影響しません</span></button>'+
-        '<button id="_emOver" style="display:block;width:100%;text-align:left;margin-bottom:14px;padding:11px 12px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">♻️ 元の雇用条件セットを上書き<br><span style="font-size:11px;color:#b45309;">'+cntTxt+'</span></button>'+
+        '<button id="_emOver" style="display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 12px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">♻️ 元の雇用条件セットを上書き<br><span style="font-size:11px;color:#b45309;">'+cntTxt+'</span></button>'+
+        '<button id="_emNew" style="display:block;width:100%;text-align:left;margin-bottom:14px;padding:11px 12px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155;border-radius:8px;cursor:pointer;font-size:13px;line-height:1.5;">🆕 新しい雇用条件セットとして作成し、この案件に紐付け<br><span style="font-size:11px;color:#475569;">他の案件には影響しません</span></button>'+
         '<div style="text-align:right;"><button id="_emCancel" style="padding:7px 16px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button></div>'+
       '</div>';
     document.body.appendChild(wrap);
