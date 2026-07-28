@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260724.02</div>
+    <div class="ver">ver.20260728.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -423,6 +423,10 @@ function fOr2(){
   }
   return f(arguments[0]);
 }
+// 「社会保険や労働条件以外の保険」(emp_set.socialInsurance) を Ⅸ.その他 の「その他（　）」へ差し込む。
+// 入力欄が無くDBの読込値(_empLoadedSet)にのみ存在するため直接参照する。
+function otherIns(){ try{ return String((window._empLoadedSet||{}).socialInsurance||'').trim(); }catch(_e){ return ''; } }
+function otherInsEn(){ try{ var s=window._empLoadedSet||{}; return String(s.socialInsuranceEn||s.socialInsurance||'').trim(); }catch(_e){ return ''; } }
 function p(){
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
   if(_currentDoc==='iko'){ p_iko(); return; }
@@ -863,7 +867,7 @@ function p(){
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅸ．その他<br><span style="font-size:8pt;font-weight:normal;">IX. Others</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(insEnrolled('insPension'),"ins_kousei")}&nbsp;厚生年金，${cb(insEnrolled('insKenpo'),"ins_kenko")}&nbsp;健康保険，${cb(insEnrolled('insEmp'),"ins_koyo")}&nbsp;雇用保険，${cb(insEnrolled('insLabor'),"ins_rousai")}&nbsp;労災保険，</div>
-      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(false,"ins_other")}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;））<br><span class="id" style="font-size:7pt;">Joining social insurance / employment insurance. (${cb(insEnrolled('insPension'),"ins_kousei_id")}&nbsp;Employees' pension insurance, ${cb(insEnrolled('insKenpo'),"ins_kenko_id")}&nbsp;Health insurance, ${cb(insEnrolled('insEmp'),"ins_koyo_id")}&nbsp;Employment insurance, ${cb(insEnrolled('insLabor'),"ins_rousai_id")}&nbsp;Industrial accident insurance,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")}&nbsp;National pension, ${cb(false,"ins_kokumin_kenko_id")}&nbsp;National health insurance, ${cb(false,"ins_other_id")}&nbsp;Others ( ))</span></div>
+      <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(!!otherIns(),"ins_other")}&nbsp;その他（${otherIns()?'&nbsp;'+esc(otherIns())+'&nbsp;':'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'}））<br><span class="id" style="font-size:7pt;">Joining social insurance / employment insurance. (${cb(insEnrolled('insPension'),"ins_kousei_id")}&nbsp;Employees' pension insurance, ${cb(insEnrolled('insKenpo'),"ins_kenko_id")}&nbsp;Health insurance, ${cb(insEnrolled('insEmp'),"ins_koyo_id")}&nbsp;Employment insurance, ${cb(insEnrolled('insLabor'),"ins_rousai_id")}&nbsp;Industrial accident insurance,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")}&nbsp;National pension, ${cb(false,"ins_kokumin_kenko_id")}&nbsp;National health insurance, ${cb(!!otherIns(),"ins_other_id")}&nbsp;Others (${otherInsEn()?' '+esc(otherInsEn())+' ':' '}))</span></div>
       <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;">Health check at the time of hiring: Month ${f('es_healthCheckM2')} Year ${f('es_healthCheckY2')}</span></div>
       <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${fOr('es_healthCheckY','es_healthCheckY2')}年&emsp;${fOr('es_healthCheckM','es_healthCheckM2')}月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month ${fOr('es_healthCheckM','es_healthCheckM2')} Year ${fOr('es_healthCheckY','es_healthCheckY2')} (every 1 year afterwards)</span></div>
       <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">Point of contact for matters concerning the improvement of employment management etc.</span></div>
