@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>申請取下書（参考様式11）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:20mm!important;line-height:1.6!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+.tt-line{border-bottom:1px solid #000;}
+.tt-circle{border:1.6px solid #000;border-radius:50%;padding:0 5px;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 申請取下書（参考様式11）</div>
+    <div class="ver">ver.20260728.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('torisage')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">提出先・作成日</div>
+      <div class="fg"><label>提出先局（受付番号から自動）</label><input id="f_bureau" oninput="p()" placeholder="例：大阪"></div>
+      <div class="fg"><label>作成日（年）</label><input id="f_docY" oninput="p()" placeholder="2026"></div>
+      <div class="fg"><label>作成日（月）</label><input id="f_docM" oninput="p()" placeholder="7"></div>
+      <div class="fg"><label>作成日（日）</label><input id="f_docD" oninput="p()" placeholder="4"></div>
+    </div>
+    <div class="fs"><div class="fs-title">申請人</div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別（男／女）</label><input id="f_gender" oninput="p()" placeholder="男 または 女"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+      <div class="fg"><label>申請日</label><input id="f_appDate" oninput="p()"></div>
+      <div class="fg"><label>申請番号（受付番号）</label><input id="f_appNo" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">取下理由・署名</div>
+      <div class="fg"><label>理由</label><textarea id="f_reason" oninput="p()" rows="3" placeholder="例：健康状態が申請時と異なり、特定技能1号としての就労が難しくなるため申請を取り下げいたします。"></textarea></div>
+      <div class="fg"><label>署名（通常は手書き・空欄可）</label><input id="f_sign" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784722725"></script>
+<script>
+// 受付番号の接頭辞 → 提出先局（日本語 / 英語）
+var BUREAU_MAP={ '東':['東京','TOKYO'],'阪':['大阪','OSAKA'],'名':['名古屋','NAGOYA'],'福':['福岡','FUKUOKA'],
+  '横':['横浜','YOKOHAMA'],'神':['神戸','KOBE'],'広':['広島','HIROSHIMA'],'仙':['仙台','SENDAI'],
+  '高':['高松','TAKAMATSU'],'札':['札幌','SAPPORO'],'那':['那覇','NAHA'],'中':['広島','HIROSHIMA'] };
+function bureauFromReceipt(rno){
+  var s=String(rno||'').trim(); if(!s) return null;
+  var head=s.charAt(0);
+  return BUREAU_MAP[head]||null;
+}
+function bureauEn(jp){
+  jp=String(jp||'').trim();
+  for(var k in BUREAU_MAP){ if(BUREAU_MAP[k][0]===jp) return BUREAU_MAP[k][1]; }
+  return '';
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const g=String(v('f_gender')||'');
+  const isF=/女|female/i.test(g), isM=(/男|male/i.test(g)&&!isF);
+  const mMale=isM?'<span class="tt-circle">男</span> Male':'男 Male';
+  const mFemale=isF?'<span class="tt-circle">女</span> Female':'女 Female';
+  const bjp=String(v('f_bureau')||'');
+  const ben=bureauEn(bjp);
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10.5pt;margin-bottom:6mm;">参考様式１１</div>
+<div style="text-align:right;font-size:11pt;margin-bottom:1mm;">${f('f_docY')} 年　${f('f_docM')} 月　${f('f_docD')} 日</div>
+<div style="text-align:right;font-size:8.5pt;margin-bottom:5mm;">（ Year　　Month　　Day ）</div>
+<div style="font-size:15pt;font-weight:bold;text-align:center;letter-spacing:3px;margin:2mm 0 1mm;">申　請　取　下　書</div>
+<div style="font-size:9pt;font-weight:bold;text-align:center;margin-bottom:7mm;">（Withdrawal of Application）</div>
+<div style="font-size:10.5pt;margin-bottom:1mm;"><span style="display:inline-block;min-width:7em;border-bottom:1px solid #000;text-align:center;">${f('f_bureau')}</span>　出入国在留管理局長　あて</div>
+<div style="font-size:8pt;margin-bottom:6mm;">(To the director General of ＿${ben||'＿＿＿＿'}＿ Regional Immigration Services Bureau)</div>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;">
+  <tr><td style="width:44%;padding:1.6mm 0;">国 籍 ・ 地 域（Nationality/Region）：</td><td style="border-bottom:1px solid #000;">${f('f_nationality')}</td></tr>
+  <tr><td style="padding:1.6mm 0;">氏　　　　　名（N a m e）：</td><td style="border-bottom:1px solid #000;">${f('f_applicant')}</td></tr>
+  <tr><td style="padding:1.6mm 0;">性　　　　　別（S e x）：</td><td style="border-bottom:1px solid #000;text-align:center;">${mMale}　／　${mFemale}</td></tr>
+  <tr><td style="padding:1.6mm 0;">生 年 月 日（Date of Birth）：</td><td style="border-bottom:1px solid #000;">${f('f_birthdate')}</td></tr>
+  <tr><td style="padding:1.6mm 0;">申　請　日（Date of Application）：</td><td style="border-bottom:1px solid #000;">${f('f_appDate')}</td></tr>
+  <tr><td style="padding:1.6mm 0;">申 請 番 号（Application Number）：</td><td style="border-bottom:1px solid #000;">${f('f_appNo')}</td></tr>
+</table>
+<div style="font-size:10.5pt;margin-top:9mm;margin-bottom:2mm;">理　　由 （Reason for Withdrawal of Application）</div>
+<div style="font-size:10.5pt;min-height:26mm;border-bottom:1px dotted #999;padding-bottom:2mm;white-space:pre-wrap;">${f('f_reason')}</div>
+<div style="font-size:10.5pt;text-align:center;margin-top:16mm;">署　名（Signature）<span style="display:inline-block;min-width:16em;border-bottom:1px solid #000;">&nbsp;${f('f_sign')}</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no,receipt_date&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      const rno=cas.receipt_no||cas.case_no||'';
+      s('f_appNo',rno);
+      s('f_appDate',cas.receipt_date||'');
+      // 提出先局を受付番号から自動判定（手入力があれば尊重）
+      if(!v('f_bureau')){ const b=bureauFromReceipt(rno); if(b) document.getElementById('f_bureau').value=b[0]; }
+    }
+    const persons=await sb('persons?select=gender,nationality,birthdate&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_gender',pd.gender||'');
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',pd.birthdate||'');
+    }
+    // 作成日の既定＝本日（未入力時のみ）
+    if(!v('f_docY')){const n=new Date();document.getElementById('f_docY').value=n.getFullYear();document.getElementById('f_docM').value=n.getMonth()+1;document.getElementById('f_docD').value=n.getDate();}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'torisage'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

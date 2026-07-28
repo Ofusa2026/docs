@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>依頼書（在留カード受領）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:20mm!important;line-height:1.7!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+.ir-blank{display:inline-block;min-width:15em;border-bottom:1px solid #000;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 依頼書（在留カードの受領）</div>
+    <div class="ver">ver.20260728.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('irai')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">取次者</div>
+      <div class="fg"><label>取次者を選択</label>
+        <select id="f_agent" onchange="applyAgent();p()">
+          <option value="nakabayashi">中林 俊介（行-132023200582）</option>
+          <option value="tanaka">田中 綾美（行-132023200463）</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">依頼者（申請人）</div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">申請内容</div>
+      <div class="fg"><label>申請種別</label>
+        <select id="f_appType" onchange="p()">
+          <option value="変更">在留資格変更許可申請</option>
+          <option value="更新">在留期間更新許可申請</option>
+          <option value="取得">在留資格取得許可申請</option>
+          <option value="永住">永住許可申請</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="fg"><label>その他（種別名・種別がその他のとき）</label><input id="f_appTypeOther" oninput="p()"></div>
+      <div class="fg"><label>申請番号（受付番号）</label><input id="f_appNo" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">日付</div>
+      <div class="fg"><label>依頼日（年）</label><input id="f_docY" oninput="p()" placeholder="令和8"></div>
+      <div class="fg"><label>依頼日（月）</label><input id="f_docM" oninput="p()"></div>
+      <div class="fg"><label>依頼日（日）</label><input id="f_docD" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1784722725"></script>
+<script>
+// 取次者プリセット（住所・所属・電話は共通、番号のみ異なる）
+var AGENTS={
+  nakabayashi:{ name:'中林　俊介', addr:'東京都大田区蒲田５丁目１１−１０ FUNDES蒲田8階', org:'大房行政書士法人', tel:'03-6424-8849', no:'行-132023200582' },
+  tanaka:{ name:'田中 綾美', addr:'東京都大田区蒲田５丁目１１−１０ FUNDES蒲田8階', org:'大房行政書士法人', tel:'03-6424-8849', no:'行-132023200463' }
+};
+function curAgent(){ return AGENTS[v('f_agent')||'nakabayashi']||AGENTS.nakabayashi; }
+function applyAgent(){ /* プリセットは描画時に参照するため保持のみ */ }
+
+// app_type の値 → 申請種別キー（変更/更新/取得/永住/その他）
+function appTypeKey(){
+  var t=String(v('f_appType')||'');
+  if(/変更/.test(t)) return '変更';
+  if(/更新/.test(t)) return '更新';
+  if(/取得/.test(t)) return '取得';
+  if(/永住/.test(t)) return '永住';
+  return 'その他';
+}
+function box(on){ return on?'☑':'☐'; }
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const key=appTypeKey();
+  const no=f('f_appNo');
+  const blank='　　　　　　　　　　　　';
+  // 各行：選択された種別の行にのみ申請番号を出す
+  const row=(k,label)=>`<div style="margin:0.5mm 0;">${box(key===k)}　${label}（申請番号：<span style="border-bottom:1px solid #000;display:inline-block;min-width:12em;text-align:center;">${key===k?no:blank}</span>）</div>`;
+  const otherLabel=v('f_appTypeOther')?f('f_appTypeOther'):'<span style="border-bottom:1px solid #000;display:inline-block;min-width:10em;">&nbsp;</span>';
+  const rowOther=`<div style="margin:0.5mm 0;">${box(key==='その他')}　${otherLabel}（申請番号：<span style="border-bottom:1px solid #000;display:inline-block;min-width:12em;text-align:center;">${key==='その他'?no:blank}</span>）</div>`;
+  const ag=curAgent();
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:9.5pt;margin-bottom:3mm;">参考書式</div>
+<div style="font-size:15pt;font-weight:bold;text-align:center;letter-spacing:6px;margin:1mm 0 6mm;">依　頼　書</div>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:5mm;">
+  <tr><td style="width:9em;">（依頼者）　国籍・地域</td><td style="border-bottom:1px solid #000;">${f('f_nationality')}</td></tr>
+  <tr><td style="padding-top:1.5mm;text-align:right;padding-right:1em;">氏　　名</td><td style="padding-top:1.5mm;border-bottom:1px solid #000;">${f('f_applicant')}</td></tr>
+  <tr><td style="padding-top:1.5mm;text-align:right;padding-right:1em;">生年月日</td><td style="padding-top:1.5mm;border-bottom:1px solid #000;">${f('f_birthdate')}</td></tr>
+</table>
+<div style="font-size:10.5pt;margin-bottom:3mm;">私は，下記の者を取次者として，</div>
+<div style="font-size:10.5pt;margin-left:1.5em;">
+  ${row('変更','在留資格変更許可申請')}
+  ${row('更新','在留期間更新許可申請')}
+  ${row('取得','在留資格取得許可申請')}
+  ${row('永住','永住許可申請　　　　')}
+  ${rowOther}
+</div>
+<div style="font-size:10.5pt;margin:3mm 0 6mm;">に係る在留カードの受領の手続を依頼します。</div>
+<table style="width:100%;border-collapse:collapse;font-size:10.5pt;">
+  <tr><td style="width:8em;vertical-align:top;">（取次者）</td><td></td></tr>
+  <tr><td style="text-align:right;padding-right:1em;">氏　　　名</td><td style="border-bottom:1px solid #000;">${ag.name}</td></tr>
+  <tr><td style="text-align:right;padding-right:1em;padding-top:1.2mm;vertical-align:top;">住　　　所</td><td style="padding-top:1.2mm;border-bottom:1px solid #000;">${ag.addr}</td></tr>
+  <tr><td style="text-align:right;padding-right:1em;padding-top:1.2mm;">所 属 機 関</td><td style="padding-top:1.2mm;border-bottom:1px solid #000;">${ag.org}</td></tr>
+  <tr><td style="text-align:right;padding-right:1em;padding-top:1.2mm;">電 話 番 号</td><td style="padding-top:1.2mm;border-bottom:1px solid #000;">${ag.tel}</td></tr>
+  <tr><td style="text-align:right;padding-right:1em;padding-top:1.2mm;">申請等取次者番号</td><td style="padding-top:1.2mm;border-bottom:1px solid #000;">${ag.no}</td></tr>
+</table>
+<div style="text-align:right;font-size:10.5pt;margin-top:8mm;">${f('f_docY')} 年　${f('f_docM')} 月　${f('f_docD')} 日</div>
+<div style="font-size:10.5pt;margin-top:4mm;">依頼者署名<span class="ir-blank">&nbsp;</span></div>
+<div style="font-size:8.5pt;margin-top:8mm;">※　申請等取次者番号は，申請人等取次者証明書及び届出済証明書を所持している者のみ記載</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no,app_type&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      s('f_appNo',cas.receipt_no||cas.case_no||'');
+      // 申請種別の自動選択
+      const t=String(cas.app_type||'');
+      const sel=document.getElementById('f_appType');
+      if(sel){
+        if(/変更/.test(t)) sel.value='変更';
+        else if(/更新/.test(t)) sel.value='更新';
+        else if(/取得/.test(t)) sel.value='取得';
+        else if(/永住/.test(t)) sel.value='永住';
+        // 認定など該当なしは既定(変更)のまま。手動で「その他」等に変更可
+      }
+    }
+    const persons=await sb('persons?select=nationality,birthdate&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',pd.birthdate||'');
+    }
+    if(!v('f_docY')){const n=new Date();document.getElementById('f_docY').value='令和'+(n.getFullYear()-2018);document.getElementById('f_docM').value=n.getMonth()+1;document.getElementById('f_docD').value=n.getDate();}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'irai'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
