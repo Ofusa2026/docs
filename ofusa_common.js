@@ -1,6 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260727.01
+ * ver.20260729.01
+ * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
  * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
  */
 
@@ -632,6 +633,16 @@ function loadEditedHTML(){
    各書類の入力欄プレフィックスに幅広く対応
    (es_*, f_*, 接頭辞なし) すべて試して存在するものだけセット
    ========================================================== */
+// ver.20260729: 書類別の作成責任者（companies.extra.docAuthors）。項目単位で無ければ既定(author_*)を使う
+function getDocAuthor(co, docKey){
+  var da = (co && co.extra && co.extra.docAuthors && docKey && co.extra.docAuthors[docKey]) || {};
+  return {
+    name:    da.name    || (co && co.author_name)     || '',
+    title:   da.title   || (co && co.author_title)    || '',
+    nameEn:  da.nameEn  || (co && co.author_name_en)  || '',
+    titleEn: da.titleEn || (co && co.author_title_en) || ''
+  };
+}
 async function loadCaseToForm(info, docKey){
   if(!info||!info.caseId) return;
   // ver.20260717: 直接編集が未保存のまま別の案件に切り替えると編集内容が失われる。
@@ -727,10 +738,14 @@ async function loadCaseToForm(info, docKey){
     setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || co.rep_name_en);
     setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || co.rep_title_en);
 
-    // 作成責任者
-    setValMulti(['f_author'], [co.author_title, co.author_name].filter(Boolean).join('　'));
-    setValMulti(['es_authorName','f_authorName'], co.author_name);
-    setValMulti(['es_authorTitle','f_authorTitle'], co.author_title);
+    // 作成責任者（ver.20260729: 書類別の個別設定(extra.docAuthors)があればそちらを優先。空欄は既定author_*）
+    var _docKey = window.OFUSA_DOC_KEY || docKey || '';
+    var _au = getDocAuthor(co, _docKey);
+    setValMulti(['f_author'], [_au.title, _au.name].filter(Boolean).join('　'));
+    setValMulti(['es_authorName','f_authorName'], _au.name);
+    setValMulti(['es_authorTitle','f_authorTitle'], _au.title);
+    setValMulti(['es_authorNameEn','f_authorNameEn'], _au.nameEn);
+    setValMulti(['es_authorTitleEn','f_authorTitleEn'], _au.titleEn);
 
     // === 申請人 ===
     const applicantNameJp = pd.name_jp || pd.applicant_name || (cas && cas.applicant) || '';

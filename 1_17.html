@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260723.02
+  ver.20260729.01
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -433,6 +433,12 @@ function dbRowToCompany(r) {
   if(co.extra && typeof co.extra === 'object'){
     _extraKeys.forEach(function(k){ if(!co[k] && co.extra[k]) co[k] = co.extra[k]; });
   }
+  // ver.20260729: 書類別の作成責任者（extra.docAuthors['1_17']）があれば項目単位で優先
+  var _da = (co.extra && co.extra.docAuthors && co.extra.docAuthors['1_17']) || {};
+  if(_da.name)    co.authorName   = _da.name;
+  if(_da.title)   co.authorTitle  = _da.title;
+  if(_da.nameEn)  co.authorNameEn = _da.nameEn;
+  if(_da.titleEn && co.authorTitleEn !== undefined) co.authorTitleEn = _da.titleEn;
   return co;
 }
 
