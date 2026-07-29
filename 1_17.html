@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260729.01
+  ver.20260729.02
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -398,8 +398,44 @@ function dbRowToCase(r) {
   };
 }
 
-function dbRowToCompany(r) {
-  var co = {
+// ver.20260729.02: 代表者プルダウン（rep2/rep3対応）。会社マスタに代表者②③が登録されている場合のみ
+// 右上にプルダウンを表示し、選んだ代表者で co.repName 等を差し替える。選択は localStorage（会社ごと）に保存。
+// 差し替えはマッピング時に行うため、変更時はリロードして再描画する。
+function _repList17(co){
+  var l=[];
+  [['','①'],['2','②'],['3','③']].forEach(function(p){
+    var nm=co['rep'+p[0]+'Name'];
+    if(nm) l.push({ no:(p[0]||'1'), label:'代表者'+p[1]+'：'+nm,
+      name:nm, title:co['rep'+p[0]+'Title']||'', nameEn:co['rep'+p[0]+'NameEn']||'', titleEn:co['rep'+p[0]+'TitleEn']||'' });
+  });
+  return l;
+}
+function _applyRepChoice17(co){
+  var list=_repList17(co);
+  var lsKey='ofusa_repsel_1_17_'+(co.id||'');
+  var bar=document.getElementById('ofusaRepSelectBar');
+  if(list.length<2){ if(bar) bar.remove(); return co; }
+  var saved=localStorage.getItem(lsKey)||'1';
+  var pick=null;
+  for(var i=0;i<list.length;i++){ if(list[i].no===saved){ pick=list[i]; break; } }
+  if(!pick) pick=list[0];
+  co.repName=pick.name; co.repTitle=pick.title; co.repNameEn=pick.nameEn; co.repTitleEn=pick.titleEn;
+  if(!bar){
+    bar=document.createElement('div');
+    bar.id='ofusaRepSelectBar';
+    bar.style.cssText='position:fixed;top:8px;right:8px;z-index:9999;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:6px 10px;font-size:12px;color:#1e40af;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+    document.body.appendChild(bar);
+    var st=document.createElement('style');
+    st.textContent='@media print{#ofusaRepSelectBar{display:none!important;}}';
+    document.head.appendChild(st);
+  }
+  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);location.reload();" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
+    + list.map(function(x){ return '<option value="'+x.no+'"'+(x.no===saved?' selected':'')+'>'+x.label.replace(/</g,'&lt;')+'</option>'; }).join('')
+    + '</select>';
+  return co;
+}
+
+function dbRowToCompany(r) {  var co = {
     id:r.id, name:r.name||'', nameKana:r.name_kana||'', nameEn:r.name_en||'',
     corpNo:r.corp_no||'', empInsNo:r.emp_ins_no||'', laborInsNo:r.labor_ins_no||'',
     industry:r.industry||'', industryCode:r.industry_code||'',
@@ -407,6 +443,8 @@ function dbRowToCompany(r) {
     addressCode:r.address_code||'', detailAddress:r.detail_address||'',
     addressEn:r.address_en||'', tel:r.tel||'',
     repName:r.rep_name||'', repTitle:r.rep_title||'', repNameEn:r.rep_name_en||'', repTitleEn:r.rep_title_en||'',
+    rep2Name:r.rep2_name||'', rep2Title:r.rep2_title||'', rep2NameEn:r.rep2_name_en||'', rep2TitleEn:r.rep2_title_en||'',
+    rep3Name:r.rep3_name||'', rep3Title:r.rep3_title||'', rep3NameEn:r.rep3_name_en||'', rep3TitleEn:r.rep3_title_en||'',
     authorName:r.author_name||'', authorTitle:r.author_title||'', authorNameEn:r.author_name_en||'',
     capital:r.capital||'', sales:r.sales||'', employees:r.employees||'',
     foreignEmployees:r.foreign_employees||'', techTrainees:r.tech_trainees||'',
@@ -560,6 +598,7 @@ async function loadCaseById(caseId, companyId){
 
   if(coRow){
     var coObj = dbRowToCompany(coRow);
+    coObj = _applyRepChoice17(coObj); // ver.20260729.02: 代表者プルダウン（rep2/rep3。2人以上で表示）
     var cIdx = companies.findIndex(function(x){ return x.id === coObj.id; });
     if(cIdx >= 0) companies[cIdx] = coObj; else companies.push(coObj);
     log("会社取得: " + coObj.name + " (supportStaff=[" + (coObj.supportStaff||'') + "])");

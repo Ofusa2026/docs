@@ -1,6 +1,6 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260729.01
+ * ver.20260729.02
  * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
  * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
  */
@@ -737,6 +737,8 @@ async function loadCaseToForm(info, docKey){
     setValMulti(['es_repTitle','f_repTitle'], es.repTitle || co.rep_title);
     setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || co.rep_name_en);
     setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || co.rep_title_en);
+    // ver.20260729.02: 代表者が複数登録されている場合はプルダウンで選択（rep2/rep3対応。1人なら非表示）
+    try{ renderRepSelect(co, es); }catch(e){ console.warn('repSelect', e); }
 
     // 作成責任者（ver.20260729: 書類別の個別設定(extra.docAuthors)があればそちらを優先。空欄は既定author_*）
     var _docKey = window.OFUSA_DOC_KEY || docKey || '';
@@ -1618,3 +1620,54 @@ function _holidayDaysOK(val, max){
 }
 function isWeeklyHolidayOK(id){ return _holidayDaysOK(v(id), 7); }
 function isMonthlyHolidayOK(id){ return _holidayDaysOK(v(id), 31); }
+
+// ===== ver.20260729.02: 代表者プルダウン（rep2/rep3対応） =====
+// 会社マスタに代表者②③が登録されている場合、書類右上にプルダウンを出してどの代表者名で出すか選べる。
+// 1人だけの会社は非表示（従来どおり代表者①を自動適用）。選択は localStorage（書類×会社ごと）に保存・復元。
+function getRepList(co){
+  var list=[];
+  [['','①'],['2','②'],['3','③']].forEach(function(p){
+    var nm=co['rep'+p[0]+'_name'];
+    if(nm) list.push({ no:(p[0]||'1'), label:'代表者'+p[1]+'：'+nm,
+      name:nm, title:co['rep'+p[0]+'_title']||'', nameEn:co['rep'+p[0]+'_name_en']||'', titleEn:co['rep'+p[0]+'_title_en']||'' });
+  });
+  return list;
+}
+function applyRepSelect(no){
+  var co=window._ofusaRepCo, es=window._ofusaRepEs||{};
+  if(!co) return;
+  var list=getRepList(co);
+  var pick=null;
+  for(var i=0;i<list.length;i++){ if(list[i].no===String(no)){ pick=list[i]; break; } }
+  if(!pick) pick=list[0]||{name:co.rep_name||'',title:co.rep_title||'',nameEn:co.rep_name_en||'',titleEn:co.rep_title_en||''};
+  // ✏️直接編集(es)で手動上書きされている項目は尊重する
+  setValMulti(['es_repName','f_repName'], es.repName || pick.name);
+  setValMulti(['es_repTitle','f_repTitle'], es.repTitle || pick.title);
+  setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || pick.nameEn);
+  setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || pick.titleEn);
+}
+function renderRepSelect(co, es){
+  window._ofusaRepCo=co; window._ofusaRepEs=es||{};
+  var list=getRepList(co);
+  var docKey=window.OFUSA_DOC_KEY || location.pathname.split('/').pop().replace(/\.html.*$/,'');
+  var lsKey='ofusa_repsel_'+docKey+'_'+(co.id||'');
+  var old=document.getElementById('ofusaRepSelectBar');
+  if(list.length<2){ if(old) old.remove(); return; } // 1人以下 → プルダウン非表示（①が自動適用済み）
+  var saved=localStorage.getItem(lsKey)||'1';
+  if(!list.some(function(x){return x.no===saved;})) saved='1';
+  applyRepSelect(saved);
+  var bar=old;
+  if(!bar){
+    bar=document.createElement('div');
+    bar.id='ofusaRepSelectBar';
+    bar.style.cssText='position:fixed;top:8px;right:8px;z-index:9999;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:6px 10px;font-size:12px;color:#1e40af;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+    document.body.appendChild(bar);
+    var st=document.createElement('style');
+    st.textContent='@media print{#ofusaRepSelectBar{display:none!important;}}';
+    document.head.appendChild(st);
+  }
+  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
+    + list.map(function(x){ return '<option value="'+x.no+'"'+(x.no===saved?' selected':'')+'>'+x.label.replace(/</g,'&lt;')+'</option>'; }).join('')
+    + '</select>';
+}
+// ===== /代表者プルダウン =====
