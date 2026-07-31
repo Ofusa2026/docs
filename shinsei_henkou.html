@@ -131,7 +131,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260716.02</div>
+    <div class="ver">ver.20260731.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -1479,6 +1479,18 @@ function resetForm(){
   }
 }
 
+// ver.20260731: 電話番号のハイフン整形（0356279111 → 03-5627-9111）。
+// 03/06は市外局番2桁(2-4-4)、携帯11桁は3-4-4、その他10桁は3-3-4。判定不能はそのまま。
+function _fmtTel(t){
+  t=String(t||'').replace(/[^0-9]/g,'');
+  if(!t) return '';
+  if(t.length===11) return t.slice(0,3)+'-'+t.slice(3,7)+'-'+t.slice(7);
+  if(t.length===10){
+    if(/^0[36]/.test(t)) return t.slice(0,2)+'-'+t.slice(2,6)+'-'+t.slice(6);
+    return t.slice(0,3)+'-'+t.slice(3,6)+'-'+t.slice(6);
+  }
+  return String(t);
+}
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -1504,7 +1516,7 @@ async function loadFromDB(passedInfo){
       s('f_name',pd.applicant_name_en||(cas&&cas.applicant)||'');
       s('f_gender',pd.gender||'');
       s('f_birthPlace',pd.birth_place||'');
-      s('f_spouse',pd.spouse||'');
+      s('f_spouse',pd.spouse||'無');
       // ver.20260715: 職業はアンシス未入力が多いため在留資格から補完する。
       // 「留学」なら学生、それ以外は会社員。アンシスに値があればそちらを優先。
       s('f_occupation', pd.occupation || (/留学/.test(pd.residence_status||'') ? '学生' : (pd.residence_status ? '会社員' : '')));
@@ -1549,7 +1561,9 @@ async function loadFromDB(passedInfo){
     if(co){
       s('f_soName',co.name||'');
       s('f_soAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
-      s('f_soTel',co.tel||'');
+      s('f_soTel',_fmtTel(co.tel));
+      // ver.20260731: 申請人の電話が空なら、所属機関の電話をハイフン整形して補完
+      if(!(document.getElementById('f_perTel')||{}).value && co.tel) s('f_perTel',_fmtTel(co.tel));
     }
     // 19 日本語能力：アンシスの jp_eval_type(2,438件) が証明方法そのもの。
     // 「技能実習２号を良好に修了」が1,248件あり、試験名の有無だけで判定すると
