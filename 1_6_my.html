@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260731.05</div>
+    <div class="ver">ver.20260731.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -510,7 +510,7 @@ function p(){
     </div>
     <div class="hdr-ul" style="margin-bottom:2px;font-size:8.5pt;">${f('applicantName')}&nbsp;殿<br><span class="id" style="font-size:7.5pt;margin-bottom:10px;">(ဦး/ဒေါ်)&nbsp;&nbsp;${f('applicantName')}</span></div>
     <div style="display:flex;justify-content:flex-end;">
-      <table class="hdr-ul" style="font-size:8pt;border-collapse:collapse;width:55%;">
+      <table class="hdr-ul" style="font-size:8pt;border-collapse:collapse;width:62%;">
         <tr><td style="padding:1px 6px 1px 0;white-space:nowrap;">特定技能所属機関名</td><td>${f('es_orgName')}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">အထူးကျွမ်းကျင်လုပ်သား‌ဆောင်ရွက်မည့်အဖွဲ့အစည်းအမည်</td><td class="id" style="font-size:7pt;">${f('es_orgNameEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">所在地</td><td>${f('es_orgAddress')}</td></tr>
@@ -954,37 +954,37 @@ function p(){
     <colgroup><col style="width:55%"><col style="width:30%"><col style="width:15%"></colgroup>
     <tr>
       <td style="vertical-align:top;">(a) 税　　金<br><span class="id" style="font-size:7pt;">(a) အခွန်</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductTax')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductTax')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductTax')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductTax')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductTax')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductTax')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;">(b) လူမှုဖူလုံရေးအာမခံ</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductSocialIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductSocialIns')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductSocialIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductSocialIns')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(c) 雇用保険料<br><span class="id" style="font-size:7pt;">(c) အလုပ်ခန့်အပ်မှုအာမခံ</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductEmpIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductEmpIns')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductEmpIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductEmpIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductEmpIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductEmpIns')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(d) 食　　費<br><span class="id" style="font-size:7pt;">(d) စားစရိတ်</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductFood')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductFood')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductFood')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductFood')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductFood')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductFood')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(e) 居　住　費<br><span class="id" style="font-size:7pt;">(e) နေထိုင်စရိတ်</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductHousing')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductHousing')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductHousing')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductHousing')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductHousing')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductHousing')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">(f) その他（水道光熱費）<br><span class="id" style="font-size:7pt;">(f) အခြား (ရေမီးအသုံးစရိတ်များ)</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductUtility')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductUtility')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductUtility')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductUtility')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductUtility')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductUtility')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
       <td style="vertical-align:top;">（${f('es_deductOther1Name')}）<br><span class="id" style="font-size:7pt;">(${f('es_deductOther1NameEn')})</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductOther1Amount')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductOther1Amount')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductOther1Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductOther1Amount')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductOther1Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductOther1Amount')}</td></tr></table></td>
       <td></td>
     </tr>
     <tr>
