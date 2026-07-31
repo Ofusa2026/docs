@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260731.02</div>
+    <div class="ver">ver.20260731.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -238,17 +238,19 @@ async function loadFromDB(passedInfo){
       s('f_wageReg',es.wageRegulation||'');
       s('f_salaryRule',es.salaryRuleApply||'');
       s('f_jpReason',es.jpCompReason||'');
-      // ver.20260731: 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ。手当名のみ（金額なし）
+      // ver.20260731: 手当名に「手当」が無ければ補う（例:「住宅」→「住宅手当」。既に「〜手当」なら据え置き）
+      var _teate=function(n){ n=String(n||'').trim(); if(!n) return ''; return n.indexOf('手当')>=0 ? n : n+'手当'; };
+      // 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ。手当名のみ（金額なし）
       var _allowParts=[];
       for(var _i=1;_i<=3;_i++){
-        var _nm=String(es['jpCompAllow'+_i+'Name']||'').trim();
+        var _nm=_teate(es['jpCompAllow'+_i+'Name']);
         if(_nm) _allowParts.push(_nm);
       }
       s('f_other2', _allowParts.join('、'));
-      // ver.20260731: 申請人の手当（allowance1〜4）を⑤その他へ。手当名のみ（金額なし）
+      // 申請人の手当（allowance1〜4）を⑤その他へ。手当名のみ（金額なし）
       var _appAllow=[];
       for(var _j=1;_j<=4;_j++){
-        var _an=String(es['allowance'+_j+'Name']||'').trim();
+        var _an=_teate(es['allowance'+_j+'Name']);
         if(_an) _appAllow.push(_an);
       }
       s('f_other1', _appAllow.join('、'));
