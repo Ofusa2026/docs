@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260710.07</div>
+    <div class="ver">ver.20260729.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -238,6 +238,17 @@ async function loadFromDB(passedInfo){
       s('f_wageReg',es.wageRegulation||'');
       s('f_salaryRule',es.salaryRuleApply||'');
       s('f_jpReason',es.jpCompReason||'');
+      // ver.20260729: 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ流し込む
+      var _allowParts=[];
+      for(var _i=1;_i<=3;_i++){
+        var _nm=String(es['jpCompAllow'+_i+'Name']||'').trim();
+        var _amtRaw=String(es['jpCompAllow'+_i+'Amt']||'').trim();
+        if(!_nm && !_amtRaw) continue;
+        var _amtTxt='';
+        if(_amtRaw){ var _n=Number(_amtRaw.replace(/,/g,'')); _amtTxt=(isNaN(_n)?_amtRaw:_n.toLocaleString('ja-JP'))+'円'; }
+        _allowParts.push([_nm,_amtTxt].filter(Boolean).join('　'));
+      }
+      if(_allowParts.length) s('f_other2', _allowParts.join('、'));
     }
     const persons=await sb('persons?select=age,gender,experience&case_id=eq.'+caseId);
     const pd=persons&&persons[0];
