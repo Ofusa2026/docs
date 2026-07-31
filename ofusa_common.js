@@ -1,6 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260729.02
+ * ver.20260731.01
+ * - sb() GET(読込)に cache:no-store を付与し、編集の即時反映を阻む約5分のHTTPキャッシュを解消
  * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
  * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
  */
@@ -55,6 +56,11 @@ async function sb(path,opts={}){
   };
   // opts から headers を除外してから spread（headers が上書きされないように）
   const { headers: _hdr, ...restOpts } = opts;
+  // ver.20260731: GET(読込)はHTTPキャッシュ（ブラウザ/CDN）で古い応答が最大約5分返り、
+  // 案シスでの編集がSaySayに即時反映されない事象があったため、GETは常に最新をDBから取得する。
+  // 書込(POST/PATCH/DELETE等)には影響しない。呼び出し側が cache を明示していればそれを優先。
+  const _method = (restOpts.method || 'GET').toUpperCase();
+  if(_method === 'GET' && restOpts.cache === undefined) restOpts.cache = 'no-store';
   const r = await fetch(SB_URL + '/rest/v1/' + path, { ...restOpts, headers });
   const t = await r.text();
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
