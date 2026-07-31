@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260731.09</div>
+    <div class="ver">ver.20260731.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -517,7 +517,7 @@ function p(){
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">ที่อยู่</td><td class="id" style="font-size:7pt;">${f('es_orgAddressEn')}</td></tr>
         <tr><td style="padding:2px 6px 1px 0;">電話番号</td><td>${f('es_orgTel')}</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">โทรศัพท์</td><td class="id" style="font-size:7pt;">${f('es_orgTel')}</td></tr>
-        <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;${(v('es_applicantField')||'').includes('建設')?'印':''}</td></tr>
+        <tr><td style="padding:2px 6px 1px 0;">代表者&nbsp;役職・氏名</td><td>${f('es_repTitle')}&nbsp;${f('es_repName')}&nbsp;&nbsp;印</td></tr>
         <tr><td class="id" style="font-size:7pt;padding-right:6px;">ชื่อ-นามสกุลและตำแหน่งตัวแทนองค์กร</td><td class="id" style="font-size:7pt;">${f('es_repTitleEn')} ${f('es_repNameEn')} ตราประทับ</td></tr>
       </table>
     </div>
