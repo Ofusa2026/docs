@@ -32,7 +32,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 ကိုးကား ပုံစံ ၁-၁၆（ミャンマー語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260717.01</div>
+    <div class="ver">ver.20260717.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -57,6 +57,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
       <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
       <div class="fg"><label>作成責任者（役職・氏名）</label><input id="f_author" oninput="p()"></div>
+      <input id="f_companyEn" type="hidden"><input id="f_authorEn" type="hidden"><input id="f_docDateEn" type="hidden">
     </div>
     <div class="fs"><div class="fs-title">特定技能外国人</div>
       <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
@@ -326,11 +327,11 @@ function p(){
 <div style="font-size:9pt;margin-bottom:4mm;" class="id">အထက်ပါ ၁ မှ ၃ အထိ၏ အကြောင်းအရာများတွင် ကွဲလွဲမှုမရှိပါ။ ထို့ပြင် အလုပ်ရှာသူ (လျှောက်ထားသူ) သည် နေထိုင်ခွင့် "သီးသန့်ကျွမ်းကျင်မှု" အတွက် လုပ်ဆောင်ခြင်းနှင့် ပတ်သက်၍ အာမခံငွေ၊ ပျက်ကွက်ကြေး စသည့် မသင့်လျော်သော ကုန်ကျစရိတ်များ ကောက်ခံခံခြင်း မရှိကြောင်း သူ့ထံမှ စုံစမ်းမေးမြန်းခြင်းဖြင့် အတည်ပြုထားပါသည်။</div>
 
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ပြုစုသည့် နေ့စွဲ：${f('f_docDate')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ပြုစုသည့် နေ့စွဲ：${f('f_docDateEn')}</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">သီးသန့်ကျွမ်းကျင်မှု ဆက်စပ်အဖွဲ့အစည်း အမည်</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">သီးသန့်ကျွမ်းကျင်မှု ဆက်စပ်အဖွဲ့အစည်း အမည်　${f('f_companyEn')}</div>
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
-<div style="font-size:9pt;text-align:right;" class="id">ပြုစုသည့်တာဝန်ခံ၏ အမည်နှင့် ရာထူး</div>
+<div style="font-size:9pt;text-align:right;" class="id">ပြုစုသည့်တာဝန်ခံ၏ အမည်နှင့် ရာထူး　${f('f_authorEn')}</div>
 </div>
 
 <div class="doc">
@@ -436,8 +437,8 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos,intakes]=await Promise.all([
       caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,emp_sets,extra&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
@@ -445,10 +446,15 @@ async function loadFromDB(passedInfo){
     if(co){
       s('f_company',co.name||'');
       s('f_author',[co.author_title||co.rep_title,co.author_name||co.rep_name].filter(Boolean).join('　'));
+      // ver.20260731: 翻訳行用 ①企業名ローマ字(orgNameEn) ②作成責任者英語(extra.docAuthors['1_16'])
+      var _es0=(co.emp_sets&&co.emp_sets[0])||{};
+      s('f_companyEn', _es0.orgNameEn||'');
+      var _da16=(co.extra&&co.extra.docAuthors&&co.extra.docAuthors['1_16'])||{};
+      s('f_authorEn',[_da16.titleEn,_da16.nameEn].filter(Boolean).join(' '));
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
-      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`;}}
+      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`; var e2=document.getElementById('f_docDateEn'); if(e2)e2.value=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();}}
     }
     if(ir && ir.agency_name){
       s('f_ag_name', ir.agency_name);
