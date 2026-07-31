@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260728.01</div>
+    <div class="ver">ver.20260731.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -548,13 +548,13 @@ function p(){
         <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">*If the contract may be renewed, the renewal of the contract shall be determined based on the following criteria.</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;Volume of work to be done at the time the term of contract expires</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;Employee's work performance and attitude</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;Progress of work currently being performed</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_1_id')}&nbsp;Volume of work to be done at the time the term of contract expires</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_2_id')}&nbsp;Employee's work performance and attitude</span></td>
+            <td style="vertical-align:top;">${cb(rPos,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_3_id')}&nbsp;Progress of work currently being performed</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;Employee's ability to perform work</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;Company's management situation</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_4_id')}&nbsp;Employee's ability to perform work</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_5_id')}&nbsp;Company's management situation</span></td>
             <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;Other（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>

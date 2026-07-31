@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260728.01</div>
+    <div class="ver">ver.20260731.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -548,13 +548,13 @@ function p(){
         <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;">※ 상기 계약의 갱신의 유무를 「갱신하는 경우가 있을 수 있다」라고 한 경우의 갱신의 판단 기준은 이하대로 한다.</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_1_id')}&nbsp;계약기간 만료시 업무량</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_2_id')}&nbsp;노동자의 근무 성적, 태도</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_3_id')}&nbsp;종사하는 업무의 진행 상황</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_1_id')}&nbsp;계약기간 만료시 업무량</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_2_id')}&nbsp;노동자의 근무 성적, 태도</span></td>
+            <td style="vertical-align:top;">${cb(rPos,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_3_id')}&nbsp;종사하는 업무의 진행 상황</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_4_id')}&nbsp;근로자의 업무 수행 능력</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_5_id')}&nbsp;회사 경영 상황</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_4_id')}&nbsp;근로자의 업무 수행 능력</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;">${cb(rPos,'kijun_5_id')}&nbsp;회사 경영 상황</span></td>
             <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;">${cb(false,'kijun_6_id')}&nbsp;기타（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>

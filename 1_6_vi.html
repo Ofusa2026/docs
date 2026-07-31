@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260728.01</div>
+    <div class="ver">ver.20260731.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -548,13 +548,13 @@ function p(){
         <div style="font-size:8pt;margin-top:3px;">※上記契約の更新の有無を「更新する場合があり得る」とした場合の更新の判断基準は以下のとおりとする。<br><span class="id" style="font-size:6.5pt;" data-key="20">※ Tiêu chuẩn quyết định có gia hạn hợp đồng trên hay không trong trường hợp "Có trường hợp gia hạn" là như sau.</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;margin-top:2px;">
           <tr>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">${cb(false,'kijun_1_id')}&nbsp;Khối lượng công việc khi kết thúc thời hạn hợp đồng</span></td>
-            <td style="vertical-align:top;width:33%;">${cb(false,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">${cb(false,'kijun_2_id')}&nbsp;Thành tích, thái độ trong công việc của người lao động</span></td>
-            <td style="vertical-align:top;">${cb(false,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">${cb(false,'kijun_3_id')}&nbsp;Tình trạng tiến bộ trong công việc đang thực hiện</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_1')}&nbsp;契約期間満了時の業務量<br><span class="id" style="font-size:6.5pt;" data-key="21">${cb(rPos,'kijun_1_id')}&nbsp;Khối lượng công việc khi kết thúc thời hạn hợp đồng</span></td>
+            <td style="vertical-align:top;width:33%;">${cb(rPos,'kijun_2')}&nbsp;労働者の勤務成績，態度<br><span class="id" style="font-size:6.5pt;" data-key="22">${cb(rPos,'kijun_2_id')}&nbsp;Thành tích, thái độ trong công việc của người lao động</span></td>
+            <td style="vertical-align:top;">${cb(rPos,'kijun_3')}&nbsp;従事している業務の進捗状況<br><span class="id" style="font-size:6.5pt;" data-key="23">${cb(rPos,'kijun_3_id')}&nbsp;Tình trạng tiến bộ trong công việc đang thực hiện</span></td>
           </tr>
           <tr>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">${cb(false,'kijun_4_id')}&nbsp;Năng lực thực hiện công việc của người lao động</span></td>
-            <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">${cb(false,'kijun_5_id')}&nbsp;Tình trạng kinh doanh của công ty</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_4')}&nbsp;労働者の業務を遂行する能力<br><span class="id" style="font-size:6.5pt;" data-key="24">${cb(rPos,'kijun_4_id')}&nbsp;Năng lực thực hiện công việc của người lao động</span></td>
+            <td style="vertical-align:top;padding-top:2px;">${cb(rPos,'kijun_5')}&nbsp;会社の経営状況<br><span class="id" style="font-size:6.5pt;" data-key="25">${cb(rPos,'kijun_5_id')}&nbsp;Tình trạng kinh doanh của công ty</span></td>
             <td style="vertical-align:top;padding-top:2px;">${cb(false,'kijun_6')}&nbsp;その他（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:6.5pt;" data-key="26">${cb(false,'kijun_6_id')}&nbsp;Khác（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）</span></td>
           </tr>
         </table>
