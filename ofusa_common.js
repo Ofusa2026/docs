@@ -1,6 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260731.01
+ * ver.20260731.02
+ * - 書類プレビューの値クリックで対応入力欄へジャンプ＆フォーカス（全書類）
  * - sb() GET(読込)に cache:no-store を付与し、編集の即時反映を阻む約5分のHTTPキャッシュを解消
  * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
  * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
@@ -149,6 +150,33 @@ window._fieldData=window._fieldData||{};
 const v=id=>{const el=document.getElementById(id);if(el&&el.value!=='')return el.value;return (window._fieldData&&window._fieldData[id])||'';};
 const fmt=n=>n?Number(String(n).replace(/,/g,'')).toLocaleString('ja-JP'):'';
 const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
+// ver.20260731: 書類プレビューの値（.f[data-bind]）をクリックすると、対応する入力欄へスクロール＆フォーカスして即編集できる。
+// f() が出力する全項目が data-bind に入力欄ID(es_xxx / f_xxx)を持つため、1箇所の委譲クリックで全書類に効く。印刷時は無効。
+(function(){
+  try{
+    var st=document.createElement('style');
+    st.textContent='.f[data-bind]{cursor:pointer;}'
+      +'.f[data-bind]:hover{background:rgba(74,144,217,.15);border-radius:2px;outline:1px dashed rgba(74,144,217,.6);}'
+      +'@media print{.f[data-bind]{cursor:auto;background:none!important;outline:none!important;}}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    var el=(t&&t.closest)?t.closest('.f[data-bind]'):null;
+    if(!el) return;
+    // 画面編集モード中や選択操作を優先したい場合はここでガード可能（現状は常に有効）
+    var id=el.getAttribute('data-bind'); if(!id) return;
+    var inp=document.getElementById(id); if(!inp) return;
+    // 折りたたみセクション内なら開く（親の details / .collapsed 等に対応）
+    try{ var d=inp.closest && inp.closest('details'); if(d && !d.open) d.open=true; }catch(e){}
+    try{ inp.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){ try{inp.scrollIntoView();}catch(e2){} }
+    try{ inp.focus({preventScroll:true}); }catch(e){ try{inp.focus();}catch(e2){} }
+    try{ if(inp.select && (inp.type==='text'||inp.tagName==='TEXTAREA')) inp.select(); }catch(e){}
+    var prev=inp.style.boxShadow;
+    inp.style.transition='box-shadow .2s'; inp.style.boxShadow='0 0 0 2px #4a90d9';
+    setTimeout(function(){ inp.style.boxShadow=prev; }, 1200);
+  }, false);
+})();
 // 業務区分の冗長表示対策: 値の中の「（〜分野…）」「（〜特定技能…号）」など、分野名/号数の括弧書きを表示時に除去する。
 // 例「飲食料品製造業全般（飲食料品製造業分野・特定技能１号）」→「飲食料品製造業全般」。他の括弧は残す。
 const fBunya=id=>{const rawFull=v(id);const raw=String(rawFull||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').replace(/\s+$/,'').trim();const val=esc(raw).replace(/\n/g,'<br>');const label=id.replace(/^es_/,'es.').replace(/^f_/,'');return val?`<span class="f" data-bind="${id}">${val}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;};
