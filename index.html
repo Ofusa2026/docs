@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260728.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260731.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -427,6 +427,21 @@ function setGlobalLang(lang){
   if(fr1_3 && fr1_3.style.display!=='none'){
     try{fr1_3.contentWindow.postMessage({type:'SET_LANG',lang:resolveLangForDoc('1_3',lang)},'*');}catch(e){}
   }
+}
+
+// ver.20260731: 国籍 → 書類言語コード。対応版が無い国籍は英語。空/確認中/その他は変更しない（null）
+function idxLangFromNationality(nat){
+  var n=String(nat||'').replace(/[Ａ-Ｚａ-ｚ０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).toUpperCase().replace(/\s/g,'');
+  if(!n||/確認中|その他/.test(n)) return null;
+  if(/ベトナム|VIETNAM|VIET/.test(n)) return 'vi';
+  if(/インドネシア|INDONESIA/.test(n)) return 'id';
+  if(/ミャンマ|MYANMAR|BURMA/.test(n)) return 'my';
+  if(/ネパール|NEPAL/.test(n)) return 'ne';
+  if(/カンボジア|CAMBODIA|KHMER/.test(n)) return 'km';
+  if(/中国|台湾|CHINA|CHINESE|TAIWAN/.test(n)) return 'zh';
+  if(/韓国|KOREA/.test(n)) return 'ko';
+  if(/タイ|THAI/.test(n)) return 'th';
+  return 'en'; // フィリピン・スリランカ・インド・欧米等（対応言語版なし）は英語
 }
 
 let cur1_5Lang='id';
@@ -963,7 +978,14 @@ async function idxJumpByPaste(){
       empSetIdx:row.emp_set_idx||0
     };
     idxSelectedCase=info;
-    idxSendToVisible(info);
+    // ver.20260731: 国籍に合わせて初期言語を選択（対応言語版がある場合のみ切替）
+    var _lang=idxLangFromNationality(row.nationality);
+    if(_lang && _lang!==currentLang){
+      setGlobalLang(_lang); // 言語切替＋開いている書類を再ロード
+      setTimeout(function(){ idxSendToVisible(info); },350); // 再ロード後に案件を送る
+    } else {
+      idxSendToVisible(info);
+    }
     if(st){ st.textContent='✅ ジャンプしました'; st.style.color='#86efac'; }
     if(info_el){
       info_el.style.display='block';
