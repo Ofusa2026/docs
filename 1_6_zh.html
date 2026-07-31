@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260731.10</div>
+    <div class="ver">ver.20260731.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -340,24 +340,19 @@
       <div class="fg"><label>税（円）<span class="fid">es.deductTax</span></label><input id="es_deductTax" oninput="p()"></div>
       <div class="fg"><label>社会保険料（円）<span class="fid">es.deductSocialIns</span></label><input id="es_deductSocialIns" oninput="p()"></div>
       <div class="fg"><label>雇用保険料（円）<span class="fid">es.deductEmpIns</span></label><input id="es_deductEmpIns" oninput="p()"></div>
-      <div class="fg"><label>食費（円）<span class="fid">es.deductFood</span></label><input id="es_deductFood" oninput="p()"></div>
-      <div class="fg"><label>居住費（円）<span class="fid">es.deductHousing</span></label><input id="es_deductHousing" oninput="p()"></div>
-      <div class="fg"><label>光熱費（円）<span class="fid">es.deductUtility</span></label><input id="es_deductUtility" oninput="p()"></div>
-      <div class="fg"><label>概算(食費)※実費用</label><input id="es_deductFoodEst" oninput="p()" placeholder="3,000"></div>
-      <div class="fg"><label>概算(居住費)※実費用</label><input id="es_deductHousingEst" oninput="p()" placeholder="3,000"></div>
-      <div class="fg"><label>概算(光熱費)※実費用</label><input id="es_deductUtilityEst" oninput="p()" placeholder="3,000"></div>
-      <div class="fg"><label>概算(その他1)※実費用</label><input id="es_deductOther1AmountEst" oninput="p()" placeholder="3,000"></div>
-      <div class="fg"><label>概算(その他2)※実費用</label><input id="es_deductOther2AmountEst" oninput="p()" placeholder="3,000"></div>
+      <div class="fg"><label>食費（円）<span class="fid">es.deductFood</span></label><input id="es_deductFood" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductFoodJippi" onchange="_setJippi('es_deductFood',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductFoodEst" type="hidden"></div>
+      <div class="fg"><label>居住費（円）<span class="fid">es.deductHousing</span></label><input id="es_deductHousing" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductHousingJippi" onchange="_setJippi('es_deductHousing',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductHousingEst" type="hidden"></div>
+      <div class="fg"><label>光熱費（円）<span class="fid">es.deductUtility</span></label><input id="es_deductUtility" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductUtilityJippi" onchange="_setJippi('es_deductUtility',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductUtilityEst" type="hidden"></div>
       <div class="fg2">
         <div class="fg"><label>その他控除名（日）<span class="fid">es.deductOther1Name</span></label><input id="es_deductOther1Name" oninput="p()"></div>
         <div class="fg"><label>その他控除名（ID）<span class="fid">es.deductOther1NameEn</span></label><input id="es_deductOther1NameEn" oninput="p()"></div>
       </div>
-      <div class="fg"><label>その他控除額（円）<span class="fid">es.deductOther1Amount</span></label><input id="es_deductOther1Amount" oninput="p()"></div>
+      <div class="fg"><label>その他控除額（円）<span class="fid">es.deductOther1Amount</span></label><input id="es_deductOther1Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther1AmountJippi" onchange="_setJippi('es_deductOther1Amount',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductOther1AmountEst" type="hidden"></div>
       <div class="fg2">
         <div class="fg"><label>その他控除2名（日）<span class="fid">es.deductOther2Name</span></label><input id="es_deductOther2Name" oninput="p()"></div>
         <div class="fg"><label>その他控除2名（ID）<span class="fid">es.deductOther2NameEn</span></label><input id="es_deductOther2NameEn" oninput="p()"></div>
       </div>
-      <div class="fg"><label>その他控除2額（円）<span class="fid">es.deductOther2Amount</span></label><input id="es_deductOther2Amount" oninput="p()"></div>
+      <div class="fg"><label>その他控除2額（円）<span class="fid">es.deductOther2Amount</span></label><input id="es_deductOther2Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther2AmountJippi" onchange="_setJippi('es_deductOther2Amount',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductOther2AmountEst" type="hidden"></div>
       <div class="fg"><label>控除合計（円）<span class="fid">es.deductTotal</span></label><input id="es_deductTotal" oninput="p()"></div>
       <div class="fg"><label>支払概算総額（円）<span class="fid">es.salaryTotal</span></label><input id="es_salaryTotal" oninput="p()"></div>
       <div class="fg"><label>手取り支給額（円）<span class="fid">es.netPay</span></label><input id="es_netPay" oninput="p()"></div>
@@ -428,6 +423,7 @@ function fOr2(){
 function otherIns(){ try{ return String((window._empLoadedSet||{}).socialInsurance||'').trim(); }catch(_e){ return ''; } }
 function otherInsEn(){ try{ var s=window._empLoadedSet||{}; return String(s.socialInsuranceEn||s.socialInsurance||'').trim(); }catch(_e){ return ''; } }
 function p(){
+  try{_syncJippi();}catch(e){}
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
   if(_currentDoc==='iko'){ p_iko(); return; }
   resetCbSeq();
@@ -1222,17 +1218,14 @@ function fPayL(jaId, enId){
   return '<span class="f" data-bind="'+enId+'">'+esc(t)+'</span>';
 }
 function _isKensetsu(){ return ((v('es_applicantField')||'')+(v('es_applicantFieldEn')||'')).includes('建設'); }
-function _jAmt(fld){ if(_isKensetsu()&&/実費/.test(v(fld)||'')) return (v(fld+'Est')||'3,000'); return ff(fld); }
-function _jT(fld){ if(/実費/.test(v(fld)||'')){ if(_isKensetsu()) return (v(fld+'Est')||'3,000'); return '实际费用'; } return ff(fld); }
-function _jSuf(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（実費）</span>'; }
-function _jSufE(fld){ if(!_isKensetsu()||!/実費/.test(v(fld)||'')) return ''; return '<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（实际费用）</span>'; }
-function _jippiDefault(){
-  if(!_isKensetsu()) return;
-  ['es_deductTax','es_deductSocialIns','es_deductEmpIns','es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(id){
-    var e=document.getElementById(id);
-    if(e && /実費/.test(e.value||'')){ var est=document.getElementById(id+'Est'); if(est && !est.value) est.value='3,000'; }
-  });
-}
+function _isJippi(fld){ return /実費/.test(v(fld+'Est')||''); }
+ function _jAmt(fld){ return ff(fld); }
+function _jT(fld){ return ff(fld); }
+function _jSuf(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（実費）</span>':''; }
+function _jSufE(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（实际费用）</span>':''; }
+function _setJippi(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } if(typeof p==='function') p(); }
+function _syncJippi(){ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(b){ var amt=document.getElementById(b), est=document.getElementById(b+'Est'), cb=document.getElementById(b+'Jippi'); if(!amt||!est) return; if(/実費/.test(amt.value||'')){ var oe=est.value||''; amt.value=(oe&&!/実費/.test(oe))?oe:''; est.value='実費'; } if(cb) cb.checked=/実費/.test(est.value||''); }); }
+function _jippiDefault(){ try{_syncJippi();}catch(e){} }
 function _kensetsuBonus(txt){
   txt=(txt||'').trim();
   if(!txt) return '業績による';
