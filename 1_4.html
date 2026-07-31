@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260731.01</div>
+    <div class="ver">ver.20260731.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -220,7 +220,7 @@ async function loadFromDB(passedInfo){
       const cos3 = await sb(`companies?select=name,author_name,author_title,emp_sets&name=eq.${encodeURIComponent(cas.org)}`);
       co = cos3 && cos3[0];
     }
-    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    const s=(id,val)=>{const e=document.getElementById(id);if(e)e.value=(val==null?'':val);}; // ver.20260731: 空でも上書きして前案件の値が残らないようにする
     if(cas) s('f_applicant',cas.applicant||'');
     if(co){
       s('f_company',co.name||'');
@@ -238,31 +238,20 @@ async function loadFromDB(passedInfo){
       s('f_wageReg',es.wageRegulation||'');
       s('f_salaryRule',es.salaryRuleApply||'');
       s('f_jpReason',es.jpCompReason||'');
-      // ver.20260729: 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ流し込む
+      // ver.20260731: 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ。手当名のみ（金額なし）
       var _allowParts=[];
       for(var _i=1;_i<=3;_i++){
         var _nm=String(es['jpCompAllow'+_i+'Name']||'').trim();
-        var _amtRaw=String(es['jpCompAllow'+_i+'Amt']||'').trim();
-        if(!_nm && !_amtRaw) continue;
-        var _amtTxt='';
-        if(_amtRaw){ var _n=Number(_amtRaw.replace(/,/g,'')); _amtTxt=(isNaN(_n)?_amtRaw:_n.toLocaleString('ja-JP'))+'円'; }
-        _allowParts.push([_nm,_amtTxt].filter(Boolean).join('　'));
+        if(_nm) _allowParts.push(_nm);
       }
-      if(_allowParts.length) s('f_other2', _allowParts.join('、'));
-      // ver.20260731: 申請人の手当（allowance1〜4：名称/金額/条件）を⑤その他へ流し込む
+      s('f_other2', _allowParts.join('、'));
+      // ver.20260731: 申請人の手当（allowance1〜4）を⑤その他へ。手当名のみ（金額なし）
       var _appAllow=[];
       for(var _j=1;_j<=4;_j++){
         var _an=String(es['allowance'+_j+'Name']||'').trim();
-        var _aa=String(es['allowance'+_j+'Amt']||es['allowance'+_j+'Amount']||'').trim();
-        var _ac=String(es['allowance'+_j+'Cond']||es['allowance'+_j+'Calc']||'').trim();
-        if(!_an && !_aa && !_ac) continue;
-        var _at='';
-        if(_aa){ var _nn=Number(_aa.replace(/,/g,'')); _at=(isNaN(_nn)?_aa:_nn.toLocaleString('ja-JP'))+'円'; }
-        var _head=[_an,_at].filter(Boolean).join('　');
-        if(_ac) _head += '（'+_ac+'）';
-        _appAllow.push(_head);
+        if(_an) _appAllow.push(_an);
       }
-      if(_appAllow.length) s('f_other1', _appAllow.join('、'));
+      s('f_other1', _appAllow.join('、'));
     }
     const persons=await sb('persons?select=age,gender,experience&case_id=eq.'+caseId);
     const pd=persons&&persons[0];
