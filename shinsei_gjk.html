@@ -167,7 +167,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260801.73</div>
+    <div class="ver">ver.20260801.74</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1628,9 +1628,23 @@ window.addEventListener('message', async function(e){
         b.style.boxShadow=(b.dataset.fm===rec)?'0 0 0 2px #f59e0b':'none';
         b.title=(b.dataset.fm===rec)?('この案件の推奨様式（'+st+'／'+ap+'）'):'';
       });
-      if(rec&&rec!==CUR&&!detect._warned){
-        detect._warned=true;
-        if(typeof showToast==='function')showToast('⚠️ この案件は「'+st+'／'+ap+'」です。上の様式ボタン（金枠）から正しい様式へ移動できます');
+      if(rec&&rec!==CUR){
+        const key='fmAuto_'+info.caseId;
+        if(!window._editedDirty && !sessionStorage.getItem(key)){
+          sessionStorage.setItem(key,'1');
+          if(typeof showToast==='function')showToast('➡️ 「'+st+'／'+ap+'」の様式へ自動で移動します');
+          setTimeout(()=>{location.href=rec+'.html?caseId='+encodeURIComponent(info.caseId);},600);
+          return;
+        }
+        if(!detect._warned){detect._warned=true;
+          if(typeof showToast==='function')showToast('⚠️ この案件は「'+st+'／'+ap+'」です。金枠の様式ボタンから移動できます');}
+      }
+      if(rec===CUR){
+        const setIf=(id,v)=>{const e=document.getElementById(id); if(e&&!String(e.value||'').trim()&&v){e.value=v;return true;}return false;};
+        let ch=false;
+        if(CUR==='shinsei_henkou'){ ch=setIf('f_newStatus',st)||ch; }
+        if(CUR==='shinsei_koushin'||CUR==='shinsei_gjk'){ ch=setIf('f_curStatus',st)||ch; }
+        if(ch&&typeof p==='function')p();
       }
     }catch(e){}
   }
