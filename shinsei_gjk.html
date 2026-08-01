@@ -179,7 +179,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260801.82</div>
+    <div class="ver">ver.20260801.83</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -964,6 +964,7 @@ ${v('f_fam5Lv')==='無'?'<div class="cirs" style="left:113.48mm;top:253.00mm"></
 
 
 
+
 <div class="pickhot cb-click" style="left:171.70mm;top:174.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_crime','有')" title="f_crime=有"></div>
 <div class="pickhot cb-click" style="left:171.70mm;top:174.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_crime','無')" title="f_crime=無"></div>
 <div class="pickhot cb-click" style="left:108.67mm;top:214.48mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_fam1Lv','有')" title="f_fam1Lv=有"></div>
@@ -977,7 +978,7 @@ ${v('f_fam5Lv')==='無'?'<div class="cirs" style="left:113.48mm;top:253.00mm"></
 <div class="pickhot cb-click" style="left:108.67mm;top:252.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_fam5Lv','有')" title="f_fam5Lv=有"></div>
 <div class="pickhot cb-click" style="left:112.68mm;top:252.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_fam5Lv','無')" title="f_fam5Lv=無"></div>
 <div class="pickhot cb-click" style="left:138.80mm;top:189.49mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_famYN','有')" title="f_famYN=有"></div>
-<div class="pickhot cb-click" style="left:137.45mm;top:192.50mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_famYN','無')" title="f_famYN=無"></div>
+<div class="pickhot cb-click" style="left:137.50mm;top:192.50mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_famYN','無')" title="f_famYN=無"></div>
 <div class="pickhot cb-click" style="left:47.78mm;top:80.96mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_gender','女')" title="f_gender=女"></div>
 <div class="pickhot cb-click" style="left:39.20mm;top:80.96mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_gender','男')" title="f_gender=男"></div>
 <div class="pickhot cb-click" style="left:124.85mm;top:82.30mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_spouse','有')" title="f_spouse=有"></div>
@@ -1068,6 +1069,7 @@ ${pick&&v('f_fam6Liv')==='有'?'<div class="cirs" style="left:111.72mm;top:254.4
 ${pick&&v('f_fam6Liv')==='無'?'<div class="cirs" style="left:116.96mm;top:254.45mm"></div>':''}
 <div class="av avg" style="left:126.31mm;top:255.25mm;width:30.02mm;text-align:center;font-size:7pt;white-space:normal;line-height:1.05;">${f('f_fam6Wk')}</div>
 <div class="av avg" style="left:158.33mm;top:255.25mm;width:30.27mm;text-align:center;font-size:7pt;white-space:normal;line-height:1.05;">${f('f_fam6Cd')}</div>
+
 <div class="pickhot cb-click" style="left:28.01mm;top:177.32mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_crime','有')" title="f_crime=有"></div>
 <div class="pickhot cb-click" style="left:28.01mm;top:194.09mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_famYN','有')" title="f_famYN=有"></div>
 <div class="pickhot cb-click" style="left:167.31mm;top:79.41mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_spouse','有')" title="f_spouse=有"></div>
@@ -1175,6 +1177,11 @@ ${v('f_g19')==='v_oth'?'<span class="av avm" style="left:139.00mm;top:134.30mm;f
 <div class="av avg" style="left:104.14mm;top:275.73mm;font-size:8.8pt;">${f('f_agentOrg')}</div>
 <div class="av avg" style="left:138.79mm;top:275.73mm;font-size:8.8pt;">${f('f_agentTel')}</div>
 
+
+<div class="av avg" style="left:137.50mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigY')}</div>
+<div class="av avg" style="left:154.40mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigM')}</div>
+<div class="av avg" style="left:170.90mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigD')}</div>
+
 <div class="pickhot cb-click" style="left:51.40mm;top:49.40mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g18Loc','fr')" title="f_g18Loc=fr"></div>
 <div class="pickhot cb-click" style="left:34.90mm;top:49.40mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g18Loc','jp')" title="f_g18Loc=jp"></div>
 <div class="pickhot cb-click" style="left:92.70mm;top:57.20mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g18Lv','bach')" title="f_g18Lv=bach"></div>
@@ -1220,10 +1227,6 @@ ${v('f_g19')==='v_oth'?'<span class="av avm" style="left:139.00mm;top:134.30mm;f
 <div class="pickhot cb-click" style="left:146.90mm;top:126.40mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g19','v_law')" title="f_g19=v_law"></div>
 <div class="pickhot cb-click" style="left:76.40mm;top:126.40mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g19','v_med')" title="f_g19=v_med"></div>
 <div class="pickhot cb-click" style="left:138.30mm;top:133.60mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_g19','v_oth')" title="f_g19=v_oth"></div>
-
-<div class="av avg" style="left:137.50mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigY')}</div>
-<div class="av avg" style="left:154.40mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigM')}</div>
-<div class="av avg" style="left:170.90mm;top:234.30mm;font-size:9pt;transform:translateX(-100%);">${f('f_aSigD')}</div>
 
 </div>
 <div class="doc docabs" id="docP3">
@@ -1285,6 +1288,7 @@ ${v('f_gPos')==='no'?'<span class="av avm" style="left:157.39mm;top:184.35mm;fon
 <div class="av avg" style="left:158.70mm;top:198.60mm;font-size:9.0pt;transform:translateX(-50%);">${f('f_occMain')}</div>
 <div class="av avg" style="left:158.70mm;top:208.90mm;font-size:9.0pt;transform:translateX(-50%);">${f('f_occSub')}</div>
 <div class="av avg" style="left:105.00mm;top:277.50mm;font-size:9.0pt;transform:translateX(-50%);">${f('f_gAct')}</div>
+
 <div class="pickhot cb-click" style="left:75.42mm;top:153.60mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_gEs','grad')" title="f_gEs=grad"></div>
 <div class="pickhot cb-click" style="left:75.42mm;top:150.41mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_gEs','ok')" title="f_gEs=ok"></div>
 <div class="pickhot cb-click" style="left:75.42mm;top:159.99mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_gEs','oth')" title="f_gEs=oth"></div>
@@ -1336,6 +1340,8 @@ ${v('f_gPos')==='no'?'<span class="av avm" style="left:157.39mm;top:184.35mm;fon
 <div class="av avg" style="left:143.30mm;top:187.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_oSigY')}</div>
 <div class="av avg" style="left:158.50mm;top:187.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_oSigM')}</div>
 <div class="av avg" style="left:171.50mm;top:187.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_oSigD')}</div>
+
+
 
 
 </div>
