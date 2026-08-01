@@ -174,7 +174,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.57</div>
+    <div class="ver">ver.20260801.58</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -184,6 +184,14 @@
   <button class="btn fmB" data-fm="shinsei_nintei" style="padding:2px 7px;font-size:10.5px;">特技･認定</button>
   <button class="btn fmB" data-fm="shinsei_gjk" style="padding:2px 7px;font-size:10.5px;">技人国</button>
 </span>
+    <button class="btn" id="adjModeBtn" onclick="toggleAdjMode()" style="background:#0e7490;color:white;">🔧 位置調整</button>
+    <span id="adjPanel" style="display:none;gap:4px;align-items:center;background:#164e63;padding:2px 8px;border-radius:6px;">
+      <span id="adjSel" style="font-size:10px;color:#a5f3fc;">未選択</span>
+      <button class="btn" style="padding:1px 7px;" onclick="adjSize(-0.5)">A−</button>
+      <button class="btn" style="padding:1px 7px;" onclick="adjSize(0.5)">A＋</button>
+      <button class="btn" style="padding:1px 7px;" onclick="adjReset()">リセット</button>
+      <button class="btn" style="padding:1px 7px;" onclick="adjResetAll()">全リセット</button>
+    </span>
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
     <button class="btn" onclick="saveFormGeneric('shinsei_koushin')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -366,7 +374,7 @@
     </div>
     <div class="fs"><div class="fs-title">2 (1)　雇用契約期間</div>
       <div class="fg"><label>開始</label><div style="display:flex;gap:4px;"><input id="f_csY" oninput="p()" placeholder="年"><input id="f_csM" oninput="p()" placeholder="月"><input id="f_csD" oninput="p()" placeholder="日"></div></div>
-      <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市"></div>
+      <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市"></div><span style="display:none"><input type="hidden" id="f__adjust"></span>
       <span style="display:none"><input id="f_q22"><input id="f_q23"><input id="f_q24"><input id="f_q25"><input id="f_q26"><input id="f_q29"><input id="f_q30"><input id="f_q31"><input id="f_q32"><input id="f_q39"><input id="f_q41"><input id="f_q33"><input id="f_coop1"><input id="f_coop2"><input id="f_staffF"><input id="f_staffT"></span>
       <div class="fg"><label>終了</label><div style="display:flex;gap:4px;"><input id="f_ceY" oninput="p()" placeholder="年"><input id="f_ceM" oninput="p()" placeholder="月"><input id="f_ceD" oninput="p()" placeholder="日"></div></div>
     </div>
@@ -872,7 +880,6 @@ function p(){
 <div class="av avg" style="left:88.01mm;top:144.89mm;font-size:9.19pt;transform:translateX(-50%);">${f('f_card')}</div>
 <div class="av avg" style="left:77.28mm;top:153.58mm;font-size:9.19pt;transform:translateX(-50%);">${f('f_newPeriod')}</div>
 <div class="av avg" style="left:58.28mm;top:162.21mm;font-size:9.19pt;">${f('f_reason')}</div>
-<div class="av avg" style="left:55.82mm;top:217.75mm;font-size:9.19pt;transform:translateX(-50%);">${f('f_fam1Nm')}</div>
 ${v('f_gender')==='男'?'<div class="cir" style="left:40.00mm;top:81.76mm"></div>':''}
 ${v('f_gender')==='女'?'<div class="cir" style="left:48.58mm;top:81.76mm"></div>':''}
 ${v('f_spouse')==='有'?'<div class="cir" style="left:125.61mm;top:82.35mm"></div>':''}
@@ -1012,10 +1019,6 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:35.79mm;top:255.73mm;f
 <div class="av avg" style="left:107.00mm;top:264.01mm;font-size:9.9pt;">${f('f_agentAddr')}</div>
 <div class="av avg" style="left:60.73mm;top:281.12mm;font-size:9.9pt;">${f('f_agentOrg')}</div>
 <div class="av avg" style="left:145.44mm;top:281.10mm;font-size:9.9pt;">${f('f_agentTel')}</div>
-<div class="av avg" style="left:63.85mm;top:22.69mm;font-size:9.3pt;">${f('f_q22Org')}</div>
-<div class="av avg" style="left:32.09mm;top:187.17mm;font-size:9.3pt;">${f('f_agAddr')}</div>
-<div class="av avg" style="left:43.77mm;top:196.20mm;font-size:9.3pt;">${f('f_agTel')}</div>
-<div class="av avg" style="left:131.97mm;top:196.20mm;font-size:9.3pt;">${f('f_agCel')}</div>
 ${v('f_a22')==='有'?'<div class="cir" style="left:22.06mm;top:22.63mm"></div>':''}
 ${v('f_a22')==='無'?'<div class="cir" style="left:176.99mm;top:22.63mm"></div>':''}
 ${v('f_a23')==='有'?'<div class="cir" style="left:22.27mm;top:63.12mm"></div>':''}
@@ -1261,10 +1264,6 @@ ${v('f_ins2')==='無'?'<div class="cir" style="left:120.64mm;top:115.87mm"></div
 <div class="doc docabs" id="docP6">
 <div class="page-num-label">P6</div>
 <div class="av avg" style="left:96.31mm;top:125.64mm;font-size:6.69pt;">${f('f_q29d')}</div>
-<div class="av avg" style="left:70.45mm;top:168.49mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
-<div class="av avg" style="left:85.07mm;top:168.49mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
-<div class="av avg" style="left:99.68mm;top:168.49mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigD')}</div>
-<div class="av avg" style="left:116.55mm;top:168.49mm;font-size:6.1pt;">${f('f_subCity')}</div>
 <div class="av avg" style="left:70.45mm;top:178.81mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
 <div class="av avg" style="left:85.07mm;top:178.81mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
 <div class="av avg" style="left:99.68mm;top:178.81mm;font-size:6.1pt;transform:translateX(-50%);">${f('f_oSigD')}</div>
@@ -1368,7 +1367,6 @@ ${v('f_q39')==='無'?'<div class="cir" style="left:160.17mm;top:12.51mm"></div>'
 ${v('f_q41')==='有'?'<div class="cir" style="left:157.57mm;top:38.40mm"></div>':''}
 ${v('f_q41')==='無'?'<div class="cir" style="left:160.17mm;top:38.40mm"></div>':''}
 <div class="av avg" style="left:81.53mm;top:207.00mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_roName')}</div>
-<div class="av avg" style="left:81.62mm;top:223.53mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_roAddr')}</div>
 <div class="av avg" style="left:81.62mm;top:223.53mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_roAddr')}</div>
 <div class="av avg" style="left:149.05mm;top:223.53mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_roTel')}</div>
 <div class="av avg" style="left:73.48mm;top:231.45mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_roRep')}</div>
@@ -1828,5 +1826,105 @@ window.addEventListener('message', async function(e){
   }
 })();
 </script>
+
+<script>
+/* ==== 位置調整モード（窓口申請書専用）: ドラッグ移動・サイズ変更・DB保存永続化 ==== */
+(function(){
+  window._adjMode=false; window._adjSel=null;
+  function adjStore(){ let e=document.getElementById('f__adjust'); return e; }
+  function getADJ(){ try{ return JSON.parse(adjStore().value||'{}'); }catch(_){ return {}; } }
+  function setADJ(a){ adjStore().value=JSON.stringify(a); if(typeof markDirty==='function')markDirty(); }
+  function tagWrappers(){
+    document.querySelectorAll('.doc .av').forEach(w=>{
+      if(w.dataset.f) return;
+      const b=w.querySelector('span.f[data-bind]');
+      if(!b) return;
+      w.dataset.f=b.dataset.bind;
+      w.dataset.bl=parseFloat(w.style.left)||0;
+      w.dataset.bt=parseFloat(w.style.top)||0;
+      w.dataset.bs=parseFloat(w.style.fontSize)||9;
+    });
+  }
+  window.applyAdj=function(){
+    tagWrappers();
+    const A=getADJ();
+    document.querySelectorAll('.doc .av[data-f]').forEach(w=>{
+      const a=A[w.dataset.f];
+      if(!a) { w.style.left=w.dataset.bl+'mm'; w.style.top=w.dataset.bt+'mm'; w.style.fontSize=w.dataset.bs+'pt'; return; }
+      w.style.left=(parseFloat(w.dataset.bl)+(a.dx||0)).toFixed(2)+'mm';
+      w.style.top=(parseFloat(w.dataset.bt)+(a.dy||0)).toFixed(2)+'mm';
+      w.style.fontSize=(parseFloat(w.dataset.bs)+(a.ds||0)).toFixed(1)+'pt';
+      if(_adjMode) w.classList.add('adj-moved');
+    });
+  };
+  if(typeof p==='function'){ const _p=window.p; window.p=function(){ _p.apply(this,arguments); try{applyAdj();}catch(e){} }; }
+  window.toggleAdjMode=function(){
+    _adjMode=!_adjMode;
+    document.body.classList.toggle('adjmode', _adjMode);
+    document.getElementById('adjPanel').style.display=_adjMode?'inline-flex':'none';
+    document.getElementById('adjModeBtn').style.background=_adjMode?'#f59e0b':'#0e7490';
+    if(_adjMode){ applyAdj(); if(typeof showToast==='function')showToast('位置調整モード：文字をドラッグで移動／クリックで選択してA±でサイズ変更／ダブルクリックで入力欄へ'); }
+    else { selEl(null); }
+  };
+  function selEl(w){
+    document.querySelectorAll('.av.adj-sel').forEach(x=>x.classList.remove('adj-sel'));
+    _adjSel=w;
+    if(w){ w.classList.add('adj-sel'); document.getElementById('adjSel').textContent=w.dataset.f; }
+    else document.getElementById('adjSel').textContent='未選択';
+  }
+  window.adjSize=function(d){
+    if(!_adjSel) return;
+    const A=getADJ(); const k=_adjSel.dataset.f;
+    A[k]=A[k]||{}; A[k].ds=Math.round(((A[k].ds||0)+d)*10)/10;
+    setADJ(A); applyAdj(); selEl(document.querySelector('.av[data-f="'+k+'"]')||_adjSel);
+  };
+  window.adjReset=function(){
+    if(!_adjSel) return;
+    const A=getADJ(); delete A[_adjSel.dataset.f]; setADJ(A); applyAdj();
+  };
+  window.adjResetAll=function(){ if(confirm('全フィールドの位置・サイズ調整をリセットしますか？')){ setADJ({}); applyAdj(); } };
+  let drag=null;
+  document.addEventListener('mousedown', e=>{
+    if(!_adjMode) return;
+    const w=e.target.closest('.doc .av[data-f]');
+    if(!w) return;
+    e.preventDefault();
+    const doc=w.closest('.doc'); const r=doc.getBoundingClientRect();
+    drag={w, doc, sx:e.clientX, sy:e.clientY, l:parseFloat(w.style.left), t:parseFloat(w.style.top), mmpx:210/r.width};
+    selEl(w);
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!drag) return;
+    e.preventDefault();
+    const dx=(e.clientX-drag.sx)*drag.mmpx, dy=(e.clientY-drag.sy)*drag.mmpx;
+    drag.w.style.left=(drag.l+dx).toFixed(2)+'mm';
+    drag.w.style.top=(drag.t+dy).toFixed(2)+'mm';
+  });
+  document.addEventListener('mouseup', e=>{
+    if(!drag) return;
+    const w=drag.w;
+    const nl=parseFloat(w.style.left), nt=parseFloat(w.style.top);
+    const A=getADJ(); const k=w.dataset.f;
+    A[k]=A[k]||{};
+    A[k].dx=Math.round((nl-parseFloat(w.dataset.bl))*10)/10;
+    A[k].dy=Math.round((nt-parseFloat(w.dataset.bt))*10)/10;
+    if(Math.abs(A[k].dx)<0.05 && Math.abs(A[k].dy)<0.05 && !A[k].ds) delete A[k];
+    setADJ(A); drag=null; applyAdj();
+  });
+  document.addEventListener('dblclick', e=>{
+    if(!_adjMode) return;
+    const w=e.target.closest('.doc .av[data-f]');
+    if(!w) return;
+    const inp=document.getElementById(w.dataset.f);
+    if(inp){ inp.scrollIntoView({block:'center'}); inp.focus(); if(inp.select)inp.select(); }
+  });
+})();
+</script>
+<style>
+body.adjmode .doc .av[data-f]{outline:1px dashed rgba(14,116,144,.55);cursor:move;}
+body.adjmode .doc .av[data-f]:hover{background:rgba(14,116,144,.10);}
+.doc .av.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.12);}
+@media print{.doc .av{outline:none !important;background:none !important;}}
+</style>
 </body>
 </html>
