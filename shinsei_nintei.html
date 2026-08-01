@@ -33,9 +33,17 @@ window.addEventListener('beforeprint', function(){ /* @media print で様式は�
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 在留資格認定証明書交付申請書 🚧【作成中・使用不可】</div>
-    <div class="ver">ver.20260713.02（作成中）</div>
+    <div class="ver">ver.20260801.10（作成中）</div>
   </div>
   <div class="bar-btns">
+    <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
+  <span style="font-size:10px;color:#cbd5e1;">様式:</span>
+  <button class="btn fmB" data-fm="shinsei_henkou" style="padding:2px 7px;font-size:10.5px;">特技･変更</button>
+  <button class="btn fmB" data-fm="shinsei_koushin" style="padding:2px 7px;font-size:10.5px;">特技･更新</button>
+  <button class="btn fmB" data-fm="shinsei_nintei" style="padding:2px 7px;font-size:10.5px;">特技･認定</button>
+  <button class="btn fmB" data-fm="shinsei_gjk" style="padding:2px 7px;font-size:10.5px;">技人国</button>
+</span>
+
     <button class="btn" onclick="alert('この様式は作成中です。まだ使用できません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🚧 作成中（使用不可）</button>
     <button class="btn btn-print" onclick="alert('この様式は作成中のため、印刷・PDF出力はできません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🖨️ 印刷・PDF（停止中）</button>
   </div>
@@ -199,6 +207,14 @@ window.addEventListener('message', async function(e){
 });
 
 p();
+</script>
+
+<script>
+(function(){const CUR='shinsei_nintei';
+[...document.querySelectorAll('.fmB')].forEach(b=>{
+  if(b.dataset.fm===CUR){b.style.background='#1d4ed8';b.style.color='#fff';b.style.fontWeight='bold';}
+  b.onclick=()=>{const cid=(window._lastCaseInfo&&window._lastCaseInfo.caseId)||''; if(b.dataset.fm===CUR)return; location.href=b.dataset.fm+'.html'+(cid?('?caseId='+encodeURIComponent(cid)):'');};
+});})();
 </script>
 </body>
 </html>

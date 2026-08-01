@@ -174,9 +174,16 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.05</div>
+    <div class="ver">ver.20260801.06</div>
   </div>
   <div class="bar-btns">
+    <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
+  <span style="font-size:10px;color:#cbd5e1;">様式:</span>
+  <button class="btn fmB" data-fm="shinsei_henkou" style="padding:2px 7px;font-size:10.5px;">特技･変更</button>
+  <button class="btn fmB" data-fm="shinsei_koushin" style="padding:2px 7px;font-size:10.5px;">特技･更新</button>
+  <button class="btn fmB" data-fm="shinsei_nintei" style="padding:2px 7px;font-size:10.5px;">特技･認定</button>
+  <button class="btn fmB" data-fm="shinsei_gjk" style="padding:2px 7px;font-size:10.5px;">技人国</button>
+</span>
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
     <button class="btn" onclick="saveFormGeneric('shinsei_henkou')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -1749,6 +1756,67 @@ window.addEventListener('message', async function(e){
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou'); }
   if(typeof loadFromDB==='function') loadFromDB(info);
 });
+</script>
+
+<script>
+/* ==== 窓口申請書 様式スイッチャー（在留資格×申請種別で自動判定） ==== */
+(function(){
+  const CUR=location.pathname.split('/').pop().replace('.html','');
+  const btns=[...document.querySelectorAll('.fmB')];
+  btns.forEach(b=>{
+    if(b.dataset.fm===CUR){b.style.background='#1d4ed8';b.style.color='#fff';b.style.fontWeight='bold';}
+    b.onclick=()=>{
+      const cid=(window._lastCaseInfo&&window._lastCaseInfo.caseId)||'';
+      if(b.dataset.fm===CUR)return;
+      location.href=b.dataset.fm+'.html'+(cid?('?caseId='+encodeURIComponent(cid)):'');
+    };
+  });
+  async function detect(){
+    const info=window._lastCaseInfo;
+    if(!info||!info.caseId||info.caseId===detect._done)return;
+    try{
+      const rs=await sb('cases?select=residence_status,app_type&id=eq.'+info.caseId);
+      if(!rs||!rs[0])return;
+      detect._done=info.caseId;
+      const st=(rs[0].residence_status||''); const ap=(rs[0].app_type||'');
+      let rec='';
+      if(/技術・人文|技人国|人文知識/.test(st)) rec='shinsei_gjk';
+      else if(/特定技能/.test(st)){
+        if(/変更/.test(ap)) rec='shinsei_henkou';
+        else if(/認定/.test(ap)) rec='shinsei_nintei';
+        else rec='shinsei_koushin';
+      }
+      btns.forEach(b=>{
+        b.style.boxShadow=(b.dataset.fm===rec)?'0 0 0 2px #f59e0b':'none';
+        b.title=(b.dataset.fm===rec)?('この案件の推奨様式（'+st+'／'+ap+'）'):'';
+      });
+      if(rec&&rec!==CUR&&!detect._warned){
+        detect._warned=true;
+        if(typeof showToast==='function')showToast('⚠️ この案件は「'+st+'／'+ap+'」です。上の様式ボタン（金枠）から正しい様式へ移動できます');
+      }
+    }catch(e){}
+  }
+  setInterval(detect,1200);
+  /* ?caseId= 自動選択 */
+  const cid=new URLSearchParams(location.search).get('caseId');
+  if(cid){
+    (async()=>{
+      let nm='';
+      try{const r=await sb('cases?select=name&id=eq.'+cid); nm=(r&&r[0]&&r[0].name)||'';}catch(e){}
+      let tries=0;
+      const t=setInterval(()=>{
+        tries++;
+        const ft=document.getElementById('filterText'); const sel=document.getElementById('caseSelect');
+        if(ft&&sel&&nm){
+          if(ft.value!==nm){ft.value=nm;ft.dispatchEvent(new Event('input'));if(typeof filterCases==='function')filterCases();}
+          const op=[...sel.options].find(o=>{try{return JSON.parse(o.value).caseId===cid;}catch(e){return false;}});
+          if(op){sel.value=op.value;sel.dispatchEvent(new Event('change'));clearInterval(t);}
+        }
+        if(tries>30)clearInterval(t);
+      },700);
+    })();
+  }
+})();
 </script>
 </body>
 </html>
