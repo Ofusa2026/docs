@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260731.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260801.01</span></div>
   <div style="flex:1;"></div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
@@ -203,7 +203,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
       <span class="item-icon">📝</span>
-      <div>🚧【作成中】窓口申請書（変更）<span class="item-sub">全7ページ一括　スクロールで全部見られます</span></div>
+      <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定を自動判別</span></div>
     </div>
     <div class="divider"></div>
     <div class="section">分野別誓約書</div>
@@ -1127,6 +1127,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20260801.01',
+    date: '2026-08-01',
+    notify: true,
+    items: [
+      '📝 窓口申請書メニューを「窓口申請書（全種別）」に一本化しました。案件を選ぶと、変更・更新・技人国・認定の様式を自動で判別して正しいページを開きます（これまで様式ごとに開き直す必要がありました）。'
+    ]
+  },
   {
     version: 'ver.20260713.03',
     date: '2026-07-13',
