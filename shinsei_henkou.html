@@ -38,6 +38,10 @@
 #docP5 .av{margin-top:0.40mm}
 #docP6 .av{margin-top:0.43mm}
 #docP7 .av{margin-top:-0.25mm}
+.docabs .pickhot{position:absolute;cursor:pointer;z-index:6;border-radius:50%;}
+.docabs .pickhot:hover{background:rgba(124,58,237,.18);}
+@media print{.docabs .pickhot{display:none!important;background:none!important;}}
+
 
 
 /* ==== P1: 見本由来背景(600dpi)＋実座標オーバーレイ方式（完全一致版） ==== */
@@ -170,7 +174,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.03</div>
+    <div class="ver">ver.20260801.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -356,6 +360,7 @@
     <div class="fs"><div class="fs-title">2 (1)　雇用契約期間</div>
       <div class="fg"><label>開始</label><div style="display:flex;gap:4px;"><input id="f_csY" oninput="p()" placeholder="年"><input id="f_csM" oninput="p()" placeholder="月"><input id="f_csD" oninput="p()" placeholder="日"></div></div>
       <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市"></div>
+      <span style="display:none"><input id="f_q22"><input id="f_q23"><input id="f_q24"><input id="f_q25"><input id="f_q26"><input id="f_q29"><input id="f_q30"><input id="f_q31"><input id="f_q32"><input id="f_q39"><input id="f_q41"><input id="f_q33"><input id="f_coop1"><input id="f_coop2"></span>
       <div class="fg"><label>終了</label><div style="display:flex;gap:4px;"><input id="f_ceY" oninput="p()" placeholder="年"><input id="f_ceM" oninput="p()" placeholder="月"><input id="f_ceD" oninput="p()" placeholder="日"></div></div>
     </div>
     <div class="fs"><div class="fs-title">2 (2)　従事すべき業務の内容</div>
@@ -955,6 +960,25 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:32.27mm;top:250.84mm;f
 <div class="av avg" style="left:149.01mm;top:60.06mm;font-size:8pt;">${f('f_skCountry')}</div>
 <div class="av avg" style="left:80mm;top:113.02mm;font-size:9.78pt;">${f('f_jpExam')}</div>
 <div class="av avg" style="left:149.01mm;top:125.36mm;font-size:8pt;">${f('f_jpCountry')}</div>
+
+
+<div class="pickhot cb-click" style="left:21.75mm;top:154.13mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jp','jisshu')" title="f_jp=jisshu"></div>
+<div class="pickhot cb-click" style="left:21.75mm;top:107.85mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jp','policy')" title="f_jp=policy"></div>
+<div class="pickhot cb-click" style="left:110.31mm;top:124.66mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jpLoc','fr')" title="f_jpLoc=fr"></div>
+<div class="pickhot cb-click" style="left:110.31mm;top:120.68mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jpLoc','jp')" title="f_jpLoc=jp"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:112.72mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jpSub','exam')" title="f_jpSub=exam"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:145.29mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jpSub','other')" title="f_jpSub=other"></div>
+<div class="pickhot cb-click" style="left:21.75mm;top:91.93mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_sk','jisshu')" title="f_sk=jisshu"></div>
+<div class="pickhot cb-click" style="left:21.75mm;top:42.55mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_sk','policy')" title="f_sk=policy"></div>
+<div class="pickhot cb-click" style="left:110.31mm;top:59.36mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_skLoc','fr')" title="f_skLoc=fr"></div>
+<div class="pickhot cb-click" style="left:110.31mm;top:55.38mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_skLoc','jp')" title="f_skLoc=jp"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:47.42mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_skSub','exam')" title="f_skSub=exam"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:79.99mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_skSub','other')" title="f_skSub=other"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:203.68mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_ti1Prf','doc')" title="f_ti1Prf=doc"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:195.72mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_ti1Prf','test')" title="f_ti1Prf=test"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:250.14mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_ti2Prf','doc')" title="f_ti2Prf=doc"></div>
+<div class="pickhot cb-click" style="left:31.57mm;top:242.18mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_ti2Prf','test')" title="f_ti2Prf=test"></div>
+
 </div>
 <div class="doc docabs" id="docP3">
 <div class="page-num-label">P3</div>
@@ -976,6 +1000,44 @@ ${v('f_a23')==='無'?'<div class="cir" style="left:164.38mm;top:49.13mm"></div>'
 <div class="av avg" style="left:174.21mm;top:225.54mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigD')}</div>
 <div class="av avg" style="left:99.02mm;top:272.17mm;font-size:8.6pt;">${f('f_agentOrg')}</div>
 <div class="av avg" style="left:147.60mm;top:272.17mm;font-size:8.6pt;">${f('f_agentTel')}</div>
+<div class="av avg" style="left:25.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1InY')}</div>
+<div class="av avg" style="left:34.90mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1InM')}</div>
+<div class="av avg" style="left:44.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1OutY')}</div>
+<div class="av avg" style="left:54.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1OutM')}</div>
+<div class="av avg" style="left:80.90mm;top:150.47mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk1Nm')}</div>
+<div class="av avg" style="left:25.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2InY')}</div>
+<div class="av avg" style="left:34.90mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2InM')}</div>
+<div class="av avg" style="left:44.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2OutY')}</div>
+<div class="av avg" style="left:54.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2OutM')}</div>
+<div class="av avg" style="left:80.90mm;top:158.67mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk2Nm')}</div>
+<div class="av avg" style="left:25.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3InY')}</div>
+<div class="av avg" style="left:34.90mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3InM')}</div>
+<div class="av avg" style="left:44.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3OutY')}</div>
+<div class="av avg" style="left:54.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3OutM')}</div>
+<div class="av avg" style="left:80.90mm;top:166.82mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk3Nm')}</div>
+<div class="av avg" style="left:107.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4InY')}</div>
+<div class="av avg" style="left:117.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4InM')}</div>
+<div class="av avg" style="left:126.90mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4OutY')}</div>
+<div class="av avg" style="left:136.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4OutM')}</div>
+<div class="av avg" style="left:163.30mm;top:150.47mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk4Nm')}</div>
+<div class="av avg" style="left:107.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5InY')}</div>
+<div class="av avg" style="left:117.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5InM')}</div>
+<div class="av avg" style="left:126.90mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5OutY')}</div>
+<div class="av avg" style="left:136.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5OutM')}</div>
+<div class="av avg" style="left:163.30mm;top:158.67mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk5Nm')}</div>
+<div class="av avg" style="left:107.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6InY')}</div>
+<div class="av avg" style="left:117.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6InM')}</div>
+<div class="av avg" style="left:126.90mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6OutY')}</div>
+<div class="av avg" style="left:136.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6OutM')}</div>
+<div class="av avg" style="left:163.30mm;top:166.82mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk6Nm')}</div>
+
+
+
+<div class="pickhot cb-click" style="left:24.05mm;top:19.71mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','有')" title="f_a22=有"></div>
+<div class="pickhot cb-click" style="left:172.13mm;top:19.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','無')" title="f_a22=無"></div>
+<div class="pickhot cb-click" style="left:24.25mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','有')" title="f_a23=有"></div>
+<div class="pickhot cb-click" style="left:163.58mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','無')" title="f_a23=無"></div>
+
 </div>
 <div class="doc docabs" id="docP4">
 <div class="page-num-label">P4</div>
@@ -994,15 +1056,16 @@ ${v('f_a23')==='無'?'<div class="cir" style="left:164.38mm;top:49.13mm"></div>'
 <div class="av avg" style="left:142.27mm;top:84.09mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_hoursM')}</div>
 <div class="av avg" style="left:150.17mm;top:99.12mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_pay')}</div>
 <div class="av avg" style="left:78.57mm;top:105.95mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_payH')}</div>
-<div class="av avg" style="left:150.17mm;top:104.55mm;font-size:9.83pt;transform:translateX(-100%);">${f('f_payJp')}</div>
+<div class="av avg" style="left:110.06mm;top:111.37mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_payJp')}</div>
 ${v('f_payWay')==='bank'?'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">■</span>':'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">□</span>'}
 ${v('f_payWay')==='cash'?'<span class="av avm" style="left:72.29mm;top:125.59mm;font-size:9.83pt;">■</span>':''}
 <div class="av avg" style="left:42.14mm;top:138.46mm;font-size:9.0pt;">${f('f_q6d')}</div>
 ${v('f_hoursEq')==='有'?'<div class="cir" style="left:158.58mm;top:88.44mm"></div>':''}
 ${v('f_hoursEq')==='無'?'<div class="cir" style="left:162.41mm;top:88.44mm"></div>':''}
-${v('f_payEq')==='有'?'<div class="cir" style="left:158.58mm;top:88.44mm"></div>':''}
-${v('f_payEq')==='無'?'<div class="cir" style="left:162.41mm;top:88.44mm"></div>':''}
+${v('f_payEq')==='有'?'<div class="cir" style="left:158.53mm;top:118.13mm"></div>':''}
+${v('f_payEq')==='無'?'<div class="cir" style="left:162.46mm;top:118.13mm"></div>':''}
 ${v('f_q6')==='有'?'<div class="cir" style="left:28.23mm;top:137.26mm"></div>':''}
+${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>':''}
 <div class="cir" style="left:158.82mm;top:118.28mm;width:4.82mm;height:5.69mm"></div>
 <div class="cir" style="left:159.59mm;top:152.96mm;width:4.60mm;height:5.32mm"></div>
 <div class="cir" style="left:159.76mm;top:143.68mm;width:4.60mm;height:5.32mm"></div>
@@ -1069,6 +1132,17 @@ ${v('f_q6')==='有'?'<div class="cir" style="left:28.23mm;top:137.26mm"></div>':
 <div class="av avg" style="left:81.63mm;top:223.59mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_dpAddr')}</div>
 <div class="av avg" style="left:151.77mm;top:223.59mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_dpTel')}</div>
 <div class="av avg" style="left:76.79mm;top:227.44mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_dpRep')}</div>
+
+
+<div class="pickhot cb-click" style="left:157.78mm;top:87.64mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_hoursEq','有')" title="f_hoursEq=有"></div>
+<div class="pickhot cb-click" style="left:161.61mm;top:87.64mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_hoursEq','無')" title="f_hoursEq=無"></div>
+<div class="pickhot cb-click" style="left:157.73mm;top:117.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_payEq','有')" title="f_payEq=有"></div>
+<div class="pickhot cb-click" style="left:161.66mm;top:117.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_payEq','無')" title="f_payEq=無"></div>
+<div class="pickhot cb-click" style="left:110.56mm;top:124.89mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_payWay','bank')" title="f_payWay=bank"></div>
+<div class="pickhot cb-click" style="left:71.59mm;top:124.89mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_payWay','cash')" title="f_payWay=cash"></div>
+<div class="pickhot cb-click" style="left:27.43mm;top:136.46mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q6','有')" title="f_q6=有"></div>
+<div class="pickhot cb-click" style="left:163.40mm;top:136.62mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q6','無')" title="f_q6=無"></div>
+
 </div>
 <div class="doc docabs" id="docP5">
 <div class="page-num-label">P5</div>
@@ -1099,6 +1173,13 @@ ${v('f_ins2')==='無'?'<div class="cir" style="left:126.96mm;top:113.98mm"></div
 <div class="cir" style="left:172.60mm;top:183.83mm;width:5.31mm;height:4.69mm"></div>
 <div class="cir" style="left:172.33mm;top:168.27mm;width:5.29mm;height:4.78mm"></div>
 <div class="cir" style="left:172.81mm;top:152.74mm;width:5.31mm;height:4.71mm"></div>
+
+
+<div class="pickhot cb-click" style="left:122.98mm;top:107.60mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins1','有')" title="f_ins1=有"></div>
+<div class="pickhot cb-click" style="left:126.16mm;top:107.60mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins1','無')" title="f_ins1=無"></div>
+<div class="pickhot cb-click" style="left:122.98mm;top:113.18mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','有')" title="f_ins2=有"></div>
+<div class="pickhot cb-click" style="left:126.16mm;top:113.18mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','無')" title="f_ins2=無"></div>
+
 </div>
 <div class="doc docabs" id="docP6">
 <div class="page-num-label">P6</div>
@@ -1116,20 +1197,20 @@ ${v('f_q26')==='無'?'<div class="cir" style="left:168.86mm;top:53.50mm"></div>'
 
 
 
-${v('f_q29')==='有'?'<div class="cir" style="left:165.79mm;top:129.52mm"></div>':''}
-${v('f_q29')==='無'?'<div class="cir" style="left:168.86mm;top:129.52mm"></div>':''}
+${v('f_q29')==='有'?'<div class="cir" style="left:30.23mm;top:125.54mm"></div>':''}
+${v('f_q29')==='無'?'<div class="cir" style="left:165.38mm;top:124.87mm"></div>':''}
 ${v('f_q30')==='有'?'<div class="cir" style="left:165.79mm;top:129.52mm"></div>':''}
 ${v('f_q30')==='無'?'<div class="cir" style="left:168.86mm;top:129.52mm"></div>':''}
 ${v('f_q31')==='有'?'<div class="cir" style="left:165.79mm;top:140.53mm"></div>':''}
 ${v('f_q31')==='無'?'<div class="cir" style="left:168.86mm;top:140.53mm"></div>':''}
 ${v('f_q32')==='有'?'<div class="cir" style="left:166.05mm;top:151.00mm"></div>':''}
 ${v('f_q32')==='無'?'<div class="cir" style="left:168.60mm;top:151.00mm"></div>':''}
-${v('f_q35')==='有'?'<div class="cir" style="left:165.79mm;top:221.24mm"></div>':''}
-${v('f_q35')==='無'?'<div class="cir" style="left:168.86mm;top:221.24mm"></div>':''}
-${v('f_q36')==='有'?'<div class="cir" style="left:165.79mm;top:228.99mm"></div>':''}
-${v('f_q36')==='無'?'<div class="cir" style="left:168.86mm;top:228.99mm"></div>':''}
-${v('f_q37')==='有'?'<div class="cir" style="left:165.79mm;top:272.91mm"></div>':''}
-${v('f_q37')==='無'?'<div class="cir" style="left:168.86mm;top:272.91mm"></div>':''}
+${v('f_q35')==='有'?'<div class="cir" style="left:165.74mm;top:229.29mm"></div>':''}
+${v('f_q35')==='無'?'<div class="cir" style="left:168.91mm;top:229.29mm"></div>':''}
+${v('f_q36')==='有'?'<div class="cir" style="left:165.74mm;top:273.21mm"></div>':''}
+${v('f_q36')==='無'?'<div class="cir" style="left:168.91mm;top:273.21mm"></div>':''}
+${v('f_q37')==='有'?'<div class="cir" style="left:165.74mm;top:283.54mm"></div>':''}
+${v('f_q37')==='無'?'<div class="cir" style="left:168.91mm;top:283.54mm"></div>':''}
 <div class="av avg" style="left:41.46mm;top:15.93mm;font-size:8.5pt;">${f('f_q22d')}</div>
 <div class="av avg" style="left:41.46mm;top:36.84mm;font-size:8.5pt;">${f('f_q24d')}</div>
 <div class="av avg" style="left:41.46mm;top:47.17mm;font-size:8.5pt;">${f('f_q25d')}</div>
@@ -1140,12 +1221,12 @@ ${v('f_q27sel')==='1'?'<span class="av avm" style="left:30.79mm;top:71.43mm;font
 ${v('f_q27sel')==='2'?'<span class="av avm" style="left:30.79mm;top:81.76mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q27sel')==='3'?'<span class="av avm" style="left:30.79mm;top:92.10mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q27sel')==='4'?'<span class="av avm" style="left:30.79mm;top:102.43mm;font-size:9.5pt;">■</span>':''}
-<div class="av avg" style="left:172.58mm;top:183.92mm;font-size:9.3pt;">${f('f_smName')}</div>
-${v('f_smYN')==='有'?'<div class="cir" style="left:165.79mm;top:185.08mm"></div>':''}
-${v('f_smYN')==='無'?'<div class="cir" style="left:168.86mm;top:185.08mm"></div>':''}
-<div class="av avg" style="left:82.20mm;top:197.10mm;font-size:9.3pt;">${f('f_ssName')}</div>
-${v('f_ssYN')==='有'?'<div class="cir" style="left:165.79mm;top:208.33mm"></div>':''}
-${v('f_ssYN')==='無'?'<div class="cir" style="left:168.86mm;top:208.33mm"></div>':''}
+<div class="av avg" style="left:71.48mm;top:201.92mm;font-size:9.3pt;">${f('f_smName')}</div>
+${v('f_smYN')==='有'?'<div class="cir" style="left:165.74mm;top:208.63mm"></div>':''}
+${v('f_smYN')==='無'?'<div class="cir" style="left:168.91mm;top:208.63mm"></div>':''}
+<div class="av avg" style="left:71.48mm;top:214.92mm;font-size:9.3pt;">${f('f_ssName')}</div>
+${v('f_ssYN')==='有'?'<div class="cir" style="left:165.74mm;top:221.54mm"></div>':''}
+${v('f_ssYN')==='無'?'<div class="cir" style="left:168.91mm;top:221.54mm"></div>':''}
 <div class="cir" style="left:165.41mm;top:159.87mm;width:5.86mm;height:4.73mm"></div>
 <div class="cir" style="left:164.42mm;top:172.34mm;width:5.83mm;height:4.64mm"></div>
 <div class="cir" style="left:164.64mm;top:185.89mm;width:5.91mm;height:4.63mm"></div>
@@ -1155,8 +1236,8 @@ ${v('f_ssYN')==='無'?'<div class="cir" style="left:168.86mm;top:208.33mm"></div
 
 ${v('f_q27')==='有'?'<div class="cir" style="left:165.79mm;top:64.94mm"></div>':''}
 ${v('f_q27')==='無'?'<div class="cir" style="left:168.86mm;top:64.94mm"></div>':''}
-${v('f_q28')==='有'?'<div class="cir" style="left:165.79mm;top:129.52mm"></div>':''}
-${v('f_q28')==='無'?'<div class="cir" style="left:168.86mm;top:129.52mm"></div>':''}
+${v('f_q28')==='有'?'<div class="cir" style="left:30.19mm;top:117.12mm"></div>':''}
+${v('f_q28')==='無'?'<div class="cir" style="left:165.38mm;top:117.12mm"></div>':''}
 <div class="av avg" style="left:41.46mm;top:118.02mm;font-size:8.5pt;">${f('f_q28d')}</div>
 <div class="av avm" style="left:67.84mm;top:168.34mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
 <div class="av avm" style="left:83.61mm;top:168.34mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
@@ -1166,6 +1247,68 @@ ${v('f_q28')==='無'?'<div class="cir" style="left:168.86mm;top:129.52mm"></div>
 <div class="av avm" style="left:83.61mm;top:178.67mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
 <div class="av avm" style="left:99.34mm;top:179.46mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigD')}</div>
 <div class="av avm" style="left:121.02mm;top:178.67mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_subCity')}</div>
+
+
+${v('f_q33')==='有'?'<div class="cir" style="left:165.74mm;top:185.38mm"></div>':''}
+${v('f_q33')==='無'?'<div class="cir" style="left:168.91mm;top:185.38mm"></div>':''}
+${v('f_coop1')==='有'?'<div class="cir" style="left:166.00mm;top:160.02mm"></div>':''}
+${v('f_coop1')==='無'?'<div class="cir" style="left:168.65mm;top:160.02mm"></div>':''}
+${v('f_coop2')==='有'?'<div class="cir" style="left:166.00mm;top:172.60mm"></div>':''}
+${v('f_coop2')==='無'?'<div class="cir" style="left:168.65mm;top:172.60mm"></div>':''}
+
+${v('f_q35sel')==='1'?'<span class="av avm" style="left:30.79mm;top:238.07mm;font-size:9.5pt;">■</span>':''}
+${v('f_q35sel')==='2'?'<span class="av avm" style="left:30.79mm;top:250.99mm;font-size:9.5pt;">■</span>':''}
+${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;font-size:9.5pt;">■</span>':''}
+<div class="av avg" style="left:96.99mm;top:264.00mm;font-size:8.5pt;">${f('f_q35d')}</div>
+<div class="av avg" style="left:147.31mm;top:202.00mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_smTitle')}</div>
+<div class="av avg" style="left:147.31mm;top:214.92mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_ssTitle')}</div>
+
+<div class="pickhot cb-click" style="left:165.20mm;top:159.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','有')" title="f_coop1=有"></div>
+<div class="pickhot cb-click" style="left:167.85mm;top:159.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','無')" title="f_coop1=無"></div>
+<div class="pickhot cb-click" style="left:165.20mm;top:171.80mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop2','有')" title="f_coop2=有"></div>
+<div class="pickhot cb-click" style="left:167.85mm;top:171.80mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop2','無')" title="f_coop2=無"></div>
+<div class="pickhot cb-click" style="left:28.79mm;top:13.93mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','有')" title="f_q22=有"></div>
+<div class="pickhot cb-click" style="left:164.08mm;top:13.93mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','無')" title="f_q22=無"></div>
+<div class="pickhot cb-click" style="left:164.99mm;top:21.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q23','有')" title="f_q23=有"></div>
+<div class="pickhot cb-click" style="left:168.06mm;top:21.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q23','無')" title="f_q23=無"></div>
+<div class="pickhot cb-click" style="left:28.79mm;top:34.84mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q24','有')" title="f_q24=有"></div>
+<div class="pickhot cb-click" style="left:164.08mm;top:34.84mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q24','無')" title="f_q24=無"></div>
+<div class="pickhot cb-click" style="left:28.79mm;top:45.17mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q25','有')" title="f_q25=有"></div>
+<div class="pickhot cb-click" style="left:164.08mm;top:45.17mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q25','無')" title="f_q25=無"></div>
+<div class="pickhot cb-click" style="left:164.99mm;top:52.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q26','有')" title="f_q26=有"></div>
+<div class="pickhot cb-click" style="left:168.06mm;top:52.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q26','無')" title="f_q26=無"></div>
+<div class="pickhot cb-click" style="left:164.99mm;top:64.14mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q27','有')" title="f_q27=有"></div>
+<div class="pickhot cb-click" style="left:168.06mm;top:64.14mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q27','無')" title="f_q27=無"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:70.73mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q27sel','1')" title="f_q27sel=1"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:81.06mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q27sel','2')" title="f_q27sel=2"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:91.40mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q27sel','3')" title="f_q27sel=3"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:101.73mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q27sel','4')" title="f_q27sel=4"></div>
+<div class="pickhot cb-click" style="left:29.39mm;top:116.32mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q28','有')" title="f_q28=有"></div>
+<div class="pickhot cb-click" style="left:164.58mm;top:116.32mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q28','無')" title="f_q28=無"></div>
+<div class="pickhot cb-click" style="left:29.43mm;top:124.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q29','有')" title="f_q29=有"></div>
+<div class="pickhot cb-click" style="left:164.58mm;top:124.07mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q29','無')" title="f_q29=無"></div>
+<div class="pickhot cb-click" style="left:164.99mm;top:128.72mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q30','有')" title="f_q30=有"></div>
+<div class="pickhot cb-click" style="left:168.06mm;top:128.72mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q30','無')" title="f_q30=無"></div>
+<div class="pickhot cb-click" style="left:164.99mm;top:139.73mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q31','有')" title="f_q31=有"></div>
+<div class="pickhot cb-click" style="left:168.06mm;top:139.73mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q31','無')" title="f_q31=無"></div>
+<div class="pickhot cb-click" style="left:165.25mm;top:150.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q32','有')" title="f_q32=有"></div>
+<div class="pickhot cb-click" style="left:167.80mm;top:150.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q32','無')" title="f_q32=無"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:184.58mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q33','有')" title="f_q33=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:184.58mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q33','無')" title="f_q33=無"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:228.49mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q35','有')" title="f_q35=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:228.49mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q35','無')" title="f_q35=無"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:237.37mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q35sel','1')" title="f_q35sel=1"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:250.29mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q35sel','2')" title="f_q35sel=2"></div>
+<div class="pickhot cb-click" style="left:30.09mm;top:263.20mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_q35sel','3')" title="f_q35sel=3"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:272.41mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q36','有')" title="f_q36=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:272.41mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q36','無')" title="f_q36=無"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:282.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q37','有')" title="f_q37=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:282.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q37','無')" title="f_q37=無"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:207.83mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_smYN','有')" title="f_smYN=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:207.83mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_smYN','無')" title="f_smYN=無"></div>
+<div class="pickhot cb-click" style="left:164.94mm;top:220.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','有')" title="f_ssYN=有"></div>
+<div class="pickhot cb-click" style="left:168.11mm;top:220.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','無')" title="f_ssYN=無"></div>
+
 </div>
 <div class="doc docabs" id="docP7">
 <div class="page-num-label">P7</div>
@@ -1232,6 +1375,13 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:178.29mm;top:44.82mm"></div>'
 <div class="cir" style="left:174.40mm;top:136.70mm;width:5.12mm;height:5.02mm"></div>
 <div class="cir" style="left:175.00mm;top:92.52mm;width:5.12mm;height:5.02mm"></div>
 <div class="cir" style="left:175.23mm;top:81.26mm;width:5.12mm;height:5.03mm"></div>
+
+
+<div class="pickhot cb-click" style="left:175.28mm;top:21.53mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q39','有')" title="f_q39=有"></div>
+<div class="pickhot cb-click" style="left:177.49mm;top:21.53mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q39','無')" title="f_q39=無"></div>
+<div class="pickhot cb-click" style="left:175.28mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','有')" title="f_q41=有"></div>
+<div class="pickhot cb-click" style="left:177.49mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','無')" title="f_q41=無"></div>
+
 </div>
 `;
   _fontSize = (_fontSize === 8.5) ? 8 : _fontSize;
