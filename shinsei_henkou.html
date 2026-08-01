@@ -174,7 +174,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.07</div>
+    <div class="ver">ver.20260801.08</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1045,6 +1045,24 @@ ${v('f_a23')==='無'?'<div class="cir" style="left:164.38mm;top:49.13mm"></div>'
 <div class="pickhot cb-click" style="left:24.25mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','有')" title="f_a23=有"></div>
 <div class="pickhot cb-click" style="left:163.58mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','無')" title="f_a23=無"></div>
 
+
+
+<div class="av avg" style="left:35.09mm;top:262.10mm;font-size:9pt;">${f('f_agentName')}</div>
+<div class="av avg" style="left:96.00mm;top:262.10mm;font-size:9pt;">${f('f_agentAddr')}</div>
+
+${v('f_a24')==='有'?'<div class="cir" style="left:171.30mm;top:78.80mm"></div>':''}
+${v('f_a24')==='無'?'<div class="cir" style="left:176.60mm;top:78.80mm"></div>':''}
+<div class="pickhot cb-click" style="left:170.50mm;top:78.00mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a24','有')" title="f_a24=有"></div>
+<div class="pickhot cb-click" style="left:175.80mm;top:78.00mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a24','無')" title="f_a24=無"></div>
+${v('f_a25')==='有'?'<div class="cir" style="left:171.30mm;top:94.90mm"></div>':''}
+${v('f_a25')==='無'?'<div class="cir" style="left:176.60mm;top:94.90mm"></div>':''}
+<div class="pickhot cb-click" style="left:170.50mm;top:94.10mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a25','有')" title="f_a25=有"></div>
+<div class="pickhot cb-click" style="left:175.80mm;top:94.10mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a25','無')" title="f_a25=無"></div>
+${v('f_a26')==='有'?'<div class="cir" style="left:171.30mm;top:115.10mm"></div>':''}
+${v('f_a26')==='無'?'<div class="cir" style="left:176.60mm;top:115.10mm"></div>':''}
+<div class="pickhot cb-click" style="left:170.50mm;top:114.30mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a26','有')" title="f_a26=有"></div>
+<div class="pickhot cb-click" style="left:175.80mm;top:114.30mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a26','無')" title="f_a26=無"></div>
+
 </div>
 <div class="doc docabs" id="docP4">
 <div class="page-num-label">P4</div>
@@ -1150,6 +1168,13 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="pickhot cb-click" style="left:27.43mm;top:136.46mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q6','有')" title="f_q6=有"></div>
 <div class="pickhot cb-click" style="left:163.40mm;top:136.62mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q6','無')" title="f_q6=無"></div>
 
+<div class="av avg" style="left:63.30mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpsY')}</div>
+<div class="av avg" style="left:78.89mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpsM')}</div>
+<div class="av avg" style="left:94.47mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpsD')}</div>
+<div class="av avg" style="left:117.85mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpeY')}</div>
+<div class="av avg" style="left:133.43mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpeM')}</div>
+<div class="av avg" style="left:149.02mm;top:234.60mm;font-size:9pt;transform:translateX(-100%);">${f('f_dpeD')}</div>
+
 </div>
 <div class="doc docabs" id="docP5">
 <div class="page-num-label">P5</div>
@@ -1186,6 +1211,9 @@ ${v('f_ins2')==='無'?'<div class="cir" style="left:126.96mm;top:113.98mm"></div
 <div class="pickhot cb-click" style="left:126.16mm;top:107.60mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins1','無')" title="f_ins1=無"></div>
 <div class="pickhot cb-click" style="left:122.98mm;top:113.18mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','有')" title="f_ins2=有"></div>
 <div class="pickhot cb-click" style="left:126.16mm;top:113.18mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','無')" title="f_ins2=無"></div>
+
+<div class="av avg" style="left:153.72mm;top:54.88mm;font-size:9.3pt;transform:translateX(-50%);">${f('f_bizMain')}</div>
+<div class="av avg" style="left:159.45mm;top:62.42mm;font-size:9.3pt;transform:translateX(-50%);">${f('f_bizSub')}</div>
 
 </div>
 <div class="doc docabs" id="docP6">
