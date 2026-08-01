@@ -31,6 +31,13 @@
 .docabs .av .f,.docabs .av span.f{font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;letter-spacing:0!important;background:none!important;border:none!important;padding:0!important;margin:0!important;display:inline!important;line-height:1!important;}
 .docabs .cir{position:absolute;border:0.16mm solid #000;border-radius:50%;width:5.9mm;height:6.4mm;}
 .docabs .cirs{position:absolute;border:0.14mm solid #000;border-radius:50%;width:4.2mm;height:4.8mm;}
+
+/* 印刷時に背景様式(base64)を必ず印字する */
+.docabs{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@media print{
+  .docabs{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;background-color:#fff;}
+}
+
 .docabs .pickhot{position:absolute;cursor:pointer;z-index:6;border-radius:50%;}
 .docabs .pickhot:hover{background:rgba(124,58,237,.18);}
 @media print{.docabs .pickhot{display:none!important;background:none!important;}}
@@ -172,7 +179,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260801.79</div>
+    <div class="ver">ver.20260801.80</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">

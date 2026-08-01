@@ -38,6 +38,13 @@
 #docP5 .av{margin-top:0.40mm}
 #docP6 .av{margin-top:0.43mm}
 #docP7 .av{margin-top:-0.25mm}
+
+/* 印刷時に背景様式(base64)を必ず印字する */
+.docabs{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+@media print{
+  .docabs{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;background-color:#fff;}
+}
+
 .docabs .pickhot{position:absolute;cursor:pointer;z-index:6;border-radius:50%;}
 .docabs .pickhot:hover{background:rgba(124,58,237,.18);}
 @media print{.docabs .pickhot{display:none!important;background:none!important;}}
@@ -174,7 +181,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.12</div>
+    <div class="ver">ver.20260801.13</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
