@@ -1,6 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20260731.02
+ * ver.20260801.01
+ * - DB復元時に直接編集版へ applyBindings() を適用し、サイド編集値が消える不具合を修正
  * - 書類プレビューの値クリックで対応入力欄へジャンプ＆フォーカス（全書類）
  * - sb() GET(読込)に cache:no-store を付与し、編集の即時反映を阻む約5分のHTTPキャッシュを解消
  * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
@@ -1247,6 +1248,10 @@ async function loadFormGenericFromDB(docKey, info){
       if(_ed && _ed.html && _area){
         _area.innerHTML = _ed.html;
         window._htmlFrozen = true; window._editedRestored = true;
+        // ver.20260801: 直接編集版を復元した後も、変数欄(data-bind)は最新のサイド値で上書きする。
+        // これを呼ばないと、直接編集スナップショットの古い焼き込み値が残り、
+        // 後からのサイド編集が反映されず「消えた」ように見える（ファイル呼出 loadEditedHTML と挙動統一）。
+        if(typeof applyBindings === 'function') applyBindings();
         if(typeof showToast === 'function') showToast('📝 直接編集版を復元しました');
       } else if(window._editedRestored && _area){
         window._htmlFrozen = false; window._editedRestored = false;
