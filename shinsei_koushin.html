@@ -174,7 +174,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.51</div>
+    <div class="ver">ver.20260801.52</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -360,7 +360,7 @@
     <div class="fs"><div class="fs-title">2 (1)　雇用契約期間</div>
       <div class="fg"><label>開始</label><div style="display:flex;gap:4px;"><input id="f_csY" oninput="p()" placeholder="年"><input id="f_csM" oninput="p()" placeholder="月"><input id="f_csD" oninput="p()" placeholder="日"></div></div>
       <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市"></div>
-      <span style="display:none"><input id="f_q22"><input id="f_q23"><input id="f_q24"><input id="f_q25"><input id="f_q26"><input id="f_q29"><input id="f_q30"><input id="f_q31"><input id="f_q32"><input id="f_q39"><input id="f_q41"><input id="f_q33"><input id="f_coop1"><input id="f_coop2"></span>
+      <span style="display:none"><input id="f_q22"><input id="f_q23"><input id="f_q24"><input id="f_q25"><input id="f_q26"><input id="f_q29"><input id="f_q30"><input id="f_q31"><input id="f_q32"><input id="f_q39"><input id="f_q41"><input id="f_q33"><input id="f_coop1"><input id="f_coop2"><input id="f_staffF"><input id="f_staffT"></span>
       <div class="fg"><label>終了</label><div style="display:flex;gap:4px;"><input id="f_ceY" oninput="p()" placeholder="年"><input id="f_ceM" oninput="p()" placeholder="月"><input id="f_ceD" oninput="p()" placeholder="日"></div></div>
     </div>
     <div class="fs"><div class="fs-title">2 (2)　従事すべき業務の内容</div>
@@ -919,6 +919,7 @@ ${v('f_fam5Lv')==='無'?'<div class="cirs" style="left:113.48mm;top:253.00mm"></
 <div class="av avg" style="left:122.00mm;top:257.95mm;font-size:8pt;transform:translateX(-50%);">${f('f_fam6Nat')}</div>
 <div class="av avg" style="left:150.00mm;top:257.95mm;font-size:8pt;transform:translateX(-50%);">${f('f_fam6Wk')}</div>
 <div class="av avg" style="left:182.00mm;top:257.95mm;font-size:8pt;transform:translateX(-50%);">${f('f_fam6Cd')}</div>
+
 <div class="pickhot cb-click" style="left:171.70mm;top:174.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_crime','有')" title="f_crime=有"></div>
 <div class="pickhot cb-click" style="left:171.70mm;top:174.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_crime','無')" title="f_crime=無"></div>
 <div class="pickhot cb-click" style="left:108.67mm;top:214.48mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_fam1Lv','有')" title="f_fam1Lv=有"></div>
@@ -976,6 +977,7 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:35.79mm;top:255.73mm;f
 <div class="av avg" style="left:127.62mm;top:233.41mm;font-size:9.5pt;transform:translateX(-50%);">${f('f_ti2Ope')}</div>
 <div class="av avg" style="left:36.91mm;top:282.29mm;font-size:10.01pt;">${f('f_totalY')}</div>
 <div class="av avg" style="left:57.83mm;top:282.29mm;font-size:10.01pt;">${f('f_totalM')}</div>
+
 <div class="pickhot cb-click" style="left:110.05mm;top:138.02mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jp','jisshu')" title="f_jp=jisshu"></div>
 <div class="pickhot cb-click" style="left:25.79mm;top:108.47mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jp','policy')" title="f_jp=policy"></div>
 <div class="pickhot cb-click" style="left:110.05mm;top:125.77mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_jpLoc','fr')" title="f_jpLoc=fr"></div>
@@ -1004,8 +1006,10 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:35.79mm;top:255.73mm;f
 <div class="av avg" style="left:32.09mm;top:187.17mm;font-size:9.3pt;">${f('f_agAddr')}</div>
 <div class="av avg" style="left:43.77mm;top:196.20mm;font-size:9.3pt;">${f('f_agTel')}</div>
 <div class="av avg" style="left:131.97mm;top:196.20mm;font-size:9.3pt;">${f('f_agCel')}</div>
-<div class="cir" style="left:176.68mm;top:22.63mm"></div>
-<div class="cir" style="left:170.63mm;top:63.12mm"></div>
+${v('f_a22')==='有'?'<div class="cir" style="left:22.06mm;top:22.63mm"></div>':''}
+${v('f_a22')==='無'?'<div class="cir" style="left:176.99mm;top:22.63mm"></div>':''}
+${v('f_a23')==='有'?'<div class="cir" style="left:22.27mm;top:63.12mm"></div>':''}
+${v('f_a23')==='無'?'<div class="cir" style="left:170.63mm;top:63.12mm"></div>':''}
 <div class="cir" style="left:170.78mm;top:78.90mm"></div>
 <div class="cir" style="left:170.63mm;top:116.05mm"></div>
 <div class="av avg" style="left:63.85mm;top:23.07mm;font-size:8.8pt;">${f('f_q22Org')}</div>
@@ -1051,6 +1055,12 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:35.79mm;top:255.73mm;f
 <div class="av avg" style="left:138.20mm;top:166.45mm;font-size:7.6pt;transform:translateX(-50%);">${f('f_wk6OutM')}</div>
 <div class="av avg" style="left:166.07mm;top:166.45mm;font-size:7.2pt;transform:translateX(-50%);">${f('f_wk6Nm')}</div>
 
+
+<div class="pickhot cb-click" style="left:21.26mm;top:21.83mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','有')" title="f_a22=有"></div>
+<div class="pickhot cb-click" style="left:176.19mm;top:21.83mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','無')" title="f_a22=無"></div>
+
+<div class="pickhot cb-click" style="left:21.47mm;top:62.32mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','有')" title="f_a23=有"></div>
+<div class="pickhot cb-click" style="left:169.83mm;top:62.32mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','無')" title="f_a23=無"></div>
 
 </div>
 <div class="doc docabs" id="docP4">
@@ -1116,6 +1126,7 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:167.70mm;top:138.37mm"></div>'
 <div class="av avg" style="left:115.11mm;top:283.85mm;font-size:7.81pt;transform:translateX(-50%);">${f('f_jaY')}</div>
 <div class="av avg" style="left:133.13mm;top:283.85mm;font-size:7.81pt;transform:translateX(-50%);">${f('f_jaM')}</div>
 <div class="av avg" style="left:149.14mm;top:283.85mm;font-size:7.81pt;transform:translateX(-50%);">${f('f_jaD')}</div>
+
 <div class="pickhot cb-click" style="left:162.32mm;top:88.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_hoursEq','有')" title="f_hoursEq=有"></div>
 <div class="pickhot cb-click" style="left:165.81mm;top:88.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_hoursEq','無')" title="f_hoursEq=無"></div>
 <div class="pickhot cb-click" style="left:162.32mm;top:118.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_payEq','有')" title="f_payEq=有"></div>
@@ -1180,8 +1191,14 @@ ${v('f_ins2')==='有'?'<div class="cir" style="left:120.63mm;top:115.87mm"></div
 <div class="cir" style="left:163.97mm;top:254.39mm;width:6.15mm;height:4.64mm;"></div>
 <div class="cir" style="left:163.07mm;top:265.11mm;width:6.15mm;height:4.64mm;"></div>
 <div class="cir" style="left:163.07mm;top:284.06mm;width:6.15mm;height:4.65mm;"></div>
+
+${v('f_ins1')==='無'?'<div class="cir" style="left:120.64mm;top:109.82mm"></div>':''}
+${v('f_ins2')==='無'?'<div class="cir" style="left:120.64mm;top:115.87mm"></div>':''}
+
 <div class="pickhot cb-click" style="left:119.94mm;top:109.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins1','有')" title="f_ins1=有"></div>
+<div class="pickhot cb-click" style="left:119.84mm;top:109.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins1','無')" title="f_ins1=無"></div>
 <div class="pickhot cb-click" style="left:119.83mm;top:115.07mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','有')" title="f_ins2=有"></div>
+<div class="pickhot cb-click" style="left:119.84mm;top:115.07mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ins2','無')" title="f_ins2=無"></div>
 
 </div>
 <div class="doc docabs" id="docP6">
@@ -1245,6 +1262,7 @@ ${v('f_q29')==='有'?'<div class="cir" style="left:50.37mm;top:125.53mm"></div>'
 <div class="cir" style="left:162.28mm;top:173.41mm;width:4.00mm;height:4.18mm;"></div>
 <div class="cir" style="left:126.56mm;top:178.14mm;width:4.00mm;height:4.18mm;"></div>
 <div class="cir" style="left:162.17mm;top:189.12mm;width:4.00mm;height:4.18mm;"></div>
+
 <div class="pickhot cb-click" style="left:161.36mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','有')" title="f_q22=有"></div>
 <div class="pickhot cb-click" style="left:163.34mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','無')" title="f_q22=無"></div>
 <div class="pickhot cb-click" style="left:161.36mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q23','有')" title="f_q23=有"></div>
@@ -1297,6 +1315,7 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:160.17mm;top:38.40mm"></div>'
 <div class="av avg" style="left:136.06mm;top:271.61mm;font-size:8.5pt;transform:translateX(-100%);">${f('f_oSigY')}</div>
 <div class="av avg" style="left:149.96mm;top:271.61mm;font-size:8.5pt;transform:translateX(-100%);">${f('f_oSigM')}</div>
 <div class="av avg" style="left:161.95mm;top:271.61mm;font-size:8.5pt;transform:translateX(-100%);">${f('f_oSigD')}</div>
+
 <div class="pickhot cb-click" style="left:156.77mm;top:11.71mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q39','有')" title="f_q39=有"></div>
 <div class="pickhot cb-click" style="left:159.37mm;top:11.71mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q39','無')" title="f_q39=無"></div>
 <div class="pickhot cb-click" style="left:156.77mm;top:37.60mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','有')" title="f_q41=有"></div>
