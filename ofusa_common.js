@@ -376,20 +376,20 @@ async function printBoth(){
       setTimeout(function(){ window.removeEventListener('message',h); resolve(null); },1000);
     });
   }
-  if(typeof showToast==='function') showToast('📄 '+pair.selfNo+'号と'+pair.otherNo+'号をまとめています…少々お待ちください');
+  var _tst=(typeof showToast==='function')?showToast('📄 '+pair.selfNo+'号と'+pair.otherNo+'号をまとめています…',0):null;
   var q = info&&info.caseId ? ('?caseId='+encodeURIComponent(info.caseId)) : '';
   var ifr=document.createElement('iframe');
   ifr.style.cssText='position:fixed;left:-9999px;top:0;width:1024px;height:1400px;border:0;';
   ifr.src=pair.other+q;
   document.body.appendChild(ifr);
-  await new Promise(function(res){ ifr.onload=function(){ setTimeout(res,400); }; });
+  await new Promise(function(res){ ifr.onload=function(){ setTimeout(res,150); }; });
   try{
     var idoc=ifr.contentDocument, iwin=ifr.contentWindow;
     if(info&&info.caseId&&iwin){
       try{ iwin.postMessage({type:'SELECT_CASE', info:info}, '*'); }catch(e){}
       if(typeof iwin.loadFromDB==='function'){ try{ await iwin.loadFromDB(info); }catch(e){} }
     }
-    await new Promise(function(r){ setTimeout(r,2000); });
+    await new Promise(function(r){ setTimeout(r,900); });
     var otherDocs=idoc.querySelectorAll('.doc');
     if(!otherDocs.length){ if(typeof showToast==='function') showToast('⚠️ 相方書類の読込に失敗しました'); if(ifr.parentNode)ifr.parentNode.removeChild(ifr); return; }
     var host=document.createElement('div');
@@ -409,17 +409,21 @@ async function printBoth(){
     }catch(_e){}
     // 印刷後クリーンアップ
     function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); window.removeEventListener('afterprint',cleanup); }
+    if(_tst&&_tst.remove) _tst.remove();
+    if(typeof clearToasts==='function') clearToasts();
     window.addEventListener('afterprint',cleanup);
     window.print();
     setTimeout(cleanup, 3000);
   }catch(e){
     console.error('[printBoth]',e);
+    if(_tst&&_tst.remove) _tst.remove();
     if(typeof showToast==='function') showToast('⚠️ まとめ印刷でエラー: '+e.message);
     if(ifr&&ifr.parentNode) ifr.parentNode.removeChild(ifr);
   }
 }
 
-function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function showToast(msg,ms){const t=document.createElement('div');t.className='__toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);var d=(ms===undefined?3000:ms);if(d>0)setTimeout(function(){t.remove();},d);return t;}
+function clearToasts(){document.querySelectorAll('.__toast').forEach(function(t){t.remove();});}
 
 // ===== 文字サイズ =====
 let _fontSize=8.5,_editMode=false,_editLock=false;
