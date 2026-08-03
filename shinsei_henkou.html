@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.32</div>
+    <div class="ver">ver.20260801.35</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -541,7 +541,7 @@
       <div class="fg"><label>(10) 支援責任者名</label><input id="f_roSm" oninput="p()"></div>
       <div class="fg"><label>(11) 支援担当者名</label><input id="f_roSs" oninput="p()"></div>
       <div class="fg"><label>(12) 対応可能言語</label><input id="f_roLang" oninput="p()"></div>
-      <div class="fg"><label>(13) 支援委託手数料（月額／人・円）</label><input id="f_roFee" oninput="p()"></div>
+      <div class="fg"><label>(13) 支援委託手数料（月額／人・円）</label><input id="f_fee" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">記名／申請書作成年月日</div>
       <div class="fg"><label>特定技能所属機関名</label><input id="f_o4coName" oninput="p()"></div>
@@ -1336,12 +1336,11 @@ ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;fon
 <div class="av avg" style="left:150.13mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegD')}</div>
 <div class="av avg" style="left:76.26mm;top:229.72mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roAddr')}</div>
 <div class="av avg" style="left:163.98mm;top:229.72mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roTel')}</div>
-<div class="av avg" style="left:42.00mm;top:249.60mm;font-size:8pt;transform:translateX(-50%);">${f('f_roOffice')}</div>
-<div class="av avg" style="left:150.00mm;top:249.60mm;font-size:8pt;transform:translateX(-50%);">${f('f_roOfficeAddr')}</div>
-<div class="av avg" style="left:50.00mm;top:254.30mm;font-size:8pt;transform:translateX(-50%);">${f('f_roSm')}</div>
-<div class="av avg" style="left:140.00mm;top:254.30mm;font-size:8pt;transform:translateX(-50%);">${f('f_roSs')}</div>
-<div class="av avg" style="left:55.00mm;top:258.90mm;font-size:8pt;transform:translateX(-50%);">${f('f_roLang')}</div>
-<div class="av avm" style="left:166.82mm;top:257.25mm;font-size:6.48pt;transform:translateX(-100%);">${f('f_roFee')}</div>
+<div class="av avg" style="left:41.00mm;top:247.60mm;font-size:7.5pt;">${f('f_roOffice')}</div>
+<div class="av avg" style="left:121.00mm;top:247.60mm;font-size:7.5pt;">${f('f_roOfficeAddr')}</div>
+<div class="av avg" style="left:31.00mm;top:252.60mm;font-size:7.5pt;">${f('f_roSm')}</div>
+<div class="av avg" style="left:115.00mm;top:252.60mm;font-size:7.5pt;">${f('f_roSs')}</div>
+<div class="av avg" style="left:31.00mm;top:257.60mm;font-size:7.5pt;">${f('f_roLang')}</div>
 <div class="av avg" style="left:42.40mm;top:269.50mm;font-size:7.2pt;">${f('f_o4coName')}</div>
 <div class="av avg" style="left:64.73mm;top:269.50mm;font-size:7.2pt;">${f('f_coRep')}</div>
 <div class="av avg" style="left:138.57mm;top:269.50mm;font-size:7.2pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
@@ -1398,7 +1397,7 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:178.29mm;top:44.82mm"></div>'
 <div class="pickhot cb-click" style="left:175.28mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','有')" title="f_q41=有"></div>
 <div class="pickhot cb-click" style="left:177.49mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','無')" title="f_q41=無"></div>
 
-<div class="av avg" style="left:185.50mm;top:258.90mm;font-size:8pt;transform:translateX(-100%);">${ff('f_fee')}</div>
+<div class="av avg" style="left:185.00mm;top:257.60mm;font-size:8pt;transform:translateX(-100%);">${ff('f_fee')}</div>
 
 </div>
 `;
@@ -1473,7 +1472,7 @@ function resetForm(){
   // --- shinsei_henkou_org4 ---
   {
   const ids_o4=['f_roName','f_roCorp','f_roEi','f_roAddr','f_roTel','f_roRep','f_roRegNo',
-    'f_roRegY','f_roRegM','f_roRegD','f_roOffice','f_roOfficeAddr','f_roSm','f_roSs','f_roLang','f_roFee',
+    'f_roRegY','f_roRegM','f_roRegD','f_roOffice','f_roOfficeAddr','f_roSm','f_roSs','f_roLang','f_fee',
     'f_o4coName','f_coRep','f_oSigY','f_oSigM','f_oSigD'];
   G38.forEach(([k,ja,en,dl])=>{ ids_o4.push('f_'+k); if(dl) ids_o4.push('f_'+k+'d'); });
   SP.forEach(([k])=>ids_o4.push('f_'+k));
