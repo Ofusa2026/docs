@@ -429,16 +429,20 @@ async function printBoth(){
       document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
     }catch(_e){}
     // 印刷後クリーンアップ
-    function cleanup(){ document.title=orig; var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode)p.parentNode.removeChild(p); var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
+    function cleanup(){ document.title=orig; try{ if(window.__combinedMO){ window.__combinedMO.disconnect(); window.__combinedMO=null; } }catch(_e){} var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode)p.parentNode.removeChild(p); var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
     _killProgress();
     if(typeof clearToasts==='function') clearToasts();
     // iframe側(相方書類)に出たトーストも消す
     try{ if(ifr&&ifr.contentDocument){ ifr.contentDocument.querySelectorAll('.__toast,#__combinedProgress').forEach(function(t){t.remove();}); } }catch(_e){}
+    // 印刷の瞬間に残存トースト/進捗を全て物理削除（@media printに依存しない確実策）
+    function _nukeToasts(){ document.querySelectorAll('.__toast,#__combinedProgress').forEach(function(t){ if(t&&t.parentNode) t.parentNode.removeChild(t); }); }
+    _nukeToasts();
+    // 印刷ダイアログ表示中に他処理がトーストを再生成しても即座に消す
+    try{ window.__combinedMO=new MutationObserver(_nukeToasts); window.__combinedMO.observe(document.body,{childList:true,subtree:true}); }catch(_e){}
     window.addEventListener('afterprint',cleanup);
     // 進捗表示が確実にDOMから消え、再描画されてから印刷する
     await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(r,200); }); }); });
-    _killProgress();
-    if(typeof clearToasts==='function') clearToasts();
+    _nukeToasts();
     window.print();
     setTimeout(cleanup, 3000);
   }catch(e){
