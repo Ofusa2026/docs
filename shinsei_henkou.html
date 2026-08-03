@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.27</div>
+    <div class="ver">ver.20260801.30</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1413,11 +1413,11 @@ ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;fon
 <div class="av avg" style="left:150.13mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegD')}</div>
 <div class="av avg" style="left:76.26mm;top:229.72mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roAddr')}</div>
 <div class="av avg" style="left:163.98mm;top:229.72mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roTel')}</div>
-<div class="av avg" style="left:59.93mm;top:247.49mm;font-size:5.16pt;white-space:normal;width:45.91mm;line-height:1.15!important;">${f('f_roOffice')}</div>
-<div class="av avg" style="left:130.86mm;top:247.26mm;font-size:6.48pt;white-space:normal;width:62mm;line-height:1.15!important;">${f('f_roOfficeAddr')}</div>
-<div class="av avg" style="left:64.71mm;top:252.25mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roSm')}</div>
-<div class="av avg" style="left:147.80mm;top:252.25mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roSs')}</div>
-<div class="av avg" style="left:39.81mm;top:256.42mm;font-size:5.16pt;white-space:normal;width:60.22mm;line-height:1.15!important;">${f('f_roLang')}</div>
+<div class="av avg" style="left:42.00mm;top:249.60mm;font-size:8pt;transform:translateX(-50%);">${f('f_roOffice')}</div>
+<div class="av avg" style="left:150.00mm;top:249.60mm;font-size:8pt;transform:translateX(-50%);">${f('f_roOfficeAddr')}</div>
+<div class="av avg" style="left:50.00mm;top:254.30mm;font-size:8pt;transform:translateX(-50%);">${f('f_roSm')}</div>
+<div class="av avg" style="left:140.00mm;top:254.30mm;font-size:8pt;transform:translateX(-50%);">${f('f_roSs')}</div>
+<div class="av avg" style="left:55.00mm;top:258.90mm;font-size:8pt;transform:translateX(-50%);">${f('f_roLang')}</div>
 <div class="av avm" style="left:166.82mm;top:257.25mm;font-size:6.48pt;transform:translateX(-100%);">${f('f_roFee')}</div>
 <div class="av avg" style="left:42.40mm;top:269.50mm;font-size:7.2pt;">${f('f_o4coName')}</div>
 <div class="av avg" style="left:64.73mm;top:269.50mm;font-size:7.2pt;">${f('f_coRep')}</div>
@@ -1475,7 +1475,7 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:178.29mm;top:44.82mm"></div>'
 <div class="pickhot cb-click" style="left:175.28mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','有')" title="f_q41=有"></div>
 <div class="pickhot cb-click" style="left:177.49mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','無')" title="f_q41=無"></div>
 
-<div class="av avg" style="left:185.90mm;top:256.10mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_fee')}</div>
+<div class="av avg" style="left:185.50mm;top:258.90mm;font-size:8pt;transform:translateX(-100%);">${f('f_fee')}</div>
 
 </div>
 `;
@@ -1624,6 +1624,11 @@ async function loadFromDB(passedInfo){
       if(pd.total_stay_year!=null && pd.total_stay_year!=='') s('f_totalY',String(pd.total_stay_year));
       if(pd.total_stay_month!=null && pd.total_stay_month!=='') s('f_totalM',String(pd.total_stay_month));
     }
+    // 6ページ 有無項目のデフォルト設定（支援体制まわりは有、保証金・違約金・不正は無）
+    (function(){ var _sd=function(id,v){ var e=document.getElementById(id); if(e && !e.value) e.value=v; };
+      _sd('f_q24','有');_sd('f_q25','有');_sd('f_q26','有');_sd('f_q27','有');_sd('f_q28','有');_sd('f_q29','有');_sd('f_q30','有');_sd('f_q31','有');_sd('f_q32','有');_sd('f_q33','有');_sd('f_q36','有');_sd('f_q37','有');_sd('f_coop1','有');_sd('f_coop2','有');_sd('f_smYN','有');_sd('f_ssYN','有');
+      _sd('f_q22','無');_sd('f_q23','無');_sd('f_q35','無');
+    })();
     // 在日親族: データが無い/無の場合は「無」を既定にし、1行目に「該当なし」を入れる。
     (function(){
       var yn=document.getElementById('f_famYN'), nm=document.getElementById('f_fam1Nm');
@@ -1848,7 +1853,7 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     // 5 登録支援機関：名前の揺れ（「株式会社KMT(82)」等）は findSupportOrg が3段照合で吸収する
     if(cas&&cas.org&&typeof findSupportOrg==='function'){
-      const org=await findSupportOrg(cas.org,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages');
+      const org=await findSupportOrg(cas.org,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages,offices,support_staff_list,so_office_idx');
       if(org){
         s('f_roName',org.name||'');
         s('f_roCorp',org.corp_no||'');
@@ -1863,6 +1868,19 @@ async function loadFromDB(passedInfo){
         // _ymd() はハイフン形式しか解さないため、8桁数字だと年月日が空欄になっていた。
         const rd=_regYmd(org.reg_date); if(rd[0]){ s('f_roRegY',rd[0]); s('f_roRegM',rd[1]); s('f_roRegD',rd[2]); }
         s('f_roSm',org.support_manager||'');
+        // 支援担当者名: 支援計画書の通り（support_staff_listの先頭 or 「支援計画書のとおり」）
+        (function(){
+          var ss='';
+          try{ if(org.support_staff_list){ var _l=(typeof org.support_staff_list==='string')?JSON.parse(org.support_staff_list):org.support_staff_list; if(Array.isArray(_l)&&_l.length){ ss=(_l[0].name||_l[0])||''; } } }catch(_e){}
+          s('f_roSs', ss || '支援計画書のとおり');
+        })();
+        // 登録支援機関の事業所名・所在地: offices（事業所配列）から。無ければ本部名/住所。
+        (function(){
+          var offName='', offAddr='';
+          try{ if(org.offices){ var _o=(typeof org.offices==='string')?JSON.parse(org.offices):org.offices; var _oi=parseInt(cas&&cas.so_office_idx||0)||0; if(Array.isArray(_o)&&_o.length){ var _t=_o[_oi]||_o[0]; offName=_t.name||_t.officeName||''; offAddr=_t.address||_t.addr||((_t.pref||'')+(_t.city||'')+(_t.address_detail||'')); } } }catch(_e){}
+          s('f_roOffice', offName || org.name || '');
+          s('f_roOfficeAddr', offAddr || org.address || ((org.pref||'')+(org.city||'')));
+        })();
         s('f_roLang',org.languages||'');
       }
     }
