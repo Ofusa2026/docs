@@ -427,9 +427,12 @@ async function printBoth(){
     function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
     if(_tst&&_tst.remove) _tst.remove();
     if(typeof clearToasts==='function') clearToasts();
-    // トーストが確実にDOM/描画から消えてから印刷する（プレビューに残らないように）
-    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(r,120); }); }); });
+    // iframe側(相方書類)に出たトーストも消す
+    try{ if(ifr&&ifr.contentDocument){ ifr.contentDocument.querySelectorAll('.__toast').forEach(function(t){t.remove();}); } }catch(_e){}
     window.addEventListener('afterprint',cleanup);
+    // トーストが確実にDOMから消え、再描画されてから印刷（プレビューにもPDFにも残らないように）
+    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(r,200); }); }); });
+    if(typeof clearToasts==='function') clearToasts();
     window.print();
     setTimeout(cleanup, 3000);
   }catch(e){
