@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260731.11</div>
+    <div class="ver">ver.20260731.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -1285,7 +1285,7 @@ async function loadFromDB(passedInfo){
   try{
     // 1. 案件基本情報 + 人材データ（persons）を同時取得
     const [cases, persons] = await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end,doc_create_date&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     const cas = cases && cases[0];
@@ -1383,6 +1383,10 @@ async function loadFromDB(passedInfo){
 
     // 5. 今日の日付を作成日にセット（未入力の場合）
     const today = new Date();
+    if(typeof cas!=='undefined' && cas && cas.doc_create_date){
+      const _dp=String(cas.doc_create_date).match(/(\d{4})[-\/年]?\s*(\d{1,2})[-\/月]?\s*(\d{1,2})/);
+      if(_dp){ const _sc=(id,v)=>{const e=document.getElementById(id); if(e) e.value=v;}; _sc('es_createY',_dp[1]); _sc('es_createM',String(parseInt(_dp[2]))); _sc('es_createD',String(parseInt(_dp[3]))); }
+    }
     const cyEl=document.getElementById('es_createY'); if(cyEl && !cyEl.value) cyEl.value=today.getFullYear();
     const cmEl=document.getElementById('es_createM'); if(cmEl && !cmEl.value) cmEl.value=today.getMonth()+1;
     const cdEl=document.getElementById('es_createD'); if(cdEl && !cdEl.value) cdEl.value=today.getDate();
@@ -1796,6 +1800,8 @@ if(!window._selectCaseListenerAdded){
     var pay=0; PAY.forEach(function(id){pay+=val([id]);});
     var ded=0; DED.forEach(function(g){ded+=val(g);});
     var net=pay-ded;
+    var hasPayInput = PAY.some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
+    if(!hasPayInput) return;
     set('es_salaryTotal',pay); set('es_deductTotal',ded); set('es_netPay',net);
   }
   function set(id,v){

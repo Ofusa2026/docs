@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260731.09T05</div>
+    <div class="ver">ver.20260731.10T05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -2083,6 +2083,8 @@ function _dtAfterRender(){ dtRenderBg(); dtApplyAll(); }
     var pay=0; PAY.forEach(function(id){pay+=val([id]);});
     var ded=0; DED.forEach(function(g){ded+=val(g);});
     var net=pay-ded;
+    var hasPayInput = PAY.some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
+    if(!hasPayInput) return;
     set('es_salaryTotal',pay); set('es_deductTotal',ded); set('es_netPay',net);
   }
   function set(id,v){
