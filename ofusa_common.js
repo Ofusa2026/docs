@@ -403,8 +403,9 @@ function enableDocEditing(on){
 let _styleMode = false;
 let _styleTarget = null;
 
+// ver.20260801: スタイル編集/位置調整(文字サイズ・移動)をDB保存対象化
 function toggleStyleMode(){
-  _styleMode = !_styleMode;
+  _styleMode = !_styleMode; window._styleMode=_styleMode;
   const btn = document.getElementById('styleModeBtn');
   const panel = document.getElementById('stylePanel');
   const area = document.getElementById('pageArea');
@@ -427,6 +428,41 @@ function toggleStyleMode(){
     document.querySelectorAll('.__style-selected').forEach(el=>el.classList.remove('__style-selected'));
   }
 }
+
+function spFont(d){
+  if(!_styleTarget) return;
+  var cur=parseFloat(getComputedStyle(_styleTarget).fontSize)||12;
+  _styleTarget.style.fontSize=(cur+d*(96/72)).toFixed(1)+'px';
+  window._styleDirty=true;
+}
+function spMove(dx,dy){
+  if(!_styleTarget) return;
+  var el=_styleTarget;
+  if(getComputedStyle(el).position==='static'){ el.style.position='relative'; }
+  var mm=96/25.4;
+  el.style.left=((parseFloat(el.style.left)||0)+dx*mm).toFixed(1)+'px';
+  el.style.top=((parseFloat(el.style.top)||0)+dy*mm).toFixed(1)+'px';
+  window._styleDirty=true;
+}
+// スタイル編集モード中は選択要素をドラッグで移動
+(function(){
+  var drag=null;
+  document.addEventListener('mousedown', function(e){
+    if(!window._styleMode || !_styleTarget) return;
+    if(!e.target.closest('#stylePanel') && (e.target===_styleTarget || _styleTarget.contains(e.target))){
+      e.preventDefault();
+      if(getComputedStyle(_styleTarget).position==='static'){ _styleTarget.style.position='relative'; }
+      drag={sx:e.clientX, sy:e.clientY, l:parseFloat(_styleTarget.style.left)||0, t:parseFloat(_styleTarget.style.top)||0};
+    }
+  }, true);
+  document.addEventListener('mousemove', function(e){
+    if(!drag||!_styleTarget) return;
+    _styleTarget.style.left=(drag.l+(e.clientX-drag.sx)).toFixed(1)+'px';
+    _styleTarget.style.top=(drag.t+(e.clientY-drag.sy)).toFixed(1)+'px';
+  }, true);
+  document.addEventListener('mouseup', function(){ if(drag){ window._styleDirty=true; } drag=null; }, true);
+})();
+
 
 function _styleClickHandler(e){
   if(!_styleMode) return;
@@ -486,6 +522,7 @@ function applyStyle(){
   _styleTarget.style.color = textColor==='#000000' ? '' : textColor;
   _styleTarget.style.textDecoration = underline==='none' ? '' : underline==='double' ? 'underline double' : 'underline';
   _styleTarget.style.padding = `${pt}px ${pr}px ${pb}px ${pl}px`;
+  window._styleDirty=true;
 }
 
 function clearStyle(){
@@ -529,6 +566,16 @@ function _injectStylePanel(){
         <option value="double">二重線</option>
       </select>
     </label>
+    <span style="color:#64748b;">｜</span>
+    <label>文字: <button type="button" onclick="spFont(-0.5)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 7px;cursor:pointer;">A−</button>
+      <button type="button" onclick="spFont(0.5)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 7px;cursor:pointer;">A＋</button></label>
+    <span style="color:#64748b;">｜</span>
+    <label>位置:
+      <button type="button" onclick="spMove(0,-0.5)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 6px;cursor:pointer;">↑</button>
+      <button type="button" onclick="spMove(0,0.5)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 6px;cursor:pointer;">↓</button>
+      <button type="button" onclick="spMove(-0.5,0)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 6px;cursor:pointer;">←</button>
+      <button type="button" onclick="spMove(0.5,0)" style="background:#334155;color:#e2e8f0;border:none;padding:2px 6px;cursor:pointer;">→</button>
+      <span style="color:#94a3b8;font-size:10px;">(ドラッグも可)</span></label>
     <span style="color:#64748b;">｜</span>
     <label>余白(上): <input id="sp_paddingT" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
     <label>下: <input id="sp_paddingB" type="number" value="0" style="width:36px;background:#334155;color:#e2e8f0;border:none;padding:2px;"></label>
@@ -1125,7 +1172,7 @@ async function saveFormGeneric(docKey, opts){
     // ※ toggleEditMode() は編集終了時に _htmlFrozen=true を立てるため、
     //   「✏️直接編集をON→編集→OFF→DB保存」でも保存対象になる（検証済み）。
     try{
-      if(window._htmlFrozen || (typeof _editMode !== 'undefined' && _editMode)){
+      if(window._htmlFrozen || (typeof _editMode !== 'undefined' && _editMode) || window._styleDirty){
         const _area = document.getElementById('pageArea');
         if(_area && info.caseId){
           const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
