@@ -349,6 +349,76 @@ function doPrint(){
   try{ window.print(); }
   finally{ setTimeout(function(){ document.title=orig; }, 1000); }
 }
+
+/* ===== 1-5 と 1-6 を1つのPDFにまとめて印刷 ===== */
+function _pairFile(){
+  // 現在のファイル名から相方(1-5⇔1-6)と言語サフィックスを判定
+  var fn=(location.pathname.split('/').pop()||'').replace(/\?.*$/,'');
+  var m=fn.match(/^1_(5|6)(_[a-z]+)?\.html$/i);
+  if(!m) return null;
+  var cur=m[1], suf=m[2]||'';
+  var other=(cur==='5')?'6':'5';
+  return { self:'1_'+cur+suf+'.html', other:'1_'+other+suf+'.html', selfNo:cur, otherNo:other };
+}
+async function printBoth(){
+  var pair=_pairFile();
+  if(!pair){ if(typeof showToast==='function') showToast('⚠️ この様式ではまとめ印刷は使えません'); return; }
+  var info = window._lastCaseInfo || null;
+  if((!info||!info.caseId)){
+    var sel=document.getElementById('caseSelect');
+    if(sel&&sel.value){ try{ info=JSON.parse(sel.value); }catch(e){} }
+  }
+  if(!info||!info.caseId){
+    info = await new Promise(function(resolve){
+      function h(e){ if(e.data&&e.data.type==='CASE_INFO_RESPONSE'){ window.removeEventListener('message',h); resolve(e.data.info||null); } }
+      window.addEventListener('message',h);
+      try{ window.parent.postMessage({type:'GET_CASE_INFO'},'*'); }catch(e){}
+      setTimeout(function(){ window.removeEventListener('message',h); resolve(null); },1000);
+    });
+  }
+  if(typeof showToast==='function') showToast('📄 '+pair.selfNo+'号と'+pair.otherNo+'号をまとめています…少々お待ちください');
+  var q = info&&info.caseId ? ('?caseId='+encodeURIComponent(info.caseId)) : '';
+  var ifr=document.createElement('iframe');
+  ifr.style.cssText='position:fixed;left:-9999px;top:0;width:1024px;height:1400px;border:0;';
+  ifr.src=pair.other+q;
+  document.body.appendChild(ifr);
+  await new Promise(function(res){ ifr.onload=function(){ setTimeout(res,400); }; });
+  try{
+    var idoc=ifr.contentDocument, iwin=ifr.contentWindow;
+    if(info&&info.caseId&&iwin){
+      try{ iwin.postMessage({type:'SELECT_CASE', info:info}, '*'); }catch(e){}
+      if(typeof iwin.loadFromDB==='function'){ try{ await iwin.loadFromDB(info); }catch(e){} }
+    }
+    await new Promise(function(r){ setTimeout(r,2000); });
+    var otherDocs=idoc.querySelectorAll('.doc');
+    if(!otherDocs.length){ if(typeof showToast==='function') showToast('⚠️ 相方書類の読込に失敗しました'); if(ifr.parentNode)ifr.parentNode.removeChild(ifr); return; }
+    var host=document.createElement('div');
+    host.id='__combinedPrintArea';
+    // 相方のstyleを取り込み（レイアウト維持）
+    idoc.querySelectorAll('style').forEach(function(st){ host.appendChild(st.cloneNode(true)); });
+    otherDocs.forEach(function(d){ var c=d.cloneNode(true); host.appendChild(c); });
+    // DOM順で 1-5 → 1-6 になるよう配置: 相方が5号なら本体の前、6号なら後ろ
+    var pageArea=document.getElementById('pageArea')||document.querySelector('.main')||document.body;
+    if(pair.otherNo==='5'){ pageArea.parentNode.insertBefore(host, pageArea); }
+    else { if(pageArea.nextSibling) pageArea.parentNode.insertBefore(host, pageArea.nextSibling); else pageArea.parentNode.appendChild(host); }
+    if(ifr.parentNode) ifr.parentNode.removeChild(ifr);
+    var orig=document.title;
+    try{
+      var who=(typeof _printApplicantName==='function')?_printApplicantName():'';
+      document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
+    }catch(_e){}
+    // 印刷後クリーンアップ
+    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); window.removeEventListener('afterprint',cleanup); }
+    window.addEventListener('afterprint',cleanup);
+    window.print();
+    setTimeout(cleanup, 3000);
+  }catch(e){
+    console.error('[printBoth]',e);
+    if(typeof showToast==='function') showToast('⚠️ まとめ印刷でエラー: '+e.message);
+    if(ifr&&ifr.parentNode) ifr.parentNode.removeChild(ifr);
+  }
+}
+
 function showToast(msg){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 // ===== 文字サイズ =====

@@ -74,3 +74,14 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
   /* 署名位置を示すためのガイド点線は画面用。印刷・PDFには出さない（署名欄の外枠は残る） */
   .sign-field-area { border-top: none !important; }
 }
+
+/* まとめ印刷: 結合エリアがある時は元のpage/docを隠して二重印刷を防ぐ */
+@media print{
+  body:has(#__combinedPrintArea) #pageArea{ display:none !important; }
+  body:has(#__combinedPrintArea) > .main > .doc,
+  body:has(#__combinedPrintArea) .main > #pageArea{ display:none !important; }
+  #__combinedPrintArea{ display:block !important; }
+  #__combinedPrintArea .doc{ page-break-after:always; }
+}
+#__combinedPrintArea{ display:none; }
+@media print{ #__combinedPrintArea{ display:block; } }
