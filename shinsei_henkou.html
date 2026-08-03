@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.30</div>
+    <div class="ver">ver.20260801.31</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1107,9 +1107,9 @@ ${v('f_a26')==='無'?'<div class="cir" style="left:176.60mm;top:115.10mm"></div>
 <div class="av avg" style="left:142.01mm;top:60.84mm;font-size:9.83pt;transform:translateX(-50%);">${f('f_occSub')}</div>
 <div class="av avg" style="left:79.21mm;top:84.09mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_hoursW')}</div>
 <div class="av avg" style="left:142.27mm;top:84.09mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_hoursM')}</div>
-<div class="av avg" style="left:150.17mm;top:99.12mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_pay')}</div>
-<div class="av avg" style="left:78.57mm;top:105.95mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_payH')}</div>
-<div class="av avg" style="left:110.06mm;top:111.37mm;font-size:8.28pt;transform:translateX(-100%);">${f('f_payJp')}</div>
+<div class="av avg" style="left:150.17mm;top:99.12mm;font-size:8.28pt;transform:translateX(-100%);">${ff('f_pay')}</div>
+<div class="av avg" style="left:78.57mm;top:105.95mm;font-size:8.28pt;transform:translateX(-100%);">${ff('f_payH')}</div>
+<div class="av avg" style="left:110.06mm;top:111.37mm;font-size:8.28pt;transform:translateX(-100%);">${ff('f_payJp')}</div>
 ${v('f_payWay')==='bank'?'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">■</span>':'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">□</span>'}
 ${v('f_payWay')==='cash'?'<span class="av avm" style="left:72.29mm;top:125.59mm;font-size:9.83pt;">■</span>':''}
 <div class="av avg" style="left:42.14mm;top:138.46mm;font-size:9.0pt;">${f('f_q6d')}</div>
@@ -1247,8 +1247,8 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="av avm" style="left:126.17mm;top:49.87mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_coEi')}</div>
 <div class="av avm" style="left:71.13mm;top:79.57mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coAddr')}</div>
 <div class="av avm" style="left:162.19mm;top:79.57mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coTel')}</div>
-<div class="av avm" style="left:60.35mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${f('f_capital')}</div>
-<div class="av avm" style="left:145.64mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${f('f_sales')}</div>
+<div class="av avm" style="left:60.35mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${ff('f_capital')}</div>
+<div class="av avm" style="left:145.64mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${ff('f_sales')}</div>
 <div class="av avm" style="left:72.97mm;top:94.74mm;font-size:6.96pt;transform:translateX(-100%);">${f('f_staff')}</div>
 <div class="av avg" style="left:160.08mm;top:94.64mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_rep')}</div>
 <div class="av avm" style="left:79.54mm;top:102.62mm;font-size:6.24pt;transform:translateX(-50%);">${f('f_office')}</div>
@@ -1475,7 +1475,7 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:178.29mm;top:44.82mm"></div>'
 <div class="pickhot cb-click" style="left:175.28mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','有')" title="f_q41=有"></div>
 <div class="pickhot cb-click" style="left:177.49mm;top:44.02mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q41','無')" title="f_q41=無"></div>
 
-<div class="av avg" style="left:185.50mm;top:258.90mm;font-size:8pt;transform:translateX(-100%);">${f('f_fee')}</div>
+<div class="av avg" style="left:185.50mm;top:258.90mm;font-size:8pt;transform:translateX(-100%);">${ff('f_fee')}</div>
 
 </div>
 `;
@@ -1743,7 +1743,7 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     s('f_fname',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'');
     // 業務区分は emp_set.category → cases.job_category のフォールバック（重説と同じ流儀）
-    s('f_field',es.applicantField||'');
+    s('f_field',(es.applicantField||'').replace(/分野$/,'').trim());
     // (9)電話番号: 就業場所(勤務事業所)の電話。emp_sets.orgTel→会社telの順。
     { var _offTel=(es.contactTel||es.orgTel||'').trim(); if(!_offTel){ try{ var _cr=await sb('companies?select=tel&id=eq.'+(companyId||(cas&&cas.company_id))); if(_cr&&_cr[0]) _offTel=_cr[0].tel||''; }catch(_e){} } var _ptE=document.getElementById('f_perTel'); if(_ptE && _offTel) _ptE.value=_offTel; }
     // 業種・職種番号を分野名から自動反映（例: 介護→業種40/職種41）
@@ -1804,7 +1804,7 @@ async function loadFromDB(passedInfo){
       s('f_capital',co.capital||'');
       s('f_sales',co.sales||'');
       s('f_staff',co.employees||'');
-      s('f_rep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
+      s('f_rep',(co.rep_name||co.author_name||'').trim());  // 見本準拠: 代表者は氏名のみ(役職なし)
       // ver.20260715: 労働保険番号は自動分割しない。
       // アンシスの実データは桁数がバラバラ（14桁1,135件/13桁69件/11桁60件/15桁21件/18桁17件…）で、
       // しかも「01-3-13-101341-000」のように区切り済みの値が主流。数字だけを機械的に切ると
