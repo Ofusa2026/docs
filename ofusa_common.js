@@ -427,6 +427,8 @@ async function printBoth(){
     function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
     if(_tst&&_tst.remove) _tst.remove();
     if(typeof clearToasts==='function') clearToasts();
+    // トーストが確実にDOM/描画から消えてから印刷する（プレビューに残らないように）
+    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(r,120); }); }); });
     window.addEventListener('afterprint',cleanup);
     window.print();
     setTimeout(cleanup, 3000);

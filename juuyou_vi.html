@@ -17,8 +17,14 @@
 .sec-h-vi{color:#555;font-size:9.5pt;margin-bottom:1.5mm;}
 .box{border:1px solid #000;padding:2mm 3mm;margin-bottom:2.5mm;}
 input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
-input.chk-box:checked{background:#000;}
-input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+input.chk-box:checked{background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+/* 背景グラフィックOFFでもチェックが消えないよう、印刷時は黒枠+黒レ点(背景に依存しない)で表示 */
+@media print{
+  input.chk-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  input.chk-box:checked{background:#fff !important;}
+  input.chk-box:checked::after{border-color:#000 !important;left:3px;top:0px;width:4px;height:8px;border-width:0 2px 2px 0;}
+}
 .tbl-amt{width:100%;border-collapse:collapse;font-size:10pt;}
 .tbl-amt td{padding:1mm 2mm;vertical-align:top;}
 .under{border-bottom:1px solid #000;display:inline-block;min-width:4em;padding:0 2px;}
@@ -34,7 +40,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20260715.07</div>
+    <div class="ver">ver.20260715.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>

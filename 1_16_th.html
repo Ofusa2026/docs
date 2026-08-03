@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 แบบอ้างอิงที่ 1-16（タイ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260717.04</div>
+    <div class="ver">ver.20260717.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -444,8 +444,8 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos,intakes]=await Promise.all([
       caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,emp_sets,extra&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
@@ -457,7 +457,7 @@ async function loadFromDB(passedInfo){
       var _es0=(co.emp_sets&&co.emp_sets[0])||{};
       s('f_companyEn', _es0.orgNameEn||'');
       var _da16=(co.extra&&co.extra.docAuthors&&co.extra.docAuthors['1_16'])||{};
-      s('f_authorEn',[_da16.titleEn,_da16.nameEn].filter(Boolean).join(' '));
+      s('f_authorEn',[_da16.titleEn||co.rep_title_en, _da16.nameEn||co.author_name_en||co.rep_name_en].filter(Boolean).join(' '));
     }
     if(cas){
       s('f_applicant',cas.applicant||'');

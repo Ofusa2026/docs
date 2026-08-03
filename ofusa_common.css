@@ -78,3 +78,6 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
 /* まとめ印刷: 結合エリア(相方の書類)は画面では隠し、印刷時のみ表示。改ページ制御はprintBothが動的に付与する。 */
 #__combinedPrintArea{ display:none; }
 @media print{ #__combinedPrintArea{ display:block !important; } }
+
+/* 印刷時はトースト通知を絶対に出さない（まとめ印刷のプレビュー残り防止） */
+@media print{ .__toast{ display:none !important; } }
