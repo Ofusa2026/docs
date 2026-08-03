@@ -399,18 +399,23 @@ async function printBoth(){
     otherDocs.forEach(function(d){ var c=d.cloneNode(true); host.appendChild(c); });
     // DOM順で 1-5 → 1-6 になるよう配置: 相方が5号なら本体の前、6号なら後ろ
     var pageArea=document.getElementById('pageArea')||document.querySelector('.main')||document.body;
-    // 結合エリアと本体の間に明示的な改ページを挿入（1-5と1-6を確実に別ページに）
-    var pgbreak=document.createElement('div');
-    pgbreak.className='__combined-pagebreak';
-    pgbreak.style.cssText='display:block;';
+    // 1-5と1-6を確実に別ページに: 空要素での改ページは空白ページを生むため、
+    // 動的CSSで「結合エリア末尾で改ページ」「本体先頭docで改ページ」を指定する（実測で空白ページ無しを確認済み）。
+    var _pbStyle=document.createElement('style');
+    _pbStyle.className='__combined-pb-style';
+    _pbStyle.textContent='@media print{'+
+      '#__combinedPrintArea{page-break-after:always;break-after:page;}'+
+      '#__combinedPrintArea .doc:last-child{page-break-after:auto !important;break-after:auto !important;}'+
+      '#pageArea > .doc:first-child{page-break-before:always;break-before:page;}'+
+    '}';
+    document.head.appendChild(_pbStyle);
     if(pair.otherNo==='5'){
       pageArea.parentNode.insertBefore(host, pageArea);
-      pageArea.parentNode.insertBefore(pgbreak, pageArea);
     }
     else {
       var ref=pageArea.nextSibling;
-      if(ref){ pageArea.parentNode.insertBefore(pgbreak, ref); pageArea.parentNode.insertBefore(host, ref); }
-      else { pageArea.parentNode.appendChild(pgbreak); pageArea.parentNode.appendChild(host); }
+      if(ref){ pageArea.parentNode.insertBefore(host, ref); }
+      else { pageArea.parentNode.appendChild(host); }
     }
     if(ifr.parentNode) ifr.parentNode.removeChild(ifr);
     var orig=document.title;
@@ -419,7 +424,7 @@ async function printBoth(){
       document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
     }catch(_e){}
     // 印刷後クリーンアップ
-    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
+    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
     if(_tst&&_tst.remove) _tst.remove();
     if(typeof clearToasts==='function') clearToasts();
     window.addEventListener('afterprint',cleanup);
