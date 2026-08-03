@@ -399,8 +399,19 @@ async function printBoth(){
     otherDocs.forEach(function(d){ var c=d.cloneNode(true); host.appendChild(c); });
     // DOM順で 1-5 → 1-6 になるよう配置: 相方が5号なら本体の前、6号なら後ろ
     var pageArea=document.getElementById('pageArea')||document.querySelector('.main')||document.body;
-    if(pair.otherNo==='5'){ pageArea.parentNode.insertBefore(host, pageArea); }
-    else { if(pageArea.nextSibling) pageArea.parentNode.insertBefore(host, pageArea.nextSibling); else pageArea.parentNode.appendChild(host); }
+    // 結合エリアと本体の間に明示的な改ページを挿入（1-5と1-6を確実に別ページに）
+    var pgbreak=document.createElement('div');
+    pgbreak.className='__combined-pagebreak';
+    pgbreak.style.cssText='display:block;';
+    if(pair.otherNo==='5'){
+      pageArea.parentNode.insertBefore(host, pageArea);
+      pageArea.parentNode.insertBefore(pgbreak, pageArea);
+    }
+    else {
+      var ref=pageArea.nextSibling;
+      if(ref){ pageArea.parentNode.insertBefore(pgbreak, ref); pageArea.parentNode.insertBefore(host, ref); }
+      else { pageArea.parentNode.appendChild(pgbreak); pageArea.parentNode.appendChild(host); }
+    }
     if(ifr.parentNode) ifr.parentNode.removeChild(ifr);
     var orig=document.title;
     try{
@@ -408,7 +419,7 @@ async function printBoth(){
       document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
     }catch(_e){}
     // 印刷後クリーンアップ
-    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); window.removeEventListener('afterprint',cleanup); }
+    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
     if(_tst&&_tst.remove) _tst.remove();
     if(typeof clearToasts==='function') clearToasts();
     window.addEventListener('afterprint',cleanup);

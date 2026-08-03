@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.31</div>
+    <div class="ver">ver.20260801.33</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -556,10 +556,10 @@
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P4</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P5</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P6</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8pt</button>
@@ -1015,85 +1015,8 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:32.27mm;top:250.84mm;f
 <div class="pickhot cb-click" style="left:31.57mm;top:242.18mm;width:5.4mm;height:5.4mm;" onclick="setPick('f_ti2Prf','test')" title="f_ti2Prf=test"></div>
 
 </div>
-<div class="doc docabs" id="docP3">
-<div class="page-num-label">P3</div>
-<div class="av avg" style="left:64.05mm;top:21.71mm;font-size:8.8pt;">${f('f_q22Org')}</div>
-<div class="av avg" style="left:135.98mm;top:21.70mm;font-size:8.8pt;">${f('f_q22Amt')}</div>
-<div class="av avg" style="left:54.15mm;top:50.33mm;font-size:8.8pt;">${f('f_q23Org')}</div>
-<div class="av avg" style="left:135.88mm;top:50.33mm;font-size:8.8pt;">${f('f_q23Amt')}</div>
-${v('f_a22')==='有'?'<div class="cir" style="left:24.85mm;top:20.51mm"></div>':''}
-${v('f_a22')==='無'?'<div class="cir" style="left:172.93mm;top:20.50mm"></div>':''}
-${v('f_a23')==='有'?'<div class="cir" style="left:25.05mm;top:49.13mm"></div>':''}
-${v('f_a23')==='無'?'<div class="cir" style="left:164.38mm;top:49.13mm"></div>':''}
-<div class="av avg" style="left:45.00mm;top:178.92mm;font-size:9.3pt;">${f('f_agName')}</div>
-<div class="av avg" style="left:127.82mm;top:178.92mm;font-size:9.3pt;">${f('f_agRel')}</div>
-<div class="av avg" style="left:45.00mm;top:188.00mm;font-size:9.3pt;">${f('f_agAddr')}</div>
-<div class="av avg" style="left:45.83mm;top:197.10mm;font-size:9.3pt;">${f('f_agTel')}</div>
-<div class="av avg" style="left:130.12mm;top:197.10mm;font-size:9.3pt;">${f('f_agCel')}</div>
-<div class="av avg" style="left:138.28mm;top:225.54mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigY')}</div>
-<div class="av avg" style="left:157.67mm;top:225.54mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigM')}</div>
-<div class="av avg" style="left:174.21mm;top:225.54mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigD')}</div>
-<div class="av avg" style="left:99.02mm;top:272.17mm;font-size:8.6pt;">${f('f_agentOrg')}</div>
-<div class="av avg" style="left:147.60mm;top:272.17mm;font-size:8.6pt;">${f('f_agentTel')}</div>
-<div class="av avg" style="left:25.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1InY')}</div>
-<div class="av avg" style="left:34.90mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1InM')}</div>
-<div class="av avg" style="left:44.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1OutY')}</div>
-<div class="av avg" style="left:54.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk1OutM')}</div>
-<div class="av avg" style="left:80.90mm;top:150.47mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk1Nm')}</div>
-<div class="av avg" style="left:25.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2InY')}</div>
-<div class="av avg" style="left:34.90mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2InM')}</div>
-<div class="av avg" style="left:44.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2OutY')}</div>
-<div class="av avg" style="left:54.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk2OutM')}</div>
-<div class="av avg" style="left:80.90mm;top:158.67mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk2Nm')}</div>
-<div class="av avg" style="left:25.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3InY')}</div>
-<div class="av avg" style="left:34.90mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3InM')}</div>
-<div class="av avg" style="left:44.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3OutY')}</div>
-<div class="av avg" style="left:54.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk3OutM')}</div>
-<div class="av avg" style="left:80.90mm;top:166.82mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk3Nm')}</div>
-<div class="av avg" style="left:107.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4InY')}</div>
-<div class="av avg" style="left:117.20mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4InM')}</div>
-<div class="av avg" style="left:126.90mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4OutY')}</div>
-<div class="av avg" style="left:136.60mm;top:150.37mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk4OutM')}</div>
-<div class="av avg" style="left:163.30mm;top:150.47mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk4Nm')}</div>
-<div class="av avg" style="left:107.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5InY')}</div>
-<div class="av avg" style="left:117.20mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5InM')}</div>
-<div class="av avg" style="left:126.90mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5OutY')}</div>
-<div class="av avg" style="left:136.60mm;top:158.57mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk5OutM')}</div>
-<div class="av avg" style="left:163.30mm;top:158.67mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk5Nm')}</div>
-<div class="av avg" style="left:107.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6InY')}</div>
-<div class="av avg" style="left:117.20mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6InM')}</div>
-<div class="av avg" style="left:126.90mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6OutY')}</div>
-<div class="av avg" style="left:136.60mm;top:166.72mm;font-size:8.4pt;transform:translateX(-50%);">${f('f_wk6OutM')}</div>
-<div class="av avg" style="left:163.30mm;top:166.82mm;font-size:7.8pt;transform:translateX(-50%);">${f('f_wk6Nm')}</div>
-
-
-
-<div class="pickhot cb-click" style="left:24.05mm;top:19.71mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','有')" title="f_a22=有"></div>
-<div class="pickhot cb-click" style="left:172.13mm;top:19.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a22','無')" title="f_a22=無"></div>
-<div class="pickhot cb-click" style="left:24.25mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','有')" title="f_a23=有"></div>
-<div class="pickhot cb-click" style="left:163.58mm;top:48.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a23','無')" title="f_a23=無"></div>
-
-
-
-<div class="av avg" style="left:35.09mm;top:262.10mm;font-size:9pt;">${f('f_agentName')}</div>
-<div class="av avg" style="left:96.00mm;top:262.10mm;font-size:9pt;">${f('f_agentAddr')}</div>
-
-${v('f_a24')==='有'?'<div class="cir" style="left:171.30mm;top:78.80mm"></div>':''}
-${v('f_a24')==='無'?'<div class="cir" style="left:176.60mm;top:78.80mm"></div>':''}
-<div class="pickhot cb-click" style="left:170.50mm;top:78.00mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a24','有')" title="f_a24=有"></div>
-<div class="pickhot cb-click" style="left:175.80mm;top:78.00mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a24','無')" title="f_a24=無"></div>
-${v('f_a25')==='有'?'<div class="cir" style="left:171.30mm;top:94.90mm"></div>':''}
-${v('f_a25')==='無'?'<div class="cir" style="left:176.60mm;top:94.90mm"></div>':''}
-<div class="pickhot cb-click" style="left:170.50mm;top:94.10mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a25','有')" title="f_a25=有"></div>
-<div class="pickhot cb-click" style="left:175.80mm;top:94.10mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a25','無')" title="f_a25=無"></div>
-${v('f_a26')==='有'?'<div class="cir" style="left:171.30mm;top:115.10mm"></div>':''}
-${v('f_a26')==='無'?'<div class="cir" style="left:176.60mm;top:115.10mm"></div>':''}
-<div class="pickhot cb-click" style="left:170.50mm;top:114.30mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a26','有')" title="f_a26=有"></div>
-<div class="pickhot cb-click" style="left:175.80mm;top:114.30mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_a26','無')" title="f_a26=無"></div>
-
-</div>
 <div class="doc docabs" id="docP4">
-<div class="page-num-label">P4</div>
+<div class="page-num-label">P3</div>
 <div class="av avg" style="left:111.2mm;top:12.86mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_fname')}</div>
 <div class="av avg" style="left:66.06mm;top:23.96mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_csY')}</div>
 <div class="av avg" style="left:120.60mm;top:23.96mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_ceY')}</div>
@@ -1241,7 +1164,7 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 
 </div>
 <div class="doc docabs" id="docP5">
-<div class="page-num-label">P5</div>
+<div class="page-num-label">P4</div>
 <div class="av avm" style="left:75.36mm;top:36.92mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_o2coName')}</div>
 <div class="av avm" style="left:159.65mm;top:36.92mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coCorp')}</div>
 <div class="av avm" style="left:126.17mm;top:49.87mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_coEi')}</div>
@@ -1281,7 +1204,7 @@ ${v('f_ins2')==='無'?'<div class="cir" style="left:126.96mm;top:113.98mm"></div
 
 </div>
 <div class="doc docabs" id="docP6">
-<div class="page-num-label">P6</div>
+<div class="page-num-label">P5</div>
 ${v('f_q22')==='有'?'<div class="cir" style="left:29.59mm;top:14.73mm"></div>':''}
 ${v('f_q22')==='無'?'<div class="cir" style="left:164.88mm;top:14.73mm"></div>':''}
 ${v('f_q23')==='有'?'<div class="cir" style="left:165.79mm;top:22.50mm"></div>':''}
@@ -1404,7 +1327,7 @@ ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;fon
 
 </div>
 <div class="doc docabs" id="docP7">
-<div class="page-num-label">P7</div>
+<div class="page-num-label">P6</div>
 <div class="av avg" style="left:69.34mm;top:215.39mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roName')}</div>
 <div class="av avg" style="left:69.33mm;top:237.17mm;font-size:7.2pt;transform:translateX(-50%);">${f('f_roRep')}</div>
 <div class="av avg" style="left:53.19mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegNo')}</div>
@@ -1643,7 +1566,7 @@ async function loadFromDB(passedInfo){
     // ===== 申請人2 =====
     {
     const [persons,cases]=await Promise.all([
-      sb('persons?select=jp_exam_1,jp_exam_loc_1,jp_eval_type,residence_status&case_id=eq.'+caseId),
+      sb('persons?select=jp_exam_1,jp_exam_loc_1,jp_eval_type,skill_exam_1,skill_exam_loc_1,skill_eval_type,residence_status&case_id=eq.'+caseId),
       sb('cases?select=company,company_id&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -1681,8 +1604,21 @@ async function loadFromDB(passedInfo){
         s('f_jpLoc', inJp ? 'jp' : 'fr');
         if(!inJp) s('f_jpCountry', loc);
       }
-      // 18 技能水準：技能実習2号からの変更なら「技能実習2号を良好に修了」が既定
-      if(/技能実習\s*2号/.test(pd.residence_status||'')) s('f_sk','jisshu');
+      // 18 技能水準：試験による証明（ヒアリングフォームの技能試験）
+      const sev = pd.skill_eval_type || '';
+      if(sev || pd.skill_exam_1){
+        s('f_sk','policy');
+        s('f_skSub','exam');
+        s('f_skExam', pd.skill_exam_1 || (/試験/.test(sev) ? sev : ''));
+        const sloc = pd.skill_exam_loc_1 || '';
+        if(sloc){
+          const sInJp = /日本|国内|Japan/i.test(sloc);
+          s('f_skLoc', sInJp ? 'jp' : 'fr');
+          if(!sInJp) s('f_skCountry', sloc);
+        }
+      }
+      // 技能実習2号からの変更なら「技能実習2号を良好に修了」が既定（試験データが無い場合）
+      if(!pd.skill_exam_1 && /技能実習\s*2号/.test(pd.residence_status||'')) s('f_sk','jisshu');
       else if(/技能実習/.test(ev)) s('f_sk','jisshu');
     }
     }
@@ -1862,7 +1798,7 @@ async function loadFromDB(passedInfo){
         // pref+city を足すと「東京都新宿区東京都新宿区新宿1-4-10新宿1-4-10」のように二重になる。
         s('f_roAddr', org.address || ((org.pref||'')+(org.city||'')));
         s('f_roTel',org.tel||'');
-        s('f_roRep',org.rep_name||'');
+        s('f_roRep',org.support_manager||org.rep_name||'');  // 代表者欄は支援責任者名(運用上こちらを記載)
         s('f_roRegNo',org.reg_no||'');
         // ver.20260715: reg_date は「20190530」の8桁数字が32件、「YYYY-MM-DD」が7件と混在する。
         // _ymd() はハイフン形式しか解さないため、8桁数字だと年月日が空欄になっていた。
