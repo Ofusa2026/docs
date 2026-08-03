@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.22</div>
+    <div class="ver">ver.20260801.23</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -769,8 +769,13 @@ function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); retur
 // 登録年月日は「20190530」「2019-05-30」「2019/5/30」が混在するので全部受ける
 function _regYmd(s){
   const t=String(s||'').trim();
-  let m=t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  // 2024年2月15日 / 2024年02月15日（和暦漢字）
+  let m=t.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
   if(m) return [m[1],String(+m[2]),String(+m[3])];
+  // 2024-2-15 / 2024/2/15
+  m=t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if(m) return [m[1],String(+m[2]),String(+m[3])];
+  // 20240215
   m=t.match(/^(\d{4})(\d{2})(\d{2})$/);
   if(m) return [m[1],String(+m[2]),String(+m[3])];
   return ['','',''];
@@ -1579,7 +1584,7 @@ async function loadFromDB(passedInfo){
     // ===== 申請人1 =====
     {
     const [persons,cases]=await Promise.all([
-      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,hoped_stay_period,expire,residence_card&case_id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,hoped_stay_period,expire,residence_card,total_stay_year,total_stay_month&case_id=eq.'+caseId),
       sb('cases?select=applicant,expire&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -1611,6 +1616,11 @@ async function loadFromDB(passedInfo){
       // ver.20260715: 13 希望する在留期間。固定「1年」にしていたが実データは「3年」が5,025件で大多数、
       // 「1年」は92件しかない。アンシスの hoped_stay_period(5,394件)から反映する。
       s('f_newPeriod',pd.hoped_stay_period||'');
+    // 通算在留期間(21): persons.total_stay_year / total_stay_month
+    if(pd){
+      if(pd.total_stay_year!=null && pd.total_stay_year!=='') s('f_totalY',String(pd.total_stay_year));
+      if(pd.total_stay_month!=null && pd.total_stay_month!=='') s('f_totalM',String(pd.total_stay_month));
+    }
     // 在日親族: データが無い/無の場合は「無」を既定にし、1行目に「該当なし」を入れる。
     (function(){
       var yn=document.getElementById('f_famYN'), nm=document.getElementById('f_fam1Nm');
@@ -1682,7 +1692,9 @@ async function loadFromDB(passedInfo){
         s('f_agentAddr',org.address||'');
         s('f_agentOrg',org.name||'');
         s('f_agentTel',org.tel||'');
-        const _fee=(org.fee||org.support_fee||'');
+        var _fee='';
+        try{ var _cf=await sb('cases?select=support_fee&id=eq.'+caseId); _fee=(_cf&&_cf[0]&&_cf[0].support_fee)?String(_cf[0].support_fee):''; }catch(_e){}
+        if(!_fee) _fee=(org.fee||org.support_fee||'');
         if(_fee) s('f_fee',String(_fee));
         // (13)職業紹介事業者: support_orgs.jj_* から反映
         if(org.jj_name){
@@ -1820,7 +1832,7 @@ async function loadFromDB(passedInfo){
     //   委託している案件では空欄が正しいので、参考値として入れるだけに留める。
     if(cas&&cas.org&&typeof findSupportOrg==='function'){
       const org=await findSupportOrg(cas.org,'name,support_manager');
-      s('f_smName','別紙参照');
+      if(org&&org.support_manager) s('f_smName',org.support_manager);
     }
     }
     // ===== 機関4 =====
@@ -1857,8 +1869,8 @@ async function loadFromDB(passedInfo){
       if(nm){ const r=await sb('companies?select=name,rep_name,rep_title,author_name,author_title&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; }
     }
     if(co){
-      s('f_o4coName','別紙参照');
-      s('f_coRep','別紙参照');
+      s('f_o4coName',co.name||'');
+      s('f_coRep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
     }
     // 作成日: 案件の書類作成日(cases.doc_create_date)を優先。無ければ今日。
     let _dcd='';
