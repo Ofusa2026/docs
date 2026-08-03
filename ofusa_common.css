@@ -78,6 +78,11 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
 /* まとめ印刷: 結合エリア(相方の書類)は本体と一緒に印刷する。本体は隠さない。 */
 #__combinedPrintArea{ display:none; }
 @media print{
-  #__combinedPrintArea{ display:block !important; }
+  #__combinedPrintArea{ display:block !important; page-break-after:always; break-after:page; }
   #__combinedPrintArea .doc{ page-break-after:always; break-after:page; }
+  /* 結合エリアが本体(pageArea)の前にある時、本体の先頭書類を必ず新ページから始める */
+  #__combinedPrintArea + #pageArea .doc:first-child,
+  #__combinedPrintArea ~ #pageArea > .doc:first-child{ page-break-before:always; break-before:page; }
+  #pageArea .doc:first-child{ page-break-before:auto; }
+  body:has(#__combinedPrintArea) #pageArea .doc:first-child{ page-break-before:always !important; break-before:page !important; }
 }
