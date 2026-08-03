@@ -441,6 +441,8 @@ async function printBoth(){
 }
 
 function showToast(msg,ms){const t=document.createElement('div');t.className='__toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);var d=(ms===undefined?3000:ms);if(d>0)setTimeout(function(){t.remove();},d);return t;}
+/* トーストは印刷・PDFに出さない（全書類共通） */
+(function(){try{if(!document.getElementById('__toast-print-hide')){var s=document.createElement('style');s.id='__toast-print-hide';s.textContent='@media print{.__toast{display:none !important;}}';document.head.appendChild(s);}}catch(e){}})();
 function clearToasts(){document.querySelectorAll('.__toast').forEach(function(t){t.remove();});}
 
 // ===== 文字サイズ =====
