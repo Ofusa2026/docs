@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.19</div>
+    <div class="ver">ver.20260801.20</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1767,6 +1767,24 @@ async function loadFromDB(passedInfo){
       // 参考値として原文を最初の枠に入れ、運用者が見て配り直せるようにする。
       if(co.labor_ins_no && !/^[―ー\-]+$/.test(String(co.labor_ins_no).trim())){
         window._laborInsRaw = co.labor_ins_no;   // 画面下に原文を出す
+        // 労働保険番号を枠(2-2-6-3-4桁=li1..li5)へ反映。
+        (function(){
+          var raw=String(co.labor_ins_no).trim();
+          // 区切り済み(ハイフン/スペース)なら区切りで分割
+          var parts=raw.split(/[\-―ー\s\u3000\/]+/).filter(function(x){return x!=='';});
+          if(parts.length===5){
+            s('f_li1',parts[0]); s('f_li2',parts[1]); s('f_li3',parts[2]); s('f_li4',parts[3]); s('f_li5',parts[4]);
+          } else {
+            var d=raw.replace(/\D/g,'');
+            if(d.length===14){ // 2-2-6-3-4 = 17桁? 実は 2+2+6+3+4=17。14桁は 2-2-6-3-1等崩れ→枠通り2-2-6-3-4で埋める
+              s('f_li1',d.slice(0,2)); s('f_li2',d.slice(2,4)); s('f_li3',d.slice(4,10)); s('f_li4',d.slice(10,13)); s('f_li5',d.slice(13));
+            } else if(d.length===17){
+              s('f_li1',d.slice(0,2)); s('f_li2',d.slice(2,4)); s('f_li3',d.slice(4,10)); s('f_li4',d.slice(10,13)); s('f_li5',d.slice(13,17));
+            } else {
+              s('f_li1',raw); // 桁数不明は先頭枠に原文（従来通り安全側）
+            }
+          }
+        })();
       }
     }
     }

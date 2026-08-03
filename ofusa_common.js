@@ -902,6 +902,12 @@ const MONEY_FIELD_PATTERNS = [
   /^f_salaryM$/,
   /^f_salaryH$/,
   /^f_jpSalary$/,
+  // 会社情報の金額(売上高・資本金)
+  /^(es_|f_)?sales$/i,
+  /^(es_|f_)?capital$/i,
+  /^f_gSal$/,
+  /^f_gDpCap$/,
+  /^f_gDpSales$/,
 ];
 
 function isMoneyField(id){
