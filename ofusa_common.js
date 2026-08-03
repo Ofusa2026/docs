@@ -376,7 +376,12 @@ async function printBoth(){
       setTimeout(function(){ window.removeEventListener('message',h); resolve(null); },1000);
     });
   }
-  var _tst=(typeof showToast==='function')?showToast('📄 '+pair.selfNo+'号と'+pair.otherNo+'号をまとめています…',0):null;
+  var _tst=document.createElement('div');
+  _tst.id='__combinedProgress';
+  _tst.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';
+  _tst.textContent='📄 '+pair.selfNo+'号と'+pair.otherNo+'号をまとめています…';
+  document.body.appendChild(_tst);
+  function _killProgress(){ var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode) p.parentNode.removeChild(p); }
   var q = info&&info.caseId ? ('?caseId='+encodeURIComponent(info.caseId)) : '';
   var ifr=document.createElement('iframe');
   ifr.style.cssText='position:fixed;left:-9999px;top:0;width:1024px;height:1400px;border:0;';
@@ -424,20 +429,21 @@ async function printBoth(){
       document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
     }catch(_e){}
     // 印刷後クリーンアップ
-    function cleanup(){ document.title=orig; var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
-    if(_tst&&_tst.remove) _tst.remove();
+    function cleanup(){ document.title=orig; var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode)p.parentNode.removeChild(p); var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
+    _killProgress();
     if(typeof clearToasts==='function') clearToasts();
     // iframe側(相方書類)に出たトーストも消す
-    try{ if(ifr&&ifr.contentDocument){ ifr.contentDocument.querySelectorAll('.__toast').forEach(function(t){t.remove();}); } }catch(_e){}
+    try{ if(ifr&&ifr.contentDocument){ ifr.contentDocument.querySelectorAll('.__toast,#__combinedProgress').forEach(function(t){t.remove();}); } }catch(_e){}
     window.addEventListener('afterprint',cleanup);
-    // トーストが確実にDOMから消え、再描画されてから印刷（プレビューにもPDFにも残らないように）
+    // 進捗表示が確実にDOMから消え、再描画されてから印刷する
     await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ setTimeout(r,200); }); }); });
+    _killProgress();
     if(typeof clearToasts==='function') clearToasts();
     window.print();
     setTimeout(cleanup, 3000);
   }catch(e){
     console.error('[printBoth]',e);
-    if(_tst&&_tst.remove) _tst.remove();
+    _killProgress();
     if(typeof showToast==='function') showToast('⚠️ まとめ印刷でエラー: '+e.message);
     if(ifr&&ifr.parentNode) ifr.parentNode.removeChild(ifr);
   }
@@ -445,7 +451,7 @@ async function printBoth(){
 
 function showToast(msg,ms){const t=document.createElement('div');t.className='__toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:sans-serif;';t.textContent=msg;document.body.appendChild(t);var d=(ms===undefined?3000:ms);if(d>0)setTimeout(function(){t.remove();},d);return t;}
 /* トーストは印刷・PDFに出さない（全書類共通） */
-(function(){try{if(!document.getElementById('__toast-print-hide')){var s=document.createElement('style');s.id='__toast-print-hide';s.textContent='@media print{.__toast{display:none !important;}}';document.head.appendChild(s);}}catch(e){}})();
+(function(){try{if(!document.getElementById('__toast-print-hide')){var s=document.createElement('style');s.id='__toast-print-hide';s.textContent='@media print{.__toast,#__combinedProgress{display:none !important;}}';document.head.appendChild(s);}}catch(e){}})();
 function clearToasts(){document.querySelectorAll('.__toast').forEach(function(t){t.remove();});}
 
 // ===== 文字サイズ =====
