@@ -184,7 +184,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.21</div>
+    <div class="ver">ver.20260801.22</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1611,6 +1611,12 @@ async function loadFromDB(passedInfo){
       // ver.20260715: 13 希望する在留期間。固定「1年」にしていたが実データは「3年」が5,025件で大多数、
       // 「1年」は92件しかない。アンシスの hoped_stay_period(5,394件)から反映する。
       s('f_newPeriod',pd.hoped_stay_period||'');
+    // 在日親族: データが無い/無の場合は「無」を既定にし、1行目に「該当なし」を入れる。
+    (function(){
+      var yn=document.getElementById('f_famYN'), nm=document.getElementById('f_fam1Nm');
+      if(yn && !yn.value){ yn.value='無'; }
+      if(yn && yn.value==='無' && nm && !nm.value){ nm.value='該当なし'; }
+    })();
     } else if(cas){
       s('f_name',cas.applicant||'');
       const ex=_ymd(cas.expire); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
