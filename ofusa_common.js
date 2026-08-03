@@ -1029,6 +1029,10 @@ const MONEY_FIELD_PATTERNS = [
   /^f_gSal$/,
   /^f_gDpCap$/,
   /^f_gDpSales$/,
+  /^f_pay$/,          // 月額報酬(変更様式)
+  /^f_payH$/,         // 時給換算
+  /^f_payJp$/,        // 日本人月額報酬
+  /^f_fee$/,          // 支援委託手数料
 ];
 
 function isMoneyField(id){
