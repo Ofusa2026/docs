@@ -75,13 +75,9 @@ body{font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;background
   .sign-field-area { border-top: none !important; }
 }
 
-/* まとめ印刷: 結合エリアがある時は元のpage/docを隠して二重印刷を防ぐ */
-@media print{
-  body:has(#__combinedPrintArea) #pageArea{ display:none !important; }
-  body:has(#__combinedPrintArea) > .main > .doc,
-  body:has(#__combinedPrintArea) .main > #pageArea{ display:none !important; }
-  #__combinedPrintArea{ display:block !important; }
-  #__combinedPrintArea .doc{ page-break-after:always; }
-}
+/* まとめ印刷: 結合エリア(相方の書類)は本体と一緒に印刷する。本体は隠さない。 */
 #__combinedPrintArea{ display:none; }
-@media print{ #__combinedPrintArea{ display:block; } }
+@media print{
+  #__combinedPrintArea{ display:block !important; }
+  #__combinedPrintArea .doc{ page-break-after:always; break-after:page; }
+}
