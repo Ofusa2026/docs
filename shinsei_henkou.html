@@ -7,6 +7,7 @@
 <style>.fp-case{display:none!important;}
 .doc .av[style*="max-width"]{white-space:nowrap;overflow:visible;}
 
+.avcircle{display:none;}
 </style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
@@ -184,7 +185,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260801.35</div>
+    <div class="ver">ver.20260801.36</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -384,7 +385,11 @@
     </div>
     <div class="fs"><div class="fs-title">2 (1)　雇用契約期間</div>
       <div class="fg"><label>開始</label><div style="display:flex;gap:4px;"><input id="f_csY" oninput="p()" placeholder="年"><input id="f_csM" oninput="p()" placeholder="月"><input id="f_csD" oninput="p()" placeholder="日"></div></div>
-      <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市"></div><span style="display:none"><input id="f_fee"></span><span style="display:none"><input type="hidden" id="f__adjust"></span>
+      <div class="fg"><label>届出先（市区町村）</label><input id="f_subCity" oninput="p()" placeholder="例：千葉県柏市">
+<span style="display:none">
+<input id="f_submit1Name"><input id="f_submit1Y"><input id="f_submit1M"><input id="f_submit1D"><input id="f_submit1City">
+<input id="f_submit2Name"><input id="f_submit2Y"><input id="f_submit2M"><input id="f_submit2D"><input id="f_submit2City">
+</span></div><span style="display:none"><input id="f_fee"></span><span style="display:none"><input type="hidden" id="f__adjust"></span>
       <span style="display:none"><input id="f_q22"><input id="f_q23"><input id="f_q24"><input id="f_q25"><input id="f_q26"><input id="f_q29"><input id="f_q30"><input id="f_q31"><input id="f_q32"><input id="f_q39"><input id="f_q41"><input id="f_q33"><input id="f_coop1"><input id="f_coop2"></span>
       <div class="fg"><label>終了</label><div style="display:flex;gap:4px;"><input id="f_ceY" oninput="p()" placeholder="年"><input id="f_ceM" oninput="p()" placeholder="月"><input id="f_ceD" oninput="p()" placeholder="日"></div></div>
     </div>
@@ -1259,10 +1264,6 @@ ${v('f_q27')==='無'?'<div class="cir" style="left:168.86mm;top:64.94mm"></div>'
 ${v('f_q28')==='有'?'<div class="cir" style="left:30.19mm;top:117.12mm"></div>':''}
 ${v('f_q28')==='無'?'<div class="cir" style="left:165.38mm;top:117.12mm"></div>':''}
 <div class="av avg" style="left:41.46mm;top:118.02mm;font-size:8.5pt;">${f('f_q28d')}</div>
-<div class="av avm" style="left:67.84mm;top:178.67mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
-<div class="av avm" style="left:83.61mm;top:178.67mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
-<div class="av avm" style="left:99.34mm;top:179.46mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_oSigD')}</div>
-<div class="av avm" style="left:121.02mm;top:178.67mm;font-size:6.84pt;transform:translateX(-50%);">${f('f_subCity')}</div>
 
 
 ${v('f_q33')==='有'?'<div class="cir" style="left:165.74mm;top:185.38mm"></div>':''}
@@ -1324,6 +1325,22 @@ ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;fon
 <div class="pickhot cb-click" style="left:168.11mm;top:207.83mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_smYN','無')" title="f_smYN=無"></div>
 <div class="pickhot cb-click" style="left:164.94mm;top:220.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','有')" title="f_ssYN=有"></div>
 <div class="pickhot cb-click" style="left:168.11mm;top:220.74mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','無')" title="f_ssYN=無"></div>
+<div class="av avg" style="left:63.00mm;top:168.30mm;font-size:6.8pt;transform:translateX(-50%);">${f('f_submit1Name')}</div>
+<div class="av avg" style="left:72.50mm;top:168.30mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit1Y')}</div>
+<div class="av avg" style="left:88.30mm;top:168.30mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit1M')}</div>
+<div class="av avg" style="left:104.00mm;top:168.30mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit1D')}</div>
+<div class="av avg" style="left:63.00mm;top:178.70mm;font-size:6.8pt;transform:translateX(-50%);">${f('f_submit2Name')}</div>
+<div class="av avg" style="left:72.50mm;top:178.70mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit2Y')}</div>
+<div class="av avg" style="left:88.30mm;top:178.70mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit2M')}</div>
+<div class="av avg" style="left:104.00mm;top:178.70mm;font-size:6.8pt;transform:translateX(-100%);">${f('f_submit2D')}</div>
+<div class="av avg avcircle" data-seg="submit1" data-ch="市" style="left:131.90mm;top:168.60mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit1" data-ch="区" style="left:135.50mm;top:168.60mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit1" data-ch="町" style="left:139.10mm;top:168.60mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit1" data-ch="村" style="left:142.80mm;top:168.60mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit2" data-ch="市" style="left:131.90mm;top:178.90mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit2" data-ch="区" style="left:135.50mm;top:178.90mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit2" data-ch="町" style="left:139.10mm;top:178.90mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
+<div class="av avg avcircle" data-seg="submit2" data-ch="村" style="left:142.80mm;top:178.90mm;font-size:9pt;transform:translate(-50%,-50%);">◯</div>
 
 </div>
 <div class="doc docabs" id="docP7">
@@ -1406,6 +1423,8 @@ ${v('f_q41')==='無'?'<div class="cir" style="left:178.29mm;top:44.82mm"></div>'
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
   fitDocToPreview();
+
+  if(typeof updateSubmitCircles==='function') updateSubmitCircles();
 }
 
 // 案件切替時に前の案件の値が残らないよう必ず初期化する（別人の情報が載るのを防ぐ）
@@ -1492,6 +1511,16 @@ function _fmtTel(t){
   }
   return String(t);
 }
+function updateSubmitCircles(){
+  ['submit1','submit2'].forEach(function(seg){
+    var el=document.getElementById('f_'+seg+'City');
+    var val=el?String(el.value).trim():'';
+    document.querySelectorAll('.avcircle[data-seg="'+seg+'"]').forEach(function(c){
+      c.style.display = (c.getAttribute('data-ch')===val && val) ? 'block' : 'none';
+    });
+  });
+}
+
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -1546,6 +1575,35 @@ async function loadFromDB(passedInfo){
       if(pd.total_stay_year!=null && pd.total_stay_year!=='') s('f_totalY',String(pd.total_stay_year));
       if(pd.total_stay_month!=null && pd.total_stay_month!=='') s('f_totalM',String(pd.total_stay_month));
     }
+    // 32番 協力確認書(上段=事業所所在地の市区町村/下段=住居地の市区町村)
+    (function(){
+      // 市区町村名を「大田区」→ 名前「大田」+種別「区」に分解し、種別文字に丸(◯)を付ける
+      function splitCity(full){
+        var t=String(full||'').trim();
+        var m=t.match(/^(.*?)(市|区|町|村)$/);
+        if(m) return {name:m[1], type:m[2]};
+        return {name:t, type:''};
+      }
+      // 種別に応じて「市・区・町・村」のうち該当を◯で囲んだ文字列
+      function circledType(type){
+        var arr=['市','区','町','村'];
+        return arr.map(function(x){ return x===type ? '◯'+x : x; }).join('・');
+      }
+      // 上段: 事業所所在地の市区町村（emp_sets.officeAddr or 会社city）
+      var offCity='';
+      try{ if(typeof es!=='undefined' && es && es.officeAddr){ var mm=String(es.officeAddr).match(/(..+?[都道府県])?(.+?[市区町村])/); if(mm) offCity=mm[2]; } }catch(_e){}
+      if(!offCity && typeof co!=='undefined' && co && co.city) offCity=co.city;
+      var s1=splitCity(offCity);
+      var _s=function(id,val){ var el=document.getElementById(id); if(el && val!=null) el.value=val; };
+      _s('f_submit1Name', s1.name);
+      _s('f_submit1City', s1.type);
+      // 下段: 申請人の住居地の市区町村（pd.address等から）
+      var homeCity='';
+      try{ var addr=(typeof pd!=='undefined'&&pd)?(pd.jp_detail_address||pd.address||''):''; var mh=String(addr).match(/(.+?[市区町村])/); if(mh) homeCity=mh[1].replace(/^.*?[都道府県]/,''); }catch(_e){}
+      var s2=splitCity(homeCity);
+      _s('f_submit2Name', s2.name);
+      _s('f_submit2City', s2.type);
+    })();
     // 6ページ 有無項目のデフォルト設定（支援体制まわりは有、保証金・違約金・不正は無）
     (function(){ var _sd=function(id,v){ var e=document.getElementById(id); if(e && !e.value) e.value=v; };
       _sd('f_q24','有');_sd('f_q25','有');_sd('f_q26','有');_sd('f_q27','有');_sd('f_q28','有');_sd('f_q29','有');_sd('f_q30','有');_sd('f_q31','有');_sd('f_q32','有');_sd('f_q33','有');_sd('f_q36','有');_sd('f_q37','有');_sd('f_coop1','有');_sd('f_coop2','有');_sd('f_smYN','有');_sd('f_ssYN','有');
@@ -1835,7 +1893,11 @@ async function loadFromDB(passedInfo){
     let _dcd='';
     try{ const _c=await sb('cases?select=doc_create_date&id=eq.'+caseId); _dcd=(_c&&_c[0]&&_c[0].doc_create_date)?String(_c[0].doc_create_date):''; }catch(_e){}
     const _p=_dcd?_dcd.split(/[-\/]/):[];
-    if(_p.length>=3){ s('f_oSigY',_p[0]); s('f_oSigM',String(parseInt(_p[1],10))); s('f_oSigD',String(parseInt(_p[2],10))); }
+    if(_p.length>=3){
+      s('f_oSigY',_p[0]); s('f_oSigM',String(parseInt(_p[1],10))); s('f_oSigD',String(parseInt(_p[2],10)));
+      var _sd=function(id,v){var e=document.getElementById(id);if(e&&v)e.value=v;};
+      ['submit1','submit2'].forEach(function(pfx){ _sd('f_'+pfx+'Y',_p[0]); _sd('f_'+pfx+'M',String(parseInt(_p[1],10))); _sd('f_'+pfx+'D',String(parseInt(_p[2],10))); });
+    }
     else { const n=new Date(); s('f_oSigY',String(n.getFullYear())); s('f_oSigM',String(n.getMonth()+1)); s('f_oSigD',String(n.getDate())); }
     }
     p(); showToast('✅ 全7ページにデータを読み込みました');
