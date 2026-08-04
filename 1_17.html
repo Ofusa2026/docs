@@ -139,8 +139,13 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.10</span>
+  <span class="ver">ver.20260804.11</span>
   <a href="./index.html" class="back">← docsトップへ</a>
+  <!-- ver.20260804.11: 一時利用停止（テンプレの黄色ハイライト対応中） -->
+  <div id="maintBanner" style="margin:14px 0;padding:16px 18px;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;color:#92400e;font-weight:700;font-size:15px;line-height:1.6;">
+    ⚠️ 1-17号 支援計画書は現在メンテナンス中のため、一時的にご利用いただけません。<br>
+    <span style="font-weight:400;font-size:13px;">テンプレートの調整作業を行っています。復旧までしばらくお待ちください。</span>
+  </div>
 </header>
 
 <main>
@@ -2364,6 +2369,9 @@ function updateGenerateBtn(){
 }
 
 async function onGenerate(){
+  // ver.20260804.11: 一時利用停止中
+  setStatus("現在メンテナンス中のため、1-17号は一時的にご利用いただけません。", "error");
+  return;
   clearLog();
   var btn = $("btnGenerate");
   btn.disabled = true;
