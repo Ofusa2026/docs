@@ -164,7 +164,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260723.02</span>
+  <span class="ver">ver.20260804.01</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -200,6 +200,19 @@
   <!-- ========= 現在の案件 ========= -->
   <div class="card">
     <h2>2. 案件を確認・編集</h2>
+    <!-- ver.20260804: Saysay単体でも使えるよう案件ID直接入力欄を追加。
+         案シスからiframe埋め込みで開いた場合は従来通りpostMessage(SELECT_CASE)でも読み込める（両対応）。 -->
+    <div id="caseIdInputRow" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <label style="font-size:13px;font-weight:600;">案件ID</label>
+      <input id="caseIdInput" type="text" placeholder="例: case_1776390750332"
+        style="flex:1;min-width:220px;padding:6px 8px;border:1px solid #bbb;border-radius:4px;font-size:13px;"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();loadCaseFromInput();}">
+      <button id="btnLoadCase" onclick="loadCaseFromInput()"
+        style="padding:6px 14px;border:1px solid #2563eb;background:#2563eb;color:#fff;border-radius:4px;font-size:13px;cursor:pointer;">
+        読み込む
+      </button>
+      <span id="caseIdInputMsg" style="font-size:12px;color:var(--muted);"></span>
+    </div>
     <div id="caseInfo" class="case-info">
       <div id="caseInfoEmpty" style="color:var(--muted);font-size:13px;">
         左サイドバー上部の案件選択欄で案件を選ぶと、ここに案件情報が表示されます。
@@ -765,6 +778,7 @@ window.PLACEHOLDER_MAP = {
   'パスポート.性別(漢字のみ)':'p.gender',
   '在留期間':'p.stayPeriod',
   // ===== 窓口申請書（変更）=====
+  'パスポート.氏名':'p.applicantNameEn',
   'パスポート.国籍':'p.nationality',
   'パスポート.本国における居住地':'p.homeAddress',
   'パスポート.旅券番号':'p.passport',
@@ -1830,6 +1844,41 @@ window.addEventListener("message", async function(e){
     setStatus("案件読み込みエラー: " + err.message, "error");
   }
 });
+
+// ver.20260804: 案件ID入力欄から案件を読み込む（Saysay単体対応）。
+// 上の SELECT_CASE ハンドラと同じ流れ（loadCaseById→currentCase設定→renderCaseInfo→updateGenerateBtn）を踏む。
+async function loadCaseFromInput(){
+  var inp = document.getElementById("caseIdInput");
+  var msg = document.getElementById("caseIdInputMsg");
+  var caseId = (inp && inp.value || "").trim();
+  if(!caseId){
+    if(msg){ msg.textContent = "案件IDを入力してください"; msg.style.color = "#c0392b"; }
+    return;
+  }
+  var btn = document.getElementById("btnLoadCase");
+  if(btn) btn.disabled = true;
+  if(msg){ msg.textContent = "読み込み中..."; msg.style.color = "var(--muted)"; }
+  try {
+    setStatus("案件データ取得中...", "info");
+    await loadCaseById(caseId);
+    currentCase = cData.find(function(x){ return x.id === caseId; });
+    if(!currentCase) throw new Error("案件が見つかりません: " + caseId);
+    // 雇用条件セットの既定index（案件に保持があればそれ、無ければ0）
+    currentEmpSetIdx = (currentCase && currentCase.empSetIdx != null)
+      ? String(currentCase.empSetIdx) : "0";
+    renderCaseInfo();
+    updateGenerateBtn();
+    setStatus("案件読み込み完了。テンプレートを選んでください。", "success");
+    if(msg){ msg.textContent = "✅ 読み込みました"; msg.style.color = "#0a7a3b"; }
+  } catch(err) {
+    console.error(err);
+    log("ERROR: " + err.message);
+    setStatus("案件読み込みエラー: " + err.message, "error");
+    if(msg){ msg.textContent = "❌ " + err.message; msg.style.color = "#c0392b"; }
+  } finally {
+    if(btn) btn.disabled = false;
+  }
+}
 
 function renderCaseInfo(){
   if(!currentCase){
