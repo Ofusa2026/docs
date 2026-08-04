@@ -139,7 +139,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.05</span>
+  <span class="ver">ver.20260804.06</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1887,6 +1887,70 @@ function renderCaseInfo(){
   $("caseInfoEmpty").style.display = "none";
   dl.style.display = "grid";
   renderMappingEditor();
+  // ver.20260804: 機能4/5 登録支援機関の最終更新・変更履歴を表示
+  try { renderSupportOrgAudit(c); } catch(ae){ console.warn('support audit error', ae); }
+}
+
+/* 機能4/5: 登録支援機関マスタの最終更新・変更履歴（audit_logから取得） */
+async function renderSupportOrgAudit(c){
+  var host = document.getElementById('supportAuditPanel');
+  if(!host){
+    host = document.createElement('div');
+    host.id = 'supportAuditPanel';
+    host.style.cssText = 'margin-top:12px;';
+    var ci = document.getElementById('caseInfo');
+    if(ci && ci.parentNode) ci.appendChild(host);
+  }
+  // 案件の支援機関オブジェクトを特定
+  var soName = c.org || '';
+  var so = supportOrgs.find(function(x){ return x.name === soName; });
+  if(!so || !so.id){ host.innerHTML = ''; return; }
+  host.innerHTML = '<div style="font-size:12px;color:#888;padding:6px 0;">登録支援機関の更新履歴を取得中...</div>';
+  try {
+    if(!_sb){ host.innerHTML=''; return; }
+    var res = await _sb.from('audit_log')
+      .select('user_name,operation,changed_fields,created_at')
+      .eq('table_name','support_orgs').eq('record_id', so.id)
+      .order('created_at', {ascending:false}).limit(30);
+    if(res.error) throw new Error(res.error.message);
+    var rows = res.data || [];
+    if(!rows.length){
+      host.innerHTML = '<div style="font-size:12px;color:#94a3b8;padding:6px 0;">登録支援機関「'+esc(soName)+'」の変更履歴はありません。</div>';
+      return;
+    }
+    var latest = rows[0];
+    function fmtAt(s){ try{ var d=new Date(s); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}catch(e){return s;} }
+    function keysOf(cf){ try{ return Object.keys(cf||{}).join(', ');}catch(e){return '';} }
+    // 機能4: 最終更新サマリ
+    var head = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">'
+      + '<div style="font-size:12px;color:#334155;"><b>登録支援機関マスタ 最終更新：</b>'
+      + esc(latest.user_name||'不明') + '　' + fmtAt(latest.created_at)
+      + '<span style="color:#94a3b8;">（' + esc(keysOf(latest.changed_fields)) + '）</span></div>'
+      + '<button id="soAuditToggle" style="font-size:11px;padding:4px 10px;background:#fff;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;color:#475569;font-weight:700;">変更履歴を見る（'+rows.length+'）</button>'
+      + '</div>';
+    // 機能5: 履歴リスト（初期は隠す）
+    var list = '<div id="soAuditList" style="display:none;margin-top:8px;max-height:280px;overflow:auto;border-top:1px dashed #e2e8f0;padding-top:8px;">';
+    rows.forEach(function(r){
+      list += '<div style="font-size:11px;color:#475569;padding:4px 0;border-bottom:1px solid #f1f5f9;">'
+        + '<span style="color:#0f172a;font-weight:700;">'+esc(r.user_name||'不明')+'</span>'
+        + '　<span style="color:#64748b;">'+fmtAt(r.created_at)+'</span>'
+        + '　<span style="color:#94a3b8;">'+esc(r.operation||'')+'</span>'
+        + '　<span style="color:#334155;">'+esc(keysOf(r.changed_fields))+'</span>'
+        + '</div>';
+    });
+    list += '</div></div>';
+    host.innerHTML = head + list;
+    var tgl = document.getElementById('soAuditToggle');
+    if(tgl) tgl.addEventListener('click', function(){
+      var el = document.getElementById('soAuditList');
+      var open = el.style.display !== 'none';
+      el.style.display = open ? 'none' : 'block';
+      tgl.textContent = (open ? '変更履歴を見る（' : '履歴を閉じる（') + rows.length + '）';
+    });
+  } catch(err){
+    host.innerHTML = '<div style="font-size:12px;color:#c0392b;padding:6px 0;">履歴取得エラー: '+esc(err.message||String(err))+'</div>';
+  }
 }
 
 /* ==========================================================
