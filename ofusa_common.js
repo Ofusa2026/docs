@@ -1,5 +1,11 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260804.01
+ * - loadCaseToForm: 案件ID読込時の「前案件データ残存」バグを修正。emp_setsに手当等のキーが
+ *   無い案件でも、前案件の es_a1Name/es_fixedOT* 等がフォームに残り雇用条件書に無い手当・別案件の
+ *   金額が焼き付く事故があった（三谷総建で発覚）。emp_setsループ直前に es_*/f_* 入力欄を
+ *   一旦クリア[氏名・職種・年齢性別経験・作成者、所属機関、代表者、住所など案件由来は除外]してから
+ *   今の案件のemp_setsで再セットするよう変更。
  * ver.20260801.01
  * - DB復元時に直接編集版へ applyBindings() を適用し、サイド編集値が消える不具合を修正
  * - 書類プレビューの値クリックで対応入力欄へジャンプ＆フォーカス（全書類）
@@ -972,9 +978,43 @@ async function loadCaseToForm(info, docKey){
     // 氏名は案件(cases.applicant / persons)からのみ引くべきなので、ここでは流し込まない。
     // ※ nationality / birthdate / passport 等は persons 由来の経路が無く、
     //   ここで流し込まないと31書類が空欄になるため、除外対象に含めない。
-    const _ES_SKIP = ['applicantName','applicantNameEn'];
+    // ver.20260804: 前案件の残存バグ対策。
+    //   このループは emp_sets に存在するキーだけをセットするため、次の案件の emp_sets に
+    //   手当等のキーが無いと、前案件で入った es_a1Name / es_fixedOT* 等がフォームに残り、
+    //   雇用条件書に無い手当や別案件の金額が焼き付く事故が起きていた（三谷総建で発覚）。
+    //   対策: ループ直前に「emp_sets由来の es_* フィールドだけ」を一旦クリアしてから再セットする。
+    //   ただし氏名・職種・年齢性別経験・作成者/所属機関/代表者/住所など、
+    //   案件(cases/persons)由来で既に上でセット済みのフィールドは消してはいけないため除外する。
+    //   （消すと emp_sets に同名キーが無い場合に復活せず、逆に空欄事故になる）
+    const _ES_SKIP = [
+      'applicantName','applicantNameEn',        // 氏名（案件由来・従来からの除外）
+      'applicantField','applicantFieldEn',      // 職種/分野（上で案件補完済み）
+      'age','gender','experience','exp',        // persons由来
+      'authorName','authorNameEn','authorTitle','authorTitleEn', // 作成者
+      'orgName','orgNameEn','orgAddress','orgAddressEn','orgTel', // 所属機関
+      'repName','repNameEn','repTitle','repTitleEn',              // 代表者
+      'company','companyEn','address','addressEn','tel',         // 会社・住所・電話
+      'createY','createM','createD',                             // 作成日(emp_sets/doc_create_date由来。後続の作成日処理が扱う)
+      'docYear','docMonth','docDay','docDate'                     // 作成日の別ペア(f_*)。クリアすると作成日が今日に化ける
+    ];
+    // ★ クリア: フォーム上に存在する es_* / f_* 入力欄のうち、_ES_SKIP を除いて空にする。
+    //   これで前案件の手当・控除・賃金・契約期間などの残存を消してから、
+    //   今の案件の emp_sets で上書きし直す（キーが無ければ空のままになる＝正しい挙動）。
+    try {
+      var _clrEls = document.querySelectorAll('[id^="es_"],[id^="f_"]');
+      for (var _ci = 0; _ci < _clrEls.length; _ci++) {
+        var _el = _clrEls[_ci];
+        var _id = _el.id || '';
+        var _key = _id.replace(/^es_/, '').replace(/^f_/, '');
+        if (_ES_SKIP.indexOf(_key) !== -1) continue; // 案件由来は温存
+        if (_el.tagName === 'INPUT' || _el.tagName === 'TEXTAREA' || _el.tagName === 'SELECT') {
+          _el.value = '';
+        }
+      }
+    } catch(_clrErr) { console.warn('[doc] es_* クリア失敗:', _clrErr); }
+
     Object.keys(es).forEach(k => {
-      if(_ES_SKIP.includes(k)) return;   // 氏名はひな形から流さない
+      if(_ES_SKIP.includes(k)) return;   // 氏名等はひな形から流さない
       setValMulti(['es_'+k, 'f_'+k], es[k]);
     });
 
