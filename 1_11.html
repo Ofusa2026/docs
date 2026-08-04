@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260804.09</div>
+    <div class="ver">ver.20260804.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -143,7 +143,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1785825416"></script>
+<script src="ofusa_common.js?v=1785833677"></script>
 <script>
 const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
 const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
@@ -162,11 +162,27 @@ function p(){
   const nums='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
   let offRows='';
   if(useBessi){
-    // 本体は「別紙のとおり」1行のみ
-    offRows='<tr>'
-      +'<td style="width:30%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
-      +'<td colspan="4" style="height:4em;text-align:center;vertical-align:middle;font-weight:bold;">別紙のとおり</td>'
-      +'</tr>';
+    // 5名以下と同じ表構造(①〜⑤の枠)を維持し、①のふりがな欄に「別紙記載」を左詰め表示
+    for(let i=0;i<MAX_OFF;i++){
+      const n=i+1;
+      const leftCell = i===0
+        ? '<td rowspan="'+(MAX_OFF*2)+'" style="width:30%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
+        : '';
+      // ①のふりがな行に「別紙記載」を左詰めで入れる。他の行・氏名欄は空
+      const kanaCell = (i===0)
+        ? '<td style="height:3em;text-align:left;vertical-align:middle;font-weight:bold;">別紙記載</td>'
+        : '<td style="height:3em;"></td>';
+      offRows+='<tr>'
+        +leftCell
+        +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+nums[i]+'</td>'
+        +kanaCell
+        +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
+        +'<td rowspan="2"></td>'
+        +'</tr>'
+        +'<tr>'
+        +'<td style="height:3em;"></td>'
+        +'</tr>';
+    }
   }else{
     // 本体に全役員（最大5名）を記載。左セルはrowspan=MAX_OFF*2で1つ
     for(let i=0;i<MAX_OFF;i++){
@@ -219,7 +235,6 @@ function p(){
       bessiPage+=`
 <div class="doc" style="page-break-before:always;">
 <div class="page-num-label">${pageLabel}</div>
-<div style="font-size:12pt;font-weight:bold;text-align:center;margin-bottom:4mm;">別紙</div>
 <div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">１　所属役員</div>
 <table class="tbl">
   <tbody>${bessiRows}</tbody>
