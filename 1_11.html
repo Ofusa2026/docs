@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>参考様式第１－１１号</title>
-<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<link rel="stylesheet" href="ofusa_common.css?v=1785825416">
 <style>
 .fp-case{display:none!important;}
 .doc{padding:15mm!important;line-height:1.4!important;min-height:auto!important}
@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260713.07</div>
+    <div class="ver">ver.20260804.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -41,7 +41,7 @@
       <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
       <div class="fg"><label>作成責任者役職・氏名</label><input id="f_author" oninput="p()"></div>
     </div>
-    <div class="fs"><div class="fs-title">所属役員（最大5名）</div>
+    <div class="fs"><div class="fs-title">所属役員（6名以上は自動で別紙になります）</div>
       <div class="fg"><label>役員①　役職</label><input id="off1Title" oninput="p()"></div>
       <div class="fg"><label>役員①　氏名</label><input id="off1Name" oninput="p()"></div>
       <div class="fg"><label>役員①　ふりがな</label><input id="off1Kana" oninput="p()"></div>
@@ -57,6 +57,51 @@
       <div class="fg"><label>役員⑤　役職</label><input id="off5Title" oninput="p()"></div>
       <div class="fg"><label>役員⑤　氏名</label><input id="off5Name" oninput="p()"></div>
       <div class="fg"><label>役員⑤　ふりがな</label><input id="off5Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑥　役職</label><input id="off6Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑥　氏名</label><input id="off6Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑥　ふりがな</label><input id="off6Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑦　役職</label><input id="off7Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑦　氏名</label><input id="off7Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑦　ふりがな</label><input id="off7Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑧　役職</label><input id="off8Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑧　氏名</label><input id="off8Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑧　ふりがな</label><input id="off8Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑨　役職</label><input id="off9Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑨　氏名</label><input id="off9Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑨　ふりがな</label><input id="off9Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑩　役職</label><input id="off10Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑩　氏名</label><input id="off10Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑩　ふりがな</label><input id="off10Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑪　役職</label><input id="off11Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑪　氏名</label><input id="off11Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑪　ふりがな</label><input id="off11Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑫　役職</label><input id="off12Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑫　氏名</label><input id="off12Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑫　ふりがな</label><input id="off12Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑬　役職</label><input id="off13Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑬　氏名</label><input id="off13Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑬　ふりがな</label><input id="off13Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑭　役職</label><input id="off14Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑭　氏名</label><input id="off14Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑭　ふりがな</label><input id="off14Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑮　役職</label><input id="off15Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑮　氏名</label><input id="off15Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑮　ふりがな</label><input id="off15Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑯　役職</label><input id="off16Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑯　氏名</label><input id="off16Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑯　ふりがな</label><input id="off16Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑰　役職</label><input id="off17Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑰　氏名</label><input id="off17Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑰　ふりがな</label><input id="off17Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑱　役職</label><input id="off18Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑱　氏名</label><input id="off18Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑱　ふりがな</label><input id="off18Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑲　役職</label><input id="off19Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑲　氏名</label><input id="off19Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑲　ふりがな</label><input id="off19Kana" oninput="p()"></div>
+      <div class="fg"><label>役員⑳　役職</label><input id="off20Title" oninput="p()"></div>
+      <div class="fg"><label>役員⑳　氏名</label><input id="off20Name" oninput="p()"></div>
+      <div class="fg"><label>役員⑳　ふりがな</label><input id="off20Kana" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">決算状況</div>
       <div class="fg"><label>売上高（前年度）</label><input id="f_salesY1" oninput="p()"></div>
@@ -98,33 +143,90 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1784722725"></script>
+<script src="ofusa_common.js?v=1785825416"></script>
 <script>
-const MAX_OFF=5;
+const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
+const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
 
+  // 入力済み役員の件数を数える（氏名 or ふりがな or 役職のいずれかがあれば1名とみなす）
+  let offCount=0;
+  for(let i=1;i<=MAX_OFF_ALL;i++){
+    if(v('off'+i+'Name')||v('off'+i+'Kana')||v('off'+i+'Title')) offCount=i;
+  }
+  const useBessi = offCount>MAX_OFF;   // 6名以上なら別紙方式
+
   // 役員行の生成
-  const nums='①②③④⑤';
+  const nums='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
   let offRows='';
-  // 左セルはrowspan=MAX_OFF*2で1つ
-  for(let i=0;i<MAX_OFF;i++){
-    const n=i+1;
-    const kanaKey='off'+n+'Kana', nameKey='off'+n+'Name', titleKey='off'+n+'Title';
-    const leftCell = i===0
-      ? '<td rowspan="'+(MAX_OFF*2)+'" style="width:30%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
-      : '';
-    offRows+='<tr>'
-      +leftCell
-      +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+nums[i]+'</td>'
-      +'<td style="height:3em;">'+f(kanaKey)+'</td>'
-      +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
-      +'<td rowspan="2">'+f(titleKey)+'</td>'
-      +'</tr>'
-      +'<tr>'
-      +'<td style="height:3em;">'+f(nameKey)+'</td>'
+  if(useBessi){
+    // 本体は「別紙のとおり」1行のみ
+    offRows='<tr>'
+      +'<td style="width:30%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
+      +'<td colspan="4" style="height:4em;text-align:center;vertical-align:middle;font-weight:bold;">別紙のとおり</td>'
       +'</tr>';
+  }else{
+    // 本体に全役員（最大5名）を記載。左セルはrowspan=MAX_OFF*2で1つ
+    for(let i=0;i<MAX_OFF;i++){
+      const n=i+1;
+      const kanaKey='off'+n+'Kana', nameKey='off'+n+'Name', titleKey='off'+n+'Title';
+      const leftCell = i===0
+        ? '<td rowspan="'+(MAX_OFF*2)+'" style="width:30%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
+        : '';
+      offRows+='<tr>'
+        +leftCell
+        +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+nums[i]+'</td>'
+        +'<td style="height:3em;">'+f(kanaKey)+'</td>'
+        +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
+        +'<td rowspan="2">'+f(titleKey)+'</td>'
+        +'</tr>'
+        +'<tr>'
+        +'<td style="height:3em;">'+f(nameKey)+'</td>'
+        +'</tr>';
+    }
+  }
+
+  // 別紙（役員名簿）ページの生成 — 6名以上のときだけ。多人数は複数ページに自動分割
+  let bessiPage='';
+  if(useBessi){
+    const PER_PAGE=13;  // 1ページあたりの役員数（A4に収まる安全値）
+    const pageN=Math.ceil(offCount/PER_PAGE);
+    for(let pg=0; pg<pageN; pg++){
+      const start=pg*PER_PAGE;
+      const end=Math.min(start+PER_PAGE, offCount);
+      const rowsInPage=end-start;
+      let bessiRows='';
+      for(let i=start;i<end;i++){
+        const n=i+1;
+        const kanaKey='off'+n+'Kana', nameKey='off'+n+'Name', titleKey='off'+n+'Title';
+        const leftCell = (i===start)
+          ? '<td rowspan="'+(rowsInPage*2)+'" style="width:26%;vertical-align:middle;">（ふりがな）<br>（１）役員氏名</td>'
+          : '';
+        bessiRows+='<tr>'
+          +leftCell
+          +'<td rowspan="2" style="width:5%;text-align:center;vertical-align:middle;">'+(n<=nums.length?nums[i]:n)+'</td>'
+          +'<td style="height:2.6em;">'+f(kanaKey)+'</td>'
+          +'<td rowspan="2" style="width:8%;text-align:center;vertical-align:middle;">役職</td>'
+          +'<td rowspan="2">'+f(titleKey)+'</td>'
+          +'</tr>'
+          +'<tr>'
+          +'<td style="height:2.6em;">'+f(nameKey)+'</td>'
+          +'</tr>';
+      }
+      const pageLabel = pageN>1 ? ('別紙（'+(pg+1)+'/'+pageN+'）') : '別紙';
+      bessiPage+=`
+<div class="doc" style="page-break-before:always;">
+<div class="page-num-label">${pageLabel}</div>
+<div style="font-size:12pt;font-weight:bold;text-align:center;margin-bottom:4mm;">別紙</div>
+<div style="font-size:9pt;font-weight:bold;margin-bottom:1mm;">１　所属役員</div>
+<table class="tbl">
+  <tbody>${bessiRows}</tbody>
+</table>
+<div style="font-size:8pt;margin-top:3mm;">（注意）役員が複数名いる場合は，その全てについて記載すること。</div>
+</div>`;
+    }
   }
 
   w.innerHTML=`
@@ -342,7 +444,7 @@ function p(){
 <div style="text-align:right;margin-bottom:4mm;">${f('f_docDate')}</div>
 <div style="text-align:right;margin-bottom:2mm;">特定技能所属機関の氏名又は名称　　${f('f_company')}</div>
 <div style="text-align:right;">作成責任者　役職・氏名　　${f('f_author')}</div>
-</div>`;
+</div>${bessiPage}`;
 
   _fontSize
   _fontSize = (_fontSize === 8.5) ? 9 : _fontSize;
@@ -411,7 +513,7 @@ async function loadFromDB(passedInfo){
     s('f_jpVQ',co.jp_voluntary_quit||'');s('f_jpIQ',co.jp_involuntary_quit||'');
     s('f_fgnVQ',co.fn_voluntary_quit||'');s('f_fgnIQ',co.fn_involuntary_quit||'');
     const officers=Array.isArray(co.officers)?co.officers:[];
-    officers.forEach((o,i)=>{if(i>=10)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');s(`off${i+1}Title`,o.title||'');});
+    officers.forEach((o,i)=>{if(i>=20)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');s(`off${i+1}Title`,o.title||'');});
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
