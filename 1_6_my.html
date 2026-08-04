@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260731.14</div>
+    <div class="ver">ver.20260803.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -402,7 +402,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1785750202"></script>
+<script src="ofusa_common.js?v=1785815495"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -864,7 +864,7 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(insEnrolled('insPension'),"ins_kousei")}&nbsp;厚生年金，${cb(insEnrolled('insKenpo'),"ins_kenko")}&nbsp;健康保険，${cb(insEnrolled('insEmp'),"ins_koyo")}&nbsp;雇用保険，${cb(insEnrolled('insLabor'),"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(!!otherIns(),"ins_other")}&nbsp;その他（${otherIns()?'&nbsp;'+esc(otherIns())+'&nbsp;':'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'}））<br><span class="id" style="font-size:7pt;">၁။ လူမှုဖူလုံရေးအာမခံလျှောက်ထားခြင်း၊ လုပ်သားအာမခံ ( ${cb(insEnrolled('insPension'),"ins_kousei_id")}&nbsp;လုပ်သားပင်စင် , ${cb(insEnrolled('insKenpo'),"ins_kenko_id")}&nbsp;ကျန်းမာရေးအာမခံ , ${cb(insEnrolled('insEmp'),"ins_koyo_id")}&nbsp;အလုပ်အာမခံ , ${cb(insEnrolled('insLabor'),"ins_rousai_id")}&nbsp;လုပ်သားမတော်တဆမှုလျော်ကြေး ,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")}&nbsp;နိုင်ငံတော်ပင်စင် , ${cb(false,"ins_kokumin_kenko_id")}&nbsp;နိုင်ငံတော်ကျန်းမာရေးအာမခံ , ${cb(!!otherIns(),"ins_other_id")}&nbsp;အခြား (${otherInsEn()?' '+esc(otherInsEn())+' ':' '}))</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;">၂။ အလုပ်ခန့်စဥ် ကျန်းမာရေးစစ်ဆေးခြင်း ${f('es_healthCheckY2')} နှစ် ${f('es_healthCheckM2')} လ</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;">၂။ အလုပ်ခန့်စဥ် ကျန်းမာရေးစစ်ဆေးခြင်း &nbsp;&nbsp;${f('es_healthCheckY2')}&nbsp;&nbsp; နှစ် &nbsp;&nbsp;${f('es_healthCheckM2')}&nbsp;&nbsp; လ</span></div>
       <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${fOr('es_healthCheckY','es_healthCheckY2')}年&emsp;${fOr('es_healthCheckM','es_healthCheckM2')}月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">၃။ ပထမအကြိမ်ဆေးစစ်ခြင်း ${fOr('es_healthCheckY','es_healthCheckY2')} နှစ် ${fOr('es_healthCheckM','es_healthCheckM2')} လ (နောက်ပိုင်း ၁ နှစ်အလိုက်ဆေးစစ်ခြင်း)</span></div>
       <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">၄။ အလုပ်ခန့်အပ်ခြင်းစီမံခန့်ခွဲမှု ပြင်ဆင်ခြင်းနှင့် ပတ်သတ်ပြီး ဆွေးနွေးရန် ဌာန</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">ဌာနအမည်&emsp;${f('es_contactDeptEn')}&emsp;&emsp;တာဝန်ခံဧ်။အလုပ်အကိုင်နာမည်&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(ဆက်သွယ်ရန်&emsp;${f('es_contactTel')})</span></div>

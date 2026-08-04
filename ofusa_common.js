@@ -405,22 +405,34 @@ async function printBoth(){
     // DOM順で 1-5 → 1-6 になるよう配置: 相方が5号なら本体の前、6号なら後ろ
     var pageArea=document.getElementById('pageArea')||document.querySelector('.main')||document.body;
     // 1-5と1-6を確実に別ページに: 空要素での改ページは空白ページを生むため、
-    // 動的CSSで「結合エリア末尾で改ページ」「本体先頭docで改ページ」を指定する（実測で空白ページ無しを確認済み）。
+    // 「先に来るブロックの末尾で改ページ」を動的CSSで指定する。
+    // 配置は起動元によって変わる(下のif)ので、改ページCSSも配置確定後に生成する。
     var _pbStyle=document.createElement('style');
     _pbStyle.className='__combined-pb-style';
-    _pbStyle.textContent='@media print{'+
-      '#__combinedPrintArea{page-break-after:always;break-after:page;}'+
-      '#__combinedPrintArea .doc:last-child{page-break-after:auto !important;break-after:auto !important;}'+
-      '#pageArea > .doc:first-child{page-break-before:always;break-before:page;}'+
-    '}';
     document.head.appendChild(_pbStyle);
     if(pair.otherNo==='5'){
+      // 相方=1-5 → host(1-5)を本体(1-6)の前に。DOM順: host(1-5) → pageArea(1-6)
       pageArea.parentNode.insertBefore(host, pageArea);
+      _pbStyle.textContent='@media print{'+
+        // 先頭ブロック(1-5=結合エリア)の最後のdocの後で改ページ
+        '#__combinedPrintArea{page-break-after:always;break-after:page;}'+
+        '#__combinedPrintArea .doc:last-child{page-break-after:always !important;break-after:page !important;}'+
+        // 後続ブロック(1-6=本体)の先頭docは改ページ抑制(二重改ページ=空白ページ防止)
+        '#pageArea > .doc:first-child{page-break-before:auto !important;break-before:auto !important;}'+
+      '}';
     }
     else {
+      // 相方=1-6 → host(1-6)を本体(1-5)の後に。DOM順: pageArea(1-5) → host(1-6)
       var ref=pageArea.nextSibling;
       if(ref){ pageArea.parentNode.insertBefore(host, ref); }
       else { pageArea.parentNode.appendChild(host); }
+      _pbStyle.textContent='@media print{'+
+        // 先頭ブロック(1-5=本体)の最後のdocの後で改ページ
+        '#pageArea{page-break-after:always;break-after:page;}'+
+        '#pageArea > .doc:last-child{page-break-after:always !important;break-after:page !important;}'+
+        // 後続ブロック(1-6=結合エリア)の先頭docは改ページ抑制
+        '#__combinedPrintArea .doc:first-child{page-break-before:auto !important;break-before:auto !important;}'+
+      '}';
     }
     if(ifr.parentNode) ifr.parentNode.removeChild(ifr);
     var orig=document.title;
