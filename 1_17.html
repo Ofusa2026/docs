@@ -139,7 +139,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.03</span>
+  <span class="ver">ver.20260804.04</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -229,6 +229,7 @@
 <div id="toast" class="toast"></div>
 
 <!-- ========= ライブラリ ========= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1603,6 +1604,9 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
     URL.revokeObjectURL(a.href);
     showToast('✅ Word書類を出力しました');
 
+    // ver.20260804: 機能2 生成したdocxをブラウザにプレビュー表示（ダウンロードせず中身確認）
+    try { renderDocxPreview(blob); } catch(pe){ console.warn('preview error', pe); }
+
     // プレビューも表示
     var area=document.getElementById('dg_missing_edit');
     var h='<div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px;">';
@@ -2010,6 +2014,45 @@ function renderValidationPanel(c, pd, co, es){
       + '<div style="font-weight:700;color:#0a7a3b;font-size:13px;">OK 空欄・整合性チェック 問題なし</div></div>';
   }
   host.innerHTML = html;
+}
+
+/* 機能2: 生成docxをブラウザにプレビュー表示（mammothでdocx→HTML化） */
+function renderDocxPreview(blob){
+  var host = document.getElementById('docxPreview');
+  if(!host){
+    host = document.createElement('div');
+    host.id = 'docxPreview';
+    host.style.cssText = 'margin-top:16px;';
+    var vp = document.getElementById('validationPanel');
+    var anchorEl = vp || document.getElementById('mappingEditor');
+    if(anchorEl && anchorEl.parentNode) anchorEl.parentNode.insertBefore(host, anchorEl.nextSibling);
+  }
+  host.innerHTML = '<div style="font-size:12px;color:#888;padding:8px;">プレビュー生成中...</div>';
+  if(typeof mammoth === 'undefined'){
+    host.innerHTML = '<div style="font-size:12px;color:#c0392b;padding:8px;">プレビュー用ライブラリの読み込みに失敗しました。</div>';
+    return;
+  }
+  blob.arrayBuffer().then(function(buf){
+    return mammoth.convertToHtml({arrayBuffer: buf});
+  }).then(function(res){
+    var docHtml = res.value || '';
+    // 未置換のプレースホルダ {{...}} が残っていたら赤ハイライト
+    var leftover = (docHtml.match(/\{\{[^}]+\}\}/g) || []);
+    docHtml = docHtml.replace(/\{\{[^}]+\}\}/g, function(m){
+      return '<span style="background:#fde2e1;color:#c0392b;font-weight:700;padding:0 2px;border-radius:2px;">'+m+'</span>';
+    });
+    var warn = leftover.length
+      ? '<div style="font-size:12px;color:#c0392b;margin-bottom:8px;">未反映のプレースホルダが'+leftover.length+'件あります（赤表示）。</div>'
+      : '<div style="font-size:12px;color:#0a7a3b;margin-bottom:8px;">未反映のプレースホルダはありません。</div>';
+    host.innerHTML =
+      '<div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;">'
+      + '<div style="background:#f4f6f8;padding:8px 12px;font-weight:700;font-size:13px;border-bottom:1px solid #ddd;">書類プレビュー（生成物の中身）</div>'
+      + '<div style="padding:8px 12px;">'+warn+'</div>'
+      + '<div style="max-height:520px;overflow:auto;padding:16px;background:#fff;font-size:12px;line-height:1.7;">'+docHtml+'</div>'
+      + '</div>';
+  }).catch(function(err){
+    host.innerHTML = '<div style="font-size:12px;color:#c0392b;padding:8px;">プレビュー生成エラー: '+(err&&err.message||err)+'</div>';
+  });
 }
 
 /**
