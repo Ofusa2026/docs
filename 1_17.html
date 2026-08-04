@@ -139,7 +139,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.07</span>
+  <span class="ver">ver.20260804.08</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1892,6 +1892,64 @@ function renderCaseInfo(){
 }
 
 /* 機能4/5: 登録支援機関マスタの最終更新・変更履歴（audit_logから取得） */
+/* 支援機関の詳細情報パネル（1-17に入る登録支援機関情報を確認用に表示） */
+function renderSupportOrgDetail(so){
+  var host = document.getElementById('supportDetailPanel');
+  if(!host){
+    host = document.createElement('div');
+    host.id = 'supportDetailPanel';
+    host.style.cssText = 'margin-top:12px;';
+    var me = document.getElementById('mappingEditor');
+    if(me && me.parentNode) me.parentNode.insertBefore(host, me);
+  }
+  // offices配列に入っている支援責任者・事業所情報も拾う
+  var off = (so.offices && so.offices.length) ? so.offices[0] : {};
+  var mgrName = so.supportManagerName || off.supportManager || '';
+  var mgrKana = so.supportManagerKana || off.supportManagerKana || '';
+  var mgrTitle = so.supportManagerTitle || off.supportManagerTitle || '';
+  var addr = so.address || ((so.pref||'')+(so.city||'')+(so.addressDetail||''));
+  var staffCount = so.supportStaffCount || off.supportStaffCount || '';
+  var supporterCount = so.supporterCount || off.supporterCount || '';
+
+  function row(label, val){
+    var v = (val===null||val===undefined||String(val).trim()==='') ? '<span style="color:#cbd5e1;">(未登録)</span>' : esc(String(val));
+    return '<div style="display:flex;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:12px;">'
+      + '<div style="width:130px;color:#64748b;flex-shrink:0;">'+esc(label)+'</div>'
+      + '<div style="color:#0f172a;flex:1;">'+v+'</div></div>';
+  }
+  var body =
+    row('登録支援機関名', so.name) +
+    row('ふりがな', so.nameKana) +
+    row('英語名', so.nameEn) +
+    row('登録番号', so.regNo) +
+    row('登録年月日', so.regDate) +
+    row('郵便番号', so.zip) +
+    row('住所', addr) +
+    row('英語住所', so.addressEn) +
+    row('電話番号', so.tel) +
+    row('代表者', so.repName) +
+    row('支援責任者', (mgrName? mgrName : '') + (mgrTitle? '（'+mgrTitle+'）':'') ) +
+    row('支援責任者ふりがな', mgrKana) +
+    row('支援担当者数', staffCount) +
+    row('支援実績（人数）', supporterCount);
+
+  host.innerHTML =
+    '<div style="border:1px solid #dbeafe;border-radius:8px;overflow:hidden;">'
+    + '<div id="soDetailHead" style="background:#eff6ff;padding:9px 12px;font-weight:700;font-size:13px;color:#1e40af;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
+    + '<span><span id="soDetailArrow" style="display:inline-block;width:14px;">▼</span> この案件の登録支援機関：'+esc(so.name||'')+'</span>'
+    + '<span style="font-size:11px;color:#3b82f6;">クリックで開閉</span></div>'
+    + '<div id="soDetailBody" style="padding:10px 14px;background:#fff;">'+body+'</div>'
+    + '</div>';
+  var head = document.getElementById('soDetailHead');
+  if(head) head.addEventListener('click', function(){
+    var b = document.getElementById('soDetailBody');
+    var ar = document.getElementById('soDetailArrow');
+    var open = b.style.display !== 'none';
+    b.style.display = open ? 'none' : 'block';
+    ar.textContent = open ? '▶' : '▼';
+  });
+}
+
 async function renderSupportOrgAudit(c){
   var host = document.getElementById('supportAuditPanel');
   if(!host){
@@ -1905,6 +1963,8 @@ async function renderSupportOrgAudit(c){
   var soName = c.org || '';
   var so = supportOrgs.find(function(x){ return x.name === soName; });
   if(!so || !so.id){ host.innerHTML = ''; return; }
+  // ver.20260804: 支援機関の詳細情報パネルを表示
+  try { renderSupportOrgDetail(so); } catch(de){ console.warn('support detail error', de); }
   host.innerHTML = '<div style="font-size:12px;color:#888;padding:6px 0;">登録支援機関の更新履歴を取得中...</div>';
   try {
     if(!_sb){ host.innerHTML=''; return; }
