@@ -139,7 +139,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.04</span>
+  <span class="ver">ver.20260804.05</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1911,29 +1911,68 @@ function renderMappingEditor(){
   var rows = [];
   mappingDirtyKeys = {};
 
-  MAPPING_1_17.forEach(function(m, i){
-    var info = resolveMappingWriteTarget(m.field);
-    // 現在値の取得（編集可能な原始値）
-    var currentValue = readFieldValue(m.field, c, pd, co, es);
-    var editable = info.editable;
-    var cellId = 'mapInput_' + i;
-    var targetLabel = info.table ? info.table + '.' + info.column : '(自動計算)';
+  // 機能3: フィールドのプレフィックスでカテゴリ分類
+  function _catOf(field){
+    if(!field) return {key:'other', label:'その他'};
+    if(field.indexOf('p.')===0 || /^(applicant|birth|gender|nationality|passport)/.test(field)) return {key:'person', label:'申請人'};
+    if(field.indexOf('co.')===0) return {key:'company', label:'企業情報'};
+    if(field.indexOf('es.')===0) return {key:'emp', label:'雇用条件'};
+    if(field.indexOf('so.')===0) return {key:'so', label:'登録支援機関'};
+    if(field.indexOf('case.')===0) return {key:'case', label:'作成日・案件'};
+    return {key:'other', label:'その他'};
+  }
+  var _catOrder = ['person','company','emp','so','case','other'];
+  var _grouped = {};
+  MAPPING_1_17.forEach(function(m, i){ var c2=_catOf(m.field); (_grouped[c2.key]=_grouped[c2.key]||{label:c2.label,items:[]}).items.push({m:m,i:i}); });
 
+  _catOrder.forEach(function(catKey){
+    var g = _grouped[catKey];
+    if(!g || !g.items.length) return;
+    // カテゴリ見出し行（クリックで開閉）
     rows.push(
-      '<tr>' +
-        '<td style="padding:6px 8px;border-bottom:1px solid #eee;color:#555;">' + esc(m.label||m.cell||m.field) + '</td>' +
-        '<td style="padding:4px 8px;border-bottom:1px solid #eee;">' +
-          (editable
-            ? '<input type="text" id="'+cellId+'" data-field="'+esc(m.field)+'" value="'+esc(currentValue)+'" '
-              + 'style="width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;">'
-            : '<span style="color:#888;font-style:italic;">'+esc(currentValue||'(空)')+'</span>'
-          ) +
+      '<tr class="mapCatHead" data-cat="'+catKey+'" style="cursor:pointer;background:#eef2f7;">' +
+        '<td colspan="3" style="padding:7px 10px;font-weight:700;font-size:12px;color:#334155;border-bottom:1px solid #dbe3ec;">' +
+          '<span class="mapCatArrow" style="display:inline-block;width:14px;">▼</span> ' + esc(g.label) + '（'+g.items.length+'）' +
         '</td>' +
-        '<td style="padding:6px 8px;border-bottom:1px solid #eee;color:#999;font-size:10px;">' + esc(targetLabel) + '</td>' +
       '</tr>'
     );
+    g.items.forEach(function(it){
+      var m = it.m, i = it.i;
+      var info = resolveMappingWriteTarget(m.field);
+      var currentValue = readFieldValue(m.field, c, pd, co, es);
+      var editable = info.editable;
+      var cellId = 'mapInput_' + i;
+      var targetLabel = info.table ? info.table + '.' + info.column : '(自動計算)';
+      var isEmpty = (currentValue===null||currentValue===undefined||String(currentValue).trim()==='');
+      var emptyBg = isEmpty ? 'background:#fffaf0;' : '';
+      rows.push(
+        '<tr class="mapRow cat-'+catKey+'" style="'+emptyBg+'">' +
+          '<td style="padding:6px 8px 6px 26px;border-bottom:1px solid #eee;color:#555;">' + esc(m.label||m.cell||m.field) + '</td>' +
+          '<td style="padding:4px 8px;border-bottom:1px solid #eee;">' +
+            (editable
+              ? '<input type="text" id="'+cellId+'" data-field="'+esc(m.field)+'" value="'+esc(currentValue)+'" '
+                + 'style="width:100%;padding:4px 6px;border:1px solid '+(isEmpty?'#f0c36d':'#ccc')+';border-radius:3px;font-size:12px;'+(isEmpty?'background:#fffdf5;':'')+'">'
+              : '<span style="color:#888;font-style:italic;">'+esc(currentValue||'(空)')+'</span>'
+            ) +
+          '</td>' +
+          '<td style="padding:6px 8px;border-bottom:1px solid #eee;color:#999;font-size:10px;">' + esc(targetLabel) + '</td>' +
+        '</tr>'
+      );
+    });
   });
   tbody.innerHTML = rows.join('');
+
+  // カテゴリ見出しクリックで開閉
+  Array.from(tbody.querySelectorAll('.mapCatHead')).forEach(function(head){
+    head.addEventListener('click', function(){
+      var cat = head.dataset.cat;
+      var arrow = head.querySelector('.mapCatArrow');
+      var rowsEl = tbody.querySelectorAll('.cat-'+cat);
+      var hide = arrow.textContent === '▼';
+      arrow.textContent = hide ? '▶' : '▼';
+      Array.from(rowsEl).forEach(function(r){ r.style.display = hide ? 'none' : ''; });
+    });
+  });
   $("mappingEditor").style.display = "block";
 
   // 入力変更で「保存」ボタン有効化
