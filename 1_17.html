@@ -139,7 +139,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.06</span>
+  <span class="ver">ver.20260804.07</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1898,8 +1898,8 @@ async function renderSupportOrgAudit(c){
     host = document.createElement('div');
     host.id = 'supportAuditPanel';
     host.style.cssText = 'margin-top:12px;';
-    var ci = document.getElementById('caseInfo');
-    if(ci && ci.parentNode) ci.appendChild(host);
+    var me = document.getElementById('mappingEditor');
+    if(me && me.parentNode) me.parentNode.insertBefore(host, me);
   }
   // 案件の支援機関オブジェクトを特定
   var soName = c.org || '';
