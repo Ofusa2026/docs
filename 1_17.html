@@ -139,9 +139,9 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20260804.11</span>
+  <span class="ver">ver.20260804.12</span>
   <a href="./index.html" class="back">← docsトップへ</a>
-  <!-- ver.20260804.11: 一時利用停止（テンプレの黄色ハイライト対応中） -->
+  <!-- ver.20260804.12: 一時利用停止（テンプレの黄色ハイライト対応中） -->
   <div id="maintBanner" style="margin:14px 0;padding:16px 18px;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;color:#92400e;font-weight:700;font-size:15px;line-height:1.6;">
     ⚠️ 1-17号 支援計画書は現在メンテナンス中のため、一時的にご利用いただけません。<br>
     <span style="font-weight:400;font-size:13px;">テンプレートの調整作業を行っています。復旧までしばらくお待ちください。</span>
@@ -1590,6 +1590,10 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
       // デバッグ: xmlにso.関連変数があるか確認
       xml = fixSplitPlaceholders(xml, PLACEHOLDER_MAP, rv);
 
+      // ver.20260804.12: 黄色ハイライト整理
+      // 文字が入っている箇所の黄色は消す／空欄（スペースのみ）の黄色は残す（手書き記入欄の目印）
+      xml = stripFilledYellowHighlights(xml);
+
       var _xmlBytes = new TextEncoder().encode(xml);
       zip.file('word/document.xml', _xmlBytes);
       return zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
@@ -1634,6 +1638,23 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
 }
 
 // run分割されたプレースホルダーを修復して置換
+/* 黄色ハイライト整理：値が入った箇所の黄色は消し、空欄（スペース/全角スペースのみ）は残す。
+   w:r（run）単位で処理。runのw:tテキストが実質空でなければ、そのrunのw:highlight yellowを削除する。
+   cyan/greenなど他色や、空欄runの黄色には触れない。 */
+function stripFilledYellowHighlights(xml){
+  return xml.replace(/<w:r\b[^>]*>[\s\S]*?<\/w:r>/g, function(run){
+    if(run.indexOf('w:val="yellow"') === -1) return run;
+    var texts = run.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/g) || [];
+    var joined = texts.map(function(t){
+      var m = t.match(/<w:t[^>]*>([\s\S]*?)<\/w:t>/);
+      return m ? m[1] : '';
+    }).join('');
+    var stripped = joined.replace(/[\s\u3000]/g,'');
+    if(stripped === '') return run; // 空欄→黄色を残す
+    return run.replace(/<w:highlight\s+w:val="yellow"\s*\/>/g, ''); // 文字あり→黄色のみ削除
+  });
+}
+
 function fixSplitPlaceholders(xml, phMap, rv){
   // 全w:tノード（開閉タグ + self-closing）の位置を記録
   var tNodes=[];
@@ -2369,7 +2390,7 @@ function updateGenerateBtn(){
 }
 
 async function onGenerate(){
-  // ver.20260804.11: 一時利用停止中
+  // ver.20260804.12: 一時利用停止中
   setStatus("現在メンテナンス中のため、1-17号は一時的にご利用いただけません。", "error");
   return;
   clearLog();
