@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260805.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -68,11 +68,17 @@
 </div>
 <script src="ofusa_common.js?v=1785894190"></script>
 <script>
-const MAX_OFF=8;
+const MAX_OFF=20;
+const _offMark=function(i){ return '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳'[i] || ('('+(i+1)+')'); };
 function buildOfficerForm(){
   document.getElementById('officerList').innerHTML=Array.from({length:MAX_OFF},(_,i)=>`
     <div style="background:#f8f8f8;padding:4px 6px;border-radius:4px;margin-bottom:4px;">
-      <div style="font-size:9px;font-weight:700;color:#333;">役員${'①②③④⑤⑥⑦⑧'[i]}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:9px;font-weight:700;color:#333;">役員${_offMark(i)}</div>
+        <label style="font-size:9px;color:#2563eb;cursor:pointer;display:flex;align-items:center;gap:3px;">
+          <input type="checkbox" id="off${i+1}Show" checked onchange="p()" style="cursor:pointer;">載せる
+        </label>
+      </div>
       <div class="fg"><label>ふりがな</label><input id="off${i+1}Kana" oninput="p()"></div>
       <div class="fg"><label>氏名</label><input id="off${i+1}Name" oninput="p()"></div>
     </div>`).join('');
@@ -80,14 +86,25 @@ function buildOfficerForm(){
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  const totalRows = MAX_OFF * 2;
-  const rows = Array.from({length:MAX_OFF},(_,i)=>{
+  // 「載せる」にチェックが入っている役員だけを対象にする。
+  // 入力途中（初期）はプレースホルダ表示のため、1名も確定入力が無ければ最低8行の空欄を出す。
+  const chk=(id)=>{const e=document.getElementById(id);return e?e.checked:true;};
+  let _picked=[];
+  for(let i=0;i<MAX_OFF;i++){
     const kana=v(`off${i+1}Kana`), name=v(`off${i+1}Name`);
+    if((kana||name) && chk(`off${i+1}Show`)) _picked.push({kana,name});
+  }
+  // 表示する行データ：選択済みがあればそれ、無ければ空欄8行（プレースホルダ）
+  const disp = _picked.length ? _picked : Array.from({length:8},()=>({kana:'',name:''}));
+  const rowCount = disp.length;
+  const totalRows = rowCount * 2;
+  const rows = disp.map((o,i)=>{
+    const kana=o.kana, name=o.name;
     const leftCell = i===0
       ? `<td style="border:1px solid #333;padding:3px 6px;width:140px;vertical-align:top;text-align:left;" rowspan="${totalRows}">（ふりがな）<br>役員の氏名</td>`
       : '';
-    return `<tr>${leftCell}<td style="border:1px solid #333;padding:2px 5px;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Kana</span>`}</td></tr>
-<tr><td style="border:1px solid #333;padding:2px 5px;">${name||`<span class="f" style="color:#aaa;font-size:0.8em;">off${i+1}Name</span>`}</td></tr>`;
+    return `<tr>${leftCell}<td style="border:1px solid #333;padding:2px 5px;">${kana||`<span class="f" style="color:#aaa;font-size:0.8em;">（ふりがな）</span>`}</td></tr>
+<tr><td style="border:1px solid #333;padding:2px 5px;">${name||`<span class="f" style="color:#aaa;font-size:0.8em;">（氏名）</span>`}</td></tr>`;
   }).join('');
   w.innerHTML=`
 <div class="doc">
