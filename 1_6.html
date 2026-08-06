@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260803.21</div>
+    <div class="ver">ver.20260806.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -458,7 +458,8 @@ function p(){
 
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
-  const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const flexTypeShown=v('es_flexType')||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && !!_vw);
+  // ver.20260806: 変形労働の日本語表示はサイドバー入力欄 es_flexUnit を参照する（従来は入力欄の無い es_flexType を見ており手入力が反映されなかった）
+  const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const _flexUnitInput=v('es_flexUnit'); const flexTypeShown=v('es_flexType')||_flexUnitInput||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && (!!_flexUnitInput || !!_vw));
   // ver.20260716: 賞与も退職金と同じく cb() でプレビュー上のクリック切替を効かせる
   const bonusOn = v('es_bonus')==='有';
   const retOn = v('es_retirement')==='有' || !!v('es_retirementDetail');
@@ -1252,7 +1253,7 @@ function _isJippi(fld){ return /実費/.test(v(fld+'Est')||''); }
 function _jT(fld){ return ff(fld); }
 function _jSuf(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（実費）</span>':''; }
 function _jSufE(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（biaya aktual）</span>':''; }
-function _setJippi(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } if(typeof p==='function') p(); }
+function _setJippi(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } if(!checked){ var a=document.getElementById(base); if(a && /実費/.test(a.value||'')) a.value=''; } /* ver.20260806: OFF時に金額欄の「実費」も消し、_syncJippiでの再チェックを防ぐ */ if(typeof p==='function') p(); }
 function _syncJippi(){ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(b){ var amt=document.getElementById(b), est=document.getElementById(b+'Est'), cb=document.getElementById(b+'Jippi'); if(!amt||!est) return; if(/実費/.test(amt.value||'')){ var oe=est.value||''; amt.value=(oe&&!/実費/.test(oe))?oe:''; est.value='実費'; } if(cb) cb.checked=/実費/.test(est.value||''); }); }
 function _jippiDefault(){ try{_syncJippi();}catch(e){} }
 function _kensetsuBonus(txt){

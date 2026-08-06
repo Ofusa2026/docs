@@ -1,5 +1,10 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260806.01
+ * - loadCaseToForm: 業務区分2(category2/category2En)に emp_sets の生値「建築（建設分野・特定技能１号）」等が
+ *   括弧付きのまま入り、fBunyaPair表示とサイドバー入力欄がズレる／サイドバーで消しても復活する不具合を修正。
+ *   2つ目の区分は「categoryのカンマ2件目」優先、無ければ別フィールドcategory2を括弧除去して採用し、
+ *   どちらも無ければ空にして生値の残存を防ぐようにした。
  * ver.20260805.01
  * - loadCaseToForm: 案件ID読込時の「前案件データ残存」バグを修正。emp_setsに手当等のキーが
  *   無い案件でも、前案件の es_a1Name/es_fixedOT* 等がフォームに残り雇用条件書に無い手当・別案件の
@@ -1025,12 +1030,17 @@ async function loadCaseToForm(info, docKey){
       if(raw) setValMulti(['es_'+k,'f_'+k], _stripP(raw));
     });
     // category / categoryEn は括弧除去＋カンマ区切りで category2 に分割
+    // ver.20260806: category2/category2En に生値（例「建築（建設分野・特定技能１号）」）が
+    //   そのまま残り、サイドバーで消しても復活する不具合を修正。2つ目は
+    //   「categoryのカンマ2件目」を優先し、無ければ別フィールドcategory2を括弧除去して採用。
+    //   どちらも無ければ空にして生値の残存を防ぐ。
     ['category','categoryEn'].forEach(k=>{
       const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
-      if(!raw) return;
+      const raw2=(window._fieldData&&window._fieldData['es_'+k+'2'])||'';
       const parts=raw.split(/[,、]\s*/).map(s=>_stripP(s)).filter(Boolean);
       setValMulti(['es_'+k,'f_'+k], parts[0]||'');
-      if(parts[1]) setValMulti(['es_'+k+'2','f_'+k+'2'], parts[1]);
+      const second = (parts.length>1) ? parts[1] : _stripP(raw2);
+      setValMulti(['es_'+k+'2','f_'+k+'2'], second||'');
     });
 
     // === 作成日 ===
