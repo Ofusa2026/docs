@@ -1936,3 +1936,67 @@ function renderRepSelect(co, es){
     + '</select>';
 }
 // ===== /代表者プルダウン =====
+
+/* ===== マスター（テンプレ座標）編集：端末ゲート＆書き出し ver.20260806.02 =====
+   位置調整ツールは「この端末に印がある人（＝あなた）だけ」表示する。
+   印の付与/解除: URLに ?master=on / ?master=off（Saysay外で一度開けばOK。
+   Saysayのiframeは同一オリジンなのでlocalStorageが共有され、Saysay内でもボタンが出る）。
+   書き出し: 現在適用中(ドラッグ後)の .av 座標をそのまま絶対mmとして出力し、
+   Claudeがソースへ焼き込む→全案件共通テンプレ位置になる。 */
+function ofusaMasterGate(){
+  try{
+    var qs=new URLSearchParams(location.search);
+    if(qs.get('master')==='on'){ try{localStorage.setItem('ofusaMasterEdit','1');}catch(_){}
+      if(typeof showToast==='function') showToast('🔑 マスター編集モードON（この端末のみ）'); }
+    if(qs.get('master')==='off'){ try{localStorage.removeItem('ofusaMasterEdit');}catch(_){}
+      if(typeof showToast==='function') showToast('マスター編集モードOFF'); }
+  }catch(_e){}
+  var on=false; try{ on=localStorage.getItem('ofusaMasterEdit')==='1'; }catch(_){}
+  var b=document.getElementById('adjModeBtn'); if(b) b.style.display=on?'':'none';
+  var x=document.getElementById('tplExportBtn'); if(x) x.style.display=on?'':'none';
+  return on;
+}
+window.ofusaMasterGate=ofusaMasterGate;
+window._isMasterEdit=function(){ try{ return localStorage.getItem('ofusaMasterEdit')==='1'; }catch(_){ return false; } };
+
+window.ofusaExportTplCoords=function(docKey){
+  var store=document.getElementById('f__adjust');
+  var A={}; try{ A=JSON.parse((store&&store.value)||'{}'); }catch(_){}
+  var keys=Object.keys(A);
+  if(!keys.length){ alert('調整された欄がありません。\n「🔧位置調整」でドラッグしてから書き出してください。'); return; }
+  var out={_doc:docKey||'', fields:{}};
+  keys.forEach(function(k){
+    var el=document.querySelector('.doc .av[data-f="'+k+'"]');
+    if(!el){ out.fields[k]={note:'element-not-found', d:A[k]}; return; }
+    var L=parseFloat(el.style.left), T=parseFloat(el.style.top), S=parseFloat(el.style.fontSize);
+    var o={ d:A[k] };
+    if(!isNaN(L)) o.left=+L.toFixed(2);
+    if(!isNaN(T)) o.top=+T.toFixed(2);
+    if(!isNaN(S)) o.fs=+S.toFixed(1);
+    out.fields[k]=o;
+  });
+  var txt=JSON.stringify(out,null,2);
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  var box=document.createElement('div');
+  box.style.cssText='background:#fff;max-width:680px;width:92%;max-height:82vh;overflow:auto;border-radius:12px;padding:18px;font-family:sans-serif;';
+  var h=document.createElement('div'); h.style.cssText='font-weight:800;font-size:15px;margin-bottom:8px;'; h.textContent='📐 テンプレ座標の書き出し';
+  var p=document.createElement('div'); p.style.cssText='font-size:12.5px;color:#444;margin-bottom:10px;line-height:1.6;';
+  p.textContent='この内容をコピーして Claude に貼り付けてください。ソース座標へ焼き込み→全案件共通のテンプレ位置に反映します。';
+  var ta=document.createElement('textarea'); ta.readOnly=true;
+  ta.style.cssText='width:100%;height:320px;font-family:monospace;font-size:12px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;';
+  ta.value=txt;
+  var row=document.createElement('div'); row.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:flex-end;';
+  var cp=document.createElement('button'); cp.textContent='コピー'; cp.style.cssText='padding:6px 14px;background:#16a34a;color:#fff;border:none;border-radius:8px;cursor:pointer;';
+  var cl=document.createElement('button'); cl.textContent='閉じる'; cl.style.cssText='padding:6px 14px;background:#64748b;color:#fff;border:none;border-radius:8px;cursor:pointer;';
+  cp.onclick=function(){ ta.select(); try{ navigator.clipboard.writeText(txt); }catch(_){ try{document.execCommand('copy');}catch(__){} } cp.textContent='コピーしました'; };
+  cl.onclick=function(){ ov.remove(); };
+  ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+  row.appendChild(cp); row.appendChild(cl);
+  box.appendChild(h); box.appendChild(p); box.appendChild(ta); box.appendChild(row);
+  ov.appendChild(box); document.body.appendChild(ov); ta.select();
+};
+
+if(document.readyState!=='loading') ofusaMasterGate();
+else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
+/* ===== /マスター編集ゲート＆書き出し ===== */
