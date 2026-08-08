@@ -187,7 +187,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20260808.01</div>
+    <div class="ver">ver.20260808.03</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -980,8 +980,8 @@ ${pick&&v('f_fam6Liv')==='無'?'<div class="cirs" style="left:116.96mm;top:254.4
 </div>
 <div class="doc docabs" id="docP2">
 <div class="page-num-label">P2</div>
-<div class="av avg" style="left:105.01mm;top:22.50mm;font-size:10.44pt;transform:translateX(-50%);">${f('f_soName')}</div>
-<div class="av avg" style="left:80.91mm;top:31.82mm;font-size:9.5pt;transform:translateX(-50%);">${f('f_soAddr')}</div>
+<div class="av avg avfit" data-w="75.6" style="left:104.78mm;top:22.50mm;font-size:10.44pt;transform:translateX(-50%);max-width:75.6mm;">${f('f_soName')}</div>
+<div class="av avg avfit" data-w="56.9" style="left:80.69mm;top:31.82mm;font-size:9.5pt;transform:translateX(-50%);max-width:56.9mm;">${f('f_soAddr')}</div>
 <div class="av avg" style="left:163.46mm;top:31.35mm;font-size:10.44pt;transform:translateX(-50%);">${f('f_soTel')}</div>
 <div class="av avg" style="left:63.73mm;top:184.52mm;font-size:10.44pt;transform:translateX(-50%);">${f('f_ti1Occ')}</div>
 <div class="av avg" style="left:144.30mm;top:184.52mm;font-size:10.44pt;transform:translateX(-50%);">${f('f_ti1Ope')}</div>
@@ -1034,7 +1034,7 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:32.27mm;top:250.84mm;f
 </div>
 <div class="doc docabs" id="docP4">
 <div class="page-num-label">P3</div>
-<div class="av avg" style="left:111.2mm;top:12.86mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_fname')}</div>
+<div class="av avg avfit" data-w="75.9" style="left:110.67mm;top:12.86mm;font-size:8.28pt;transform:translateX(-50%);max-width:75.9mm;">${f('f_fname')}</div>
 <div class="av avg" style="left:66.06mm;top:23.96mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_csY')}</div>
 <div class="av avg" style="left:120.60mm;top:23.96mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_ceY')}</div>
 <div class="av avg" style="left:83.57mm;top:23.96mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_csM')}</div>
@@ -1102,7 +1102,7 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="pickhot cb-click" style="left:163.40mm;top:136.62mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q6','無')" title="f_q6=無"></div>
 
 
-<div class="av avg" style="left:74.10mm;top:201.20mm;font-size:9pt;transform:translateX(-50%);">${f('f_dpName')}</div>
+<div class="av avg avfit" data-w="48.6" style="left:73.67mm;top:201.20mm;font-size:9pt;transform:translateX(-50%);max-width:48.6mm;">${f('f_dpName')}</div>
 <div class="av avg" style="left:128.35mm;top:201.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpCorp')||'').replace(/-/g,'').charAt(0)}</div>
 <div class="av avg" style="left:132.24mm;top:201.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpCorp')||'').replace(/-/g,'').charAt(1)}</div>
 <div class="av avg" style="left:136.13mm;top:201.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpCorp')||'').replace(/-/g,'').charAt(2)}</div>
@@ -1127,16 +1127,16 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="av avg" style="left:65.98mm;top:213.90mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpEi')||'').replace(/-/g,'').charAt(8)}</div>
 <div class="av avg" style="left:69.87mm;top:213.90mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpEi')||'').replace(/-/g,'').charAt(9)}</div>
 <div class="av avg" style="left:77.65mm;top:213.90mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_dpEi')||'').replace(/-/g,'').charAt(10)}</div>
-<div class="av avg" style="left:81.60mm;top:222.30mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_dpAddr')}</div>
+<div class="av avg avfit" data-w="64.2" style="left:81.46mm;top:222.30mm;font-size:8.8pt;transform:translateX(-50%);max-width:64.2mm;">${f('f_dpAddr')}</div>
 <div class="av avg" style="left:151.70mm;top:222.00mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_dpTel')}</div>
-<div class="av avg" style="left:81.60mm;top:229.50mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_dpRep')}</div>
+<div class="av avg avfit" data-w="48.6" style="left:81.50mm;top:229.50mm;font-size:8.8pt;transform:translateX(-50%);max-width:48.6mm;">${f('f_dpRep')}</div>
 <div class="av avg" style="left:62.10mm;top:235.10mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsY')}</div>
 <div class="av avg" style="left:77.30mm;top:235.40mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsM')}</div>
 <div class="av avg" style="left:93.40mm;top:234.80mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsD')}</div>
 <div class="av avg" style="left:116.70mm;top:234.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeY')}</div>
 <div class="av avg" style="left:132.10mm;top:234.80mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeM')}</div>
 <div class="av avg" style="left:147.80mm;top:234.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeD')}</div>
-<div class="av avg" style="left:74.10mm;top:252.30mm;font-size:9pt;transform:translateX(-50%);">${f('f_jaName')}</div>
+<div class="av avg avfit" data-w="48.6" style="left:73.71mm;top:252.30mm;font-size:9pt;transform:translateX(-50%);max-width:48.6mm;">${f('f_jaName')}</div>
 <div class="av avg" style="left:128.35mm;top:252.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaCorp')||'').replace(/-/g,'').charAt(0)}</div>
 <div class="av avg" style="left:132.24mm;top:252.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaCorp')||'').replace(/-/g,'').charAt(1)}</div>
 <div class="av avg" style="left:136.13mm;top:252.30mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaCorp')||'').replace(/-/g,'').charAt(2)}</div>
@@ -1161,7 +1161,7 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="av avg" style="left:65.98mm;top:266.80mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaEi')||'').replace(/-/g,'').charAt(8)}</div>
 <div class="av avg" style="left:69.87mm;top:266.80mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaEi')||'').replace(/-/g,'').charAt(9)}</div>
 <div class="av avg" style="left:77.65mm;top:266.80mm;font-size:8.3pt;transform:translateX(-50%);">${(v('f_jaEi')||'').replace(/-/g,'').charAt(10)}</div>
-<div class="av avg" style="left:81.60mm;top:275.40mm;font-size:7.3pt;transform:translateX(-50%);">${f('f_jaAddr')}</div>
+<div class="av avg avfit" data-w="64.2" style="left:81.46mm;top:275.40mm;font-size:7.3pt;transform:translateX(-50%);max-width:64.2mm;">${f('f_jaAddr')}</div>
 <div class="av avg" style="left:152.00mm;top:274.90mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_jaTel')}</div>
 <div class="av avg" style="left:67.90mm;top:281.90mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_jaNo')}</div>
 <div class="av avg" style="left:117.80mm;top:280.30mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_jaY')}</div>
@@ -1174,14 +1174,14 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="av avm" style="left:75.36mm;top:36.92mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_o2coName')}</div>
 <div class="av avm" style="left:159.65mm;top:36.92mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coCorp')}</div>
 <div class="av avm" style="left:126.17mm;top:49.87mm;font-size:8.28pt;transform:translateX(-50%);">${f('f_coEi')}</div>
-<div class="av avm" style="left:71.13mm;top:79.57mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coAddr')}</div>
+<div class="av avm avfit" data-w="86.8" style="left:71.00mm;top:79.57mm;font-size:7.56pt;transform:translateX(-50%);max-width:86.8mm;">${f('f_coAddr')}</div>
 <div class="av avm" style="left:162.19mm;top:79.57mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_coTel')}</div>
 <div class="av avm" style="left:60.35mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${ff('f_capital')}</div>
 <div class="av avm" style="left:145.64mm;top:86.10mm;font-size:6.96pt;transform:translateX(-100%);">${ff('f_sales')}</div>
 <div class="av avm" style="left:72.97mm;top:94.74mm;font-size:6.96pt;transform:translateX(-100%);">${f('f_staff')}</div>
-<div class="av avg" style="left:160.08mm;top:94.64mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_rep')}</div>
+<div class="av avg avfit" data-w="53.0" style="left:159.91mm;top:94.64mm;font-size:7.56pt;transform:translateX(-50%);max-width:53.0mm;">${f('f_rep')}</div>
 <div class="av avm" style="left:79.54mm;top:102.62mm;font-size:6.24pt;transform:translateX(-50%);">${f('f_office')}</div>
-<div class="av avm" style="left:151.58mm;top:102.35mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_officeAddr')}</div>
+<div class="av avm avfit" data-w="61.4" style="left:151.44mm;top:102.35mm;font-size:7.56pt;transform:translateX(-50%);max-width:61.4mm;">${f('f_officeAddr')}</div>
 <div class="av avg" style="left:102.81mm;top:123.06mm;font-size:7.56pt;transform:translateX(-50%);">${f('f_li1')}${f('f_li2')}${f('f_li3')}${f('f_li4')}${f('f_li5')}</div>
 ${v('f_ins1')==='有'?'<div class="cir" style="left:123.78mm;top:108.40mm"></div>':''}
 ${v('f_ins1')==='無'?'<div class="cir" style="left:126.96mm;top:108.40mm"></div>':''}
@@ -1249,10 +1249,10 @@ ${v('f_q27sel')==='1'?'<span class="av avm" style="left:30.79mm;top:71.43mm;font
 ${v('f_q27sel')==='2'?'<span class="av avm" style="left:30.79mm;top:81.76mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q27sel')==='3'?'<span class="av avm" style="left:30.79mm;top:92.10mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q27sel')==='4'?'<span class="av avm" style="left:30.79mm;top:102.43mm;font-size:9.5pt;">■</span>':''}
-<div class="av avg" style="left:71.48mm;top:201.92mm;font-size:9.3pt;">${f('f_smName')}</div>
+<div class="av avg avfit" data-w="41.2" style="left:71.63mm;top:201.92mm;font-size:9.3pt;transform:translateX(-50%);max-width:41.2mm;">${f('f_smName')}</div>
 ${v('f_smYN')==='有'?'<div class="cir" style="left:165.74mm;top:208.63mm"></div>':''}
 ${v('f_smYN')==='無'?'<div class="cir" style="left:168.91mm;top:208.63mm"></div>':''}
-<div class="av avg" style="left:71.48mm;top:214.92mm;font-size:9.3pt;">${f('f_ssName')}</div>
+<div class="av avg avfit" data-w="41.2" style="left:71.63mm;top:214.92mm;font-size:9.3pt;transform:translateX(-50%);max-width:41.2mm;">${f('f_ssName')}</div>
 ${v('f_ssYN')==='有'?'<div class="cir" style="left:165.74mm;top:221.54mm"></div>':''}
 ${v('f_ssYN')==='無'?'<div class="cir" style="left:168.91mm;top:221.54mm"></div>':''}
 <div class="cir" style="left:164.64mm;top:185.89mm;width:5.91mm;height:4.63mm"></div>
@@ -1278,8 +1278,8 @@ ${v('f_q35sel')==='1'?'<span class="av avm" style="left:30.79mm;top:238.07mm;fon
 ${v('f_q35sel')==='2'?'<span class="av avm" style="left:30.79mm;top:250.99mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;font-size:9.5pt;">■</span>':''}
 <div class="av avg" style="left:96.99mm;top:264.00mm;font-size:8.5pt;">${f('f_q35d')}</div>
-<div class="av avg" style="left:147.31mm;top:202.00mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_smTitle')}</div>
-<div class="av avg" style="left:147.31mm;top:214.92mm;font-size:8.5pt;transform:translateX(-50%);">${f('f_ssTitle')}</div>
+<div class="av avg avfit" data-w="49.1" style="left:142.51mm;top:202.00mm;font-size:8.5pt;transform:translateX(-50%);max-width:49.1mm;">${f('f_smTitle')}</div>
+<div class="av avg avfit" data-w="49.1" style="left:142.51mm;top:214.92mm;font-size:8.5pt;transform:translateX(-50%);max-width:49.1mm;">${f('f_ssTitle')}</div>
 
 <div class="pickhot cb-click" style="left:165.20mm;top:159.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','有')" title="f_coop1=有"></div>
 <div class="pickhot cb-click" style="left:167.85mm;top:159.22mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','無')" title="f_coop1=無"></div>
@@ -1346,19 +1346,19 @@ ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;fon
 </div>
 <div class="doc docabs" id="docP7">
 <div class="page-num-label">P6</div>
-<div class="av avg" style="left:69.34mm;top:215.39mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roName')}</div>
-<div class="av avg" style="left:69.63mm;top:237.97mm;font-size:7.2pt;transform:translateX(-50%);">${f('f_roRep')}</div>
+<div class="av avg avfit" data-w="57.9" style="left:69.18mm;top:215.39mm;font-size:6.48pt;transform:translateX(-50%);max-width:57.9mm;">${f('f_roName')}</div>
+<div class="av avg avfit" data-w="57.9" style="left:69.18mm;top:237.97mm;font-size:7.2pt;transform:translateX(-50%);max-width:57.9mm;">${f('f_roRep')}</div>
 <div class="av avg" style="left:54.29mm;top:243.06mm;font-size:6.5pt;transform:translateX(-50%);">${f('f_roRegNo')}</div>
 <div class="av avg" style="left:110.87mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegY')}</div>
 <div class="av avg" style="left:131.65mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegM')}</div>
 <div class="av avg" style="left:150.13mm;top:242.26mm;font-size:6.48pt;transform:translateX(-50%);">${f('f_roRegD')}</div>
-<div class="av avg" style="left:76.26mm;top:232.92mm;font-size:6.5pt;transform:translateX(-50%);">${f('f_roAddr')}</div>
+<div class="av avg avfit" data-w="71.8" style="left:76.12mm;top:232.92mm;font-size:6.5pt;transform:translateX(-50%);max-width:71.8mm;">${f('f_roAddr')}</div>
 <div class="av avg" style="left:163.98mm;top:231.52mm;font-size:6.5pt;transform:translateX(-50%);">${f('f_roTel')}</div>
-<div class="av avg" style="left:73.80mm;top:247.60mm;font-size:7.5pt;">${f('f_roOffice')}</div>
-<div class="av avg" style="left:122.30mm;top:247.60mm;font-size:7.5pt;">${f('f_roOfficeAddr')}</div>
-<div class="av avg" style="left:59.10mm;top:252.60mm;font-size:7.5pt;">${f('f_roSm')}</div>
-<div class="av avg" style="left:124.50mm;top:252.60mm;font-size:7.5pt;">${f('f_roSs')}</div>
-<div class="av avg" style="left:32.90mm;top:258.40mm;font-size:4.5pt;">${f('f_roLang')}</div>
+<div class="av avg avfit" data-w="44.1" style="left:80.74mm;top:247.60mm;font-size:7.5pt;transform:translateX(-50%);max-width:44.1mm;">${f('f_roOffice')}</div>
+<div class="av avg avfit" data-w="57.9" style="left:156.90mm;top:247.60mm;font-size:7.5pt;transform:translateX(-50%);max-width:57.9mm;">${f('f_roOfficeAddr')}</div>
+<div class="av avg avfit" data-w="48.7" style="left:64.56mm;top:252.60mm;font-size:7.5pt;transform:translateX(-50%);max-width:48.7mm;">${f('f_roSm')}</div>
+<div class="av avg avfit" data-w="48.7" style="left:147.63mm;top:252.60mm;font-size:7.5pt;transform:translateX(-50%);max-width:48.7mm;">${f('f_roSs')}</div>
+<div class="av avg avfit" data-w="54" style="left:66.90mm;top:258.40mm;font-size:6.5pt;transform:translateX(-50%);max-width:54mm;">${f('f_roLang')}</div>
 <div class="av avg" style="left:20.70mm;top:270.30mm;font-size:7.2pt;">${f('f_o4coName')}</div>
 <div class="av avg" style="left:65.03mm;top:270.30mm;font-size:7.2pt;">${f('f_coRep')}</div>
 <div class="av avg" style="left:138.57mm;top:269.50mm;font-size:7.2pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
