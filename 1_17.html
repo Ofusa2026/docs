@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260729.02
+  ver.20260808.03
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -599,6 +599,20 @@ async function loadCaseById(caseId, companyId){
   }
   if(soRow){
     var soObj = dbRowToSupportOrg(soRow);
+    // ver.20260808.01: 言語別詳細（support_org_by_language）をロード
+    try{
+      var langsRes = await _sb.rpc('get_org_langs', {p_org_id: soObj.id});
+      if(langsRes && !langsRes.error && langsRes.data){
+        soObj._byLang = {}; // {nationalityKeyword: langRow}
+        (langsRes.data.langs||[]).forEach(function(lr){
+          // language_code / language_customをキーにする + 国籍マッピング用の別キーも用意
+          if(lr.language_code) soObj._byLang[lr.language_code] = lr;
+          if(lr.language_custom) soObj._byLang['custom:'+lr.language_custom] = lr;
+        });
+        soObj._langsMaster = langsRes.data.languages_master || [];
+        log("言語別詳細: " + (langsRes.data.langs||[]).length + "件ロード");
+      }
+    }catch(e){ log("⚠ get_org_langs失敗: " + (e.message||e)); }
     var sIdx = supportOrgs.findIndex(function(x){ return x.id === soObj.id; });
     if(sIdx >= 0) supportOrgs[sIdx] = soObj; else supportOrgs.push(soObj);
   }
@@ -1226,6 +1240,80 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
       var _telSplit=function(t){ var p=String(t||'').split(/[-ー－\s]+/).filter(Boolean); while(p.length<3) p.push(''); return p.slice(0,3); };
       var _cb=function(b){ return b?'■':'□'; };
       var _ex=_so.extra||{};
+      // ===== ver.20260808.01: 言語別詳細のオーバーライド =====
+      // 申請人国籍から言語コードを解決し、_so._byLang に該当エントリがあれば
+      // 相当する _ex フィールドを上書きする（NULLならデフォルト継承）。
+      var _langOverride = null;
+      var _langByNat = {
+        'ベトナム':'vi','インドネシア':'id','ミャンマー':'my','ネパール':'ne',
+        '中国':'zh','タイ':'th','カンボジア':'km','クメール':'km','韓国':'ko',
+        // 英語圏として扱う国籍
+        'フィリピン':'en','スリランカ':'en','バングラデシュ':'en','インド':'en','ラオス':'en','台湾':'en'
+      };
+      if(_so._byLang){
+        var _nat = String(c.nationality||'').replace(/[Ａ-Ｚ]/g, function(s){return String.fromCharCode(s.charCodeAt(0)-0xFEE0);});
+        var _langKey = null;
+        Object.keys(_langByNat).some(function(nat){
+          if(_nat.indexOf(nat)>=0 || _nat.toUpperCase().indexOf(nat.toUpperCase())>=0){ _langKey = _langByNat[nat]; return true; }
+          return false;
+        });
+        if(_langKey && _so._byLang[_langKey]) _langOverride = _so._byLang[_langKey];
+      }
+      // オーバーライドがあれば _ex 側の該当フィールドを上書き（浅いコピー）
+      if(_langOverride){
+        var _lo = _langOverride;
+        // 通訳者（interpreters[0] を上書き）
+        if(_lo.translator_name || _lo.translator_org){
+          _ex = Object.assign({}, _ex, {
+            interpreters: [{
+              language: _lo.language_label || (Array.isArray(_ex.interpreters)&&_ex.interpreters[0]&&_ex.interpreters[0].language)||'',
+              name: _lo.translator_name || ((Array.isArray(_ex.interpreters)&&_ex.interpreters[0]&&_ex.interpreters[0].name)||''),
+              org:  _lo.translator_org  || ((Array.isArray(_ex.interpreters)&&_ex.interpreters[0]&&_ex.interpreters[0].org)||'')
+            }]
+          });
+        }
+        // 相談方法（電話・メール）
+        if(_lo.consult_phone || _lo.consult_email){
+          _ex = Object.assign({}, _ex, {
+            consultMethods: Object.assign({}, _ex.consultMethods||{}, {
+              telNo: _lo.consult_phone || (_ex.consultMethods&&_ex.consultMethods.telNo)||'',
+              mailAddr: _lo.consult_email || (_ex.consultMethods&&_ex.consultMethods.mailAddr)||''
+            })
+          });
+        }
+        // 実施時間
+        if(_lo.guidance_hours || _lo.orientation_hours){
+          _ex = Object.assign({}, _ex, {
+            implHours: Object.assign({}, _ex.implHours||{}, {
+              guidance: _lo.guidance_hours || (_ex.implHours&&_ex.implHours.guidance)||'',
+              orientation: _lo.orientation_hours || (_ex.implHours&&_ex.implHours.orientation)||''
+            })
+          });
+        }
+        // 定期面談
+        if(_lo.meeting_frequency || _lo.meeting_method){
+          _ex = Object.assign({}, _ex, {
+            regularMeeting: Object.assign({}, _ex.regularMeeting||{}, {
+              schedule: _lo.meeting_frequency || (_ex.regularMeeting&&_ex.regularMeeting.schedule)||'',
+              method: _lo.meeting_method || (_ex.regularMeeting&&_ex.regularMeeting.method)||''
+            })
+          });
+        }
+        // 住居方針
+        if(_lo.housing_policy_a || _lo.housing_policy_b || _lo.housing_policy_c){
+          _ex = Object.assign({}, _ex, {
+            housingPolicy: Object.assign({}, _ex.housingPolicy||{}, {
+              a: _lo.housing_policy_a || (_ex.housingPolicy&&_ex.housingPolicy.a)||'',
+              b: _lo.housing_policy_b || (_ex.housingPolicy&&_ex.housingPolicy.b)||'',
+              c: _lo.housing_policy_c || (_ex.housingPolicy&&_ex.housingPolicy.c)||''
+            })
+          });
+        }
+        // 実施言語（機関側デフォルトが無ければ言語ラベルを使う）
+        if(_lo.language_label && !_ex.supportLanguages){
+          _ex = Object.assign({}, _ex, { supportLanguages: _lo.language_label });
+        }
+      }
       if(_soF.indexOf('ex_')===0){
         var k=_soF.substring(3);
         var H=_ex.supportHours||{}, CM=_ex.consultMethods||{}, EC=_ex.emergencyContact||{};
