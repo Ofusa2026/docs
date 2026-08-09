@@ -359,6 +359,87 @@ function doPrint(){
   }catch(_e){}
   try{ window.print(); }
   finally{ setTimeout(function(){ document.title=orig; }, 1000); }
+  // ver.20260808.05: 案件書類ジャーナルへ記録（MVP Component 1 - 全書類展開）
+  try{ dgjLogFromContext('print'); }catch(_){}
+}
+
+/* ===== ver.20260808.05: 案件書類ジャーナル ヘルパー ===================
+   全書類HTMLから共通利用。ファイル名から docKey / doc_label を自動判定し、
+   window._lastCaseInfo の caseId を使って log_doc_generation RPC を呼ぶ。
+   1_17.html（docx生成）は既に独自ログを持つため、ここでの記録対象外。
+   ==================================================================*/
+var DGJ_DOC_LABELS_JS = {
+  '1_1':'1-1号', '1_3':'1-3号', '1_5':'1-5号 雇用契約書', '1_6':'1-6号 雇用条件書',
+  '1_11':'1-11号', '1_16':'1-16号 事前ガイダンス確認書',
+  '1_23':'1-23号', '1_25':'1-25号', '1_27':'1-27号', '1_29':'1-29号', '1_30':'1-30号', '1_31':'1-31号',
+  'iko':'移行準備説明書', 'irai':'依頼書', 'ininjou':'委任状', 'henkou':'変更申出書',
+  'juuyou':'重要事項説明書', 'madoguchi':'窓口', 'suisenhyo':'推薦票', 'torisage':'取り下げ書',
+  'shinsei_henkou':'申請書(変更)', 'shinsei_koushin':'申請書(更新)', 'shinsei_gjk':'申請書(認定)',
+  'kyoryoku':'協力確認書', 'kyoryoku_kaigo':'協力確認書(介護)',
+  '2_1':'2-1号', '3_1':'3-1号', '4_1':'4-1号', '5_1':'5-1号', '6_1':'6-1号',
+  '7_1':'7-1号', '8_1':'8-1号', '9_1':'9-1号',
+  '10_1':'10-1号','10_2':'10-2号','11_1':'11-1号','11_3':'11-3号','11_4':'11-4号',
+  '12_1':'12-1号','12_2':'12-2号','13_1':'13-1号','13_2':'13-2号',
+  '14_1':'14-1号','14_2':'14-2号','15_1':'15-1号','15_2':'15-2号',
+  '16_1':'16-1号','16_2':'16-2号','17_1':'17-1号','18_1':'18-1号'
+};
+function _dgjInferDocKey(){
+  try{
+    var fn = (location.pathname.split('/').pop()||'').replace(/\?.*$/,'').replace(/\.html$/i,'');
+    // 言語サフィックス除去（1_16_id → 1_16）
+    var m = fn.match(/^(1_\d+|[a-z_]+?)(_(id|vi|my|ne|zh|en|th|km|ko))?$/i);
+    if(m) return m[1];
+    return fn || null;
+  }catch(_){ return null; }
+}
+function _dgjInferLang(){
+  try{
+    var fn = (location.pathname.split('/').pop()||'').replace(/\?.*$/,'').replace(/\.html$/i,'');
+    var m = fn.match(/_(id|vi|my|ne|zh|en|th|km|ko)$/i);
+    return m ? m[1].toLowerCase() : null;
+  }catch(_){ return null; }
+}
+async function dgjLog(docKey, docLabel, opts){
+  opts = opts || {};
+  try{
+    // 案件情報取得
+    var info = null;
+    var sel = document.getElementById('caseSelect');
+    if(sel && sel.value){ try{ info = JSON.parse(sel.value); }catch(_){} }
+    if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId){
+      info = window._lastCaseInfo;
+    }
+    if(!info || !info.caseId) return; // 案件未選択なら黙って諦める
+    var payload = {
+      p_case_id: String(info.caseId),
+      p_doc_key: docKey,
+      p_doc_label: docLabel || DGJ_DOC_LABELS_JS[docKey] || docKey,
+      p_language: opts.language || _dgjInferLang(),
+      p_template_variant: opts.templateVariant || null,
+      p_file_name: opts.fileName || null,
+      p_file_size: opts.fileSize || null,
+      p_status: opts.status || 'success',
+      p_note: opts.note || null,
+      p_warnings: opts.warnings || null
+    };
+    // sb() 経由でRPC POST
+    await sb('rpc/log_doc_generation', {
+      method:'POST',
+      body: JSON.stringify(payload)
+    });
+    // 親（Saysay index.html）にリアルタイム通知
+    try{ window.parent.postMessage({type:'DOC_GENERATED', caseId:info.caseId, docKey:docKey}, '*'); }catch(_){}
+  }catch(e){ console.warn('dgjLog error:', e); }
+}
+// コンテキスト（現在のHTML）から自動判定してログ
+function dgjLogFromContext(action){
+  var docKey = _dgjInferDocKey();
+  if(!docKey) return;
+  var lang = _dgjInferLang();
+  dgjLog(docKey, DGJ_DOC_LABELS_JS[docKey] || docKey, {
+    language: lang,
+    note: action==='print' ? '印刷/PDF出力' : action==='save' ? 'DB保存' : action==='downloadHtml' ? 'HTML保存' : null
+  });
 }
 
 /* ===== 1-5 と 1-6 を1つのPDFにまとめて印刷 ===== */
@@ -468,6 +549,14 @@ async function printBoth(){
     _nukeToasts();
     window.print();
     setTimeout(cleanup, 3000);
+    // ver.20260808.05: ジャーナル記録（1-5号と1-6号のペア両方）
+    try{
+      var _selfKey = '1_'+pair.selfNo;
+      var _otherKey = '1_'+pair.otherNo;
+      var _lang = _dgjInferLang();
+      dgjLog(_selfKey, DGJ_DOC_LABELS_JS[_selfKey]||_selfKey, {note:'まとめ印刷/PDF', language:_lang});
+      dgjLog(_otherKey, DGJ_DOC_LABELS_JS[_otherKey]||_otherKey, {note:'まとめ印刷/PDF（相方）', language:_lang});
+    }catch(_){}
   }catch(e){
     console.error('[printBoth]',e);
     _killProgress();
@@ -787,6 +876,8 @@ function saveEditedHTML(){
   a.click();
   URL.revokeObjectURL(a.href);
   showToast('💾 保存しました（入力値込み）');
+  // ver.20260808.05: ジャーナル記録
+  try{ dgjLogFromContext('downloadHtml'); }catch(_){}
 }
 
 function loadEditedHTML(){
@@ -1398,6 +1489,8 @@ async function saveFormGeneric(docKey, opts){
     if(typeof showToast==='function') showToast(msg);
     else alert(msg);
     clearEditedDirty();   // 保存できたので離脱警告を解除
+    // ver.20260808.05: ジャーナル記録（docKey は saveFormGeneric の第1引数から）
+    try{ dgjLog(docKey, DGJ_DOC_LABELS_JS[docKey]||docKey, {note:'DB保存', language:_dgjInferLang()}); }catch(_){}
   } catch(err){
     console.error('[saveFormGeneric]', err);
     if(typeof showToast==='function') showToast('⚠️ 保存エラー: ' + err.message);
