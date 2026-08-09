@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260808.03
+  ver.20260808.04
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1697,6 +1697,41 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
     a.click();
     URL.revokeObjectURL(a.href);
     showToast('✅ Word書類を出力しました');
+
+    // ver.20260808.04: 案件書類ジャーナルへログ記録（MVP Component 1）
+    try{
+      if(_sb && c && c.id){
+        var _lang = (typeof currentLang !== 'undefined') ? currentLang : null;
+        var _tplVariant = (_tplForName && (_tplForName.name||_tplForName.filename)) || '';
+        var _warnings = [];
+        // 空値プレースホルダを警告として記録
+        try{
+          (mappingArr||[]).forEach(function(m){
+            var v = rv(m.field);
+            if(!v && v!==0 && v!==false){
+              _warnings.push({field:m.field, label:m.label||m.cell, reason:'empty'});
+            }
+          });
+        }catch(_){}
+        _sb.rpc('log_doc_generation', {
+          p_case_id: c.id,
+          p_doc_key: '1_17',
+          p_doc_label: '1-17号 支援計画書',
+          p_language: _lang,
+          p_template_variant: _tplVariant,
+          p_file_name: fname,
+          p_file_size: blob && blob.size || null,
+          p_status: _warnings.length > 0 ? 'warning' : 'success',
+          p_warnings: _warnings.length > 0 ? _warnings : null
+        }).then(function(res){
+          if(res && res.error){ console.warn('journal log error:', res.error); }
+          else { 
+            // Saysay親フレームに通知（バッジ更新用）
+            try{ parent.postMessage({type:'DOC_GENERATED', caseId:c.id, docKey:'1_17'}, '*'); }catch(_){}
+          }
+        }).catch(function(e){ console.warn('journal log failed:', e); });
+      }
+    }catch(logErr){ console.warn('journal log setup error:', logErr); }
 
     // ver.20260804: 機能2 生成したdocxをブラウザにプレビュー表示（ダウンロードせず中身確認）
     try { renderDocxPreview(blob); } catch(pe){ console.warn('preview error', pe); }

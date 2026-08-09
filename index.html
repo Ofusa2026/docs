@@ -82,11 +82,37 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260808.02</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260808.04</span></div>
   <div style="flex:1;"></div>
+  <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
+  <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
+    <span style="font-size:14px;">📋</span>
+    <span id="dgjBarName" style="font-weight:700;color:#93c5fd;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <button onclick="dgjOpenPanel()" style="background:#3b82f6;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
+      履歴 <span id="dgjBarCount" style="background:rgba(255,255,255,.25);padding:1px 6px;border-radius:99px;font-size:10px;">0</span>
+    </button>
+  </div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
   </button>
+</div>
+
+<!-- ver.20260808.04: 書類ジャーナルパネル（右スライドイン） -->
+<div id="dgjPanelOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9998;" onclick="dgjClosePanel()"></div>
+<div id="dgjPanel" style="display:none;position:fixed;top:0;right:0;bottom:0;width:min(520px,90vw);background:#0f172a;color:#e2e8f0;z-index:9999;box-shadow:-8px 0 24px rgba(0,0,0,.4);flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#1e293b;border-bottom:1px solid #334155;">
+    <div>
+      <div style="font-size:14px;font-weight:800;color:#93c5fd;">📋 案件書類ジャーナル</div>
+      <div id="dgjPanelName" style="font-size:11px;color:#94a3b8;margin-top:2px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="dgjLoadJournal()" title="再読み込み" style="background:transparent;border:1px solid #475569;color:#cbd5e1;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;">🔄</button>
+      <button onclick="dgjClosePanel()" style="background:none;border:none;color:#94a3b8;font-size:22px;cursor:pointer;">×</button>
+    </div>
+  </div>
+  <div id="dgjPanelBody" style="flex:1;overflow-y:auto;padding:14px 18px;font-size:12px;">
+    <div style="color:#64748b;text-align:center;padding:40px 0;">案件を選択すると履歴が表示されます</div>
+  </div>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -1057,7 +1083,181 @@ function idxSendToVisible(info){
     if(!fr||fr.style.display==='none'||!fr.src||fr.src===location.href) return;
     try{fr.contentWindow.postMessage({type:'SELECT_CASE',info},'*');}catch(e){}
   });
+  // ver.20260808.04: ジャーナルバーを更新
+  try{ dgjOnCaseChanged(info); }catch(_){}
 }
+
+// ===== ver.20260808.04: 案件書類ジャーナル (MVP Component 1) =====
+var _dgjCurrentCaseId = null;
+var _dgjLastEntries = [];
+
+// 書類キー→表示ラベルのマップ（1_17.htmlから記録される doc_label をそのまま使うが、フォールバック用）
+var DGJ_DOC_LABELS = {
+  '1_17':'1-17号 支援計画書',
+  '1_5':'1-5号 雇用契約書',
+  '1_6':'1-6号 雇用条件書',
+  '1_3':'1-3号 特定技能雇用契約書',
+  '1_11':'1-11号','1_16':'1-16号 事前ガイダンス確認書',
+  '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号',
+  '1_1':'1-1号','iko':'移行準備説明書','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
+  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書',
+  'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
+  'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',
+  'shinsei_henkou_org3':'申請書(所属機関)③','shinsei_henkou_org4':'申請書(所属機関)④'
+};
+
+// 案件選択時にバーの表示を更新
+function dgjOnCaseChanged(info){
+  if(!info || !info.caseId){
+    _dgjCurrentCaseId = null;
+    var bar=document.getElementById('dgjBar'); if(bar) bar.style.display='none';
+    return;
+  }
+  _dgjCurrentCaseId = info.caseId;
+  // 案件名の解決（idxAllCases から）
+  var row = (idxAllCases||[]).find(function(c){return String(c.id)===String(info.caseId);});
+  var applicant = row ? (row.applicant||row.name||info.caseId) : (info.caseId);
+  var bar=document.getElementById('dgjBar');
+  var nameEl=document.getElementById('dgjBarName');
+  if(bar && nameEl){
+    nameEl.textContent = applicant + (row&&row.org ? ' / '+row.org : '');
+    nameEl.title = nameEl.textContent;
+    bar.style.display = 'flex';
+  }
+  var pnl=document.getElementById('dgjPanelName');
+  if(pnl){ pnl.textContent = applicant + (row&&row.org ? ' / '+row.org : ''); }
+  // カウント取得（軽い呼び出し）
+  dgjLoadJournal(true);
+}
+
+// パネル開閉
+function dgjOpenPanel(){
+  var ov=document.getElementById('dgjPanelOverlay');
+  var pn=document.getElementById('dgjPanel');
+  if(ov) ov.style.display='block';
+  if(pn) pn.style.display='flex';
+  dgjLoadJournal();
+}
+function dgjClosePanel(){
+  var ov=document.getElementById('dgjPanelOverlay');
+  var pn=document.getElementById('dgjPanel');
+  if(ov) ov.style.display='none';
+  if(pn) pn.style.display='none';
+}
+
+// ジャーナル取得
+async function dgjLoadJournal(countOnly){
+  if(!_dgjCurrentCaseId || !_sbDocs) return;
+  try{
+    var res = await _sbDocs.rpc('get_case_journal', {p_case_id: _dgjCurrentCaseId, p_limit: 100});
+    if(res.error){ 
+      console.warn('journal load error:', res.error);
+      var body=document.getElementById('dgjPanelBody');
+      if(body && !countOnly) body.innerHTML = '<div style="color:#f87171;text-align:center;padding:20px;">読み込みエラー: '+ (res.error.message||'') +'</div>';
+      return;
+    }
+    var data = res.data || {entries:[], count:0};
+    _dgjLastEntries = data.entries || [];
+    // バッジ更新
+    var cnt=document.getElementById('dgjBarCount');
+    if(cnt) cnt.textContent = data.count || 0;
+    // パネル描画
+    if(!countOnly){
+      var body=document.getElementById('dgjPanelBody');
+      if(body) body.innerHTML = dgjRenderEntries(_dgjLastEntries);
+    }
+  }catch(e){ console.warn('journal load exception:', e); }
+}
+
+// 日付でグループ化して描画
+function dgjRenderEntries(entries){
+  if(!entries || !entries.length){
+    return '<div style="color:#64748b;text-align:center;padding:40px 0;">まだ書類が生成されていません</div>';
+  }
+  // 日付でグループ化
+  var groups={};
+  var order=[];
+  entries.forEach(function(e){
+    var d = new Date(e.generated_at);
+    var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(!groups[key]){ groups[key]=[]; order.push(key); }
+    groups[key].push(e);
+  });
+  var today = new Date();
+  var todayKey = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var h='';
+  order.forEach(function(dateKey){
+    var isToday = (dateKey===todayKey);
+    var labelDate = isToday ? '本日' : dateKey.replace(/-/g,'/');
+    h += '<div style="font-size:10px;font-weight:800;color:#94a3b8;margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase;">'+labelDate+'</div>';
+    groups[dateKey].forEach(function(e){ h += dgjRenderEntry(e); });
+  });
+  return h;
+}
+
+function dgjRenderEntry(e){
+  var t = new Date(e.generated_at);
+  var hhmm = String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+  var statusIcon = e.status==='error' ? '❌' : (e.status==='warning' ? '⚠️' : '✅');
+  var statusColor = e.status==='error' ? '#f87171' : (e.status==='warning' ? '#fbbf24' : '#4ade80');
+  var docLabel = e.doc_label || DGJ_DOC_LABELS[e.doc_key] || e.doc_key;
+  var langBadge = e.language ? ' <span style="background:#334155;color:#cbd5e1;padding:1px 6px;border-radius:99px;font-size:9px;margin-left:4px;">'+dgjEsc(e.language)+'</span>' : '';
+  var warnCount = (e.warnings && e.warnings.length) || 0;
+  var warnBadge = warnCount>0 ? ' <span style="background:#78350f;color:#fbbf24;padding:1px 6px;border-radius:99px;font-size:9px;margin-left:4px;">警告 '+warnCount+'件</span>' : '';
+  var h='';
+  h += '<div style="background:rgba(30,41,59,.6);border:1px solid #334155;border-left:3px solid '+statusColor+';border-radius:6px;padding:10px 12px;margin-bottom:6px;">';
+  h += '<div style="display:flex;align-items:center;gap:8px;">';
+  h += '<span style="font-size:14px;">'+statusIcon+'</span>';
+  h += '<span style="font-size:10px;color:#64748b;font-family:ui-monospace,Menlo,monospace;">'+hhmm+'</span>';
+  h += '<span style="font-weight:700;color:#e2e8f0;font-size:12px;">'+dgjEsc(docLabel)+'</span>';
+  h += langBadge + warnBadge;
+  h += '<span style="flex:1;"></span>';
+  h += '<button onclick="dgjRegenerate(\''+dgjEsc(e.doc_key)+'\')" title="この書類を再生成" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;">🔄 開く</button>';
+  h += '</div>';
+  if(e.generated_by){
+    h += '<div style="font-size:10px;color:#64748b;margin-top:4px;margin-left:22px;">📥 '+dgjEsc(e.generated_by)+(e.file_name?' — '+dgjEsc(e.file_name):'')+'</div>';
+  }
+  // 警告詳細（折りたたみ表示）
+  if(warnCount>0){
+    h += '<details style="margin-top:6px;margin-left:22px;"><summary style="cursor:pointer;font-size:10px;color:#fbbf24;font-weight:700;">警告の詳細を見る</summary>';
+    h += '<div style="margin-top:4px;padding:6px 8px;background:rgba(120,53,15,.25);border-radius:4px;font-size:10px;color:#fde68a;">';
+    (e.warnings||[]).slice(0,10).forEach(function(w){
+      h += '• '+dgjEsc(w.label||w.field||'')+(w.reason==='empty'?'（空欄）':(w.reason?'（'+dgjEsc(w.reason)+'）':''))+'<br>';
+    });
+    if(warnCount>10) h += '… 他 '+(warnCount-10)+' 件<br>';
+    h += '</div></details>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function dgjEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c];}); }
+
+// 書類を開いて再生成しやすくする（現状：該当書類にジャンプ）
+function dgjRegenerate(docKey){
+  if(!docs || !docs[docKey]){
+    alert('この書類は Saysay で開けません: '+docKey);
+    return;
+  }
+  dgjClosePanel();
+  try{ open_doc(docKey); }catch(e){ console.warn('open_doc error:', e); }
+}
+
+// 子iframeからのDOC_GENERATED通知を受信してバッジ更新
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type!=='DOC_GENERATED') return;
+  if(e.data.caseId && String(e.data.caseId)===String(_dgjCurrentCaseId)){
+    dgjLoadJournal(); // 開いていれば再描画、閉じていてもカウント更新
+    // トースト
+    try{ 
+      var toast=document.createElement('div');
+      toast.textContent='📋 ジャーナルに記録しました';
+      toast.style.cssText='position:fixed;bottom:24px;right:24px;background:#1e293b;color:#93c5fd;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:9999;border:1px solid #3b82f6;';
+      document.body.appendChild(toast);
+      setTimeout(function(){ toast.style.opacity='0'; toast.style.transition='opacity .3s'; setTimeout(function(){toast.remove();},300); }, 2000);
+    }catch(_){}
+  }
+});
 
 // 子iframe からの DOC_READY 通知を受信して、選択中の案件があれば送り直す
 window.addEventListener('message', function(e){
