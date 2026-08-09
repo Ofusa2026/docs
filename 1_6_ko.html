@@ -402,7 +402,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1786266775"></script>
+<script src="ofusa_common.js?v=1786269988"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1397,19 +1397,7 @@ async function loadFromDB(passedInfo){
     showToast('✅ データを読み込みました');
     // ②: 読込直後の雇用条件欄を基準値として記録（以後の編集検知に使う）
     try{ if(typeof snapshotEmpBaseline==='function') snapshotEmpBaseline(); }catch(_e){}
-    // 保存済みの直接編集版があれば復元
-    try{
-      let _cid=companyId;
-      if(!_cid){ try{ const _q=await sb('cases?select=company_id&id=eq.'+caseId); if(_q&&_q[0]&&_q[0].company_id)_cid=_q[0].company_id; }catch(_e){} }
-      if(_cid){
-        const _r=await sb('companies?select=extra&id=eq.'+_cid);
-        const _ed=_r&&_r[0]&&_r[0].extra&&_r[0].extra['_edited']&&_r[0].extra['_edited']['1_6_ko']&&_r[0].extra['_edited']['1_6_ko'][caseId];
-        if(_ed&&_ed.html){
-          const _a=document.getElementById('pageArea');
-          if(_a){ _a.innerHTML=_ed.html; window._htmlFrozen=true; showToast('📝 直接編集版を復元しました'); }
-        }
-      }
-    }catch(_e){ console.warn('[restoreEdited]',_e); }
+    // ver.20260808.06: 直接編集版の復元は loadCaseToForm(ofusa_common.js)に一本化
   }catch(e){
     console.error('DB読込エラー:',e);
     showToast('⚠️ 読込エラー: '+e.message);
@@ -1486,7 +1474,7 @@ async function saveForm(){
         const _area=document.getElementById('pageArea');
         if(_area && info.caseId){
           // ⑦: read-modify-write競合を避け、DB側で該当パスのみ原子的に更新（jsonb_set RPC）
-          await sb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:companyId,p_doc:'1_6_ko',p_case_id:info.caseId,p_html:_area.innerHTML,p_saved_at:new Date().toISOString(),p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
+          await sb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:companyId,p_doc:'1_6_ko',p_case_id:info.caseId,p_html:(typeof getBindResetHtml==='function'?getBindResetHtml():_area.innerHTML),p_saved_at:new Date().toISOString(),p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
           const _rex=await sb('companies?select=extra&id=eq.'+companyId);
           const _sv=_rex&&_rex[0]&&_rex[0].extra&&_rex[0].extra['_edited']&&_rex[0].extra['_edited']['1_6_ko']&&_rex[0].extra['_edited']['1_6_ko'][info.caseId];
           if(!_sv||!_sv.html) throw new Error('直接編集版の保存確認に失敗しました');
@@ -1739,10 +1727,9 @@ if(!window._selectCaseListenerAdded){
         sel.value=opt.value;
       }
     }
-    // まず共通関数で全入力欄を埋める
+    // ver.20260808.06: loadFromDBを先にawaitで実行してから loadCaseToForm を呼ぶ順序に変更
+    if(typeof loadFromDB==='function'){ await loadFromDB(info); }
     if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_6'); }
-    // 書類固有の追加処理があれば loadFromDB で補完
-    if(typeof loadFromDB==='function'){ loadFromDB(info); }
   });
 }
 

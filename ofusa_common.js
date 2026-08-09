@@ -283,6 +283,27 @@ function resetBindings(){
     span.textContent=label;
   });
 }
+// ver.20260808.07: 保存用のプレースホルダ化されたHTMLを取得（元DOMは変更しない）
+//   直接編集版DB保存の際、data-bindスパンに焼き込まれた値を含んだまま保存すると
+//   別案件から戻ってきた時にその値が焼き込まれたまま残る問題がある。
+//   保存時にはプレースホルダ化して、復元時にapplyBindings()で正しい値を流し込む。
+function getBindResetHtml(){
+  const area=document.getElementById('pageArea');
+  if(!area) return '';
+  const snapshot = area.cloneNode(true);
+  try{
+    snapshot.querySelectorAll('[data-bind]').forEach(function(span){
+      const id = span.getAttribute('data-bind');
+      const label = id.replace(/^es_/,'es.').replace(/^f_/,'');
+      span.innerHTML = '';
+      span.textContent = label;
+      span.style.color = '';
+      span.style.fontSize = '';
+      span.style.fontFamily = '';
+    });
+  }catch(e){ console.warn('[getBindResetHtml]', e); return area.innerHTML; }
+  return snapshot.innerHTML;
+}
 /* 編集呼び出し後のフリーズ管理 */
 window._htmlFrozen=window._htmlFrozen||false;
 function freezeLoadedHtml(){window._htmlFrozen=true;}
@@ -576,24 +597,146 @@ function _applyFontSize(){let st=document.getElementById('_fontSizeStyle');if(!s
 function changeFontSize(delta){if(_editMode){const sel=window.getSelection();if(sel&&!sel.isCollapsed){const range=sel.getRangeAt(0);const newSize=delta===0?8.5:Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2;const span=document.createElement('span');span.style.fontSize=newSize+'pt';try{range.surroundContents(span);sel.removeAllRanges();}catch(e){const frag=range.extractContents();span.appendChild(frag);range.insertNode(span);}}const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=(delta===0?8.5:Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2)+'pt';return;}if(delta===0){_fontSize=8.5;}else{_fontSize=Math.round(Math.max(5,Math.min(14,_fontSize+delta))*2)/2;}_applyFontSize();const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';}
 
 // ===== 直接編集モード =====
+// ver.20260808.07: ワンクリック化＋自動保存（ドラフト）
+//   - 編集モード終了時に自動的にDB保存を実行（従来は別途「💾 DB保存」が必要だった）
+//   - 編集モード中は10秒ごとにバックグラウンドで自動保存（下書き扱い・トースト無し）
+//   - ボタンラベルを状態に応じて動的に変える
 function toggleEditMode(){
   _editMode=!_editMode;
   const btn=document.getElementById('editModeBtn');
   const area=document.getElementById('pageArea');
   if(_editMode){
     _editLock=true;
-    if(btn){btn.textContent='✏️ 編集中（クリックで終了）';btn.classList.add('edit-mode-on');}
+    if(btn){btn.textContent='✅ 完了して保存';btn.classList.add('edit-mode-on');btn.title='編集モードを終了して自動的にDB保存します';}
     if(area)area.classList.add('edit-mode');
     enableDocEditing(true);
+    // ver.20260808.07: 編集中の自動保存を開始
+    _startAutosave();
+    // ver.20260808.07: 未保存表示（画面枠を赤くする）
+    _showEditingIndicator(true);
   }else{
     _editLock=false;
-    if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');}
+    if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');btn.title='';}
     if(area)area.classList.remove('edit-mode');
     enableDocEditing(false);
     // 直接編集した内容を破棄しないよう、終了時にHTMLをフリーズして保持する。
     // （以前はここで p() を呼んでフォーム値から作り直していたため、手編集が消えていた）
     // フリーズ後もフォームの変数(data-bind)は applyBindings() 経由で更新される。
     window._htmlFrozen=true;
+    // ver.20260808.07: 自動保存を停止＆最終保存を実行
+    _stopAutosave();
+    _showEditingIndicator(false);
+    // 編集モード終了時に自動でDB保存
+    _autoSaveOnExit();
+  }
+}
+
+// ver.20260808.07: 編集モード終了時の自動保存
+async function _autoSaveOnExit(){
+  try{
+    if(typeof showToast === 'function') showToast('💾 編集を保存しています...', 1500);
+    // 書類側の独自保存関数を優先（1_6.htmlのsaveForm等）→ なければsaveFormGeneric
+    if(typeof saveForm === 'function'){
+      await saveForm();
+    } else {
+      const docKey = window._empDocKey || _dgjInferDocKey();
+      if(!docKey){ console.warn('[autoSaveOnExit] docKey取得不可'); return; }
+      if(typeof saveFormGeneric !== 'function'){ return; }
+      await saveFormGeneric(docKey);
+    }
+    // 各保存関数の中でトーストが出るのでここでは追加しない
+  }catch(e){
+    console.warn('[autoSaveOnExit]', e);
+    if(typeof showToast === 'function') showToast('⚠️ 自動保存に失敗しました。「💾 DB保存」を手動で押してください');
+  }
+}
+
+// ver.20260808.07: 自動保存（下書き）
+let _autosaveTimer = null;
+let _autosaveInFlight = false;
+const AUTOSAVE_INTERVAL_MS = 10000; // 10秒
+
+function _startAutosave(){
+  if(_autosaveTimer) return; // 既に起動中
+  _autosaveTimer = setInterval(async function(){
+    if(!window._editedDirty) return;        // 変更なし → スキップ
+    if(_autosaveInFlight) return;            // 前回まだ進行中 → スキップ
+    if(!_editMode) return;                   // 既に終了 → スキップ
+    _autosaveInFlight = true;
+    try{
+      window._autosaving = true;
+      _showAutosaveIndicator('saving');
+      // 書類側の独自保存関数を優先（1_6.htmlのsaveForm等）→ なければsaveFormGeneric
+      if(typeof saveForm === 'function'){
+        await saveForm();
+      } else {
+        const docKey = window._empDocKey || _dgjInferDocKey();
+        if(docKey && typeof saveFormGeneric === 'function'){
+          await saveFormGeneric(docKey);
+        }
+      }
+      _showAutosaveIndicator('saved');
+      // 3秒後にインジケーターを消す
+      setTimeout(function(){ _showAutosaveIndicator('idle'); }, 3000);
+    }catch(e){
+      console.warn('[autosave]', e);
+      _showAutosaveIndicator('error');
+    }finally{
+      window._autosaving = false;
+      _autosaveInFlight = false;
+    }
+  }, AUTOSAVE_INTERVAL_MS);
+}
+
+function _stopAutosave(){
+  if(_autosaveTimer){ clearInterval(_autosaveTimer); _autosaveTimer = null; }
+  _showAutosaveIndicator('idle');
+}
+
+// ver.20260808.07: 自動保存インジケーター（画面下・小さく）
+function _showAutosaveIndicator(state){
+  let el = document.getElementById('__autosaveIndicator');
+  if(state === 'idle'){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    return;
+  }
+  if(!el){
+    el = document.createElement('div');
+    el.id = '__autosaveIndicator';
+    el.style.cssText = 'position:fixed;bottom:16px;left:16px;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;z-index:99998;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:sans-serif;transition:opacity .2s;';
+    document.body.appendChild(el);
+  }
+  if(state === 'saving'){
+    el.style.background = '#3b82f6'; el.style.color = 'white';
+    el.textContent = '💾 自動保存中...';
+  } else if(state === 'saved'){
+    el.style.background = '#10b981'; el.style.color = 'white';
+    el.textContent = '✅ 自動保存しました';
+  } else if(state === 'error'){
+    el.style.background = '#ef4444'; el.style.color = 'white';
+    el.textContent = '⚠️ 自動保存に失敗';
+  }
+}
+
+// ver.20260808.07: 編集モード中の視覚表示（画面枠を赤みがかった枠線に）
+function _showEditingIndicator(on){
+  let el = document.getElementById('__editingIndicator');
+  if(!on){
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    return;
+  }
+  if(!el){
+    el = document.createElement('div');
+    el.id = '__editingIndicator';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f59e0b,#ef4444,#f59e0b);background-size:200% 100%;animation:__editingPulse 2s linear infinite;z-index:99997;pointer-events:none;';
+    // アニメーション定義
+    if(!document.getElementById('__editingIndicatorCSS')){
+      const st = document.createElement('style');
+      st.id = '__editingIndicatorCSS';
+      st.textContent = '@keyframes __editingPulse{0%{background-position:0% 0%}100%{background-position:200% 0%}}';
+      document.head.appendChild(st);
+    }
+    document.body.appendChild(el);
   }
 }
 function enableDocEditing(on){
@@ -951,11 +1094,24 @@ async function loadCaseToForm(info, docKey){
   // ver.20260717: 直接編集が未保存のまま別の案件に切り替えると編集内容が失われる。
   // 画面は編集後の見た目のままなので気づけないため、切り替える前に確認する。
   // 同じ案件の再読込（言語切替など）では聞かない。
+  // ver.20260808.06: 「保存して切り替える」オプションを追加し、うっかり喪失を防ぐ。
   try{
     const _prev = window._lastCaseInfo && window._lastCaseInfo.caseId;
     if(window._editedDirty && _prev && _prev !== info.caseId){
-      if(!confirm('直接編集した内容がまだ保存されていません。\n案件を切り替えると編集内容は失われます。\n\n切り替えますか？\n（保存する場合は「キャンセル」を押して「💾 DB保存」）')){
-        return;
+      const _prevCaseId = _prev;
+      const _choice = confirm('⚠️ 直接編集した内容がまだ保存されていません。\n案件を切り替える前に自動で保存しますか？\n\n・OK = 保存してから切り替える（推奨）\n・キャンセル = 保存せず切り替える（編集内容は失われます）');
+      if(_choice){
+        // 保存を試みる
+        try{
+          if(typeof saveFormGeneric === 'function' && window._empDocKey){
+            await saveFormGeneric(window._empDocKey);
+            if(typeof showToast === 'function') showToast('✅ 前の案件の編集内容を保存しました');
+          }
+        }catch(_saveErr){
+          if(!confirm('保存に失敗しました。それでも切り替えますか？（編集内容は失われます）')){
+            return;
+          }
+        }
       }
     }
     if(_prev !== info.caseId) clearEditedDirty();
@@ -1442,7 +1598,14 @@ async function saveFormGeneric(docKey, opts){
           const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
           if(!extra['_edited']) extra['_edited'] = {};
           if(!extra['_edited'][_edKey]) extra['_edited'][_edKey] = {};
-          extra['_edited'][_edKey][info.caseId] = { html: _area.innerHTML, _savedAt: new Date().toISOString() };
+          // ver.20260808.07: 共通ヘルパーgetBindResetHtml()でプレースホルダ化
+          //   別案件を開いた際にその案件のフォーム値が焼き込まれず、
+          //   applyBindings()で正しい変数値が流れるようにする
+          extra['_edited'][_edKey][info.caseId] = { 
+            html: (typeof getBindResetHtml==='function' ? getBindResetHtml() : _area.innerHTML),
+            _savedAt: new Date().toISOString(),
+            _schemaVer: 2  // ver.20260808.06+ フォーマット（data-bindプレースホルダ化済み）
+          };
           window._editedJustSaved = true;
         }
       }
@@ -1565,13 +1728,22 @@ async function loadFormGenericFromDB(docKey, info){
       const _ed = co.extra && co.extra['_edited'] && co.extra['_edited'][_edKey] && info && info.caseId && co.extra['_edited'][_edKey][info.caseId];
       const _area = document.getElementById('pageArea');
       if(_ed && _ed.html && _area){
+        // ver.20260808.06: 復元中フラグを立てて他の書き換えをブロック
+        window._editedRestoring = true;
         _area.innerHTML = _ed.html;
         window._htmlFrozen = true; window._editedRestored = true;
         // ver.20260801: 直接編集版を復元した後も、変数欄(data-bind)は最新のサイド値で上書きする。
         // これを呼ばないと、直接編集スナップショットの古い焼き込み値が残り、
         // 後からのサイド編集が反映されず「消えた」ように見える（ファイル呼出 loadEditedHTML と挙動統一）。
         if(typeof applyBindings === 'function') applyBindings();
-        if(typeof showToast === 'function') showToast('📝 直接編集版を復元しました');
+        // ver.20260808.06: 金額整形も再適用
+        try{ if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting(); }catch(_){}
+        window._editedRestoring = false;
+        if(typeof showToast === 'function'){
+          const _when = _ed._savedAt ? new Date(_ed._savedAt) : null;
+          const _label = _when ? ('📝 直接編集版を復元しました ('+ _when.toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) +')') : '📝 直接編集版を復元しました';
+          showToast(_label);
+        }
       } else if(window._editedRestored && _area){
         window._htmlFrozen = false; window._editedRestored = false;
         if(typeof p === 'function') p();
