@@ -18,6 +18,8 @@
 .doc .lbl{font-size:7.6pt;}
 .doc .val{font-size:8.4pt;min-height:1.2em;}
 #docP3{width:210mm!important;height:297mm;padding:0!important;border:none!important;box-shadow:none!important;position:relative;overflow:hidden;background-image:url("bg/ko_docP3.png?v=1");background-size:210mm 297mm;background-repeat:no-repeat;background-color:#fff;}
+/* ver.20260808.11: 更新申請書のP3ページを非表示（画面・印刷とも） */
+#docP3{display:none!important;}
 
 #docP7{width:210mm!important;height:297mm;padding:0!important;border:none!important;box-shadow:none!important;position:relative;overflow:hidden;background-image:url("bg/ko_docP7.png?v=1");background-size:210mm 297mm;background-repeat:no-repeat;background-color:#fff;}
 
@@ -1248,6 +1250,10 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:167.70mm;top:138.37mm"></div>'
 <div class="av avg" style="left:68.44mm;top:85.63mm;font-size:7.5pt;">${f('f_capital')}</div>
 <div class="av avg" style="left:144.99mm;top:85.93mm;font-size:7.5pt;">${f('f_sales')}</div>
 <div class="av avg" style="left:78.64mm;top:94.25mm;font-size:7.5pt;">${f('f_staff')}</div>
+<!-- ver.20260808.11: 背景画像に焼き付いた「,,,」を白矩形で隠す（資本金・売上・常勤職員数） -->
+<div style="position:absolute;left:57mm;top:88.5mm;width:23mm;height:3.5mm;background:#fff;z-index:2;"></div>
+<div style="position:absolute;left:135mm;top:88.5mm;width:23mm;height:3.5mm;background:#fff;z-index:2;"></div>
+<div style="position:absolute;left:70mm;top:97mm;width:15mm;height:3.5mm;background:#fff;z-index:2;"></div>
 <div class="av avg" style="left:153.71mm;top:95.05mm;font-size:7.0pt;transform:translateX(-100%);">${f('f_staffF')}</div>
 <div class="av avg avfit" data-w="40.1" style="left:80.23mm;top:102.23mm;font-size:7pt;transform:translateX(-50%);max-width:40.1mm;">${f('f_office')}</div>
 <div class="av avg avfit" data-w="55.4" style="left:145.89mm;top:102.32mm;font-size:7pt;transform:translateX(-50%);max-width:55.4mm;">${f('f_officeAddr')}</div>
