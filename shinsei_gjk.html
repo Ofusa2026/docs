@@ -8,7 +8,7 @@
 .doc .av[style*="max-width"]{white-space:nowrap;overflow:visible;}
 
 </style>
-<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<link rel="stylesheet" href="ofusa_common.css?v=1786345725">
 <style>
 /* --- shinsei_henkou --- */
 .doc{padding:8mm 10mm!important;line-height:1.15!important;min-height:auto!important;font-size:8pt;}
@@ -201,6 +201,7 @@
       <span style="width:1px;height:14px;background:rgba(255,255,255,.3);margin:0 2px;"></span>
       <button class="btn" id="adjAlignLeftBtn"   style="padding:1px 7px;" onclick="adjAlign('left')"   title="左寄せ">⇤ 左</button>
       <button class="btn" id="adjAlignCenterBtn" style="padding:1px 7px;" onclick="adjAlign('center')" title="中央寄せ">⇔ 中</button>
+      <button class="btn" id="adjAlignRightBtn"  style="padding:1px 7px;" onclick="adjAlign('right')"  title="右寄せ">⇥ 右</button>
       <span style="width:1px;height:14px;background:rgba(255,255,255,.3);margin:0 2px;"></span>
       <button class="btn" style="padding:1px 7px;" onclick="adjReset()">リセット</button>
       <button class="btn" style="padding:1px 7px;" onclick="adjResetAll()">全リセット</button>
@@ -595,7 +596,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1786090213"></script>
+<script src="ofusa_common.js?v=1786346366"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -1826,7 +1827,7 @@ setInterval(applyGjkType, 800); applyGjkType();
       w.dataset.bt=parseFloat(w.style.top)||0;
       w.dataset.bs=parseFloat(w.style.fontSize)||9;
       // ver.20260808.08: 元の寄せ方を保存（transform に translateX(-50%) があれば center、なければ left）
-      const _baseAlign = w.getAttribute('data-align') || (/translateX\(-50%\)/.test(w.style.transform||'') ? 'center' : 'left');
+      const _baseAlign = w.getAttribute('data-align') || (/translateX\(-100%\)/.test(w.style.transform||'') ? 'right' : /translateX\(-50%\)/.test(w.style.transform||'') ? 'center' : 'left');
       w.dataset.ba = _baseAlign;
     });
   }
@@ -1840,7 +1841,7 @@ setInterval(applyGjkType, 800); applyGjkType();
       const _curTr = w.style.transform || '';
       const _scaleXMatch = _curTr.match(/scaleX\([^)]*\)/);
       const _scaleXPart = _scaleXMatch ? ' ' + _scaleXMatch[0] : '';
-      const _translatePart = (_finalAlign === 'center') ? 'translateX(-50%)' : '';
+      const _translatePart = (_finalAlign === 'center') ? 'translateX(-50%)' : (_finalAlign === 'right') ? 'translateX(-100%)' : '';
       w.style.transform = (_translatePart + _scaleXPart).trim();
       if(_finalAlign !== w.dataset.ba || (a && a.align)) w.setAttribute('data-align', _finalAlign);
       if(!a) { w.style.left=w.dataset.bl+'mm'; w.style.top=w.dataset.bt+'mm'; w.style.fontSize=w.dataset.bs+'pt'; return; }
@@ -1867,8 +1868,9 @@ setInterval(applyGjkType, 800); applyGjkType();
     // ver.20260808.08: 寄せ方ボタンの状態を反映
     try{
       const _lb = document.getElementById('adjAlignLeftBtn');
-      const _cb = document.getElementById('adjAlignCenterBtn');
-      if(_lb && _cb){
+        const _cb = document.getElementById('adjAlignCenterBtn');
+        const _rb = document.getElementById('adjAlignRightBtn');
+        if(_lb && _cb && _rb){
         if(w){
           const A = getADJ();
           const _cur = (A[w.dataset.f] && A[w.dataset.f].align) || w.dataset.ba || 'center';
@@ -1876,8 +1878,10 @@ setInterval(applyGjkType, 800); applyGjkType();
           _lb.style.color      = (_cur==='left')  ? '#000' : '';
           _cb.style.background = (_cur==='center')? '#f59e0b' : '';
           _cb.style.color      = (_cur==='center')? '#000' : '';
+          _rb.style.background = (_cur==='right') ? '#f59e0b' : '';
+          _rb.style.color      = (_cur==='right') ? '#000' : '';
         } else {
-          _lb.style.background=''; _lb.style.color=''; _cb.style.background=''; _cb.style.color='';
+          _lb.style.background=''; _lb.style.color=''; _cb.style.background=''; _cb.style.color=''; _rb.style.background=''; _rb.style.color='';
         }
       }
     }catch(_){}
@@ -1894,7 +1898,7 @@ setInterval(applyGjkType, 800); applyGjkType();
       A[k].align = mode;
     }
     setADJ(A); applyAdj(); selEl(document.querySelector('.av[data-f="'+k+'"]')||_adjSel);
-    if(typeof showToast==='function') showToast('寄せ方: '+ (mode==='left'?'左寄せ':'中央寄せ'));
+    if(typeof showToast==='function') showToast('寄せ方: '+ (mode==='left'?'左寄せ':mode==='right'?'右寄せ':'中央寄せ'));
   };
   window.adjSize=function(d){
     if(!_adjSel) return;
