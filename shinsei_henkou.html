@@ -233,6 +233,24 @@
     <div class="fs" style="background:#1e293b;border-radius:6px;margin-top:10px;">
       <div class="fs-title" style="color:#fff;font-size:12px;">📄 申請人1　<span style="font-weight:normal;font-size:9px;color:#94a3b8;">申請人等作成用1（項目1〜16）</span></div>
     </div>
+    <div class="fs"><div class="fs-title">📷 顔写真</div>
+      <!-- ver.20260810.05: 顔写真アップロード対応 -->
+      <div id="photoDropZone" ondragover="event.preventDefault();this.style.background='#334155';" ondragleave="this.style.background='';" ondrop="onPhotoDrop(event)" onclick="document.getElementById('photoFileInput').click()" style="border:2px dashed #64748b;border-radius:6px;padding:20px;text-align:center;cursor:pointer;font-size:12px;color:#94a3b8;transition:background .1s;">
+        <div id="photoPreviewSmall" style="display:none;margin-bottom:8px;">
+          <img id="photoPreviewImg" style="max-width:100%;max-height:150px;border-radius:4px;" alt="顔写真">
+        </div>
+        <div id="photoDropText">
+          クリックで選択<br>または画像をドラッグ&amp;ドロップ<br>
+          <span style="font-size:10px;color:#64748b;">JPG / PNG / GIF</span>
+        </div>
+      </div>
+      <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="onPhotoFileChange(this)">
+      <div style="display:flex;gap:4px;margin-top:6px;">
+        <button type="button" onclick="loadPhotoFromDrive()" style="flex:1;font-size:11px;padding:5px 8px;background:#3b82f6;color:#fff;border:none;border-radius:4px;cursor:pointer;">🔄 人材フォルダから取得</button>
+        <button type="button" onclick="clearPhoto()" style="font-size:11px;padding:5px 8px;background:#64748b;color:#fff;border:none;border-radius:4px;cursor:pointer;">🗑️</button>
+      </div>
+      <div id="photoStatus" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
+    </div>
     <div class="fs"><div class="fs-title">1〜6　申請人（基本）</div>
       <div class="fg"><label>1 国籍・地域</label><input id="f_nationality" oninput="p()"></div>
       <div class="fg"><label>2 生年月日</label>
@@ -981,6 +999,88 @@ function _regYmd(s){
 // 支援計画16項目は通常すべて「有」。1つずつ選ぶのは現実的でないため一括ボタンを用意する。
 function allYes(){ SP.forEach(([k])=>{const e=document.getElementById('f_'+k); if(e) e.value='有';}); p(); }
 
+// ver.20260810.05: 顔写真アップロード & 人材フォルダから取得
+// 保存先: localStorage（case_id別）。DBには保存しない（サイズ大きすぎる）
+function _photoKey(){ return 'henkou_photo_' + (idxSelectedCase && idxSelectedCase.caseId || 'default'); }
+function _photoStatus(msg, isError){
+  var el = document.getElementById('photoStatus');
+  if(el){ el.textContent = msg||''; el.style.color = isError?'#fca5a5':'#94a3b8'; }
+}
+function _showPhoto(dataUrl){
+  // サイドバー
+  var small = document.getElementById('photoPreviewSmall');
+  var img = document.getElementById('photoPreviewImg');
+  var txt = document.getElementById('photoDropText');
+  if(img && small){ img.src = dataUrl; small.style.display = 'block'; }
+  if(txt){ txt.style.display = dataUrl ? 'none' : 'block'; }
+  // 書類プレビュー
+  var doc = document.getElementById('applicantPhotoImg');
+  if(doc){ doc.src = dataUrl; doc.style.display = dataUrl ? 'block' : 'none'; }
+}
+function _readFileAsDataURL(file){
+  return new Promise(function(res, rej){
+    var reader = new FileReader();
+    reader.onload = function(){ res(reader.result); };
+    reader.onerror = function(){ rej(new Error('読み込み失敗')); };
+    reader.readAsDataURL(file);
+  });
+}
+async function onPhotoDrop(e){
+  e.preventDefault();
+  var zone = document.getElementById('photoDropZone');
+  if(zone) zone.style.background = '';
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if(!files || !files[0]) return;
+  await _setPhotoFromFile(files[0]);
+}
+async function onPhotoFileChange(input){
+  if(!input || !input.files || !input.files[0]) return;
+  await _setPhotoFromFile(input.files[0]);
+  input.value = ''; // 同じファイルを再選択できるように
+}
+async function _setPhotoFromFile(file){
+  if(!file.type.startsWith('image/')){ _photoStatus('画像ファイルを選んでください', true); return; }
+  try{
+    var dataUrl = await _readFileAsDataURL(file);
+    _showPhoto(dataUrl);
+    try{ localStorage.setItem(_photoKey(), dataUrl); }catch(_e){}
+    _photoStatus('✅ '+file.name+' を設定');
+  }catch(e){ _photoStatus('❌ '+e.message, true); }
+}
+function clearPhoto(){
+  _showPhoto('');
+  try{ localStorage.removeItem(_photoKey()); }catch(_e){}
+  _photoStatus('クリアしました');
+}
+async function loadPhotoFromDrive(){
+  // 案件の人材フォルダ(persons.drive_urls)から顔写真を検索
+  if(!idxSelectedCase || !idxSelectedCase.caseId){ _photoStatus('案件を選択してください', true); return; }
+  _photoStatus('🔍 人材フォルダを検索中...');
+  try{
+    var pr = await sb('persons?select=drive_urls&case_id=eq.'+idxSelectedCase.caseId);
+    var driveUrls = pr && pr[0] && pr[0].drive_urls;
+    if(!driveUrls){ _photoStatus('人材フォルダURLが登録されていません', true); return; }
+    // drive_urls は JSON配列 or 単一URL
+    var urls = Array.isArray(driveUrls) ? driveUrls : (typeof driveUrls==='object' ? Object.values(driveUrls) : [driveUrls]);
+    urls = urls.filter(function(u){ return typeof u==='string' && u.indexOf('drive.google.com')>=0; });
+    if(urls.length === 0){ _photoStatus('Google DriveのURLが見つかりません', true); return; }
+    _photoStatus('人材フォルダを開いてください: '+urls[0].substring(0,50)+'...', false);
+    // 現状: Google Drive APIの認証なしでは画像取得できないので、フォルダを別タブで開く案内
+    window.open(urls[0], '_blank');
+    _photoStatus('別タブで人材フォルダを開きました。顔写真をこちらへドラッグ&ドロップしてください', false);
+  }catch(e){
+    _photoStatus('❌ '+e.message, true);
+  }
+}
+// 案件切替時に localStorage から顔写真を復元
+function _restorePhotoForCurrentCase(){
+  try{
+    var d = localStorage.getItem(_photoKey());
+    if(d) _showPhoto(d);
+    else _showPhoto('');
+  }catch(_e){}
+}
+
 // ver.20260810.03: 取次者氏名が変更された時に、大房の住所・所属・電話を保証する
 // (別書類から case を切り替えた際、他書類の情報が残っている場合の保険)
 function onAgentNameChange(){
@@ -1187,6 +1287,10 @@ function p(){
   w.innerHTML=`
 <div class="doc" id="docP1">
 <div class="page-num-label">P1</div>
+<!-- ver.20260810.05: 顔写真表示エリア（33mm×45mm 標準規格。位置は入管様式に合わせて調整可） -->
+<div id="applicantPhotoBox" style="position:absolute;left:150.5mm;top:20.5mm;width:33mm;height:45mm;overflow:hidden;background:transparent;z-index:3;">
+  <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;" alt="顔写真">
+</div>
 <div class="av avg" style="left:48.32mm;top:63.37mm;font-size:9.84pt;">${f('f_nationality')}</div>
 <div class="av avg" style="left:126.71mm;top:63.37mm;font-size:9.84pt;">${f('f_birthY')}</div>
 <div class="av avg" style="left:126.71mm;top:63.37mm;font-size:9.84pt;">${f('')}</div>
@@ -2313,6 +2417,8 @@ window.addEventListener('message', async function(e){
   }
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou'); }
   if(typeof loadFromDB==='function') loadFromDB(info);
+  // ver.20260810.05: 案件切替時に localStorage から顔写真を復元
+  try{ if(typeof _restorePhotoForCurrentCase==='function') _restorePhotoForCurrentCase(); }catch(_e){}
 });
 </script>
 
