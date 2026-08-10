@@ -182,7 +182,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260810.10</div>
+    <div class="ver">ver.20260810.11</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -227,6 +227,34 @@
   <div class="fp-inner">
     <div class="fs" style="background:#1e293b;border-radius:6px;margin-top:10px;">
       <div class="fs-title" style="color:#fff;font-size:12px;">📄 申請人1　<span style="font-weight:normal;font-size:9px;color:#94a3b8;">申請人等作成用1（項目1〜16）</span></div>
+    </div>
+    <div class="fs"><div class="fs-title">📷 顔写真</div>
+      <!-- ver.20260810.10: 顔写真アップロード対応 -->
+      <div id="photoDropZone" ondragover="event.preventDefault();this.style.background='#334155';" ondragleave="this.style.background='';" ondrop="onPhotoDrop(event)" onclick="document.getElementById('photoFileInput').click()" style="border:2px dashed #64748b;border-radius:6px;padding:20px;text-align:center;cursor:pointer;font-size:12px;color:#94a3b8;transition:background .1s;">
+        <div id="photoPreviewSmall" style="display:none;margin-bottom:8px;">
+          <img id="photoPreviewImg" style="max-width:100%;max-height:150px;border-radius:4px;" alt="顔写真">
+        </div>
+        <div id="photoDropText">
+          クリックで選択<br>または画像をドラッグ&amp;ドロップ<br>
+          <span style="font-size:10px;color:#64748b;">JPG / PNG / GIF</span>
+        </div>
+      </div>
+      <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="onPhotoFileChange(this)">
+      <div style="display:flex;gap:4px;margin-top:6px;">
+        <button type="button" onclick="loadPhotoFromDrive()" style="flex:1;font-size:11px;padding:5px 8px;background:#3b82f6;color:#fff;border:none;border-radius:4px;cursor:pointer;">🔄 人材フォルダから取得</button>
+        <button type="button" onclick="clearPhoto()" style="font-size:11px;padding:5px 8px;background:#64748b;color:#fff;border:none;border-radius:4px;cursor:pointer;">🗑️</button>
+      </div>
+      <!-- ver.20260810.10: 写真枠のサイズ・位置調整（編集モード無しでも使える） -->
+      <div style="display:flex;gap:2px;margin-top:6px;align-items:center;font-size:10px;color:#94a3b8;">
+        <span style="min-width:44px;">サイズ:</span>
+        <button type="button" onclick="photoResize(-0.5)" style="font-size:11px;padding:3px 6px;background:#475569;color:#fff;border:none;border-radius:3px;cursor:pointer;">− 小</button>
+        <button type="button" onclick="photoResize(0.5)" style="font-size:11px;padding:3px 6px;background:#475569;color:#fff;border:none;border-radius:3px;cursor:pointer;">大 +</button>
+        <button type="button" onclick="photoResetPos()" style="font-size:11px;padding:3px 6px;background:#7c3aed;color:#fff;border:none;border-radius:3px;cursor:pointer;margin-left:6px;">位置リセット</button>
+      </div>
+      <div style="font-size:10px;color:#64748b;margin-top:4px;line-height:1.3;">
+        💡 書類プレビューの写真枠を<b style="color:#94a3b8;">ドラッグ</b>で位置調整
+      </div>
+      <div id="photoStatus" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
     </div>
     <div class="fs"><div class="fs-title">1〜6　申請人（基本）</div>
       <div class="fg"><label>1 国籍・地域</label><input id="f_nationality" oninput="p()"></div>
@@ -1083,6 +1111,127 @@ function showOccCandidates(){
   _showCandidateModal('職種', candidates, OCC_NAMES_MAP, 'f_occMain');
 }
 
+
+// ver.20260810.10: 顔写真アップロード & 人材フォルダから取得
+// 保存先: localStorage（case_id別）。DBには保存しない（サイズ大きすぎる）
+function _photoKey(){
+  var docName = document.title || 'doc';
+  return docName + '_photo_' + (idxSelectedCase && idxSelectedCase.caseId || 'default');
+}
+function _photoStatus(msg, isError){
+  var el = document.getElementById('photoStatus');
+  if(el){ el.textContent = msg||''; el.style.color = isError?'#fca5a5':'#94a3b8'; }
+}
+function _showPhoto(dataUrl){
+  var small = document.getElementById('photoPreviewSmall');
+  var img = document.getElementById('photoPreviewImg');
+  var txt = document.getElementById('photoDropText');
+  if(img && small){ img.src = dataUrl; small.style.display = 'block'; }
+  if(txt){ txt.style.display = dataUrl ? 'none' : 'block'; }
+  var doc = document.getElementById('applicantPhotoImg');
+  if(doc){ doc.src = dataUrl; doc.style.display = dataUrl ? 'block' : 'none'; }
+}
+function _readFileAsDataURL(file){
+  return new Promise(function(res, rej){
+    var reader = new FileReader();
+    reader.onload = function(){ res(reader.result); };
+    reader.onerror = function(){ rej(new Error('読み込み失敗')); };
+    reader.readAsDataURL(file);
+  });
+}
+async function onPhotoDrop(e){
+  e.preventDefault();
+  var zone = document.getElementById('photoDropZone');
+  if(zone) zone.style.background = '';
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if(!files || !files[0]) return;
+  await _setPhotoFromFile(files[0]);
+}
+async function onPhotoFileChange(input){
+  if(!input || !input.files || !input.files[0]) return;
+  await _setPhotoFromFile(input.files[0]);
+  input.value = '';
+}
+async function _setPhotoFromFile(file){
+  if(!file.type.startsWith('image/')){ _photoStatus('画像ファイルを選んでください', true); return; }
+  try{
+    var dataUrl = await _readFileAsDataURL(file);
+    _showPhoto(dataUrl);
+    try{ localStorage.setItem(_photoKey(), dataUrl); }catch(_e){}
+    _photoStatus('✅ '+file.name+' を設定');
+  }catch(e){ _photoStatus('❌ '+e.message, true); }
+}
+function clearPhoto(){
+  _showPhoto('');
+  try{ localStorage.removeItem(_photoKey()); }catch(_e){}
+  _photoStatus('クリアしました');
+}
+async function loadPhotoFromDrive(){
+  if(!idxSelectedCase || !idxSelectedCase.caseId){ _photoStatus('案件を選択してください', true); return; }
+  _photoStatus('🔍 人材フォルダを検索中...');
+  try{
+    var pr = await sb('persons?select=drive_urls&case_id=eq.'+idxSelectedCase.caseId);
+    var driveUrls = pr && pr[0] && pr[0].drive_urls;
+    if(!driveUrls){ _photoStatus('人材フォルダURLが登録されていません', true); return; }
+    var urls = Array.isArray(driveUrls) ? driveUrls : (typeof driveUrls==='object' ? Object.values(driveUrls) : [driveUrls]);
+    urls = urls.filter(function(u){ return typeof u==='string' && u.indexOf('drive.google.com')>=0; });
+    if(urls.length === 0){ _photoStatus('Google DriveのURLが見つかりません', true); return; }
+    window.open(urls[0], '_blank');
+    _photoStatus('別タブで人材フォルダを開きました。顔写真をこちらへドラッグ&ドロップしてください', false);
+  }catch(e){
+    _photoStatus('❌ '+e.message, true);
+  }
+}
+function _restorePhotoForCurrentCase(){
+  try{
+    var d = localStorage.getItem(_photoKey());
+    if(d) _showPhoto(d);
+    else _showPhoto('');
+  }catch(_e){}
+}
+// 起動時に古い__photo調整を除去（v09対応と同じフラグ運用）
+function _clearOldPhotoAdjust(){
+  try{
+    var flag = 'photo_adjust_cleared_v09';
+    if(localStorage.getItem(flag)) return;
+    var adjEl = document.getElementById('f__adjust');
+    if(adjEl){
+      var A = {};
+      try{ A = JSON.parse(adjEl.value||'{}'); }catch(_e){}
+      if(A['__photo']){
+        delete A['__photo'];
+        adjEl.value = JSON.stringify(A);
+        if(typeof markDirty === 'function') markDirty();
+        if(typeof applyAdj === 'function') applyAdj();
+      }
+    }
+    localStorage.setItem(flag, '1');
+  }catch(_e){}
+}
+setTimeout(_clearOldPhotoAdjust, 500);
+function photoResize(d){
+  var box = document.getElementById('applicantPhotoBox');
+  if(!box) return;
+  var A = {};
+  try{ A = JSON.parse(document.getElementById('f__adjust').value||'{}'); }catch(_e){}
+  A['__photo'] = A['__photo'] || {};
+  A['__photo'].dw = Math.round(((A['__photo'].dw||0) + d) * 10) / 10;
+  A['__photo'].dh = Math.round(((A['__photo'].dh||0) + d * 1.36) * 10) / 10;
+  document.getElementById('f__adjust').value = JSON.stringify(A);
+  if(typeof markDirty === 'function') markDirty();
+  if(typeof applyAdj === 'function') applyAdj();
+  _photoStatus('サイズ調整: 幅' + (A['__photo'].dw>0?'+':'') + A['__photo'].dw + 'mm');
+}
+function photoResetPos(){
+  var A = {};
+  try{ A = JSON.parse(document.getElementById('f__adjust').value||'{}'); }catch(_e){}
+  delete A['__photo'];
+  document.getElementById('f__adjust').value = JSON.stringify(A);
+  if(typeof markDirty === 'function') markDirty();
+  if(typeof applyAdj === 'function') applyAdj();
+  _photoStatus('位置・サイズを初期状態に戻しました');
+}
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -1175,6 +1324,10 @@ function p(){
     </div>`;
   w.innerHTML=`
 <div class="doc docabs" id="docP1">
+<!-- ver.20260810.10: 顔写真表示エリア - henkouで確定した座標を移植 -->
+<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:157.9mm;top:21.2mm;width:28mm;height:38mm;overflow:hidden;background:transparent;z-index:3;">
+  <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;pointer-events:none;" alt="顔写真">
+</div>
 <div class="page-num-label">P1</div>
 <div class="av avg" style="left:69.68mm;top:65.00mm;font-size:9.2pt;transform:translateX(-50%);">${f('f_nationality')}</div>
 <div class="av avg" style="left:126.66mm;top:65.00mm;font-size:9.19pt;transform:translateX(-50%);">${f('f_birthY')}</div>
@@ -2001,6 +2154,8 @@ window.addEventListener('message', async function(e){
   }
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou'); }
   if(typeof loadFromDB==='function') loadFromDB(info);
+  // ver.20260810.11: 案件切替時に localStorage から顔写真を復元
+  try{ if(typeof _restorePhotoForCurrentCase==='function') _restorePhotoForCurrentCase(); }catch(_e){}
 });
 </script>
 
@@ -2100,6 +2255,7 @@ setInterval(applyGjkType, 800); applyGjkType();
   function tagWrappers(){
     document.querySelectorAll('.doc .av').forEach(w=>{
       if(w.dataset.f) return;
+      // ver.20260810.10: 顔写真枠 (#applicantPhotoBox) は data-f="__photo" が既にHTMLで付いている
       const b=w.querySelector('span.f[data-bind]');
       if(!b) return;
       w.dataset.f=b.dataset.bind;
@@ -2110,6 +2266,16 @@ setInterval(applyGjkType, 800); applyGjkType();
       const _baseAlign = w.getAttribute('data-align') || (/translateX\(-100%\)/.test(w.style.transform||'') ? 'right' : /translateX\(-50%\)/.test(w.style.transform||'') ? 'center' : 'left');
       w.dataset.ba = _baseAlign;
     });
+    // ver.20260810.10: 写真枠は初回のみ基準座標・サイズを記録
+    var photoBox = document.getElementById('applicantPhotoBox');
+    if(photoBox && !photoBox.dataset.bl){
+      photoBox.dataset.bl = parseFloat(photoBox.style.left)||0;
+      photoBox.dataset.bt = parseFloat(photoBox.style.top)||0;
+      photoBox.dataset.bw = parseFloat(photoBox.style.width)||33;
+      photoBox.dataset.bh = parseFloat(photoBox.style.height)||45;
+      photoBox.dataset.ba = 'left';
+      photoBox.dataset.bs = 0;
+    }
   }
   window.applyAdj=function(){
     tagWrappers();
@@ -2130,6 +2296,23 @@ setInterval(applyGjkType, 800); applyGjkType();
       w.style.fontSize=(parseFloat(w.dataset.bs)+(a.ds||0)).toFixed(1)+'pt';
       if(_adjMode) w.classList.add('adj-moved');
     });
+    // ver.20260810.10: 顔写真枠は幅・高さも調整可能。専用処理
+    var photoBox = document.getElementById('applicantPhotoBox');
+    if(photoBox && photoBox.dataset.bl){
+      var pa = A['__photo'];
+      if(!pa){
+        photoBox.style.left = photoBox.dataset.bl + 'mm';
+        photoBox.style.top = photoBox.dataset.bt + 'mm';
+        photoBox.style.width = photoBox.dataset.bw + 'mm';
+        photoBox.style.height = photoBox.dataset.bh + 'mm';
+      } else {
+        photoBox.style.left = (parseFloat(photoBox.dataset.bl) + (pa.dx||0)).toFixed(2) + 'mm';
+        photoBox.style.top = (parseFloat(photoBox.dataset.bt) + (pa.dy||0)).toFixed(2) + 'mm';
+        photoBox.style.width = (parseFloat(photoBox.dataset.bw) + (pa.dw||0)).toFixed(2) + 'mm';
+        photoBox.style.height = (parseFloat(photoBox.dataset.bh) + (pa.dh||0)).toFixed(2) + 'mm';
+      }
+      if(_adjMode) photoBox.classList.add('adj-moved');
+    }
   };
   if(typeof p==='function'){ const _p=window.p; window.p=function(){ _p.apply(this,arguments); try{applyAdj();}catch(e){} }; }
   window.toggleAdjMode=function(){
@@ -2183,7 +2366,14 @@ setInterval(applyGjkType, 800); applyGjkType();
   window.adjSize=function(d){
     if(!_adjSel) return;
     const A=getADJ(); const k=_adjSel.dataset.f;
-    A[k]=A[k]||{}; A[k].ds=Math.round(((A[k].ds||0)+d)*10)/10;
+    A[k]=A[k]||{};
+    // ver.20260810.10: 写真枠の場合は幅・高さを等比で増減
+    if(k === '__photo'){
+      A[k].dw = Math.round(((A[k].dw||0) + d) * 10) / 10;
+      A[k].dh = Math.round(((A[k].dh||0) + d * 1.36) * 10) / 10;
+    } else {
+      A[k].ds = Math.round(((A[k].ds||0) + d) * 10) / 10;
+    }
     setADJ(A); applyAdj(); selEl(document.querySelector('.av[data-f="'+k+'"]')||_adjSel);
   };
   window.adjReset=function(){
@@ -2193,6 +2383,15 @@ setInterval(applyGjkType, 800); applyGjkType();
   window.adjResetAll=function(){ if(confirm('全フィールドの位置・サイズ調整をリセットしますか？')){ setADJ({}); applyAdj(); } };
   let drag=null;
   document.addEventListener('mousedown', e=>{
+    // ver.20260810.10: 写真枠は編集モード無しでもドラッグ可能に
+    var photoBox = e.target.closest && e.target.closest('#applicantPhotoBox');
+    if(photoBox){
+      e.preventDefault();
+      const doc=photoBox.closest('.doc'); const r=doc.getBoundingClientRect();
+      drag={w:photoBox, doc, sx:e.clientX, sy:e.clientY, l:parseFloat(photoBox.style.left), t:parseFloat(photoBox.style.top), mmpx:210/r.width};
+      if(_adjMode) selEl(photoBox);
+      return;
+    }
     if(!_adjMode) return;
     const w=e.target.closest('.doc .av[data-f]');
     if(!w) return;
@@ -2216,7 +2415,9 @@ setInterval(applyGjkType, 800); applyGjkType();
     A[k]=A[k]||{};
     A[k].dx=Math.round((nl-parseFloat(w.dataset.bl))*10)/10;
     A[k].dy=Math.round((nt-parseFloat(w.dataset.bt))*10)/10;
-    if(Math.abs(A[k].dx)<0.05 && Math.abs(A[k].dy)<0.05 && !A[k].ds) delete A[k];
+    // ver.20260810.10: 写真枠は ds ではなく dw/dh を使うので、削除条件を分岐
+    var _hasSize = (k === '__photo') ? (A[k].dw || A[k].dh) : A[k].ds;
+    if(Math.abs(A[k].dx)<0.05 && Math.abs(A[k].dy)<0.05 && !_hasSize && !A[k].align) delete A[k];
     setADJ(A); drag=null; applyAdj();
   });
   document.addEventListener('dblclick', e=>{
@@ -2232,7 +2433,12 @@ setInterval(applyGjkType, 800); applyGjkType();
 body.adjmode .doc .av[data-f]{outline:1px dashed rgba(14,116,144,.55);cursor:move;}
 body.adjmode .doc .av[data-f]:hover{background:rgba(14,116,144,.10);}
 .doc .av.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.12);}
-@media print{.doc .av{outline:none !important;background:none !important;}}
+/* ver.20260810.10: 顔写真枠は常時表示・常時ドラッグ可能に */
+#applicantPhotoBox{outline:2px dashed rgba(59,130,246,.5);background:rgba(59,130,246,.04);cursor:move;}
+#applicantPhotoBox:hover{outline-color:rgba(59,130,246,.9);background:rgba(59,130,246,.10);}
+body.adjmode #applicantPhotoBox{outline:2px dashed rgba(59,130,246,.9)!important;background:rgba(59,130,246,.10);}
+body.adjmode #applicantPhotoBox.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.15);}
+@media print{.doc .av{outline:none !important;background:none !important;} #applicantPhotoBox{outline:none !important;background:none !important;cursor:default;}}
 </style>
 
 <script>
