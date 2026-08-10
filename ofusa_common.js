@@ -2238,6 +2238,10 @@ window.ofusaExportTplCoords=function(docKey){
     if(!isNaN(L)) o.left=+L.toFixed(2);
     if(!isNaN(T)) o.top=+T.toFixed(2);
     if(!isNaN(S)) o.fs=+S.toFixed(1);
+    // ver.20260808.08: 寄せ方を出力（元と違う場合のみ）
+    var _cur = el.getAttribute('data-align') || (/translateX\(-50%\)/.test(el.style.transform||'') ? 'center' : 'left');
+    var _base = el.dataset.ba || 'center';
+    if(_cur !== _base) o.align = _cur;
     out.fields[k]=o;
   });
   var txt=JSON.stringify(out,null,2);

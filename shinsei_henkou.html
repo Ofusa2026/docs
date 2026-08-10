@@ -202,6 +202,11 @@
       <span id="adjSel" style="font-size:10px;color:#a5f3fc;">未選択</span>
       <button class="btn" style="padding:1px 7px;" onclick="adjSize(-0.5)">A−</button>
       <button class="btn" style="padding:1px 7px;" onclick="adjSize(0.5)">A＋</button>
+      <!-- ver.20260808.08: 寄せ方切替（マスター編集専用） -->
+      <span style="width:1px;height:14px;background:rgba(255,255,255,.3);margin:0 2px;"></span>
+      <button class="btn" id="adjAlignLeftBtn"   style="padding:1px 7px;" onclick="adjAlign('left')"   title="左寄せ">⇤ 左</button>
+      <button class="btn" id="adjAlignCenterBtn" style="padding:1px 7px;" onclick="adjAlign('center')" title="中央寄せ">⇔ 中</button>
+      <span style="width:1px;height:14px;background:rgba(255,255,255,.3);margin:0 2px;"></span>
       <button class="btn" style="padding:1px 7px;" onclick="adjReset()">リセット</button>
       <button class="btn" style="padding:1px 7px;" onclick="adjResetAll()">全リセット</button>
       <button class="btn" id="tplExportBtn" style="padding:1px 7px;background:#b45309;color:#fff;" onclick="ofusaExportTplCoords('shinsei_henkou')">📐 書き出し</button>
@@ -2028,6 +2033,10 @@ window.addEventListener('message', async function(e){
       w.dataset.bl=parseFloat(w.style.left)||0;
       w.dataset.bt=parseFloat(w.style.top)||0;
       w.dataset.bs=parseFloat(w.style.fontSize)||9;
+      // ver.20260808.08: 元の寄せ方を保存（transform に translateX(-50%) があれば center、なければ left）
+      const _tr = (w.style.transform||'') + ' ' + (w.getAttribute('data-align')||'');
+      const _baseAlign = w.getAttribute('data-align') || (/translateX\(-50%\)/.test(w.style.transform||'') ? 'center' : 'left');
+      w.dataset.ba = _baseAlign;
     });
   }
   window.applyAdj=function(){
@@ -2035,6 +2044,17 @@ window.addEventListener('message', async function(e){
     const A=getADJ();
     document.querySelectorAll('.doc .av[data-f]').forEach(w=>{
       const a=A[w.dataset.f];
+      // ver.20260808.08: align指定があれば上書き、なければ元の寄せ方(dataset.ba)を維持
+      const _finalAlign = (a && a.align) || w.dataset.ba || 'center';
+      // 現在のtransformから translateX(-50%) と scaleX(...) を分離管理
+      const _curTr = w.style.transform || '';
+      const _scaleXMatch = _curTr.match(/scaleX\([^)]*\)/);
+      const _scaleXPart = _scaleXMatch ? ' ' + _scaleXMatch[0] : '';
+      const _translatePart = (_finalAlign === 'center') ? 'translateX(-50%)' : '';
+      const _newTr = (_translatePart + _scaleXPart).trim();
+      w.style.transform = _newTr;
+      // data-align属性も同期しておく（書き出しで使う）
+      if(_finalAlign !== w.dataset.ba || (a && a.align)) w.setAttribute('data-align', _finalAlign);
       if(!a) { w.style.left=w.dataset.bl+'mm'; w.style.top=w.dataset.bt+'mm'; w.style.fontSize=w.dataset.bs+'pt'; return; }
       w.style.left=(parseFloat(w.dataset.bl)+(a.dx||0)).toFixed(2)+'mm';
       w.style.top=(parseFloat(w.dataset.bt)+(a.dy||0)).toFixed(2)+'mm';
@@ -2056,7 +2076,40 @@ window.addEventListener('message', async function(e){
     _adjSel=w;
     if(w){ w.classList.add('adj-sel'); document.getElementById('adjSel').textContent=w.dataset.f; }
     else document.getElementById('adjSel').textContent='未選択';
+    // ver.20260808.08: 寄せ方ボタンの状態を反映
+    try{
+      const _lb = document.getElementById('adjAlignLeftBtn');
+      const _cb = document.getElementById('adjAlignCenterBtn');
+      if(_lb && _cb){
+        if(w){
+          const A = getADJ();
+          const _cur = (A[w.dataset.f] && A[w.dataset.f].align) || w.dataset.ba || 'center';
+          _lb.style.background = (_cur==='left')  ? '#f59e0b' : '';
+          _lb.style.color      = (_cur==='left')  ? '#000' : '';
+          _cb.style.background = (_cur==='center')? '#f59e0b' : '';
+          _cb.style.color      = (_cur==='center')? '#000' : '';
+        } else {
+          _lb.style.background=''; _lb.style.color=''; _cb.style.background=''; _cb.style.color='';
+        }
+      }
+    }catch(_){}
   }
+  // ver.20260808.08: 寄せ方切替（マスター編集専用）
+  window.adjAlign=function(mode){
+    if(!_adjSel) { if(typeof showToast==='function') showToast('文字を選んでから寄せ方を選んでください'); return; }
+    const A=getADJ(); const k=_adjSel.dataset.f;
+    A[k]=A[k]||{};
+    // 元の寄せ方と同じなら削除、違えば設定
+    if(mode === (_adjSel.dataset.ba || 'center')){
+      delete A[k].align;
+      // 他のフィールドが空なら削除
+      if(!A[k].dx && !A[k].dy && !A[k].ds && Object.keys(A[k]).length===0) delete A[k];
+    } else {
+      A[k].align = mode;
+    }
+    setADJ(A); applyAdj(); selEl(document.querySelector('.av[data-f="'+k+'"]')||_adjSel);
+    if(typeof showToast==='function') showToast('寄せ方: '+ (mode==='left'?'左寄せ':'中央寄せ'));
+  };
   window.adjSize=function(d){
     if(!_adjSel) return;
     const A=getADJ(); const k=_adjSel.dataset.f;
