@@ -381,7 +381,14 @@
       <div style="font-size:10px;color:#888;padding:2px 0;">※ 署名と作成年月日は申請人（法定代理人）が自署</div>
     </div>
     <div class="fs"><div class="fs-title">※　取次者</div>
-      <div class="fg"><label>(1) 氏名</label><input id="f_agentName" oninput="p()"></div>
+      <!-- ver.20260810.03: 大房行政書士法人固定。中林俊介 / 田中綾美から選択 -->
+      <div class="fg"><label>(1) 氏名</label>
+        <select id="f_agentName" onchange="onAgentNameChange();p()">
+          <option value=""></option>
+          <option value="中林 俊介">中林 俊介</option>
+          <option value="田中 綾美">田中 綾美</option>
+        </select>
+      </div>
       <div class="fg"><label>(2) 住所</label><textarea id="f_agentAddr" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>(3) 所属機関等</label><input id="f_agentOrg" oninput="p()"></div>
       <div class="fg"><label>　電話番号</label><input id="f_agentTel" oninput="p()"></div>
@@ -806,6 +813,20 @@ function _regYmd(s){
 // 支援計画16項目は通常すべて「有」。1つずつ選ぶのは現実的でないため一括ボタンを用意する。
 function allYes(){ SP.forEach(([k])=>{const e=document.getElementById('f_'+k); if(e) e.value='有';}); p(); }
 
+// ver.20260810.03: 取次者氏名が変更された時に、大房の住所・所属・電話を保証する
+// (別書類から case を切り替えた際、他書類の情報が残っている場合の保険)
+function onAgentNameChange(){
+  const OFUSA = {
+    addr: '東京都大田区蒲田5丁目11-10 FUNDES蒲田8階',
+    org:  '大房行政書士法人',
+    tel:  '03-6424-8849'
+  };
+  const s=(id,val)=>{const e=document.getElementById(id);if(e && (!e.value || e.value !== val)) e.value=val;};
+  s('f_agentAddr', OFUSA.addr);
+  s('f_agentOrg',  OFUSA.org);
+  s('f_agentTel',  OFUSA.tel);
+}
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -1040,26 +1061,26 @@ ${v('f_ti2Prf')==='doc'?'<span class="av avm" style="left:32.27mm;top:250.84mm;f
 </div>
 <div class="doc docabs" id="docP3">
 <div class="page-num-label">P3</div>
-<div class="av avg avfit" data-w="38.6" style="left:56.86mm;top:263.99mm;font-size:9.9pt;transform:translateX(-50%);max-width:38.6mm;">${f('f_agentName')}</div>
-<div class="av avg avfit" data-w="79.1" style="left:143.18mm;top:264.01mm;font-size:9.9pt;transform:translateX(-50%);max-width:79.1mm;">${f('f_agentAddr')}</div>
-<div class="av avg" style="left:60.73mm;top:281.12mm;font-size:9.9pt;">${f('f_agentOrg')}</div>
-<div class="av avg" style="left:145.44mm;top:281.10mm;font-size:9.9pt;">${f('f_agentTel')}</div>
+<div class="av avg avfit" data-w="38.6" style="left:59.26mm;top:265.59mm;font-size:9.9pt;transform:translateX(-50%);max-width:38.6mm;">${f('f_agentName')}</div>
+<div class="av avg avfit" data-w="79.1" style="left:143.18mm;top:264.81mm;font-size:9.9pt;transform:translateX(-50%);max-width:79.1mm;">${f('f_agentAddr')}</div>
+<div class="av avg" style="left:60.73mm;top:282.42mm;font-size:9.9pt;">${f('f_agentOrg')}</div>
+<div class="av avg" style="left:145.44mm;top:282.70mm;font-size:9.9pt;">${f('f_agentTel')}</div>
 ${v('f_a22')==='有'?'<div class="cir" style="left:22.06mm;top:22.63mm"></div>':''}
 ${v('f_a22')==='無'?'<div class="cir" style="left:176.99mm;top:22.63mm"></div>':''}
 ${v('f_a23')==='有'?'<div class="cir" style="left:22.27mm;top:63.12mm"></div>':''}
 ${v('f_a23')==='無'?'<div class="cir" style="left:170.63mm;top:63.12mm"></div>':''}
-<div class="av avg" style="left:63.85mm;top:23.07mm;font-size:8.8pt;">${f('f_q22Org')}</div>
-<div class="av avg" style="left:139.13mm;top:23.05mm;font-size:8.8pt;">${f('f_q22Amt')}</div>
-<div class="av avg" style="left:66.23mm;top:51.33mm;font-size:8.8pt;">${f('f_q23Org')}</div>
-<div class="av avg" style="left:143.59mm;top:51.36mm;font-size:8.8pt;">${f('f_q23Amt')}</div>
+<div class="av avg" style="left:64.95mm;top:21.77mm;font-size:8.8pt;">${f('f_q22Org')}</div>
+<div class="av avg" style="left:137.03mm;top:21.75mm;font-size:8.8pt;">${f('f_q22Amt')}</div>
+<div class="av avg" style="left:56.93mm;top:49.73mm;font-size:8.8pt;">${f('f_q23Org')}</div>
+<div class="av avg" style="left:148.09mm;top:50.06mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_q23Amt')}</div>
 <div class="av avg" style="left:59.29mm;top:180.74mm;font-size:9.3pt;">${f('f_agName')}</div>
-<div class="av avg" style="left:157.93mm;top:180.74mm;font-size:9.3pt;">${f('f_agRel')}</div>
-<div class="av avg" style="left:39.69mm;top:189.47mm;font-size:9.3pt;">${f('f_agAddr')}</div>
-<div class="av avg" style="left:66.47mm;top:199.10mm;font-size:9.3pt;">${f('f_agTel')}</div>
-<div class="av avg" style="left:154.97mm;top:199.10mm;font-size:9.3pt;">${f('f_agCel')}</div>
-<div class="av avg" style="left:139.98mm;top:224.68mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigY')}</div>
-<div class="av avg" style="left:160.28mm;top:224.68mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigM')}</div>
-<div class="av avg" style="left:177.58mm;top:224.68mm;font-size:9.3pt;transform:translateX(-100%);">${f('f_aSigD')}</div>
+<div class="av avg" style="left:160.63mm;top:180.44mm;font-size:9.3pt;transform:translateX(-50%);">${f('f_agRel')}</div>
+<div class="av avg" style="left:46.79mm;top:189.47mm;font-size:9.3pt;">${f('f_agAddr')}</div>
+<div class="av avg" style="left:72.27mm;top:198.80mm;font-size:9.3pt;transform:translateX(-50%);">${f('f_agTel')}</div>
+<div class="av avg" style="left:156.27mm;top:199.10mm;font-size:9.3pt;transform:translateX(-50%);">${f('f_agCel')}</div>
+<div class="av avg" style="left:137.38mm;top:225.78mm;font-size:9.3pt;">${f('f_aSigY')}</div>
+<div class="av avg" style="left:157.08mm;top:225.18mm;font-size:9.3pt;">${f('f_aSigM')}</div>
+<div class="av avg" style="left:173.58mm;top:225.18mm;font-size:9.3pt;">${f('f_aSigD')}</div>
 <div class="av avg" style="left:21.40mm;top:150.30mm;font-size:7.6pt;transform:translateX(-50%);">${f('f_wk1InY')}</div>
 <div class="av avg" style="left:31.60mm;top:150.30mm;font-size:7.6pt;transform:translateX(-50%);">${f('f_wk1InM')}</div>
 <div class="av avg" style="left:41.70mm;top:150.30mm;font-size:7.6pt;transform:translateX(-50%);">${f('f_wk1OutY')}</div>
@@ -1130,9 +1151,9 @@ ${v('f_a26')==='無'?'<div class="cir" style="left:176.60mm;top:115.10mm"></div>
 <div class="av avg" style="left:160.81mm;top:65.64mm;font-size:9.8pt;transform:translateX(-50%);">${f('f_occSub')}</div>
 <div class="av avg" style="left:77.71mm;top:83.79mm;font-size:8.3pt;transform:translateX(-50%);">${f('f_hoursW')}</div>
 <div class="av avg" style="left:140.17mm;top:83.79mm;font-size:8.3pt;transform:translateX(-50%);">${f('f_hoursM')}</div>
-<div class="av avg" style="left:154.97mm;top:98.02mm;font-size:8.3pt;">${ff('f_pay')}</div>
+<div class="av avg" style="left:156.27mm;top:98.02mm;font-size:8.3pt;transform:translateX(-100%);">${ff('f_pay')}</div>
 <div class="av avg" style="left:83.07mm;top:105.15mm;font-size:8.3pt;transform:translateX(-50%);">${ff('f_payH')}</div>
-<div class="av avg" style="left:108.26mm;top:112.17mm;font-size:8.3pt;">${ff('f_payJp')}</div>
+<div class="av avg" style="left:108.76mm;top:111.67mm;font-size:8.3pt;transform:translateX(-100%);">${ff('f_payJp')}</div>
 ${v('f_payWay')==='bank'?'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">■</span>':'<span class="av avm" style="left:111.26mm;top:125.59mm;font-size:9.83pt;">□</span>'}
 ${v('f_payWay')==='cash'?'<span class="av avm" style="left:72.29mm;top:125.59mm;font-size:9.83pt;">■</span>':''}
 <div class="av avg" style="left:42.14mm;top:138.46mm;font-size:9.0pt;">${f('f_q6d')}</div>
@@ -1214,9 +1235,9 @@ ${v('f_q6')==='無'?'<div class="cir" style="left:164.20mm;top:137.42mm"></div>'
 <div class="av avg" style="left:151.70mm;top:222.00mm;font-size:8.8pt;transform:translateX(-50%);">${f('f_dpTel')}</div>
 <div class="av avg avfit" data-w="48.6" style="left:81.50mm;top:229.50mm;font-size:8.8pt;transform:translateX(-50%);max-width:48.6mm;">${f('f_dpRep')}</div>
 <div class="av avg" style="left:62.10mm;top:235.10mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsY')}</div>
-<div class="av avg" style="left:77.30mm;top:235.40mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsM')}</div>
-<div class="av avg" style="left:93.40mm;top:234.80mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpsD')}</div>
-<div class="av avg" style="left:111.70mm;top:236.40mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeY')}</div>
+<div class="av avg" style="left:77.80mm;top:235.10mm;font-size:8.8pt;">${f('f_dpsM')}</div>
+<div class="av avg" style="left:93.40mm;top:235.10mm;font-size:8.8pt;">${f('f_dpsD')}</div>
+<div class="av avg" style="left:117.60mm;top:234.60mm;font-size:8.8pt;">${f('f_dpeY')}</div>
 <div class="av avg" style="left:132.10mm;top:234.80mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeM')}</div>
 <div class="av avg" style="left:147.80mm;top:234.60mm;font-size:8.8pt;transform:translateX(-100%);">${f('f_dpeD')}</div>
 <div class="av avg avfit" data-w="48.6" style="left:73.71mm;top:252.30mm;font-size:9pt;transform:translateX(-50%);max-width:48.6mm;">${f('f_jaName')}</div>
@@ -1360,7 +1381,7 @@ ${v('f_coop2')==='無'?'<div class="cir" style="left:168.65mm;top:172.60mm"></di
 ${v('f_q35sel')==='1'?'<span class="av avm" style="left:30.79mm;top:238.07mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q35sel')==='2'?'<span class="av avm" style="left:30.79mm;top:250.99mm;font-size:9.5pt;">■</span>':''}
 ${v('f_q35sel')==='3'?'<span class="av avm" style="left:30.79mm;top:263.90mm;font-size:9.5pt;">■</span>':''}
-<div class="av avg" style="left:96.99mm;top:264.00mm;font-size:8.5pt;">${f('f_q35d')}</div>
+<div class="av avg" style="left:100.69mm;top:263.20mm;font-size:8.5pt;">${f('f_q35d')}</div>
 <div class="av avg avfit" data-w="49.1" style="left:142.51mm;top:202.30mm;font-size:8.5pt;transform:translateX(-50%);max-width:49.1mm;">${f('f_smTitle')}</div>
 <div class="av avg avfit" data-w="49.1" style="left:142.51mm;top:214.92mm;font-size:8.5pt;transform:translateX(-50%);max-width:49.1mm;">${f('f_ssTitle')}</div>
 
@@ -1768,17 +1789,25 @@ async function loadFromDB(passedInfo){
     const cases=await sb('cases?select=org&id=eq.'+caseId);
     const cas=cases&&cases[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    // ※取次者：登録支援機関(support_orgs)の支援責任者を既定にする。
-    // 名前の揺れ（「株式会社KMT(82)」等）は共通の findSupportOrg が3段照合で吸収する。
+    // ver.20260810.03: ※取次者は大房行政書士法人固定。氏名(中林俊介/田中綾美)以外は自動セット。
+    // 従来: 登録支援機関の支援責任者を既定にする → 変更。
+    // 大房情報を先に埋めて（氏名は空のまま = ユーザーが選択）、後段の findSupportOrg の
+    // 職業紹介事業者(f_ja*)ロジックだけ残す。
+    const OFUSA_AGENT = {
+      addr: '東京都大田区蒲田5丁目11-10 FUNDES蒲田8階',
+      org:  '大房行政書士法人',
+      tel:  '03-6424-8849'
+    };
+    s('f_agentAddr', OFUSA_AGENT.addr);
+    s('f_agentOrg',  OFUSA_AGENT.org);
+    s('f_agentTel',  OFUSA_AGENT.tel);
+    // 氏名(f_agentName)はユーザーがサイドバーで中林/田中を選択する
     // 支援委託手数料は案件(cases.support_fee)から。org照合の成否に依存させない。
     try{ var _cf=await sb('cases?select=support_fee&id=eq.'+caseId); var _fee=(_cf&&_cf[0]&&_cf[0].support_fee)?String(_cf[0].support_fee):''; if(_fee) s('f_fee',_fee); }catch(_e){}
     if(cas&&cas.org&&typeof findSupportOrg==='function'){
       const org=await findSupportOrg(cas.org,'name,address,support_manager,tel,jj_name,jj_corp_no,jj_emp_ins_no,jj_zip,jj_pref,jj_city,jj_address_detail,jj_tel,jj_permit_no,jj_permit_date');
       if(org){
-        s('f_agentName',org.support_manager||'');
-        s('f_agentAddr',org.address||'');
-        s('f_agentOrg',org.name||'');
-        s('f_agentTel',org.tel||'');
+        // ver.20260810.03: 取次者は大房固定にしたため、登録支援機関の情報を f_agent* に入れない
         // (13)職業紹介事業者: support_orgs.jj_* から反映
         if(org.jj_name){
           s('f_jaName',org.jj_name||'');

@@ -784,6 +784,19 @@ function _regYmd(s){
 // 支援計画16項目は通常すべて「有」。1つずつ選ぶのは現実的でないため一括ボタンを用意する。
 function allYes(){ SP.forEach(([k])=>{const e=document.getElementById('f_'+k); if(e) e.value='有';}); p(); }
 
+// ver.20260810.03: 取次者氏名が変更された時に、大房の住所・所属・電話を保証する
+function onAgentNameChange(){
+  const OFUSA = {
+    addr: '東京都大田区蒲田5丁目11-10 FUNDES蒲田8階',
+    org:  '大房行政書士法人',
+    tel:  '03-6424-8849'
+  };
+  const s=(id,val)=>{const e=document.getElementById(id);if(e && (!e.value || e.value !== val)) e.value=val;};
+  s('f_agentAddr', OFUSA.addr);
+  s('f_agentOrg',  OFUSA.org);
+  s('f_agentTel',  OFUSA.tel);
+}
+
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -1606,17 +1619,17 @@ async function loadFromDB(passedInfo){
     const cases=await sb('cases?select=org&id=eq.'+caseId);
     const cas=cases&&cases[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    // ※取次者：登録支援機関(support_orgs)の支援責任者を既定にする。
-    // 名前の揺れ（「株式会社KMT(82)」等）は共通の findSupportOrg が3段照合で吸収する。
-    if(cas&&cas.org&&typeof findSupportOrg==='function'){
-      const org=await findSupportOrg(cas.org,'name,address,support_manager,tel');
-      if(org){
-        s('f_agentName',org.support_manager||'');
-        s('f_agentAddr',org.address||'');
-        s('f_agentOrg',org.name||'');
-        s('f_agentTel',org.tel||'');
-      }
-    }
+    // ver.20260810.03: ※取次者は大房行政書士法人固定。氏名(中林俊介/田中綾美)以外は自動セット。
+    // 従来: 登録支援機関の支援責任者を既定にする → 変更。
+    const OFUSA_AGENT = {
+      addr: '東京都大田区蒲田5丁目11-10 FUNDES蒲田8階',
+      org:  '大房行政書士法人',
+      tel:  '03-6424-8849'
+    };
+    s('f_agentAddr', OFUSA_AGENT.addr);
+    s('f_agentOrg',  OFUSA_AGENT.org);
+    s('f_agentTel',  OFUSA_AGENT.tel);
+    // 氏名(f_agentName)はユーザーがサイドバーで中林/田中を選択する
     // 作成年月日は今日を既定
     const n=new Date();
     s('f_aSigY',String(n.getFullYear())); s('f_aSigM',String(n.getMonth()+1)); s('f_aSigD',String(n.getDate()));
