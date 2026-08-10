@@ -422,7 +422,124 @@
     <div class="fs"><div class="fs-title">2 (2)　従事すべき業務の内容</div>
       <div class="fg"><label>特定産業分野</label><input id="f_field" oninput="p()"></div>
       <div class="fg"><label>業務区分</label><input id="f_cat" oninput="p()"></div>
-      <div class="fg"><label>主たる職種（番号1つ）</label><input id="f_occMain" oninput="p()" placeholder="例：74"></div>
+      <div class="fg"><label>主たる職種（番号1つ）<button type="button" onclick="showOccCandidates()" style="float:right;font-size:10px;padding:1px 6px;background:#f59e0b;color:#000;border:none;border-radius:3px;cursor:pointer;">💡 候補</button></label>
+        <select id="f_occMain" onchange="p()" style="width:100%;">
+          <option value=""></option>
+          <option value="1" title="経営">1</option>
+          <option value="2" title="管理業務（経営者を除く）">2</option>
+          <option value="3" title="調査研究">3</option>
+          <option value="4" title="技術開発（農林水産分野）">4</option>
+          <option value="5" title="技術開発（食品分野）">5</option>
+          <option value="6" title="技術開発（機械器具分野）">6</option>
+          <option value="7" title="技術開発（その他製造分野）">7</option>
+          <option value="8" title="生産管理（食品分野）">8</option>
+          <option value="9" title="生産管理（機械器具分野）">9</option>
+          <option value="10" title="生産管理（その他製造分野）">10</option>
+          <option value="11" title="建築・土木・測量技術">11</option>
+          <option value="12" title="情報処理・通信技術">12</option>
+          <option value="13" title="法律関係業務">13</option>
+          <option value="14" title="金融・保険">14</option>
+          <option value="15" title="コピーライティング">15</option>
+          <option value="16" title="報道">16</option>
+          <option value="17" title="編集">17</option>
+          <option value="18" title="デザイン">18</option>
+          <option value="19" title="教育（教員免許）">19</option>
+          <option value="20" title="教育（小中高の語学）">20</option>
+          <option value="21" title="教育（専修学校）">21</option>
+          <option value="22" title="教育（各種学校）">22</option>
+          <option value="23" title="教育（インターナショナルスクール）">23</option>
+          <option value="24" title="教育（教育機関を除く）">24</option>
+          <option value="25" title="翻訳・通訳">25</option>
+          <option value="26" title="海外取引業務">26</option>
+          <option value="27" title="企画事務（マーケティング，リサーチ）">27</option>
+          <option value="28" title="企画事務（広報・宣伝）">28</option>
+          <option value="29" title="会計事務">29</option>
+          <option value="30" title="法人営業">30</option>
+          <option value="31" title="ＣＡＤオペレーション">31</option>
+          <option value="32" title="調理">32</option>
+          <option value="33" title="外国特有の建築技術">33</option>
+          <option value="34" title="外国特有の製品製造">34</option>
+          <option value="35" title="宝石・貴金属・毛皮加工">35</option>
+          <option value="36" title="動物の調教">36</option>
+          <option value="37" title="石油・地熱等掘削調査">37</option>
+          <option value="38" title="パイロット">38</option>
+          <option value="39" title="スポーツ指導">39</option>
+          <option value="40" title="ソムリエ">40</option>
+          <option value="41" title="介護福祉士">41</option>
+          <option value="42" title="研究">42</option>
+          <option value="43" title="研究の指導">43</option>
+          <option value="44" title="教育（大学等）">44</option>
+          <option value="45" title="記者">45</option>
+          <option value="46" title="報道カメラマン">46</option>
+          <option value="47" title="医師">47</option>
+          <option value="48" title="歯科医師">48</option>
+          <option value="49" title="薬剤師">49</option>
+          <option value="50" title="看護師">50</option>
+          <option value="51" title="接客（販売店）">51</option>
+          <option value="52" title="接客（飲食店）">52</option>
+          <option value="53" title="接客（その他）">53</option>
+          <option value="54" title="製品製造">54</option>
+          <option value="55" title="保健師">55</option>
+          <option value="56" title="助産師">56</option>
+          <option value="57" title="准看護師">57</option>
+          <option value="58" title="歯科衛生士">58</option>
+          <option value="59" title="診療放射線技師">59</option>
+          <option value="60" title="理学療法士">60</option>
+          <option value="61" title="作業療法士">61</option>
+          <option value="62" title="視能訓練士">62</option>
+          <option value="63" title="臨床工学技士">63</option>
+          <option value="64" title="義肢装具士">64</option>
+          <option value="65" title="弁護士">65</option>
+          <option value="66" title="司法書士">66</option>
+          <option value="67" title="弁理士">67</option>
+          <option value="68" title="土地家屋調査士">68</option>
+          <option value="69" title="外国法事務弁護士">69</option>
+          <option value="70" title="公認会計士">70</option>
+          <option value="71" title="外国公認会計士">71</option>
+          <option value="72" title="税理士">72</option>
+          <option value="73" title="社会保険労務士">73</option>
+          <option value="74" title="行政書士">74</option>
+          <option value="75" title="海事代理士">75</option>
+          <option value="76" title="著述家">76</option>
+          <option value="77" title="美術家・写真家">77</option>
+          <option value="78" title="音楽家・舞台芸術家">78</option>
+          <option value="79" title="宗教家">79</option>
+          <option value="80" title="家事使用人">80</option>
+          <option value="81" title="プロスポーツ選手">81</option>
+          <option value="82" title="アマチュアスポーツ選手">82</option>
+          <option value="83" title="インターンシップ">83</option>
+          <option value="84" title="ワーキング・ホリデー">84</option>
+          <option value="85" title="外国弁護士">85</option>
+          <option value="86" title="サマージョブ">86</option>
+          <option value="87" title="国際文化交流">87</option>
+          <option value="88" title="EPA看護師">88</option>
+          <option value="89" title="EPA介護福祉士">89</option>
+          <option value="90" title="EPA看護師候補者">90</option>
+          <option value="91" title="EPA介護福祉士候補者">91</option>
+          <option value="92" title="EPA就学介護福祉士候補者">92</option>
+          <option value="93" title="外国人建設就労者">93</option>
+          <option value="94" title="外国人造船就労者">94</option>
+          <option value="95" title="製造業外国従業員">95</option>
+          <option value="96" title="家事支援者（国家戦略特区）">96</option>
+          <option value="97" title="耕種農業支援者（国家戦略特区）">97</option>
+          <option value="98" title="畜産農業支援者（国家戦略特区）">98</option>
+          <option value="99" title="起業活動">99</option>
+          <option value="100" title="その他のサービス職業従事者">100</option>
+          <option value="101" title="農林漁業従事者">101</option>
+          <option value="102" title="製品製造・加工処理従事者（金属製品）">102</option>
+          <option value="103" title="製品製造・加工処理従事者（金属製品を除く）">103</option>
+          <option value="104" title="機械組立従事者">104</option>
+          <option value="105" title="機械整備・修理従事者">105</option>
+          <option value="106" title="機械検査従事者">106</option>
+          <option value="107" title="建設躯体工事従事者">107</option>
+          <option value="108" title="建設従事者（躯体除く）">108</option>
+          <option value="109" title="その他の建設・採掘従事者">109</option>
+          <option value="110" title="運搬・清掃・包装等従事者">110</option>
+          <option value="111" title="外交">111</option>
+          <option value="112" title="公用">112</option>
+          <option value="999" title="その他">999</option>
+        </select>
+      </div>
       <div class="fg"><label>他の職種（番号・複数可）</label><input id="f_occSub" oninput="p()" placeholder="カンマ区切り"></div>
       <div style="font-size:10px;color:#888;padding:2px 0;">※ 別紙「職種一覧」の 1～43, 45～50, 55～81, 100～112, 999 から選択</div>
     </div>
@@ -478,7 +595,58 @@
       <div class="fg"><label>(1) 氏名又は名称</label><input id="f_o2coName" oninput="p()"></div>
       <div class="fg"><label>(2) 法人番号（13桁）</label><input id="f_coCorp" oninput="p()" maxlength="13"></div>
       <div class="fg"><label>(3) 雇用保険適用事業所番号（11桁）</label><input id="f_coEi" oninput="p()" maxlength="11"></div>
-      <div class="fg"><label>(4) 主たる業種（番号1つ）</label><input id="f_bizMain" oninput="p()"></div>
+      <div class="fg"><label>(4) 主たる業種（番号1つ）<button type="button" onclick="showBizCandidates()" style="float:right;font-size:10px;padding:1px 6px;background:#f59e0b;color:#000;border:none;border-radius:3px;cursor:pointer;">💡 候補</button></label>
+        <select id="f_bizMain" onchange="p()" style="width:100%;">
+          <option value=""></option>
+          <option value="1" title="農林業">1</option>
+          <option value="2" title="漁業">2</option>
+          <option value="3" title="鉱業，採石業，砂利採取業">3</option>
+          <option value="4" title="建設業">4</option>
+          <option value="5" title="製造業：食料品">5</option>
+          <option value="6" title="製造業：繊維工業">6</option>
+          <option value="7" title="製造業：プラスチック製品">7</option>
+          <option value="8" title="製造業：金属製品">8</option>
+          <option value="9" title="製造業：生産用機械器具">9</option>
+          <option value="10" title="製造業：電気機械器具">10</option>
+          <option value="11" title="製造業：輸送用機械器具">11</option>
+          <option value="12" title="製造業：その他">12</option>
+          <option value="13" title="電気・ガス・熱供給・水道業">13</option>
+          <option value="14" title="情報通信業">14</option>
+          <option value="15" title="運輸・信書便事業">15</option>
+          <option value="16" title="卸売業：各種商品（総合商社等）">16</option>
+          <option value="17" title="卸売業：繊維・衣服等">17</option>
+          <option value="18" title="卸売業：飲食料品">18</option>
+          <option value="19" title="卸売業：建築材料，鉱物・金属材料等">19</option>
+          <option value="20" title="卸売業：機械器具">20</option>
+          <option value="21" title="卸売業：その他">21</option>
+          <option value="22" title="小売業：各種商品">22</option>
+          <option value="23" title="小売業：織物・衣服・身の回り品">23</option>
+          <option value="24" title="小売業：飲食料品（コンビニ等）">24</option>
+          <option value="25" title="小売業：機械器具">25</option>
+          <option value="26" title="小売業：その他">26</option>
+          <option value="27" title="金融・保険業">27</option>
+          <option value="28" title="不動産・物品賃貸業">28</option>
+          <option value="29" title="学術研究，専門・技術サービス業：学術・開発研究機関">29</option>
+          <option value="30" title="同：専門サービス業（他分類外）">30</option>
+          <option value="31" title="同：広告業">31</option>
+          <option value="32" title="同：技術サービス業（他分類外）">32</option>
+          <option value="33" title="宿泊業">33</option>
+          <option value="34" title="飲食サービス業">34</option>
+          <option value="35" title="生活関連サービス（理容・美容等）・娯楽業">35</option>
+          <option value="36" title="学校教育">36</option>
+          <option value="37" title="その他の教育，学習支援業">37</option>
+          <option value="38" title="医療・福祉業：医療業">38</option>
+          <option value="39" title="同：保健衛生">39</option>
+          <option value="40" title="同：社会保険・社会福祉・介護事業">40</option>
+          <option value="41" title="複合サービス事業">41</option>
+          <option value="42" title="職業紹介・労働者派遣業">42</option>
+          <option value="43" title="その他の事業サービス業（速記・複写・建物・警備等）">43</option>
+          <option value="44" title="その他のサービス業">44</option>
+          <option value="45" title="宗教">45</option>
+          <option value="46" title="公務（他に分類されるものを除く）">46</option>
+          <option value="47" title="分類不能の産業">47</option>
+        </select>
+      </div>
       <div class="fg"><label>(4) 他の業種（番号・複数可）</label><input id="f_bizSub" oninput="p()" placeholder="カンマ区切り"></div>
       <div class="fg"><label>(5) 住所（本店・主たる事務所）</label><textarea id="f_coAddr" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>　電話番号</label><input id="f_coTel" oninput="p()"></div>
@@ -814,6 +982,105 @@ function onAgentNameChange(){
   s('f_agentAddr', OFUSA.addr);
   s('f_agentOrg',  OFUSA.org);
   s('f_agentTel',  OFUSA.tel);
+}
+
+
+// ver.20260810.04: 業種・職種の候補提案システム
+// 自動判定が外れやすいため、候補を複数出してユーザーに選ばせる
+var BIZ_CAND = {"介護": [40, 39, 43], "ビルクリーニング": [43, 32, 44], "ビルクリ": [43, 32, 44], "素形材": [8, 9, 11, 12], "産業機械": [9, 8, 11], "電気電子": [10, 8, 12], "電気・電子": [10, 8, 12], "工業製品製造業": [8, 9, 10, 11, 12], "製造業": [5, 6, 7, 8, 9, 10, 11, 12], "建設": [4], "造船": [11, 32], "造船・舶用": [11, 32], "自動車整備": [11, 32, 43], "航空": [15], "宿泊": [33, 34], "農業": [1], "漁業": [2], "飲食料品製造": [5], "飲食料品製造業": [5], "外食": [34], "外食業": [34], "自動車運送": [15], "鉄道": [15], "林業": [1], "木材産業": [12, 5], "木材": [12, 5]};
+var OCC_CAND = {"介護": [41, 55, 57], "ビルクリーニング": [110, 100, 32], "ビルクリ": [110, 100, 32], "素形材": [102, 103, 104, 105, 106], "産業機械": [102, 103, 9, 6], "電気電子": [102, 103, 104, 12], "電気・電子": [102, 103, 104, 12], "工業製品製造業": [54, 102, 103, 104], "製造業": [54, 102, 103, 104, 8, 10], "建設": [107, 108, 109, 11], "造船": [46, 102, 103, 107], "造船・舶用": [46, 102, 103, 107], "自動車整備": [105, 106], "航空": [48, 110], "宿泊": [49, 52, 53], "農業": [101, 97, 98], "漁業": [101], "飲食料品製造": [103, 54, 8, 5], "飲食料品製造業": [103, 54, 8, 5], "外食": [32, 52, 53], "外食業": [32, 52, 53], "自動車運送": [50, 110], "鉄道": [52, 110], "林業": [101], "木材産業": [103, 54], "木材": [103, 54]};
+var BIZ_NAMES_MAP = {"1": "農林業", "2": "漁業", "3": "鉱業", "4": "建設業", "5": "製造業：食料品", "6": "製造業：繊維工業", "7": "製造業：プラスチック製品", "8": "製造業：金属製品", "9": "製造業：生産用機械器具", "10": "製造業：電気機械器具", "11": "製造業：輸送用機械器具", "12": "製造業：その他", "13": "電気・ガス・熱供給・水道業", "14": "情報通信業", "15": "運輸・信書便事業", "16": "卸売業：各種商品", "17": "卸売業：繊維・衣服等", "18": "卸売業：飲食料品", "19": "卸売業：建築材料・鉱物・金属", "20": "卸売業：機械器具", "21": "卸売業：その他", "22": "小売業：各種商品", "23": "小売業：織物・衣服・身の回り品", "24": "小売業：飲食料品（コンビニ等）", "25": "小売業：機械器具", "26": "小売業：その他", "27": "金融・保険業", "28": "不動産・物品賃貸業", "29": "学術研究：学術・開発研究機関", "30": "学術研究：専門サービス業", "31": "学術研究：広告業", "32": "学術研究：技術サービス業", "33": "宿泊業", "34": "飲食サービス業", "35": "生活関連サービス・娯楽業", "36": "学校教育", "37": "その他の教育・学習支援業", "38": "医療・福祉業：医療業", "39": "同：保健衛生", "40": "同：社会保険・社会福祉・介護事業", "41": "複合サービス事業", "42": "職業紹介・労働者派遣業", "43": "その他の事業サービス業（建物・警備等）", "44": "その他のサービス業", "45": "宗教", "46": "公務", "47": "分類不能の産業"};
+var OCC_NAMES_MAP = {"1": "経営", "2": "管理業務", "3": "調査研究", "4": "技術開発（農林水産）", "5": "技術開発（食品）", "6": "技術開発（機械器具）", "7": "技術開発（その他製造）", "8": "生産管理（食品）", "9": "生産管理（機械器具）", "10": "生産管理（その他製造）", "11": "建築・土木・測量技術", "12": "情報処理・通信技術", "13": "法律関係業務", "14": "金融・保険", "15": "コピーライティング", "16": "報道", "17": "編集", "18": "デザイン", "32": "調理", "33": "外国特有の建築技術", "34": "外国特有の製品製造", "41": "介護福祉士", "46": "報道カメラマン", "48": "歯科医師", "49": "薬剤師", "50": "看護師", "51": "接客（販売店）", "52": "接客（飲食店）", "53": "接客（その他）", "54": "製品製造", "55": "保健師", "57": "准看護師", "97": "耕種農業支援者", "98": "畜産農業支援者", "100": "その他のサービス職業", "101": "農林漁業従事者", "102": "製品製造（金属）", "103": "製品製造（金属除く）", "104": "機械組立", "105": "機械整備・修理", "106": "機械検査", "107": "建設躯体工事", "108": "建設（躯体除く）", "109": "その他の建設・採掘", "110": "運搬・清掃・包装等", "999": "その他"};
+
+function _getCurrentField(){
+  var fEl = document.getElementById('f_field');
+  var cEl = document.getElementById('f_cat');
+  return {
+    field: (fEl && fEl.value || '').trim(),
+    category: (cEl && cEl.value || '').trim()
+  };
+}
+
+function _findCandidates(map, field, category){
+  // 分野名・業務区分から候補を探す
+  var results = [];
+  var searchTerms = [field, category].filter(Boolean);
+  // 完全一致優先
+  for (var i=0; i<searchTerms.length; i++){
+    var t = searchTerms[i];
+    if (map[t]) return map[t].slice();
+  }
+  // 部分一致
+  for (var i=0; i<searchTerms.length; i++){
+    var t = searchTerms[i];
+    for (var k in map){
+      if (t.indexOf(k) >= 0 || k.indexOf(t) >= 0){
+        map[k].forEach(function(n){ if(results.indexOf(n)<0) results.push(n); });
+      }
+    }
+  }
+  return results;
+}
+
+function _showCandidateModal(title, candidates, namesMap, targetSelectId){
+  // 既存のモーダルがあれば削除
+  var old = document.getElementById('__candidateModal');
+  if (old) old.remove();
+  
+  var {field, category} = _getCurrentField();
+  var contextInfo = '';
+  if (field || category) contextInfo = '<div style="font-size:11px;color:#666;margin-bottom:8px;">分野: <b>'+(field||'-')+'</b> / 業務区分: <b>'+(category||'-')+'</b></div>';
+  
+  var itemsHtml = '';
+  if (candidates.length === 0) {
+    itemsHtml = '<div style="padding:20px;text-align:center;color:#888;">候補が見つかりません。<br>下記のセレクトから直接選んでください。</div>';
+  } else {
+    candidates.forEach(function(n){
+      var name = namesMap[n] || namesMap[String(n)] || '(名前不明)';
+      itemsHtml += '<div onclick="_selectCandidate(\''+targetSelectId+'\', \''+n+'\')" style="padding:10px 12px;margin:4px 0;background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;transition:all .1s;" onmouseover="this.style.background=\'#dbeafe\';this.style.borderColor=\'#3b82f6\';" onmouseout="this.style.background=\'#f3f4f6\';this.style.borderColor=\'#d1d5db\';">'
+        + '<span style="font-weight:700;font-size:16px;color:#1e40af;">'+n+'</span>'
+        + '<span style="margin-left:12px;color:#374151;">'+name+'</span>'
+        + '</div>';
+    });
+  }
+  
+  var modal = document.createElement('div');
+  modal.id = '__candidateModal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+  modal.innerHTML = '<div style="background:white;border-radius:8px;padding:20px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,.3);">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+    + '<h3 style="margin:0;font-size:16px;">💡 '+title+'の候補</h3>'
+    + '<button onclick="document.getElementById(\'__candidateModal\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#666;">×</button>'
+    + '</div>'
+    + contextInfo
+    + '<div style="max-height:400px;overflow-y:auto;">' + itemsHtml + '</div>'
+    + '<div style="margin-top:12px;font-size:11px;color:#888;text-align:center;">候補をクリックすると選択されます</div>'
+    + '</div>';
+  modal.onclick = function(e){ if(e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function _selectCandidate(selectId, value){
+  var sel = document.getElementById(selectId);
+  if (sel){
+    sel.value = value;
+    if (typeof p === 'function') p();
+    var modal = document.getElementById('__candidateModal');
+    if (modal) modal.remove();
+    if (typeof showToast === 'function') showToast('✅ '+value+' を選択しました');
+  }
+}
+
+function showBizCandidates(){
+  var {field, category} = _getCurrentField();
+  var candidates = _findCandidates(BIZ_CAND, field, category);
+  _showCandidateModal('業種', candidates, BIZ_NAMES_MAP, 'f_bizMain');
+}
+
+function showOccCandidates(){
+  var {field, category} = _getCurrentField();
+  var candidates = _findCandidates(OCC_CAND, field, category);
+  _showCandidateModal('職種', candidates, OCC_NAMES_MAP, 'f_occMain');
 }
 
 function p(){
