@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１１－１号（農業 特定技能所属機関：直接雇用）　受入れに係る誓約書</div>
-    <div class="ver">ver.20260731.01</div>
+    <div class="ver">ver.20260810.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -204,16 +204,18 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos]=await Promise.all([
       caseId?sb('cases?select=applicant,org&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+      companyId?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}&order=address.desc.nullslast,author_name.desc.nullslast&limit=5`):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const cas=cases&&cases[0]; 
+    // ver.20260810.02: 同名会社が複数ある場合、空データを避けて実データが入ってる行を優先
+    const co = (cos||[]).find(x => x && (x.address || x.pref || x.author_name || x.rep_name)) || (cos&&cos[0]);
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     // 11-1号は「特定技能所属機関（直接雇用）」の誓約書のため、作成責任者は所属機関側の代表者。
     // 11-4号のように support_orgs（登録支援機関）からは引かない。
     if(co){
       s('f_coName',co.name||'');
-      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||'')+(co.detail_address||''))||'');
       s('f_author',((co.author_title||'')+' '+(co.author_name||'')).trim());
     }
     if(cas){

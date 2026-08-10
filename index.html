@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260808.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260810.02</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -124,15 +124,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       </div>
       <div id="idx_jumpStatus" style="margin-top:6px;font-size:11px;color:#a0aec0;min-height:14px;"></div>
       <div id="idx_jumpedInfo" style="margin-top:4px;padding:6px 8px;background:rgba(34,197,94,0.15);border-radius:4px;font-size:12px;color:#86efac;display:none;line-height:1.4;"></div>
-      <label style="margin-top:10px;">🔍 案件検索（人材名・案件名・会社名）</label>
-      <input id="idx_filterText" oninput="idxFilterDebounced()" placeholder="人材名・案件名・会社名・国籍で検索" style="padding:5px 8px;border-radius:4px;border:1px solid #4a5568;background:#1a202c;color:#e2e8f0;font-size:12px;">
-      <select id="idx_filterCompany" onchange="idxFilterCases()" style="margin-top:6px;padding:5px 8px;border-radius:4px;border:1px solid #4a5568;background:#1a202c;color:#e2e8f0;font-size:12px;"></select>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-        <label style="margin:0;">📁 検索結果（選ぶと表示中の書類に反映）</label>
-        <span id="idx_caseCount" style="font-size:10px;color:#94a3b8;font-weight:700;"></span>
-      </div>
-      <select id="idx_caseSelect" onchange="idxCaseSelected()" size="8" style="padding:4px;border-radius:4px;border:1px solid #4a5568;background:#1a202c;color:#e2e8f0;font-size:12px;"></select>
-      <div style="font-size:10px;color:#64748b;margin-top:3px;line-height:1.4;">※ 未ログイン時は0件（RLS）。ログイン後に一覧が表示されます。</div>
+      <!-- ver.20260810.01: 「🔍 案件検索」ブロック撤去（案件選択は case ID 貼り付け or URL遷移に一本化）。
+           idx_filterText / idx_filterCompany / idx_caseCount / idx_caseSelect / RLS注記 の5要素を削除。 -->
       <label style="margin-top:10px;">🌐 言語（書類全体に適用）</label>
       <div class="global-lang-btns" id="globalLangBtns">
         <button class="glbtn" data-lang="ja" onclick="setGlobalLang('ja')" title="日本語">🇯🇵</button>
@@ -924,8 +917,8 @@ async function idxInit(){
     // 全案件
     const cases=await idxSb('cases?select=id,name,applicant,org,company,nationality,company_id,emp_set_idx&order=applicant',true);
     idxAllCases=cases||[];
-    idxBuildCompanyFilter();
-    idxFilterCases();
+    // ver.20260810.01: 「🔍 案件検索」ブロック撤去に伴い、以下2つの呼び出しを削除
+    //   （idxBuildCompanyFilter / idxFilterCases。参照要素が消えたため）
     await idxAutoSelectFromUrl(); // ver.20260714.07: ?caseId= / ?doc= で自動選択
   }catch(e){console.error('idxInit',e);}
 }
@@ -961,11 +954,9 @@ async function idxAutoSelectFromUrl(){
   }catch(e){ console.error('idxAutoSelectFromUrl',e); }
 }
 
-function idxBuildCompanyFilter(){
-  const companies=[...new Set(idxAllCases.map(c=>c.org).filter(Boolean))].sort();
-  const sel=document.getElementById('idx_filterCompany');
-  if(sel) sel.innerHTML='<option value="">— すべて —</option>'+companies.map(c=>`<option>${c}</option>`).join('');
-}
+// ver.20260810.01: 「🔍 案件検索」ブロック撤去に伴い、以下の関数を削除
+//   idxBuildCompanyFilter / idxFilterDebounced / idxFilterCases / idxCaseSelected
+//   (参照要素が消えたため無用)
 
 /* ===== case ID 貼り付けジャンプ ===== */
 function idxOnPasteInput(){
@@ -1032,40 +1023,9 @@ async function idxJumpByPaste(){
   }
 }
 
-// ver.20260808.02: 検索入力のデバウンス（打鍵ごとの再描画を間引く）
-var _idxFilterTimer=null;
-function idxFilterDebounced(){
-  clearTimeout(_idxFilterTimer);
-  _idxFilterTimer=setTimeout(idxFilterCases, 200);
-}
-function idxFilterCases(){
-  const company=(document.getElementById('idx_filterCompany')?.value||'');
-  const text=(document.getElementById('idx_filterText')?.value||'').toLowerCase();
-  let filtered=idxAllCases;
-  if(company) filtered=filtered.filter(c=>c.org===company);
-  if(text) filtered=filtered.filter(c=>
-    (c.applicant||'').toLowerCase().includes(text)||
-    (c.name||'').toLowerCase().includes(text)||
-    (c.org||'').toLowerCase().includes(text)||
-    (c.nationality||'').toLowerCase().includes(text)
-  );
-  const sel=document.getElementById('idx_caseSelect');
-  // ver.20260808.02: 大量件数対策。表示は先頭200件までに制限して描画負荷を抑える（検索で絞り込む前提）
-  const IDX_MAX=200;
-  const shown=filtered.slice(0,IDX_MAX);
-  if(sel) sel.innerHTML='<option value="">← 案件を選択</option>'+shown.map(c=>`<option value='${JSON.stringify({caseId:c.id,companyId:c.company_id,companyName:c.company||c.org,orgName:c.org,empSetIdx:c.emp_set_idx||0})}'>${c.applicant||c.name||c.id}</option>`).join('')+(filtered.length>IDX_MAX?`<option value="" disabled>… 他 ${filtered.length-IDX_MAX} 件（さらに絞り込んでください）</option>`:'');
-  const badge=document.getElementById('idx_caseCount');
-  if(badge) badge.textContent=filtered.length>IDX_MAX?`${filtered.length}件（先頭${IDX_MAX}件）`:`${filtered.length}件`;
-}
-
-function idxCaseSelected(){
-  const sel=document.getElementById('idx_caseSelect');
-  if(!sel||!sel.value) return;
-  let info; try{info=JSON.parse(sel.value);}catch(e){return;}
-  idxSelectedCase=info;
-  // 表示中のiframeに送信
-  idxSendToVisible(info);
-}
+// ver.20260810.01: 「🔍 案件検索」ブロック撤去に伴い、以下の関数群を削除
+//   var _idxFilterTimer / idxFilterDebounced / idxFilterCases / idxCaseSelected
+//   (参照要素が消えたため無用。idxSendToVisible は残す — case ID 貼り付けから使う)
 
 function idxSendToVisible(info){
   if(!info) return;

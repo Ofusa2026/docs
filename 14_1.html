@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１４－１号（外食業）　受入れに関する誓約書</div>
-    <div class="ver">ver.20260810.01</div>
+    <div class="ver">ver.20260810.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -175,15 +175,18 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos]=await Promise.all([
       caseId?sb('cases?select=applicant&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
+      companyId?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}&order=address.desc.nullslast,author_name.desc.nullslast&limit=5`):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const cas=cases&&cases[0]; 
+    // ver.20260810.02: 同名会社が複数ある場合、空データを避けて実データが入ってる行を優先
+    const co = (cos||[]).find(x => x && (x.address || x.pref || x.author_name || x.rep_name)) || (cos&&cos[0]);
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
       s('f_coName',co.name||'');
-      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
-      s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+      s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||'')+(co.detail_address||''))||'');
+      // ver.20260810.02: author が空なら rep で補完（案件によっては rep のみ入っている）
+      s('f_author',[co.author_title||co.rep_title,co.author_name||co.rep_name].filter(Boolean).join('　'));
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
