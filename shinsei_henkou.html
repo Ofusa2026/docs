@@ -249,6 +249,16 @@
         <button type="button" onclick="loadPhotoFromDrive()" style="flex:1;font-size:11px;padding:5px 8px;background:#3b82f6;color:#fff;border:none;border-radius:4px;cursor:pointer;">🔄 人材フォルダから取得</button>
         <button type="button" onclick="clearPhoto()" style="font-size:11px;padding:5px 8px;background:#64748b;color:#fff;border:none;border-radius:4px;cursor:pointer;">🗑️</button>
       </div>
+      <!-- ver.20260810.07: 写真枠のサイズ・位置調整（編集モード無しでも使える） -->
+      <div style="display:flex;gap:2px;margin-top:6px;align-items:center;font-size:10px;color:#94a3b8;">
+        <span style="min-width:44px;">サイズ:</span>
+        <button type="button" onclick="photoResize(-0.5)" style="font-size:11px;padding:3px 6px;background:#475569;color:#fff;border:none;border-radius:3px;cursor:pointer;">− 小</button>
+        <button type="button" onclick="photoResize(0.5)" style="font-size:11px;padding:3px 6px;background:#475569;color:#fff;border:none;border-radius:3px;cursor:pointer;">大 +</button>
+        <button type="button" onclick="photoResetPos()" style="font-size:11px;padding:3px 6px;background:#7c3aed;color:#fff;border:none;border-radius:3px;cursor:pointer;margin-left:6px;">位置リセット</button>
+      </div>
+      <div style="font-size:10px;color:#64748b;margin-top:4px;line-height:1.3;">
+        💡 書類プレビューの写真枠を<b style="color:#94a3b8;">ドラッグ</b>で位置調整
+      </div>
       <div id="photoStatus" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
     </div>
     <div class="fs"><div class="fs-title">1〜6　申請人（基本）</div>
@@ -1080,6 +1090,29 @@ function _restorePhotoForCurrentCase(){
     else _showPhoto('');
   }catch(_e){}
 }
+// ver.20260810.07: 写真枠のサイズ・位置調整（編集モード不要）
+function photoResize(d){
+  var box = document.getElementById('applicantPhotoBox');
+  if(!box) return;
+  var A = {};
+  try{ A = JSON.parse(document.getElementById('f__adjust').value||'{}'); }catch(_e){}
+  A['__photo'] = A['__photo'] || {};
+  A['__photo'].dw = Math.round(((A['__photo'].dw||0) + d) * 10) / 10;
+  A['__photo'].dh = Math.round(((A['__photo'].dh||0) + d * 1.36) * 10) / 10;
+  document.getElementById('f__adjust').value = JSON.stringify(A);
+  if(typeof markDirty === 'function') markDirty();
+  if(typeof applyAdj === 'function') applyAdj();
+  _photoStatus('サイズ調整: 幅' + (A['__photo'].dw>0?'+':'') + A['__photo'].dw + 'mm');
+}
+function photoResetPos(){
+  var A = {};
+  try{ A = JSON.parse(document.getElementById('f__adjust').value||'{}'); }catch(_e){}
+  delete A['__photo'];
+  document.getElementById('f__adjust').value = JSON.stringify(A);
+  if(typeof markDirty === 'function') markDirty();
+  if(typeof applyAdj === 'function') applyAdj();
+  _photoStatus('位置・サイズを初期状態に戻しました');
+}
 
 // ver.20260810.03: 取次者氏名が変更された時に、大房の住所・所属・電話を保証する
 // (別書類から case を切り替えた際、他書類の情報が残っている場合の保険)
@@ -1289,8 +1322,9 @@ function p(){
 <div class="page-num-label">P1</div>
 <!-- ver.20260810.05: 顔写真表示エリア（33mm×45mm 標準規格。位置は入管様式に合わせて調整可） -->
 <!-- ver.20260810.06: マスター編集モードで位置・サイズ調整可能に。data-f="__photo" でtagWrappersが認識 -->
+<!-- ver.20260810.07: img に pointer-events:none で親divに mousedown が伝わるように修正 -->
 <div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:150.5mm;top:20.5mm;width:33mm;height:45mm;overflow:hidden;background:transparent;z-index:3;">
-  <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;" alt="顔写真">
+  <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;pointer-events:none;" alt="顔写真">
 </div>
 <div class="av avg" style="left:48.32mm;top:63.37mm;font-size:9.84pt;">${f('f_nationality')}</div>
 <div class="av avg" style="left:126.71mm;top:63.37mm;font-size:9.84pt;">${f('f_birthY')}</div>
@@ -2644,6 +2678,15 @@ window.addEventListener('message', async function(e){
   window.adjResetAll=function(){ if(confirm('全フィールドの位置・サイズ調整をリセットしますか？')){ setADJ({}); applyAdj(); } };
   let drag=null;
   document.addEventListener('mousedown', e=>{
+    // ver.20260810.07: 写真枠は編集モード無しでもドラッグ可能に
+    var photoBox = e.target.closest && e.target.closest('#applicantPhotoBox');
+    if(photoBox){
+      e.preventDefault();
+      const doc=photoBox.closest('.doc'); const r=doc.getBoundingClientRect();
+      drag={w:photoBox, doc, sx:e.clientX, sy:e.clientY, l:parseFloat(photoBox.style.left), t:parseFloat(photoBox.style.top), mmpx:210/r.width};
+      if(_adjMode) selEl(photoBox);
+      return;
+    }
     if(!_adjMode) return;
     const w=e.target.closest('.doc .av[data-f]');
     if(!w) return;
@@ -2685,10 +2728,12 @@ window.addEventListener('message', async function(e){
 body.adjmode .doc .av[data-f]{outline:1px dashed rgba(14,116,144,.55);cursor:move;}
 body.adjmode .doc .av[data-f]:hover{background:rgba(14,116,144,.10);}
 .doc .av.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.12);}
-/* ver.20260810.06: 顔写真枠は編集モード時に視認性を上げる */
-body.adjmode #applicantPhotoBox{outline:2px dashed rgba(59,130,246,.7)!important;background:rgba(59,130,246,.06);}
+/* ver.20260810.07: 顔写真枠は常時表示・常時ドラッグ可能に */
+#applicantPhotoBox{outline:2px dashed rgba(59,130,246,.5);background:rgba(59,130,246,.04);cursor:move;}
+#applicantPhotoBox:hover{outline-color:rgba(59,130,246,.9);background:rgba(59,130,246,.10);}
+body.adjmode #applicantPhotoBox{outline:2px dashed rgba(59,130,246,.9)!important;background:rgba(59,130,246,.10);}
 body.adjmode #applicantPhotoBox.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.15);}
-@media print{.doc .av{outline:none !important;background:none !important;} #applicantPhotoBox{outline:none !important;background:none !important;}}
+@media print{.doc .av{outline:none !important;background:none !important;} #applicantPhotoBox{outline:none !important;background:none !important;cursor:default;}}
 </style>
 
 <script>
