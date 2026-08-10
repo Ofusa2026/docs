@@ -182,7 +182,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260810.11</div>
+    <div class="ver">ver.20260810.12</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1325,7 +1325,8 @@ function p(){
   w.innerHTML=`
 <div class="doc docabs" id="docP1">
 <!-- ver.20260810.10: 顔写真表示エリア - henkouで確定した座標を移植 -->
-<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:157.9mm;top:21.2mm;width:28mm;height:38mm;overflow:hidden;background:transparent;z-index:3;">
+<!-- ver.20260810.12: gjk専用に微調整 (dx:-2.6 dy:+0.5) -->
+<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:155.3mm;top:21.7mm;width:28mm;height:38mm;overflow:hidden;background:transparent;z-index:3;">
   <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;pointer-events:none;" alt="顔写真">
 </div>
 <div class="page-num-label">P1</div>
