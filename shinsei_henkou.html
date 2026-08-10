@@ -1323,7 +1323,8 @@ function p(){
 <!-- ver.20260810.05: 顔写真表示エリア（33mm×45mm 標準規格。位置は入管様式に合わせて調整可） -->
 <!-- ver.20260810.06: マスター編集モードで位置・サイズ調整可能に。data-f="__photo" でtagWrappersが認識 -->
 <!-- ver.20260810.07: img に pointer-events:none で親divに mousedown が伝わるように修正 -->
-<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:150.5mm;top:20.5mm;width:33mm;height:45mm;overflow:hidden;background:transparent;z-index:3;">
+<!-- ver.20260810.08: マスター編集モードで調整した座標を焼き込み (dx:+7.2 dy:+0.3 dw:-4.5 dh:-6.3) -->
+<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:157.7mm;top:20.8mm;width:28.5mm;height:38.7mm;overflow:hidden;background:transparent;z-index:3;">
   <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;pointer-events:none;" alt="顔写真">
 </div>
 <div class="av avg" style="left:48.32mm;top:63.37mm;font-size:9.84pt;">${f('f_nationality')}</div>
