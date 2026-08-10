@@ -1288,7 +1288,8 @@ function p(){
 <div class="doc" id="docP1">
 <div class="page-num-label">P1</div>
 <!-- ver.20260810.05: 顔写真表示エリア（33mm×45mm 標準規格。位置は入管様式に合わせて調整可） -->
-<div id="applicantPhotoBox" style="position:absolute;left:150.5mm;top:20.5mm;width:33mm;height:45mm;overflow:hidden;background:transparent;z-index:3;">
+<!-- ver.20260810.06: マスター編集モードで位置・サイズ調整可能に。data-f="__photo" でtagWrappersが認識 -->
+<div id="applicantPhotoBox" class="av" data-f="__photo" style="position:absolute;left:150.5mm;top:20.5mm;width:33mm;height:45mm;overflow:hidden;background:transparent;z-index:3;">
   <img id="applicantPhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;" alt="顔写真">
 </div>
 <div class="av avg" style="left:48.32mm;top:63.37mm;font-size:9.84pt;">${f('f_nationality')}</div>
@@ -2507,6 +2508,8 @@ window.addEventListener('message', async function(e){
   function tagWrappers(){
     document.querySelectorAll('.doc .av').forEach(w=>{
       if(w.dataset.f) return;
+      // ver.20260810.06: 顔写真枠 (#applicantPhotoBox) は data-f="__photo" が既にHTMLで付いている
+      // → span.f[data-bind] を持たないが、data-f があれば処理対象にする
       const b=w.querySelector('span.f[data-bind]');
       if(!b) return;
       w.dataset.f=b.dataset.bind;
@@ -2518,6 +2521,16 @@ window.addEventListener('message', async function(e){
       const _baseAlign = w.getAttribute('data-align') || (/translateX\(-100%\)/.test(w.style.transform||'') ? 'right' : /translateX\(-50%\)/.test(w.style.transform||'') ? 'center' : 'left');
       w.dataset.ba = _baseAlign;
     });
+    // ver.20260810.06: 写真枠は初回のみ基準座標・サイズを記録（横幅・縦幅もdata-bw/bhに保存）
+    var photoBox = document.getElementById('applicantPhotoBox');
+    if(photoBox && !photoBox.dataset.bl){
+      photoBox.dataset.bl = parseFloat(photoBox.style.left)||0;
+      photoBox.dataset.bt = parseFloat(photoBox.style.top)||0;
+      photoBox.dataset.bw = parseFloat(photoBox.style.width)||33;
+      photoBox.dataset.bh = parseFloat(photoBox.style.height)||45;
+      photoBox.dataset.ba = 'left';
+      photoBox.dataset.bs = 0; // font-size は使わない
+    }
   }
   window.applyAdj=function(){
     tagWrappers();
@@ -2541,6 +2554,24 @@ window.addEventListener('message', async function(e){
       w.style.fontSize=(parseFloat(w.dataset.bs)+(a.ds||0)).toFixed(1)+'pt';
       if(_adjMode) w.classList.add('adj-moved');
     });
+    // ver.20260810.06: 顔写真枠は幅・高さも調整可能。専用処理
+    var photoBox = document.getElementById('applicantPhotoBox');
+    if(photoBox && photoBox.dataset.bl){
+      var pa = A['__photo'];
+      if(!pa){
+        photoBox.style.left = photoBox.dataset.bl + 'mm';
+        photoBox.style.top = photoBox.dataset.bt + 'mm';
+        photoBox.style.width = photoBox.dataset.bw + 'mm';
+        photoBox.style.height = photoBox.dataset.bh + 'mm';
+      } else {
+        photoBox.style.left = (parseFloat(photoBox.dataset.bl) + (pa.dx||0)).toFixed(2) + 'mm';
+        photoBox.style.top = (parseFloat(photoBox.dataset.bt) + (pa.dy||0)).toFixed(2) + 'mm';
+        // ds を width/height の増減として扱う（縦横比を維持）
+        photoBox.style.width = (parseFloat(photoBox.dataset.bw) + (pa.dw||0)).toFixed(2) + 'mm';
+        photoBox.style.height = (parseFloat(photoBox.dataset.bh) + (pa.dh||0)).toFixed(2) + 'mm';
+      }
+      if(_adjMode) photoBox.classList.add('adj-moved');
+    }
   };
   if(typeof p==='function'){ const _p=window.p; window.p=function(){ _p.apply(this,arguments); try{applyAdj();}catch(e){} }; }
   window.toggleAdjMode=function(){
@@ -2596,7 +2627,14 @@ window.addEventListener('message', async function(e){
   window.adjSize=function(d){
     if(!_adjSel) return;
     const A=getADJ(); const k=_adjSel.dataset.f;
-    A[k]=A[k]||{}; A[k].ds=Math.round(((A[k].ds||0)+d)*10)/10;
+    A[k]=A[k]||{};
+    // ver.20260810.06: 写真枠の場合は幅・高さを等比で増減 (33:45 = 1:1.36)
+    if(k === '__photo'){
+      A[k].dw = Math.round(((A[k].dw||0) + d) * 10) / 10;
+      A[k].dh = Math.round(((A[k].dh||0) + d * 1.36) * 10) / 10;
+    } else {
+      A[k].ds = Math.round(((A[k].ds||0) + d) * 10) / 10;
+    }
     setADJ(A); applyAdj(); selEl(document.querySelector('.av[data-f="'+k+'"]')||_adjSel);
   };
   window.adjReset=function(){
@@ -2629,7 +2667,9 @@ window.addEventListener('message', async function(e){
     A[k]=A[k]||{};
     A[k].dx=Math.round((nl-parseFloat(w.dataset.bl))*10)/10;
     A[k].dy=Math.round((nt-parseFloat(w.dataset.bt))*10)/10;
-    if(Math.abs(A[k].dx)<0.05 && Math.abs(A[k].dy)<0.05 && !A[k].ds) delete A[k];
+    // ver.20260810.06: 写真枠は ds ではなく dw/dh を使うので、削除条件を分岐
+    var _hasSize = (k === '__photo') ? (A[k].dw || A[k].dh) : A[k].ds;
+    if(Math.abs(A[k].dx)<0.05 && Math.abs(A[k].dy)<0.05 && !_hasSize && !A[k].align) delete A[k];
     setADJ(A); drag=null; applyAdj();
   });
   document.addEventListener('dblclick', e=>{
@@ -2645,7 +2685,10 @@ window.addEventListener('message', async function(e){
 body.adjmode .doc .av[data-f]{outline:1px dashed rgba(14,116,144,.55);cursor:move;}
 body.adjmode .doc .av[data-f]:hover{background:rgba(14,116,144,.10);}
 .doc .av.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.12);}
-@media print{.doc .av{outline:none !important;background:none !important;}}
+/* ver.20260810.06: 顔写真枠は編集モード時に視認性を上げる */
+body.adjmode #applicantPhotoBox{outline:2px dashed rgba(59,130,246,.7)!important;background:rgba(59,130,246,.06);}
+body.adjmode #applicantPhotoBox.adj-sel{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.15);}
+@media print{.doc .av{outline:none !important;background:none !important;} #applicantPhotoBox{outline:none !important;background:none !important;}}
 </style>
 
 <script>
