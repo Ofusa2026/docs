@@ -1,5 +1,12 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260811.02
+ * - fix(loadCaseToForm): 契約期間・入国予定日(Y/M/D)欄が空欄になる不具合を追加修正。
+ *   独自loadFromDB(1_6.html等)が cases.contract_start / cases.contract_end / persons.entry_date から
+ *   Y/M/Dに分割して先にセットした値を、8/5導入の "es_* クリアループ" が消してしまい、
+ *   emp_set側に contractStart / contractEnd の値が無い案件では空欄のまま残っていた。
+ *   contractStartY/M/D / contractEndY/M/D / entryY/M/D を _ES_SKIP に追加し、
+ *   案件由来の値をクリアループで保護。
  * ver.20260811.01
  * - fix(loadCaseToForm): 8/9 b289ab7 (ver.20260808.06) の loadFromDB → loadCaseToForm 順序変更で、
  *   後勝ちの loadCaseToForm 側が別名対応を持たず、独自loadFromDB(setFormValues)が正しく埋めた
@@ -1254,7 +1261,12 @@ async function loadCaseToForm(info, docKey){
       'repName','repNameEn','repTitle','repTitleEn',              // 代表者
       'company','companyEn','address','addressEn','tel',         // 会社・住所・電話
       'createY','createM','createD',                             // 作成日(emp_sets/doc_create_date由来。後続の作成日処理が扱う)
-      'docYear','docMonth','docDay','docDate'                     // 作成日の別ペア(f_*)。クリアすると作成日が今日に化ける
+      'docYear','docMonth','docDay','docDate',                    // 作成日の別ペア(f_*)。クリアすると作成日が今日に化ける
+      // ver.20260811.02: 契約期間・入国予定日はcases.contract_start/end・persons.entry_date由来（案件由来）で、
+      //   独自loadFromDB(1_6.html等)がY/M/Dに分割して先にセット済み。ここでクリアすると空欄事故になる。
+      'contractStartY','contractStartM','contractStartD',
+      'contractEndY','contractEndM','contractEndD',
+      'entryY','entryM','entryD'
     ];
     // ★ クリア: フォーム上に存在する es_* / f_* 入力欄のうち、_ES_SKIP を除いて空にする。
     //   これで前案件の手当・控除・賃金・契約期間などの残存を消してから、
