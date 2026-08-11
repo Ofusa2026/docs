@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260715.01</div>
+    <div class="ver">ver.20260811.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -233,7 +233,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,org,nationality,emp_set_idx&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,org,nationality,emp_set_idx,doc_create_date&id=eq.'+caseId),
       sb('persons?select=applicant_name_en,nationality,skill_eval_type&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
@@ -264,7 +264,24 @@ async function loadFromDB(passedInfo){
     s('f_orgName',coName);
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
-    if(!v('f_date')){ const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日'); }
+    if(!v('f_date')){
+      // ver.20260811.02: DBの doc_create_date を優先。無ければ今日の日付を自動セット
+      const dbDate = cas && cas.doc_create_date;
+      if(dbDate){
+        // "2026-07-02" 形式を "令和8年7月2日" に変換
+        const m = String(dbDate).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if(m){
+          const yy = parseInt(m[1],10) - 2018;
+          const mm = parseInt(m[2],10);
+          const dd = parseInt(m[3],10);
+          s('f_date', '令和' + yy + '年' + mm + '月' + dd + '日');
+        } else {
+          s('f_date', String(dbDate));
+        }
+      } else {
+        const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日');
+      }
+    }
     // 技能区分
     const skillType=pd&&pd.skill_eval_type||'';
     if(skillType){
