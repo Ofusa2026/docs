@@ -1,5 +1,12 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260811.01
+ * - fix(loadCaseToForm): 8/9 b289ab7 (ver.20260808.06) の loadFromDB → loadCaseToForm 順序変更で、
+ *   後勝ちの loadCaseToForm 側が別名対応を持たず、独自loadFromDB(setFormValues)が正しく埋めた
+ *   1-6等の欄(officeAddress・officeTel・weeklyMin/monthlyMin/yearlyMin・contractStartY/M/D・
+ *   contractEndY/M/D 他)が空欄・古値焼付けになる不具合が発生していた。
+ *   1_6.html の _FORM_TO_DB と同じ別名対応、および contractStart/End の Y/M/D 分割
+ *   ("2026-08-20"・"2026年8月20日" 両対応)をここでも行うことで復旧。
  * ver.20260806.01
  * - loadCaseToForm: 業務区分2(category2/category2En)に emp_sets の生値「建築（建設分野・特定技能１号）」等が
  *   括弧付きのまま入り、fBunyaPair表示とサイドバー入力欄がズレる／サイドバーで消しても復活する不具合を修正。
@@ -1265,9 +1272,52 @@ async function loadCaseToForm(info, docKey){
       }
     } catch(_clrErr) { console.warn('[doc] es_* クリア失敗:', _clrErr); }
 
+    // ver.20260811: 8/9のb289ab7で loadFromDB → loadCaseToForm の順に変更した際、
+    //   ofusa_common.js側は emp_set のキーをそのまま es_<キー> に流すだけで別名対応が無く、
+    //   loadFromDB(独自)がsetFormValues()で埋めた 1-6等の欄が総当たりループ(下)で
+    //   上書き/焼付けされ、officeAddress・officeTel・weekly/monthly/yearlyMin・
+    //   contractStartY/M/D・contractEndY/M/D 等が空欄になる不具合が発生していた。
+    //   1_6.html の _FORM_TO_DB / setFormValues と同じ別名対応をここでも行い、
+    //   総当たりループの前に「テンプレのプレースホルダ名」の側にも同時に値を入れる。
+    const _ALIAS_DB2FORM = {
+      officeAddr:'officeAddress', officeAddrEn:'officeAddressEn',
+      officeContact:'officeTel',
+      weeklyMins:'weeklyMin', weeklyMinsEn:'weeklyMinEn',
+      monthlyMins:'monthlyMin', monthlyMinsEn:'monthlyMinEn',
+      yearlyMins:'yearlyMin', yearlyMinsEn:'yearlyMinEn',
+      totalMonthly:'salaryTotal',
+      otRate60:'ot60under', otRate60En:'ot60underEn',
+      otRate60over:'ot60over', otRate60overEn:'ot60overEn',
+      otRateOver:'otPrescribed', otRateOverEn:'otPrescribedEn',
+      nightRate:'nightPremium', nightRateEn:'nightPremiumEn',
+      holidayRateLegal:'holidayLegal', holidayRateLegalEn:'holidayLegalEn',
+      holidayRateNon:'holidayNonLegal', holidayRateNonEn:'holidayNonLegalEn',
+      bonusCond:'bonusCondition', bonusCondEn:'bonusConditionEn',
+      salaryRaiseCond:'raiseCondition', salaryRaiseCondEn:'raiseConditionEn',
+      payCutoffDay:'payCutoff', payCutoffDayEn:'payCutoffEn',
+      otherHoliday:'otherHolidays',
+      deductSocial:'deductSocialIns', deductEmployment:'deductEmpIns'
+    };
+    const _splitYMD = (v) => {
+      if(v==null || String(v)==='') return null;
+      const m = String(v).match(/(\d{4})[-\/年\.](\d{1,2})[-\/月\.](\d{1,2})/);
+      return m ? {y:m[1], m:String(parseInt(m[2],10)), d:String(parseInt(m[3],10))} : null;
+    };
     Object.keys(es).forEach(k => {
-      if(_ES_SKIP.includes(k)) return;   // 氏名等はひな形から流さない
+      if(_ES_SKIP.includes(k)) return;
       setValMulti(['es_'+k, 'f_'+k], es[k]);
+      // 別名にも同じ値を橋渡し（テンプレ側のプレースホルダ名）
+      const alias = _ALIAS_DB2FORM[k];
+      if(alias) setValMulti(['es_'+alias, 'f_'+alias], es[k]);
+      // 単一日付 → Y/M/D 分割（"2026-08-20"・"2026年8月20日"両対応）
+      if(k === 'contractStart' || k === 'contractEnd'){
+        const ymd = _splitYMD(es[k]);
+        if(ymd){
+          setValMulti(['es_'+k+'Y'], ymd.y);
+          setValMulti(['es_'+k+'M'], ymd.m);
+          setValMulti(['es_'+k+'D'], ymd.d);
+        }
+      }
     });
 
     // 業務区分・分野: Object.keys(es)ループ後にまとめて括弧除去
