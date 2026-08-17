@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追完書類提出のご案内（入管宛レター）</div>
-    <div class="ver">ver.20260817.11</div>
+    <div class="ver">ver.20260817.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -112,7 +112,9 @@ var AGENTS={
 function curAgent(){ return AGENTS[v('f_agent')||'nakabayashi']||AGENTS.nakabayashi; }
 function applyAgent(){ /* 描画時に参照するため保持のみ */ }
 
-function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// ver.20260817.12: 独自のesc関数は撤去。ofusa_common.js の const esc と衝突して
+//   inline script 全体が SyntaxError で実行されず、フォーム自動入力・プレビュー描画が
+//   一切動かない不具合の根本原因だった。以降は common.js の esc を使用。
 
 // 提出書類リスト → 番号付き行
 function docsRows(){
