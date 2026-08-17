@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>追完書類提出のご案内（入管宛レター）</title>
 <style>.fp-case{display:none!important;}</style>
-<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<link rel="stylesheet" href="ofusa_common.css?v=1786953000">
 <style>
 .doc{padding:20mm!important;line-height:1.75!important;min-height:auto!important}
 @media print{
@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追完書類提出のご案内（入管宛レター）</div>
-    <div class="ver">ver.20260817.10</div>
+    <div class="ver">ver.20260817.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -264,8 +264,19 @@ window.addEventListener('message', async function(e){
       sel.appendChild(opt); sel.value=opt.value;
     }
   }
-  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tsuikan_letter'); }
-  if(typeof loadFromDB==='function') loadFromDB(info);
+  // ver.20260817.11: loadCaseToForm が form_data テーブル未登録タイプで例外を投げると
+  //   後続の loadFromDB が実行されず、フォームが空欄・プレビューも真っ黒になる不具合を修正。
+  //   loadCaseToForm は try/catch で囲んで、失敗しても loadFromDB を必ず呼ぶ。
+  if(typeof loadCaseToForm==='function'){
+    try{ await loadCaseToForm(info, 'tsuikan_letter'); }
+    catch(err){ console.warn('loadCaseToForm skipped:', err && err.message); }
+  }
+  if(typeof loadFromDB==='function'){
+    try{ await loadFromDB(info); }
+    catch(err){ console.error('loadFromDB failed:', err); showToast('⚠️ 読込エラー: '+(err&&err.message||err)); }
+  }
+  // 保険: 何らかの理由でプレビューが未生成の場合、明示的に描画
+  try{ if(typeof p === 'function') p(); }catch(err){ console.error('p() failed:', err); }
 });
 </script>
 </body>
