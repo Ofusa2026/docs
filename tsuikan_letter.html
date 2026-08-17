@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>追完書類提出のご案内（入管宛レター）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:20mm!important;line-height:1.75!important;min-height:auto!important}
+@media print{
+  @page{ size:A4; margin:0; }
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .tl-keep{ break-inside:avoid; page-break-inside:avoid; }
+  .tl-docs tr{ break-inside:avoid; page-break-inside:avoid; }
+  .tl-tail{ break-inside:avoid; page-break-inside:avoid; }
+}
+.tl-blank{display:inline-block;min-width:8em;border-bottom:1px solid #000;text-align:center;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 追完書類提出のご案内（入管宛レター）</div>
+    <div class="ver">ver.20260817.03</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('tsuikan_letter')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">取次者（差出人）</div>
+      <div class="fg"><label>取次者を選択</label>
+        <select id="f_agent" onchange="applyAgent();p()">
+          <option value="nakabayashi">中林 俊介（行-132023200582）</option>
+          <option value="tanaka">田中 綾美（行-132023200463）</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">提出先・作成日</div>
+      <div class="fg"><label>提出先局（受付番号から自動）</label><input id="f_bureau" oninput="p()" placeholder="例：名古屋"></div>
+      <div class="fg"><label>作成日（年）</label><input id="f_docY" oninput="p()" placeholder="令和8"></div>
+      <div class="fg"><label>作成日（月）</label><input id="f_docM" oninput="p()"></div>
+      <div class="fg"><label>作成日（日）</label><input id="f_docD" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">申請人</div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+      <div class="fg"><label>申請日</label><input id="f_appDate" oninput="p()"></div>
+      <div class="fg"><label>申請番号（受付番号）</label><input id="f_appNo" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">追完内容（メール本文から転記）</div>
+      <div class="fg"><label>担当（入管側／例：西村）</label><input id="f_officer" oninput="p()" placeholder="例：西村"></div>
+      <div class="fg"><label>本文（案件ごとに書き換え可）</label>
+        <textarea id="f_body" oninput="p()" rows="4" placeholder="拝啓　時下ますますご清祥のこととお慶び申し上げます。&#10;下記申請人の在留諸申請につきまして、追完のご依頼をいただきました書類を提出いたしますので、ご査収くださいますようお願い申し上げます。"></textarea>
+        <div style="font-size:10px;color:#888;margin-top:2px;">空欄なら既定の文面を使用します。</div>
+      </div>
+      <div class="fg"><label>提出書類（1行に1件・箇条書きで出力）</label>
+        <textarea id="f_docs" oninput="p()" rows="6" placeholder="申請人の令和7年度の納税証明書&#10;参考様式1-17号署名ページ&#10;雇用条件書一式&#10;国交省の受入計画認定証の写し"></textarea>
+      </div>
+      <div class="fg"><label>備考・特記（任意）</label><textarea id="f_note" oninput="p()" rows="2" placeholder="例：雇用契約期間の訂正および申請人の署名漏れを修正のうえ再作成いたしました。"></textarea></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1786427341"></script>
+<script>
+// 受付番号の接頭辞 → 提出先局
+var BUREAU_MAP={ '東':['東京'],'阪':['大阪'],'名':['名古屋'],'福':['福岡'],
+  '横':['横浜'],'神':['神戸'],'広':['広島'],'仙':['仙台'],
+  '高':['高松'],'札':['札幌'],'那':['那覇'],'中':['広島'] };
+function bureauFromReceipt(rno){
+  var s=String(rno||'').trim(); if(!s) return null;
+  var head=s.charAt(0);
+  return BUREAU_MAP[head]||null;
+}
+
+// 取次者プリセット
+var AGENTS={
+  nakabayashi:{ name:'中林　俊介', addr:'東京都大田区蒲田５丁目１１−１０ FUNDES蒲田8階', org:'大房行政書士法人', tel:'03-6424-8849', no:'行-132023200582' },
+  tanaka:{ name:'田中 綾美', addr:'東京都大田区蒲田５丁目１１−１０ FUNDES蒲田8階', org:'大房行政書士法人', tel:'03-6424-8849', no:'行-132023200463' }
+};
+function curAgent(){ return AGENTS[v('f_agent')||'nakabayashi']||AGENTS.nakabayashi; }
+function applyAgent(){ /* 描画時に参照するため保持のみ */ }
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// 提出書類リスト → 番号付き行
+function docsRows(){
+  var raw=String(v('f_docs')||'');
+  var lines=raw.split(/\r?\n/).map(function(x){return x.replace(/^[・\-\s]+/,'').trim();}).filter(function(x){return x.length;});
+  if(!lines.length){
+    return '<div style="border-bottom:1px dotted #999;min-height:22mm;">&nbsp;</div>';
+  }
+  return '<table class="tl-docs" style="width:100%;border-collapse:collapse;font-size:10.5pt;">'+
+    lines.map(function(t,i){
+      return '<tr><td style="width:2.4em;vertical-align:top;padding:1mm 0;">'+(i+1)+'．</td><td style="padding:1mm 0;border-bottom:1px dotted #bbb;">'+esc(t)+'</td></tr>';
+    }).join('')+'</table>';
+}
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const ag=curAgent();
+  const officer=String(v('f_officer')||'').trim();
+  const officerLine=officer?('（担当：'+esc(officer)+'）'):'';
+  const note=String(v('f_note')||'').trim();
+  const DEFAULT_BODY='拝啓　時下ますますご清祥のこととお慶び申し上げます。\n下記申請人の在留諸申請につきまして、追完のご依頼をいただきました書類を提出いたしますので、ご査収くださいますようお願い申し上げます。';
+  const bodyRaw=String(v('f_body')||'').trim()||DEFAULT_BODY;
+  const bodyHtml=esc(bodyRaw).replace(/\r?\n/g,'<br>');
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="tl-keep">
+<div style="text-align:right;font-size:10.5pt;margin-bottom:1mm;">${f('f_docY')} 年　${f('f_docM')} 月　${f('f_docD')} 日</div>
+<div style="font-size:10.5pt;margin-bottom:6mm;"><span class="tl-blank" style="min-width:8em;">${f('f_bureau')}</span>　出入国在留管理局長　殿${officerLine}</div>
+
+<div style="text-align:right;font-size:10.5pt;line-height:1.6;margin-bottom:6mm;">
+  ${esc(ag.org)}<br>
+  取次者　${esc(ag.name)}<br>
+  <span style="font-size:9pt;">${esc(ag.addr)}</span><br>
+  <span style="font-size:9pt;">TEL：${esc(ag.tel)}／申請等取次者番号：${esc(ag.no)}</span>
+</div>
+
+<div style="font-size:14pt;font-weight:bold;text-align:center;letter-spacing:3px;margin:2mm 0 6mm;">追完書類提出のご案内</div>
+</div>
+
+<div style="font-size:10.5pt;margin-bottom:4mm;">${bodyHtml}</div>
+
+<div style="font-size:10.5pt;text-align:center;letter-spacing:2px;margin:5mm 0 3mm;">記</div>
+
+<table class="tl-keep" style="width:100%;border-collapse:collapse;font-size:10.5pt;margin-bottom:5mm;">
+  <tr><td style="width:9em;padding:1mm 0;">申請人氏名</td><td style="padding:1mm 0;border-bottom:1px solid #000;">${f('f_applicant')}</td></tr>
+  <tr><td style="padding:1mm 0;">国籍・地域</td><td style="padding:1mm 0;border-bottom:1px solid #000;">${f('f_nationality')}</td></tr>
+  <tr><td style="padding:1mm 0;">生年月日</td><td style="padding:1mm 0;border-bottom:1px solid #000;">${f('f_birthdate')}</td></tr>
+  <tr><td style="padding:1mm 0;">申　請　日</td><td style="padding:1mm 0;border-bottom:1px solid #000;">${f('f_appDate')}</td></tr>
+  <tr><td style="padding:1mm 0;">申請受付番号</td><td style="padding:1mm 0;border-bottom:1px solid #000;">${f('f_appNo')}</td></tr>
+</table>
+
+<div style="font-size:10.5pt;font-weight:bold;margin-bottom:2mm;">【提出書類】</div>
+${docsRows()}
+
+<div class="tl-tail">
+${note?`<div style="font-size:10.5pt;margin-top:4mm;"><span style="font-weight:bold;">【備考】</span><br>${esc(note)}</div>`:''}
+
+<div style="font-size:10.5pt;text-align:right;margin-top:8mm;">以　上</div>
+<div style="font-size:10.5pt;text-align:right;margin-top:2mm;">敬具</div>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no,receipt_date&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      const rno=cas.receipt_no||cas.case_no||'';
+      s('f_appNo',rno);
+      s('f_appDate',cas.receipt_date||'');
+      if(!v('f_bureau')){ const b=bureauFromReceipt(rno); if(b) document.getElementById('f_bureau').value=b[0]; }
+    }
+    const persons=await sb('persons?select=nationality,birthdate&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',pd.birthdate||'');
+    }
+    if(!v('f_docY')){const n=new Date();document.getElementById('f_docY').value='令和'+(n.getFullYear()-2018);document.getElementById('f_docM').value=n.getMonth()+1;document.getElementById('f_docD').value=n.getDate();}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tsuikan_letter'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
