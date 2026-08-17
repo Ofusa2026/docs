@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追完書類提出のご案内（入管宛レター）</div>
-    <div class="ver">ver.20260817.03</div>
+    <div class="ver">ver.20260817.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -210,6 +210,22 @@ async function loadFromDB(passedInfo){
       s('f_birthdate',pd.birthdate||'');
     }
     if(!v('f_docY')){const n=new Date();document.getElementById('f_docY').value='令和'+(n.getFullYear()-2018);document.getElementById('f_docM').value=n.getMonth()+1;document.getElementById('f_docD').value=n.getDate();}
+    // ver.20260817.10: index から postMessage で渡されるカード情報を反映(上書きOK)
+    //   info.body / info.docs / info.officer / info.dueDate
+    if(info.body !== undefined && info.body !== null){
+      const el=document.getElementById('f_body'); if(el) el.value = String(info.body||'');
+    }
+    if(info.docs !== undefined && info.docs !== null){
+      const el=document.getElementById('f_docs'); if(el) el.value = String(info.docs||'');
+    }
+    if(info.officer){
+      const el=document.getElementById('f_officer'); if(el) el.value = String(info.officer);
+    }
+    if(info.dueDate){
+      // 期限を備考欄に出す(既に何か入っていれば上書きしない)
+      const el=document.getElementById('f_note');
+      if(el && !el.value){ el.value = '提出期限: '+String(info.dueDate); }
+    }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
