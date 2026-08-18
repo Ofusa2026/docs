@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260817.01</div>
+    <div class="ver">ver.20260818.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -486,7 +486,9 @@ function p(){
       return'';
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id" data-key="1">ရည်ညွှန်းပုံစံအမှတ် ၁-၆</div>`;
+    // ver.20260818.01: ミャンマー語行が固定文字列で翻訳を反映していなかった不具合修正。
+    //   他言語版と同じくnEn/amt/calcEnを差し込む実装に統一。
+    annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（ခံစားခွင့်　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)} ယန်း／တွက်ချက်ပုံ：${ph(calcEn,'CalcEn')}）</div>`;
   });
 
   w.innerHTML=`
