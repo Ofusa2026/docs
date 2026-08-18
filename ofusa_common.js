@@ -1,5 +1,15 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260818.03
+ * - fix(loadCaseToForm): 実費フラグ橋渡しで hasOwnProperty 判定に変更。
+ *   案シス側で明示的にキー削除された案件は既存 saysay 側 Est/Jippi 状態を維持する。
+ *   案シスと連動する形で、案シス側は「OFF時にキー削除」する仕様(ver.20260818.08)。
+ * ver.20260818.02
+ * - feat(loadCaseToForm): 案シスから渡される es.deductXxxType(boolean)を
+ *   既存の実費フラグUI(es_deductXxxJippi/es_deductXxxEst)に橋渡し。
+ *   案シス側で「実費」チェックした食費・居住費・水道光熱・その他①/②が
+ *   書類の「（実費）」表記に自動反映されるようになった。
+ *   従来はsaysay側でチェックしないと反映されず、案シスとの二重管理だった。
  * ver.20260811.02
  * - fix(loadCaseToForm): 契約期間・入国予定日(Y/M/D)欄が空欄になる不具合を追加修正。
  *   独自loadFromDB(1_6.html等)が cases.contract_start / cases.contract_end / persons.entry_date から
@@ -1350,6 +1360,35 @@ async function loadCaseToForm(info, docKey){
       setValMulti(['es_'+k,'f_'+k], parts[0]||'');
       const second = (parts.length>1) ? parts[1] : _stripP(raw2);
       setValMulti(['es_'+k+'2','f_'+k+'2'], second||'');
+    });
+
+    // ver.20260818.02: 案シスから渡される es.deductXxxType(boolean) を、
+    //   既存の実費フラグ UI(チェックボックス es_deductXxxJippi + hidden es_deductXxxEst)に
+    //   橋渡しする。これで案シスの実費チェックONの項目が書類の「（実費）」表記に反映される。
+    //   ver.20260818.03: undefined/null/欠損キー は「無処理」で既存の saysay 側設定を維持。
+    //   案シス側は OFF時にキーごと delete する仕様(ver.20260818.08)のため、
+    //   キー未定義=既存維持、true=実費ON、false=実費OFFの三値扱いとなる。
+    const _JIPPI_TYPE_MAP = {
+      deductFoodType:    'deductFood',
+      deductHousingType: 'deductHousing',
+      deductUtilityType: 'deductUtility',
+      deductOther1Type:  'deductOther1Amount',
+      deductOther2Type:  'deductOther2Amount'
+    };
+    Object.keys(_JIPPI_TYPE_MAP).forEach(function(typeKey){
+      // hasOwnProperty で判定(undefined 明示スキップ)。案シス側で削除された案件は
+      // ここに来ないので既存 saysay 状態を維持
+      if(!Object.prototype.hasOwnProperty.call(es, typeKey)) return;
+      var val = es[typeKey];
+      if(val === undefined || val === null) return;
+      var isJippi = (val === true || val === 'true' || val === 1 || val === '1');
+      var base = 'es_' + _JIPPI_TYPE_MAP[typeKey];
+      var cb  = document.getElementById(base + 'Jippi');
+      var est = document.getElementById(base + 'Est');
+      // dataset.jippiInit=1 を立てておくと _syncJippi の初期化ロジックがスキップされ、
+      // ここでセットした状態が保持される
+      if(cb){ cb.checked = isJippi; cb.dataset.jippiInit = '1'; }
+      if(est){ est.value = isJippi ? '実費' : ''; }
     });
 
     // === 作成日 ===
