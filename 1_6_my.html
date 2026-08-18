@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260818.01</div>
+    <div class="ver">ver.20260818.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -328,7 +328,10 @@
       <div class="fg"><label>賞与　有無<span class="fid">es.bonus</span></label><select id="es_bonus" onchange="p()"><option value="">（未設定）</option><option value="有">有</option><option value="無">無</option></select></div>
       <div class="fg"><label>賞与条件（日）<span class="fid">es.bonusCondition</span></label><input id="es_bonusCondition" oninput="p()"></div>
       <div class="fg"><label>賞与条件（ID）<span class="fid">es.bonusConditionEn</span></label><input id="es_bonusConditionEn" oninput="p()"></div>
-      <div class="fg"><label>退職金詳細<span class="fid">es.retirementDetail</span></label><input id="es_retirementDetail" oninput="p()"></div>
+      <!-- ver.20260818.04: 退職金 有無セレクト・翻訳欄をサイドバーに追加（従来欠落していた） -->
+      <div class="fg"><label>退職金　有無<span class="fid">es.retirement</span></label><select id="es_retirement" onchange="p()"><option value="">（未設定）</option><option value="有">有</option><option value="無">無</option></select></div>
+      <div class="fg"><label>退職金詳細（日）<span class="fid">es.retirementDetail</span></label><input id="es_retirementDetail" oninput="p()"></div>
+      <div class="fg"><label>退職金詳細（MY）<span class="fid">es.retirementDetailEn</span></label><input id="es_retirementDetailEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">別紙 固定残業代</div>
       <div class="fg"><label>手当名称（日）<span class="fid">es.fixedOTName</span></label><input id="es_fixedOTName" oninput="p()"></div>
@@ -458,7 +461,9 @@ function p(){
   const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const flexTypeShown=v('es_flexType')||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && !!_vw);
   // ver.20260716: 賞与も退職金と同じく cb() でプレビュー上のクリック切替を効かせる
   const bonusOn = v('es_bonus')==='有';
-  const retOn = v('es_retirement')==='有' || !!v('es_retirementDetail');
+  // ver.20260818.04: 退職金 有無判定を修正。従来は「詳細に値があれば有」で、詳細を消しても外れない不具合。
+  const retSel = v('es_retirement');
+  const retOn = retSel==='有' || (retSel==='' && !!v('es_retirementDetail'));
   const _sf=v('es_shiftFlg'); const shiftOn = !!_sf && !/^なし$|^無$|しない/.test(_sf);
   let allowLine1='',allowLine2='';
   for(let i=1;i<=4;i++){
@@ -831,7 +836,7 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">１０．退職金<br><span class="id" style="font-size:7pt;">၁၀။ အလုပ်ထွက်ခ</span></td>
-          <td style="vertical-align:top;">${cb(retOn,"keicho_yes")}&nbsp;有（時期，金額等&emsp;${f('es_retirementDetail')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(retOn,"cb_auto_020")} ရှိမည် (အချိန်ပမာဏစသည်&emsp;${f('es_retirementDetailEn')||f('es_retirementDetail')}&emsp;)</span></td>
+          <td style="vertical-align:top;">${cb(retOn,"keicho_yes")}&nbsp;有（時期，金額等&emsp;${f('es_retirementDetail')}&emsp;）<br><span class="id" style="font-size:7pt;">${cb(retOn,"cb_auto_020")} ရှိမည် (အချိန်ပမာဏစသည်&emsp;${f('es_retirementDetailEn')}&emsp;)</span></td>
           <td style="vertical-align:top;padding-bottom:2px;padding-left:8em;">${cb(!retOn,"cb_auto_021")}&nbsp;無<br><span class="id" style="font-size:7pt;">${cb(!retOn,"cb_auto_022")} မရှိပါ</span></td>
         </tr>
         <tr>
