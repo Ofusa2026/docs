@@ -27,7 +27,10 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 }
 .tbl-amt{width:100%;border-collapse:collapse;font-size:10pt;}
 .tbl-amt td{padding:1mm 2mm;vertical-align:top;}
-.under{border-bottom:1px solid #000;display:inline-block;min-width:4em;padding:0 2px;}
+/* ver.20260817.02: 下線を linear-gradient に変更。改行しても各行の下だけに線が引かれ、
+   inline-block 時のように空セル・改行余白まで下線が伸びる不具合を修正。 */
+.under{display:inline;padding:0 2px;background-image:linear-gradient(transparent 95%,#000 95%,#000 100%);background-repeat:repeat-x;}
+.under:empty::before{content:"\3000\3000\3000\3000";color:transparent;}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
@@ -40,7 +43,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ミャンマー語）</div>
-    <div class="ver">ver.20260715.08</div>
+    <div class="ver">ver.20260817.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
