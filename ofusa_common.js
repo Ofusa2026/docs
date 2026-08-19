@@ -766,23 +766,14 @@ function _showEditingIndicator(on){
 function enableDocEditing(on){
   const area=document.getElementById('pageArea');
   if(!area)return;
-  // ver.20260818.05: 直接編集モード時のCSSを1回だけ注入
-  //   - white-space: pre-wrap で「Enterで挿入した<br>」と「連続空白」を保つ
-  //   - .doc-editable の全子要素で改行を許可（テーブルセルのnowrap上書き）
-  //   - 変数スパン(.f)や下線内でも改行できる
-  if(!document.getElementById('__docEditableCSS')){
-    var _st = document.createElement('style');
-    _st.id = '__docEditableCSS';
-    _st.textContent = ''
-      + '.doc-editable, .doc-editable *{white-space:pre-wrap !important;word-break:break-word;}'
-      // 変数スパン内でも自然に改行できる
-      + '.doc-editable .f{display:inline;white-space:pre-wrap !important;}'
-      // 編集中は下線が壊れないようoverflow:visible
-      + '.doc-editable .under{overflow:visible;}'
-      // 印刷時は編集モードの影響を残さない
-      + '@media print{.doc-editable, .doc-editable *{white-space:normal !important;}}';
-    document.head.appendChild(_st);
-  }
+  // ver.20260819.01: 直接編集モードで Enter=<br> 挿入のみ有効化。
+  //   以前(ver.20260818.05)で入れた「.doc-editable * { white-space:pre-wrap !important }」は
+  //   HTMLソース内の改行・インデントまで空白として反映してしまい、書類が縦に大きく伸びる
+  //   不具合があったため撤去。white-space は元のレイアウトのまま。
+  //   Enterで<br>を挿入するだけで改行できる(<br>は white-space:normal でも折り返す)。
+  //   前回入れてしまった __docEditableCSS の style タグが残っている環境では明示的に削除。
+  var _oldCSS = document.getElementById('__docEditableCSS');
+  if(_oldCSS && _oldCSS.parentNode) _oldCSS.parentNode.removeChild(_oldCSS);
   // ver.20260717: 直接編集の未保存を検知する。editable 中の入力を1度だけ拾えばよい。
   if(on && !area.dataset.dirtyHooked){
     area.dataset.dirtyHooked='1';
