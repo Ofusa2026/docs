@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260819.05</div>
+    <div class="ver">ver.20260819.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -408,7 +408,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787134797"></script>
+<script src="ofusa_common.js?v=1787140200"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1796,6 +1796,16 @@ if(!window._selectCaseListenerAdded){
       }
     }catch(_e){}
     console.log('[doc] SELECT_CASE received:', info);
+    // ver.20260819.06: 案件切替時に前案件の入力欄値をクリア。
+    //   loadFromDB / loadCaseToForm が新案件の値をセットする前に、
+    //   全 es_* / f_* 入力欄を空にする。
+    //   杉興(office系がcompanyレベルnull)を開くと飛田(前案件)のoffice系が
+    //   残ってしまう問題の根本対策。値がある項目は後段で正しく上書きされる。
+    try{
+      document.querySelectorAll('input[id^="es_"], input[id^="f_"], textarea[id^="es_"], textarea[id^="f_"]').forEach(function(el){
+        if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
+      });
+    }catch(_e){ console.warn('[SELECT_CASE] input clear failed:', _e); }
     const sel=document.getElementById('caseSelect');
     if(sel){
       let found=false;

@@ -1195,6 +1195,9 @@ async function loadCaseToForm(info, docKey){
   // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
   window._lastCaseInfo = info;
   window._fieldData = {}; // ver.20260612: 案件読込ごとにDBフォールバック値をリセット
+  // ver.20260819.06: 入力欄クリアは各書類の SELECT_CASE ハンドラ側で loadFromDB
+  //   より先に実行するため、ここでは行わない（ここでクリアするとloadFromDBで
+  //   セットされた値まで消えてしまう）。
   console.log('[doc] loadCaseToForm:', info);
   const {caseId, companyId, companyName, empSetIdx} = info;
   try {
