@@ -193,10 +193,16 @@ const f=id=>{const raw=v(id);const val=esc(raw).replace(/\n/g,'<br>');const labe
     var st=document.createElement('style');
     st.textContent='.f[data-bind]{cursor:pointer;}'
       +'.f[data-bind]:hover{background:rgba(74,144,217,.15);border-radius:2px;outline:1px dashed rgba(74,144,217,.6);}'
+      /* ver.20260819.02: 直接編集モード中はクリック機能を無効化するため、ホバーの視覚効果も消す */
+      +'body.doc-editing .f[data-bind]{cursor:text;}'
+      +'body.doc-editing .f[data-bind]:hover{background:none;outline:none;}'
       +'@media print{.f[data-bind]{cursor:auto;background:none!important;outline:none!important;}}';
     (document.head||document.documentElement).appendChild(st);
   }catch(e){}
   document.addEventListener('click',function(e){
+    // ver.20260819.02: 直接編集モード中は、クリック→サイドバーフォーカスを無効化。
+    //   有効にすると contenteditable にカーソルが立たず、書類プレビュー上で直接編集できなくなる。
+    if(typeof _editMode !== 'undefined' && _editMode) return;
     var t=e.target;
     var el=(t&&t.closest)?t.closest('.f[data-bind]'):null;
     if(!el) return;
@@ -820,6 +826,12 @@ function enableDocEditing(on){
       doc.classList.remove('doc-editable');
     }
   });
+  // ver.20260819.02: body に doc-editing クラスをつけ外し、
+  //   .f[data-bind] のホバー効果とクリック機能を無効化する（CSS制御）
+  try{
+    if(on) document.body.classList.add('doc-editing');
+    else document.body.classList.remove('doc-editing');
+  }catch(_e){}
 }
 
 
