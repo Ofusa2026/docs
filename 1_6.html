@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260819.03</div>
+    <div class="ver">ver.20260819.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -408,7 +408,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787131960"></script>
+<script src="ofusa_common.js?v=1787134797"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1489,6 +1489,46 @@ async function saveForm(){
     }
   }
   if(!companyId){ alert('会社IDが取得できませんでした\n（案件管理で会社を紐付けてください）'); return; }
+
+  // ver.20260819.05: 保存前の企業名整合性チェック（他社データ混入防止）
+  //   杉興の会社に飛田鉄筋工業のデータを保存してしまったバグの再発防止。
+  //   companyId の会社の name と、フォームの es_officeName / es_orgName を比較して、
+  //   全く一致しない場合はユーザーに警告して確認を求める。
+  try{
+    const _companyRow = await sb('companies?select=name&id=eq.'+encodeURIComponent(companyId));
+    const _dbCompanyName = (_companyRow && _companyRow[0] && _companyRow[0].name || '').trim();
+    if(_dbCompanyName){
+      const _formOfficeName = ((document.getElementById('es_officeName')||{}).value || '').trim();
+      const _formOrgName = ((document.getElementById('es_orgName')||{}).value || '').trim();
+      // どちらも空でない場合のみ検証（空はチェックしない）
+      const _hasAny = _formOfficeName || _formOrgName;
+      // 一致判定: 部分一致でも OK（「株式会社◯◯」と「◯◯」の揺れを許容）
+      const _matches = function(a, b){
+        if(!a || !b) return true; // 片方空なら OK
+        return a === b || a.indexOf(b) >= 0 || b.indexOf(a) >= 0;
+      };
+      const _officeOk = _matches(_formOfficeName, _dbCompanyName);
+      const _orgOk = _matches(_formOrgName, _dbCompanyName);
+      if(_hasAny && !_officeOk && !_orgOk){
+        const _msg = '⚠️ 会社情報の不一致を検出しました。\n\n'
+          + 'DBの会社: 「' + _dbCompanyName + '」\n'
+          + 'フォームの事業所名: 「' + (_formOfficeName || '(空)') + '」\n'
+          + 'フォームの所属機関名: 「' + (_formOrgName || '(空)') + '」\n\n'
+          + '別の会社のデータを保存しようとしている可能性があります。\n'
+          + 'このまま保存すると、この会社に他社のデータが上書きされます。\n\n'
+          + 'それでも保存しますか？';
+        if(!confirm(_msg)){
+          console.warn('[saveForm] company name mismatch, save cancelled by user');
+          return;
+        }
+        console.warn('[saveForm] company name mismatch but user confirmed:',
+          {dbName:_dbCompanyName, officeName:_formOfficeName, orgName:_formOrgName});
+      }
+    }
+  }catch(_e){
+    console.warn('[saveForm] company name check failed:', _e);
+    // チェック失敗は保存を止めない（従来動作を維持）
+  }
 
   try{
     const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
