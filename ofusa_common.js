@@ -766,10 +766,57 @@ function _showEditingIndicator(on){
 function enableDocEditing(on){
   const area=document.getElementById('pageArea');
   if(!area)return;
+  // ver.20260818.05: 直接編集モード時のCSSを1回だけ注入
+  //   - white-space: pre-wrap で「Enterで挿入した<br>」と「連続空白」を保つ
+  //   - .doc-editable の全子要素で改行を許可（テーブルセルのnowrap上書き）
+  //   - 変数スパン(.f)や下線内でも改行できる
+  if(!document.getElementById('__docEditableCSS')){
+    var _st = document.createElement('style');
+    _st.id = '__docEditableCSS';
+    _st.textContent = ''
+      + '.doc-editable, .doc-editable *{white-space:pre-wrap !important;word-break:break-word;}'
+      // 変数スパン内でも自然に改行できる
+      + '.doc-editable .f{display:inline;white-space:pre-wrap !important;}'
+      // 編集中は下線が壊れないようoverflow:visible
+      + '.doc-editable .under{overflow:visible;}'
+      // 印刷時は編集モードの影響を残さない
+      + '@media print{.doc-editable, .doc-editable *{white-space:normal !important;}}';
+    document.head.appendChild(_st);
+  }
   // ver.20260717: 直接編集の未保存を検知する。editable 中の入力を1度だけ拾えばよい。
   if(on && !area.dataset.dirtyHooked){
     area.dataset.dirtyHooked='1';
     area.addEventListener('input', function(){ if(_editMode) markEditedDirty(); });
+  }
+  // ver.20260818.05: 直接編集モードで Enter/Shift+Enter を確実に改行として扱う。
+  //   contenteditable の既定挙動はブラウザ/ブロック親要素で <div><p><br> と揺れるため、
+  //   常に <br> を挿入して自然な改行にする。td/span 内でも動くようにする。
+  //   IMEの変換確定Enterはブラウザ側で処理させる（e.isComposing を確認）。
+  if(on && !area.dataset.enterHooked){
+    area.dataset.enterHooked='1';
+    area.addEventListener('keydown', function(e){
+      if(!_editMode) return;
+      if(e.key !== 'Enter') return;
+      if(e.isComposing || e.keyCode === 229) return; // IME変換中は素通し
+      // Enter単独=改行 / Shift+Enter=改行 / Alt+Enter=改行 全て統一
+      e.preventDefault();
+      var sel = window.getSelection();
+      if(!sel || sel.rangeCount === 0) return;
+      var range = sel.getRangeAt(0);
+      range.deleteContents();
+      var br = document.createElement('br');
+      range.insertNode(br);
+      // カーソルを<br>の直後へ移動（連続Enterで空行が入るよう、ゼロ幅スペースは使わない）
+      // 空行の高さを保つため、末尾に来た改行は追加の<br>を1個入れる
+      var after = document.createTextNode('\u200B');
+      br.parentNode.insertBefore(after, br.nextSibling);
+      range.setStartAfter(br);
+      range.setEndAfter(br);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      // dirtyフラグを立てる（inputイベントが飛ばない場合の保険）
+      if(typeof markEditedDirty==='function') markEditedDirty();
+    });
   }
   area.querySelectorAll('.doc').forEach(doc=>{
     if(on){
