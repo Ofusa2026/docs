@@ -1237,14 +1237,23 @@ async function loadCaseToForm(info, docKey){
     try{ if(typeof renderEmpSetSelector==='function') renderEmpSetSelector(co, idx, info); }catch(_e){}
 
     // 入力欄にセット：複数のID候補を試して存在するものにセット
+    // ver.20260819.03: 空値もクリアするよう修正。従来は空スキップで前案件の値が
+    //   サイドバーに残るバグがあった。ただし _fieldData への保存は続ける（emp_sets
+    //   にはあるがサイドバー入力欄が無い項目のフォールバック用）。
     const setValMulti = (ids, val) => {
-      if(val===undefined || val===null || String(val)==='') return;
       const list = Array.isArray(ids) ? ids : [ids];
+      const isEmpty = (val===undefined || val===null || String(val)==='');
       let elSet = false;
       for(const id of list){
-        // ver.20260612: 入力欄の有無に関わらず全候補idをフォールバックへ。要素があれば先頭の1つに値もセット
-        window._fieldData[id] = val;
-        if(!elSet){ const el = document.getElementById(id); if(el){ el.value = val; elSet = true; } }
+        // 値が空でなければ _fieldData に保存（空は保存しない = 前値保持）
+        if(!isEmpty) window._fieldData[id] = val;
+        if(!elSet){
+          const el = document.getElementById(id);
+          if(el){
+            el.value = isEmpty ? '' : val;
+            elSet = true;
+          }
+        }
       }
     };
 

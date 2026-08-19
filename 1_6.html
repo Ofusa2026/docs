@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260819.02</div>
+    <div class="ver">ver.20260819.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -408,7 +408,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787119328"></script>
+<script src="ofusa_common.js?v=1787131960"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1345,7 +1345,11 @@ async function loadFromDB(passedInfo){
       const co = cos && cos[0];
       if(co){
         // 所属機関基本情報をセット
-        const _s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+        // ver.20260819.03: 空値でも必ずセットしてクリアする。従来は `if(e && val)` で
+        //   空値はスキップされ、前案件の値がサイドバーに残る不具合があった
+        //   （例: 杉興(tel/rep等がcompanyレベルnull)を開くと、前に開いた飛田鉄筋工業の
+        //   代表者名・住所・電話が消えず表示されっぱなしになる）
+        const _s=(id,val)=>{const e=document.getElementById(id);if(e) e.value=(val==null?'':val);};
         _s('es_orgName',    co.name||'');
         _s('es_orgNameEn',  co.name_en||'');
         _s('es_orgAddress', (co.pref||'')+(co.city||'')+(co.address||''));
