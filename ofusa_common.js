@@ -835,120 +835,167 @@ function enableDocEditing(on){
 }
 
 
-// ===== ユーザー注記機能 =====
-// ver.20260819.09: 書類プレビュー上に自由記入注記(ユーザーノート)を配置できる機能
-//   - 直接編集モード中に「➕ 注記追加」ボタンで新規追加
-//   - 日本語 + 翻訳の2行表示（黒文字・地の文）
-//   - 絶対座標配置（ドラッグで位置調整可能）
-//   - companies.emp_sets[i]._userNotes 配列に保存
+// ===== ユーザー注記機能（v2: 行の下に挿入方式）=====
+// ver.20260820.07: フリー配置(絶対座標)方式は印刷ズレが解消できなかったため、
+//   「クリックした要素の直後に挿入」方式に変更。
+//   - 直接編集モード中に書類上の任意の行(要素)をクリックしてアンカー選択
+//   - 「➕ 注記を追加」で日本語+翻訳を入力するモーダル
+//   - 注記はアンカー要素の直後にインラインで挿入される（絶対配置ではない）
+//   - 印刷でもズレない（インライン挿入だから）
+//   - companies.emp_sets[i]._userNotes 配列に保存（キー_userNotesは維持）
 //   - 同じ雇用条件セットを使う他案件でも復元
-//   - 印刷にも出る
 //
-// 注記データ構造 (JSON):
-// { id: 'note_xxxx', ja: '日本語文', tr: '翻訳文', x: 数値, y: 数値, page: 数値 }
+// 注記データ構造 (v2 JSON):
+// { id: 'note_xxxx', ja: '日本語文', tr: '翻訳文',
+//   page: ページ番号(1..7),           # どのページか
+//   anchorText: '対象行のテキスト先頭部分', # 最大80文字
+//   anchorIndex: 0                      # 同じテキストが複数ある場合の番目(0始まり)
+// }
 
-// 全注記を保持（メモリ）
+// メモリ上の全注記
 window._userNotes = [];
+// 現在選択中のアンカー要素(_editMode中にクリックで選ぶ)
+window._selectedAnchor = null;
 
-// 注記コンテナのCSS注入（1回だけ）
+// CSS注入
 function _ensureUserNoteCSS(){
   if(document.getElementById('__userNoteCSS')) return;
   var st = document.createElement('style');
   st.id = '__userNoteCSS';
   st.textContent =
-    '.user-note{position:absolute;background:transparent;padding:2px 4px;font-size:8.5pt;line-height:1.4;color:#000;z-index:5;max-width:60%;white-space:pre-wrap;word-break:break-word;box-sizing:border-box;}' +
+    /* インライン注記本体：地の文として表示 */
+    '.user-note{display:block;color:#000;font-size:8.5pt;line-height:1.4;margin:2px 0;padding:0;white-space:pre-wrap;word-break:break-word;position:relative;}' +
     '.user-note .un-line-tr{font-size:7.5pt;color:#000;}' +
-    /* 編集モード中だけ枠と操作UIを表示 */
-    'body.doc-editing .user-note{outline:1px dashed #a855f7;background:rgba(245,240,255,.6);cursor:move;}' +
-    'body.doc-editing .user-note:hover{outline:1px solid #7c3aed;background:rgba(245,240,255,.9);}' +
-    '.user-note .un-tools{display:none;position:absolute;top:-22px;right:0;background:#fff;border:1px solid #ccc;border-radius:3px;padding:1px 4px;font-size:10px;}' +
+    /* 編集モード中だけ淡いハイライトとツール */
+    'body.doc-editing .user-note{outline:1px dashed #a855f7;background:rgba(245,240,255,.4);padding:2px 4px;}' +
+    'body.doc-editing .user-note:hover{outline:1px solid #7c3aed;background:rgba(245,240,255,.7);}' +
+    '.user-note .un-tools{display:none;position:absolute;top:-22px;right:0;background:#fff;border:1px solid #ccc;border-radius:3px;padding:1px 4px;font-size:10px;z-index:100;}' +
     'body.doc-editing .user-note:hover .un-tools{display:inline-block;}' +
     '.user-note .un-btn{display:inline-block;margin:0 2px;padding:2px 6px;cursor:pointer;color:#374151;border-radius:3px;user-select:none;}' +
     '.user-note .un-btn:hover{background:#eee;}' +
-    /* 注記追加フローティングボタン */
+    /* アンカー選択中の要素をハイライト */
+    'body.doc-editing .__note-anchor-selected{outline:2px solid #7c3aed !important;outline-offset:2px;background:rgba(245,240,255,.5)!important;}' +
+    /* 追加ボタン(フローティング) */
     '#userNoteAddBtn{display:none;position:fixed;bottom:70px;right:16px;z-index:9999;padding:10px 14px;background:#7c3aed;color:#fff;border:none;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,.2);}' +
     '#userNoteAddBtn:hover{background:#6d28d9;}' +
     'body.doc-editing #userNoteAddBtn{display:inline-block;}' +
-    /* 印刷時：枠なし、ツール非表示、+.docのサイズを明示固定して注記位置ズレを防ぐ */
+    /* 印刷時: 枠なし、地の文として表示、ツール非表示 */
     '@media print{' +
-      '.user-note{outline:none!important;background:transparent!important;position:absolute!important;}' +
+      '.user-note{outline:none!important;background:transparent!important;padding:0!important;}' +
       '.user-note .un-tools{display:none!important;}' +
       '#userNoteAddBtn{display:none!important;}' +
-      /* ver.20260820.06: .doc は width固定＋overflow:visibleだけ強制。
-         height/min-height はブラウザに任せて（元々1123pxのmin-heightがあるが
-         !important強制は空白ページを生む可能性があるため付けない）、
-         内容が A4 に収まればそのまま1ページに収まる。 */
-      '.doc{width:794px!important;overflow:visible!important;position:relative!important;margin:0 auto!important;}' +
-      /* pageAreaも余計な幅を持たないように */
-      '#pageArea{width:auto!important;background:none!important;padding:0!important;margin:0!important;}' +
+      '.__note-anchor-selected{outline:none!important;background:none!important;}' +
     '}';
   document.head.appendChild(st);
 }
 
-// ページエリア内で新しい注記を追加するボタンを設置（1回だけ）
+// 追加ボタン設置
 function _ensureUserNoteAddBtn(){
   if(document.getElementById('userNoteAddBtn')) return;
   var btn = document.createElement('button');
   btn.id = 'userNoteAddBtn';
   btn.type = 'button';
   btn.textContent = '➕ 注記を追加';
-  btn.title = '書類の好きな場所に自由記入の注記を追加します';
+  btn.title = '書類の任意の行をクリックしてから、このボタンで注記を追加します';
   btn.onclick = function(){ createUserNoteInteractive(); };
   document.body.appendChild(btn);
 }
 
-// 注記IDを生成
+// アンカー選択ハンドラを設置（1度だけ）
+function _ensureAnchorSelectionHandler(){
+  var area = document.getElementById('pageArea');
+  if(!area || area.dataset.anchorHooked) return;
+  area.dataset.anchorHooked = '1';
+  area.addEventListener('click', function(ev){
+    if(typeof _editMode === 'undefined' || !_editMode) return;
+    // 注記本体のクリックは無視（別のハンドラで処理）
+    if(ev.target.closest('.user-note')) return;
+    if(ev.target.closest('.un-tools')) return;
+    // アンカー候補: 行相当の要素（div, tr, tdなど）
+    var target = ev.target;
+    // 適切な粒度の親を選ぶ（テキストを含む最小の block/inline要素）
+    // 既存の選択を解除
+    var doc = area.ownerDocument;
+    doc.querySelectorAll('.__note-anchor-selected').forEach(function(el){
+      el.classList.remove('__note-anchor-selected');
+    });
+    if(target && target.classList){
+      target.classList.add('__note-anchor-selected');
+      window._selectedAnchor = target;
+    }
+  });
+}
+
 function _generateUserNoteId(){
   return 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
 }
 
-// 1件の注記要素をDOMに描画
-function _renderUserNote(note){
+// 要素からアンカー識別情報を取得
+function _getAnchorInfo(element){
+  if(!element) return null;
   var area = document.getElementById('pageArea');
   if(!area) return null;
-  // page指定があれば該当 .doc を親にする（フォールバックは area）
   var pages = area.querySelectorAll('.doc');
-  var parent = area;
-  if(note.page && pages[note.page - 1]){
-    parent = pages[note.page - 1];
-    // .doc に position:relative がなければ付与
-    if(getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+  // 何ページ目か
+  var page = 1;
+  for(var i = 0; i < pages.length; i++){
+    if(pages[i].contains(element)){ page = i + 1; break; }
   }
-  // 既存要素があれば取り除いて置き換え
+  // テキストの先頭部分(最大80文字)を保存
+  var text = (element.textContent || '').replace(/\s+/g, ' ').trim().substring(0, 80);
+  if(!text) return null;
+  // 同じテキスト先頭を持つ要素が複数あれば何番目か特定
+  var allElements = pages[page - 1] ? pages[page - 1].querySelectorAll(element.tagName) : [];
+  var index = 0, found = false;
+  for(var j = 0; j < allElements.length; j++){
+    var t = (allElements[j].textContent || '').replace(/\s+/g, ' ').trim().substring(0, 80);
+    if(t === text){
+      if(allElements[j] === element){ found = true; break; }
+      index++;
+    }
+  }
+  return {
+    page: page,
+    anchorText: text,
+    anchorIndex: index,
+    anchorTag: element.tagName
+  };
+}
+
+// アンカー情報から実際の要素を再取得
+function _findAnchorElement(anchorInfo){
+  if(!anchorInfo) return null;
+  var area = document.getElementById('pageArea');
+  if(!area) return null;
+  var pages = area.querySelectorAll('.doc');
+  var pageEl = pages[(anchorInfo.page || 1) - 1];
+  if(!pageEl) return null;
+  var tag = anchorInfo.anchorTag || '*';
+  var candidates = pageEl.querySelectorAll(tag);
+  var matched = [];
+  for(var i = 0; i < candidates.length; i++){
+    var t = (candidates[i].textContent || '').replace(/\s+/g, ' ').trim().substring(0, 80);
+    if(t === anchorInfo.anchorText) matched.push(candidates[i]);
+  }
+  return matched[anchorInfo.anchorIndex || 0] || matched[0] || null;
+}
+
+// 1件の注記を描画（アンカー要素の直後に挿入）
+function _renderUserNote(note){
+  // 既存要素を削除して再挿入
   var old = document.getElementById('un_' + note.id);
   if(old && old.parentNode) old.parentNode.removeChild(old);
+
+  var anchor = _findAnchorElement(note);
+  if(!anchor){
+    console.warn('[userNote] anchor not found for:', note.anchorText);
+    return null;
+  }
 
   var el = document.createElement('div');
   el.id = 'un_' + note.id;
   el.className = 'user-note';
   el.dataset.noteId = note.id;
-  // ver.20260820.03: 座標は「%」相対配置に統一（印刷ズレ解消）。
-  //   note.xPct/yPct（0-100）があればそれを優先、なければ旧px値から換算。
-  //   旧データ(x/y px)は初回レンダリング時に xPct/yPct へマイグレーション。
-  var parentRect = parent.getBoundingClientRect();
-  if(note.xPct != null && note.yPct != null){
-    el.style.left = note.xPct + '%';
-    el.style.top = note.yPct + '%';
-  } else if(parentRect.width > 0 && parentRect.height > 0){
-    // 旧データ: pxから%に換算 → styleにも%を適用、noteオブジェクトも更新
-    // ver.20260820.04: マイグ時にstyleを%で書き、DBにも保存する（従来はpx style
-    //   のまま置いてマイグ結果を捨てていた）
-    note.xPct = Math.round(((note.x || 0) / parentRect.width) * 10000) / 100;
-    note.yPct = Math.round(((note.y || 0) / parentRect.height) * 10000) / 100;
-    el.style.left = note.xPct + '%';
-    el.style.top = note.yPct + '%';
-    // 遅延保存（他の描画呼出しをまとめるため）
-    if(!window.__userNotesMigrateSaveTimer){
-      window.__userNotesMigrateSaveTimer = setTimeout(function(){
-        window.__userNotesMigrateSaveTimer = null;
-        if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
-      }, 800);
-    }
-  } else {
-    // 親サイズが取れない場合はpxのまま（次回試行）
-    el.style.left = (note.x || 0) + 'px';
-    el.style.top = (note.y || 0) + 'px';
-  }
   // 日本語行
   var ja = document.createElement('div');
   ja.className = 'un-line-ja';
@@ -964,7 +1011,7 @@ function _renderUserNote(note){
   // ツール（編集・削除）
   var tools = document.createElement('div');
   tools.className = 'un-tools';
-  tools.setAttribute('contenteditable', 'false'); // 編集モードでも触れる
+  tools.setAttribute('contenteditable', 'false');
   var edit = document.createElement('span');
   edit.className = 'un-btn';
   edit.textContent = '✏️ 編集';
@@ -977,72 +1024,27 @@ function _renderUserNote(note){
   tools.appendChild(edit);
   tools.appendChild(del);
   el.appendChild(tools);
-
-  // ドラッグ移動（編集モード時のみ有効）
-  el.addEventListener('mousedown', function(ev){
-    // ver.20260820.02: _editMode は let 宣言のため window._editMode ではなく直接参照
-    if(typeof _editMode === 'undefined' || !_editMode) return;
-    if(ev.target.closest('.un-tools')) return; // ツール上はドラッグしない
-    ev.preventDefault();
-    var startX = ev.clientX, startY = ev.clientY;
-    // ドラッグ開始時の要素の位置(親からのオフセット)をpxで確定
-    var pr = el.parentElement.getBoundingClientRect();
-    var er = el.getBoundingClientRect();
-    var origLeft = er.left - pr.left;
-    var origTop  = er.top  - pr.top;
-    // ドラッグ中はpxで動かす
-    el.style.left = origLeft + 'px';
-    el.style.top  = origTop  + 'px';
-    function onMove(mv){
-      el.style.left = (origLeft + (mv.clientX - startX)) + 'px';
-      el.style.top  = (origTop  + (mv.clientY - startY)) + 'px';
-    }
-    function onUp(){
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      // ver.20260820.03: ドラッグ後の位置を%相対座標として保存（印刷ズレ解消）
-      var n = window._userNotes.find(function(nn){ return nn.id === note.id; });
-      if(n){
-        var finalLeft = parseInt(el.style.left, 10) || 0;
-        var finalTop  = parseInt(el.style.top, 10) || 0;
-        var parentRect = el.parentElement.getBoundingClientRect();
-        if(parentRect.width > 0 && parentRect.height > 0){
-          n.xPct = Math.round((finalLeft / parentRect.width) * 10000) / 100;
-          n.yPct = Math.round((finalTop / parentRect.height) * 10000) / 100;
-          // 見た目もすぐ%に切り替え
-          el.style.left = n.xPct + '%';
-          el.style.top = n.yPct + '%';
-        }
-        // 互換のためpxも保持（旧ローダー対策）
-        n.x = finalLeft;
-        n.y = finalTop;
-      }
-      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
-      if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
-    }
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
-  });
-
-  // 内側は編集モード中もクリック=ドラッグの起点扱いにする（contenteditableが浸食しないよう）
   el.setAttribute('contenteditable', 'false');
 
-  parent.appendChild(el);
+  // アンカー要素の直後に挿入
+  if(anchor.nextSibling){
+    anchor.parentNode.insertBefore(el, anchor.nextSibling);
+  } else {
+    anchor.parentNode.appendChild(el);
+  }
   return el;
 }
 
-// 全注記を描画
 function renderAllUserNotes(){
   _ensureUserNoteCSS();
   _ensureUserNoteAddBtn();
+  _ensureAnchorSelectionHandler();
   // 既存の描画をクリア
   document.querySelectorAll('.user-note').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });
   (window._userNotes || []).forEach(function(note){ _renderUserNote(note); });
 }
 
-// ver.20260820.01: HTMLモーダルで日本語＋翻訳を同時入力できるように改良
-//   従来: prompt() を2回連続で出していた（1つずつ入力）
-//   新: モーダル1枚で両方入力＋プレビュー表示
+// ===== モーダル =====
 function _ensureUserNoteModal(){
   if(document.getElementById('userNoteModal')) return;
   var modal = document.createElement('div');
@@ -1051,6 +1053,7 @@ function _ensureUserNoteModal(){
   modal.innerHTML =
     '<div style="background:#fff;border-radius:8px;padding:20px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);">' +
       '<h3 id="unModalTitle" style="margin:0 0 12px;font-size:15px;color:#1f2937;">📝 注記を追加</h3>' +
+      '<div id="unModalAnchor" style="margin-bottom:10px;padding:8px;background:#f3f4f6;border-radius:4px;font-size:11px;color:#4b5563;">挿入位置: (未選択)</div>' +
       '<div style="margin-bottom:10px;">' +
         '<label style="display:block;font-size:12px;color:#4b5563;margin-bottom:4px;font-weight:600;">日本語文（先頭に「※」は自動で付きます）</label>' +
         '<textarea id="unModalJa" rows="3" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;font-family:inherit;box-sizing:border-box;resize:vertical;" placeholder="例：シフト制につき一例"></textarea>' +
@@ -1065,7 +1068,6 @@ function _ensureUserNoteModal(){
       '</div>' +
     '</div>';
   document.body.appendChild(modal);
-  // 背景クリックで閉じる
   modal.addEventListener('click', function(e){
     if(e.target === modal) _closeUserNoteModal();
   });
@@ -1073,23 +1075,19 @@ function _ensureUserNoteModal(){
 
 function _closeUserNoteModal(){
   var modal = document.getElementById('userNoteModal');
-  if(modal){
-    modal.style.display = 'none';
-    modal._onSave = null; // クリア
-  }
+  if(modal) modal.style.display = 'none';
 }
 
-// モーダルを開く（title, ja, tr, onSaveCallback）
 function _openUserNoteModal(opts){
   _ensureUserNoteModal();
   var modal = document.getElementById('userNoteModal');
   document.getElementById('unModalTitle').textContent = opts.title || '📝 注記';
+  document.getElementById('unModalAnchor').textContent = '挿入位置: ' + (opts.anchorPreview || '(未選択)');
   var jaEl = document.getElementById('unModalJa');
   var trEl = document.getElementById('unModalTr');
   jaEl.value = opts.ja || '';
   trEl.value = opts.tr || '';
   modal.style.display = 'flex';
-  // OKボタンのハンドラ差し替え
   var okBtn = document.getElementById('unModalOk');
   var newOk = okBtn.cloneNode(true);
   okBtn.parentNode.replaceChild(newOk, okBtn);
@@ -1100,93 +1098,87 @@ function _openUserNoteModal(opts){
     _closeUserNoteModal();
     if(typeof opts.onSave === 'function') opts.onSave(ja, tr);
   });
-  // キャンセル
   var caBtn = document.getElementById('unModalCancel');
   var newCa = caBtn.cloneNode(true);
   caBtn.parentNode.replaceChild(newCa, caBtn);
   newCa.addEventListener('click', function(){ _closeUserNoteModal(); });
-  // フォーカス
   setTimeout(function(){ jaEl.focus(); }, 100);
 }
 
-// ユーザーに新規注記を作らせる
+// 新規注記作成
 function createUserNoteInteractive(){
+  var anchor = window._selectedAnchor;
+  if(!anchor || !document.body.contains(anchor)){
+    alert('注記を挿入したい行を書類上でクリックしてから、もう一度「➕ 注記を追加」を押してください。');
+    return;
+  }
+  var anchorInfo = _getAnchorInfo(anchor);
+  if(!anchorInfo){
+    alert('アンカー位置を特定できませんでした。別の行を選択してください。');
+    return;
+  }
   _openUserNoteModal({
     title: '📝 新しい注記を追加',
+    anchorPreview: '(P' + anchorInfo.page + ') ' + anchorInfo.anchorText.substring(0, 50),
     ja: '',
     tr: '',
     onSave: function(ja, tr){
-      // デフォルト座標: 現在の可視ページ内の中央
-      var area = document.getElementById('pageArea');
-      var visiblePage = 1;
-      if(area){
-        var pages = area.querySelectorAll('.doc');
-        var scrollTop = area.scrollTop;
-        for(var i = 0; i < pages.length; i++){
-          if(pages[i].offsetTop > scrollTop){ visiblePage = Math.max(1, i); break; }
-          visiblePage = i + 1;
-        }
-      }
       var note = {
         id: _generateUserNoteId(),
         ja: ja,
         tr: tr,
-        // ver.20260820.03: 初期座標を%相対で（印刷ズレ解消）。左10%, 上10%
-        xPct: 10,
-        yPct: 10,
-        x: 80,
-        y: 80,
-        page: visiblePage
+        page: anchorInfo.page,
+        anchorText: anchorInfo.anchorText,
+        anchorIndex: anchorInfo.anchorIndex,
+        anchorTag: anchorInfo.anchorTag
       };
       window._userNotes = window._userNotes || [];
       window._userNotes.push(note);
       _renderUserNote(note);
-      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
+      // アンカー選択解除
+      var doc = anchor.ownerDocument;
+      doc.querySelectorAll('.__note-anchor-selected').forEach(function(el){
+        el.classList.remove('__note-anchor-selected');
+      });
+      window._selectedAnchor = null;
       if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
     }
   });
 }
 
-// 既存の注記を編集
+// 注記編集
 function editUserNote(noteId){
   var note = (window._userNotes || []).find(function(n){ return n.id === noteId; });
   if(!note) return;
   _openUserNoteModal({
     title: '✏️ 注記を編集',
+    anchorPreview: '(P' + note.page + ') ' + (note.anchorText || '').substring(0, 50),
     ja: note.ja || '',
     tr: note.tr || '',
     onSave: function(ja, tr){
       note.ja = ja;
       note.tr = tr;
       _renderUserNote(note);
-      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
       if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
     }
   });
 }
 
-// 注記を削除
+// 注記削除
 function deleteUserNote(noteId){
   if(!confirm('この注記を削除しますか？')) return;
   window._userNotes = (window._userNotes || []).filter(function(n){ return n.id !== noteId; });
   var el = document.getElementById('un_' + noteId);
   if(el && el.parentNode) el.parentNode.removeChild(el);
-  // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
   if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
 }
 
-// window スコープに公開（htmlから呼べるように）
 window.createUserNoteInteractive = createUserNoteInteractive;
 window.editUserNote = editUserNote;
 window.deleteUserNote = deleteUserNote;
 window.renderAllUserNotes = renderAllUserNotes;
 
-// ver.20260820.02: 注記のみを保存する専用関数
-//   注記の変更で emp_set 全体を保存すると「上書き/新規作成」ダイアログが出て
-//   ユーザーの操作を邪魔する。注記だけをDB内の該当箇所に直接書き込み、
-//   フォーム側の dirty 判定にも影響を与えないようにする。
-//   RPC set_edited_html は使わず、companies.emp_sets[idx]._userNotes を
-//   jsonb_set で更新する。
+// 注記のみを直接保存する専用関数
 async function saveUserNotesOnly(){
   if(typeof sb !== 'function') return;
   var info = window._lastCaseInfo;
@@ -1195,22 +1187,17 @@ async function saveUserNotesOnly(){
   if(isNaN(idx)) idx = 0;
   var notes = Array.isArray(window._userNotes) ? window._userNotes : [];
   try{
-    // 会社の emp_sets[idx]._userNotes だけを更新（RPC使用）
-    var payload = {
-      p_company_id: info.companyId,
-      p_idx: idx,
-      p_notes: notes
-    };
+    // RPCがあれば優先
+    var payload = { p_company_id: info.companyId, p_idx: idx, p_notes: notes };
     var res = await sb('rpc/set_emp_set_user_notes', {
-      method: 'POST',
-      body: JSON.stringify(payload)
+      method: 'POST', body: JSON.stringify(payload)
     });
-    console.log('[userNotes] saved:', notes.length, 'notes');
+    console.log('[userNotes] saved:', notes.length);
     if(typeof showToast === 'function') showToast('💾 注記を保存しました', 1200);
     return res;
   }catch(e){
-    // RPCが未実装の場合フォールバック: emp_sets全体を read-modify-write
-    console.warn('[userNotes] RPC failed, fallback to full write:', e);
+    // フォールバック: emp_sets 全体を read-modify-write
+    console.warn('[userNotes] RPC failed, fallback:', e);
     try{
       var rows = await sb('companies?select=emp_sets&id=eq.' + encodeURIComponent(info.companyId));
       if(!rows || !rows[0]) return;
@@ -1218,18 +1205,18 @@ async function saveUserNotesOnly(){
       if(!empSets[idx]) empSets[idx] = {};
       empSets[idx]._userNotes = notes;
       await sb('companies?id=eq.' + encodeURIComponent(info.companyId), {
-        method: 'PATCH',
-        body: JSON.stringify({ emp_sets: empSets })
+        method: 'PATCH', body: JSON.stringify({ emp_sets: empSets })
       });
-      console.log('[userNotes] saved via fallback');
       if(typeof showToast === 'function') showToast('💾 注記を保存しました', 1200);
     }catch(e2){
-      console.error('[userNotes] fallback save failed:', e2);
+      console.error('[userNotes] save failed:', e2);
       if(typeof showToast === 'function') showToast('⚠️ 注記の保存に失敗しました');
     }
   }
 }
 window.saveUserNotesOnly = saveUserNotesOnly;
+
+
 
 // ===== スタイル編集モード =====
 let _styleMode = false;
