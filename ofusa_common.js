@@ -400,20 +400,51 @@ function _printApplicantName(){
   }catch(_e){}
   return '';
 }
+// ver.20260820.10: docKey → 書類日本語名（ファイル名用、番号なし）
+var _PRINT_DOC_NAMES = {
+  '1_3':'受診者の申告書',
+  '1_4':'報酬に関する説明書',
+  '1_5':'雇用契約書',
+  '1_6':'雇用条件書',
+  '1_11':'健康診断個人票',
+  '1_16':'事前ガイダンス確認書',
+  '1_17':'支援計画書',
+  '1_23':'役員に関する誓約書',
+  '1_25':'支援委託契約に関する説明書',
+  '1_27':'公的義務履行に関する説明書',
+  '1_29':'書類省略に当たっての誓約書',
+  '1_30':'休業期間に関する申立書',
+  '1_31':'通算在留期間を超える在留に関する申立書',
+  'iko':'移行準備説明書',
+  'irai':'依頼書',
+  'ininjou':'委任状',
+  'henkou':'変更申出書',
+  'juuyou':'重要事項説明書',
+  'madoguchi':'窓口',
+  'suisenhyo':'推薦票',
+  'torisage':'取り下げ書',
+  'shinsei_henkou':'申請書(変更)',
+  'shinsei_koushin':'申請書(更新)',
+  'shinsei_gjk':'申請書(認定)',
+  'kyoryoku':'協力確認書',
+  'kyoryoku_kaigo':'協力確認書(介護)'
+};
+
 function _printDocLabel(){
-  // <title>「参考様式第１－６号 …」から「1-6」を作る。取れなければタイトルをそのまま使う。
-  // ver.20260820.09: 「号」は含めない（ユーザー要望）
+  // ver.20260820.10: docKey → 書類日本語名で返す。
+  //   例: 1_6 → 「雇用条件書」、1_5 → 「雇用契約書」、juuyou → 「重要事項説明書」
+  //   フォールバック: title からパターン抽出（旧動作）
+  try{
+    var key = (typeof _dgjInferDocKey === 'function') ? _dgjInferDocKey() : null;
+    if(key && _PRINT_DOC_NAMES[key]) return _PRINT_DOC_NAMES[key];
+  }catch(_e){}
+  // フォールバック: titleからキーワード抽出
   var t=String(document.title||'').trim();
-  var zen='０１２３４５６７８９';
-  var norm=t.replace(/[０-９]/g,function(c){ return String(zen.indexOf(c)); });
-  var m=norm.match(/第\s*(\d+)\s*[－\-−ー]\s*(\d+)\s*号/);
-  if(m) return m[1]+'-'+m[2];
-  m=norm.match(/様式第\s*(\d+)\s*号?/);
-  if(m) return m[1];
-  // 重要事項説明書などパターンにマッチしないもの
   if(/重要事項/.test(t)) return '重要事項説明書';
   if(/移行準備/.test(t)) return '移行準備説明書';
   if(/委任状/.test(t)) return '委任状';
+  if(/雇用契約書/.test(t)) return '雇用契約書';
+  if(/雇用条件書/.test(t)) return '雇用条件書';
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
@@ -431,7 +462,8 @@ function doPrint(){
   try{
     var who=_printApplicantName();
     var doc=_printDocLabel();
-    var name=(who? who+'_' : '')+doc;
+    // ver.20260820.10: フォーマットを「申請人名様_書類名」に変更
+    var name=(who? who+'様_' : '')+doc;
     var sanitized = name.replace(/[\\\/:*?"<>|]/g,'_');
     document.title = sanitized;
     // 親フレームの title も書き換え
@@ -631,9 +663,8 @@ async function printBoth(){
     }catch(_ce){}
     try{
       var who=(typeof _printApplicantName==='function')?_printApplicantName():'';
-      // ver.20260820.09: フォーマットを「1-6」に統一（雇用契約書_雇用条件書 → 1-6）
-      //   本体は1-6号なので、ファイル名は「申請人名_1-6」
-      var titleName = ((who?who+'_':'')+'1-6').replace(/[\\\/:*?"<>|]/g,'_');
+      // ver.20260820.10: フォーマットを「申請人名様_雇用契約書・雇用条件書」に変更
+      var titleName = ((who?who+'様_':'')+'雇用契約書・雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
       document.title = titleName;
       try{
         if(parentOrig !== null){
