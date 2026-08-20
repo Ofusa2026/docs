@@ -40,7 +40,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 所属機関の代表者に関する申告書</div>
-    <div class="ver">ver.20260820.12</div>
+    <div class="ver">ver.20260820.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -106,7 +106,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787232671"></script>
+<script src="ofusa_common.js?v=1787235064"></script>
 <script>
 // ページ描画
 function p(){
@@ -211,9 +211,8 @@ async function loadFromDB(){
         // 所属機関名
         const cEl = document.getElementById('f_company');
         if(cEl && !cEl.value) cEl.value = co.name || '';
-        // 代表者英字名 (rep_name_en があれば)
-        const rEl = document.getElementById('f_rep_name_en');
-        if(rEl && !rEl.value) rEl.value = co.rep_name_en || '';
+        // ver.20260820.13: 代表者英字名は自動追従しない（ユーザー要望）
+        //   会社の rep_name_en とは別人の可能性があるため、必ず手入力する。
         // extra.shozoku_daihyou.rep_status_type / rep_zairyu_card_no を復元
         const saved = co.extra && co.extra.shozoku_daihyou;
         if(saved){
