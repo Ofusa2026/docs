@@ -1378,7 +1378,7 @@ async function loadCaseToForm(info, docKey){
       holidayRateNon:'holidayNonLegal', holidayRateNonEn:'holidayNonLegalEn',
       bonusCond:'bonusCondition', bonusCondEn:'bonusConditionEn',
       salaryRaiseCond:'raiseCondition', salaryRaiseCondEn:'raiseConditionEn',
-      /* ver.20260819.07: 重要事項説明書(juuyou_*.html)用のフィールド名マッピング追加。
+      /* ver.20260819.08: 重要事項説明書(juuyou_*.html)用のフィールド名マッピング追加。
          従来はこれらが未マッピングで、案件を開くたびに空欄になり、
          毎回手入力が必要だった不具合の修正。 */
       category:'workType', categoryEn:'workTypeEn',
@@ -1410,7 +1410,20 @@ async function loadCaseToForm(info, docKey){
       }
     });
 
-    // 業務区分・分野: Object.keys(es)ループ後にまとめて括弧除去
+    // ver.20260819.08: 重要事項説明書(juuyou_*.html) 専用のフィールド名別名対応。
+    //   juuyou は独自のフィールド名 (f_raiseCond/f_raiseCondEn) を使うため、
+    //   共通の _ALIAS_DB2FORM (エイリアス名=1つ) では対応できない。
+    //   ここで juuyou 用エイリアスを追加で橋渡しする。
+    //   1_6.html 等の既存書類には影響しない (別の入力欄IDのため)。
+    const _JUUYOU_ALIAS = {
+      salaryRaiseCond: 'raiseCond', salaryRaiseCondEn: 'raiseCondEn'
+    };
+    Object.keys(_JUUYOU_ALIAS).forEach(dbKey => {
+      const alias = _JUUYOU_ALIAS[dbKey];
+      if(es[dbKey] != null && String(es[dbKey]) !== ''){
+        setValMulti(['f_'+alias], es[dbKey]);
+      }
+    });
     // applicantField / applicantFieldEn は単純除去
     ['applicantField','applicantFieldEn'].forEach(k=>{
       const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
