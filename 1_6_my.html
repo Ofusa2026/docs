@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260820.07</div>
+    <div class="ver">ver.20260820.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -405,7 +405,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787226129"></script>
+<script src="ofusa_common.js?v=1787228254"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -646,7 +646,8 @@ function p(){
       <div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">１．始業・終業の時刻等<br><span style="font-size:8pt;font-weight:normal;">၁။အလုပ်စတင်ချိန်နှင့်အလုပ်ပြီးဆုံးချိန်စသည်</span></div>
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
-        <span class="id" style="font-size:7.5pt;" data-key="52">အလုပ်စချိန်（&emsp;&emsp;）အလုပ်ပြီးဆုံးချိန်（&emsp;&emsp;）(၁ရက်က အလုပ်ချိန် စုစုပေါင်း&emsp;နာရီ&emsp;မိနှစ်)</span>
+        <!-- ver.20260820.12: ミャンマー語行にも時刻・時間・分の実値を差し込む（従来は空欄固定だった） -->
+        <span class="id" style="font-size:7.5pt;" data-key="52">အလုပ်စချိန်（${f('es_startTime')}）အလုပ်ပြီးဆုံးချိန်（${f('es_endTime')}）(၁ရက်က အလုပ်ချိန် စုစုပေါင်း&nbsp;${f('es_dailyHours')}နာရီ&nbsp;${f('es_dailyMins')}မိနှစ်)</span>
       </div>
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">【အောက်ပါစနစ်များသည် အလုပ်သမားနှင့် သက်ဆိုင်အကျုံးဝင်ပါက】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
@@ -666,7 +667,7 @@ function p(){
             const hStr     = s.h     ? s.h     : '&emsp;&emsp;';
             const minStr   = s.min   ? s.min   : '&emsp;&emsp;';
             const daysEnStr= s.daysEn? s.daysEn: '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;';
-            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">အလုပ်စတင်ချိန် (&emsp;နာရီ&emsp;မိနစ်) အလုပ်ပြီးဆုံးချိန် (&emsp;နာရီ&emsp;မိနစ်) (စတင်အကျုံးဝင်သည့်ရက်စွဲ&emsp;၊ တစ်ရက်လျှင် သတ်မှတ်ထားသော အလုပ်ချိန်&emsp;နာရီ&emsp;မိနစ်)</span></div>`;
+            return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;" data-key="57">အလုပ်စတင်ချိန် (${startStr}) အလုပ်ပြီးဆုံးချိန် (${endStr}) (စတင်အကျုံးဝင်သည့်ရက်စွဲ${daysEnStr}၊ တစ်ရက်လျှင် သတ်မှတ်ထားသော အလုပ်ချိန်${hStr}နာရီ${minStr}မိနစ်)</span></div>`;
           }).join('');
         })()}
         ${v('es_shiftDetail') ? `<div style="font-size:7.5pt;margin-top:2px;">（シフト詳細）${f('es_shiftDetail')}</div>` : ''}
