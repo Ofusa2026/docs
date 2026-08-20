@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ベトナム語版）</div>
-    <div class="ver">ver.20260820.04</div>
+    <div class="ver">ver.20260820.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -405,7 +405,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787204181"></script>
+<script src="ofusa_common.js?v=1787205268"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1047,6 +1047,8 @@ function p(){
 `;
   // フォントサイズを再適用（p()でDOMが再生成されるため）
   if(_fontSize !== 8.5) _applyFontSize();
+  // ver.20260820.05: p()の後に注記を再描画（DOM書換で消えるため）
+  try{ if(typeof renderAllUserNotes === 'function') renderAllUserNotes(); }catch(_e){}
 }
 
 // フォームID → DBキーのマッピング（1_6.htmlのフォームID → empSets内のキー名）
