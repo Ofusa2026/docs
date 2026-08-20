@@ -390,26 +390,58 @@ function _printApplicantName(){
   return '';
 }
 function _printDocLabel(){
-  // <title>「参考様式第１－６号 …」から「1-6」を作る。取れなければタイトルをそのまま使う。
+  // <title>「参考様式第１－６号 …」から「1-6号」を作る。取れなければタイトルをそのまま使う。
+  // ver.20260820.08: フォーマットを「1-6」から「1-6号」に変更
   var t=String(document.title||'').trim();
   var zen='０１２３４５６７８９';
   var norm=t.replace(/[０-９]/g,function(c){ return String(zen.indexOf(c)); });
   var m=norm.match(/第\s*(\d+)\s*[－\-−ー]\s*(\d+)\s*号/);
-  if(m) return m[1]+'-'+m[2];
+  if(m) return m[1]+'-'+m[2]+'号';
   m=norm.match(/様式第\s*(\d+)\s*号?/);
-  if(m) return m[1];
+  if(m) return m[1]+'号';
+  // 重要事項説明書などパターンにマッチしないもの
+  if(/重要事項/.test(t)) return '重要事項説明書';
+  if(/移行準備/.test(t)) return '移行準備説明書';
+  if(/委任状/.test(t)) return '委任状';
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
-  var orig=document.title;
+  var orig = document.title;
+  // ver.20260820.08: 親フレーム(index.html)のtitleも書き換える。
+  //   Chrome の PDF保存ダイアログの名前欄には、iframe内でwindow.print()を呼んでも
+  //   親フレームの document.title が使われる仕様。iframe側のtitleだけ変えても
+  //   「O-Link Saysay」というindex.htmlのtitleがファイル名になっていた。
+  var parentOrig = null;
+  try{
+    if(window.parent && window.parent !== window){
+      parentOrig = window.parent.document.title;
+    }
+  }catch(_ce){ /* cross-origin なら諦める */ }
   try{
     var who=_printApplicantName();
     var doc=_printDocLabel();
     var name=(who? who+'_' : '')+doc;
-    document.title=name.replace(/[\\\/:*?"<>|]/g,'_');
+    var sanitized = name.replace(/[\\\/:*?"<>|]/g,'_');
+    document.title = sanitized;
+    // 親フレームの title も書き換え
+    try{
+      if(parentOrig !== null){
+        window.parent.document.title = sanitized;
+      }
+    }catch(_pe){}
   }catch(_e){}
   try{ window.print(); }
-  finally{ setTimeout(function(){ document.title=orig; }, 1000); }
+  finally{
+    // 少し遅延させて元に戻す（印刷ダイアログが開ききってから）
+    setTimeout(function(){
+      document.title = orig;
+      try{
+        if(parentOrig !== null){
+          window.parent.document.title = parentOrig;
+        }
+      }catch(_pe){}
+    }, 1000);
+  }
   // ver.20260808.05: 案件書類ジャーナルへ記録（MVP Component 1 - 全書類展開）
   try{ dgjLogFromContext('print'); }catch(_){}
 }
@@ -579,12 +611,33 @@ async function printBoth(){
     }
     if(ifr.parentNode) ifr.parentNode.removeChild(ifr);
     var orig=document.title;
+    // ver.20260820.08: 親フレームのtitleも書き換え（PDF保存名になる）
+    var parentOrig = null;
+    try{
+      if(window.parent && window.parent !== window){
+        parentOrig = window.parent.document.title;
+      }
+    }catch(_ce){}
     try{
       var who=(typeof _printApplicantName==='function')?_printApplicantName():'';
-      document.title=((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
+      var titleName = ((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
+      document.title = titleName;
+      try{
+        if(parentOrig !== null){
+          window.parent.document.title = titleName;
+        }
+      }catch(_pe){}
     }catch(_e){}
     // 印刷後クリーンアップ
-    function cleanup(){ document.title=orig; try{ if(window.__combinedMO){ window.__combinedMO.disconnect(); window.__combinedMO=null; } }catch(_e){} var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode)p.parentNode.removeChild(p); var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h); document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();}); window.removeEventListener('afterprint',cleanup); }
+    function cleanup(){
+      document.title=orig;
+      try{ if(parentOrig !== null){ window.parent.document.title = parentOrig; } }catch(_pe){}
+      try{ if(window.__combinedMO){ window.__combinedMO.disconnect(); window.__combinedMO=null; } }catch(_e){}
+      var p=document.getElementById('__combinedProgress'); if(p&&p.parentNode)p.parentNode.removeChild(p);
+      var h=document.getElementById('__combinedPrintArea'); if(h&&h.parentNode) h.parentNode.removeChild(h);
+      document.querySelectorAll('.__combined-pagebreak, .__combined-pb-style').forEach(function(x){x.remove();});
+      window.removeEventListener('afterprint',cleanup);
+    }
     _killProgress();
     if(typeof clearToasts==='function') clearToasts();
     // iframe側(相方書類)に出たトーストも消す
