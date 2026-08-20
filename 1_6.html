@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260820.01</div>
+    <div class="ver">ver.20260820.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -408,7 +408,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787200723"></script>
+<script src="ofusa_common.js?v=1787201463"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1376,6 +1376,8 @@ async function loadFromDB(passedInfo){
         //   emp_set 内の _userNotes 配列（あれば）を復元して描画
         try{
           window._userNotes = Array.isArray(esData && esData._userNotes) ? JSON.parse(JSON.stringify(esData._userNotes)) : [];
+          // ver.20260820.02: saveUserNotesOnly() が使う情報を確実にセット
+          window._lastCaseInfo = Object.assign({}, info, {companyId: companyId, empSetIdx: String(idx)});
           // 描画は p() 後に行う（.doc要素が生成された後）
           setTimeout(function(){
             if(typeof renderAllUserNotes === 'function') renderAllUserNotes();

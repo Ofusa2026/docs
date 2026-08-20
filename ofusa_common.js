@@ -944,7 +944,8 @@ function _renderUserNote(note){
 
   // ドラッグ移動（編集モード時のみ有効）
   el.addEventListener('mousedown', function(ev){
-    if(!window._editMode) return;
+    // ver.20260820.02: _editMode は let 宣言のため window._editMode ではなく直接参照
+    if(typeof _editMode === 'undefined' || !_editMode) return;
     if(ev.target.closest('.un-tools')) return; // ツール上はドラッグしない
     ev.preventDefault();
     var startX = ev.clientX, startY = ev.clientY;
@@ -963,7 +964,8 @@ function _renderUserNote(note){
         n.x = parseInt(el.style.left, 10) || 0;
         n.y = parseInt(el.style.top, 10) || 0;
       }
-      if(typeof markEditedDirty === 'function') markEditedDirty();
+      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
+      if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
     }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
@@ -1083,7 +1085,8 @@ function createUserNoteInteractive(){
       window._userNotes = window._userNotes || [];
       window._userNotes.push(note);
       _renderUserNote(note);
-      if(typeof markEditedDirty === 'function') markEditedDirty();
+      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
+      if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
     }
   });
 }
@@ -1100,7 +1103,8 @@ function editUserNote(noteId){
       note.ja = ja;
       note.tr = tr;
       _renderUserNote(note);
-      if(typeof markEditedDirty === 'function') markEditedDirty();
+      // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
+      if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
     }
   });
 }
@@ -1111,7 +1115,8 @@ function deleteUserNote(noteId){
   window._userNotes = (window._userNotes || []).filter(function(n){ return n.id !== noteId; });
   var el = document.getElementById('un_' + noteId);
   if(el && el.parentNode) el.parentNode.removeChild(el);
-  if(typeof markEditedDirty === 'function') markEditedDirty();
+  // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
+  if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
 }
 
 // window スコープに公開（htmlから呼べるように）
@@ -1119,6 +1124,56 @@ window.createUserNoteInteractive = createUserNoteInteractive;
 window.editUserNote = editUserNote;
 window.deleteUserNote = deleteUserNote;
 window.renderAllUserNotes = renderAllUserNotes;
+
+// ver.20260820.02: 注記のみを保存する専用関数
+//   注記の変更で emp_set 全体を保存すると「上書き/新規作成」ダイアログが出て
+//   ユーザーの操作を邪魔する。注記だけをDB内の該当箇所に直接書き込み、
+//   フォーム側の dirty 判定にも影響を与えないようにする。
+//   RPC set_edited_html は使わず、companies.emp_sets[idx]._userNotes を
+//   jsonb_set で更新する。
+async function saveUserNotesOnly(){
+  if(typeof sb !== 'function') return;
+  var info = window._lastCaseInfo;
+  if(!info || !info.companyId) return;
+  var idx = info.empSetIdx != null && info.empSetIdx !== '' ? parseInt(info.empSetIdx, 10) : 0;
+  if(isNaN(idx)) idx = 0;
+  var notes = Array.isArray(window._userNotes) ? window._userNotes : [];
+  try{
+    // 会社の emp_sets[idx]._userNotes だけを更新（RPC使用）
+    var payload = {
+      p_company_id: info.companyId,
+      p_idx: idx,
+      p_notes: notes
+    };
+    var res = await sb('rpc/set_emp_set_user_notes', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    console.log('[userNotes] saved:', notes.length, 'notes');
+    if(typeof showToast === 'function') showToast('💾 注記を保存しました', 1200);
+    return res;
+  }catch(e){
+    // RPCが未実装の場合フォールバック: emp_sets全体を read-modify-write
+    console.warn('[userNotes] RPC failed, fallback to full write:', e);
+    try{
+      var rows = await sb('companies?select=emp_sets&id=eq.' + encodeURIComponent(info.companyId));
+      if(!rows || !rows[0]) return;
+      var empSets = rows[0].emp_sets || [];
+      if(!empSets[idx]) empSets[idx] = {};
+      empSets[idx]._userNotes = notes;
+      await sb('companies?id=eq.' + encodeURIComponent(info.companyId), {
+        method: 'PATCH',
+        body: JSON.stringify({ emp_sets: empSets })
+      });
+      console.log('[userNotes] saved via fallback');
+      if(typeof showToast === 'function') showToast('💾 注記を保存しました', 1200);
+    }catch(e2){
+      console.error('[userNotes] fallback save failed:', e2);
+      if(typeof showToast === 'function') showToast('⚠️ 注記の保存に失敗しました');
+    }
+  }
+}
+window.saveUserNotesOnly = saveUserNotesOnly;
 
 // ===== スタイル編集モード =====
 let _styleMode = false;
