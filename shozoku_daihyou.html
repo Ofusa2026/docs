@@ -7,38 +7,66 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
-.doc{padding:20mm 25mm!important;line-height:2.0!important;font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;font-size:11pt;color:#000;}
+.doc{padding:22mm 22mm!important;line-height:1.9!important;font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;font-size:10.5pt;color:#000;}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:20mm 25mm!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:22mm 22mm!important}
 }
-.doc .hdr{display:flex;justify-content:space-between;font-size:10pt;line-height:1.4;margin-bottom:8px;}
-.doc .title{font-size:14pt;text-align:center;letter-spacing:0.5em;margin:16px 0 32px;line-height:1.6;}
-.doc .sec{margin:24px 0 8px;font-size:11pt;}
-.doc .sec .num{display:inline-block;width:2em;font-weight:normal;}
-.doc .cbrow{margin:8px 0 8px 2em;line-height:2.2;}
-.doc .cb{display:inline-block;width:14px;height:14px;border:1px solid #000;text-align:center;line-height:12px;vertical-align:-3px;margin-right:6px;font-size:12pt;}
-.doc .cb.checked::before{content:"✔";font-weight:bold;}
-.doc .cbrow .maru{display:inline-block;width:1.5em;}
-.doc .cbrow .arw{margin:0 6px;}
-.doc .undbox{border-bottom:1px solid #000;min-height:36px;margin:12px 0 40px;padding:8px 0;min-width:400px;max-width:520px;font-size:12pt;letter-spacing:0.05em;}
-.doc .undbox.mono{font-family:'MS Gothic','Courier New',monospace;letter-spacing:0.3em;}
-.doc .warn{margin-top:60px;padding-left:1em;text-indent:1em;line-height:1.8;}
-.doc .fbox{margin-top:32px;text-align:right;padding-right:20mm;}
-.doc .fbox .date-row{margin-bottom:24px;font-size:11pt;letter-spacing:0.3em;}
-.doc .fbox .date-row .num{display:inline-block;min-width:2.5em;text-align:center;}
-.doc .fbox .fld{margin:12px 0;font-size:11pt;}
-.doc .fbox .fld .lbl{display:inline-block;margin-right:1em;letter-spacing:0.5em;}
-.doc .fbox .fld .val{display:inline-block;min-width:280px;border-bottom:1px solid #000;padding:0 6px;text-align:left;}
-.doc .foot-note{margin-top:8px;font-size:10pt;text-align:right;padding-right:20mm;}
+/* ヘッダー */
+.doc .hdr{display:flex;justify-content:space-between;font-size:10.5pt;line-height:1.4;}
+/* タイトル: ヘッダーから空行3つ分あけて中央 */
+.doc .title{font-size:13.5pt;text-align:center;letter-spacing:0.55em;margin:52px 0 0;line-height:1.5;padding-left:0.55em;}
+/* セクション1: タイトルから空行2つ分 */
+.doc .sec1{margin-top:44px;font-size:10.5pt;font-weight:bold;}
+.doc .sec1 .num{display:inline-block;width:2.2em;font-weight:normal;text-align:left;}
+/* チェック行 */
+.doc .cbrow{margin:18px 0 0 3.2em;line-height:1.8;font-weight:bold;}
+.doc .cb{display:inline-block;width:13px;height:13px;border:1px solid #000;text-align:center;line-height:11px;vertical-align:-2px;margin-right:12px;font-size:11pt;font-weight:normal;}
+.doc .cb.checked::before{content:"\2714";font-weight:bold;font-size:10pt;}
+.doc .cbrow .maru{display:inline-block;width:2.2em;}
+.doc .cbrow .arw{margin:0 16px;font-weight:normal;}
+.doc .cbrow .u{text-decoration:underline;text-underline-offset:3px;}
+/* セクション2/3: 空行5つ分あけて */
+.doc .sec2{margin-top:76px;font-size:10.5pt;font-weight:bold;}
+.doc .sec2 .num{display:inline-block;width:2.2em;font-weight:normal;text-align:left;}
+/* 記入欄: 見出しから空行4つ分下に下線 */
+.doc .undline{
+  border-bottom:1px solid #000;
+  height:1px;
+  margin:66px 0 0 3.4em;
+  width:400px;
+}
+.doc .undval{
+  position:relative;
+  margin:0 0 0 3.4em;
+  width:400px;
+  height:0;
+  top:-8px;
+  font-size:11.5pt;
+  letter-spacing:0.05em;
+  white-space:nowrap;
+}
+.doc .undval.mono{font-family:'MS Gothic','Courier New',monospace;letter-spacing:0.28em;}
+/* 警告文 */
+.doc .warn{margin-top:76px;line-height:1.75;text-indent:1em;}
+/* 日付行: 警告文のすぐ下、右寄り */
+.doc .dater{margin-top:22px;text-align:right;padding-right:22px;letter-spacing:0.15em;}
+.doc .dater .n{display:inline-block;min-width:3.2em;text-align:center;}
+/* 署名欄 */
+.doc .sigbox{margin-top:16px;padding-left:36%;}
+.doc .sigrow{margin:8px 0;font-size:10.5pt;white-space:nowrap;}
+.doc .sigrow .lbl{display:inline-block;width:8.5em;letter-spacing:0.42em;text-align:justify;text-align-last:justify;}
+.doc .sigrow .val{display:inline-block;width:240px;border-bottom:1px solid #000;padding:0 4px;margin-left:6px;vertical-align:bottom;}
+/* 注記 */
+.doc .fnote{margin-top:8px;font-size:10pt;text-align:right;padding-right:12px;}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 所属機関の代表者に関する申告書</div>
-    <div class="ver">ver.20260820.14</div>
+    <div class="ver">ver.20260820.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -106,7 +134,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787238560"></script>
+<script src="ofusa_common.js?v=1787239222"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -129,33 +157,32 @@ function p(){
       <div>参考様式</div>
       <div>（在留資格決定時・更新時共通）</div>
     </div>
-    <div class="title">所 属 機 関 の 代 表 者 に 関 す る 申 告 書</div>
-    <div class="sec"><span class="num">１</span>所属機関の代表者について、該当する□にチェックしてください。</div>
-    <div class="cbrow">${cb(check1)}<span class="maru">①</span>日本人、特別永住者<span class="arw">→</span>以下記入不要です。</div>
-    <div class="cbrow">${cb(check2)}<span class="maru">②</span>上記①以外<span class="arw">→</span>次の２及び３を記入してください。</div>
-    <div class="sec" style="margin-top:40px;"><span class="num">２</span>代表者の氏名（英字表記）</div>
-    <div class="undbox">${nameEn || '&nbsp;'}</div>
-    <div class="sec" style="margin-top:40px;"><span class="num">３</span>代表者の在留カード番号</div>
-    <div class="undbox mono">${cardNo || '&nbsp;'}</div>
-    <div class="warn">
-      上記に事実ではない内容が含まれている場合、虚偽の申請と判断される可能性があることを理解した上で本申告書を作成しました。
+
+    <div class="title">所属機関の代表者に関する申告書</div>
+
+    <div class="sec1"><span class="num">１</span>所属機関の代表者について、該当する□にチェックしてください。</div>
+
+    <div class="cbrow">${cb(check1)}<span class="maru">①</span>日本人、特別永住者<span class="arw">→</span><span style="font-weight:normal;">以下記入不要です。</span></div>
+
+    <div class="cbrow">${cb(check2)}<span class="maru">②</span>上記①以外<span class="arw">→</span><span class="u">次の２及び３を記入してください。</span></div>
+
+    <div class="sec2"><span class="num">２</span>代表者の氏名（英字表記）</div>
+    <div class="undline"></div>
+    <div class="undval">${nameEn || ''}</div>
+
+    <div class="sec2"><span class="num">３</span>代表者の在留カード番号</div>
+    <div class="undline"></div>
+    <div class="undval mono">${cardNo || ''}</div>
+
+    <div class="warn">上記に事実ではない内容が含まれている場合、虚偽の申請と判断される可能性があることを理解した上で本申告書を作成しました。</div>
+
+    <div class="dater"><span class="n">${dY || ''}</span>年<span class="n">${dM || ''}</span>月<span class="n">${dD || ''}</span>日</div>
+
+    <div class="sigbox">
+      <div class="sigrow"><span class="lbl">所属機関名</span><span class="val">${company || ''}</span></div>
+      <div class="sigrow"><span class="lbl">作成者氏名</span><span class="val">${author || ''}</span></div>
     </div>
-    <div class="fbox">
-      <div class="date-row">
-        <span class="num">${dY || '　　　'}</span>年
-        <span class="num">${dM || '　　'}</span>月
-        <span class="num">${dD || '　　'}</span>日
-      </div>
-      <div class="fld">
-        <span class="lbl">所 属 機 関 名</span>
-        <span class="val">${company || '&nbsp;'}</span>
-      </div>
-      <div class="fld">
-        <span class="lbl">作 成 者 氏 名</span>
-        <span class="val">${author || '&nbsp;'}</span>
-      </div>
-    </div>
-    <div class="foot-note">※　作成者は所属機関の職員に限る。</div>
+    <div class="fnote">※　作成者は所属機関の職員に限る。</div>
   </div>
   `;
   if(_fontSize !== 8.5) _applyFontSize();
