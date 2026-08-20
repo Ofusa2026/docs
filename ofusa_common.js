@@ -835,6 +835,219 @@ function enableDocEditing(on){
 }
 
 
+// ===== ユーザー注記機能 =====
+// ver.20260819.09: 書類プレビュー上に自由記入注記(ユーザーノート)を配置できる機能
+//   - 直接編集モード中に「➕ 注記追加」ボタンで新規追加
+//   - 日本語 + 翻訳の2行表示（黒文字・地の文）
+//   - 絶対座標配置（ドラッグで位置調整可能）
+//   - companies.emp_sets[i]._userNotes 配列に保存
+//   - 同じ雇用条件セットを使う他案件でも復元
+//   - 印刷にも出る
+//
+// 注記データ構造 (JSON):
+// { id: 'note_xxxx', ja: '日本語文', tr: '翻訳文', x: 数値, y: 数値, page: 数値 }
+
+// 全注記を保持（メモリ）
+window._userNotes = [];
+
+// 注記コンテナのCSS注入（1回だけ）
+function _ensureUserNoteCSS(){
+  if(document.getElementById('__userNoteCSS')) return;
+  var st = document.createElement('style');
+  st.id = '__userNoteCSS';
+  st.textContent =
+    '.user-note{position:absolute;background:transparent;padding:2px 4px;font-size:8.5pt;line-height:1.4;color:#000;z-index:5;max-width:400px;white-space:pre-wrap;word-break:break-word;}' +
+    '.user-note .un-line-tr{font-size:7.5pt;color:#000;}' +
+    /* 編集モード中だけ枠と操作UIを表示 */
+    'body.doc-editing .user-note{outline:1px dashed #a855f7;background:rgba(245,240,255,.6);cursor:move;}' +
+    'body.doc-editing .user-note:hover{outline:1px solid #7c3aed;background:rgba(245,240,255,.9);}' +
+    '.user-note .un-tools{display:none;position:absolute;top:-22px;right:0;background:#fff;border:1px solid #ccc;border-radius:3px;padding:1px 4px;font-size:10px;}' +
+    'body.doc-editing .user-note:hover .un-tools{display:inline-block;}' +
+    '.user-note .un-btn{display:inline-block;margin:0 2px;padding:2px 6px;cursor:pointer;color:#374151;border-radius:3px;user-select:none;}' +
+    '.user-note .un-btn:hover{background:#eee;}' +
+    /* 注記追加フローティングボタン */
+    '#userNoteAddBtn{display:none;position:fixed;bottom:70px;right:16px;z-index:9999;padding:10px 14px;background:#7c3aed;color:#fff;border:none;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,.2);}' +
+    '#userNoteAddBtn:hover{background:#6d28d9;}' +
+    'body.doc-editing #userNoteAddBtn{display:inline-block;}' +
+    /* 印刷時：枠なし、ツール非表示 */
+    '@media print{.user-note{outline:none!important;background:transparent!important;} .user-note .un-tools{display:none!important;} #userNoteAddBtn{display:none!important;}}';
+  document.head.appendChild(st);
+}
+
+// ページエリア内で新しい注記を追加するボタンを設置（1回だけ）
+function _ensureUserNoteAddBtn(){
+  if(document.getElementById('userNoteAddBtn')) return;
+  var btn = document.createElement('button');
+  btn.id = 'userNoteAddBtn';
+  btn.type = 'button';
+  btn.textContent = '➕ 注記を追加';
+  btn.title = '書類の好きな場所に自由記入の注記を追加します';
+  btn.onclick = function(){ createUserNoteInteractive(); };
+  document.body.appendChild(btn);
+}
+
+// 注記IDを生成
+function _generateUserNoteId(){
+  return 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+}
+
+// 1件の注記要素をDOMに描画
+function _renderUserNote(note){
+  var area = document.getElementById('pageArea');
+  if(!area) return null;
+  // page指定があれば該当 .doc を親にする（フォールバックは area）
+  var pages = area.querySelectorAll('.doc');
+  var parent = area;
+  if(note.page && pages[note.page - 1]){
+    parent = pages[note.page - 1];
+    // .doc に position:relative がなければ付与
+    if(getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+  }
+  // 既存要素があれば取り除いて置き換え
+  var old = document.getElementById('un_' + note.id);
+  if(old && old.parentNode) old.parentNode.removeChild(old);
+
+  var el = document.createElement('div');
+  el.id = 'un_' + note.id;
+  el.className = 'user-note';
+  el.dataset.noteId = note.id;
+  el.style.left = (note.x || 0) + 'px';
+  el.style.top = (note.y || 0) + 'px';
+  // 日本語行
+  var ja = document.createElement('div');
+  ja.className = 'un-line-ja';
+  ja.textContent = '※' + (note.ja || '');
+  el.appendChild(ja);
+  // 翻訳行
+  if(note.tr){
+    var tr = document.createElement('div');
+    tr.className = 'un-line-tr';
+    tr.textContent = '※' + note.tr;
+    el.appendChild(tr);
+  }
+  // ツール（編集・削除）
+  var tools = document.createElement('div');
+  tools.className = 'un-tools';
+  tools.setAttribute('contenteditable', 'false'); // 編集モードでも触れる
+  var edit = document.createElement('span');
+  edit.className = 'un-btn';
+  edit.textContent = '✏️ 編集';
+  edit.onclick = function(e){ e.stopPropagation(); e.preventDefault(); editUserNote(note.id); };
+  var del = document.createElement('span');
+  del.className = 'un-btn';
+  del.textContent = '🗑️ 削除';
+  del.style.color = '#dc2626';
+  del.onclick = function(e){ e.stopPropagation(); e.preventDefault(); deleteUserNote(note.id); };
+  tools.appendChild(edit);
+  tools.appendChild(del);
+  el.appendChild(tools);
+
+  // ドラッグ移動（編集モード時のみ有効）
+  el.addEventListener('mousedown', function(ev){
+    if(!window._editMode) return;
+    if(ev.target.closest('.un-tools')) return; // ツール上はドラッグしない
+    ev.preventDefault();
+    var startX = ev.clientX, startY = ev.clientY;
+    var origLeft = parseInt(el.style.left, 10) || 0;
+    var origTop  = parseInt(el.style.top, 10) || 0;
+    function onMove(mv){
+      el.style.left = (origLeft + (mv.clientX - startX)) + 'px';
+      el.style.top  = (origTop  + (mv.clientY - startY)) + 'px';
+    }
+    function onUp(){
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      // ノートオブジェクトを更新
+      var n = window._userNotes.find(function(nn){ return nn.id === note.id; });
+      if(n){
+        n.x = parseInt(el.style.left, 10) || 0;
+        n.y = parseInt(el.style.top, 10) || 0;
+      }
+      if(typeof markEditedDirty === 'function') markEditedDirty();
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+
+  // 内側は編集モード中もクリック=ドラッグの起点扱いにする（contenteditableが浸食しないよう）
+  el.setAttribute('contenteditable', 'false');
+
+  parent.appendChild(el);
+  return el;
+}
+
+// 全注記を描画
+function renderAllUserNotes(){
+  _ensureUserNoteCSS();
+  _ensureUserNoteAddBtn();
+  // 既存の描画をクリア
+  document.querySelectorAll('.user-note').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });
+  (window._userNotes || []).forEach(function(note){ _renderUserNote(note); });
+}
+
+// ユーザーに新規注記を作らせる
+function createUserNoteInteractive(){
+  var ja = prompt('注記の日本語文を入力してください（先頭に「※」は自動で付きます）:');
+  if(ja == null) return;
+  ja = String(ja).trim();
+  if(!ja) return;
+  var tr = prompt('注記の翻訳文を入力してください（不要ならキャンセル）:');
+  if(tr == null) tr = '';
+  tr = String(tr).trim();
+  // デフォルト座標: 現在の可視ページ内の中央
+  var area = document.getElementById('pageArea');
+  var visiblePage = 1;
+  if(area){
+    var pages = area.querySelectorAll('.doc');
+    var scrollTop = area.scrollTop;
+    for(var i = 0; i < pages.length; i++){
+      if(pages[i].offsetTop > scrollTop){ visiblePage = Math.max(1, i); break; }
+      visiblePage = i + 1;
+    }
+  }
+  var note = {
+    id: _generateUserNoteId(),
+    ja: ja,
+    tr: tr,
+    x: 80,
+    y: 80,
+    page: visiblePage
+  };
+  window._userNotes = window._userNotes || [];
+  window._userNotes.push(note);
+  _renderUserNote(note);
+  if(typeof markEditedDirty === 'function') markEditedDirty();
+}
+
+// 既存の注記を編集
+function editUserNote(noteId){
+  var note = (window._userNotes || []).find(function(n){ return n.id === noteId; });
+  if(!note) return;
+  var ja = prompt('注記の日本語文（先頭の「※」は不要）:', note.ja || '');
+  if(ja == null) return;
+  var tr = prompt('注記の翻訳文（不要なら空欄）:', note.tr || '');
+  if(tr == null) return;
+  note.ja = String(ja).trim();
+  note.tr = String(tr).trim();
+  _renderUserNote(note);
+  if(typeof markEditedDirty === 'function') markEditedDirty();
+}
+
+// 注記を削除
+function deleteUserNote(noteId){
+  if(!confirm('この注記を削除しますか？')) return;
+  window._userNotes = (window._userNotes || []).filter(function(n){ return n.id !== noteId; });
+  var el = document.getElementById('un_' + noteId);
+  if(el && el.parentNode) el.parentNode.removeChild(el);
+  if(typeof markEditedDirty === 'function') markEditedDirty();
+}
+
+// window スコープに公開（htmlから呼べるように）
+window.createUserNoteInteractive = createUserNoteInteractive;
+window.editUserNote = editUserNote;
+window.deleteUserNote = deleteUserNote;
+window.renderAllUserNotes = renderAllUserNotes;
+
 // ===== スタイル編集モード =====
 let _styleMode = false;
 let _styleTarget = null;

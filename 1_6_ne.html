@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260819.06</div>
+    <div class="ver">ver.20260819.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -405,7 +405,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787193638"></script>
+<script src="ofusa_common.js?v=1787198650"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1338,6 +1338,14 @@ async function loadFromDB(passedInfo){
           if(typeof renderEmpSetSelector==='function') renderEmpSetSelector(co, idx, info);
         }catch(_e){ console.warn('[empSel] loadFromDB',_e); }
 
+        // ver.20260819.09: ユーザー注記を読み込み
+        try{
+          window._userNotes = Array.isArray(esData && esData._userNotes) ? JSON.parse(JSON.stringify(esData._userNotes)) : [];
+          setTimeout(function(){
+            if(typeof renderAllUserNotes === 'function') renderAllUserNotes();
+          }, 300);
+        }catch(_e){ console.warn('[userNotes] load',_e); window._userNotes = []; }
+
       }
     }
 
@@ -1456,6 +1464,12 @@ async function saveForm(){
     const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
     // 現在のフォーム値を収集
     const newData = collectFormValues();
+    // ver.20260819.09: ユーザー注記(_userNotes)もemp_setに保存
+    try{
+      if(Array.isArray(window._userNotes)){
+        newData._userNotes = JSON.parse(JSON.stringify(window._userNotes));
+      }
+    }catch(_e){ console.warn('[saveForm] userNotes serialize failed:', _e); }
     // ②: 読込後に雇用条件を編集していたら保存モードを選ばせる（B:新セット / C:上書き）
     let mode = 'overwrite';
     if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
@@ -1718,6 +1732,14 @@ if(!window._selectCaseListenerAdded){
       }
     }catch(_e){}
     console.log('[doc] SELECT_CASE received:', info);
+    // ver.20260819.06/09: 案件切替時に前案件の入力欄値と注記をクリア。
+    try{
+      document.querySelectorAll('input[id^="es_"], input[id^="f_"], textarea[id^="es_"], textarea[id^="f_"]').forEach(function(el){
+        if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
+      });
+      window._userNotes = [];
+      document.querySelectorAll('.user-note').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });
+    }catch(_e){ console.warn('[SELECT_CASE] input clear failed:', _e); }
     const sel=document.getElementById('caseSelect');
     if(sel){
       let found=false;
