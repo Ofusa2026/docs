@@ -7,46 +7,45 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
-.doc{padding:15mm!important;line-height:1.9!important}
+.doc{padding:20mm 25mm!important;line-height:2.0!important;font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif;font-size:11pt;color:#000;}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm 25mm!important}
 }
-.doc h1{font-size:14pt;font-weight:normal;text-align:center;letter-spacing:0.4em;margin:16px 0 24px;}
-.doc .subtitle{font-size:10pt;text-align:center;margin-bottom:24px;}
-.doc .item-row{margin:16px 0;line-height:1.9;}
-.doc .checkbox{display:inline-block;width:12px;height:12px;border:1px solid #000;text-align:center;line-height:12px;vertical-align:middle;margin-right:4px;font-size:11pt;}
-.doc .checkbox.checked::before{content:"✔";font-weight:bold;}
-.doc .name-en-box, .doc .card-no-box{
-  display:inline-block;
-  border:1px solid #000;
-  padding:6px 10px;
-  min-width:280px;
-  min-height:28px;
-  margin-top:8px;
-  font-size:11pt;
-  letter-spacing:0.05em;
-}
-.doc .card-no-box{font-family:'MS Gothic',monospace;letter-spacing:0.2em;}
-.doc .warn{font-size:9pt;margin-top:32px;line-height:1.7;}
-.doc .footer-row{margin-top:24px;line-height:2.2;}
-.doc .footer-row .lbl{display:inline-block;width:120px;}
-.doc .footer-row .val{border-bottom:1px solid #333;display:inline-block;min-width:280px;padding:0 8px;}
-.doc .footer-note{font-size:9pt;color:#555;margin-top:12px;}
+.doc .hdr{display:flex;justify-content:space-between;font-size:10pt;line-height:1.4;margin-bottom:8px;}
+.doc .title{font-size:14pt;text-align:center;letter-spacing:0.5em;margin:16px 0 32px;line-height:1.6;}
+.doc .sec{margin:24px 0 8px;font-size:11pt;}
+.doc .sec .num{display:inline-block;width:2em;font-weight:normal;}
+.doc .cbrow{margin:8px 0 8px 2em;line-height:2.2;}
+.doc .cb{display:inline-block;width:14px;height:14px;border:1px solid #000;text-align:center;line-height:12px;vertical-align:-3px;margin-right:6px;font-size:12pt;}
+.doc .cb.checked::before{content:"✔";font-weight:bold;}
+.doc .cbrow .maru{display:inline-block;width:1.5em;}
+.doc .cbrow .arw{margin:0 6px;}
+.doc .undbox{border-bottom:1px solid #000;min-height:36px;margin:12px 0 40px;padding:8px 0;min-width:400px;max-width:520px;font-size:12pt;letter-spacing:0.05em;}
+.doc .undbox.mono{font-family:'MS Gothic','Courier New',monospace;letter-spacing:0.3em;}
+.doc .warn{margin-top:60px;padding-left:1em;text-indent:1em;line-height:1.8;}
+.doc .fbox{margin-top:32px;text-align:right;padding-right:20mm;}
+.doc .fbox .date-row{margin-bottom:24px;font-size:11pt;letter-spacing:0.3em;}
+.doc .fbox .date-row .num{display:inline-block;min-width:2.5em;text-align:center;}
+.doc .fbox .fld{margin:12px 0;font-size:11pt;}
+.doc .fbox .fld .lbl{display:inline-block;margin-right:1em;letter-spacing:0.5em;}
+.doc .fbox .fld .val{display:inline-block;min-width:280px;border-bottom:1px solid #000;padding:0 6px;text-align:left;}
+.doc .foot-note{margin-top:8px;font-size:10pt;text-align:right;padding-right:20mm;}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 所属機関の代表者に関する申告書</div>
-    <div class="ver">ver.20260820.13</div>
+    <div class="ver">ver.20260820.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" onclick="saveFormGeneric('shozoku_daihyou')" style="background:#16a34a;color:white;">🛢 DB保存</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" onclick="discardEditedFromDB()">♻️ 編集版破棄</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
   </div>
 </div>
@@ -60,7 +59,6 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
-
     <div class="fs">
       <div class="fs-title">代表者の区分</div>
       <div class="fg">
@@ -72,7 +70,6 @@
         </select>
       </div>
     </div>
-
     <div class="fs">
       <div class="fs-title">代表者情報（②の場合のみ）</div>
       <div class="fg">
@@ -84,14 +81,17 @@
         <input id="f_rep_zairyu_card_no" oninput="p()" placeholder="例：AB12345678CD" maxlength="16">
       </div>
     </div>
-
     <div class="fs">
-      <div class="fs-title">基本情報</div>
-      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()" placeholder="例：2026年8月20日"></div>
+      <div class="fs-title">日付</div>
+      <div class="fg"><label>年</label><input id="f_dateY" oninput="p()" placeholder="例：2026" style="width:80px;"></div>
+      <div class="fg"><label>月</label><input id="f_dateM" oninput="p()" placeholder="例：8" style="width:60px;"></div>
+      <div class="fg"><label>日</label><input id="f_dateD" oninput="p()" placeholder="例：20" style="width:60px;"></div>
+    </div>
+    <div class="fs">
+      <div class="fs-title">署名欄</div>
       <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
       <div class="fg"><label>作成者氏名</label><input id="f_author" oninput="p()" placeholder="所属機関の職員に限る"></div>
     </div>
-
   </div>
 </div>
 <div class="pp">
@@ -106,114 +106,75 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787235064"></script>
+<script src="ofusa_common.js?v=1787238560"></script>
 <script>
-// ページ描画
 function p(){
   if(_editMode) return;
   const w = document.getElementById('pageArea'); if(!w) return;
-
-  // フォーム値取得
   const v = id => (document.getElementById(id) || {}).value || '';
   const type = v('f_rep_status_type');
   const nameEn = v('f_rep_name_en');
   const cardNo = v('f_rep_zairyu_card_no');
-  const docDate = v('f_docDate');
+  const dY = v('f_dateY');
+  const dM = v('f_dateM');
+  const dD = v('f_dateD');
   const company = v('f_company');
   const author = v('f_author');
-
-  // チェックボックスHTMLヘルパー
-  const cb = (checked) => `<span class="checkbox${checked?' checked':''}"></span>`;
+  const cb = (c) => `<span class="cb${c?' checked':''}"></span>`;
   const check1 = type === '1';
   const check2 = type === '2';
-
-  // 在留カード番号: 12桁を「◯◯◯◯◯◯◯◯◯◯◯◯」でセパレータなし、8個+4個
-  // ただし例: AB12345678CD → そのまま表示
-  const cardDisplay = cardNo || '　　　　　　　　　　　　';
-
   w.innerHTML = `
   <div class="doc" id="docP1">
-    <div style="font-size:9pt;text-align:right;">参考様式 （在留資格決定時・更新時共通）</div>
-    <h1>所 属 機 関 の 代 表 者 に 関 す る 申 告 書</h1>
-
-    <div class="item-row">
-      <strong>１</strong> 所属機関の代表者について、該当する□にチェックしてください。
+    <div class="hdr">
+      <div>参考様式</div>
+      <div>（在留資格決定時・更新時共通）</div>
     </div>
-
-    <div class="item-row" style="margin-left:2em;">
-      ${cb(check1)} ① 日本人、特別永住者 → 以下記入不要です。
-    </div>
-
-    <div class="item-row" style="margin-left:2em;">
-      ${cb(check2)} ② 上記①以外 → 次の２及び３を記入してください。
-    </div>
-
-    <div class="item-row" style="margin-top:24px;">
-      <strong>２</strong> 代表者の氏名（英字表記）
-    </div>
-    <div style="margin-left:2em;">
-      <span class="name-en-box">${nameEn || '&nbsp;'}</span>
-    </div>
-
-    <div class="item-row" style="margin-top:24px;">
-      <strong>３</strong> 代表者の在留カード番号
-    </div>
-    <div style="margin-left:2em;">
-      <span class="card-no-box">${cardDisplay}</span>
-    </div>
-
+    <div class="title">所 属 機 関 の 代 表 者 に 関 す る 申 告 書</div>
+    <div class="sec"><span class="num">１</span>所属機関の代表者について、該当する□にチェックしてください。</div>
+    <div class="cbrow">${cb(check1)}<span class="maru">①</span>日本人、特別永住者<span class="arw">→</span>以下記入不要です。</div>
+    <div class="cbrow">${cb(check2)}<span class="maru">②</span>上記①以外<span class="arw">→</span>次の２及び３を記入してください。</div>
+    <div class="sec" style="margin-top:40px;"><span class="num">２</span>代表者の氏名（英字表記）</div>
+    <div class="undbox">${nameEn || '&nbsp;'}</div>
+    <div class="sec" style="margin-top:40px;"><span class="num">３</span>代表者の在留カード番号</div>
+    <div class="undbox mono">${cardNo || '&nbsp;'}</div>
     <div class="warn">
-      上記に事実ではない内容が含まれている場合、虚偽の申請と判断される可能性があることを<br>
-      理解した上で本申告書を作成しました。
+      上記に事実ではない内容が含まれている場合、虚偽の申請と判断される可能性があることを理解した上で本申告書を作成しました。
     </div>
-
-    <div style="text-align:right;margin-top:20px;">
-      <span class="val" style="min-width:200px;">${docDate || '&nbsp;'}</span>
+    <div class="fbox">
+      <div class="date-row">
+        <span class="num">${dY || '　　　'}</span>年
+        <span class="num">${dM || '　　'}</span>月
+        <span class="num">${dD || '　　'}</span>日
+      </div>
+      <div class="fld">
+        <span class="lbl">所 属 機 関 名</span>
+        <span class="val">${company || '&nbsp;'}</span>
+      </div>
+      <div class="fld">
+        <span class="lbl">作 成 者 氏 名</span>
+        <span class="val">${author || '&nbsp;'}</span>
+      </div>
     </div>
-
-    <div class="footer-row">
-      <span class="lbl">所属機関 名</span>
-      <span class="val">${company || '&nbsp;'}</span>
-    </div>
-
-    <div class="footer-row">
-      <span class="lbl">作成者 氏 名</span>
-      <span class="val">${author || '&nbsp;'}</span>
-    </div>
-
-    <div class="footer-note">※ 作成者は所属機関の職員に限る。</div>
+    <div class="foot-note">※　作成者は所属機関の職員に限る。</div>
   </div>
   `;
-  // フォントサイズ再適用
   if(_fontSize !== 8.5) _applyFontSize();
-  // 注記の再描画（もし将来追加するなら）
   try{ if(typeof renderAllUserNotes === 'function') renderAllUserNotes(); }catch(_e){}
 }
 
-// DB読み込み: cases + companies から自動追従
 async function loadFromDB(){
   let info = null;
   const sel = document.getElementById('caseSelect');
-  if(sel && sel.value){
-    try{ info = JSON.parse(sel.value); }catch(e){}
-  }
-  if(!info || !info.caseId){
-    info = window._lastCaseInfo;
-  }
+  if(sel && sel.value){ try{ info = JSON.parse(sel.value); }catch(e){} }
+  if(!info || !info.caseId){ info = window._lastCaseInfo; }
   if(!info || !info.caseId) return;
-
   try{
-    // 会社情報
     if(info.companyId){
       const cos = await sb('companies?select=*&id=eq.' + encodeURIComponent(info.companyId));
       const co = cos && cos[0];
       if(co){
-        // 所属機関名
         const cEl = document.getElementById('f_company');
         if(cEl && !cEl.value) cEl.value = co.name || '';
-        // ver.20260820.13: 代表者英字名は自動追従しない（ユーザー要望）
-        //   会社の rep_name_en とは別人の可能性があるため、必ず手入力する。
-        // extra.shozoku_daihyou.rep_status_type / rep_zairyu_card_no を復元
         const saved = co.extra && co.extra.shozoku_daihyou;
         if(saved){
           const tEl = document.getElementById('f_rep_status_type');
@@ -227,23 +188,24 @@ async function loadFromDB(){
         }
       }
     }
-    // 書類作成日: 今日をデフォルトに
-    const dEl = document.getElementById('f_docDate');
-    if(dEl && !dEl.value){
+    const yEl = document.getElementById('f_dateY');
+    const mEl = document.getElementById('f_dateM');
+    const dEl = document.getElementById('f_dateD');
+    if(yEl && !yEl.value){
       const now = new Date();
-      dEl.value = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+      yEl.value = String(now.getFullYear());
+      mEl.value = String(now.getMonth()+1);
+      dEl.value = String(now.getDate());
     }
   }catch(e){ console.warn('[shozoku_daihyou] loadFromDB error:', e); }
   p();
 }
 
-// SELECT_CASE 受信（indexからのpostMessage）
 window.addEventListener('message', async function(e){
   if(!e.data || e.data.type !== 'SELECT_CASE') return;
   const info = e.data.info;
   if(!info || !info.caseId) return;
   console.log('[shozoku_daihyou] SELECT_CASE received:', info);
-  // 全入力欄クリア
   try{
     document.querySelectorAll('input[id^="f_"], textarea[id^="f_"]').forEach(function(el){
       if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
@@ -253,17 +215,13 @@ window.addEventListener('message', async function(e){
   }catch(_e){}
   window._lastCaseInfo = info;
   await loadFromDB();
-  // 共通の loadCaseToForm も呼ぶ（他書類との整合のため）
   if(typeof loadCaseToForm === 'function'){
     try{ await loadCaseToForm(info, 'shozoku_daihyou'); }catch(_e){}
   }
   p();
 });
-
-// 起動
 document.addEventListener('DOMContentLoaded', function(){
   p();
-  // 親に案件情報を要求
   try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(_e){}
 });
 </script>
