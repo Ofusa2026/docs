@@ -1378,6 +1378,12 @@ async function loadCaseToForm(info, docKey){
       holidayRateNon:'holidayNonLegal', holidayRateNonEn:'holidayNonLegalEn',
       bonusCond:'bonusCondition', bonusCondEn:'bonusConditionEn',
       salaryRaiseCond:'raiseCondition', salaryRaiseCondEn:'raiseConditionEn',
+      /* ver.20260819.07: 重要事項説明書(juuyou_*.html)用のフィールド名マッピング追加。
+         従来はこれらが未マッピングで、案件を開くたびに空欄になり、
+         毎回手入力が必要だった不具合の修正。 */
+      category:'workType', categoryEn:'workTypeEn',
+      category2:'workCat', category2En:'workCatEn',
+      foreignerJobDesc:'workDetail', foreignerJobDescEn:'workDetailEn',
       payCutoffDay:'payCutoff', payCutoffDayEn:'payCutoffEn',
       otherHoliday:'otherHolidays',
       deductSocial:'deductSocialIns', deductEmployment:'deductEmpIns'
