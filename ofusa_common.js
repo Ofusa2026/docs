@@ -856,7 +856,7 @@ function _ensureUserNoteCSS(){
   var st = document.createElement('style');
   st.id = '__userNoteCSS';
   st.textContent =
-    '.user-note{position:absolute;background:transparent;padding:2px 4px;font-size:8.5pt;line-height:1.4;color:#000;z-index:5;max-width:400px;white-space:pre-wrap;word-break:break-word;}' +
+    '.user-note{position:absolute;background:transparent;padding:2px 4px;font-size:8.5pt;line-height:1.4;color:#000;z-index:5;max-width:60%;white-space:pre-wrap;word-break:break-word;box-sizing:border-box;}' +
     '.user-note .un-line-tr{font-size:7.5pt;color:#000;}' +
     /* 編集モード中だけ枠と操作UIを表示 */
     'body.doc-editing .user-note{outline:1px dashed #a855f7;background:rgba(245,240,255,.6);cursor:move;}' +
@@ -911,8 +911,24 @@ function _renderUserNote(note){
   el.id = 'un_' + note.id;
   el.className = 'user-note';
   el.dataset.noteId = note.id;
-  el.style.left = (note.x || 0) + 'px';
-  el.style.top = (note.y || 0) + 'px';
+  // ver.20260820.03: 座標は「%」相対配置に統一（印刷ズレ解消）。
+  //   note.xPct/yPct（0-100）があればそれを優先、なければ旧px値から換算。
+  //   旧データ(x/y px)は初回レンダリング時に xPct/yPct へマイグレーション。
+  var parentRect = parent.getBoundingClientRect();
+  if(note.xPct != null && note.yPct != null){
+    el.style.left = note.xPct + '%';
+    el.style.top = note.yPct + '%';
+  } else {
+    // 旧データ: pxのまま配置 → 次のマイグレーションで%に変換
+    el.style.left = (note.x || 0) + 'px';
+    el.style.top = (note.y || 0) + 'px';
+    // 換算して保存
+    if(parentRect.width > 0 && parentRect.height > 0){
+      note.xPct = Math.round(((note.x || 0) / parentRect.width) * 10000) / 100;
+      note.yPct = Math.round(((note.y || 0) / parentRect.height) * 10000) / 100;
+      // 次から%を使うため、pxは残しても再レンダリング時に%が優先される
+    }
+  }
   // 日本語行
   var ja = document.createElement('div');
   ja.className = 'un-line-ja';
@@ -949,8 +965,14 @@ function _renderUserNote(note){
     if(ev.target.closest('.un-tools')) return; // ツール上はドラッグしない
     ev.preventDefault();
     var startX = ev.clientX, startY = ev.clientY;
-    var origLeft = parseInt(el.style.left, 10) || 0;
-    var origTop  = parseInt(el.style.top, 10) || 0;
+    // ドラッグ開始時の要素の位置(親からのオフセット)をpxで確定
+    var pr = el.parentElement.getBoundingClientRect();
+    var er = el.getBoundingClientRect();
+    var origLeft = er.left - pr.left;
+    var origTop  = er.top  - pr.top;
+    // ドラッグ中はpxで動かす
+    el.style.left = origLeft + 'px';
+    el.style.top  = origTop  + 'px';
     function onMove(mv){
       el.style.left = (origLeft + (mv.clientX - startX)) + 'px';
       el.style.top  = (origTop  + (mv.clientY - startY)) + 'px';
@@ -958,11 +980,22 @@ function _renderUserNote(note){
     function onUp(){
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
-      // ノートオブジェクトを更新
+      // ver.20260820.03: ドラッグ後の位置を%相対座標として保存（印刷ズレ解消）
       var n = window._userNotes.find(function(nn){ return nn.id === note.id; });
       if(n){
-        n.x = parseInt(el.style.left, 10) || 0;
-        n.y = parseInt(el.style.top, 10) || 0;
+        var finalLeft = parseInt(el.style.left, 10) || 0;
+        var finalTop  = parseInt(el.style.top, 10) || 0;
+        var parentRect = el.parentElement.getBoundingClientRect();
+        if(parentRect.width > 0 && parentRect.height > 0){
+          n.xPct = Math.round((finalLeft / parentRect.width) * 10000) / 100;
+          n.yPct = Math.round((finalTop / parentRect.height) * 10000) / 100;
+          // 見た目もすぐ%に切り替え
+          el.style.left = n.xPct + '%';
+          el.style.top = n.yPct + '%';
+        }
+        // 互換のためpxも保持（旧ローダー対策）
+        n.x = finalLeft;
+        n.y = finalTop;
       }
       // ver.20260820.02: 注記のみ直接保存（フォームdirty化を回避）
       if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
@@ -1078,6 +1111,9 @@ function createUserNoteInteractive(){
         id: _generateUserNoteId(),
         ja: ja,
         tr: tr,
+        // ver.20260820.03: 初期座標を%相対で（印刷ズレ解消）。左10%, 上10%
+        xPct: 10,
+        yPct: 10,
         x: 80,
         y: 80,
         page: visiblePage
