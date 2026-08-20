@@ -985,52 +985,124 @@ function renderAllUserNotes(){
   (window._userNotes || []).forEach(function(note){ _renderUserNote(note); });
 }
 
+// ver.20260820.01: HTMLモーダルで日本語＋翻訳を同時入力できるように改良
+//   従来: prompt() を2回連続で出していた（1つずつ入力）
+//   新: モーダル1枚で両方入力＋プレビュー表示
+function _ensureUserNoteModal(){
+  if(document.getElementById('userNoteModal')) return;
+  var modal = document.createElement('div');
+  modal.id = 'userNoteModal';
+  modal.style.cssText = 'display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:99999;align-items:center;justify-content:center;';
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:8px;padding:20px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);">' +
+      '<h3 id="unModalTitle" style="margin:0 0 12px;font-size:15px;color:#1f2937;">📝 注記を追加</h3>' +
+      '<div style="margin-bottom:10px;">' +
+        '<label style="display:block;font-size:12px;color:#4b5563;margin-bottom:4px;font-weight:600;">日本語文（先頭に「※」は自動で付きます）</label>' +
+        '<textarea id="unModalJa" rows="3" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;font-family:inherit;box-sizing:border-box;resize:vertical;" placeholder="例：シフト制につき一例"></textarea>' +
+      '</div>' +
+      '<div style="margin-bottom:12px;">' +
+        '<label style="display:block;font-size:12px;color:#4b5563;margin-bottom:4px;font-weight:600;">翻訳文（不要なら空欄でOK）</label>' +
+        '<textarea id="unModalTr" rows="3" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;font-family:inherit;box-sizing:border-box;resize:vertical;" placeholder="例：Salah satu contoh sistem per shift"></textarea>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:flex-end;gap:8px;">' +
+        '<button type="button" id="unModalCancel" style="padding:8px 16px;background:#e5e7eb;color:#374151;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600;">キャンセル</button>' +
+        '<button type="button" id="unModalOk" style="padding:8px 16px;background:#7c3aed;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:700;">保存</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  // 背景クリックで閉じる
+  modal.addEventListener('click', function(e){
+    if(e.target === modal) _closeUserNoteModal();
+  });
+}
+
+function _closeUserNoteModal(){
+  var modal = document.getElementById('userNoteModal');
+  if(modal){
+    modal.style.display = 'none';
+    modal._onSave = null; // クリア
+  }
+}
+
+// モーダルを開く（title, ja, tr, onSaveCallback）
+function _openUserNoteModal(opts){
+  _ensureUserNoteModal();
+  var modal = document.getElementById('userNoteModal');
+  document.getElementById('unModalTitle').textContent = opts.title || '📝 注記';
+  var jaEl = document.getElementById('unModalJa');
+  var trEl = document.getElementById('unModalTr');
+  jaEl.value = opts.ja || '';
+  trEl.value = opts.tr || '';
+  modal.style.display = 'flex';
+  // OKボタンのハンドラ差し替え
+  var okBtn = document.getElementById('unModalOk');
+  var newOk = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOk, okBtn);
+  newOk.addEventListener('click', function(){
+    var ja = jaEl.value.trim();
+    var tr = trEl.value.trim();
+    if(!ja){ alert('日本語文を入力してください'); jaEl.focus(); return; }
+    _closeUserNoteModal();
+    if(typeof opts.onSave === 'function') opts.onSave(ja, tr);
+  });
+  // キャンセル
+  var caBtn = document.getElementById('unModalCancel');
+  var newCa = caBtn.cloneNode(true);
+  caBtn.parentNode.replaceChild(newCa, caBtn);
+  newCa.addEventListener('click', function(){ _closeUserNoteModal(); });
+  // フォーカス
+  setTimeout(function(){ jaEl.focus(); }, 100);
+}
+
 // ユーザーに新規注記を作らせる
 function createUserNoteInteractive(){
-  var ja = prompt('注記の日本語文を入力してください（先頭に「※」は自動で付きます）:');
-  if(ja == null) return;
-  ja = String(ja).trim();
-  if(!ja) return;
-  var tr = prompt('注記の翻訳文を入力してください（不要ならキャンセル）:');
-  if(tr == null) tr = '';
-  tr = String(tr).trim();
-  // デフォルト座標: 現在の可視ページ内の中央
-  var area = document.getElementById('pageArea');
-  var visiblePage = 1;
-  if(area){
-    var pages = area.querySelectorAll('.doc');
-    var scrollTop = area.scrollTop;
-    for(var i = 0; i < pages.length; i++){
-      if(pages[i].offsetTop > scrollTop){ visiblePage = Math.max(1, i); break; }
-      visiblePage = i + 1;
+  _openUserNoteModal({
+    title: '📝 新しい注記を追加',
+    ja: '',
+    tr: '',
+    onSave: function(ja, tr){
+      // デフォルト座標: 現在の可視ページ内の中央
+      var area = document.getElementById('pageArea');
+      var visiblePage = 1;
+      if(area){
+        var pages = area.querySelectorAll('.doc');
+        var scrollTop = area.scrollTop;
+        for(var i = 0; i < pages.length; i++){
+          if(pages[i].offsetTop > scrollTop){ visiblePage = Math.max(1, i); break; }
+          visiblePage = i + 1;
+        }
+      }
+      var note = {
+        id: _generateUserNoteId(),
+        ja: ja,
+        tr: tr,
+        x: 80,
+        y: 80,
+        page: visiblePage
+      };
+      window._userNotes = window._userNotes || [];
+      window._userNotes.push(note);
+      _renderUserNote(note);
+      if(typeof markEditedDirty === 'function') markEditedDirty();
     }
-  }
-  var note = {
-    id: _generateUserNoteId(),
-    ja: ja,
-    tr: tr,
-    x: 80,
-    y: 80,
-    page: visiblePage
-  };
-  window._userNotes = window._userNotes || [];
-  window._userNotes.push(note);
-  _renderUserNote(note);
-  if(typeof markEditedDirty === 'function') markEditedDirty();
+  });
 }
 
 // 既存の注記を編集
 function editUserNote(noteId){
   var note = (window._userNotes || []).find(function(n){ return n.id === noteId; });
   if(!note) return;
-  var ja = prompt('注記の日本語文（先頭の「※」は不要）:', note.ja || '');
-  if(ja == null) return;
-  var tr = prompt('注記の翻訳文（不要なら空欄）:', note.tr || '');
-  if(tr == null) return;
-  note.ja = String(ja).trim();
-  note.tr = String(tr).trim();
-  _renderUserNote(note);
-  if(typeof markEditedDirty === 'function') markEditedDirty();
+  _openUserNoteModal({
+    title: '✏️ 注記を編集',
+    ja: note.ja || '',
+    tr: note.tr || '',
+    onSave: function(ja, tr){
+      note.ja = ja;
+      note.tr = tr;
+      _renderUserNote(note);
+      if(typeof markEditedDirty === 'function') markEditedDirty();
+    }
+  });
 }
 
 // 注記を削除
