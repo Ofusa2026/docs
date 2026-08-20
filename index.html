@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.18</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.19</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -374,7 +374,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1787269676';
+window.__DOCS_CACHE_BUSTER__ = '1787269891';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -382,60 +382,60 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787269676'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787269676'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787269676'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787269676'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787269676'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787269676'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787269676'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787269676'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787269676'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787269676'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787269676'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787269676'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787269676'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787269676'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787269676'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787269676'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787269676'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787269676'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787269676'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787269676'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787269676'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787269676'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787269676'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787269676'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787269676'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787269676'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787269676'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787269676'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787269676'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787269676'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787269676'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787269676'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787269676'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787269676'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787269676'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787269676'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787269676'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787269676'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787269676'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787269676'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787269676'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787269676'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787269676'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787269676'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787269676'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787269676'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787269676'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787269676'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787269676'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787269676'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787269676'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787269676'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787269676'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787269676'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787269891'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787269891'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787269891'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787269891'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787269891'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787269891'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787269891'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787269891'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787269891'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787269891'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787269891'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787269891'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787269891'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787269891'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787269891'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787269891'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787269891'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787269891'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787269891'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787269891'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787269891'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787269891'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787269891'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787269891'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787269891'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787269891'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787269891'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787269891'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787269891'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787269891'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787269891'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787269891'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787269891'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787269891'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787269891'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787269891'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787269891'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787269891'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787269891'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787269891'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787269891'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787269891'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787269891'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787269891'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787269891'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787269891'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787269891'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787269891'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787269891'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787269891'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787269891'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787269891'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787269891'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787269891'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -497,15 +497,15 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1787269676',
-  'vi':'1_5_vi.html?v=1787269676',
-  'th':'1_5_th.html?v=1787269676',
-  'ne':'1_5_ne.html?v=1787269676',
-  'my':'1_5_my.html?v=1787269676',
-  'km':'1_5_km.html?v=1787269676',
-  'en':'1_5_en.html?v=1787269676',
-  'ko':'1_5_ko.html?v=1787269676',
-  'zh':'1_5_zh.html?v=1787269676',
+  'id':'1_5.html?v=1787269891',
+  'vi':'1_5_vi.html?v=1787269891',
+  'th':'1_5_th.html?v=1787269891',
+  'ne':'1_5_ne.html?v=1787269891',
+  'my':'1_5_my.html?v=1787269891',
+  'km':'1_5_km.html?v=1787269891',
+  'en':'1_5_en.html?v=1787269891',
+  'ko':'1_5_ko.html?v=1787269891',
+  'zh':'1_5_zh.html?v=1787269891',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -549,14 +549,14 @@ function open_1_5(lang){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1787269676',
-  'vi':'1_6_vi.html?v=1787269676',
-  'th':'1_6_th.html?v=1787269676',
-  'ne':'1_6_ne.html?v=1787269676',
-  'my':'1_6_my.html?v=1787269676',
-  'km':'1_6_km.html?v=1787269676',
-  'en':'1_6_en.html?v=1787269676',
-  'ko':'1_6_ko.html?v=1787269676',
+  'id':'1_6.html?v=1787269891',
+  'vi':'1_6_vi.html?v=1787269891',
+  'th':'1_6_th.html?v=1787269891',
+  'ne':'1_6_ne.html?v=1787269891',
+  'my':'1_6_my.html?v=1787269891',
+  'km':'1_6_km.html?v=1787269891',
+  'en':'1_6_en.html?v=1787269891',
+  'ko':'1_6_ko.html?v=1787269891',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -600,15 +600,15 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1787269676',
-  'vi':'1_16_vi.html?v=1787269676',
-  'th':'1_16_th.html?v=1787269676',
-  'ne':'1_16_ne.html?v=1787269676',
-  'my':'1_16_my.html?v=1787269676',
-  'km':'1_16_km.html?v=1787269676',
-  'en':'1_16_en.html?v=1787269676',
-  'ko':'1_16_ko.html?v=1787269676',
-  'zh':'1_16_zh.html?v=1787269676',
+  'id':'1_16_id.html?v=1787269891',
+  'vi':'1_16_vi.html?v=1787269891',
+  'th':'1_16_th.html?v=1787269891',
+  'ne':'1_16_ne.html?v=1787269891',
+  'my':'1_16_my.html?v=1787269891',
+  'km':'1_16_km.html?v=1787269891',
+  'en':'1_16_en.html?v=1787269891',
+  'ko':'1_16_ko.html?v=1787269891',
+  'zh':'1_16_zh.html?v=1787269891',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1768,11 +1768,17 @@ function _renderPriorityDocsModal(){
       html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;">この在留資格×分野で、認定/変更/更新のどれでも共通で上部に表示する書類にチェック。</div>';
       html += _renderDocCheckGrid(idx, 'base', card.base || [], allDocs, '#e0e7ff');
     } else {
+      // ver.20260820.19: 認定/変更/更新タブでは、書類ごとに現在の状態を色分けで表示。
+      //   状態: base(紫)/add(緑)/remove(赤・打消し線)/none(白)
+      //   クリックで状態を切り替え: base→base維持(グリッドで直接base変更は不可) / none→add / add→none / base→remove / remove→base
       var jaLabel = activeTab === 'nintei' ? '認定' : (activeTab === 'henkou' ? '変更' : '更新');
-      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;">'+_esc(jaLabel)+'の場合の <strong style="color:#16a34a;">追加</strong>書類（ベースにさらに足す）</div>';
-      html += _renderDocCheckGrid(idx, 'add_'+activeTab, card['add_'+activeTab] || [], allDocs, '#dcfce7');
-      html += '<div style="font-size:12px;color:#4b5563;margin:16px 0 10px 0;">'+_esc(jaLabel)+'の場合の <strong style="color:#dc2626;">除外</strong>書類（ベースから外す）</div>';
-      html += _renderDocCheckGrid(idx, 'remove_'+activeTab, card['remove_'+activeTab] || [], allDocs, '#fee2e2');
+      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;line-height:1.7;">'+_esc(jaLabel)+' の場合の書類。' +
+        '<br><span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;">🟪 ベース</span> = 常に表示　　' +
+        '<span style="background:#dcfce7;padding:1px 6px;border-radius:3px;">🟩 追加</span> = '+_esc(jaLabel)+'のとき追加　　' +
+        '<span style="background:#fee2e2;padding:1px 6px;border-radius:3px;text-decoration:line-through;">🟥 除外</span> = '+_esc(jaLabel)+'のとき外す　　' +
+        '<span style="padding:1px 6px;border:1px solid #d1d5db;border-radius:3px;">⬜ 未選択</span>' +
+        '<br><small style="color:#6b7280;">クリックで状態が切り替わります: 未選択→追加→未選択 ／ ベース→除外→ベース</small></div>';
+      html += _renderDocStateGrid(idx, activeTab, card, allDocs);
     }
     html += '</div>';
 
@@ -1804,6 +1810,80 @@ function _renderDocCheckGrid(idx, field, selectedArr, allDocs, bgHi){
   });
   html += '</div>';
   return html;
+}
+
+// ver.20260820.19: 認定/変更/更新タブ用の統合ビューグリッド。
+// 各書類の状態を色分けで表示: base(紫)/add(緑)/remove(赤・打消)/none(白)
+function _renderDocStateGrid(idx, atKey, card, allDocs){
+  var base = card.base || [];
+  var addArr = card['add_'+atKey] || [];
+  var removeArr = card['remove_'+atKey] || [];
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 8px;font-size:12px;">';
+  allDocs.forEach(function(d){
+    var state = 'none';
+    var style = 'padding:5px 8px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid #e5e7eb;user-select:none;';
+    var badge = '⬜';
+    if(removeArr.indexOf(d.key) >= 0){
+      state = 'remove';
+      style += 'background:#fee2e2;text-decoration:line-through;color:#7f1d1d !important;';
+      badge = '🟥';
+    } else if(base.indexOf(d.key) >= 0){
+      state = 'base';
+      style += 'background:#e0e7ff;color:#3730a3 !important;font-weight:600;';
+      badge = '🟪';
+    } else if(addArr.indexOf(d.key) >= 0){
+      state = 'add';
+      style += 'background:#dcfce7;color:#14532d !important;font-weight:600;';
+      badge = '🟩';
+    }
+    var titleAttr = 'title="' + _esc('状態: ' + (state==='base'?'ベース(クリックで除外)':state==='add'?'追加(クリックで解除)':state==='remove'?'除外(クリックで解除)':'未選択(クリックで追加)')) + '"';
+    html += '<div ' + titleAttr + ' data-idx="'+idx+'" data-at="'+_esc(atKey)+'" data-doc="'+_esc(d.key)+'" data-state="'+state+'" onclick="_cycleDocState(this)" style="'+style+'">';
+    html += '<span style="font-size:11px;">'+badge+'</span>';
+    html += '<span style="flex:1;">'+_esc(d.label)+' <span style="color:#6b7280;font-size:10px;font-weight:normal;">('+_esc(d.key)+')</span></span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// 状態切り替え: 
+// - baseの場合: base → remove → base
+// - baseでない場合: none → add → none
+function _cycleDocState(el){
+  var idx = parseInt(el.dataset.idx,10);
+  var at = el.dataset.at;
+  var doc = el.dataset.doc;
+  var state = el.dataset.state;
+  var card = _priorityDocsData.residences[idx];
+  if(!card) return;
+  var base = card.base || [];
+  card['add_'+at] = card['add_'+at] || [];
+  card['remove_'+at] = card['remove_'+at] || [];
+  var addArr = card['add_'+at];
+  var removeArr = card['remove_'+at];
+  var isBase = base.indexOf(doc) >= 0;
+
+  if(isBase){
+    // ベース書類: base ↔ remove
+    if(state === 'base'){
+      // → remove
+      if(removeArr.indexOf(doc) < 0) removeArr.push(doc);
+    } else {
+      // remove → base に戻す
+      var i = removeArr.indexOf(doc); if(i >= 0) removeArr.splice(i, 1);
+    }
+  } else {
+    // ベースでない: none ↔ add
+    if(state === 'add'){
+      // add → none
+      var i = addArr.indexOf(doc); if(i >= 0) addArr.splice(i, 1);
+    } else {
+      // → add
+      if(addArr.indexOf(doc) < 0) addArr.push(doc);
+    }
+  }
+  // プレビュー含め再描画
+  _renderPriorityDocsModal();
 }
 
 function _computeFinal(card, atKey){
