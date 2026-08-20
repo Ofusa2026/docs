@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.17</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.18</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -374,7 +374,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1787269325';
+window.__DOCS_CACHE_BUSTER__ = '1787269676';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -382,60 +382,60 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787269325'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787269325'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787269325'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787269325'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787269325'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787269325'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787269325'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787269325'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787269325'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787269325'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787269325'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787269325'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787269325'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787269325'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787269325'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787269325'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787269325'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787269325'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787269325'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787269325'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787269325'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787269325'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787269325'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787269325'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787269325'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787269325'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787269325'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787269325'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787269325'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787269325'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787269325'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787269325'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787269325'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787269325'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787269325'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787269325'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787269325'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787269325'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787269325'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787269325'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787269325'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787269325'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787269325'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787269325'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787269325'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787269325'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787269325'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787269325'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787269325'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787269325'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787269325'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787269325'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787269325'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787269325'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787269676'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787269676'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787269676'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787269676'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787269676'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787269676'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787269676'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787269676'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787269676'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787269676'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787269676'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787269676'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787269676'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787269676'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787269676'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787269676'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787269676'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787269676'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787269676'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787269676'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787269676'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787269676'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787269676'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787269676'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787269676'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787269676'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787269676'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787269676'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787269676'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787269676'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787269676'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787269676'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787269676'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787269676'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787269676'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787269676'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787269676'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787269676'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787269676'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787269676'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787269676'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787269676'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787269676'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787269676'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787269676'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787269676'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787269676'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787269676'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787269676'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787269676'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787269676'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787269676'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787269676'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787269676'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -497,15 +497,15 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1787269325',
-  'vi':'1_5_vi.html?v=1787269325',
-  'th':'1_5_th.html?v=1787269325',
-  'ne':'1_5_ne.html?v=1787269325',
-  'my':'1_5_my.html?v=1787269325',
-  'km':'1_5_km.html?v=1787269325',
-  'en':'1_5_en.html?v=1787269325',
-  'ko':'1_5_ko.html?v=1787269325',
-  'zh':'1_5_zh.html?v=1787269325',
+  'id':'1_5.html?v=1787269676',
+  'vi':'1_5_vi.html?v=1787269676',
+  'th':'1_5_th.html?v=1787269676',
+  'ne':'1_5_ne.html?v=1787269676',
+  'my':'1_5_my.html?v=1787269676',
+  'km':'1_5_km.html?v=1787269676',
+  'en':'1_5_en.html?v=1787269676',
+  'ko':'1_5_ko.html?v=1787269676',
+  'zh':'1_5_zh.html?v=1787269676',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -549,14 +549,14 @@ function open_1_5(lang){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1787269325',
-  'vi':'1_6_vi.html?v=1787269325',
-  'th':'1_6_th.html?v=1787269325',
-  'ne':'1_6_ne.html?v=1787269325',
-  'my':'1_6_my.html?v=1787269325',
-  'km':'1_6_km.html?v=1787269325',
-  'en':'1_6_en.html?v=1787269325',
-  'ko':'1_6_ko.html?v=1787269325',
+  'id':'1_6.html?v=1787269676',
+  'vi':'1_6_vi.html?v=1787269676',
+  'th':'1_6_th.html?v=1787269676',
+  'ne':'1_6_ne.html?v=1787269676',
+  'my':'1_6_my.html?v=1787269676',
+  'km':'1_6_km.html?v=1787269676',
+  'en':'1_6_en.html?v=1787269676',
+  'ko':'1_6_ko.html?v=1787269676',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -600,15 +600,15 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1787269325',
-  'vi':'1_16_vi.html?v=1787269325',
-  'th':'1_16_th.html?v=1787269325',
-  'ne':'1_16_ne.html?v=1787269325',
-  'my':'1_16_my.html?v=1787269325',
-  'km':'1_16_km.html?v=1787269325',
-  'en':'1_16_en.html?v=1787269325',
-  'ko':'1_16_ko.html?v=1787269325',
-  'zh':'1_16_zh.html?v=1787269325',
+  'id':'1_16_id.html?v=1787269676',
+  'vi':'1_16_vi.html?v=1787269676',
+  'th':'1_16_th.html?v=1787269676',
+  'ne':'1_16_ne.html?v=1787269676',
+  'my':'1_16_my.html?v=1787269676',
+  'km':'1_16_km.html?v=1787269676',
+  'en':'1_16_en.html?v=1787269676',
+  'ko':'1_16_ko.html?v=1787269676',
+  'zh':'1_16_zh.html?v=1787269676',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1470,77 +1470,126 @@ function closeDocsWhatsNew(){
 }
 
 // ============================================================
-// ver.20260820.16: 優先書類マップ機能
+// ver.20260820.18: 優先書類マップ機能 v2
 // ============================================================
-// 案件を開いた時、その residence_status × applicant_field × app_type に応じて
-// 「必要書類」を上部に、残りを「その他の書類 ▼」で折りたたむ。
-// マップは Supabase settings テーブルの key='saysay_priority_docs' に JSON で保存。
+// 「在留資格 × 分野」ごとに1カード。中で ベース書類 + 認定/変更/更新の追加/除外を管理。
+// 最終優先書類 = base ∪ add_<種別> \ remove_<種別>
+// データ: settings.saysay_priority_docs (version=2)
 // ============================================================
 
-var _priorityDocsRules = null;  // メモリキャッシュ (ルール配列)
-var _priorityDocsRulesLoading = false;
+var _priorityDocsData = null;  // {version, residences:[{residence, field, base, add_nintei, add_henkou, add_koushin, remove_*}]}
+var _priorityDocsLoading = false;
 
-// マップをDBから取得（キャッシュ有）
 async function loadPriorityDocs(){
-  if(_priorityDocsRules !== null) return _priorityDocsRules;
-  if(_priorityDocsRulesLoading){
-    // 進行中の別呼び出しを待つ
+  if(_priorityDocsData !== null) return _priorityDocsData;
+  if(_priorityDocsLoading){
     for(var i=0; i<40; i++){
       await new Promise(r=>setTimeout(r,50));
-      if(_priorityDocsRules !== null) return _priorityDocsRules;
+      if(_priorityDocsData !== null) return _priorityDocsData;
     }
   }
-  _priorityDocsRulesLoading = true;
+  _priorityDocsLoading = true;
   try{
     var rows = await idxSb('settings?select=value&key=eq.saysay_priority_docs');
     if(rows && rows[0] && rows[0].value){
       var val = typeof rows[0].value === 'string' ? JSON.parse(rows[0].value) : rows[0].value;
-      _priorityDocsRules = (val && val.rules) || [];
+      // v1 → v2 マイグレーション (メモリ上のみ、保存時に v2 化)
+      if(val && val.version === 2 && Array.isArray(val.residences)){
+        _priorityDocsData = val;
+      } else if(val && Array.isArray(val.rules)){
+        // 旧v1形式から自動変換 (種別ごとに散らばっていたルールを在留資格ごとに集約)
+        _priorityDocsData = _migrateV1ToV2(val.rules);
+      } else {
+        _priorityDocsData = {version: 2, residences: []};
+      }
     } else {
-      _priorityDocsRules = [];
+      _priorityDocsData = {version: 2, residences: []};
     }
   }catch(e){
     console.warn('[priorityDocs] load failed:', e);
-    _priorityDocsRules = [];
+    _priorityDocsData = {version: 2, residences: []};
   }finally{
-    _priorityDocsRulesLoading = false;
+    _priorityDocsLoading = false;
   }
-  return _priorityDocsRules;
+  return _priorityDocsData;
 }
 
-// residence × field × appType にマッチする docKey 配列を返す
+function _migrateV1ToV2(v1rules){
+  // 在留資格 × 分野 でグループ化
+  var groups = {};
+  v1rules.forEach(function(r){
+    var key = (r.residence||'') + '|' + (r.field||'*');
+    if(!groups[key]){
+      groups[key] = {residence: r.residence, field: r.field || '*',
+        _accum: {nintei:[], henkou:[], koushin:[], any:[]}};
+    }
+    var g = groups[key];
+    var at = r.appType || '*';
+    var docs = r.docs || [];
+    if(at === '認定') g._accum.nintei = docs;
+    else if(at === '変更') g._accum.henkou = docs;
+    else if(at === '更新') g._accum.koushin = docs;
+    else g._accum.any = docs;
+  });
+  // 各グループでベース (全種別に共通するもの) を取り出し
+  var residences = [];
+  Object.keys(groups).forEach(function(k){
+    var g = groups[k];
+    var a = g._accum;
+    // 存在する種別のリストだけで共通集合
+    var lists = [];
+    if(a.nintei.length) lists.push(a.nintei);
+    if(a.henkou.length) lists.push(a.henkou);
+    if(a.koushin.length) lists.push(a.koushin);
+    if(a.any.length) lists.push(a.any);
+    var base = lists.length ? lists.reduce(function(acc, cur){
+      return acc.filter(function(x){ return cur.indexOf(x) >= 0; });
+    }, lists[0].slice()) : [];
+    residences.push({
+      residence: g.residence,
+      field: g.field,
+      base: base,
+      add_nintei: a.nintei.filter(function(x){ return base.indexOf(x) < 0; }),
+      add_henkou: a.henkou.filter(function(x){ return base.indexOf(x) < 0; }),
+      add_koushin: a.koushin.filter(function(x){ return base.indexOf(x) < 0; }),
+      remove_nintei: [], remove_henkou: [], remove_koushin: []
+    });
+  });
+  return {version: 2, residences: residences};
+}
+
+// residence + field + appType にマッチする card から docKey配列を計算
 function matchPriorityDocs(residence, field, appType){
-  var rules = _priorityDocsRules || [];
-  var best = null;
-  var bestScore = -1;
-  for(var i=0; i<rules.length; i++){
-    var r = rules[i];
-    if(!r.residence) continue;
-    // residence は表記ゆれ吸収: 部分一致
+  if(!_priorityDocsData || !Array.isArray(_priorityDocsData.residences)) return [];
+  var best = null, bestScore = -1;
+  _priorityDocsData.residences.forEach(function(card){
+    if(!card.residence) return;
     var resMatch = false;
-    if(residence && (residence === r.residence || residence.indexOf(r.residence) >= 0 || r.residence.indexOf(residence) >= 0)) resMatch = true;
-    // 技人国 <-> 技術・人文知識・国際業務 の相互OK
-    if(!resMatch && r.residence === '技人国' && residence && /技術|人文|国際/.test(residence)) resMatch = true;
-    if(!resMatch && r.residence === '技術・人文知識・国際業務' && residence && (/技人国/.test(residence) || /技術/.test(residence))) resMatch = true;
-    if(!resMatch) continue;
+    if(residence && (residence === card.residence || residence.indexOf(card.residence) >= 0 || card.residence.indexOf(residence) >= 0)) resMatch = true;
+    if(!resMatch && card.residence === '技人国' && residence && /技術|人文|国際/.test(residence)) resMatch = true;
+    if(!resMatch && card.residence === '技術・人文知識・国際業務' && residence && (/技人国/.test(residence) || /技術/.test(residence))) resMatch = true;
+    if(!resMatch) return;
 
-    var fieldMatch = false;
-    var score = 1;
-    if(r.field === '*' || !r.field) fieldMatch = true;
-    else if(field && (field === r.field || field.indexOf(r.field) >= 0 || r.field.indexOf(field) >= 0)){ fieldMatch = true; score += 2; }
-    if(!fieldMatch) continue;
+    var fieldMatch = false, score = 1;
+    if(card.field === '*' || !card.field) fieldMatch = true;
+    else if(field && (field === card.field || field.indexOf(card.field) >= 0 || card.field.indexOf(field) >= 0)){ fieldMatch = true; score += 2; }
+    if(!fieldMatch) return;
 
-    var atMatch = false;
-    if(r.appType === '*' || !r.appType) atMatch = true;
-    else if(appType && (appType === r.appType || appType.indexOf(r.appType) >= 0)){ atMatch = true; score += 2; }
-    if(!atMatch) continue;
-
-    if(score > bestScore){ bestScore = score; best = r; }
+    if(score > bestScore){ bestScore = score; best = card; }
+  });
+  if(!best) return [];
+  // 種別に応じて add/remove を適用
+  var atKey = appType === '認定' ? 'nintei' : (appType === '変更' ? 'henkou' : (appType === '更新' ? 'koushin' : ''));
+  var result = (best.base || []).slice();
+  if(atKey){
+    (best['add_' + atKey] || []).forEach(function(d){ if(result.indexOf(d) < 0) result.push(d); });
+    (best['remove_' + atKey] || []).forEach(function(d){
+      var i = result.indexOf(d); if(i >= 0) result.splice(i, 1);
+    });
   }
-  return best ? (best.docs || []) : [];
+  return result;
 }
 
-// ナビを並び替え: 該当書類を priorityDocsList に、残りを otherDocsContainer に戻す
 async function reorderNavByPriority(info){
   await loadPriorityDocs();
   var priorityDocs = matchPriorityDocs(info.residenceStatus, info.applicantField, info.appType);
@@ -1549,55 +1598,38 @@ async function reorderNavByPriority(info){
   var otherToggleEl = document.getElementById('otherDocsToggle');
   var otherContEl = document.getElementById('otherDocsContainer');
   if(!prioListEl || !otherContEl) return;
-
-  // 一旦、優先セクションにある nav-* を全て otherDocsContainer に戻す
   Array.from(prioListEl.querySelectorAll('.item')).forEach(function(el){
     otherContEl.appendChild(el);
   });
-
   if(!priorityDocs.length){
-    // 該当ルールなし: 優先セクションと折りたたみを非表示、フル表示
     prioSecEl.style.display = 'none';
     otherToggleEl.style.display = 'none';
-    // 全表示
     otherContEl.style.display = 'block';
     return;
   }
-
-  // 優先書類の nav-* を順番通り優先セクションに移動
   priorityDocs.forEach(function(docKey){
     var el = document.getElementById('nav-' + docKey);
     if(el) prioListEl.appendChild(el);
   });
-
   prioSecEl.style.display = 'block';
   otherToggleEl.style.display = 'block';
-  // デフォルトで「その他」は折りたたむ
   otherContEl.style.display = 'none';
   var icon = document.getElementById('otherDocsToggleIcon');
   if(icon) icon.textContent = '▶';
 }
 
-// その他書類の開閉トグル
 function toggleOtherDocs(){
   var el = document.getElementById('otherDocsContainer');
   var icon = document.getElementById('otherDocsToggleIcon');
   if(!el) return;
   if(el.style.display === 'none'){
-    el.style.display = 'block';
-    if(icon) icon.textContent = '▼';
+    el.style.display = 'block'; if(icon) icon.textContent = '▼';
   } else {
-    el.style.display = 'none';
-    if(icon) icon.textContent = '▶';
+    el.style.display = 'none'; if(icon) icon.textContent = '▶';
   }
 }
 
-// ============================================================
-// 優先書類設定モーダル
-// ============================================================
-var _priorityDocsModal = null;
-
-// 全ての選択可能な書類キー (nav-* から動的抽出)
+// 全書類キーを nav-* から抽出
 function _getAllDocKeys(){
   var out = [];
   document.querySelectorAll('[id^="nav-"]').forEach(function(el){
@@ -1607,7 +1639,6 @@ function _getAllDocKeys(){
       var mainDiv = el.querySelector('div');
       if(mainDiv){
         var clone = mainDiv.cloneNode(true);
-        // item-sub を除去
         clone.querySelectorAll('.item-sub').forEach(function(s){ s.remove(); });
         label = clone.textContent.trim();
       }
@@ -1618,12 +1649,8 @@ function _getAllDocKeys(){
   return out;
 }
 
-// 選択肢 (在留資格)
 var _PRIO_RESIDENCE_OPTS = ['特定技能1号','特定技能2号','特定活動','特定活動⇒特定技能','技術・人文知識・国際業務','技人国','家族滞在','その他'];
-// 選択肢 (分野)
 var _PRIO_FIELD_OPTS = ['*','建設分野（特定技能１号）','介護分野','外食業分野（特定技能１号）','飲食料品製造業分野（特定技能１号）','農業分野（特定技能１号）','ビルクリーニング','宿泊分野（特定技能１号）','工業製品製造業（特定技能１号）','その他'];
-// 選択肢 (申請種別)
-var _PRIO_APPTYPE_OPTS = ['*','認定','変更','更新'];
 
 async function openPriorityDocsSettings(){
   await loadPriorityDocs();
@@ -1634,7 +1661,6 @@ async function openPriorityDocsSettings(){
 
 function _ensurePriorityDocsModal(){
   if(document.getElementById('priorityDocsModal')) return;
-  // ver.20260820.17: モーダル内は必ず黒文字を強制するCSS
   if(!document.getElementById('__priorityDocsCSS')){
     var st = document.createElement('style');
     st.id = '__priorityDocsCSS';
@@ -1643,31 +1669,34 @@ function _ensurePriorityDocsModal(){
       '#priorityDocsModal input[type=checkbox]{accent-color:#7c3aed;width:14px;height:14px;}' +
       '#priorityDocsModal select, #priorityDocsModal option{color:#111827 !important;background:#fff !important;}' +
       '#priorityDocsModal label{color:#111827 !important;}' +
-      /* 例外: 削除ボタンは赤、キャンセルはグレー、保存は白、閉じる×はグレー */
-      '#priorityDocsModal button[onclick*="_deletePrioRule"]{color:#dc2626 !important;}' +
+      '#priorityDocsModal button[onclick*="_deletePrioCard"]{color:#dc2626 !important;}' +
       '#priorityDocsModal button[onclick="savePriorityDocs()"]{color:#fff !important;}' +
-      '#priorityDocsModal button[onclick="addPriorityRule()"]{color:#fff !important;}' +
-      '#priorityDocsModal button[onclick="closePriorityDocsSettings()"]{color:#6b7280 !important;}';
+      '#priorityDocsModal button[onclick="addPriorityCard()"]{color:#fff !important;}' +
+      '#priorityDocsModal button[onclick="closePriorityDocsSettings()"]{color:#6b7280 !important;}' +
+      '#priorityDocsModal .prio-tab{padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #d1d5db;background:#f9fafb;border-radius:6px 6px 0 0;margin-right:4px;user-select:none;}' +
+      '#priorityDocsModal .prio-tab.active{background:#7c3aed;color:#fff !important;border-color:#7c3aed;}' +
+      '#priorityDocsModal .prio-panel{border:1px solid #d1d5db;border-top:none;border-radius:0 6px 6px 6px;padding:12px;background:#fafafa;}';
     document.head.appendChild(st);
   }
   var modal = document.createElement('div');
   modal.id = 'priorityDocsModal';
   modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99998;align-items:center;justify-content:center;';
   modal.innerHTML =
-    '<div style="background:#fff;border-radius:10px;padding:0;max-width:820px;width:92%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.4);color:#111827;">' +
+    '<div style="background:#fff;border-radius:10px;max-width:900px;width:94%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.4);color:#111827;">' +
       '<div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">' +
-        '<h3 style="margin:0;font-size:16px;color:#1f2937;">⚙️ 優先書類の設定</h3>' +
-        '<button onclick="closePriorityDocsSettings()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;">×</button>' +
+        '<h3 style="margin:0;font-size:16px;">⚙️ 優先書類の設定</h3>' +
+        '<button onclick="closePriorityDocsSettings()" style="background:none;border:none;font-size:22px;cursor:pointer;">×</button>' +
       '</div>' +
-      '<div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-size:12px;color:#4b5563;line-height:1.6;">' +
-        '在留資格 × 分野 × 申請種別 の組み合わせごとに、「必要書類」として上部に表示する書類を選びます。' +
-        '<br>選ばれなかった書類は「その他の書類 ▼」で折りたたまれます。<span style="color:#7c3aed;font-weight:700;">全スタッフで共有</span>されます。' +
+      '<div style="padding:14px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-size:12px;line-height:1.7;">' +
+        '在留資格 × 分野 ごとに<strong>ベース書類</strong>を決めて、認定/変更/更新の各種別で必要に応じて<strong>追加</strong>や<strong>除外</strong>ができます。' +
+        '<br>最終的な優先書類 = <span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;">ベース</span> ＋ <span style="background:#dcfce7;padding:1px 6px;border-radius:3px;">追加</span> － <span style="background:#fee2e2;padding:1px 6px;border-radius:3px;">除外</span>' +
+        '<br><span style="color:#7c3aed;font-weight:700;">全スタッフで共有</span>されます。' +
       '</div>' +
       '<div id="priorityDocsModalBody" style="padding:16px 20px;overflow-y:auto;flex:1;"></div>' +
       '<div style="padding:12px 20px;border-top:1px solid #e5e7eb;background:#f9fafb;display:flex;justify-content:space-between;align-items:center;">' +
-        '<button onclick="addPriorityRule()" style="padding:6px 12px;background:#7c3aed;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">＋ ルール追加</button>' +
+        '<button onclick="addPriorityCard()" style="padding:6px 12px;background:#7c3aed;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">＋ 在留資格を追加</button>' +
         '<div>' +
-          '<button onclick="closePriorityDocsSettings()" style="padding:8px 14px;background:#e5e7eb;color:#374151;border:none;border-radius:5px;cursor:pointer;margin-right:8px;font-weight:600;">キャンセル</button>' +
+          '<button onclick="closePriorityDocsSettings()" style="padding:8px 14px;background:#e5e7eb;border:none;border-radius:5px;cursor:pointer;margin-right:8px;font-weight:600;">キャンセル</button>' +
           '<button onclick="savePriorityDocs()" style="padding:8px 16px;background:#16a34a;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700;">💾 保存</button>' +
         '</div>' +
       '</div>' +
@@ -1677,123 +1706,173 @@ function _ensurePriorityDocsModal(){
     if(e.target === modal) closePriorityDocsSettings();
   });
 }
-
 function closePriorityDocsSettings(){
   var m = document.getElementById('priorityDocsModal');
   if(m) m.style.display = 'none';
 }
 
+// アクティブタブ (カードごと): 'base' | 'nintei' | 'henkou' | 'koushin'
+var _prioActiveTab = {};
+
 function _renderPriorityDocsModal(){
   var body = document.getElementById('priorityDocsModalBody');
   if(!body) return;
-  var rules = _priorityDocsRules || [];
+  var data = _priorityDocsData || {residences:[]};
+  var cards = data.residences || [];
   var allDocs = _getAllDocKeys();
 
-  if(rules.length === 0){
-    body.innerHTML = '<div style="color:#9ca3af;font-style:italic;padding:32px;text-align:center;">ルールがありません。下の「＋ ルール追加」で作成してください。</div>';
+  if(cards.length === 0){
+    body.innerHTML = '<div style="color:#9ca3af;font-style:italic;padding:32px;text-align:center;">カードがありません。下の「＋ 在留資格を追加」で作成してください。</div>';
     return;
   }
 
   var html = '';
-  rules.forEach(function(r, idx){
-    html += '<div style="border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-bottom:12px;background:#fff;color:#111827;">';
-    html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">';
-    // 在留資格セレクト
-    html += '<label style="font-size:12px;color:#374151;font-weight:600;">在留資格</label>';
-    html += '<select data-idx="'+idx+'" data-fld="residence" onchange="_updatePrioField(this)" style="padding:4px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:4px;color:#111827;background:#fff;">';
+  cards.forEach(function(card, idx){
+    if(!_prioActiveTab[idx]) _prioActiveTab[idx] = 'base';
+    var activeTab = _prioActiveTab[idx];
+    html += '<div style="border:1px solid #d1d5db;border-radius:10px;padding:14px;margin-bottom:16px;background:#fff;">';
+    // ヘッダー: 在留資格・分野・削除
+    html += '<div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">';
+    html += '<label style="font-size:12px;font-weight:700;">在留資格</label>';
+    html += '<select data-idx="'+idx+'" data-fld="residence" onchange="_updateCardField(this)" style="padding:5px 10px;font-size:13px;border:1px solid #d1d5db;border-radius:4px;background:#fff;font-weight:600;">';
     _PRIO_RESIDENCE_OPTS.forEach(function(o){
-      html += '<option value="'+_esc(o)+'"'+(o===r.residence?' selected':'')+'>'+_esc(o)+'</option>';
+      html += '<option value="'+_esc(o)+'"'+(o===card.residence?' selected':'')+'>'+_esc(o)+'</option>';
     });
     html += '</select>';
-    // 分野セレクト
-    html += '<label style="font-size:12px;color:#374151;margin-left:8px;font-weight:600;">分野</label>';
-    html += '<select data-idx="'+idx+'" data-fld="field" onchange="_updatePrioField(this)" style="padding:4px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:4px;color:#111827;background:#fff;">';
+    html += '<label style="font-size:12px;font-weight:700;margin-left:8px;">分野</label>';
+    html += '<select data-idx="'+idx+'" data-fld="field" onchange="_updateCardField(this)" style="padding:5px 10px;font-size:13px;border:1px solid #d1d5db;border-radius:4px;background:#fff;">';
     _PRIO_FIELD_OPTS.forEach(function(o){
       var label = o === '*' ? '（全分野）' : o;
-      html += '<option value="'+_esc(o)+'"'+(o===r.field?' selected':'')+'>'+_esc(label)+'</option>';
+      html += '<option value="'+_esc(o)+'"'+(o===card.field?' selected':'')+'>'+_esc(label)+'</option>';
     });
     html += '</select>';
-    // 申請種別セレクト
-    html += '<label style="font-size:12px;color:#374151;margin-left:8px;font-weight:600;">申請種別</label>';
-    html += '<select data-idx="'+idx+'" data-fld="appType" onchange="_updatePrioField(this)" style="padding:4px 8px;font-size:12px;border:1px solid #d1d5db;border-radius:4px;color:#111827;background:#fff;">';
-    _PRIO_APPTYPE_OPTS.forEach(function(o){
-      var label = o === '*' ? '（全種別）' : o;
-      html += '<option value="'+_esc(o)+'"'+(o===r.appType?' selected':'')+'>'+_esc(label)+'</option>';
-    });
-    html += '</select>';
-    // 削除ボタン
-    html += '<button onclick="_deletePrioRule('+idx+')" style="margin-left:auto;padding:4px 10px;background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;">🗑 削除</button>';
+    html += '<button onclick="_deletePrioCard('+idx+')" style="margin-left:auto;padding:5px 12px;background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;">🗑 このカードを削除</button>';
     html += '</div>';
-    // 書類チェック
-    html += '<div style="font-size:11px;color:#6b7280;margin-bottom:4px;">上部に表示する書類（チェック）:</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 12px;font-size:12px;">';
-    allDocs.forEach(function(d){
-      var checked = (r.docs || []).indexOf(d.key) >= 0;
-      html += '<label style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:3px;cursor:pointer;color:#111827;'+(checked?'background:#f3e8ff;':'')+'">';
-      html += '<input type="checkbox" data-idx="'+idx+'" data-doc="'+_esc(d.key)+'" onchange="_updatePrioDoc(this)"'+(checked?' checked':'')+'>';
-      html += '<span style="flex:1;color:#111827;">'+_esc(d.label)+' <span style="color:#6b7280;font-size:10px;">('+_esc(d.key)+')</span></span>';
-      html += '</label>';
+
+    // タブ
+    var tabs = [
+      {key:'base', label:'📦 ベース書類（全種別）'},
+      {key:'nintei', label:'認定 のみ'},
+      {key:'henkou', label:'変更 のみ'},
+      {key:'koushin', label:'更新 のみ'}
+    ];
+    html += '<div style="margin-top:4px;">';
+    tabs.forEach(function(t){
+      html += '<span class="prio-tab'+(activeTab===t.key?' active':'')+'" onclick="_switchPrioTab('+idx+',\''+t.key+'\')">'+t.label+'</span>';
     });
     html += '</div>';
+
+    // パネル
+    html += '<div class="prio-panel">';
+    if(activeTab === 'base'){
+      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;">この在留資格×分野で、認定/変更/更新のどれでも共通で上部に表示する書類にチェック。</div>';
+      html += _renderDocCheckGrid(idx, 'base', card.base || [], allDocs, '#e0e7ff');
+    } else {
+      var jaLabel = activeTab === 'nintei' ? '認定' : (activeTab === 'henkou' ? '変更' : '更新');
+      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;">'+_esc(jaLabel)+'の場合の <strong style="color:#16a34a;">追加</strong>書類（ベースにさらに足す）</div>';
+      html += _renderDocCheckGrid(idx, 'add_'+activeTab, card['add_'+activeTab] || [], allDocs, '#dcfce7');
+      html += '<div style="font-size:12px;color:#4b5563;margin:16px 0 10px 0;">'+_esc(jaLabel)+'の場合の <strong style="color:#dc2626;">除外</strong>書類（ベースから外す）</div>';
+      html += _renderDocCheckGrid(idx, 'remove_'+activeTab, card['remove_'+activeTab] || [], allDocs, '#fee2e2');
+    }
+    html += '</div>';
+
+    // 最終プレビュー
+    var previewNintei = _computeFinal(card, 'nintei');
+    var previewHenkou = _computeFinal(card, 'henkou');
+    var previewKoushin = _computeFinal(card, 'koushin');
+    html += '<div style="margin-top:14px;padding:10px 12px;background:#f9fafb;border-radius:6px;border-left:3px solid #7c3aed;">';
+    html += '<div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:6px;">🔍 プレビュー（実際の優先書類）</div>';
+    html += '<div style="font-size:11px;line-height:1.8;">';
+    html += '<div><strong>認定:</strong> '+_esc(previewNintei.join(', ')||'（なし）')+'</div>';
+    html += '<div><strong>変更:</strong> '+_esc(previewHenkou.join(', ')||'（なし）')+'</div>';
+    html += '<div><strong>更新:</strong> '+_esc(previewKoushin.join(', ')||'（なし）')+'</div>';
+    html += '</div></div>';
+
     html += '</div>';
   });
   body.innerHTML = html;
 }
 
+function _renderDocCheckGrid(idx, field, selectedArr, allDocs, bgHi){
+  var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 12px;font-size:12px;">';
+  allDocs.forEach(function(d){
+    var checked = selectedArr.indexOf(d.key) >= 0;
+    html += '<label style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:3px;cursor:pointer;'+(checked?'background:'+bgHi+';':'')+'">';
+    html += '<input type="checkbox" data-idx="'+idx+'" data-field="'+_esc(field)+'" data-doc="'+_esc(d.key)+'" onchange="_updateCardDoc(this,\''+bgHi+'\')"'+(checked?' checked':'')+'>';
+    html += '<span style="flex:1;">'+_esc(d.label)+' <span style="color:#6b7280;font-size:10px;">('+_esc(d.key)+')</span></span>';
+    html += '</label>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _computeFinal(card, atKey){
+  var result = (card.base || []).slice();
+  (card['add_' + atKey] || []).forEach(function(d){ if(result.indexOf(d) < 0) result.push(d); });
+  (card['remove_' + atKey] || []).forEach(function(d){
+    var i = result.indexOf(d); if(i >= 0) result.splice(i, 1);
+  });
+  return result;
+}
+
 function _esc(s){ return String(s||'').replace(/[<>&"']/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
-function _updatePrioField(el){
+function _switchPrioTab(idx, tab){
+  _prioActiveTab[idx] = tab;
+  _renderPriorityDocsModal();
+}
+function _updateCardField(el){
   var idx = parseInt(el.dataset.idx,10);
   var fld = el.dataset.fld;
-  if(!_priorityDocsRules[idx]) return;
-  _priorityDocsRules[idx][fld] = el.value;
+  if(!_priorityDocsData.residences[idx]) return;
+  _priorityDocsData.residences[idx][fld] = el.value;
 }
-function _updatePrioDoc(el){
+function _updateCardDoc(el, bgHi){
   var idx = parseInt(el.dataset.idx,10);
+  var field = el.dataset.field;
   var doc = el.dataset.doc;
-  if(!_priorityDocsRules[idx]) return;
-  _priorityDocsRules[idx].docs = _priorityDocsRules[idx].docs || [];
-  var arr = _priorityDocsRules[idx].docs;
+  if(!_priorityDocsData.residences[idx]) return;
+  var card = _priorityDocsData.residences[idx];
+  card[field] = card[field] || [];
+  var arr = card[field];
   if(el.checked){
     if(arr.indexOf(doc) < 0) arr.push(doc);
   } else {
-    var i = arr.indexOf(doc);
-    if(i >= 0) arr.splice(i, 1);
+    var i = arr.indexOf(doc); if(i >= 0) arr.splice(i, 1);
   }
-  // 行のハイライト再適用
-  el.parentElement.style.background = el.checked ? '#f3e8ff' : '';
-}
-function _deletePrioRule(idx){
-  if(!confirm('このルールを削除しますか？')) return;
-  _priorityDocsRules.splice(idx, 1);
+  el.parentElement.style.background = el.checked ? bgHi : '';
+  // プレビュー更新のため再レンダリング
   _renderPriorityDocsModal();
 }
-function addPriorityRule(){
-  _priorityDocsRules = _priorityDocsRules || [];
-  _priorityDocsRules.push({
-    residence: '特定技能1号',
-    field: '*',
-    appType: '認定',
-    docs: []
+function _deletePrioCard(idx){
+  if(!confirm('この在留資格カードを削除しますか？')) return;
+  _priorityDocsData.residences.splice(idx, 1);
+  delete _prioActiveTab[idx];
+  _renderPriorityDocsModal();
+}
+function addPriorityCard(){
+  _priorityDocsData = _priorityDocsData || {version:2, residences:[]};
+  _priorityDocsData.residences.push({
+    residence: '特定技能1号', field: '*',
+    base: [], add_nintei: [], add_henkou: [], add_koushin: [],
+    remove_nintei: [], remove_henkou: [], remove_koushin: []
   });
   _renderPriorityDocsModal();
 }
 async function savePriorityDocs(){
   try{
     var payload = {
-      version: 1,
+      version: 2,
       updated_at: new Date().toISOString(),
       updated_by: 'user',
-      rules: _priorityDocsRules || []
+      residences: _priorityDocsData.residences || []
     };
-    // 既存レコードを upsert
     await idxSb('settings?key=eq.saysay_priority_docs', {
       method: 'PATCH',
       body: JSON.stringify({ value: JSON.stringify(payload) })
     });
     alert('✅ 保存しました');
     closePriorityDocsSettings();
-    // 現在開いている案件があれば並び替え再適用
     if(idxSelectedCase && typeof reorderNavByPriority === 'function'){
       reorderNavByPriority(idxSelectedCase);
     }
@@ -1802,6 +1881,7 @@ async function savePriorityDocs(){
     alert('⚠️ 保存に失敗しました: ' + e.message);
   }
 }
+
 
 </script>
 
