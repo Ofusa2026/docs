@@ -869,8 +869,17 @@ function _ensureUserNoteCSS(){
     '#userNoteAddBtn{display:none;position:fixed;bottom:70px;right:16px;z-index:9999;padding:10px 14px;background:#7c3aed;color:#fff;border:none;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,.2);}' +
     '#userNoteAddBtn:hover{background:#6d28d9;}' +
     'body.doc-editing #userNoteAddBtn{display:inline-block;}' +
-    /* 印刷時：枠なし、ツール非表示 */
-    '@media print{.user-note{outline:none!important;background:transparent!important;} .user-note .un-tools{display:none!important;} #userNoteAddBtn{display:none!important;}}';
+    /* 印刷時：枠なし、ツール非表示、+.docのサイズを明示固定して注記位置ズレを防ぐ */
+    '@media print{' +
+      '.user-note{outline:none!important;background:transparent!important;position:absolute!important;}' +
+      '.user-note .un-tools{display:none!important;}' +
+      '#userNoteAddBtn{display:none!important;}' +
+      /* ver.20260820.04: .docサイズ固定と overflow:visible で注記が確実に印刷される */
+      '.doc{width:794px!important;min-height:1123px!important;overflow:visible!important;position:relative!important;margin:0 auto!important;page-break-after:always;break-after:page;}' +
+      '.doc:last-child{page-break-after:auto;break-after:auto;}' +
+      /* pageAreaも余計な幅を持たないように */
+      '#pageArea{width:auto!important;background:none!important;padding:0!important;margin:0!important;}' +
+    '}';
   document.head.appendChild(st);
 }
 
@@ -918,16 +927,25 @@ function _renderUserNote(note){
   if(note.xPct != null && note.yPct != null){
     el.style.left = note.xPct + '%';
     el.style.top = note.yPct + '%';
+  } else if(parentRect.width > 0 && parentRect.height > 0){
+    // 旧データ: pxから%に換算 → styleにも%を適用、noteオブジェクトも更新
+    // ver.20260820.04: マイグ時にstyleを%で書き、DBにも保存する（従来はpx style
+    //   のまま置いてマイグ結果を捨てていた）
+    note.xPct = Math.round(((note.x || 0) / parentRect.width) * 10000) / 100;
+    note.yPct = Math.round(((note.y || 0) / parentRect.height) * 10000) / 100;
+    el.style.left = note.xPct + '%';
+    el.style.top = note.yPct + '%';
+    // 遅延保存（他の描画呼出しをまとめるため）
+    if(!window.__userNotesMigrateSaveTimer){
+      window.__userNotesMigrateSaveTimer = setTimeout(function(){
+        window.__userNotesMigrateSaveTimer = null;
+        if(typeof saveUserNotesOnly === 'function') saveUserNotesOnly();
+      }, 800);
+    }
   } else {
-    // 旧データ: pxのまま配置 → 次のマイグレーションで%に変換
+    // 親サイズが取れない場合はpxのまま（次回試行）
     el.style.left = (note.x || 0) + 'px';
     el.style.top = (note.y || 0) + 'px';
-    // 換算して保存
-    if(parentRect.width > 0 && parentRect.height > 0){
-      note.xPct = Math.round(((note.x || 0) / parentRect.width) * 10000) / 100;
-      note.yPct = Math.round(((note.y || 0) / parentRect.height) * 10000) / 100;
-      // 次から%を使うため、pxは残しても再レンダリング時に%が優先される
-    }
   }
   // 日本語行
   var ja = document.createElement('div');
