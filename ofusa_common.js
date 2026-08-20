@@ -372,7 +372,9 @@ window.addEventListener('beforeunload', function(e){
 function _printApplicantName(){
   try{
     // ① 書類ごとの申請人欄（書類により名前が異なるので順に探す）
-    var ids=['es_applicantName','f_applicant','f_applicantName','es_applicant'];
+    // ver.20260820.09: applicantName (プレフィックスなし) も候補に追加。
+    //   1_6.html は id="applicantName" で保存しており、従来の候補では拾えなかった。
+    var ids=['applicantName','es_applicantName','f_applicant','f_applicantName','es_applicant'];
     for(var i=0;i<ids.length;i++){
       var el=document.getElementById(ids[i]);
       if(el && String(el.value||'').trim()) return String(el.value).trim();
@@ -385,20 +387,29 @@ function _printApplicantName(){
       t=String(t||'').split('　(')[0].replace(/^\d+\.\s*/,'').trim();
       if(t && t!=='(名前なし)') return t;
     }
+    // ③ 親フレームの _lastCaseInfo から取得
+    if(window._lastCaseInfo && window._lastCaseInfo.applicant) return String(window._lastCaseInfo.applicant).trim();
+    // ④ 親フレーム(index.html)側の情報
+    try{
+      if(window.parent && window.parent !== window){
+        var p = window.parent;
+        if(p.idxSelectedCase && p.idxSelectedCase.applicant) return String(p.idxSelectedCase.applicant).trim();
+      }
+    }catch(_pe){}
     if(window._empCtx && window._empCtx.applicant) return String(window._empCtx.applicant).trim();
   }catch(_e){}
   return '';
 }
 function _printDocLabel(){
-  // <title>「参考様式第１－６号 …」から「1-6号」を作る。取れなければタイトルをそのまま使う。
-  // ver.20260820.08: フォーマットを「1-6」から「1-6号」に変更
+  // <title>「参考様式第１－６号 …」から「1-6」を作る。取れなければタイトルをそのまま使う。
+  // ver.20260820.09: 「号」は含めない（ユーザー要望）
   var t=String(document.title||'').trim();
   var zen='０１２３４５６７８９';
   var norm=t.replace(/[０-９]/g,function(c){ return String(zen.indexOf(c)); });
   var m=norm.match(/第\s*(\d+)\s*[－\-−ー]\s*(\d+)\s*号/);
-  if(m) return m[1]+'-'+m[2]+'号';
+  if(m) return m[1]+'-'+m[2];
   m=norm.match(/様式第\s*(\d+)\s*号?/);
-  if(m) return m[1]+'号';
+  if(m) return m[1];
   // 重要事項説明書などパターンにマッチしないもの
   if(/重要事項/.test(t)) return '重要事項説明書';
   if(/移行準備/.test(t)) return '移行準備説明書';
@@ -620,7 +631,9 @@ async function printBoth(){
     }catch(_ce){}
     try{
       var who=(typeof _printApplicantName==='function')?_printApplicantName():'';
-      var titleName = ((who?who+'_':'')+'雇用契約書_雇用条件書').replace(/[\\\/:*?"<>|]/g,'_');
+      // ver.20260820.09: フォーマットを「1-6」に統一（雇用契約書_雇用条件書 → 1-6）
+      //   本体は1-6号なので、ファイル名は「申請人名_1-6」
+      var titleName = ((who?who+'_':'')+'1-6').replace(/[\\\/:*?"<>|]/g,'_');
       document.title = titleName;
       try{
         if(parentOrig !== null){
