@@ -874,9 +874,11 @@ function _ensureUserNoteCSS(){
       '.user-note{outline:none!important;background:transparent!important;position:absolute!important;}' +
       '.user-note .un-tools{display:none!important;}' +
       '#userNoteAddBtn{display:none!important;}' +
-      /* ver.20260820.04: .docサイズ固定と overflow:visible で注記が確実に印刷される */
-      '.doc{width:794px!important;min-height:1123px!important;overflow:visible!important;position:relative!important;margin:0 auto!important;page-break-after:always;break-after:page;}' +
-      '.doc:last-child{page-break-after:auto;break-after:auto;}' +
+      /* ver.20260820.06: .doc は width固定＋overflow:visibleだけ強制。
+         height/min-height はブラウザに任せて（元々1123pxのmin-heightがあるが
+         !important強制は空白ページを生む可能性があるため付けない）、
+         内容が A4 に収まればそのまま1ページに収まる。 */
+      '.doc{width:794px!important;overflow:visible!important;position:relative!important;margin:0 auto!important;}' +
       /* pageAreaも余計な幅を持たないように */
       '#pageArea{width:auto!important;background:none!important;padding:0!important;margin:0!important;}' +
     '}';
