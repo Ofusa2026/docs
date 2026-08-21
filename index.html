@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.24</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260821.01</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -374,7 +374,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1787272356';
+window.__DOCS_CACHE_BUSTER__ = '1787273813';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -382,60 +382,60 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787272356'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787272356'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787272356'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787272356'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787272356'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787272356'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787272356'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787272356'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787272356'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787272356'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787272356'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787272356'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787272356'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787272356'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787272356'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787272356'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787272356'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787272356'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787272356'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787272356'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787272356'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787272356'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787272356'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787272356'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787272356'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787272356'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787272356'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787272356'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787272356'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787272356'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787272356'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787272356'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787272356'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787272356'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787272356'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787272356'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787272356'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787272356'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787272356'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787272356'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787272356'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787272356'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787272356'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787272356'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787272356'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787272356'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787272356'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787272356'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787272356'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787272356'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787272356'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787272356'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787272356'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787272356'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787273813'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787273813'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787273813'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787273813'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787273813'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787273813'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787273813'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787273813'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787273813'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787273813'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787273813'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787273813'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787273813'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787273813'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787273813'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787273813'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787273813'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787273813'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787273813'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787273813'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787273813'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787273813'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787273813'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787273813'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787273813'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787273813'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787273813'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787273813'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787273813'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787273813'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787273813'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787273813'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787273813'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787273813'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787273813'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787273813'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787273813'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787273813'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787273813'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787273813'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787273813'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787273813'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787273813'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787273813'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787273813'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787273813'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787273813'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787273813'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787273813'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787273813'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787273813'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787273813'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787273813'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787273813'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -497,15 +497,15 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1787272356',
-  'vi':'1_5_vi.html?v=1787272356',
-  'th':'1_5_th.html?v=1787272356',
-  'ne':'1_5_ne.html?v=1787272356',
-  'my':'1_5_my.html?v=1787272356',
-  'km':'1_5_km.html?v=1787272356',
-  'en':'1_5_en.html?v=1787272356',
-  'ko':'1_5_ko.html?v=1787272356',
-  'zh':'1_5_zh.html?v=1787272356',
+  'id':'1_5.html?v=1787273813',
+  'vi':'1_5_vi.html?v=1787273813',
+  'th':'1_5_th.html?v=1787273813',
+  'ne':'1_5_ne.html?v=1787273813',
+  'my':'1_5_my.html?v=1787273813',
+  'km':'1_5_km.html?v=1787273813',
+  'en':'1_5_en.html?v=1787273813',
+  'ko':'1_5_ko.html?v=1787273813',
+  'zh':'1_5_zh.html?v=1787273813',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -549,14 +549,14 @@ function open_1_5(lang){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1787272356',
-  'vi':'1_6_vi.html?v=1787272356',
-  'th':'1_6_th.html?v=1787272356',
-  'ne':'1_6_ne.html?v=1787272356',
-  'my':'1_6_my.html?v=1787272356',
-  'km':'1_6_km.html?v=1787272356',
-  'en':'1_6_en.html?v=1787272356',
-  'ko':'1_6_ko.html?v=1787272356',
+  'id':'1_6.html?v=1787273813',
+  'vi':'1_6_vi.html?v=1787273813',
+  'th':'1_6_th.html?v=1787273813',
+  'ne':'1_6_ne.html?v=1787273813',
+  'my':'1_6_my.html?v=1787273813',
+  'km':'1_6_km.html?v=1787273813',
+  'en':'1_6_en.html?v=1787273813',
+  'ko':'1_6_ko.html?v=1787273813',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -600,15 +600,15 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1787272356',
-  'vi':'1_16_vi.html?v=1787272356',
-  'th':'1_16_th.html?v=1787272356',
-  'ne':'1_16_ne.html?v=1787272356',
-  'my':'1_16_my.html?v=1787272356',
-  'km':'1_16_km.html?v=1787272356',
-  'en':'1_16_en.html?v=1787272356',
-  'ko':'1_16_ko.html?v=1787272356',
-  'zh':'1_16_zh.html?v=1787272356',
+  'id':'1_16_id.html?v=1787273813',
+  'vi':'1_16_vi.html?v=1787273813',
+  'th':'1_16_th.html?v=1787273813',
+  'ne':'1_16_ne.html?v=1787273813',
+  'my':'1_16_my.html?v=1787273813',
+  'km':'1_16_km.html?v=1787273813',
+  'en':'1_16_en.html?v=1787273813',
+  'ko':'1_16_ko.html?v=1787273813',
+  'zh':'1_16_zh.html?v=1787273813',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1482,6 +1482,7 @@ var _priorityDocsLoading = false;
 var _prioActiveTab = {};      // カード毎: 'base'|'nintei'|'henkou'|'koushin'|'bunya'
 var _prioActiveBunya = {};    // カード毎の bunya タブで選択中の分野名
 var _prioActiveBunyaAT = {};  // 分野タブで選択中の種別 ('nintei'|'henkou'|'koushin')
+var _prioActiveUkeire = {};   // 種別タブで選択中の受入区分 ('common'|'first'|'exist')
 
 async function loadPriorityDocs(){
   if(_priorityDocsData !== null) return _priorityDocsData;
@@ -1513,10 +1514,18 @@ async function loadPriorityDocs(){
 function _ensureV3Shape(val){
   if(!val) return {version: 3, residences: []};
   var out = {version: 3, residences: []};
-  if(val.version === 3 && Array.isArray(val.residences)){
-    // v3 のまま。ただし bunya が欠けているカードを補正
+  if((val.version === 3 || val.version === 4) && Array.isArray(val.residences)){
+    // v3/v4。bunya と ukeire が欠けているカードを補正
     out.residences = val.residences.map(function(c){
       c.bunya = c.bunya || {};
+      c.ukeire = c.ukeire || {};
+      ['first','exist'].forEach(function(u){
+        c.ukeire[u] = c.ukeire[u] || {};
+        ['nintei','henkou','koushin'].forEach(function(at){
+          c.ukeire[u]['add_'+at] = c.ukeire[u]['add_'+at] || [];
+          c.ukeire[u]['remove_'+at] = c.ukeire[u]['remove_'+at] || [];
+        });
+      });
       return c;
     });
     return out;
@@ -1597,7 +1606,7 @@ function _findMatchingCard(residence){
 }
 
 // 案件の residence/field/appType にマッチする書類配列を計算
-function matchPriorityDocs(residence, field, appType){
+function matchPriorityDocs(residence, field, appType, ukeire){
   var card = _findMatchingCard(residence);
   if(!card) return [];
   var atKey = appType === '認定' ? 'nintei' : (appType === '変更' ? 'henkou' : (appType === '更新' ? 'koushin' : ''));
@@ -1605,6 +1614,10 @@ function matchPriorityDocs(residence, field, appType){
   // 種別追加
   if(atKey){
     (card['add_' + atKey] || []).forEach(function(d){ if(result.indexOf(d) < 0) result.push(d); });
+  }
+  // ver.20260821.01: 受入区分ごとの追加（ukeire = 'first'（初回受入） or 'exist'（既受入））
+  if(atKey && ukeire && card.ukeire && card.ukeire[ukeire]){
+    (card.ukeire[ukeire]['add_' + atKey] || []).forEach(function(d){ if(result.indexOf(d) < 0) result.push(d); });
   }
   // 分野追加/除外 (field が bunya にキーとして存在)
   if(field && card.bunya){
@@ -1627,6 +1640,12 @@ function matchPriorityDocs(residence, field, appType){
       var i = result.indexOf(d); if(i >= 0) result.splice(i, 1);
     });
   }
+  // 受入区分ごとの除外
+  if(atKey && ukeire && card.ukeire && card.ukeire[ukeire]){
+    (card.ukeire[ukeire]['remove_' + atKey] || []).forEach(function(d){
+      var i = result.indexOf(d); if(i >= 0) result.splice(i, 1);
+    });
+  }
   return result;
 }
 
@@ -1643,9 +1662,23 @@ function _findMatchingBunyaKey(bunya, field){
   return null;
 }
 
+// ver.20260821.01: 会社の受入実績を判定（同じ会社に他の案件があれば「既受入」）
+async function _judgeUkeire(info){
+  try{
+    if(!info || !info.companyId) return 'first';
+    var rows = await idxSb('cases?select=id&company_id=eq.' + encodeURIComponent(info.companyId) + '&id=neq.' + encodeURIComponent(info.caseId || '') + '&limit=1');
+    return (rows && rows.length > 0) ? 'exist' : 'first';
+  }catch(e){
+    console.warn('[priorityDocs] ukeire judge failed:', e);
+    return 'first';
+  }
+}
+
 async function reorderNavByPriority(info){
   await loadPriorityDocs();
-  var priorityDocs = matchPriorityDocs(info.residenceStatus, info.applicantField, info.appType);
+  var ukeire = await _judgeUkeire(info);
+  console.log('[priorityDocs] ukeire=' + ukeire + ' (companyId=' + (info.companyId||'') + ')');
+  var priorityDocs = matchPriorityDocs(info.residenceStatus, info.applicantField, info.appType, ukeire);
   var prioListEl = document.getElementById('priorityDocsList');
   var prioSecEl = document.getElementById('priorityDocsSection');
   var otherToggleEl = document.getElementById('otherDocsToggle');
@@ -1666,6 +1699,14 @@ async function reorderNavByPriority(info){
     var el = document.getElementById('nav-' + docKey);
     if(el) prioListEl.appendChild(el);
   });
+  // 受入区分バッジをセクションタイトルに表示
+  try{
+    var secTitle = prioSecEl.querySelector('.section');
+    if(secTitle){
+      var badge = ukeire === 'exist' ? '<span style="font-size:9px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:8px;margin-left:6px;">♻️ 既受入</span>' : '<span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:8px;margin-left:6px;">🆕 初回受入</span>';
+      secTitle.innerHTML = '📌 この案件の必要書類' + badge;
+    }
+  }catch(_e){}
   prioSecEl.style.display = 'block';
   otherToggleEl.style.display = 'block';
   otherContEl.style.display = 'none';
@@ -1832,13 +1873,23 @@ function _renderPriorityDocsModal(){
       html += _renderBunyaPanel(idx, card, allDocs);
     } else {
       var jaLabel = activeTab === 'nintei' ? '認定' : (activeTab === 'henkou' ? '変更' : '更新');
-      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;line-height:1.7;">'+_esc(jaLabel)+' の場合の書類。' +
+      // ver.20260821.01: 受入区分サブタブ（共通 / 初回受入のみ / 既受入のみ）
+      var ukMode = _prioActiveUkeire[idx] || 'common';
+      html += '<div style="margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
+      html += '<span style="font-size:11px;color:#6b7280;font-weight:600;">受入区分:</span>';
+      [{k:'common',l:'🔄 共通（受入問わず）'},{k:'first',l:'🆕 初回受入のみ'},{k:'exist',l:'♻️ 既受入のみ'}].forEach(function(u){
+        var act = u.k === ukMode;
+        html += '<span class="subtab'+(act?' active':'')+'" onclick="_switchUkeire('+idx+',\''+u.k+'\')">'+u.l+'</span>';
+      });
+      html += '</div>';
+      var ukNote = ukMode === 'common' ? '受入実績に関わらず適用されます。' : (ukMode === 'first' ? '同じ会社で<strong>初めての受入れ</strong>のときだけ適用されます（例: 1-4号・1-16号）。' : '同じ会社で<strong>既に受入実績がある</strong>ときだけ適用されます。');
+      html += '<div style="font-size:12px;color:#4b5563;margin-bottom:10px;line-height:1.7;">'+_esc(jaLabel)+' の場合の書類。'+ukNote+
         '<br><span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;">🟪 ベース</span>　' +
         '<span style="background:#dcfce7;padding:1px 6px;border-radius:3px;">🟩 追加</span>　' +
         '<span style="background:#fee2e2;padding:1px 6px;border-radius:3px;text-decoration:line-through;">🟥 除外</span>　' +
         '<span style="padding:1px 6px;border:1px solid #d1d5db;border-radius:3px;">⬜ 未選択</span>' +
         '<br><small style="color:#6b7280;">クリックで状態が切り替わります: 未選択→追加→未選択 ／ ベース→除外→ベース</small></div>';
-      html += _renderDocStateGrid(idx, activeTab, card, allDocs);
+      html += _renderDocStateGrid(idx, activeTab, card, allDocs, ukMode);
     }
     html += '</div>';
 
@@ -2107,10 +2158,19 @@ function _renderDocCheckGrid(idx, field, selectedArr, allDocs, bgHi){
   return html;
 }
 
-function _renderDocStateGrid(idx, atKey, card, allDocs){
+function _renderDocStateGrid(idx, atKey, card, allDocs, ukeireMode){
+  ukeireMode = ukeireMode || 'common';
   var base = card.base || [];
-  var addArr = card['add_'+atKey] || [];
-  var removeArr = card['remove_'+atKey] || [];
+  var addArr, removeArr;
+  if(ukeireMode === 'common'){
+    addArr = card['add_'+atKey] || [];
+    removeArr = card['remove_'+atKey] || [];
+  } else {
+    card.ukeire = card.ukeire || {};
+    card.ukeire[ukeireMode] = card.ukeire[ukeireMode] || {};
+    addArr = card.ukeire[ukeireMode]['add_'+atKey] || [];
+    removeArr = card.ukeire[ukeireMode]['remove_'+atKey] || [];
+  }
   var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:4px 8px;font-size:12px;">';
   allDocs.forEach(function(d){
     var state = 'none';
@@ -2119,7 +2179,7 @@ function _renderDocStateGrid(idx, atKey, card, allDocs){
     if(removeArr.indexOf(d.key) >= 0){ state='remove'; style+='background:#fee2e2;text-decoration:line-through;color:#7f1d1d !important;'; badge='🟥'; }
     else if(base.indexOf(d.key) >= 0){ state='base'; style+='background:#e0e7ff;color:#3730a3 !important;font-weight:600;'; badge='🟪'; }
     else if(addArr.indexOf(d.key) >= 0){ state='add'; style+='background:#dcfce7;color:#14532d !important;font-weight:600;'; badge='🟩'; }
-    html += '<div title="'+(state==='base'?'ベース(クリックで除外)':state==='add'?'追加(クリックで解除)':state==='remove'?'除外(クリックで解除)':'未選択(クリックで追加)')+'" data-idx="'+idx+'" data-at="'+atKey+'" data-doc="'+_esc(d.key)+'" data-state="'+state+'" onclick="_cycleDocState(this)" style="'+style+'">';
+    html += '<div title="'+(state==='base'?'ベース(クリックで除外)':state==='add'?'追加(クリックで解除)':state==='remove'?'除外(クリックで解除)':'未選択(クリックで追加)')+'" data-idx="'+idx+'" data-at="'+atKey+'" data-ukeire="'+ukeireMode+'" data-doc="'+_esc(d.key)+'" data-state="'+state+'" onclick="_cycleDocState(this)" style="'+style+'">';
     html += '<span style="font-size:11px;">'+badge+'</span>';
     html += '<span style="flex:1;">'+_esc(d.label)+' <span style="color:#6b7280;font-size:10px;font-weight:normal;">('+_esc(d.key)+')</span></span>';
     html += '</div>';
@@ -2131,15 +2191,26 @@ function _renderDocStateGrid(idx, atKey, card, allDocs){
 function _cycleDocState(el){
   var idx = parseInt(el.dataset.idx,10);
   var at = el.dataset.at;
+  var ukeireMode = el.dataset.ukeire || 'common';
   var doc = el.dataset.doc;
   var state = el.dataset.state;
   var card = _priorityDocsData.residences[idx];
   if(!card) return;
   var base = card.base || [];
-  card['add_'+at] = card['add_'+at] || [];
-  card['remove_'+at] = card['remove_'+at] || [];
-  var addArr = card['add_'+at];
-  var removeArr = card['remove_'+at];
+  var addArr, removeArr;
+  if(ukeireMode === 'common'){
+    card['add_'+at] = card['add_'+at] || [];
+    card['remove_'+at] = card['remove_'+at] || [];
+    addArr = card['add_'+at];
+    removeArr = card['remove_'+at];
+  } else {
+    card.ukeire = card.ukeire || {};
+    card.ukeire[ukeireMode] = card.ukeire[ukeireMode] || {};
+    card.ukeire[ukeireMode]['add_'+at] = card.ukeire[ukeireMode]['add_'+at] || [];
+    card.ukeire[ukeireMode]['remove_'+at] = card.ukeire[ukeireMode]['remove_'+at] || [];
+    addArr = card.ukeire[ukeireMode]['add_'+at];
+    removeArr = card.ukeire[ukeireMode]['remove_'+at];
+  }
   var isBase = base.indexOf(doc) >= 0;
   if(isBase){
     if(state === 'base'){ if(removeArr.indexOf(doc) < 0) removeArr.push(doc); }
@@ -2155,6 +2226,7 @@ function _esc(s){ return String(s||'').replace(/[<>&"']/g, function(c){ return {
 function _escAttr(s){ return String(s||'').replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 
 function _switchPrioTab(idx, tab){ _prioActiveTab[idx] = tab; _renderPriorityDocsModal(); }
+function _switchUkeire(idx, mode){ _prioActiveUkeire[idx] = mode; _renderPriorityDocsModal(); }
 function _switchBunyaTab(idx, bunyaKey){ _prioActiveBunya[idx] = bunyaKey; _renderPriorityDocsModal(); }
 function _switchBunyaAT(idx, at){ _prioActiveBunyaAT[idx] = at; _renderPriorityDocsModal(); }
 
@@ -2237,7 +2309,7 @@ async function savePriorityDocs(){
       });
     });
     var payload = {
-      version: 3,
+      version: 4,
       updated_at: new Date().toISOString(),
       updated_by: 'user',
       residences: _priorityDocsData.residences || []
