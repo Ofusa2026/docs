@@ -66,7 +66,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 所属機関の代表者に関する申告書</div>
-    <div class="ver">ver.20260820.15</div>
+    <div class="ver">ver.20260821.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -134,7 +134,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787286692"></script>
+<script src="ofusa_common.js?v=1787291050"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -248,6 +248,18 @@ window.addEventListener('message', async function(e){
   p();
 });
 document.addEventListener('DOMContentLoaded', function(){
+  // ver.20260821.05: 案件未選択でも開いた時点で当日の日付を自動セット
+  try{
+    const yEl = document.getElementById('f_dateY');
+    const mEl = document.getElementById('f_dateM');
+    const dEl = document.getElementById('f_dateD');
+    if(yEl && !yEl.value){
+      const now = new Date();
+      yEl.value = String(now.getFullYear());
+      mEl.value = String(now.getMonth()+1);
+      dEl.value = String(now.getDate());
+    }
+  }catch(_e){}
   p();
   try{ window.parent.postMessage({type:'GET_CASE_INFO'}, '*'); }catch(_e){}
 });
