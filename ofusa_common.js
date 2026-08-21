@@ -1881,6 +1881,16 @@ async function loadCaseToForm(info, docKey){
       // 別名にも同じ値を橋渡し（テンプレ側のプレースホルダ名）
       const alias = _ALIAS_DB2FORM[k];
       if(alias) setValMulti(['es_'+alias, 'f_'+alias], es[k]);
+      // ver.20260821.04: 手当の動的別名（allowanceN* → es_aN*）。
+      //   1-6号のフォームIDは es_a1Name〜es_a6CalcEn だが、emp_setのキーは
+      //   allowance1Name〜allowance6CondEn。上のes_*全クリア後にここで流し込まないと、
+      //   独自loadFromDB(setFormValues)とのタイミング次第で手当欄が空になる
+      //   （contractRenewalと同型のrace。ver.20260821.03参照）。①〜⑥全対応。
+      const _am = k.match(/^allowance(\d)(Name|NameEn|Amt|Amount|Cond|CondEn)$/);
+      if(_am){
+        const _pm = {Name:'Name',NameEn:'NameEn',Amt:'Amt',Amount:'Amt',Cond:'Calc',CondEn:'CalcEn'};
+        setValMulti(['es_a'+_am[1]+(_pm[_am[2]]||_am[2])], es[k]);
+      }
       // 単一日付 → Y/M/D 分割（"2026-08-20"・"2026年8月20日"両対応）
       if(k === 'contractStart' || k === 'contractEnd'){
         const ymd = _splitYMD(es[k]);

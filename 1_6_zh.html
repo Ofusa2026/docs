@@ -307,6 +307,26 @@
             <div class="fg"><label>計算方法（日）<span class="fid">es.allowance4Calc</span></label><input id="es_a4Calc" oninput="p()"></div>
             <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance4CalcEn</span></label><input id="es_a4CalcEn" oninput="p()"></div>
           </div>
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当⑤</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance5Name</span></label><input id="es_a5Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance5NameEn</span></label><input id="es_a5NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance5Amount</span></label><input id="es_a5Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance5Calc</span></label><input id="es_a5Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance5CalcEn</span></label><input id="es_a5CalcEn" oninput="p()"></div>
+          </div>
+        <div class="fs" style="margin-top:4px;"><div class="fs-title">手当⑥</div>
+          <div class="fg2">
+            <div class="fg"><label>名称（日）<span class="fid">es.allowance6Name</span></label><input id="es_a6Name" oninput="p()"></div>
+            <div class="fg"><label>名称（ID）<span class="fid">es.allowance6NameEn</span></label><input id="es_a6NameEn" oninput="p()"></div>
+          </div>
+          <div class="fg"><label>金額（円）<span class="fid">es.allowance6Amount</span></label><input id="es_a6Amt" oninput="p()"></div>
+          <div class="fg2">
+            <div class="fg"><label>計算方法（日）<span class="fid">es.allowance6Calc</span></label><input id="es_a6Calc" oninput="p()"></div>
+            <div class="fg"><label>計算方法（ID）<span class="fid">es.allowance6CalcEn</span></label><input id="es_a6CalcEn" oninput="p()"></div>
+          </div>
         </div>
       </div>
       <div class="fg"><label>所定外60H以内割増率(%)<span class="fid">es.ot60under</span></label><input id="es_ot60under" placeholder="25" oninput="p()"></div>
@@ -415,7 +435,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787281008"></script>
+<script src="ofusa_common.js?v=1787286692"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -476,15 +496,17 @@ function p(){
   const retOn = retSel==='有' || (retSel==='' && !!v('es_retirementDetail'));
   const _sf=v('es_shiftFlg'); const shiftOn = !!_sf && !/^なし$|^無$|しない/.test(_sf);
   let allowLine1='',allowLine2='';
-  for(let i=1;i<=4;i++){
+  for(let i=1;i<=6;i++){
     const n=v('es_a'+i+'Name');
+    if(i>=5 && !n) continue; // 手当⑤⑥は入力があるときだけ表示 (ver.20260821.04)
     const nSpan=n?`<span class="f">${esc(n)}</span>`:'';
     if(i<=2) allowLine1+=`（${nSpan}　手当），`;
     else allowLine2+=`（${nSpan}　手当），`;
   }
   let allowLineId1='',allowLineId2='';
-  for(let i=1;i<=4;i++){
+  for(let i=1;i<=6;i++){
     const nEn=v('es_a'+i+'NameEn');
+    if(i>=5 && !nEn && !v('es_a'+i+'Name')) continue; // ⑤⑥は入力時のみ (ver.20260821.04)
     const nEnSpan=nEn?`<span class="f">${esc(nEn)}</span>`:'';
     if(i<=2) allowLineId1+=`（　${nEnSpan}），`;
     else allowLineId2+=`（　${nEnSpan}），`;
@@ -492,10 +514,11 @@ function p(){
 
   // 手当（別紙用）
   let annexAllow='';
-  ['a','b','c','d'].forEach((ltr,i)=>{
+  ['a','b','c','d','e','f'].forEach((ltr,i)=>{
     const idx=i+1;
     const n=v('es_a'+idx+'Name'),nEn=v('es_a'+idx+'NameEn');
     const amt=v('es_a'+idx+'Amt'),calc=v('es_a'+idx+'Calc'),calcEn=v('es_a'+idx+'CalcEn');
+    if(idx>=5 && !n && !nEn && !amt) return; // 手当⑤⑥は入力があるときだけ別紙に追加 (ver.20260821.04)
     const ph=(val,key,isMoney=false)=>{
       if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
       return'';
@@ -1803,7 +1826,7 @@ if(!window._selectCaseListenerAdded){
 <script>
 /* 合計自動計算（es_salaryTotal / es_deductTotal / es_netPay） ver.20260724.02 */
 (function(){
-  var PAY=['es_salaryMonthly','es_a1Amt','es_a2Amt','es_a3Amt','es_a4Amt','es_fixedOTAmount'];
+  var PAY=['es_salaryMonthly','es_a1Amt','es_a2Amt','es_a3Amt','es_a4Amt','es_a5Amt','es_a6Amt','es_fixedOTAmount'];
   var DED=[['es_deductTax'],['es_deductSocialIns'],['es_deductEmpIns'],
            ['es_deductFood','es_deductFoodEst'],['es_deductHousing','es_deductHousingEst'],
            ['es_deductUtility','es_deductUtilityEst'],
