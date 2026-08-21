@@ -6,7 +6,7 @@
 <title>特定技能外国人表 交付申請書+推薦状（ベトナム）</title>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
-.doc{padding:15mm!important;line-height:1.4!important;min-height:auto!important;font-size:10.5pt!important}
+.doc{padding:10mm 13mm!important;line-height:1.35!important;min-height:auto!important;font-size:10.5pt!important}
 .sh-title{font-size:14pt;font-weight:bold;text-align:center;margin:2mm 0 6mm}
 .sh-attach{text-align:right;font-size:10.5pt;margin-bottom:2mm}
 .sh-sec{margin-bottom:5mm}
@@ -85,20 +85,31 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 .kf-sign-row .stamp{margin-left:0.5em;display:inline-block;border:1px solid #d00;color:#d00;padding:1px 6px;font-size:9pt;border-radius:2px}
 .kf-page-break{page-break-after:always}
 
-/* ver.20260715.01: 画面表示とPDFのレイアウトを統一（旧 @media print の縮小ルールを常時適用）
-   大使館側「1ページに収める」要請に対応。
-   推薦表（添付1）の冒頭〜情報セクションのフォントを縮小。 */
-.kf-receipt{font-size:9pt!important;margin-bottom:2mm!important}
-.kf-title-vi{font-size:11pt!important}
-.kf-title-ja{font-size:12pt!important}
-.kf-title{margin:1mm 0 3mm!important}
-.kf-to{font-size:9.5pt!important;line-height:1.4!important;margin:2mm 0 3mm!important}
-.kf-row{font-size:9.5pt!important;margin-bottom:1.5mm!important}
-.kf-rel{font-size:9.5pt!important;line-height:1.5!important;margin:1.5mm 0 3mm!important}
-.kf-intro{font-size:8.5pt!important;line-height:1.3!important;margin:2mm 0!important}
-.kf-secnum{font-size:9.5pt!important;margin:2mm 0 1mm!important}
-.kf-info-row{font-size:9pt!important;line-height:1.45!important}
-.sh-cb{font-size:8.5pt!important;margin:0.8mm 0 1.5mm 1em!important}
+/* ver.20260715.01 → ver.20260821.08: P1を確実に1ページに収める
+   余白10mm・フォント全体を縮小・各セクション間のマージンを詰める */
+.kf-receipt{font-size:8pt!important;margin-bottom:1.5mm!important}
+.kf-title-vi{font-size:10pt!important}
+.kf-title-ja{font-size:11pt!important}
+.kf-title{margin:0.5mm 0 2mm!important}
+.kf-to{font-size:8.5pt!important;line-height:1.35!important;margin:1.5mm 0 2mm!important}
+.kf-row{font-size:8.5pt!important;margin-bottom:1mm!important}
+.kf-row .val{min-height:1.1em!important}
+.kf-rel{font-size:8.5pt!important;line-height:1.4!important;margin:1mm 0 2mm!important}
+.kf-intro{font-size:7.5pt!important;line-height:1.25!important;margin:1.5mm 0!important}
+.kf-secnum{font-size:8.5pt!important;margin:1.5mm 0 0.8mm!important}
+.kf-info-row{font-size:8pt!important;line-height:1.35!important}
+.kf-info-row .pair .val{min-width:30mm!important}
+.sh-cb{font-size:8pt!important;margin:0.5mm 0 1mm 1em!important}
+.kf-confirm{margin-top:3mm!important;font-size:8.5pt!important;line-height:1.35!important}
+.kf-sign-row{margin-top:3mm!important;font-size:8.5pt!important;line-height:1.6!important}
+table.kf-tbl{font-size:7pt!important;margin-top:1.5mm!important}
+table.kf-tbl th{font-size:6.5pt!important}
+table.kf-tbl th.kf-h-multi{font-size:5.5pt!important;line-height:1.15!important;padding:1px 2px!important}
+table.kf-tbl th,table.kf-tbl td{padding:1.5px 2px!important;line-height:1.2!important}
+table.kf-tbl td.kf-name{font-size:7pt!important}
+table.kf-tbl td.kf-school{font-size:6.5pt!important}
+table.kf-tbl td.kf-addr{font-size:6.5pt!important}
+table.kf-tbl td.kf-period{font-size:6.5pt!important}
 
 /* ver.20260521.21: 印刷・PDF時の追加設定（ページ区切り保証など） */
 @page{
@@ -125,7 +136,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260710.07</div>
+    <div class="ver">ver.20260821.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -296,7 +307,7 @@ table.kf-tbl td.kf-addr{width:19%;text-align:left;font-size:7.5pt}
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787298369"></script>
+<script src="ofusa_common.js?v=1787304003"></script>
 <script>
 function _row(i){
   // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
