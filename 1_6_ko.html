@@ -357,6 +357,16 @@
         <div class="fg"><label>その他控除2名（ID）<span class="fid">es.deductOther2NameEn</span></label><input id="es_deductOther2NameEn" oninput="p()"></div>
       </div>
       <div class="fg"><label>その他控除2額（円）<span class="fid">es.deductOther2Amount</span></label><input id="es_deductOther2Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther2AmountJippi" onchange="_setJippi('es_deductOther2Amount',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductOther2AmountEst" type="hidden"></div>
+      <div class="fg2">
+        <div class="fg"><label>その他控除3名（日）<span class="fid">es.deductOther3Name</span></label><input id="es_deductOther3Name" oninput="p()"></div>
+        <div class="fg"><label>その他控除3名（ID）<span class="fid">es.deductOther3NameEn</span></label><input id="es_deductOther3NameEn" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>その他控除3額（円）<span class="fid">es.deductOther3Amount</span></label><input id="es_deductOther3Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther3AmountJippi" onchange="_setJippi('es_deductOther3Amount',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductOther3AmountEst" type="hidden"></div>
+      <div class="fg2">
+        <div class="fg"><label>その他控除4名（日）<span class="fid">es.deductOther4Name</span></label><input id="es_deductOther4Name" oninput="p()"></div>
+        <div class="fg"><label>その他控除4名（ID）<span class="fid">es.deductOther4NameEn</span></label><input id="es_deductOther4NameEn" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>その他控除4額（円）<span class="fid">es.deductOther4Amount</span></label><input id="es_deductOther4Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther4AmountJippi" onchange="_setJippi('es_deductOther4Amount',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductOther4AmountEst" type="hidden"></div>
       <div class="fg"><label>控除合計（円）<span class="fid">es.deductTotal</span></label><input id="es_deductTotal" oninput="p()"></div>
       <div class="fg"><label>支払概算総額（円）<span class="fid">es.salaryTotal</span></label><input id="es_salaryTotal" oninput="p()"></div>
       <div class="fg"><label>手取り支給額（円）<span class="fid">es.netPay</span></label><input id="es_netPay" oninput="p()"></div>
@@ -405,7 +415,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787273813"></script>
+<script src="ofusa_common.js?v=1787276859"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -994,6 +1004,12 @@ function p(){
       <td style="vertical-align:top;">（${f('es_deductOther2Name')}）<br><span class="id" style="font-size:7pt;">(${f('es_deductOther2NameEn')})</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductOther2Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductOther2Amount')}</td></tr>
     <tr>
+      <td style="vertical-align:top;">（${f('es_deductOther3Name')}）<br><span class="id" style="font-size:7pt;">(${f('es_deductOther3NameEn')})</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductOther3Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductOther3Amount')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductOther3Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>엔${_jSufE('es_deductOther3Amount')}</td></tr></table></td>
+    <tr>
+      <td style="vertical-align:top;">（${f('es_deductOther4Name')}）<br><span class="id" style="font-size:7pt;">(${f('es_deductOther4NameEn')})</span></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductOther4Amount')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductOther4Amount')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>약&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductOther4Amount')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>엔${_jSufE('es_deductOther4Amount')}</td></tr></table></td>
+    <tr>
       <td style="vertical-align:top;">（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）<br><span class="id" style="font-size:7pt;">(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;)</span></td>
       <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">約&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;円<br><span class="id" style="font-size:7pt;">약 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 엔</span></td>
       <td></td>
@@ -1233,7 +1249,7 @@ function _jT(fld){ return ff(fld); }
 function _jSuf(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（実費）</span>':''; }
 function _jSufE(fld){ return _isJippi(fld)?'<span style="display:inline-block;width:0;white-space:nowrap;">&emsp;&emsp;&emsp;&emsp;（실비）</span>':''; }
 function _setJippi(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } if(typeof p==='function') p(); }
-function _syncJippi(){ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount'].forEach(function(b){ var amt=document.getElementById(b), est=document.getElementById(b+'Est'), cb=document.getElementById(b+'Jippi'); if(!amt||!est) return; /* ver.20260817.03: 初回のみ est/amt から cb を復元。以降は cb が真実として est/amt を同期。ユーザーがチェック後に p() 経由で cb が外される問題の修正 */ if(cb && !cb.dataset.jippiInit){ cb.dataset.jippiInit = '1'; if(/実費/.test(est.value||'') || /実費/.test(amt.value||'')){ cb.checked = true; est.value = '実費'; if(/実費/.test(amt.value||'')) amt.value = amt.value.replace(/実費/g,'').trim(); } return; } if(cb){ est.value = cb.checked ? '実費' : ''; if(!cb.checked && /実費/.test(amt.value||'')) amt.value = amt.value.replace(/実費/g,'').trim(); return; } if(/実費/.test(amt.value||'')){ var oe=est.value||''; amt.value=(oe&&!/実費/.test(oe))?oe:''; est.value='実費'; } }); }
+function _syncJippi(){ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount','es_deductOther3Amount','es_deductOther4Amount'].forEach(function(b){ var amt=document.getElementById(b), est=document.getElementById(b+'Est'), cb=document.getElementById(b+'Jippi'); if(!amt||!est) return; /* ver.20260817.03: 初回のみ est/amt から cb を復元。以降は cb が真実として est/amt を同期。ユーザーがチェック後に p() 経由で cb が外される問題の修正 */ if(cb && !cb.dataset.jippiInit){ cb.dataset.jippiInit = '1'; if(/実費/.test(est.value||'') || /実費/.test(amt.value||'')){ cb.checked = true; est.value = '実費'; if(/実費/.test(amt.value||'')) amt.value = amt.value.replace(/実費/g,'').trim(); } return; } if(cb){ est.value = cb.checked ? '実費' : ''; if(!cb.checked && /実費/.test(amt.value||'')) amt.value = amt.value.replace(/実費/g,'').trim(); return; } if(/実費/.test(amt.value||'')){ var oe=est.value||''; amt.value=(oe&&!/実費/.test(oe))?oe:''; est.value='実費'; } }); }
 function _jippiDefault(){ try{_syncJippi();}catch(e){} }
 function _kensetsuBonus(txt){
   txt=(txt||'').trim();
@@ -1793,7 +1809,9 @@ if(!window._selectCaseListenerAdded){
            ['es_deductFood','es_deductFoodEst'],['es_deductHousing','es_deductHousingEst'],
            ['es_deductUtility','es_deductUtilityEst'],
            ['es_deductOther1Amount','es_deductOther1AmountEst'],
-           ['es_deductOther2Amount','es_deductOther2AmountEst']];
+           ['es_deductOther2Amount','es_deductOther2AmountEst'],
+           ['es_deductOther3Amount','es_deductOther3AmountEst'],
+           ['es_deductOther4Amount','es_deductOther4AmountEst']];
   var TOTALS=['es_salaryTotal','es_deductTotal','es_netPay'];
   function el(id){return document.getElementById(id);}
   function num(v){
