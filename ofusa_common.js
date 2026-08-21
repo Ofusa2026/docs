@@ -1892,6 +1892,19 @@ async function loadCaseToForm(info, docKey){
       }
     });
 
+    // ver.20260821.03: 契約更新の有無（contractRenewal → es_renewal）の値変換。
+    //   上のes_*全クリア後、emp_setに'renewal'キーが無い（Saysay側で未保存の）ケースでは
+    //   es_renewal(select)が空のままになり、1-6号の「２．契約の更新の有無」の
+    //   チェックが一切付かない不具合があった（例: case_1784697558628）。
+    //   1_6.html の setFormValues と同じ変換をここでも行い、案シスの日本語値
+    //   （"更新する場合があり得る"等）を select の value に変換してセットする。
+    if(es.contractRenewal){
+      const _rv = String(es.contractRenewal);
+      const _renewMap = {'自動':'auto','possible':'possible','更新する場合':'possible','なし':'none','none':'none'};
+      const _mapped = _renewMap[_rv] || (_rv.includes('自動') ? 'auto' : (_rv.includes('可能')||_rv.includes('あり')) ? 'possible' : 'none');
+      setValMulti(['es_renewal'], _mapped);
+    }
+
     // ver.20260819.08: 重要事項説明書(juuyou_*.html) 専用のフィールド名別名対応。
     //   juuyou は独自のフィールド名 (f_raiseCond/f_raiseCondEn) を使うため、
     //   共通の _ALIAS_DB2FORM (エイリアス名=1つ) では対応できない。
