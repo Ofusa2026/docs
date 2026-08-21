@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.23</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260820.24</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -374,7 +374,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1787271916';
+window.__DOCS_CACHE_BUSTER__ = '1787272356';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -382,60 +382,60 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787271916'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787271916'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787271916'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787271916'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787271916'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787271916'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787271916'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787271916'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787271916'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787271916'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787271916'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787271916'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787271916'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787271916'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787271916'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787271916'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787271916'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787271916'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787271916'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787271916'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787271916'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787271916'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787271916'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787271916'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787271916'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787271916'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787271916'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787271916'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787271916'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787271916'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787271916'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787271916'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787271916'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787271916'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787271916'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787271916'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787271916'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787271916'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787271916'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787271916'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787271916'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787271916'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787271916'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787271916'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787271916'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787271916'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787271916'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787271916'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787271916'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787271916'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787271916'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787271916'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787271916'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787271916'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1787272356'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1787272356'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1787272356'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1787272356'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1787272356'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1787272356'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1787272356'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1787272356'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1787272356'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1787272356'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1787272356'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1787272356'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1787272356'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1787272356'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1787272356'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1787272356'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1787272356'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1787272356'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1787272356'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1787272356'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1787272356'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1787272356'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1787272356'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1787272356'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1787272356'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1787272356'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1787272356'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1787272356'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1787272356'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1787272356'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1787272356'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1787272356'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1787272356'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1787272356'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1787272356'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1787272356'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1787272356'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1787272356'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1787272356'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1787272356'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1787272356'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1787272356'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1787272356'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1787272356'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1787272356'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1787272356'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1787272356'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1787272356'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1787272356'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1787272356'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1787272356'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1787272356'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1787272356'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1787272356'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -497,15 +497,15 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1787271916',
-  'vi':'1_5_vi.html?v=1787271916',
-  'th':'1_5_th.html?v=1787271916',
-  'ne':'1_5_ne.html?v=1787271916',
-  'my':'1_5_my.html?v=1787271916',
-  'km':'1_5_km.html?v=1787271916',
-  'en':'1_5_en.html?v=1787271916',
-  'ko':'1_5_ko.html?v=1787271916',
-  'zh':'1_5_zh.html?v=1787271916',
+  'id':'1_5.html?v=1787272356',
+  'vi':'1_5_vi.html?v=1787272356',
+  'th':'1_5_th.html?v=1787272356',
+  'ne':'1_5_ne.html?v=1787272356',
+  'my':'1_5_my.html?v=1787272356',
+  'km':'1_5_km.html?v=1787272356',
+  'en':'1_5_en.html?v=1787272356',
+  'ko':'1_5_ko.html?v=1787272356',
+  'zh':'1_5_zh.html?v=1787272356',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -549,14 +549,14 @@ function open_1_5(lang){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1787271916',
-  'vi':'1_6_vi.html?v=1787271916',
-  'th':'1_6_th.html?v=1787271916',
-  'ne':'1_6_ne.html?v=1787271916',
-  'my':'1_6_my.html?v=1787271916',
-  'km':'1_6_km.html?v=1787271916',
-  'en':'1_6_en.html?v=1787271916',
-  'ko':'1_6_ko.html?v=1787271916',
+  'id':'1_6.html?v=1787272356',
+  'vi':'1_6_vi.html?v=1787272356',
+  'th':'1_6_th.html?v=1787272356',
+  'ne':'1_6_ne.html?v=1787272356',
+  'my':'1_6_my.html?v=1787272356',
+  'km':'1_6_km.html?v=1787272356',
+  'en':'1_6_en.html?v=1787272356',
+  'ko':'1_6_ko.html?v=1787272356',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -600,15 +600,15 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1787271916',
-  'vi':'1_16_vi.html?v=1787271916',
-  'th':'1_16_th.html?v=1787271916',
-  'ne':'1_16_ne.html?v=1787271916',
-  'my':'1_16_my.html?v=1787271916',
-  'km':'1_16_km.html?v=1787271916',
-  'en':'1_16_en.html?v=1787271916',
-  'ko':'1_16_ko.html?v=1787271916',
-  'zh':'1_16_zh.html?v=1787271916',
+  'id':'1_16_id.html?v=1787272356',
+  'vi':'1_16_vi.html?v=1787272356',
+  'th':'1_16_th.html?v=1787272356',
+  'ne':'1_16_ne.html?v=1787272356',
+  'my':'1_16_my.html?v=1787272356',
+  'km':'1_16_km.html?v=1787272356',
+  'en':'1_16_en.html?v=1787272356',
+  'ko':'1_16_ko.html?v=1787272356',
+  'zh':'1_16_zh.html?v=1787272356',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1860,136 +1860,183 @@ function _residenceUsesBunya(residence){
   return /特定技能|特定活動/.test(residence);
 }
 
-// 分野マトリックスパネル
+// 分野マトリックスパネル → ver.20260820.24: チップ+ピッカー方式に再設計
+// 設定済みの分野だけを行として表示し、各行に書類チップを並べる。
+// 追加はフォーカスしたピッカー（ポップオーバー）で行う。
 function _renderBunyaPanel(idx, card, allDocs){
   var activeBunyaAT = _prioActiveBunyaAT[idx] || 'nintei';
   var atLabel = activeBunyaAT === 'nintei' ? '認定' : (activeBunyaAT === 'henkou' ? '変更' : '更新');
-  var appType = activeBunyaAT === 'nintei' ? '認定' : (activeBunyaAT === 'henkou' ? '変更' : '更新');
 
   var html = '';
-  // 種別切替 (認定/変更/更新)
+  // 種別切替
   html += '<div style="margin:0 0 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
-  html += '<span style="font-size:12px;color:#6b7280;">申請種別:</span>';
+  html += '<span style="font-size:12px;color:#6b7280;font-weight:600;">申請種別:</span>';
   [{k:'nintei',l:'認定'},{k:'henkou',l:'変更'},{k:'koushin',l:'更新'}].forEach(function(t){
     var active = t.k === activeBunyaAT;
     html += '<span class="subtab'+(active?' active':'')+'" onclick="_switchBunyaAT('+idx+',\''+t.k+'\')">'+t.l+'</span>';
   });
+  html += '<span style="font-size:11px;color:#9ca3af;margin-left:8px;">「'+_esc(atLabel)+'」のときに各分野で追加する書類</span>';
   html += '</div>';
 
-  // 凡例
-  html += '<div style="font-size:11px;color:#4b5563;margin-bottom:10px;padding:8px;background:#fff;border:1px solid #e5e7eb;border-radius:6px;line-height:1.9;">';
-  html += '<strong>'+atLabel+' の各分野で必要な書類のマトリックス。</strong><br>';
-  html += '<span style="background:#e0e7ff;padding:1px 6px;border-radius:3px;">🟪 ベース</span>　';
-  html += '<span style="background:#dcfce7;padding:1px 6px;border-radius:3px;">🟩 種別追加</span>　';
-  html += '<span style="background:#fef3c7;padding:1px 6px;border-radius:3px;">🟨 分野追加</span>　';
-  html += '<span style="background:#fee2e2;padding:1px 6px;border-radius:3px;text-decoration:line-through;">🟥 除外</span>　';
-  html += '<span style="padding:1px 6px;border:1px solid #d1d5db;border-radius:3px;">⬜ 未選択</span>';
-  html += '<br><small style="color:#6b7280;">セルをクリックで <strong>分野追加(🟨)⇄未選択(⬜)</strong> を切替 ／ 🟪🟩は他タブで編集</small>';
-  html += '</div>';
-
-  // マトリックス本体（横スクロール可）
-  html += '<div style="overflow-x:auto;border:1px solid #e5e7eb;border-radius:6px;background:#fff;max-height:520px;overflow-y:auto;">';
-  html += '<table style="border-collapse:collapse;width:100%;font-size:11px;">';
-
-  // ヘッダ行
-  html += '<thead style="position:sticky;top:0;background:#f3f4f6;z-index:5;">';
-  html += '<tr>';
-  html += '<th style="position:sticky;left:0;background:#f3f4f6;padding:6px 10px;text-align:left;border-right:2px solid #d1d5db;border-bottom:1px solid #d1d5db;min-width:220px;font-weight:700;z-index:6;">書類</th>';
-  _PRIO_BUNYA_OPTS.forEach(function(bk){
-    // 分野名を短縮表示（縦書き風に長い場合は略）
-    var shortLabel = _shortenBunya(bk);
-    html += '<th style="padding:6px 4px;text-align:center;border:1px solid #d1d5db;background:#f3f4f6;min-width:60px;font-weight:600;font-size:10px;writing-mode:vertical-rl;text-orientation:mixed;white-space:nowrap;height:110px;vertical-align:bottom;" title="'+_esc(bk)+'">'+_esc(shortLabel)+'</th>';
-  });
-  html += '</tr></thead>';
-
-  // ボディ
-  html += '<tbody>';
-  var base = card.base || [];
-  var addCard = card['add_' + activeBunyaAT] || [];
-  var removeCard = card['remove_' + activeBunyaAT] || [];
-  allDocs.forEach(function(d, rowIdx){
-    var rowBg = rowIdx % 2 === 0 ? '#fff' : '#fafafa';
-    html += '<tr>';
-    // 書類名（sticky左）
-    var docState = 'none';
-    if(removeCard.indexOf(d.key) >= 0) docState = 'remove_card';
-    else if(base.indexOf(d.key) >= 0) docState = 'base';
-    else if(addCard.indexOf(d.key) >= 0) docState = 'add_card';
-    var docLabelStyle = 'padding:5px 10px;text-align:left;border-right:2px solid #d1d5db;border-bottom:1px solid #e5e7eb;position:sticky;left:0;background:'+rowBg+';font-size:11px;z-index:4;white-space:nowrap;';
-    var docBadge = '⬜';
-    if(docState === 'base'){ docLabelStyle += 'color:#3730a3;font-weight:600;'; docBadge = '🟪'; }
-    else if(docState === 'add_card'){ docLabelStyle += 'color:#14532d;font-weight:600;'; docBadge = '🟩'; }
-    else if(docState === 'remove_card'){ docLabelStyle += 'color:#7f1d1d;text-decoration:line-through;'; docBadge = '🟥'; }
-    html += '<td style="'+docLabelStyle+'">'+docBadge+' '+_esc(d.label)+' <span style="color:#9ca3af;font-size:10px;">('+_esc(d.key)+')</span></td>';
-
-    // 分野ごとにセル
-    _PRIO_BUNYA_OPTS.forEach(function(bk){
-      if(!card.bunya[bk]){
-        // 未初期化: 分野が使われるかもしれないので、その場で作る
-        card.bunya[bk] = {add_nintei:[],add_henkou:[],add_koushin:[],remove_nintei:[],remove_henkou:[],remove_koushin:[]};
-      }
-      var b = card.bunya[bk];
-      var addBunya = b['add_'+activeBunyaAT] || [];
-      var removeBunya = b['remove_'+activeBunyaAT] || [];
-      var state = 'none';
-      var bg = rowBg;
-      var badge = '';
-      var clickable = true;
-      if(removeBunya.indexOf(d.key) >= 0){
-        state = 'remove_bunya'; bg = '#fee2e2'; badge = '🟥';
-      } else if(addBunya.indexOf(d.key) >= 0){
-        state = 'add_bunya'; bg = '#fef3c7'; badge = '🟨';
-      } else if(docState === 'remove_card'){
-        // 種別除外は分野タブでも触れない
-        state = 'remove_card_ro'; bg = '#fee2e2'; badge = '🟥'; clickable = false;
-      } else if(docState === 'base'){
-        state = 'base_ro'; bg = '#e0e7ff'; badge = '🟪'; clickable = false;
-      } else if(docState === 'add_card'){
-        state = 'add_card_ro'; bg = '#dcfce7'; badge = '🟩'; clickable = false;
-      }
-      var cellStyle = 'padding:6px 4px;text-align:center;border:1px solid #e5e7eb;background:'+bg+';font-size:14px;'+(clickable?'cursor:pointer;':'cursor:not-allowed;opacity:0.5;');
-      var onclick = clickable ? 'onclick="_toggleMatrixCell(this)"' : '';
-      var title = clickable ? _esc(bk+' × '+d.label) : _esc(bk+' × '+d.label+' (他タブで管理)');
-      html += '<td style="'+cellStyle+'" '+onclick+' data-idx="'+idx+'" data-bunya="'+_escAttr(bk)+'" data-at="'+activeBunyaAT+'" data-doc="'+_esc(d.key)+'" data-state="'+state+'" title="'+title+'">';
-      html += badge;
-      html += '</td>';
+  // 設定済み分野の行（add_<at> または remove_<at> に中身がある分野のみ + 明示追加した分野）
+  var bunyaKeys = Object.keys(card.bunya || {}).filter(function(bk){
+    var b = card.bunya[bk];
+    if(!b) return false;
+    // どれかの種別に中身がある、または「今セッションで明示追加」された分野は表示
+    var hasContent = ['nintei','henkou','koushin'].some(function(at){
+      return (b['add_'+at]||[]).length > 0 || (b['remove_'+at]||[]).length > 0;
     });
-    html += '</tr>';
+    return hasContent || b.__visible;
   });
-  html += '</tbody></table></div>';
 
-  // 一括操作
-  html += '<div style="margin-top:10px;font-size:11px;color:#6b7280;">';
-  html += '💡 <strong>Tip:</strong> ある書類を全分野に追加したい場合は「認定/変更/更新」タブでベースまたは種別追加として設定してください。ここでは<strong>各分野固有の書類</strong>だけを設定します。';
+  html += '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">';
+  if(bunyaKeys.length === 0){
+    html += '<div style="padding:24px;text-align:center;color:#9ca3af;font-size:12px;">分野固有の書類はまだ設定されていません。<br>下の「＋ 分野を追加」から始めてください。</div>';
+  }
+  bunyaKeys.forEach(function(bk, i){
+    var b = card.bunya[bk];
+    var addArr = b['add_'+activeBunyaAT] || [];
+    var removeArr = b['remove_'+activeBunyaAT] || [];
+    var borderTop = i > 0 ? 'border-top:1px solid #f3f4f6;' : '';
+    html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;'+borderTop+'">';
+    // 分野名
+    html += '<div style="min-width:110px;padding-top:3px;">';
+    html += '<span style="font-size:12px;font-weight:700;color:#374151;">'+_esc(_shortenBunya(bk))+'</span>';
+    html += '<span onclick="_deleteBunya('+idx+',\''+_escAttr(bk)+'\')" title="この分野の設定を削除" style="margin-left:6px;cursor:pointer;color:#d1d5db;font-size:11px;">🗑</span>';
+    html += '</div>';
+    // チップ
+    html += '<div style="flex:1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+    if(addArr.length === 0 && removeArr.length === 0){
+      html += '<span style="font-size:11px;color:#d1d5db;font-style:italic;">（'+_esc(atLabel)+'ではまだなし）</span>';
+    }
+    addArr.forEach(function(dk){
+      var doc = allDocs.find(function(d){ return d.key === dk; });
+      var label = doc ? doc.label : dk;
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#78350f;border:1px solid #fcd34d;border-radius:12px;padding:3px 8px 3px 10px;font-size:11px;font-weight:600;">🟨 '+_esc(label);
+      html += '<span onclick="_removeBunyaChip('+idx+',\''+_escAttr(bk)+'\',\'add_'+activeBunyaAT+'\',\''+_esc(dk)+'\')" style="cursor:pointer;color:#b45309;font-weight:800;padding:0 2px;">×</span></span>';
+    });
+    removeArr.forEach(function(dk){
+      var doc = allDocs.find(function(d){ return d.key === dk; });
+      var label = doc ? doc.label : dk;
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#7f1d1d;border:1px solid #fca5a5;border-radius:12px;padding:3px 8px 3px 10px;font-size:11px;font-weight:600;text-decoration:line-through;">🟥 '+_esc(label);
+      html += '<span onclick="_removeBunyaChip('+idx+',\''+_escAttr(bk)+'\',\'remove_'+activeBunyaAT+'\',\''+_esc(dk)+'\')" style="cursor:pointer;color:#b91c1c;font-weight:800;padding:0 2px;text-decoration:none;">×</span></span>';
+    });
+    // 追加ボタン
+    html += '<span onclick="_openBunyaDocPicker(event,'+idx+',\''+_escAttr(bk)+'\')" style="display:inline-flex;align-items:center;gap:2px;border:1px dashed #a78bfa;color:#7c3aed;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;background:#faf5ff;">＋ 書類</span>';
+    html += '</div>';
+    html += '</div>';
+  });
   html += '</div>';
 
+  // 分野を追加
+  var remaining = _PRIO_BUNYA_OPTS.filter(function(o){ return bunyaKeys.indexOf(o) < 0; });
+  if(remaining.length){
+    html += '<div style="margin-top:10px;display:flex;align-items:center;gap:6px;">';
+    html += '<select id="__addBunyaSel_'+idx+'" style="padding:5px 10px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;">';
+    html += '<option value="">分野を選択...</option>';
+    remaining.forEach(function(o){ html += '<option value="'+_esc(o)+'">'+_esc(_shortenBunya(o))+'</option>'; });
+    html += '</select>';
+    html += '<button onclick="_addBunyaToCard('+idx+')" style="padding:5px 14px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">＋ 分野を追加</button>';
+    html += '</div>';
+  }
+
+  html += '<div style="margin-top:10px;font-size:11px;color:#9ca3af;line-height:1.6;">💡 ここには<strong>分野固有の書類だけ</strong>を設定します。全分野共通の書類は「📦 ベース書類」または各種別タブで設定してください。<br>🟨=その分野のとき追加 / 🟥=その分野のとき除外（除外は今後必要なら追加）</div>';
   return html;
 }
 
-// マトリックスセルのクリック（分野追加 ⇄ 未選択）
-function _toggleMatrixCell(el){
-  var idx = parseInt(el.dataset.idx,10);
-  var bunyaKey = el.dataset.bunya;
-  var at = el.dataset.at;
-  var doc = el.dataset.doc;
-  var state = el.dataset.state;
+// 分野チップの削除
+function _removeBunyaChip(idx, bunyaKey, field, doc){
+  var card = _priorityDocsData.residences[idx];
+  if(!card || !card.bunya || !card.bunya[bunyaKey]) return;
+  var arr = card.bunya[bunyaKey][field];
+  if(!arr) return;
+  var i = arr.indexOf(doc);
+  if(i >= 0) arr.splice(i, 1);
+  _renderPriorityDocsModal();
+}
+
+// 書類ピッカー（ポップオーバー）
+function _openBunyaDocPicker(ev, idx, bunyaKey){
+  ev.stopPropagation();
+  // 既存ピッカーを消す
+  var old = document.getElementById('__bunyaDocPicker');
+  if(old) old.remove();
+
   var card = _priorityDocsData.residences[idx];
   if(!card) return;
+  var at = _prioActiveBunyaAT[idx] || 'nintei';
+  var b = (card.bunya && card.bunya[bunyaKey]) || {};
+  var already = (b['add_'+at] || []).concat(b['remove_'+at] || []);
+  var allDocs = _getAllDocKeys();
+  // ベース・種別追加済みは追加不要（既に表示される）なので、それ以外を候補に
+  var base = card.base || [];
+  var addCard = card['add_'+at] || [];
+  var candidates = allDocs.filter(function(d){
+    return already.indexOf(d.key) < 0 && base.indexOf(d.key) < 0 && addCard.indexOf(d.key) < 0;
+  });
+
+  var picker = document.createElement('div');
+  picker.id = '__bunyaDocPicker';
+  picker.style.cssText = 'position:fixed;z-index:100000;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);width:340px;max-height:420px;display:flex;flex-direction:column;overflow:hidden;';
+  var rect = ev.target.getBoundingClientRect();
+  var top = Math.min(rect.bottom + 6, window.innerHeight - 430);
+  var left = Math.min(rect.left, window.innerWidth - 350);
+  picker.style.top = Math.max(8, top) + 'px';
+  picker.style.left = Math.max(8, left) + 'px';
+
+  var header = '<div style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-size:12px;font-weight:700;color:#374151;">'+_esc(_shortenBunya(bunyaKey))+' に追加する書類</div>';
+  var searchBox = '<div style="padding:8px 12px;border-bottom:1px solid #f3f4f6;"><input id="__bunyaPickerSearch" placeholder="🔍 書類名で絞り込み" style="width:100%;padding:6px 10px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;box-sizing:border-box;color:#111827;"></div>';
+  var listHtml = '<div id="__bunyaPickerList" style="overflow-y:auto;flex:1;padding:4px 0;">';
+  candidates.forEach(function(d){
+    listHtml += '<div class="__bunyaPickerItem" data-doc="'+_esc(d.key)+'" data-label="'+_esc(d.label.toLowerCase())+'" onclick="_pickBunyaDoc('+idx+',\''+_escAttr(bunyaKey)+'\',\''+_esc(d.key)+'\')" style="padding:7px 14px;font-size:12px;cursor:pointer;color:#111827;" onmouseover="this.style.background=\'#faf5ff\'" onmouseout="this.style.background=\'\'">'+_esc(d.label)+' <span style="color:#9ca3af;font-size:10px;">('+_esc(d.key)+')</span></div>';
+  });
+  if(candidates.length === 0){
+    listHtml += '<div style="padding:16px;color:#9ca3af;font-size:12px;text-align:center;">追加できる書類がありません</div>';
+  }
+  listHtml += '</div>';
+  picker.innerHTML = header + searchBox + listHtml;
+  document.body.appendChild(picker);
+
+  // 検索フィルタ
+  var searchInput = document.getElementById('__bunyaPickerSearch');
+  if(searchInput){
+    searchInput.focus();
+    searchInput.addEventListener('input', function(){
+      var q = this.value.toLowerCase();
+      document.querySelectorAll('.__bunyaPickerItem').forEach(function(item){
+        item.style.display = (!q || item.dataset.label.indexOf(q) >= 0 || item.dataset.doc.indexOf(q) >= 0) ? 'block' : 'none';
+      });
+    });
+  }
+
+  // 外側クリックで閉じる
+  setTimeout(function(){
+    document.addEventListener('click', function closePicker(e){
+      var p = document.getElementById('__bunyaDocPicker');
+      if(p && !p.contains(e.target)){
+        p.remove();
+        document.removeEventListener('click', closePicker);
+      }
+    });
+  }, 10);
+}
+
+// ピッカーから書類を選択 → その分野の add_<at> に追加
+function _pickBunyaDoc(idx, bunyaKey, doc){
+  var card = _priorityDocsData.residences[idx];
+  if(!card) return;
+  var at = _prioActiveBunyaAT[idx] || 'nintei';
   card.bunya = card.bunya || {};
   card.bunya[bunyaKey] = card.bunya[bunyaKey] || {add_nintei:[],add_henkou:[],add_koushin:[],remove_nintei:[],remove_henkou:[],remove_koushin:[]};
   var b = card.bunya[bunyaKey];
   b['add_'+at] = b['add_'+at] || [];
-  b['remove_'+at] = b['remove_'+at] || [];
-  var addArr = b['add_'+at];
-  if(state === 'add_bunya'){
-    var i = addArr.indexOf(doc); if(i >= 0) addArr.splice(i, 1);
-  } else if(state === 'none'){
-    if(addArr.indexOf(doc) < 0) addArr.push(doc);
-  }
+  if(b['add_'+at].indexOf(doc) < 0) b['add_'+at].push(doc);
+  var p = document.getElementById('__bunyaDocPicker');
+  if(p) p.remove();
   _renderPriorityDocsModal();
 }
 
-// 分野名の短縮表示（マトリックスヘッダ用）
+// 分野名の短縮表示
 function _shortenBunya(bk){
   return bk
     .replace('分野（特定技能１号）','')
@@ -2160,6 +2207,8 @@ function _addBunyaToCard(idx){
       remove_nintei: [], remove_henkou: [], remove_koushin: []
     };
   }
+  // ver.20260820.24: 空でも行として表示するためのフラグ（保存時に除去）
+  card.bunya[bk].__visible = true;
   _prioActiveBunya[idx] = bk;
   _renderPriorityDocsModal();
 }
@@ -2173,6 +2222,20 @@ function _deleteBunya(idx, bunyaKey){
 }
 async function savePriorityDocs(){
   try{
+    // ver.20260820.24: 保存前クリーンアップ
+    //   - __visible フラグ除去
+    //   - 全種別で空の分野エントリは削除（データを軽く保つ）
+    (_priorityDocsData.residences || []).forEach(function(card){
+      if(!card.bunya) return;
+      Object.keys(card.bunya).forEach(function(bk){
+        var b = card.bunya[bk];
+        delete b.__visible;
+        var hasContent = ['nintei','henkou','koushin'].some(function(at){
+          return (b['add_'+at]||[]).length > 0 || (b['remove_'+at]||[]).length > 0;
+        });
+        if(!hasContent) delete card.bunya[bk];
+      });
+    });
     var payload = {
       version: 3,
       updated_at: new Date().toISOString(),
