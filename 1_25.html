@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260821.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -183,9 +183,17 @@ async function loadFromDB(passedInfo){
       if(pd&&pd.contract_end) _cEnd=fmtJDate(pd.contract_end);
     }
     if(_cEnd) s('f_contractEnd',_cEnd);
-    // 登録番号(soNo): 所属機関に無ければ、同じ登録支援機関名を持つ他社レコードから補完
-    let _soNo=(co&&co.support_org_no)||'';
+    // 登録番号(soNo): ①登録支援機関マスタ(reg_no)優先 → ②所属機関(support_org_no) → ③同名他社の最頻値
     const _soNm=(cas&&cas.org)||(co&&co.support_org_name)||'';
+    let _soNo='';
+    if(_soNm){
+      try{
+        const so=await sb('support_orgs?select=reg_no&name=eq.'+encodeURIComponent(_soNm)+'&reg_no=not.is.null');
+        const _rn=so&&so[0]&&((so[0].reg_no)||'').trim();
+        if(_rn) _soNo=_rn;
+      }catch(_e){}
+    }
+    if(!_soNo) _soNo=(co&&co.support_org_no)||'';
     if(!_soNo && _soNm){
       try{
         const rows=await sb('companies?select=support_org_no&support_org_name=eq.'+encodeURIComponent(_soNm)+'&support_org_no=not.is.null');
