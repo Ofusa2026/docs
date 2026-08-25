@@ -437,7 +437,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787361673"></script>
+<script src="ofusa_common.js?v=1787652030"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -748,10 +748,10 @@ function p(){
   <div style="border-top:1px solid #333;padding:6px 12px;">
     <div style="font-size:9pt;font-weight:bold;margin-bottom:3px;">Ⅵ．休暇<br><span style="font-size:8pt;font-weight:normal;">VI. ခွင့်ရက်</span></div>
     <div style="font-size:8.5pt;margin-left:8px;">
-      <div>１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;">၁။ နှစ်စဥ်လစာပေးခွင့် ၆လဆက်တိုက်အလုပ်ဆင်းပြီးနောက် →&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')} ရက်</span></div>
-      <div style="text-align:right;margin-top:2px;font-size:8.5pt;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">ကနဦး 6လမတိုင်ခင် နှစ်စဥ်ခွင့်ခံစားခွင့် (${cb(false,"cb_auto_002")} ရှိမည်&emsp;${cb(true,"cb_auto_003")} မရှိပါ) → လကြာပြီးနောက်&emsp;ရက်</span></div>
-      <div style="margin-top:4px;">２．その他の休暇&emsp;有給（${f('es_otherPaid')}）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（${f('es_unpaidLeave')}）<br><span class="id" style="font-size:7.5pt;">၂။ အခြားခွင့်ရက်&emsp;လစာပေးခွင့် (${f('es_otherPaid')})&emsp;လစာမဲ့ (${f('es_unpaidLeaveEn')||f('es_unpaidLeave')})</span></div>
-      <div style="margin-top:4px;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">၃။ ယာယီနိုင်ငံပြန်ခွင့် ဒုတိယပါတီမှ ယာယီနိုင်ငံပြန်လိုပါက အထက်ပါ ၁ နှင့် ၂ အတွင်း လိုအပ်သောခွင့်ကိုပေးရမည်</span></div>
+      <div style="break-inside:avoid;page-break-inside:avoid;">１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;">၁။ နှစ်စဥ်လစာပေးခွင့် ၆လဆက်တိုက်အလုပ်ဆင်းပြီးနောက် →&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')} ရက်</span></div>
+      <div style="text-align:right;margin-top:2px;font-size:8.5pt;break-inside:avoid;page-break-inside:avoid;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">ကနဦး 6လမတိုင်ခင် နှစ်စဥ်ခွင့်ခံစားခွင့် (${cb(false,"cb_auto_002")} ရှိမည်&emsp;${cb(true,"cb_auto_003")} မရှိပါ) → လကြာပြီးနောက်&emsp;ရက်</span></div>
+      <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">２．その他の休暇&emsp;有給（<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeave')}</span>）<br><span class="id" style="font-size:7.5pt;">၂။ အခြားခွင့်ရက်&emsp;လစာပေးခွင့် (<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>)&emsp;လစာမဲ့ (<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeaveEn')||f('es_unpaidLeave')}</span>)</span></div>
+      <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">၃။ ယာယီနိုင်ငံပြန်ခွင့် ဒုတိယပါတီမှ ယာယီနိုင်ငံပြန်လိုပါက အထက်ပါ ၁ နှင့် ၂ အတွင်း လိုအပ်သောခွင့်ကိုပေးရမည်</span></div>
       <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;">○အသေးစိတ်မှာ အလုပ်ခန့်စည်းမျဉ်း အချက် မှ အချက် ,အချက် မှ အချက် ,အချက် မှ အချက်တွင်ဖော်ပြသည်</span></div>
     </div>
   </div>
