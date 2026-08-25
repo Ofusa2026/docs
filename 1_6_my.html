@@ -437,7 +437,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787652030"></script>
+<script src="ofusa_common.js?v=1787690756"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -688,7 +688,7 @@ function p(){
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">【အောက်ပါစနစ်များသည် အလုပ်သမားနှင့် သက်ဆိုင်အကျုံးဝင်ပါက】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
         ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${flexTypeShown?'：（<span class="f">'+esc(flexTypeShown.replace(/単位/g,''))+'</span>）単位の変形労働時間制':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်</span>
+        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်${flexTypeShown?': (<span class="f">'+esc(v('es_flexUnitEn')||({'1ヶ月':'၁ လ','１ヶ月':'၁ လ','1か月':'၁ လ','1カ月':'၁ လ','1年':'၁ နှစ်','１年':'၁ နှစ်','1週間':'၁ ပတ်','１週間':'၁ ပတ်'}[flexTypeShown.replace(/単位/g,'').trim()])||flexTypeShown.replace(/単位/g,''))+'</span>) အခြေခံ ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်':''}</span>
         <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">တစ်နှစ်တာအခြေခံ ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်ကို အသုံးပြုပါက၊ အလုပ်သမား (乙) နားလည်နိုင်သော ဘာသာစကားဖြင့် ဖော်ပြထားသည့် နှစ်စဉ်အလုပ်ချိန်ပြက္ခဒိန် မိတ္တူနှင့် အလုပ်သမားစံချိန်စံညွှန်း ကြီးကြပ်ရေးရုံးသို့ တင်သွင်းထားသော ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်ဆိုင်ရာ သဘောတူညီချက်စာချုပ်၏ မိတ္တူကို ပူးတွဲတင်ပြရမည်။</span></div>
         <div style="margin-top:2px;">${cb(shiftOn,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">လှည့်ကျ အလုပ်ချိန်စနစ်ဖြင့် အောက်ပါ အလုပ်ချိန်အစီအစဉ်များအတိုင်း တာဝန်ထမ်းဆောင်ရမည်။</span></div>
         ${(()=>{
