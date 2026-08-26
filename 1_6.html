@@ -440,7 +440,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787747000"></script>
+<script src="ofusa_common.js?v=1787748976"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1243,10 +1243,15 @@ function setFormValues(esData){
     const _fdEl=document.getElementById('es_fixedDay1');
     if(_fdEl && !_fdEl.value) _fdEl.value='毎週'+_fixedDays.join('・');
   }
-  // 非定例日: nonRegWeeklyDays / nonRegMonthlyDays → es_nonRegDays
-  if(esData.nonRegWeeklyDays||esData.nonRegMonthlyDays){
-    const _nrEl=document.getElementById('es_nonRegDays');
-    if(_nrEl && !_nrEl.value) _nrEl.value=esData.nonRegWeeklyDays||esData.nonRegMonthlyDays||'';
+  // ver.20260825.04: 非定例日は正しい入力欄へ（旧ID es_nonRegDays は現存しないため廃止）。
+  //   汎用ループでもセットされるが、サイドバーと書類の一致を明示的に保証する。
+  if(esData.nonRegWeeklyDays){
+    const _nrw=document.getElementById('es_nonRegWeeklyDays');
+    if(_nrw && !_nrw.value) _nrw.value=esData.nonRegWeeklyDays;
+  }
+  if(esData.nonRegMonthlyDays){
+    const _nrm=document.getElementById('es_nonRegMonthlyDays');
+    if(_nrm && !_nrm.value) _nrm.value=esData.nonRegMonthlyDays;
   }
   // 4. applicantName は persons から別途セット済みのため上書きしない
   // 5. プレビューの全チェック状態を復元。p()描画前にcbStateへ入れると、cb()が
@@ -1880,6 +1885,10 @@ if(!window._selectCaseListenerAdded){
       document.querySelectorAll('input[id^="es_"], input[id^="f_"], textarea[id^="es_"], textarea[id^="f_"]').forEach(function(el){
         if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
       });
+      // ver.20260825.04: DBフォールバック(_fieldData)も明示クリア。
+      //   入力欄が空なのに前案件/旧読込の値が書類だけに出る「見えない値」事故を防ぐ。
+      //   （サイドバーに無い値は書類にも出さない、を保証する）
+      window._fieldData = {};
       // ver.20260819.09: ユーザー注記も前案件のものをクリア
       window._userNotes = [];
       document.querySelectorAll('.user-note').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });

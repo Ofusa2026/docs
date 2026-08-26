@@ -437,7 +437,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787747000"></script>
+<script src="ofusa_common.js?v=1787748976"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1226,9 +1226,13 @@ function setFormValues(esData){
     if(_fdEl && !_fdEl.value) _fdEl.value='毎週'+_fixedDays.join('・');
   }
   // 非定例日: nonRegWeeklyDays / nonRegMonthlyDays → es_nonRegDays
-  if(esData.nonRegWeeklyDays||esData.nonRegMonthlyDays){
-    const _nrEl=document.getElementById('es_nonRegDays');
-    if(_nrEl && !_nrEl.value) _nrEl.value=esData.nonRegWeeklyDays||esData.nonRegMonthlyDays||'';
+  if(esData.nonRegWeeklyDays){
+    const _nrw=document.getElementById('es_nonRegWeeklyDays');
+    if(_nrw && !_nrw.value) _nrw.value=esData.nonRegWeeklyDays;
+  }
+  if(esData.nonRegMonthlyDays){
+    const _nrm=document.getElementById('es_nonRegMonthlyDays');
+    if(_nrm && !_nrm.value) _nrm.value=esData.nonRegMonthlyDays;
   }
   // 4. applicantName は persons から別途セット済みのため上書きしない
   p();
@@ -1793,6 +1797,7 @@ if(!window._selectCaseListenerAdded){
       document.querySelectorAll('input[id^="es_"], input[id^="f_"], textarea[id^="es_"], textarea[id^="f_"]').forEach(function(el){
         if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = '';
       });
+      window._fieldData = {}; // ver.20260825.04: 見えない値(DBフォールバック残留)防止
       window._userNotes = [];
       document.querySelectorAll('.user-note').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });
     }catch(_e){ console.warn('[SELECT_CASE] input clear failed:', _e); }
