@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.02
+  ver.20260826.03
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -2398,9 +2398,12 @@ function readFieldValue(field, c, p, co, es){
   if(field==='es.createY'){var d=c.docCreateDate||'';return d?d.split(/[-\/]/)[0]||'':'';}
   if(field==='es.createM'){var d=c.docCreateDate||'';var x=d.split(/[-\/]/)[1];return x?String(parseInt(x,10)):'';}
   if(field==='es.createD'){var d=c.docCreateDate||'';var x=d.split(/[-\/]/)[2];return x?String(parseInt(x,10)):'';}
-  if(field==='es.contractStartY'){var _cs=p.contractStart||'';return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
-  if(field==='es.contractStartM'){var _cs=p.contractStart||'';var _m=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _m?String(parseInt(_m,10)):'';}
-  if(field==='es.contractStartD'){var _cs=p.contractStart||'';var _d=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _d?String(parseInt(_d,10)):'';}
+  if(field==='es.contractStartY'){var _cs=p.contractStart||c.contractStart||'';return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
+  if(field==='es.contractStartM'){var _cs=p.contractStart||c.contractStart||'';var _m=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _m?String(parseInt(_m,10)):'';}
+  if(field==='es.contractStartD'){var _cs=p.contractStart||c.contractStart||'';var _d=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _d?String(parseInt(_d,10)):'';}
+  if(field==='es.contractEndY'){var _ce=p.contractEnd||c.contractEnd||'';return p.contractEndY||(_ce.split(/[-\/]/)[0]||'');}
+  if(field==='es.contractEndM'){var _ce=p.contractEnd||c.contractEnd||'';var _m=p.contractEndM||(_ce.split(/[-\/]/)[1]||'');return _m?String(parseInt(_m,10)):'';}
+  if(field==='es.contractEndD'){var _ce=p.contractEnd||c.contractEnd||'';var _d=p.contractEndD||(_ce.split(/[-\/]/)[2]||'');return _d?String(parseInt(_d,10)):'';}
   if(field==='es.officePref'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).pref;}
   if(field==='es.officeCity'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).city;}
   if(field==='es.housingFeeType'){var dh=es.deductHousing||'';return (dh&&dh!=='0'&&dh!=='０')?'有':'無';}
