@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.04-debug
+  ver.20260826.05
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1124,9 +1124,6 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     if(field==='es.createM'){var cd2=c.docCreateDate||'';if(cd2){var cp2=cd2.split(/[-\/]/);return cp2[1]?String(parseInt(cp2[1],10)):'';}return '';}
     if(field==='es.createD'){var cd3=c.docCreateDate||'';if(cd3){var cp3=cd3.split(/[-\/]/);return cp3[2]?String(parseInt(cp3[2],10)):'';}return '';}
     // 雇用契約期間（始期・終期）分割取得
-    if(field==='es.contractStartY'||field==='contract_start'||field==='contractStart'){
-      console.log('[DEBUG contractStart] p.contractStart=', p.contractStart, ' c.contractStart=', c.contractStart, ' field=', field);
-    }
     if(field==='es.contractStartY'){var _cs=p.contractStart||c.contractStart||'';return _cs.split(/[-\/]/)[0]||'';}
     if(field==='es.contractStartM'){var _cs=p.contractStart||c.contractStart||'';var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
     if(field==='es.contractStartD'){var _cs=p.contractStart||c.contractStart||'';var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
@@ -1427,6 +1424,12 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     if(field==='jobCategory') return c.jobCategory||es.category||'';
     if(field==='jobCategoryEn') return c.jobCategoryEn||es.categoryEn||'';
     if(field==='case.contractEndDate'){var ce=p.contractEnd||p.contractEndDate||'';if(ce){var _cep=ce.split(/[-\/]/);if(_cep.length>=3)return _cep[0]+'年'+parseInt(_cep[1],10)+'月'+parseInt(_cep[2],10)+'日';return ce;}var cey=p.contractEndY||'',cem=p.contractEndM||'',ced=p.contractEndD||'';if(cey&&cem&&ced)return cey+'年'+cem+'月'+ced+'日';return '';}
+    // 雇用契約期間（プレフィックスなし・日付まるごと）: personsになければcasesにフォールバック
+    if(field==='contractStart') return p.contractStart||c.contractStart||'';
+    if(field==='contractEnd')   return p.contractEnd  ||c.contractEnd  ||'';
+    // 直接キーのフォールバック（人材データ→案件データの順）
+    if(p[field]!==undefined && p[field]!==null && p[field]!=='') return p[field];
+    if(c[field]!==undefined && c[field]!==null && c[field]!=='') return c[field];
     return '';
   }
 
