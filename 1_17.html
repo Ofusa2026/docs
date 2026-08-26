@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.01
+  ver.20260826.02
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1124,12 +1124,12 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     if(field==='es.createM'){var cd2=c.docCreateDate||'';if(cd2){var cp2=cd2.split(/[-\/]/);return cp2[1]?String(parseInt(cp2[1],10)):'';}return '';}
     if(field==='es.createD'){var cd3=c.docCreateDate||'';if(cd3){var cp3=cd3.split(/[-\/]/);return cp3[2]?String(parseInt(cp3[2],10)):'';}return '';}
     // 雇用契約期間（始期・終期）分割取得
-    if(field==='es.contractStartY'){var _cs=p.contractStart||'';return _cs.split(/[-\/]/)[0]||'';}
-    if(field==='es.contractStartM'){var _cs=p.contractStart||'';var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
-    if(field==='es.contractStartD'){var _cs=p.contractStart||'';var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
-    if(field==='es.contractEndY'){var _ce=p.contractEnd||'';return _ce.split(/[-\/]/)[0]||'';}
-    if(field==='es.contractEndM'){var _ce=p.contractEnd||'';var _m=_ce.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
-    if(field==='es.contractEndD'){var _ce=p.contractEnd||'';var _d=_ce.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    if(field==='es.contractStartY'){var _cs=p.contractStart||c.contractStart||'';return _cs.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractStartM'){var _cs=p.contractStart||c.contractStart||'';var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractStartD'){var _cs=p.contractStart||c.contractStart||'';var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    if(field==='es.contractEndY'){var _ce=p.contractEnd||c.contractEnd||'';return _ce.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractEndM'){var _ce=p.contractEnd||c.contractEnd||'';var _m=_ce.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractEndD'){var _ce=p.contractEnd||c.contractEnd||'';var _d=_ce.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
     // 分野・区分のフォールバック
     if(field==='es.applicantField'){var _af=es.applicantField||es.field||c.applicantField||'';return _af.replace(/（特定技能[１２]号）/g,'');}
     if(field==='es.weeklyHours') return es.weeklyHours||es.workHoursWeek||'';
