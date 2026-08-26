@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.05
+  ver.20260826.06
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1085,6 +1085,19 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
   var p=personData[caseId]||{};
   var now=new Date();
 
+  /* ver.20260826.06: persons→cases フォールバック共通ヘルパー。
+     両テーブルに同名カラムが存在するフィールド（contractStart/contractEnd/
+     nationality/residenceStatus/tempReturn）は、人材側が未入力なら案件側を見る。
+     個別に p.xxx||'' と書くと今回のような取りこぼしが再発するため必ずこれを使う。 */
+  var _PC_SHARED_FIELDS = ['contractStart','contractEnd','nationality','residenceStatus','tempReturn'];
+  function _pcField(name){
+    var pv = p[name];
+    if(pv !== undefined && pv !== null && String(pv).trim() !== '') return String(pv);
+    var cv = c[name];
+    if(cv !== undefined && cv !== null && String(cv).trim() !== '') return String(cv);
+    return '';
+  }
+
   function rv(field){
     if(!field) return '';
     // PLACEHOLDER_MAPで変換（日本語プレースホルダー → so./co./es.等のフィールドキー）
@@ -1124,12 +1137,12 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     if(field==='es.createM'){var cd2=c.docCreateDate||'';if(cd2){var cp2=cd2.split(/[-\/]/);return cp2[1]?String(parseInt(cp2[1],10)):'';}return '';}
     if(field==='es.createD'){var cd3=c.docCreateDate||'';if(cd3){var cp3=cd3.split(/[-\/]/);return cp3[2]?String(parseInt(cp3[2],10)):'';}return '';}
     // 雇用契約期間（始期・終期）分割取得
-    if(field==='es.contractStartY'){var _cs=p.contractStart||c.contractStart||'';return _cs.split(/[-\/]/)[0]||'';}
-    if(field==='es.contractStartM'){var _cs=p.contractStart||c.contractStart||'';var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
-    if(field==='es.contractStartD'){var _cs=p.contractStart||c.contractStart||'';var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
-    if(field==='es.contractEndY'){var _ce=p.contractEnd||c.contractEnd||'';return _ce.split(/[-\/]/)[0]||'';}
-    if(field==='es.contractEndM'){var _ce=p.contractEnd||c.contractEnd||'';var _m=_ce.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
-    if(field==='es.contractEndD'){var _ce=p.contractEnd||c.contractEnd||'';var _d=_ce.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    if(field==='es.contractStartY'){var _cs=_pcField('contractStart');return _cs.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractStartM'){var _cs=_pcField('contractStart');var _m=_cs.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractStartD'){var _cs=_pcField('contractStart');var _d=_cs.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
+    if(field==='es.contractEndY'){var _ce=_pcField('contractEnd');return _ce.split(/[-\/]/)[0]||'';}
+    if(field==='es.contractEndM'){var _ce=_pcField('contractEnd');var _m=_ce.split(/[-\/]/)[1]||'';return _m?String(parseInt(_m,10)):'';}
+    if(field==='es.contractEndD'){var _ce=_pcField('contractEnd');var _d=_ce.split(/[-\/]/)[2]||'';return _d?String(parseInt(_d,10)):'';}
     // 分野・区分のフォールバック
     if(field==='es.applicantField'){var _af=es.applicantField||es.field||c.applicantField||'';return _af.replace(/（特定技能[１２]号）/g,'');}
     if(field==='es.weeklyHours') return es.weeklyHours||es.workHoursWeek||'';
@@ -1166,12 +1179,12 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
       var k=field.substring(3);
       k=(_ES_ALIAS&&_ES_ALIAS[k])||k;
       // 雇用契約期間の分割フィールド対応
-      if(k==='contractStartY'){var _cs=p.contractStart||'';return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
-      if(k==='contractStartM'){var _cs=p.contractStart||'';var _csm=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _csm?String(parseInt(_csm,10)):'';}
-      if(k==='contractStartD'){var _cs=p.contractStart||'';var _csd=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _csd?String(parseInt(_csd,10)):'';}
-      if(k==='contractEndY'){var _ce=p.contractEnd||'';return p.contractEndY||(_ce.split(/[-\/]/)[0]||'');}
-      if(k==='contractEndM'){var _ce=p.contractEnd||'';var _cem=p.contractEndM||(_ce.split(/[-\/]/)[1]||'');return _cem?String(parseInt(_cem,10)):'';}
-      if(k==='contractEndD'){var _ce=p.contractEnd||'';var _ced=p.contractEndD||(_ce.split(/[-\/]/)[2]||'');return _ced?String(parseInt(_ced,10)):'';}
+      if(k==='contractStartY'){var _cs=_pcField('contractStart');return p.contractStartY||(_cs.split(/[-\/]/)[0]||'');}
+      if(k==='contractStartM'){var _cs=_pcField('contractStart');var _csm=p.contractStartM||(_cs.split(/[-\/]/)[1]||'');return _csm?String(parseInt(_csm,10)):'';}
+      if(k==='contractStartD'){var _cs=_pcField('contractStart');var _csd=p.contractStartD||(_cs.split(/[-\/]/)[2]||'');return _csd?String(parseInt(_csd,10)):'';}
+      if(k==='contractEndY'){var _ce=_pcField('contractEnd');return p.contractEndY||(_ce.split(/[-\/]/)[0]||'');}
+      if(k==='contractEndM'){var _ce=_pcField('contractEnd');var _cem=p.contractEndM||(_ce.split(/[-\/]/)[1]||'');return _cem?String(parseInt(_cem,10)):'';}
+      if(k==='contractEndD'){var _ce=_pcField('contractEnd');var _ced=p.contractEndD||(_ce.split(/[-\/]/)[2]||'');return _ced?String(parseInt(_ced,10)):'';}
       if(k==='applicantField'){var _af2=es.applicantField||es.field||c.applicantField||'';return _af2.replace(/（特定技能[１２]号）/g,'');}
       if(k==='category'){var _cat=es.category||'';return _cat.replace(/（[^）]*分野[・・]特定技能[１２]号）/g,'').replace(/（特定技能[１２]号）/g,'');}
       if(k==='weeklyH') return es.weeklyH||es.weeklyHours||es.workHoursWeek||'';
@@ -1423,10 +1436,11 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
     if(field==='applicantFieldEn') return c.applicantFieldEn||es.applicantFieldEn||'';
     if(field==='jobCategory') return c.jobCategory||es.category||'';
     if(field==='jobCategoryEn') return c.jobCategoryEn||es.categoryEn||'';
-    if(field==='case.contractEndDate'){var ce=p.contractEnd||p.contractEndDate||'';if(ce){var _cep=ce.split(/[-\/]/);if(_cep.length>=3)return _cep[0]+'年'+parseInt(_cep[1],10)+'月'+parseInt(_cep[2],10)+'日';return ce;}var cey=p.contractEndY||'',cem=p.contractEndM||'',ced=p.contractEndD||'';if(cey&&cem&&ced)return cey+'年'+cem+'月'+ced+'日';return '';}
+    if(field==='case.contractEndDate'){var ce=_pcField('contractEnd')||p.contractEndDate||'';if(ce){var _cep=ce.split(/[-\/]/);if(_cep.length>=3)return _cep[0]+'年'+parseInt(_cep[1],10)+'月'+parseInt(_cep[2],10)+'日';return ce;}var cey=p.contractEndY||'',cem=p.contractEndM||'',ced=p.contractEndD||'';if(cey&&cem&&ced)return cey+'年'+cem+'月'+ced+'日';return '';}
+    if(field==='case.contractStartDate'){var cs=_pcField('contractStart');if(cs){var _csp=cs.split(/[-\/]/);if(_csp.length>=3)return _csp[0]+'年'+parseInt(_csp[1],10)+'月'+parseInt(_csp[2],10)+'日';return cs;}return '';}
     // 雇用契約期間（プレフィックスなし・日付まるごと）: personsになければcasesにフォールバック
-    if(field==='contractStart') return p.contractStart||c.contractStart||'';
-    if(field==='contractEnd')   return p.contractEnd  ||c.contractEnd  ||'';
+    if(field==='contractStart') return _pcField('contractStart');
+    if(field==='contractEnd')   return _pcField('contractEnd');
     // 直接キーのフォールバック（人材データ→案件データの順）
     if(p[field]!==undefined && p[field]!==null && p[field]!=='') return p[field];
     if(c[field]!==undefined && c[field]!==null && c[field]!=='') return c[field];
