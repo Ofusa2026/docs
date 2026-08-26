@@ -1645,7 +1645,15 @@ function getDocAuthor(co, docKey){
     titleEn: da.titleEn || (co && co.author_title_en) || ''
   };
 }
-async function loadCaseToForm(info, docKey){
+async function loadCaseToForm(info, docKey, opts){
+  // ver.20260825.03: opts.skipFieldRestore=true のとき、es_*/f_* のクリアと
+  //   emp_sets からの verbatim 復元をスキップする。
+  //   1-6系など独自の loadFromDB/setFormValues が全フィールドを変換込みで
+  //   制御する書類では、この共通クリア＆復元が後から走ると
+  //   変換済みの値（契約更新・手当別名など）を壊し、タイミング次第で
+  //   「賃金がまっさら」「保存したのに反映されない」事故の原因になっていた。
+  //   （その状態で保存すると空フィールドが emp_sets からも消える二次被害あり）
+  opts = opts || {};
   if(!info||!info.caseId) return;
   // ver.20260717: 直接編集が未保存のまま別の案件に切り替えると編集内容が失われる。
   // 画面は編集後の見た目のままなので気づけないため、切り替える前に確認する。
@@ -1825,6 +1833,7 @@ async function loadCaseToForm(info, docKey){
     // ★ クリア: フォーム上に存在する es_* / f_* 入力欄のうち、_ES_SKIP を除いて空にする。
     //   これで前案件の手当・控除・賃金・契約期間などの残存を消してから、
     //   今の案件の emp_sets で上書きし直す（キーが無ければ空のままになる＝正しい挙動）。
+    if(!opts.skipFieldRestore)
     try {
       var _clrEls = document.querySelectorAll('[id^="es_"],[id^="f_"]');
       for (var _ci = 0; _ci < _clrEls.length; _ci++) {
@@ -1875,7 +1884,7 @@ async function loadCaseToForm(info, docKey){
       const m = String(v).match(/(\d{4})[-\/年\.](\d{1,2})[-\/月\.](\d{1,2})/);
       return m ? {y:m[1], m:String(parseInt(m[2],10)), d:String(parseInt(m[3],10))} : null;
     };
-    Object.keys(es).forEach(k => {
+    if(!opts.skipFieldRestore) Object.keys(es).forEach(k => {
       if(_ES_SKIP.includes(k)) return;
       setValMulti(['es_'+k, 'f_'+k], es[k]);
       // 別名にも同じ値を橋渡し（テンプレ側のプレースホルダ名）
@@ -1908,7 +1917,7 @@ async function loadCaseToForm(info, docKey){
     //   チェックが一切付かない不具合があった（例: case_1784697558628）。
     //   1_6.html の setFormValues と同じ変換をここでも行い、案シスの日本語値
     //   （"更新する場合があり得る"等）を select の value に変換してセットする。
-    if(es.contractRenewal){
+    if(!opts.skipFieldRestore && es.contractRenewal){
       const _rv = String(es.contractRenewal);
       const _renewMap = {'自動':'auto','possible':'possible','更新する場合':'possible','なし':'none','none':'none'};
       const _mapped = _renewMap[_rv] || (_rv.includes('自動') ? 'auto' : (_rv.includes('可能')||_rv.includes('あり')) ? 'possible' : 'none');

@@ -437,7 +437,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787690756"></script>
+<script src="ofusa_common.js?v=1787747000"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -530,6 +530,14 @@ function p(){
     //   他言語版と同じくnEn/amt/calcEnを差し込む実装に統一。
     annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（ခံစားခွင့်　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)} ယန်း／တွက်ချက်ပုံ：${ph(calcEn,'CalcEn')}）</div>`;
   });
+  // ver.20260825.03: 時間外手当（固定残業代）も別紙の手当明細に追加表示
+  if(v('es_fixedOTAmount')||v('es_fixedOTHours')){
+    const _g='g';
+    const _foAmt=v('es_fixedOTAmount'), _foH=v('es_fixedOTHours'), _foCalc=v('es_fixedOTCalc'), _foCalcEn=v('es_fixedOTCalcEn');
+    const _phF=(val,isMoney=false)=>{ if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;} return''; };
+    annexAllow+=`<div>(${_g})（<span class="f">時間外手当（固定残業代）</span>　手当　月　${_phF(_foAmt,true)}円／計算方法：${_phF(_foCalc||( _foH?('月'+_foH+'時間分の時間外労働に対する固定残業代'):''))}）</div>`;
+    annexAllow+=`<div class="id">(${_g})（${_phF(_foCalcEn)||''}　,${_phF(_foAmt,true)}yen）</div>`;
+  }
 
   w.innerHTML=`
 <div class="doc" id="docP1">
@@ -1808,7 +1816,7 @@ if(!window._selectCaseListenerAdded){
     }
     // ver.20260808.06: loadFromDBを先にawaitで実行してから loadCaseToForm を呼ぶ順序に変更
     if(typeof loadFromDB==='function'){ await loadFromDB(info); }
-    if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_6'); }
+    if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_6', {skipFieldRestore:true}); }
   });
 }
 
