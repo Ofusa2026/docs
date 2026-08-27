@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 Mẫu tham khảo số 1-16（ベトナム語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260717.05</div>
+    <div class="ver">ver.20260827.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -149,7 +149,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787821375"></script>
+<script src="ofusa_common.js?v=1787822822"></script>
 <script>
 // 手数料として有効な値か判定する。
 // 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
@@ -452,12 +452,21 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(co){
       s('f_company',co.name||'');
-      s('f_author',[co.author_title||co.rep_title,co.author_name||co.rep_name].filter(Boolean).join('　'));
+      // ver.20260827.04: author_name に役職が既に含まれる場合の二重表示を防止
+      (function(){
+        var _at=(co.author_title||co.rep_title||'').trim();
+        var _an=(co.author_name||co.rep_name||'').trim();
+        s('f_author', (_at && _an && _an.replace(/[\s　]+/g,'').indexOf(_at.replace(/[\s　]+/g,''))===0) ? _an : [_at,_an].filter(Boolean).join('　'));
+      })();
       // ver.20260731: 翻訳行用 ①企業名ローマ字(orgNameEn) ②作成責任者英語(extra.docAuthors['1_16'])
       var _es0=(co.emp_sets&&co.emp_sets[0])||{};
       s('f_companyEn', _es0.orgNameEn||'');
       var _da16=(co.extra&&co.extra.docAuthors&&co.extra.docAuthors['1_16'])||{};
-      s('f_authorEn',[_da16.titleEn||co.rep_title_en, _da16.nameEn||co.author_name_en||co.rep_name_en].filter(Boolean).join(' '));
+      (function(){
+        var _atE=(_da16.titleEn||co.rep_title_en||'').trim();
+        var _anE=(_da16.nameEn||co.author_name_en||co.rep_name_en||'').trim();
+        s('f_authorEn', (_atE && _anE && _anE.toLowerCase().indexOf(_atE.toLowerCase())===0) ? _anE : [_atE,_anE].filter(Boolean).join(' '));
+      })();
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
