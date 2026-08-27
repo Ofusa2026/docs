@@ -149,6 +149,7 @@
         <div class="fg"><label>始業<span class="fid">es.startTime</span></label><input id="es_startTime" placeholder="09:00" oninput="p()"></div>
         <div class="fg"><label>終業<span class="fid">es.endTime</span></label><input id="es_endTime" placeholder="18:00" oninput="p()"></div>
       </div>
+      <div class="fg"><label>シフト制の適用<span class="fid">es.shiftFlg</span></label><select id="es_shiftFlg" onchange="p()"><option value="">（未設定）</option><option value="適用あり">適用あり</option><option value="適用なし">適用なし</option></select></div>
       <div class="fg"><label>シフト詳細（自由記述）<span class="fid">es.shiftDetail</span></label><textarea id="es_shiftDetail" rows="2" placeholder="例：シフトによる、9:00〜25:00の間で8時間就業" oninput="p()"></textarea></div>
       <div class="fg"><label>休憩（分）<span class="fid">es.breakTime</span></label><input id="es_breakTime" oninput="p()"></div>
       <div class="fg2">
@@ -170,6 +171,10 @@
         <div class="fg"><label>年(分)<span class="fid">es.yearlyMin</span></label><input id="es_yearlyMin" oninput="p()"></div>
         <div class="fg"><label>年(日)<span class="fid">es.yearlyDays</span></label><input id="es_yearlyDays" oninput="p()"></div>
       </div>
+      <!-- ver.20260825.05: 従来入力欄が無くDBフォールバック頼みだった変形労働3欄を追加（見える化） -->
+      <div class="fg"><label>変形労働の適用<span class="fid">es.flexFlg</span></label><select id="es_flexFlg" onchange="p()"><option value="">（未設定）</option><option value="適用あり">適用あり</option><option value="適用なし">適用なし</option></select></div>
+      <div class="fg"><label>変形労働の種類<span class="fid">es.flexType</span></label><input id="es_flexType" placeholder="例：1ヶ月単位" oninput="p()"></div>
+      <div class="fg"><label>変形労働 詳細<span class="fid">es.flexDetail</span></label><input id="es_flexDetail" oninput="p()"></div>
       <div class="fg"><label>変形労働単位（日）<span class="fid">es.flexUnit</span></label><input id="es_flexUnit" placeholder="例：1ヶ月" oninput="p()"></div>
       <div class="fg"><label>変形労働単位（ID）<span class="fid">es.flexUnitEn</span></label><input id="es_flexUnitEn" placeholder="例：1 bulan" oninput="p()"></div>
       <div class="fs-title" style="margin-top:8px;">交代制シフト（最大5パターン）</div>
@@ -356,6 +361,8 @@
       <div class="fg"><label>退職金　有無<span class="fid">es.retirement</span></label><select id="es_retirement" onchange="p()"><option value="">（未設定）</option><option value="有">有</option><option value="無">無</option></select></div>
       <div class="fg"><label>退職金詳細（日）<span class="fid">es.retirementDetail</span></label><input id="es_retirementDetail" oninput="p()"></div>
       <div class="fg"><label>退職金詳細（ID）<span class="fid">es.retirementDetailEn</span></label><input id="es_retirementDetailEn" oninput="p()"></div>
+      <div class="fg"><label>退職金 支給条件（日）<span class="fid">es.severanceCondition</span></label><input id="es_severanceCondition" oninput="p()"></div>
+      <div class="fg"><label>退職金 支給条件（翻訳）<span class="fid">es.severanceConditionEn</span></label><input id="es_severanceConditionEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">別紙 固定残業代</div>
       <div class="fg"><label>手当名称（日）<span class="fid">es.fixedOTName</span></label><input id="es_fixedOTName" oninput="p()"></div>
@@ -363,6 +370,8 @@
       <div class="fg"><label>固定残業時間<span class="fid">es.fixedOTHours</span></label><input id="es_fixedOTHours" oninput="p()"></div>
       <div class="fg"><label>超過時間<span class="fid">es.fixedOTHours2</span></label><input id="es_fixedOTHours2" oninput="p()"></div>
       <div class="fg"><label>固定残業代（円）<span class="fid">es.fixedOTAmount</span></label><input id="es_fixedOTAmount" oninput="p()"></div>
+      <div class="fg"><label>固定残業 計算方法（日）<span class="fid">es.fixedOTCalc</span></label><input id="es_fixedOTCalc" oninput="p()"></div>
+      <div class="fg"><label>固定残業 計算方法（翻訳）<span class="fid">es.fixedOTCalcEn</span></label><input id="es_fixedOTCalcEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">別紙 控除</div>
       <div class="fg"><label>税（円）<span class="fid">es.deductTax</span></label><input id="es_deductTax" oninput="p()"></div>
@@ -440,7 +449,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1787748976"></script>
+<script src="ofusa_common.js?v=1787802729"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1237,7 +1246,7 @@ function setFormValues(esData){
 
   // ===== 定例休日テキスト自動生成（fixedHolidayXxx フラグ → fixedDay1）=====
   const _dayJa={Mon:'月',Tue:'火',Wed:'水',Thu:'木',Fri:'金',Sat:'土',Sun:'日',Hol:'祝日'};
-  const _isDayOff=function(vv){ vv=String(vv==null?'':vv).trim(); return vv==='休み'||vv==='true'||vv==='1'||vv==='●'||vv==='○'||vv==='✓'||vv==='☑'; };
+  const _isDayOff=function(vv){ vv=String(vv==null?'':vv).trim(); return vv==='休み'||vv==='true'||vv==='1'||vv==='●'||vv==='○'||vv==='〇'||vv==='✓'||vv==='☑'||vv==='レ'||vv==='◯'; };
   const _fixedDays=Object.entries(_dayJa).filter(([k])=>_isDayOff(esData['fixedHoliday'+k])).map(([,v])=>v);
   if(_fixedDays.length>0){
     const _fdEl=document.getElementById('es_fixedDay1');
