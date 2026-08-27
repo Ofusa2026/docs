@@ -447,7 +447,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787843930"></script>
+<script src="ofusa_common.js?v=1787873824"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -511,7 +511,7 @@ function p(){
   for(let i=1;i<=6;i++){
     const n=v('es_a'+i+'Name');
     if(i>=5 && !n) continue; // 手当⑤⑥は入力があるときだけ表示 (ver.20260821.04)
-    const nSpan=n?`<span class="f">${esc(n)}</span>`:'';
+    const nSpan=n?`<span class="f" data-bind="es_a${i}Name">${esc(n)}</span>`:'';
     if(i<=2) allowLine1+=`（${nSpan}　手当），`;
     else allowLine2+=`（${nSpan}　手当），`;
   }
@@ -519,7 +519,7 @@ function p(){
   for(let i=1;i<=6;i++){
     const nEn=v('es_a'+i+'NameEn');
     if(i>=5 && !nEn && !v('es_a'+i+'Name')) continue; // ⑤⑥は入力時のみ (ver.20260821.04)
-    const nEnSpan=nEn?`<span class="f">${esc(nEn)}</span>`:'';
+    const nEnSpan=nEn?`<span class="f" data-bind="es_a${i}NameEn">${esc(nEn)}</span>`:'';
     if(i<=2) allowLineId1+=`（ប្រាក់ឧបត្ថម្ភ　${nEnSpan}），`;
     else allowLineId2+=`（ប្រាក់ឧបត្ថម្ភ　${nEnSpan}），`;
   }
@@ -532,7 +532,8 @@ function p(){
     const amt=v('es_a'+idx+'Amt'),calc=v('es_a'+idx+'Calc'),calcEn=v('es_a'+idx+'CalcEn');
     if(idx>=5 && !n && !nEn && !amt) return; // 手当⑤⑥は入力があるときだけ別紙に追加 (ver.20260821.04)
     const ph=(val,key,isMoney=false)=>{
-      if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
+      // ver.20260827.08: 別紙の手当もクリックで入力欄へジャンプできるよう data-bind を付与
+      if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;const _bk=key==='Amount'?'Amt':key;return`<span class="f" data-bind="es_a${idx}${_bk}">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
       return'';
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
@@ -542,9 +543,9 @@ function p(){
   if(v('es_fixedOTAmount')||v('es_fixedOTHours')){
     const _g='g';
     const _foAmt=v('es_fixedOTAmount'), _foH=v('es_fixedOTHours'), _foCalc=v('es_fixedOTCalc'), _foCalcEn=v('es_fixedOTCalcEn');
-    const _phF=(val,isMoney=false)=>{ if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;} return''; };
-    annexAllow+=`<div>(${_g})（<span class="f">時間外手当（固定残業代）</span>　手当　月　${_phF(_foAmt,true)}円／計算方法：${_phF(_foCalc||( _foH?('月'+_foH+'時間分の時間外労働に対する固定残業代'):''))}）</div>`;
-    annexAllow+=`<div class="id">(${_g})（${_phF(_foCalcEn)||''}　,${_phF(_foAmt,true)}yen）</div>`;
+    const _phF=(val,isMoney=false,_bk)=>{ if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f"${_bk?' data-bind="'+_bk+'"':''}>${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;} return''; };
+    annexAllow+=`<div>(${_g})（<span class="f">時間外手当（固定残業代）</span>　手当　月　${_phF(_foAmt,true,'es_fixedOTAmount')}円／計算方法：${_phF(_foCalc||( _foH?('月'+_foH+'時間分の時間外労働に対する固定残業代'):''),false,'es_fixedOTCalc')}）</div>`;
+    annexAllow+=`<div class="id">(${_g})（${_phF(_foCalcEn,false,'es_fixedOTCalcEn')||''}　,${_phF(_foAmt,true,'es_fixedOTAmount')}yen）</div>`;
   }
 
   w.innerHTML=`
