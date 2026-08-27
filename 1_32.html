@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－３２号</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:12mm 13mm!important;line-height:1.45!important;min-height:auto!important}
+.t32{width:100%;border-collapse:collapse;margin-bottom:4mm;}
+.t32 th,.t32 td{border:1px solid #333;padding:4px 6px;font-size:9.5pt;vertical-align:top;}
+.t32 th{background:#f3f4f6;font-weight:normal;text-align:left;}
+.t32k{width:34%;}
+.t32 .lbl{white-space:nowrap;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:12mm 13mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
+    <div class="ver">ver.20260827.06</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_32')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>２号特定技能外国人 氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>特定技能所属機関の氏名又は名称</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者（役職・氏名）</label><input id="f_author" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">１　業務内容</div>
+      <div class="fg"><label>① 所属部署名</label><input id="f_dept" oninput="p()"></div>
+      <div class="fg"><label>② 役職又は地位</label><input id="f_position" oninput="p()"></div>
+      <div class="fg"><label>③ 具体的な職務内容（製造物、収穫物、作業工程など）</label><textarea id="f_jobDesc" rows="4" oninput="p()"></textarea></div>
+      <div class="fg"><label>④ 技能実習生・１号特定技能外国人との職務内容の違い</label><textarea id="f_jobDiff" rows="4" oninput="p()"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">２　指導を受ける対象者（入力した行のみ表示）</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">外国人の場合は氏名欄に在留カード番号も記載</div>
+      <div class="fg"><label>① 氏名（＋在留カード番号）</label><input id="f_t1Name" oninput="p()"></div>
+      <div class="fg"><label>① 事業所及び所属部署名</label><input id="f_t1Dept" oninput="p()"></div>
+      <div class="fg"><label>① 役職又は地位</label><input id="f_t1Pos" oninput="p()"></div>
+      <div class="fg"><label>① 指導を受ける職務内容</label><input id="f_t1Job" oninput="p()"></div>
+      <div class="fg"><label>② 氏名（＋在留カード番号）</label><input id="f_t2Name" oninput="p()"></div>
+      <div class="fg"><label>② 事業所及び所属部署名</label><input id="f_t2Dept" oninput="p()"></div>
+      <div class="fg"><label>② 役職又は地位</label><input id="f_t2Pos" oninput="p()"></div>
+      <div class="fg"><label>② 指導を受ける職務内容</label><input id="f_t2Job" oninput="p()"></div>
+      <div class="fg"><label>③ 氏名（＋在留カード番号）</label><input id="f_t3Name" oninput="p()"></div>
+      <div class="fg"><label>③ 事業所及び所属部署名</label><input id="f_t3Dept" oninput="p()"></div>
+      <div class="fg"><label>③ 役職又は地位</label><input id="f_t3Pos" oninput="p()"></div>
+      <div class="fg"><label>③ 指導を受ける職務内容</label><input id="f_t3Job" oninput="p()"></div>
+      <div class="fg"><label>④ 氏名（＋在留カード番号）</label><input id="f_t4Name" oninput="p()"></div>
+      <div class="fg"><label>④ 事業所及び所属部署名</label><input id="f_t4Dept" oninput="p()"></div>
+      <div class="fg"><label>④ 役職又は地位</label><input id="f_t4Pos" oninput="p()"></div>
+      <div class="fg"><label>④ 指導を受ける職務内容</label><input id="f_t4Job" oninput="p()"></div>
+      <div class="fg"><label>⑤ 氏名（＋在留カード番号）</label><input id="f_t5Name" oninput="p()"></div>
+      <div class="fg"><label>⑤ 事業所及び所属部署名</label><input id="f_t5Dept" oninput="p()"></div>
+      <div class="fg"><label>⑤ 役職又は地位</label><input id="f_t5Pos" oninput="p()"></div>
+      <div class="fg"><label>⑤ 指導を受ける職務内容</label><input id="f_t5Job" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1787843147"></script>
+<script>
+function _tRow(n){
+  // 指導対象者の行（入力があるときのみ）
+  const nm=v('f_t'+n+'Name'), dp=v('f_t'+n+'Dept'), ps=v('f_t'+n+'Pos'), jb=v('f_t'+n+'Job');
+  if(!nm && !dp && !ps && !jb) return '';
+  const mark=['①','②','③','④','⑤'][n-1];
+  return `<tr><td style="text-align:center;width:2em;">${mark}</td><td style="width:30%;">${f('f_t'+n+'Name')}</td><td style="width:24%;">${f('f_t'+n+'Dept')}</td><td style="width:16%;">${f('f_t'+n+'Pos')}</td><td>${f('f_t'+n+'Job')}</td></tr>`;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  let tRows='';
+  for(let i=1;i<=5;i++) tRows+=_tRow(i);
+  if(!tRows) tRows=`<tr><td style="text-align:center;width:2em;">①</td><td style="width:30%;">${f('f_t1Name')}</td><td style="width:24%;">${f('f_t1Dept')}</td><td style="width:16%;">${f('f_t1Pos')}</td><td>${f('f_t1Job')}</td></tr>`;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10.5pt;margin-bottom:6px;">参考様式第１－３２号</div>
+<div style="font-size:15pt;font-weight:bold;text-align:center;margin:3mm 0;">２号特定技能外国人の業務内容に関する誓約書</div>
+<div style="margin-bottom:8px;">　当特定技能所属機関は、２号特定技能外国人　<span style="display:inline-block;min-width:14em;border-bottom:1px solid #333;text-align:center;">${f('f_applicant')}</span>　との間で特定技能雇用契約を締結するに当たって、各特定産業分野における分野別方針及び特定の分野に係る要領別冊に定めている２号特定技能外国人の従事する業務内容を確認した上で、当該外国人が従事する業務内容と相違のないことを誓約するとともに、当該業務内容を以下のとおり申告します。</div>
+<div style="font-size:8.5pt;margin-bottom:2px;">※　分野別運用方針（URL：https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri01_00132.html）</div>
+<div style="font-size:8.5pt;margin-bottom:8px;">　　要領別冊（URL：https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00201.html）</div>
+<div style="font-weight:bold;margin-bottom:4px;">１　当該２号特定技能外国人の業務内容</div>
+<table class="t32">
+<tr><th class="t32k">①　所属部署名</th><td>${f('f_dept')}</td></tr>
+<tr><th class="t32k">②　役職又は地位</th><td>${f('f_position')}</td></tr>
+<tr><th class="t32k">③　当該外国人が従事する具体的な職務内容（製造物、収穫物、作業工程など）</th><td>${f('f_jobDesc')}</td></tr>
+<tr><th class="t32k">④　技能実習生又は１号特定技能外国人が従事する場合、それら外国人と当該２号特定技能外国人の職務内容の違い（各特定産業分野における分野別方針で定めている２号特定技能外国人の従事する業務内容に相違のないよう記載すること）</th><td>${f('f_jobDiff')}</td></tr>
+</table>
+<div style="font-weight:bold;margin-bottom:4px;">２　当該２号特定技能外国人に指導を受ける対象者一覧</div>
+<table class="t32">
+<tr><th style="width:2em;"></th><th>対象者の氏名<br><span style="font-size:8pt;">※外国人の場合は在留カード番号も記載</span></th><th>事業所及び<br>所属部署名</th><th>役職又は地位</th><th>指導を受ける職務内容</th></tr>
+${tRows}
+</table>
+<div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">※　留意事項</div>
+<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">１　在留資格認定証明書の交付又は在留諸申請の許否に大きく影響するため、全て具体的に記載すること。なお、記載内容と実際の内容に相違がある場合、在留資格が取り消される可能性があるほか、虚偽の内容を記載した場合、特定技能所属機関としての欠格事由に該当することとなるため、留意すること。</div>
+<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">２　事業所、事業内容、所属部署、役職、職務内容などで、複数該当するものがある場合については、全ての内容を記載すること。</div>
+<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">３　対象者については、２号特定技能外国人と同一の事業所に出勤し、原則同一の所属部署に所属する者であって、フルタイムで業務に従事する者に限る。</div>
+<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">４　在留諸申請時点で、他の２号特定技能外国人に指導を受けている者については記載しないこと。</div>
+<div style="font-size:8.5pt;margin-left:1em;margin-bottom:0;">５　記載する枠が足りない場合は、適宜追加すること。</div>
+</div>
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-weight:bold;margin-bottom:4px;">（参考）特定産業分野ごとの指導を受ける必要な対象者数</div>
+<table class="t32" style="width:80%;">
+<tr><th>特定技能２号対象の特定産業分野</th><th style="width:36%;">必要な対象者数</th></tr>
+<tr><td>ビルクリーニング分野</td><td>２名以上</td></tr>
+<tr><td>工業製品製造業分野</td><td>２名以上</td></tr>
+<tr><td>建設分野</td><td>２名以上</td></tr>
+<tr><td>造船・舶用工業分野</td><td>２名以上</td></tr>
+<tr><td>自動車整備分野</td><td>１名以上</td></tr>
+<tr><td>航空分野</td><td>空港グランドハンドリング区分は１名以上</td></tr>
+<tr><td>宿泊分野</td><td>２名以上</td></tr>
+<tr><td>農業分野</td><td>２名以上</td></tr>
+<tr><td>漁業分野</td><td></td></tr>
+<tr><td>飲食料品製造業分野</td><td>２名以上</td></tr>
+<tr><td>外食業分野</td><td></td></tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:14mm;">※　必要な対象者数の記載がない特定産業分野又は業務区分については、指導を受ける対象者が不在でも差し支えないが、当該対象者が在籍する場合は必ず記載すること。</div>
+<div style="margin-bottom:8px;">作成年月日：${f('f_docDate')}</div>
+<div style="margin-bottom:10px;">上記の記載内容は、事実と相違ありません。</div>
+<div style="margin-bottom:8px;">２号特定技能外国人の署名　　<span style="display:inline-block;min-width:18em;border-bottom:1px solid #333;text-align:center;">${f('f_applicant')}</span></div>
+<div style="margin-bottom:8px;">特定技能所属機関の氏名又は名称　　<span style="display:inline-block;min-width:18em;">${f('f_company')}</span></div>
+<div>作成責任者の氏名及び役職　　<span style="display:inline-block;min-width:18em;">${f('f_author')}</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _wareki32(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,persons,cos,emp]=await Promise.all([
+      caseId?sb('cases?select=applicant,company_id,emp_set_idx&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('persons?select=applicant_name_en&case_id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_title,author_name,rep_name,rep_title,emp_sets&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_title,author_name,rep_name,rep_title,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const pe=persons&&persons[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    if(cas){ s('f_applicant',cas.applicant||''); }
+    if(pe){ s('f_applicant',pe.applicant_name_en||''); }
+    if(co){
+      s('f_company',co.name||'');
+      // ver.20260827.04(1-16)と同じ役職重複防止
+      var _at=(co.author_title||co.rep_title||'').trim();
+      var _an=(co.author_name||co.rep_name||'').trim();
+      s('f_author', (_at && _an && _an.replace(/[\s　]+/g,'').indexOf(_at.replace(/[\s　]+/g,''))===0) ? _an : [_at,_an].filter(Boolean).join('　'));
+      // 雇用条件セットから職務内容を初期値に
+      try{
+        var idx=parseInt((cas&&cas.emp_set_idx)||'0',10)||0;
+        var es=Array.isArray(co.emp_sets)?co.emp_sets[idx]:null;
+        if(es&&es.jobDesc) s('f_jobDesc',es.jobDesc);
+      }catch(_e){}
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_32'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
