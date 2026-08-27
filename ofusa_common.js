@@ -286,6 +286,23 @@ function _currentUserId(){
    ============================================================ */
 function applyBindings(){
   const area=document.getElementById('pageArea');if(!area)return;
+  // ver.20260827.03: 保存済みの直接編集版HTMLは修正前マークアップのスナップショットのため、
+  //   テンプレ側のレイアウト修正（合計金額の1行化・Ⅷ退職の分割禁止 ver.20260827.02）が
+  //   届かない。編集版を持つ案件にも効くよう、復元後にスタイルを後付けする。
+  try{
+    ['es_deductTotal','es_netPay','es_salaryTotal'].forEach(function(k){
+      area.querySelectorAll('span.f[data-bind="'+k+'"]').forEach(function(sp){
+        var td=sp.closest('td'); if(td) td.style.whiteSpace='nowrap';
+      });
+    });
+    Array.from(area.querySelectorAll('div')).forEach(function(h){
+      var t=(h.textContent||'').trim();
+      if(t.indexOf('Ⅷ．退職に関する事項')===0 && h.children.length<=2){
+        var blk=h.parentElement;
+        if(blk){ blk.style.breakInside='avoid'; blk.style.pageBreakInside='avoid'; }
+      }
+    });
+  }catch(_e){}
   const spans=area.querySelectorAll('[data-bind]');
   spans.forEach(span=>{
     const id=span.getAttribute('data-bind');

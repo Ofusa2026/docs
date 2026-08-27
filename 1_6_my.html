@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260827.02</div>
+    <div class="ver">ver.20260827.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -447,7 +447,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787820665"></script>
+<script src="ofusa_common.js?v=1787821375"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -700,7 +700,7 @@ function p(){
       <div style="font-size:8.5pt;margin-left:8px;">
         (1) 始業（${f('es_startTime')}）終業（${f('es_endTime')}）（１日の所定労働時間数&nbsp;${f('es_dailyHours')}時間&nbsp;${f('es_dailyMins')}分）<br>
         <!-- ver.20260820.12: ミャンマー語行にも時刻・時間・分の実値を差し込む（従来は空欄固定だった） -->
-        <!-- ver.20260827.02: 「分」の表記を「မိနှစ」→「မိနစ」に修正（過去PDFの表記に合わせる） -->
+        <!-- ver.20260827.03: 「分」の表記を「မိနှစ」→「မိနစ」に修正（過去PDFの表記に合わせる） -->
         <span class="id" style="font-size:7.5pt;" data-key="52">အလုပ်စချိန်（${f('es_startTime')}）အလုပ်ပြီးဆုံးချိန်（${f('es_endTime')}）(၁ရက်က အလုပ်ချိန် စုစုပေါင်း&nbsp;${f('es_dailyHours')}နာရီ&nbsp;${f('es_dailyMins')}မိနစ်)</span>
       </div>
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">【အောက်ပါစနစ်များသည် အလုပ်သမားနှင့် သက်ဆိုင်အကျုံးဝင်ပါက】</span></div>
