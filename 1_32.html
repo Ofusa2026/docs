@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20260827.06</div>
+    <div class="ver">ver.20260827.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -96,7 +96,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1787843147"></script>
+<script src="ofusa_common.js?v=1787843930"></script>
 <script>
 function _tRow(n){
   // 指導対象者の行（入力があるときのみ）
@@ -196,14 +196,36 @@ async function loadFromDB(passedInfo){
       var _at=(co.author_title||co.rep_title||'').trim();
       var _an=(co.author_name||co.rep_name||'').trim();
       s('f_author', (_at && _an && _an.replace(/[\s　]+/g,'').indexOf(_at.replace(/[\s　]+/g,''))===0) ? _an : [_at,_an].filter(Boolean).join('　'));
-      // 雇用条件セットから職務内容を初期値に
-      try{
-        var idx=parseInt((cas&&cas.emp_set_idx)||'0',10)||0;
-        var es=Array.isArray(co.emp_sets)?co.emp_sets[idx]:null;
-        if(es&&es.jobDesc) s('f_jobDesc',es.jobDesc);
-      }catch(_e){}
+      // ③職務内容の初期値は 2号ヒアリングフォーム(tokutei2_pledge)の回答のみ。
+      //   回答が無い場合は空欄のまま（雇用条件からのフォールバックは行わない）。
     }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
+    // ver.20260827.07: 2号ヒアリングフォーム(tokutei2_pledge)の回答があれば①〜④・指導対象者を自動反映。
+    //   回答キー: t2Dept/t2Position/t2JobDetail/t2JobDiff/t2Targets[{name,card,dept,position,job}]
+    //   フォームの回答は雇用条件フォールバックより優先（企業が直接書いた内容のため）。
+    try{
+      if(companyId){
+        const frs = await sb(`form_responses?select=response&form_type=eq.tokutei2_pledge&case_id=eq.${encodeURIComponent('co_'+companyId)}&deleted_at=is.null&order=created_at.desc&limit=1`);
+        const fr = frs && frs[0] && frs[0].response;
+        if(fr){
+          const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+          sf('f_dept', fr.t2Dept);
+          sf('f_position', fr.t2Position);
+          sf('f_jobDesc', fr.t2JobDetail);
+          sf('f_jobDiff', fr.t2JobDiff);
+          const tg = Array.isArray(fr.t2Targets) ? fr.t2Targets : [];
+          tg.slice(0,5).forEach((t,i)=>{
+            const n=i+1;
+            const nm=[t.name, t.card].filter(Boolean).join('　');
+            sf('f_t'+n+'Name', nm);
+            sf('f_t'+n+'Dept', t.dept);
+            sf('f_t'+n+'Pos', t.position);
+            sf('f_t'+n+'Job', t.job);
+          });
+          if(fr.t2Dept||fr.t2JobDetail||tg.length) showToast('📋 2号ヒアリングフォームの回答を反映しました');
+        }
+      }
+    }catch(_e){ console.warn('[1_32] tokutei2_pledge load:', _e); }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
