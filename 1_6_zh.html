@@ -259,6 +259,7 @@
       <div class="fg"><label>年次有給(日)<span class="fid">es.paidLeave</span></label><input id="es_paidLeave" oninput="p()"></div>
       <div class="fg"><label>年次有給（ID）<span class="fid">es.paidLeaveEn</span></label><input id="es_paidLeaveEn" oninput="p()"></div>
       <div class="fg"><label>その他有給<span class="fid">es.otherPaid</span></label><input id="es_otherPaid" oninput="p()"></div>
+      <div class="fg"><label>その他有給（翻訳）<span class="fid">es.otherPaidEn</span></label><input id="es_otherPaidEn" oninput="p()"></div>
       <div class="fg"><label>その他無給（日）<span class="fid">es.unpaidLeave</span></label><input id="es_unpaidLeave" oninput="p()"></div>
       <div class="fg"><label>その他無給（ID）<span class="fid">es.unpaidLeaveEn</span></label><input id="es_unpaidLeaveEn" oninput="p()"></div>
     </div>
@@ -446,7 +447,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1787802729"></script>
+<script src="ofusa_common.js?v=1787817486"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -763,7 +764,7 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div style="break-inside:avoid;page-break-inside:avoid;">１．年次有給休暇&emsp;６か月継続勤務した場合→&nbsp;${f('es_paidLeave')}&nbsp;日<br><span class="id" style="font-size:7.5pt;" data-key="63">1. 年度带薪休假&emsp;连续工作满6个月的→&nbsp;${f('es_paidLeaveEn')||f('es_paidLeave')}天</span></div>
       <div style="text-align:right;margin-top:2px;font-size:8.5pt;break-inside:avoid;page-break-inside:avoid;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;" data-key="64">连续工作未满6个月时的年度带薪休假 (${cb(false,"cb_auto_002")} 有&emsp;${cb(true,"cb_auto_003")} 无) → 经过&nbsp;&nbsp;&nbsp;个月，&nbsp;&nbsp;&nbsp;天</span></div>
-      <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">２．その他の休暇&emsp;有給（<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeave')}</span>）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. 其他休假&emsp;带薪休假 (<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>)&emsp;&emsp;无薪休假 (<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeaveEn')||f('es_unpaidLeave')}</span>)</span></div>
+      <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">２．その他の休暇&emsp;有給（<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeave')}</span>）<br><span class="id" style="font-size:7.5pt;" data-key="65">2. 其他休假&emsp;带薪休假 (<span style="display:inline-block;min-width:6em;">${fOr('es_otherPaidEn','es_otherPaid')}</span>)&emsp;&emsp;无薪休假 (<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeaveEn')||f('es_unpaidLeave')}</span>)</span></div>
       <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;" data-key="66">3. 临时回国休假&emsp;乙方希望临时回国时，在上述1及2的范围内给与必要的假期。</span></div>
       <div style="font-size:7.5pt;">○詳細は，就業規則　第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条，第&emsp;条〜第&emsp;条<br><span class="id" style="font-size:7pt;" data-key="67">◦详细内容参见就业规则 第(&emsp;〜&emsp;)条、第(&emsp;〜&emsp;)条、第(&emsp;〜&emsp;)条</span></div>
     </div>
