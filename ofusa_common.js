@@ -2982,3 +2982,85 @@ window.ofusaExportTplCoords=function(docKey){
 if(document.readyState!=='loading') ofusaMasterGate();
 else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
 /* ===== /マスター編集ゲート＆書き出し ===== */
+
+/* ===== ver.20260831.01: 共通翻訳機能（全書類） =====
+ * 翻訳欄（ID末尾 "En" で、対応する日本語欄 = "En" を外したIDが存在するもの）を自動検出し、
+ * Edge Function translate-fields（Gemini）で書類の言語に一括翻訳して流し込む。
+ * ・翻訳欄の横の 🌐 ボタンで、その項目だけ翻訳する（一括翻訳・自動翻訳はしない）
+ * ・翻訳結果は入力欄に入るだけなので、各書類の 💾DB保存 で従来どおり emp_sets 等に保存される
+ * ・翻訳欄が1つも無い書類（日本語のみの様式）ではボタンを出さない
+ */
+(function(){
+  function _docLang(){
+    try{
+      var m = (location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id)\.html$/i);
+      if(m) return m[1].toLowerCase();
+      var h = (document.documentElement.getAttribute('data-lang')||'').toLowerCase();
+      if(h) return h;
+    }catch(e){}
+    return 'id'; // 無印ファイル（1_6.html 等）はインドネシア語版
+  }
+  var LANG_JA = {id:'インドネシア語',en:'英語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',ko:'韓国語',zh:'中国語'};
+  function _pairs(){
+    var out=[];
+    document.querySelectorAll('input[id$="En"],textarea[id$="En"]').forEach(function(en){
+      var jaId = en.id.slice(0,-2);
+      var ja = document.getElementById(jaId);
+      if(!ja) return;
+      if(ja.tagName==='SELECT') return;
+      out.push({en:en, ja:ja});
+    });
+    return out;
+  }
+  async function _callTranslate(lang, items){
+    var url = SB_URL + '/functions/v1/translate-fields';
+    var r = await fetch(url, {method:'POST', headers:{
+      'apikey': SB_KEY, 'Authorization':'Bearer '+(typeof _sbToken==='function'?_sbToken():SB_KEY), 'Content-Type':'application/json'
+    }, body: JSON.stringify({lang:lang, items:items, context:(document.title||'')})});
+    var j = await r.json().catch(function(){return {};});
+    if(!r.ok || j.error) throw new Error(j.message||('HTTP '+r.status));
+    return j.items||[];
+  }
+  window.translateEmptyFields = async function(onlyKey){
+    var lang = _docLang();
+    var pairs = _pairs().filter(function(p){
+      if(onlyKey && p.en.id!==onlyKey) return false;
+      var jaV = String(p.ja.value||'').trim();
+      var enV = String(p.en.value||'').trim();
+      if(!jaV) return false;
+      if(onlyKey) return true;        // 個別ボタンは上書き可（明示操作）
+      return !enV;                    // 一括は未翻訳のみ
+    });
+    if(!pairs.length){ if(typeof showToast==='function') showToast('日本語欄が空のため翻訳できません'); return; }
+    try{
+      var items = pairs.map(function(p){ return {key:p.en.id, text:p.ja.value}; });
+      var res = await _callTranslate(lang, items);
+      var n=0;
+      res.forEach(function(it){
+        var el=document.getElementById(it.key);
+        if(el && it.translation){ el.value=it.translation; n++; el.style.background='#fef9c3'; setTimeout(function(){ el.style.background=''; },2500); }
+      });
+      if(typeof p==='function'){ try{ p(); }catch(e){} }
+      if(typeof showToast==='function') showToast('🌐 '+(LANG_JA[lang]||lang)+'に翻訳しました（内容を確認してDB保存してください）');
+    }catch(e){
+      if(typeof showToast==='function') showToast('⚠️ 翻訳エラー: '+e.message); else alert('翻訳エラー: '+e.message);
+    }
+  };
+  function _inject(){
+    var pairs=_pairs();
+    if(!pairs.length) return;
+    // 一括翻訳ボタンは設けない（表示中の項目を個別に翻訳する運用）
+    // 各翻訳欄の横に小ボタン（個別に翻訳し直す）
+    pairs.forEach(function(pr){
+      if(pr.en.parentElement && !pr.en.parentElement.querySelector('.tr-mini')){
+        var s=document.createElement('button');
+        s.type='button'; s.className='tr-mini'; s.textContent='🌐'; s.title='この欄だけ翻訳（上書き）';
+        s.style.cssText='margin-left:4px;font-size:10px;padding:1px 5px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;cursor:pointer;vertical-align:middle;';
+        s.onclick=function(ev){ ev.preventDefault(); window.translateEmptyFields(pr.en.id); };
+        pr.en.insertAdjacentElement('afterend', s);
+      }
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(_inject,300); });
+  else setTimeout(_inject,300);
+})();
