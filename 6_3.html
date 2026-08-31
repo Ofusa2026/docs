@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>分野参考様式第６－３号（建設・２号）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+/* 原本（docx）準拠: 余白 上20mm/左右30mm/下22mm, 本文10.5pt, 行送り18pt */
+.doc{padding:20mm 30mm 22mm 30mm!important;font-size:10.5pt!important;line-height:18pt!important;min-height:auto!important;text-align:justify;}
+.doc .p{margin:0;}
+.doc .t63{width:150mm;border-collapse:collapse;table-layout:fixed;margin:0;}
+.doc .t63 td{border:1px solid #000;padding:1pt 4pt;font-size:10.5pt;line-height:18pt;vertical-align:top;}
+.doc .t63 td.k{width:120mm;}
+.doc .t63 td.v{width:30mm;}
+.doc .note{font-size:10.5pt;}
+.doc .hang{padding-left:2em;text-indent:-2em;}
+.doc .hang1{padding-left:1em;text-indent:-1em;}
+.doc .sub{padding-left:1em;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm 30mm 22mm 30mm!important;font-size:10.5pt!important;line-height:18pt!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書</div>
+    <div class="ver">ver.20260831.05</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('6_3')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>作成年月日（雇用契約書の作成日と同じ）</label><div style="display:flex;gap:4px;"><input id="f_docYear" oninput="p()" style="width:4em;" placeholder="年"><input id="f_docMonth" oninput="p()" style="width:3em;" placeholder="月"><input id="f_docDay" oninput="p()" style="width:3em;" placeholder="日"></div></div>
+    </div>
+    <div class="fs"><div class="fs-title">申請者（２号特定技能外国人）</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">CCUSに実務経験が蓄積されている場合</div>
+      <div class="fg"><label>① 申請する業務区分に対応する職種</label><input id="f_job" oninput="p()" placeholder="例：内装工"></div>
+      <div class="fg"><label>② CCUSにおける技能評価基準の呼称</label><input id="f_call" oninput="p()" placeholder="例：内装仕上"></div>
+      <div class="fg"><label>③ CCUS技能者情報に基づく就業日数（職長＋班長）</label><input id="f_days1" oninput="p()" placeholder="例：1年（215日）以上"></div>
+    </div>
+    <div class="fs"><div class="fs-title">CCUSに実務経験が全て蓄積されていない場合</div>
+      <div class="fg"><label>④ 経歴証明書に基づく就業日数（職長＋班長）</label><input id="f_days2" oninput="p()" placeholder="例：751日"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1788160162"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="p" style="font-size:11pt;">分野参考様式第６－３号（特定技能外国人）</div>
+<div class="p" style="text-align:right;">${f('f_docYear')}年　　${f('f_docMonth')}月　　${f('f_docDay')}日</div>
+<div class="p" style="text-align:center;">２号特定技能外国人に求められる実務経験に係る申告書</div>
+<div class="p">出入国在留管理庁長官　殿</div>
+<div class="p" style="padding-left:75mm;">申請者</div>
+<div class="p" style="padding-left:83mm;">氏名 ${f('f_applicant')}</div>
+<div class="p" style="padding-left:83mm;">性別 ${f('f_gender')}</div>
+<div class="p" style="padding-left:83mm;">国籍・地域　${f('f_nationality')}</div>
+<div class="p" style="padding-left:83mm;">生年月日 ${f('f_birthdate')}</div>
+<div class="p" style="text-indent:1em;">建設分野における特定技能の在留資格に係る制度の運用に関する方針に規定する２号特定技能外国人に求められる実務経験については下記のとおりです。</div>
+<div class="p" style="text-align:center;">記</div>
+<div class="p" style="font-size:11pt;">〇建設キャリアアップシステム（以下CCUSという）の技能者情報に必要な実務経験が蓄積されている場合</div>
+<table class="t63">
+  <tr><td class="k">①　申請する業務区分に対応する職種</td><td class="v">${f('f_job')}</td></tr>
+  <tr><td class="k">②　CCUSにおける技能評価基準の呼称（以下、呼称）</td><td class="v">${f('f_call')}</td></tr>
+  <tr><td class="k">③　①、②で選択した職種及び呼称のCCUSの技能者情報に基づく就業日数(職長＋班長)</td><td class="v">${f('f_days1')}</td></tr>
+</table>
+<div class="p note">（注意）</div>
+<div class="p note hang">１　実務経験申告の前に、以下ア～ウについて、国土交通省ホームページ掲載の資料をご確認ください。</div>
+<div class="p note sub" style="word-break:break-all;">https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/content/001499418.pdf</div>
+<div class="p note sub">ア ２号特定技能外国人の業務区分に対応するCCUSの能力評価基準がある職種について</div>
+<div class="p note sub">イ ２号特定技能外国人に求める実務経験として各職種に必要な就業日数について</div>
+<div class="p note sub">ウ 実務経験の確認書類について</div>
+<div class="p note hang">２　③には実務経験に必要な就業日数以上（記載例：1年（215日）以上）であることを確認して記載すること。CCUSのレベル判定を受けている場合は「能力評価（レベル判定）結果通知書」のレベル３以上のものの写しを添付すること。CCUSのレベル判定を受けていない場合は、CCUSにおける就業日数の表示画面の写しを添付すること</div>
+<div class="p" style="font-size:11pt;">〇CCUSの技能者情報に必要な実務経験が全て蓄積されていない場合</div>
+<table class="t63">
+  <tr><td class="k">④　①、②で選択した職種及び呼称の経歴証明書に基づく就業日数(職長＋班長)</td><td class="v">${f('f_days2')}</td></tr>
+</table>
+<div class="p note">（注意）</div>
+<div class="p note hang1">３　③と④の合計が実務経験に必要な就業日数以上であることを確認して記載すること。また、③についてはCCUSにおける表示画面の写しを添付し、④については、別紙経歴証明書を添付すること。</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _apply6_3FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply6_3FontSize(){
+  const st=document.getElementById('_6_3FontStyle')||document.createElement('style');
+  st.id='_6_3FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
+    `.doc .t63 td{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+function _ymd63(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const [cases,persons]=await Promise.all([
+      caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('persons?select=applicant_name_en,gender,nationality,birthdate&case_id=eq.'+caseId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const pd=persons&&persons[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    if(pd&&pd.applicant_name_en){ s('f_applicant',pd.applicant_name_en); }
+    if(cas){ s('f_applicant',cas.applicant||''); }
+    if(pd){
+      const g=(pd.gender||'').trim(); s('f_gender', g==='男'?'男性':g==='女'?'女性':g);
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',_ymd63(pd.birthdate));
+    }
+    // 作成年月日 = 雇用契約書の作成日 (cases.doc_create_date)。無ければ今日。
+    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    const dcd=(cas&&cas.doc_create_date)?String(cas.doc_create_date).split(/[-\/]/):[];
+    if(dcd.length>=3&&dcd[0]&&dcd[1]&&dcd[2]){
+      sf('f_docYear',String(parseInt(dcd[0],10)));sf('f_docMonth',String(parseInt(dcd[1],10)));sf('f_docDay',String(parseInt(dcd[2],10)));
+    }else if(!v('f_docYear')){
+      const n=new Date();sf('f_docYear',String(n.getFullYear()));sf('f_docMonth',String(n.getMonth()+1));sf('f_docDay',String(n.getDate()));
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '6_3'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

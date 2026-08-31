@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－１０号（２号建設用）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+/* 原本（docx）準拠: 余白25mm四方, 本文10.5pt, 行グリッド16pt, 本文1.5行 */
+.doc{padding:25mm 25mm 25mm 25mm!important;font-size:10.5pt!important;line-height:16pt!important;min-height:auto!important;text-align:justify;}
+.doc .p{margin:0;}
+.doc .l15{line-height:24pt;}
+.doc .blank{height:16pt;}
+.doc .sig{font-size:12pt;line-height:12pt;}
+.doc .sigb{height:12pt;}
+.doc .ul{border-bottom:1px solid #000;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:25mm!important;font-size:10.5pt!important;line-height:16pt!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－１０号（２号建設用）　技能移転に係る申告書</div>
+    <div class="ver">ver.20260831.05</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_10')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">申告者</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()" placeholder="1996年7月15日"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">技能移転</div>
+      <div class="fg"><label>本国（修得等が困難な国）</label><input id="f_home" oninput="p()" placeholder="例：タイ"></div>
+      <div class="fg"><label>修得等が困難である技能等（技能実習2号 職種）</label><input id="f_skill1" oninput="p()" placeholder="例：型枠施工"></div>
+      <div class="fg"><label>本国への移転に努める技能等（技能実習2号 職種）</label><input id="f_skill2" oninput="p()" placeholder="例：型枠施工"></div>
+    </div>
+    <div class="fs"><div class="fs-title">申告年月日（雇用契約書の作成日と同じ）</div>
+      <div class="fg"><label>年 / 月 / 日</label><div style="display:flex;gap:4px;"><input id="f_docYear" oninput="p()" style="width:4em;"><input id="f_docMonth" oninput="p()" style="width:3em;"><input id="f_docDay" oninput="p()" style="width:3em;"></div></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1788160162"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="p" style="font-size:11pt;">参考様式第１－１０号</div>
+<div class="blank" style="height:12pt;"></div>
+<div class="p" style="text-align:center;font-size:16pt;letter-spacing:4.5pt;line-height:24pt;">技能移転に係る申告書</div>
+<div class="blank" style="height:8pt;"></div>
+<div class="p l15" style="padding-left:1em;">○　申告者</div>
+<div class="p l15" style="padding-left:2em;">氏名　　${f('f_applicant')}</div>
+<div class="p l15" style="padding-left:2em;">性別　　${f('f_gender')}</div>
+<div class="p l15" style="padding-left:2em;">生年月日　　${f('f_birthdate')}</div>
+<div class="p l15" style="padding-left:2em;">国籍・地域　　${f('f_nationality')}</div>
+<div class="blank" style="height:24pt;"></div>
+<div class="p">　下記の事項を申告します。</div>
+<div class="blank"></div>
+<div class="p" style="text-align:center;">記</div>
+<div class="blank"></div>
+<div class="p l15" style="text-indent:1em;">私は、日本国における技能実習制度の趣旨が、開発途上地域等への技能等の移転による国際協力の推進であることを理解しています。</div>
+<div class="p l15" style="text-indent:1em;">私は、私の本国である<span class="ul">　${f('f_home')}　　</span>では修得等が困難である<span class="ul">　　${f('f_skill1')}　　　　　　</span>に係る技能等について修得等をし、技能実習を修了しました。</div>
+<div class="p l15" style="text-indent:1em;">そのため、今後、日本国において修得、習熟又は熟達した<span class="ul">  ${f('f_skill2')}  　　　　　　　　</span>に係る技能、技術又は知識の本国への移転に努めたいと考えています。</div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="blank"></div>
+<div class="p" style="margin-bottom:8pt;">上記の記載内容は、事実と相違ありません。</div>
+<div class="sigb"></div>
+<div class="sigb"></div>
+<div class="p sig" style="text-align:right;">　　　　　　　　${f('f_docYear')}　　年　　${f('f_docMonth')}　　月　　${f('f_docDay')}　　日</div>
+<div class="sigb"></div>
+<div class="p sig" style="padding:8pt 0;">&nbsp;</div>
+<div class="p sig" style="padding:8pt 0;">　　　　　　　　　　　　　　　　　　　　申告者の署名<span class="ul">　　　　　　　　　　　　　　　</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _apply1_10FontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply1_10FontSize(){
+  const st=document.getElementById('_1_10FontStyle')||document.createElement('style');
+  st.id='_1_10FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(16*s).toFixed(2)}pt!important}`,
+    `.doc .l15{line-height:${(24*s).toFixed(2)}pt!important}`,
+    `.doc .blank{height:${(16*s).toFixed(2)}pt!important}`,
+    `.doc .sig{font-size:${(12*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:16pt"]{font-size:${(16*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+function _ymd10(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const [cases,persons]=await Promise.all([
+      caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('persons?select=applicant_name_en,gender,nationality,birthdate,gijutsu_type,gijutsu_work&case_id=eq.'+caseId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const pd=persons&&persons[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // 氏名（ローマ字優先）
+    if(pd&&pd.applicant_name_en){ s('f_applicant',pd.applicant_name_en); }
+    if(cas){ s('f_applicant',cas.applicant||''); }
+    if(pd){
+      // 性別: 男/女 → 男性/女性
+      const g=(pd.gender||'').trim();
+      s('f_gender', g==='男'?'男性':g==='女'?'女性':g);
+      s('f_birthdate',_ymd10(pd.birthdate));
+      s('f_nationality',pd.nationality||'');
+      // 本国 = 国籍・地域
+      s('f_home',pd.nationality||'');
+      // 技能等 = 試験情報（入管オンライン）の「技能実習2号 職種」(persons.gijutsu_type)。2箇所とも同じ値。
+      s('f_skill1',pd.gijutsu_type||'');
+      s('f_skill2',pd.gijutsu_type||'');
+    }
+    // 申告年月日 = 雇用契約書の作成日 (cases.doc_create_date)。無ければ今日。
+    const dcd=(cas&&cas.doc_create_date)?String(cas.doc_create_date).split(/[-\/]/):[];
+    if(dcd.length>=3&&dcd[0]&&dcd[1]&&dcd[2]){
+      sf('f_docYear',String(parseInt(dcd[0],10)));sf('f_docMonth',String(parseInt(dcd[1],10)));sf('f_docDay',String(parseInt(dcd[2],10)));
+    }else if(!v('f_docYear')){
+      const n=new Date();sf('f_docYear',String(n.getFullYear()));sf('f_docMonth',String(n.getMonth()+1));sf('f_docDay',String(n.getDate()));
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_10'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
