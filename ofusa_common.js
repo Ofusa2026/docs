@@ -2983,82 +2983,91 @@ if(document.readyState!=='loading') ofusaMasterGate();
 else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
 /* ===== /マスター編集ゲート＆書き出し ===== */
 
-/* ===== ver.20260831.01: 共通翻訳機能（全書類） =====
- * 翻訳欄（ID末尾 "En" で、対応する日本語欄 = "En" を外したIDが存在するもの）を自動検出し、
- * Edge Function translate-fields（Gemini）で書類の言語に一括翻訳して流し込む。
- * ・翻訳欄の横の 🌐 ボタンで、その項目だけ翻訳する（一括翻訳・自動翻訳はしない）
- * ・翻訳結果は入力欄に入るだけなので、各書類の 💾DB保存 で従来どおり emp_sets 等に保存される
- * ・翻訳欄が1つも無い書類（日本語のみの様式）ではボタンを出さない
+/* ===== ver.20260831.03: 共通翻訳機能（全書類） =====
+ * 翻訳欄（ID末尾 "En" で、対応する日本語欄が存在するもの）の横に 🌐 を出し、
+ * 押した欄だけをこの書類の言語に翻訳する（一括翻訳・自動翻訳はしない）。
+ * ver.20260831.03: 案シスの「AI翻訳」と同じ方式に統一。
+ *   Claude API をブラウザから直接呼び、APIキーは localStorage('ofusa_apiKey')
+ *   を共用する（案シスで設定済みなら Saysay でもそのまま使える）。
+ *   Supabase Edge Function 経由をやめたため GEMINI_API_KEY の登録は不要。
+ * 翻訳結果は入力欄に入るだけなので、各書類の 💾DB保存 で従来どおり保存される。
  */
 (function(){
   function _docLang(){
     try{
       var m = (location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id)\.html$/i);
       if(m) return m[1].toLowerCase();
-      var h = (document.documentElement.getAttribute('data-lang')||'').toLowerCase();
-      if(h) return h;
     }catch(e){}
     return 'id'; // 無印ファイル（1_6.html 等）はインドネシア語版
   }
   var LANG_JA = {id:'インドネシア語',en:'英語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',ko:'韓国語',zh:'中国語'};
+  var LANG_EN = {id:'Indonesian',en:'English',vi:'Vietnamese',th:'Thai',ne:'Nepali',my:'Burmese (Myanmar)',km:'Khmer',ko:'Korean',zh:'Simplified Chinese'};
+  function _apiKey(){
+    try{ return localStorage.getItem('ofusa_apiKey') || localStorage.getItem('claudeApiKey') || ''; }catch(e){ return ''; }
+  }
   function _pairs(){
     var out=[];
     document.querySelectorAll('input[id$="En"],textarea[id$="En"]').forEach(function(en){
-      var jaId = en.id.slice(0,-2);
-      var ja = document.getElementById(jaId);
-      if(!ja) return;
-      if(ja.tagName==='SELECT') return;
+      var ja = document.getElementById(en.id.slice(0,-2));
+      if(!ja || ja.tagName==='SELECT') return;
       out.push({en:en, ja:ja});
     });
     return out;
   }
-  async function _callTranslate(lang, items){
-    var url = SB_URL + '/functions/v1/translate-fields';
-    var r = await fetch(url, {method:'POST', headers:{
-      'apikey': SB_KEY, 'Authorization':'Bearer '+(typeof _sbToken==='function'?_sbToken():SB_KEY), 'Content-Type':'application/json'
-    }, body: JSON.stringify({lang:lang, items:items, context:(document.title||'')})});
-    var j = await r.json().catch(function(){return {};});
-    if(!r.ok || j.error) throw new Error(j.message||('HTTP '+r.status));
-    return j.items||[];
-  }
   window.translateEmptyFields = async function(onlyKey){
-    var lang = _docLang();
-    var pairs = _pairs().filter(function(p){
+    var lang=_docLang(), key=_apiKey();
+    if(!key){
+      if(typeof showToast==='function') showToast('⚠️ APIキーが未設定です。案シスの設定画面でAPIキーを登録してください');
+      else alert('APIキーが未設定です。案シスの設定画面でAPIキーを登録してください。');
+      return;
+    }
+    var pairs=_pairs().filter(function(p){
       if(onlyKey && p.en.id!==onlyKey) return false;
-      var jaV = String(p.ja.value||'').trim();
-      var enV = String(p.en.value||'').trim();
-      if(!jaV) return false;
-      if(onlyKey) return true;        // 個別ボタンは上書き可（明示操作）
-      return !enV;                    // 一括は未翻訳のみ
+      return String(p.ja.value||'').trim()!=='';
     });
     if(!pairs.length){ if(typeof showToast==='function') showToast('日本語欄が空のため翻訳できません'); return; }
+    var el0 = onlyKey ? document.getElementById(onlyKey) : null;
+    var mini = el0 && el0.nextElementSibling && el0.nextElementSibling.classList.contains('tr-mini') ? el0.nextElementSibling : null;
+    if(mini){ mini.disabled=true; mini.textContent='…'; }
     try{
-      var items = pairs.map(function(p){ return {key:p.en.id, text:p.ja.value}; });
-      var res = await _callTranslate(lang, items);
+      var payload = pairs.map(function(p,i){ return (i+1)+'. '+String(p.ja.value).replace(/\n/g,' ').slice(0,500); }).join('\n');
+      var prompt = '日本の特定技能（雇用条件書などの公的様式）の記載内容を翻訳します。\n'
+        + '次の各項目を '+LANG_EN[lang]+' に翻訳してください。\n'
+        + '・様式に印字される文言として簡潔・丁寧に\n・数字、単位（円・時間・日・月）、固有名詞はそのまま保持\n・説明や注釈は加えない\n\n'
+        + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
+      var r = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+      });
+      var j = await r.json();
+      if(j.error) throw new Error(j.error.message||'API error');
+      var text=(j.content&&j.content[0]&&j.content[0].text)||'';
+      var cleaned=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+      var arr;
+      try{ arr=JSON.parse(cleaned); }catch(e){ var m=cleaned.match(/\[[\s\S]*\]/); arr=m?JSON.parse(m[0]):[]; }
+      if(!Array.isArray(arr)) arr=[];
       var n=0;
-      res.forEach(function(it){
-        var el=document.getElementById(it.key);
-        if(el && it.translation){ el.value=it.translation; n++; el.style.background='#fef9c3'; setTimeout(function(){ el.style.background=''; },2500); }
+      pairs.forEach(function(p,i){
+        var t=String(arr[i]||'').trim();
+        if(t){ p.en.value=t; n++; p.en.style.background='#fef9c3'; setTimeout(function(){ p.en.style.background=''; },2500); }
       });
       if(typeof p==='function'){ try{ p(); }catch(e){} }
       if(typeof showToast==='function') showToast('🌐 '+(LANG_JA[lang]||lang)+'に翻訳しました（内容を確認してDB保存してください）');
     }catch(e){
       if(typeof showToast==='function') showToast('⚠️ 翻訳エラー: '+e.message); else alert('翻訳エラー: '+e.message);
+    }finally{
+      if(mini){ mini.disabled=false; mini.textContent='🌐'; }
     }
   };
   function _inject(){
-    var pairs=_pairs();
-    if(!pairs.length) return;
-    // 一括翻訳ボタンは設けない（表示中の項目を個別に翻訳する運用）
-    // 各翻訳欄の横に小ボタン（個別に翻訳し直す）
-    pairs.forEach(function(pr){
-      if(pr.en.parentElement && !pr.en.parentElement.querySelector('.tr-mini')){
-        var s=document.createElement('button');
-        s.type='button'; s.className='tr-mini'; s.textContent='🌐'; s.title='この欄だけ翻訳（上書き）';
-        s.style.cssText='margin-left:4px;font-size:10px;padding:1px 5px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;cursor:pointer;vertical-align:middle;';
-        s.onclick=function(ev){ ev.preventDefault(); window.translateEmptyFields(pr.en.id); };
-        pr.en.insertAdjacentElement('afterend', s);
-      }
+    _pairs().forEach(function(pr){
+      if(pr.en.nextElementSibling && pr.en.nextElementSibling.classList && pr.en.nextElementSibling.classList.contains('tr-mini')) return;
+      var s=document.createElement('button');
+      s.type='button'; s.className='tr-mini'; s.textContent='🌐'; s.title='この欄を翻訳（日本語欄から自動翻訳・上書き）';
+      s.style.cssText='margin-left:4px;font-size:10px;padding:1px 5px;border:1px solid #cbd5e1;border-radius:4px;background:#f8fafc;cursor:pointer;vertical-align:middle;';
+      s.onclick=function(ev){ ev.preventDefault(); window.translateEmptyFields(pr.en.id); };
+      pr.en.insertAdjacentElement('afterend', s);
     });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(_inject,300); });
