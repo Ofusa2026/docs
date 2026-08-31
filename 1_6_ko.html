@@ -149,6 +149,7 @@
       </div>
       <div class="fg"><label>シフト制の適用<span class="fid">es.shiftFlg</span></label><select id="es_shiftFlg" onchange="p()"><option value="">（未設定）</option><option value="適用あり">適用あり</option><option value="適用なし">適用なし</option></select></div>
       <div class="fg"><label>シフト詳細（自由記述）<span class="fid">es.shiftDetail</span></label><textarea id="es_shiftDetail" rows="2" placeholder="例：シフトによる、9:00〜25:00の間で8時間就業" oninput="p()"></textarea></div>
+      <div class="fg"><label>シフト詳細（翻訳）<span class="fid">es.shiftDetailEn</span></label><textarea id="es_shiftDetailEn" rows="2" oninput="p()"></textarea></div>
       <div class="fg"><label>休憩（分）<span class="fid">es.breakTime</span></label><input id="es_breakTime" oninput="p()"></div>
       <div class="fg2">
         <div class="fg"><label>1日(H)<span class="fid">es.dailyHours</span></label><input id="es_dailyHours" oninput="p()"></div>
@@ -447,7 +448,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1788127031"></script>
+<script src="ofusa_common.js?v=1788142269"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -532,7 +533,7 @@ function p(){
     const amt=v('es_a'+idx+'Amt'),calc=v('es_a'+idx+'Calc'),calcEn=v('es_a'+idx+'CalcEn');
     if(idx>=5 && !n && !nEn && !amt) return; // 手当⑤⑥は入力があるときだけ別紙に追加 (ver.20260821.04)
     const ph=(val,key,isMoney=false)=>{
-      // ver.20260827.08: 別紙の手当もクリックで入力欄へジャンプできるよう data-bind を付与
+      // ver.20260831.02: 別紙の手当もクリックで入力欄へジャンプできるよう data-bind を付与
       if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;const _bk=key==='Amount'?'Amt':key;return`<span class="f" data-bind="es_a${idx}${_bk}">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
       return'';
     };
@@ -721,7 +722,7 @@ function p(){
             return `<div style="font-size:7.5pt;">始業(${startStr})終業(${endStr})(適用日${daysStr},１日の所定労働時間${hStr}時間${minStr}分)<br><span class="id" style="font-size:6.5pt;">시업(${startStr})종업(${endStr})(적용일 ${daysEnStr}) 하루 소정 노동시간 ${hStr}시간 ${minStr}분)</span></div>`;
           }).join('');
         })()}
-        ${v('es_shiftDetail') ? `<div style="font-size:7.5pt;margin-top:2px;">（シフト詳細）${f('es_shiftDetail')}</div>` : ''}
+        ${v('es_shiftDetail') ? `<div style="font-size:7.5pt;margin-top:2px;">（シフト詳細）${f('es_shiftDetail')}</div><div class="id" style="font-size:7pt;">${fOr('es_shiftDetailEn','es_shiftDetail')}</div>` : ''}
       </div>
 </div></div>
 </div>
