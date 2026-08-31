@@ -1,5 +1,9 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260831.07
+ * - fix(loadCaseToForm): 業務区分(category/categoryEn)の分割ブロックを skipFieldRestore でガード。
+ *   1-6系で独自 setFormValues が入れた業務区分１が共通側で '' に上書きされ空欄になる不具合を修正。
+ *   2つ目のフォームIDも es_categoryEn2 → es_category2En に修正。
  * ver.20260818.03
  * - fix(loadCaseToForm): 実費フラグ橋渡しで hasOwnProperty 判定に変更。
  *   案シス側で明示的にキー削除された案件は既存 saysay 側 Est/Jippi 状態を維持する。
@@ -1965,13 +1969,19 @@ async function loadCaseToForm(info, docKey, opts){
     //   そのまま残り、サイドバーで消しても復活する不具合を修正。2つ目は
     //   「categoryのカンマ2件目」を優先し、無ければ別フィールドcategory2を括弧除去して採用。
     //   どちらも無ければ空にして生値の残存を防ぐ。
-    ['category','categoryEn'].forEach(k=>{
+    // ver.20260831.07: skipFieldRestore（1-6系など独自 setFormValues が業務区分を制御する書類）
+    //   ではこのブロックを走らせない。emp_sets ループがスキップされて _fieldData が空のまま
+    //   ここに来ると、独自処理が入れた es_category / es_categoryEn を '' で上書きしてしまい、
+    //   「案シスの雇用条件に業務区分があるのに Saysay で空」になっていた（株式会社MISORA案件で発覚）。
+    //   あわせて2つ目のIDを es_categoryEn2（存在しない）→ es_category2En に修正。
+    if(!opts.skipFieldRestore) ['category','categoryEn'].forEach(k=>{
+      const k2 = (k==='category') ? 'category2' : 'category2En';
       const raw=(window._fieldData&&window._fieldData['es_'+k])||'';
-      const raw2=(window._fieldData&&window._fieldData['es_'+k+'2'])||'';
+      const raw2=(window._fieldData&&window._fieldData['es_'+k2])||'';
       const parts=raw.split(/[,、]\s*/).map(s=>_stripP(s)).filter(Boolean);
       setValMulti(['es_'+k,'f_'+k], parts[0]||'');
       const second = (parts.length>1) ? parts[1] : _stripP(raw2);
-      setValMulti(['es_'+k+'2','f_'+k+'2'], second||'');
+      setValMulti(['es_'+k2,'f_'+k2], second||'');
     });
 
     // ver.20260818.02: 案シスから渡される es.deductXxxType(boolean) を、
