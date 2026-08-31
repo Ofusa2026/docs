@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>分野参考様式第６－３号（建設・２号）</title>
+<title>分野参考様式第６－３号（建設・２号）＋別紙</title>
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
@@ -18,6 +18,16 @@
 .doc .hang{padding-left:2em;text-indent:-2em;}
 .doc .hang1{padding-left:1em;text-indent:-1em;}
 .doc .sub{padding-left:1em;}
+/* 別紙 */
+.doc .tb{width:150mm;border-collapse:collapse;table-layout:fixed;margin:0;}
+.doc .tb td{border:1px solid #000;padding:1pt 4pt;font-size:10.5pt;line-height:18pt;vertical-align:top;}
+.doc .tb td.k{width:97.5mm;}
+.doc .tb td.v{width:52.5mm;}
+.doc .tb td.m{text-align:center;white-space:nowrap;}
+.doc .tb td.c{text-align:center;}
+.doc .tb td.r{text-align:right;}
+.doc .ul{display:inline-block;min-width:1.8em;border-bottom:1px solid #000;text-align:center;line-height:1.2;}
+.doc .uly{min-width:3.2em;}
 @media print{
   html,body,.main,.pp,#pageArea{background:#fff!important}
   .app-bar,.fp{display:none!important}
@@ -30,8 +40,8 @@
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書</div>
-    <div class="ver">ver.20260831.05</div>
+    <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書＋別紙 経歴証明書</div>
+    <div class="ver">ver.20260831.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -53,21 +63,41 @@
   </div>
   <div class="fp-inner">
     <div class="fs"><div class="fs-title">基本情報</div>
-      <div class="fg"><label>作成年月日（雇用契約書の作成日と同じ）</label><div style="display:flex;gap:4px;"><input id="f_docYear" oninput="p()" style="width:4em;" placeholder="年"><input id="f_docMonth" oninput="p()" style="width:3em;" placeholder="月"><input id="f_docDay" oninput="p()" style="width:3em;" placeholder="日"></div></div>
+      <div class="fg"><label>作成年月日（雇用契約書の作成日と同じ・両ページ共通）</label><div style="display:flex;gap:4px;"><input id="f_docYear" oninput="p()" style="width:4em;" placeholder="年"><input id="f_docMonth" oninput="p()" style="width:3em;" placeholder="月"><input id="f_docDay" oninput="p()" style="width:3em;" placeholder="日"></div></div>
     </div>
     <div class="fs"><div class="fs-title">申請者（２号特定技能外国人）</div>
       <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
       <div class="fg"><label>性別</label><input id="f_gender" oninput="p()"></div>
       <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()"></div>
+      <div class="fg"><label>建設キャリアアップシステム技能者ID（別紙）</label><input id="f_ccusId" oninput="p()"></div>
     </div>
-    <div class="fs"><div class="fs-title">CCUSに実務経験が蓄積されている場合</div>
-      <div class="fg"><label>① 申請する業務区分に対応する職種</label><input id="f_job" oninput="p()" placeholder="例：内装工"></div>
-      <div class="fg"><label>② CCUSにおける技能評価基準の呼称</label><input id="f_call" oninput="p()" placeholder="例：内装仕上"></div>
+    <div class="fs"><div class="fs-title">P1　CCUSに実務経験が蓄積されている場合</div>
+      <div class="fg"><label>① 申請する業務区分に対応する職種（別紙と共通）</label><input id="f_job" oninput="p()" placeholder="例：とび"></div>
+      <div class="fg"><label>② CCUSにおける技能評価基準の呼称（別紙と共通）</label><input id="f_call" oninput="p()" placeholder="例：とび"></div>
       <div class="fg"><label>③ CCUS技能者情報に基づく就業日数（職長＋班長）</label><input id="f_days1" oninput="p()" placeholder="例：1年（215日）以上"></div>
     </div>
-    <div class="fs"><div class="fs-title">CCUSに実務経験が全て蓄積されていない場合</div>
-      <div class="fg"><label>④ 経歴証明書に基づく就業日数（職長＋班長）</label><input id="f_days2" oninput="p()" placeholder="例：751日"></div>
+    <div class="fs"><div class="fs-title">P1　CCUSに実務経験が全て蓄積されていない場合</div>
+      <div class="fg"><label>④ 経歴証明書に基づく就業日数（職長＋班長）※空欄なら別紙の合計を表示</label><input id="f_days2" oninput="p()" placeholder="例：430日以上"></div>
+    </div>
+    <div class="fs"><div class="fs-title">P2 別紙　証明者（特定技能所属機関）</div>
+      <div class="fg"><label>事業者名</label><input id="f_certCo" oninput="p()"></div>
+      <div class="fg"><label>役職名</label><input id="f_certTitle" oninput="p()"></div>
+      <div class="fg"><label>氏名</label><input id="f_certName" oninput="p()"></div>
+      <div class="fg"><label>建設キャリアアップシステム事業者ID</label><input id="f_certCcusId" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">P2 別紙　（２）職長、班長としての就業日数</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">就労していた期間ごとに入力（年・月・日は数字のみ）</div>
+      <div class="fg"><label>① 開始（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_s1y" oninput="p()" style="width:4em;"><input id="f_s1m" oninput="p()" style="width:3em;"><input id="f_s1d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>① 終了（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_e1y" oninput="p()" style="width:4em;"><input id="f_e1m" oninput="p()" style="width:3em;"><input id="f_e1d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>① 就業日数</label><input id="f_n1" oninput="p()" style="width:5em;"></div>
+      <div class="fg"><label>② 開始（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_s2y" oninput="p()" style="width:4em;"><input id="f_s2m" oninput="p()" style="width:3em;"><input id="f_s2d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>② 終了（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_e2y" oninput="p()" style="width:4em;"><input id="f_e2m" oninput="p()" style="width:3em;"><input id="f_e2d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>② 就業日数</label><input id="f_n2" oninput="p()" style="width:5em;"></div>
+      <div class="fg"><label>③ 開始（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_s3y" oninput="p()" style="width:4em;"><input id="f_s3m" oninput="p()" style="width:3em;"><input id="f_s3d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>③ 終了（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_e3y" oninput="p()" style="width:4em;"><input id="f_e3m" oninput="p()" style="width:3em;"><input id="f_e3d" oninput="p()" style="width:3em;"></div></div>
+      <div class="fg"><label>③ 就業日数</label><input id="f_n3" oninput="p()" style="width:5em;"></div>
+      <div class="fg"><label>合計（空欄なら自動計算）</label><input id="f_total" oninput="p()" style="width:5em;"></div>
     </div>
   </div>
 </div>
@@ -75,6 +105,7 @@
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
@@ -83,16 +114,33 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1788160162"></script>
+<script src="ofusa_common.js?v=1788166834"></script>
 <script>
+function _term(n){
+  // 見本どおり1行: 「2023年　4月　1日～ 2025年 3月 25日」
+  const u=(id)=>`<span class="ul">${f(id)}</span>`;
+  const y=(id)=>`<span class="ul uly">${f(id)}</span>`;
+  return `${y('f_s'+n+'y')}年${u('f_s'+n+'m')}月${u('f_s'+n+'d')}日～ ${y('f_e'+n+'y')}年${u('f_e'+n+'m')}月${u('f_e'+n+'d')}日`;
+}
+function _days(id){ return `<span class="ul" style="min-width:4em;">${f(id)}</span>　日`; }
+function _total(){
+  let t=v('f_total'); if(t) return t;
+  let sum=0, any=false;
+  for(let i=1;i<=3;i++){ const x=parseInt((v('f_n'+i)||'').replace(/[^0-9]/g,''),10); if(!isNaN(x)){sum+=x;any=true;} }
+  return any?String(sum):'';
+}
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
+  const tot=_total();
+  const dateLine=`${f('f_docYear')}年　　${f('f_docMonth')}月　　${f('f_docDay')}日`;
+  // ④ は入力があればそれ、無ければ別紙の合計
+  const days2 = v('f_days2') ? f('f_days2') : (tot ? '<span class="f">'+tot+'日</span>' : f('f_days2'));
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
 <div class="p" style="font-size:11pt;">分野参考様式第６－３号（特定技能外国人）</div>
-<div class="p" style="text-align:right;">${f('f_docYear')}年　　${f('f_docMonth')}月　　${f('f_docDay')}日</div>
+<div class="p" style="text-align:right;">${dateLine}</div>
 <div class="p" style="text-align:center;">２号特定技能外国人に求められる実務経験に係る申告書</div>
 <div class="p">出入国在留管理庁長官　殿</div>
 <div class="p" style="padding-left:75mm;">申請者</div>
@@ -117,10 +165,45 @@ function p(){
 <div class="p note hang">２　③には実務経験に必要な就業日数以上（記載例：1年（215日）以上）であることを確認して記載すること。CCUSのレベル判定を受けている場合は「能力評価（レベル判定）結果通知書」のレベル３以上のものの写しを添付すること。CCUSのレベル判定を受けていない場合は、CCUSにおける就業日数の表示画面の写しを添付すること</div>
 <div class="p" style="font-size:11pt;">〇CCUSの技能者情報に必要な実務経験が全て蓄積されていない場合</div>
 <table class="t63">
-  <tr><td class="k">④　①、②で選択した職種及び呼称の経歴証明書に基づく就業日数(職長＋班長)</td><td class="v">${f('f_days2')}</td></tr>
+  <tr><td class="k">④　①、②で選択した職種及び呼称の経歴証明書に基づく就業日数(職長＋班長)</td><td class="v">${days2}</td></tr>
 </table>
 <div class="p note">（注意）</div>
 <div class="p note hang1">３　③と④の合計が実務経験に必要な就業日数以上であることを確認して記載すること。また、③についてはCCUSにおける表示画面の写しを添付し、④については、別紙経歴証明書を添付すること。</div>
+</div>
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div class="p" style="font-size:11pt;">別　紙</div>
+<div class="p" style="text-align:right;">${dateLine}</div>
+<div class="p" style="text-align:center;font-size:11pt;">経　歴　証　明　書</div>
+<div class="p">出入国在留管理庁長官　殿</div>
+<div class="p" style="padding-left:67mm;">証明者　</div>
+<div class="p" style="padding-left:71mm;">事業者名　${f('f_certCo')}</div>
+<div class="p" style="padding-left:71mm;">役職名　${f('f_certTitle')}</div>
+<div class="p" style="padding-left:71mm;">氏名　${f('f_certName')}</div>
+<div class="p" style="padding-left:71mm;">建設キャリアアップシステム事業者ID<br>${f('f_certCcusId')}</div>
+<div class="p">下記に示す申請者の建設分野における特定技能の在留資格に係る制度の運用に関する方針に規定する２号特定技能外国人に求められる実務経験のうち、建設キャリアアップシステムに蓄積されてない就業日数については下記のとおりです。</div>
+<div class="p" style="text-align:center;">記</div>
+<div class="p">（１）申請者</div>
+<table class="tb">
+  <tr><td class="k">氏名</td><td class="v">${f('f_applicant')}</td></tr>
+  <tr><td class="k">建設キャリアアップシステム技能者ID</td><td class="v">${f('f_ccusId')}</td></tr>
+  <tr><td class="k">申請する業務区分に対応する職種</td><td class="v">${f('f_job')}</td></tr>
+  <tr><td class="k">技能評価基準の呼称</td><td class="v">${f('f_call')}</td></tr>
+</table>
+<div class="p">（２）職長、班長としての就業日数</div>
+<table class="tb">
+  <colgroup><col style="width:8mm"><col style="width:89.5mm"><col style="width:52.5mm"></colgroup>
+  <tr><td class="c" colspan="2">就業期間</td><td class="c">就業日数</td></tr>
+  <tr><td>①</td><td class="m">${_term(1)}</td><td class="r">${_days('f_n1')}</td></tr>
+  <tr><td>②</td><td class="m">${_term(2)}</td><td class="r">${_days('f_n2')}</td></tr>
+  <tr><td>③</td><td class="m">${_term(3)}</td><td class="r">${_days('f_n3')}</td></tr>
+  <tr><td class="c" colspan="2">合計</td><td class="r"><span class="ul" style="min-width:4em;">${tot?'<span class="f">'+tot+'</span>':f('f_total')}</span>　日</td></tr>
+</table>
+<div class="p">※必要に応じ行を追加すること。</div>
+<div class="p">※転職や離職などによって職長、班長として就労していない期間がある場合は、就労していた期間ごとに入力すること。</div>
+<div class="p">誓約欄</div>
+<div class="p" style="text-indent:1em;">この証明事項に事実と相違がある場合には、在留資格が取り消されても異存の無いことを誓約いたします。</div>
+<div class="p" style="padding-left:71mm;">申請者氏名　　${f('f_applicant')}　　</div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
   _apply6_3FontSize();
@@ -134,7 +217,7 @@ function _apply6_3FontSize(){
   const s=_fontSize/10.5;
   st.textContent=[
     `.doc{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
-    `.doc .t63 td{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
+    `.doc .t63 td,.doc .tb td{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
     `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
   ].join('');
 }
@@ -147,23 +230,33 @@ async function loadFromDB(passedInfo){
     try{info=JSON.parse(sel.value);}catch(e){return;}
   }
   if(!info || !info.caseId) return;
-  const {caseId}=info;
+  const {caseId,companyId,companyName}=info;
   try{
-    const [cases,persons]=await Promise.all([
+    const [cases,persons,cos]=await Promise.all([
       caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
-      caseId?sb('persons?select=applicant_name_en,gender,nationality,birthdate&case_id=eq.'+caseId):Promise.resolve([])
+      caseId?sb('persons?select=applicant_name_en,gender,nationality,birthdate,ccus_worker_id&case_id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_title,author_name,rep_name,rep_title,ccus_company_id&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_title,author_name,rep_name,rep_title,ccus_company_id&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([])
     ]);
-    const cas=cases&&cases[0]; const pd=persons&&persons[0];
+    const cas=cases&&cases[0]; const pd=persons&&persons[0]; const co=cos&&cos[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(pd&&pd.applicant_name_en){ s('f_applicant',pd.applicant_name_en); }
     if(cas){ s('f_applicant',cas.applicant||''); }
     if(pd){
       const g=(pd.gender||'').trim(); s('f_gender', g==='男'?'男性':g==='女'?'女性':g);
       s('f_nationality',pd.nationality||'');
       s('f_birthdate',_ymd63(pd.birthdate));
+      s('f_ccusId',pd.ccus_worker_id||'');
+    }
+    if(co){
+      // 証明者 = 特定技能所属機関（代表者優先）
+      s('f_certCo',co.name||'');
+      s('f_certTitle',(co.rep_title||co.author_title||'').trim());
+      s('f_certName',(co.rep_name||co.author_name||'').trim());
+      s('f_certCcusId',co.ccus_company_id||'');
     }
     // 作成年月日 = 雇用契約書の作成日 (cases.doc_create_date)。無ければ今日。
-    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     const dcd=(cas&&cas.doc_create_date)?String(cas.doc_create_date).split(/[-\/]/):[];
     if(dcd.length>=3&&dcd[0]&&dcd[1]&&dcd[2]){
       sf('f_docYear',String(parseInt(dcd[0],10)));sf('f_docMonth',String(parseInt(dcd[1],10)));sf('f_docDay',String(parseInt(dcd[2],10)));
