@@ -3005,6 +3005,16 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   function _apiKey(){
     try{ return localStorage.getItem('ofusa_apiKey') || localStorage.getItem('claudeApiKey') || ''; }catch(e){ return ''; }
   }
+  // ver.20260831.04: 住所欄かどうか（ID・ラベル文言から判定）
+  function _isAddr(el){
+    try{
+      var id=(el.id||'').toLowerCase();
+      if(/addr|address|jusho/.test(id)) return true;
+      var fg=el.closest('.fg'), lb=fg&&fg.querySelector('label');
+      if(lb && /住所|所在地/.test(lb.textContent||'')) return true;
+    }catch(e){}
+    return false;
+  }
   function _pairs(){
     var out=[];
     document.querySelectorAll('input[id$="En"],textarea[id$="En"]').forEach(function(en){
@@ -3030,11 +3040,20 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     var mini = el0 && el0.nextElementSibling && el0.nextElementSibling.classList.contains('tr-mini') ? el0.nextElementSibling : null;
     if(mini){ mini.disabled=true; mini.textContent='…'; }
     try{
-      var payload = pairs.map(function(p,i){ return (i+1)+'. '+String(p.ja.value).replace(/\n/g,' ').slice(0,500); }).join('\n');
+      var hasAddr=false;
+      var payload = pairs.map(function(p,i){
+        var isA=_isAddr(p.ja)||_isAddr(p.en); if(isA) hasAddr=true;
+        return (i+1)+'. '+(isA?'[ADDRESS] ':'')+String(p.ja.value).replace(/\n/g,' ').slice(0,500);
+      }).join('\n');
       var prompt = '日本の特定技能（雇用条件書などの公的様式）の記載内容を翻訳します。\n'
         + '次の各項目を '+LANG_EN[lang]+' に翻訳してください。\n'
-        + '・様式に印字される文言として簡潔・丁寧に\n・数字、単位（円・時間・日・月）、固有名詞はそのまま保持\n・説明や注釈は加えない\n\n'
-        + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
+        + '・様式に印字される文言として簡潔・丁寧に\n・数字、単位（円・時間・日・月）、固有名詞はそのまま保持\n・説明や注釈は加えない\n'
+        + (hasAddr ? ('・[ADDRESS] が付いた項目は日本の住所です。欧米式の語順（小さい単位→大きい単位）に並べ替えて'+LANG_EN[lang]+'表記にしてください。\n'
+          + '  例: 愛知県北名古屋市沖村山ノ神54番地 → 54 Okimura-Yamanokami, Kitanagoya-shi, Aichi\n'
+          + '  例: 東京都港区南青山二丁目5-17 ポーラ青山ビル3F → 3F Pola Aoyama Bldg., 2-5-17 Minami-Aoyama, Minato-ku, Tokyo\n'
+          + '  丁目・番地・号は 2-5-17 のようにハイフンでまとめ、都=Tokyo、道府県=そのままローマ字、市区町村は -shi/-ku/-cho/-mura を付ける。郵便番号は入力にあるときだけ残す。\n'
+          + '  出力に [ADDRESS] の文字は含めないこと。\n') : '')
+        + '\n' + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
       var r = await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
