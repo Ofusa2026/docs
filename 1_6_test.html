@@ -401,7 +401,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1788168758"></script>
+<script src="ofusa_common.js?v=1788223446"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1318,7 +1318,9 @@ async function loadFromDB(passedInfo){
 
         // empSets から指定インデックスの雇用条件を取得
         const empSets = co.emp_sets || [];
-        const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
+        // ver.20260901.01: idx未設定なら共通の resolveEmpSetIdx で申請人名/案件名から自動選択（cases.emp_set_idx にも書き戻し）
+        const idx = (typeof window.resolveEmpSetIdx==='function') ? await window.resolveEmpSetIdx(co, cas, info)
+                  : (empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0);
         esData = empSets[idx] || empSets[0] || null;
         // ①: 雇用条件セットセレクタを描画＋読込idx/セット記録（in-doc選択時のため）
         try{

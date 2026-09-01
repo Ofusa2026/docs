@@ -1,5 +1,10 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20260901.01
+ * - feat(resolveEmpSetIdx): cases.emp_set_idx が空のとき emp_sets[0] 固定だったのを、
+ *   申請人名/案件名/入力済み項目数でセットを自動選択し cases.emp_set_idx に書き戻すよう変更。
+ *   [0] がヒアリング取込の未完成セットで本命が [1] にある会社で、分野・業務区分・事務所住所(英)・
+ *   交代制などが空欄になる不具合を修正（case_1787220246147 前田精工で発覚。同状態の案件 1,600件超）。
  * ver.20260831.07
  * - fix(loadCaseToForm): 業務区分(category/categoryEn)の分割ブロックを skipFieldRestore でガード。
  *   1-6系で独自 setFormValues が入れた業務区分１が共通側で '' に上書きされ空欄になる不具合を修正。
@@ -107,6 +112,53 @@ async function sb(path,opts={}){
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
   return t ? JSON.parse(t) : null;
 }
+
+// ver.20260901.01: 雇用条件セット(emp_sets)のインデックス自動解決。
+//   cases.emp_set_idx が空の案件が多数あり（1,600件超）、その場合 従来は emp_sets[0] を既定にしていた。
+//   しかし [0] が「ヒアリング取込 (日時取得中)」等の未完成セットで、本命のセットが [1] 以降にある会社では
+//   分野・業務区分・事務所住所(英)・交代制などが軒並み空欄になっていた（例: case_1787220246147 前田精工）。
+//   優先順: ①cases.emp_set_idx（有効な数値）→ ②setName に申請人名を含む → ③setName に案件名を含む
+//          → ④入力済み項目数が最多のセット → ⑤0。
+//   ②〜④で決めた場合は cases.emp_set_idx に書き戻して、他書類（重要事項説明書・1-17等）とも揃える。
+window.resolveEmpSetIdx = async function(co, cas, info){
+  const sets = (co && Array.isArray(co.emp_sets)) ? co.emp_sets : [];
+  const raw = (cas && cas.emp_set_idx != null && String(cas.emp_set_idx) !== '') ? String(cas.emp_set_idx)
+            : (info && info.empSetIdx != null && String(info.empSetIdx) !== '') ? String(info.empSetIdx) : '';
+  if(raw !== '' && !isNaN(parseInt(raw,10)) && sets[parseInt(raw,10)]) return parseInt(raw,10);
+  if(sets.length <= 1) return 0;
+  const norm = v => String(v||'').replace(/[\s\u3000]+/g,'').toLowerCase();
+  const names = [];
+  if(cas && cas.applicant) names.push(norm(cas.applicant));
+  if(info && info.applicantName) names.push(norm(info.applicantName));
+  if(info && info.applicantNameEn) names.push(norm(info.applicantNameEn));
+  const caseName = norm(cas && cas.name);
+  let best = -1, bestScore = -1;
+  sets.forEach((es, i) => {
+    if(!es) return;
+    const sn = norm(es.setName || es.name);
+    let score = 0;
+    if(sn && names.some(n => n && n.length >= 3 && sn.indexOf(n) >= 0)) score += 1000;
+    if(sn && caseName && caseName.length >= 3 && (sn.indexOf(caseName) >= 0 || caseName.indexOf(sn) >= 0)) score += 500;
+    // 入力済み項目数（未完成セットより完成セットを優先）
+    let filled = 0;
+    Object.keys(es).forEach(k => { if(k.charAt(0)!=='_' && es[k]!=null && String(es[k])!=='' && typeof es[k]!=='object') filled++; });
+    score += Math.min(filled, 400);
+    if(score > bestScore){ bestScore = score; best = i; }
+  });
+  if(best < 0) best = 0;
+  // 書き戻し（失敗しても読込は続行）
+  try{
+    const caseId = (cas && cas.id) || (info && info.caseId);
+    if(caseId){
+      await sb('cases?id=eq.'+caseId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({emp_set_idx: String(best)})});
+      if(cas) cas.emp_set_idx = String(best);
+      if(info) info.empSetIdx = String(best);
+      console.log('[emp_set] idx auto-resolved & saved:', best, (sets[best]&&(sets[best].setName||sets[best].name))||'');
+      if(typeof showToast==='function') showToast('雇用条件セットを自動選択しました: '+((sets[best]&&(sets[best].setName||sets[best].name))||('#'+(best+1))));
+    }
+  }catch(_e){ console.warn('[emp_set] idx write-back failed', _e); }
+  return best;
+};
 
 // ===== 登録支援機関(support_orgs)の名前照合 =====
 // ver.20260715: cases.org は「株式会社KMT(82)」のように末尾に括弧サフィックスが付いたり、
@@ -1741,8 +1793,8 @@ async function loadCaseToForm(info, docKey, opts){
     co = co || {};
     console.log('[doc] company loaded:', co.name || '(none)');
 
-    // emp_sets 取得
-    const idx = parseInt(empSetIdx||0)||0;
+    // emp_sets 取得（ver.20260901.01: idx未設定なら申請人名/案件名で自動解決）
+    const idx = await window.resolveEmpSetIdx(co, cas, info);
     const es = (co.emp_sets||[])[idx] || {};
     // ①: 雇用条件セットセレクタを描画（#empSetSelectorSlot がある書類のみ）
     window._empDocKey = docKey;
