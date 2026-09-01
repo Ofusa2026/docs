@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260827.03</div>
+    <div class="ver">ver.20260901.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -501,7 +501,8 @@ function p(){
 
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
-  const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const flexTypeShown=v('es_flexType')||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && !!_vw);
+  // ver.20260901.01: 変形労働単位（es_flexUnit）を日本語版(1_6.html)と同様に参照。現地語行も単位入力があれば出力（他言語版へ横展開）
+  const _ff=v('es_flexFlg'); const _vw=(window._empLoadedSet&&window._empLoadedSet.variableWork)||''; const _flexUnitVW=_vw?_vw.replace(/単位の変形労働時間制|の変形労働時間制|変形労働時間制/g,'').trim():''; const _flexUnitInput=v('es_flexUnit'); const flexTypeShown=v('es_flexType')||_flexUnitInput||_flexUnitVW; const flexOn = (!!_ff && !/適用なし|^なし$|^無$|適用しない/.test(_ff)) || (!_ff && !v('es_flexType') && (!!_flexUnitInput || !!_vw));
   // ver.20260716: 賞与も退職金と同じく cb() でプレビュー上のクリック切替を効かせる
   const bonusOn = v('es_bonus')==='有';
   // ver.20260818.04: 退職金 有無判定を修正。従来は「詳細に値があれば有」で、詳細を消しても外れない不具合。
