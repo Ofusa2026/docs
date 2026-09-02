@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260902.02</div>
+    <div class="ver">ver.20260902.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -448,7 +448,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1788313636"></script>
+<script src="ofusa_common.js?v=1788328867"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -926,8 +926,8 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(insEnrolled('insPension'),"ins_kousei")}&nbsp;厚生年金，${cb(insEnrolled('insKenpo'),"ins_kenko")}&nbsp;健康保険，${cb(insEnrolled('insEmp'),"ins_koyo")}&nbsp;雇用保険，${cb(insEnrolled('insLabor'),"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(!!otherIns(),"ins_other")}&nbsp;その他（${otherIns()?'&nbsp;'+esc(otherIns())+'&nbsp;':'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'}））<br><span class="id" style="font-size:7pt;">Joining social insurance / employment insurance. (${cb(insEnrolled('insPension'),"ins_kousei_id")}&nbsp;Employees' pension insurance, ${cb(insEnrolled('insKenpo'),"ins_kenko_id")}&nbsp;Health insurance, ${cb(insEnrolled('insEmp'),"ins_koyo_id")}&nbsp;Employment insurance, ${cb(insEnrolled('insLabor'),"ins_rousai_id")}&nbsp;Industrial accident insurance,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")}&nbsp;National pension, ${cb(false,"ins_kokumin_kenko_id")}&nbsp;National health insurance, ${cb(!!otherIns(),"ins_other_id")}&nbsp;Others (${otherInsEn()?' '+esc(otherInsEn())+' ':' '}))</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;">Health check at the time of hiring: Month &nbsp;&nbsp;${f('es_healthCheckM2')}&nbsp;&nbsp; Year &nbsp;&nbsp;${f('es_healthCheckY2')}&nbsp;&nbsp;</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${fOr('es_healthCheckY','es_healthCheckY2')}年&emsp;${fOr('es_healthCheckM','es_healthCheckM2')}月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month ${fOr('es_healthCheckM','es_healthCheckM2')} Year ${fOr('es_healthCheckY','es_healthCheckY2')} (every 1 year afterwards)</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>月<br><span class="id" style="font-size:7.5pt;">Health check at the time of hiring: Month &nbsp;&nbsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>&nbsp;&nbsp; Year &nbsp;&nbsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>&nbsp;&nbsp;</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span>月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month <span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span> Year <span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span> (every 1 year afterwards)</span></div>
       <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">Point of contact for matters concerning the improvement of employment management etc.</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Name of department&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Name of person in charge&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(Contact information&emsp;${f('es_contactTel')})</span></div>
       <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;">If the specified skilled worker is unable to pay for the travel expenses to return to his or her home country after the termination of this contract, the organization shall pay for the travel expenses and take necessary measures to ensure smooth departure.</span></div>

@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260902.02</div>
+    <div class="ver">ver.20260902.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -448,7 +448,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1788313636"></script>
+<script src="ofusa_common.js?v=1788328867"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -926,8 +926,8 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(insEnrolled('insPension'),"ins_kousei")}&nbsp;厚生年金，${cb(insEnrolled('insKenpo'),"ins_kenko")}&nbsp;健康保険，${cb(insEnrolled('insEmp'),"ins_koyo")}&nbsp;雇用保険，${cb(insEnrolled('insLabor'),"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(!!otherIns(),"ins_other")}&nbsp;その他（${otherIns()?'&nbsp;'+esc(otherIns())+'&nbsp;':'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'}））<br><span class="id" style="font-size:7pt;" data-key="107">1. 社会保险参保情况、劳动保险适用情况 (${cb(insEnrolled('insPension'),"ins_kousei_id")} 厚生年金, ${cb(insEnrolled('insKenpo'),"ins_kenko_id")} 健康保险, ${cb(insEnrolled('insEmp'),"ins_koyo_id")} 雇佣保险, ${cb(insEnrolled('insLabor'),"ins_rousai_id")} 工伤保险,</span><br><span class="id" style="font-size:7pt;margin-left:16px;" data-key="108">${cb(false,"ins_kokumin_id")} 国民年金, ${cb(false,"ins_kokumin_kenko_id")} 国民健康保险, ${cb(!!otherIns(),"ins_other_id")} 其他 (${otherInsEn()?' '+esc(otherInsEn())+' ':' '}))</span></div>
-      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;${f('es_healthCheckY2')}年&emsp;${f('es_healthCheckM2')}月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. 雇佣时的体检：&emsp;&nbsp;&nbsp;${f('es_healthCheckY2')}&nbsp;&nbsp;年&nbsp;&nbsp;${f('es_healthCheckM2')}&nbsp;&nbsp;月</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;${fOr('es_healthCheckY','es_healthCheckY2')}年&emsp;${fOr('es_healthCheckM','es_healthCheckM2')}月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. 首次定期体检：&emsp;${fOr('es_healthCheckY','es_healthCheckY2')}年${fOr('es_healthCheckM','es_healthCheckM2')}月 (然后每1年实施)</span></div>
+      <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>月<br><span class="id" style="font-size:7.5pt;" data-key="109">2. 雇佣时的体检：&emsp;&nbsp;&nbsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>&nbsp;&nbsp;年&nbsp;&nbsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>&nbsp;&nbsp;月</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span>月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;" data-key="110">3. 首次定期体检：&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年<span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span>月 (然后每1年实施)</span></div>
       <div style="margin-top:4px;">４．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;" data-key="111">4. 关于改善雇佣管理等事项的咨询窗口</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;" data-key="112">部门名称&emsp;${f('es_contactDeptEn')}&emsp;&emsp;负责人职务和姓名&emsp;${f('es_contactPersonEn')}&emsp;(联系方式&emsp;${f('es_contactTel')})</span></div>
       <div style="margin-top:4px;">５．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;" data-key="113">5. 乙方在本合同终止后回国之际，如乙方无法负担回国路费，甲方应负担该路费并采取必要措施确保乙方可顺利出境。</span></div>
