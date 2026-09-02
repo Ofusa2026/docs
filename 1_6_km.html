@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（カンボジア語版）</div>
-    <div class="ver">ver.20260901.01</div>
+    <div class="ver">ver.20260902.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -448,7 +448,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1788223446"></script>
+<script src="ofusa_common.js?v=1788312931"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -704,8 +704,8 @@ function p(){
       </div>
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">(2) 【ករណីប្រព័ន្ធខាងក្រោមនេះត្រូវបានអនុវត្តចំពោះកម្មករ】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
-        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${flexTypeShown?'：（<span class="f">'+esc(flexTypeShown.replace(/単位/g,''))+'</span>）単位の変形労働時間制':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
-        <span class="id" style="font-size:7pt;" data-key="54">${cb(false,'flex_work_id')} ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបាន៖ ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានឯកតា (${f('es_flexUnitEn')})</span>
+        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制${(flexOn||flexTypeShown)?'：（<span class="f">'+esc((flexTypeShown||'　　').replace(/単位/g,''))+'</span>）単位の変形労働時間制':''}${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
+        <span class="id" style="font-size:7pt;" data-key="54">${cb(flexOn,'flex_work_id')} ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបាន៖ ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានឯកតា (${f('es_flexUnitEn')})</span>
         <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">* ក្នុងករណីប្រើប្រាស់ប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានក្នុងឯកតា 1 ឆ្នាំ ត្រូវភ្ជាប់ច្បាប់ចម្លងនៃប្រតិទិនប្រចាំឆ្នាំដែលមានភាសាដែលភាគីខអាចយល់បានយ៉ាងពេញលេញ និងច្បាប់ចម្លងនៃកិច្ចព្រមព្រៀងទាក់ទងនឹងប្រព័ន្ធម៉ោងធ្វើការអាចបំប្លែងបានដែលបានដាក់ជូនការិយាល័យត្រួតពិនិត្យស្តង់ដារការងារ។</span></div>
         <div style="margin-top:2px;">${cb(shiftOn,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">${cb(false,'shift_work_id')} ជាប្រព័ន្ធឆ្លាស់គ្នា សូមបញ្ចូលគ្នានៃម៉ោងធ្វើការខាងក្រោម។</span></div>
         ${(()=>{
