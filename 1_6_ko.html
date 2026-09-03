@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260903.01</div>
+    <div class="ver">ver.20260903.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -509,7 +509,7 @@ function p(){
   const _kj=x=>rPos&&(_rcSet?_rcHas(x):true);
   const _wrNum=(pfx,i,se)=>{var v=(window._empLoadedSet&&window._empLoadedSet['workRule'+pfx+i+se])||'';return String(v).replace(/[^0-9]/g,'');};
   const _wrBlank='第&emsp;条〜第&emsp;条';
-  const _wr=pfx=>{var o=[];for(var i=1;i<=3;i++){var a=_wrNum(pfx,i,'From'),b=_wrNum(pfx,i,'To');if(a||b)o.push('第'+a+'条〜第'+b+'条');}return o.length?o.join('，'):(_wrBlank+'，'+_wrBlank+'，'+_wrBlank);};
+  const _wr=pfx=>{var o=[];for(var i=1;i<=3;i++){var a=_wrNum(pfx,i,'From'),b=_wrNum(pfx,i,'To');if(a||b)o.push('第'+a+'条〜第'+b+'条');}return o.length?'<span class="f">'+o.join('，')+'</span>':(_wrBlank+'，'+_wrBlank+'，'+_wrBlank);};
 
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
