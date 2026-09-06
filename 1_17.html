@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.09
+  ver.20260826.10
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1085,6 +1085,17 @@ window.PLACEHOLDER_MAP = {
 function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zipCallback){
   var c=cData.find(function(x){return x.id===caseId;});
   if(!c) return;
+  /* ver.20260826.10: 生成に使う人材が本当にこの案件のものか検証する。
+     過去に別案件の人材データが混入して他人の書類が生成される事故があったため、
+     不一致を検出したら生成を止める。 */
+  try{
+    var _pchk = personData[caseId] || {};
+    var _pname = _pchk.applicantNameEn || _pchk.applicantName || '(なし)';
+    if(typeof log === 'function') log('生成対象: ' + caseId + ' / 人材=' + _pname);
+    if(Object.keys(personData).length > 1){
+      if(typeof log === 'function') log('⚠ personDataに複数案件が残存: ' + Object.keys(personData).join(', '));
+    }
+  }catch(_){}
   var co=findCompanyByName(c.company);
   if(!co&&c.org)co=findCompanyByName(c.org);
   co=co||{};
@@ -1974,11 +1985,11 @@ window.addEventListener("message", async function(e){
   }));
   try {
     setStatus("案件データ取得中...", "info");
-    // ver.20260826.09: 前案件の残留データを完全に破棄してから読み込む
-    personData = {};
-    cData = [];
-    companies = [];
-    supportOrgs = [];
+    // ver.20260826.10: 前案件の残留データを破棄（参照を保つため中身だけ消す）
+    Object.keys(personData).forEach(function(k){ delete personData[k]; });
+    cData.length = 0;
+    companies.length = 0;
+    supportOrgs.length = 0;
     currentCase = null;
     await loadCaseById(info.caseId, info.companyId);
     currentCase = cData.find(function(x){ return x.id === info.caseId; });
@@ -2010,13 +2021,13 @@ async function loadCaseFromInput(){
   if(msg){ msg.textContent = "読み込み中..."; msg.style.color = "var(--muted)"; }
   try {
     setStatus("案件データ取得中...", "info");
-    /* ver.20260826.09: 読み込み前に前案件の残留データを完全に破棄する。
-       personData 等が残っていると、NULL列に前の人材の値が生き残り
-       他人の情報が書類に混入する事故につながる。 */
-    personData = {};
-    cData = [];
-    companies = [];
-    supportOrgs = [];
+    /* ver.20260826.10: 読み込み前に前案件の残留データを完全に破棄する。
+       オブジェクト/配列を再代入すると別<script>ブロックが掴んだ古い参照が
+       残るため、必ず「中身だけ」を空にして同一参照を維持する。 */
+    Object.keys(personData).forEach(function(k){ delete personData[k]; });
+    cData.length = 0;
+    companies.length = 0;
+    supportOrgs.length = 0;
     currentCase = null;
     await loadCaseById(caseId);
     currentCase = cData.find(function(x){ return x.id === caseId; });
