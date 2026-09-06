@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.08
+  ver.20260826.09
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1974,6 +1974,12 @@ window.addEventListener("message", async function(e){
   }));
   try {
     setStatus("案件データ取得中...", "info");
+    // ver.20260826.09: 前案件の残留データを完全に破棄してから読み込む
+    personData = {};
+    cData = [];
+    companies = [];
+    supportOrgs = [];
+    currentCase = null;
     await loadCaseById(info.caseId, info.companyId);
     currentCase = cData.find(function(x){ return x.id === info.caseId; });
     currentEmpSetIdx = (info.empSetIdx != null && info.empSetIdx !== "")
@@ -2004,6 +2010,14 @@ async function loadCaseFromInput(){
   if(msg){ msg.textContent = "読み込み中..."; msg.style.color = "var(--muted)"; }
   try {
     setStatus("案件データ取得中...", "info");
+    /* ver.20260826.09: 読み込み前に前案件の残留データを完全に破棄する。
+       personData 等が残っていると、NULL列に前の人材の値が生き残り
+       他人の情報が書類に混入する事故につながる。 */
+    personData = {};
+    cData = [];
+    companies = [];
+    supportOrgs = [];
+    currentCase = null;
     await loadCaseById(caseId);
     currentCase = cData.find(function(x){ return x.id === caseId; });
     if(!currentCase) throw new Error("案件が見つかりません: " + caseId);
@@ -2579,6 +2593,17 @@ async function onGenerate(){
 
     var caseId = currentCase && currentCase.id;
     if(!caseId) throw new Error("案件未選択（index.html左サイドバーで案件を選んでください）");
+
+    /* ver.20260826.09: 生成の直前に必ずDBから最新データを取り直す。
+       以前はメモリ上の cData / personData をそのまま使っていたため、
+       案件を切り替えたり別タブでデータを更新した場合に、古い（＝別人の）
+       情報のまま書類が生成される危険があった。 */
+    log("最新データを再取得: " + caseId);
+    await loadCaseById(caseId, currentCase.companyId);
+    currentCase = cData.find(function(x){ return x.id === caseId; });
+    if(!currentCase) throw new Error("案件が見つかりません: " + caseId);
+    renderCaseInfo();
+
     var empSetIdx = currentEmpSetIdx || "";
 
     // グローバル選択状態をセット（processTemplateBytesが参照）
