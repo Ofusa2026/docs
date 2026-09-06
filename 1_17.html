@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.06
+  ver.20260826.07
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -2427,6 +2427,40 @@ function readFieldValue(field, c, p, co, es){
   if(field==='es.officePref'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).pref;}
   if(field==='es.officeCity'){var oa=es.officeAddr||es.officeAddress||'';return splitAddress(oa).city;}
   if(field==='es.housingFeeType'){var dh=es.deductHousing||'';return (dh&&dh!=='0'&&dh!=='０')?'有':'無';}
+  if(field==='es.housingFee') return es.deductHousing||'';
+  /* ver.20260826.07: rv()（書類生成用）にあってreadFieldValue()（画面表示用）に
+     欠けていた30フィールドを移植。両者が別実装のため、書類には出るのに
+     マッピング表では空欄という不整合が発生していた。 */
+  if(field==='co.repTitleName') return ((co.repTitle||'')+' '+(co.repName||'')).trim();
+  if(field==='p.expireY'){var ex=p.expire||c.expire||'';var ep=ex.split(/[-\/]/);return ep[0]||'';}
+  if(field==='p.expireM'){var ex2=p.expire||c.expire||'';var ep2=ex2.split(/[-\/]/);return ep2[1]?String(parseInt(ep2[1],10)):'';}
+  if(field==='p.expireD'){var ex3=p.expire||c.expire||'';var ep3=ex3.split(/[-\/]/);return ep3[2]?String(parseInt(ep3[2],10)):'';}
+  if(field==='p.passExpY'){var pe=p.passportExpiry||p.passportExpire||'';var pp=pe.split(/[-\/]/);return pp[0]||'';}
+  if(field==='p.passExpM'){var pe2=p.passportExpiry||p.passportExpire||'';var pp2=pe2.split(/[-\/]/);return pp2[1]?String(parseInt(pp2[1],10)):'';}
+  if(field==='p.passExpD'){var pe3=p.passportExpiry||p.passportExpire||'';var pp3=pe3.split(/[-\/]/);return pp3[2]?String(parseInt(pp3[2],10)):'';}
+  if(field==='p.homeAddress') return p.homeAddress||p.birthPlace||p.homeTown||'';
+  if(field==='p.desiredStatus') return p.desiredStatus||c.residenceStatus||'特定技能1号';
+  if(field==='p.address') return p.address||c.address||'';
+  if(field==='case.company') return c.company||'';
+  if(field==='es.applicantField'){var _af=es.applicantField||es.field||c.applicantField||'';return _af.replace(/（特定技能[１２]号）/g,'');}
+  if(field==='es.weeklyHours') return es.weeklyHours||es.workHoursWeek||'';
+  if(field==='es.monthlyHours') return es.monthlyHours||'';
+  if(field==='es.salaryHourly') return es.salaryHourly||es.hourlyRate||'';
+  if(field==='es.officePrefEn') return es.officePrefEn||'';
+  if(field==='es.officeCityEn') return es.officeCityEn||'';
+  if(field==='es.supportFee') return es.supportFee||c.supportFee||'';
+  if(field==='co.supportOrgName'){return co.supportOrgName||c.org||'';}
+  if(field==='co.supportOrgNumber'){var _sonn2=co.supportOrgName||c.org||'';var _soObjN2=supportOrgs.find(function(x){return x.name===_sonn2;})||{};return co.supportOrgNumber||_soObjN2.regNo||'';}
+  if(field==='applicantName') return getDisplayName(c);
+  if(field==='applicantNameEn') return p.applicantNameEn||p.nameEn||c.applicant||'';
+  if(field==='applicantField') return c.applicantField||es.applicantField||es.field||'';
+  if(field==='applicantFieldEn') return c.applicantFieldEn||es.applicantFieldEn||'';
+  if(field==='jobCategory') return c.jobCategory||es.category||'';
+  if(field==='jobCategoryEn') return c.jobCategoryEn||es.categoryEn||'';
+  if(field==='case.contractEndDate'){var ce=(p.contractEnd||c.contractEnd||'')||p.contractEndDate||'';if(ce){var _cep=ce.split(/[-\/]/);if(_cep.length>=3)return _cep[0]+'年'+parseInt(_cep[1],10)+'月'+parseInt(_cep[2],10)+'日';return ce;}var cey=p.contractEndY||'',cem=p.contractEndM||'',ced=p.contractEndD||'';if(cey&&cem&&ced)return cey+'年'+cem+'月'+ced+'日';return '';}
+  if(field==='case.contractStartDate'){var cs=(p.contractStart||c.contractStart||'');if(cs){var _csp=cs.split(/[-\/]/);if(_csp.length>=3)return _csp[0]+'年'+parseInt(_csp[1],10)+'月'+parseInt(_csp[2],10)+'日';return cs;}return '';}
+  if(field==='contractStart') return (p.contractStart||c.contractStart||'');
+  if(field==='contractEnd')   return (p.contractEnd||c.contractEnd||'');
   if(field==='co.fullAddress') return (co.pref||'')+(co.city||'')+(co.address||'');
   if(field==='co.authorTitleName') return ((co.authorTitle||'')+' '+(co.authorName||'')).trim();
   // 直接参照
