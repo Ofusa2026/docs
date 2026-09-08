@@ -38,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 委任状（変更）</div>
-    <div class="ver">ver.20260713.03</div>
+    <div class="ver">ver.20260908.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -68,8 +68,15 @@
       <div class="fg"><label>代表者名</label><input id="f_rep" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">申請種別</div>
+      <div class="fg"><label>国交省 受入経験（企業情報から自動取得）</label>
+        <select id="f_kokkoExp" onchange="applyKokkoExp(true)">
+          <option value="">未設定</option>
+          <option value="有">あり → 変更申請</option>
+          <option value="無">なし → 新規申請</option>
+        </select>
+      </div>
       <div class="fg"><label>申請種別</label>
-        <select id="f_appType" onchange="p()">
+        <select id="f_appType" onchange="_appType2=this.value; p()">
           <option value="change">変更申請</option>
           <option value="new">新規申請</option>
           <option value="notify">変更届け出</option>
@@ -90,7 +97,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1788328867"></script>
+<script src="ofusa_common.js?v=1788851015"></script>
 <script>
 let _appType2 = 'change'; // 'new'/'change'/'notify'
 
@@ -155,8 +162,19 @@ function _applyInjouFontSize(){
     `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
   ].join('');
 }
+// ver.20260908.01: 受入経験（companies.kokko_experience 有/無）から申請種別を自動選択
+//   有 → 変更申請 / 無 → 新規申請。手動でセレクトやプレビューのチェックを変えれば上書き可能。
+function applyKokkoExp(fromUser){
+  const v=(document.getElementById('f_kokkoExp')||{}).value||'';
+  if(v==='有') _appType2='change';
+  else if(v==='無') _appType2='new';
+  else if(fromUser) _appType2='';
+  const sel=document.getElementById('f_appType'); if(sel&&_appType2) sel.value=_appType2;
+  p();
+}
 function toggleAppType(val){
   _appType2 = (_appType2 === val) ? '' : val;
+  const sel=document.getElementById('f_appType'); if(sel&&_appType2) sel.value=_appType2;
   p();
 }
 
@@ -182,8 +200,8 @@ async function loadFromDB(passedInfo){
   if(!info || !info.caseId) return;
   const {companyId,companyName}=info;
   try{
-    const q=companyId?`companies?select=name,pref,city,address,tel,rep_title,rep_name&id=eq.${companyId}`
-      :companyName?`companies?select=name,pref,city,address,tel,rep_title,rep_name&name=eq.${encodeURIComponent(companyName)}`:null;
+    const q=companyId?`companies?select=name,pref,city,address,tel,rep_title,rep_name,kokko_experience&id=eq.${companyId}`
+      :companyName?`companies?select=name,pref,city,address,tel,rep_title,rep_name,kokko_experience&name=eq.${encodeURIComponent(companyName)}`:null;
     if(!q) return;
     const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
@@ -192,6 +210,9 @@ async function loadFromDB(passedInfo){
     s('f_tel',co.tel||'');
     s('f_title',co.rep_title||'');
     s('f_rep',co.rep_name||'');
+    // 受入経験 → 申請種別を自動選択（有=変更 / 無=新規）
+    const ke=document.getElementById('f_kokkoExp');
+    if(ke){ ke.value=(co.kokko_experience==='有'||co.kokko_experience==='無')?co.kokko_experience:''; applyKokkoExp(false); }
     if(!v('f_docDate')){const n=new Date();s('f_docDate',`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`);}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
