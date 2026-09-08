@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.10
+  ver.20260826.11
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -828,6 +828,42 @@ window.PLACEHOLDER_MAP = {
   '｛｛登録支援機関対応時間_日｝｝':'so.ex_hourSun',
   '｛｛登録支援機関対応時間_祝｝｝':'so.ex_hourHol',
   '｛｛登録支援機関対応時間_平日｝｝':'so.ex_hourWeekday',
+  '｛｛登録支援機関対応時間_月_開始｝｝':'so.ex_hourMonFrom',
+  '｛｛登録支援機関対応時間_月_終了｝｝':'so.ex_hourMonTo',
+  '｛｛登録支援機関対応時間_月_開始時｝｝':'so.ex_hourMonFromH',
+  '｛｛登録支援機関対応時間_月_終了時｝｝':'so.ex_hourMonToH',
+  '｛｛登録支援機関対応時間_火_開始｝｝':'so.ex_hourTueFrom',
+  '｛｛登録支援機関対応時間_火_終了｝｝':'so.ex_hourTueTo',
+  '｛｛登録支援機関対応時間_火_開始時｝｝':'so.ex_hourTueFromH',
+  '｛｛登録支援機関対応時間_火_終了時｝｝':'so.ex_hourTueToH',
+  '｛｛登録支援機関対応時間_水_開始｝｝':'so.ex_hourWedFrom',
+  '｛｛登録支援機関対応時間_水_終了｝｝':'so.ex_hourWedTo',
+  '｛｛登録支援機関対応時間_水_開始時｝｝':'so.ex_hourWedFromH',
+  '｛｛登録支援機関対応時間_水_終了時｝｝':'so.ex_hourWedToH',
+  '｛｛登録支援機関対応時間_木_開始｝｝':'so.ex_hourThuFrom',
+  '｛｛登録支援機関対応時間_木_終了｝｝':'so.ex_hourThuTo',
+  '｛｛登録支援機関対応時間_木_開始時｝｝':'so.ex_hourThuFromH',
+  '｛｛登録支援機関対応時間_木_終了時｝｝':'so.ex_hourThuToH',
+  '｛｛登録支援機関対応時間_金_開始｝｝':'so.ex_hourFriFrom',
+  '｛｛登録支援機関対応時間_金_終了｝｝':'so.ex_hourFriTo',
+  '｛｛登録支援機関対応時間_金_開始時｝｝':'so.ex_hourFriFromH',
+  '｛｛登録支援機関対応時間_金_終了時｝｝':'so.ex_hourFriToH',
+  '｛｛登録支援機関対応時間_土_開始｝｝':'so.ex_hourSatFrom',
+  '｛｛登録支援機関対応時間_土_終了｝｝':'so.ex_hourSatTo',
+  '｛｛登録支援機関対応時間_土_開始時｝｝':'so.ex_hourSatFromH',
+  '｛｛登録支援機関対応時間_土_終了時｝｝':'so.ex_hourSatToH',
+  '｛｛登録支援機関対応時間_日_開始｝｝':'so.ex_hourSunFrom',
+  '｛｛登録支援機関対応時間_日_終了｝｝':'so.ex_hourSunTo',
+  '｛｛登録支援機関対応時間_日_開始時｝｝':'so.ex_hourSunFromH',
+  '｛｛登録支援機関対応時間_日_終了時｝｝':'so.ex_hourSunToH',
+  '｛｛登録支援機関対応時間_祝_開始｝｝':'so.ex_hourHolFrom',
+  '｛｛登録支援機関対応時間_祝_終了｝｝':'so.ex_hourHolTo',
+  '｛｛登録支援機関対応時間_祝_開始時｝｝':'so.ex_hourHolFromH',
+  '｛｛登録支援機関対応時間_祝_終了時｝｝':'so.ex_hourHolToH',
+  '｛｛登録支援機関対応時間_平日_開始｝｝':'so.ex_hourWeekdayFrom',
+  '｛｛登録支援機関対応時間_平日_終了｝｝':'so.ex_hourWeekdayTo',
+  '｛｛登録支援機関対応時間_平日_開始時｝｝':'so.ex_hourWeekdayFromH',
+  '｛｛登録支援機関対応時間_平日_終了時｝｝':'so.ex_hourWeekdayToH',
   '｛｛登録支援機関相談方法_面談｝｝':'so.ex_consultF2f',
   '｛｛登録支援機関相談方法_電話｝｝':'so.ex_consultTel',
   '｛｛登録支援機関相談方法_メール｝｝':'so.ex_consultMail',
@@ -836,6 +872,9 @@ window.PLACEHOLDER_MAP = {
   '｛｛登録支援機関相談方法_電話3｝｝':'so.ex_consultTel3',
   '｛｛登録支援機関相談方法_メールアドレス｝｝':'so.ex_consultMailAddr',
   '｛｛登録支援機関相談方法_その他｝｝':'so.ex_consultOther',
+  '｛｛登録支援機関相談方法_その他チェック｝｝':'so.ex_consultOtherChk',
+  '｛｛登録支援機関緊急時_その他チェック｝｝':'so.ex_emgOtherChk',
+  '｛｛登録支援機関緊急時_メールアドレス｝｝':'so.ex_emgMailAddr',
   '｛｛登録支援機関緊急時_面談｝｝':'so.ex_emgF2f',
   '｛｛登録支援機関緊急時_電話｝｝':'so.ex_emgTel',
   '｛｛登録支援機関緊急時_メール｝｝':'so.ex_emgMail',
@@ -1355,6 +1394,33 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         // 対応時間（曜日別）
         var dayMap={hourMon:'mon',hourTue:'tue',hourWed:'wed',hourThu:'thu',hourFri:'fri',hourSat:'sat',hourSun:'sun',hourHol:'hol'};
         if(dayMap[k]) return _hourStr(H[dayMap[k]]);
+        /* ver.20260826.11: 1-17号の対応時間表は「17時 〜 20時」「Pukul 17:00 sampai 20:00」
+           のように開始/終了を別セルに入れるため、From/To を個別に取り出す変数を追加。
+           ..From / ..To は "HH:MM" 、..FromH / ..ToH は時のみ（例 "17"）を返す。 */
+        var _dayFromTo = function(key){
+          var m = key.match(/^hour(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Hol)(From|To)(H?)$/);
+          if(!m) return null;
+          var d = m[1].toLowerCase();
+          var h = H[d] || {};
+          if(h.none) return '-';
+          var v = (m[2]==='From') ? (h.from||'') : (h.to||'');
+          if(!v) return '';
+          return m[3]==='H' ? String(parseInt(String(v).split(':')[0],10)) : v;
+        };
+        var _ft = _dayFromTo(k);
+        if(_ft !== null) return _ft;
+        // 平日まとめのFrom/To（月〜金が同値のときだけ返す）
+        if(/^hourWeekday(From|To)(H?)$/.test(k)){
+          var _wm = k.match(/^hourWeekday(From|To)(H?)$/);
+          var _wd = ['mon','tue','wed','thu','fri'].map(function(d){
+            var h=H[d]||{};
+            if(h.none) return '-';
+            var v=(_wm[1]==='From')?(h.from||''):(h.to||'');
+            if(!v) return '';
+            return _wm[2]==='H' ? String(parseInt(String(v).split(':')[0],10)) : v;
+          });
+          return _wd.every(function(x){return x===_wd[0];}) ? _wd[0] : '';
+        }
         // 平日まとめ（月〜金が同値のときだけ返す）
         if(k==='hourWeekday'){
           var vals=['mon','tue','wed','thu','fri'].map(function(d){return _hourStr(H[d]);});
@@ -1369,6 +1435,10 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         if(k==='consultTel3') return _telSplit(CM.telNo)[2];
         if(k==='consultMailAddr') return CM.mailAddr||'';
         if(k==='consultOther') return CM.other||'';
+        // ver.20260826.11: その他欄のチェックボックス／緊急時メールアドレス
+        if(k==='consultOtherChk') return _cb(!!(CM.other && String(CM.other).trim()));
+        if(k==='emgOtherChk') return _cb(!!(EC.other && String(EC.other).trim()));
+        if(k==='emgMailAddr') return EC.mailAddr||'';
         if(k==='emgF2f') return _cb(EC.f2f);
         if(k==='emgTel') return _cb(EC.tel);
         if(k==='emgMail') return _cb(EC.mail);
