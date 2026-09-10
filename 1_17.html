@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.12
+  ver.20260826.13
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -1516,32 +1516,23 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
          件数可変のため1セル内に改行区切りで列挙する。 */
       if(_soF==='staffListManagers' || _soF==='staffListStaffs' ||
          _soF==='staffListManagersCount' || _soF==='staffListStaffsCount'){
-        var _list = Array.isArray(_so.supportStaffList) ? _so.supportStaffList : [];
-        var _isMgr = function(p){
-          var t = String((p&&(p.title||p.役職))||'');
-          var te = String((p&&(p.titleEn||p.title_en))||'');
-          return /マネージャー|責任者|管理者/.test(t) || /manager|supervisor/i.test(te);
-        };
-        var _mgrs = _list.filter(_isMgr);
-        var _stfs = _list.filter(function(p){ return !_isMgr(p); });
+        /* ver.20260826.13: 名簿は support_orgs.attachments 配下の
+           support_managers（支援責任者）／support_staff（支援担当者）を直接参照する。
+           以前は support_staff_list を役職で振り分けていたが、正しい格納先はこちら。 */
+        var _att0 = _so.attachments||{};
+        var _mgrs = Array.isArray(_att0.support_managers) ? _att0.support_managers : [];
+        var _stfs = Array.isArray(_att0.support_staff)    ? _att0.support_staff    : [];
         if(_soF==='staffListManagersCount') return String(_mgrs.length);
         if(_soF==='staffListStaffsCount')   return String(_stfs.length);
-        var _fmtMgr = function(p, i){
+        var _fmtPerson = function(p, i){
           var nm  = (p.name||p.氏名||'');
           var nme = (p.nameEn||p.name_en||'');
           var ti  = (p.title||p.役職||'役職なし');
           var tie = (p.titleEn||p.title_en||'No position');
           return (i+1)+'．'+nm+' （'+ti+'）\n'+nme+' （'+tie+'）';
         };
-        var _fmtStf = function(p, i){
-          var nm  = (p.name||p.氏名||'');
-          var nme = (p.nameEn||p.name_en||'');
-          var ti  = (p.title||p.役職||'役職なし');
-          var tie = (p.titleEn||p.title_en||'No title');
-          return (i+1)+'．'+nm+' （'+ti+'）\n'+nme+' （'+tie+'）';
-        };
-        if(_soF==='staffListManagers') return _mgrs.map(_fmtMgr).join('\n');
-        if(_soF==='staffListStaffs')   return _stfs.map(_fmtStf).join('\n');
+        if(_soF==='staffListManagers') return _mgrs.map(_fmtPerson).join('\n');
+        if(_soF==='staffListStaffs')   return _stfs.map(_fmtPerson).join('\n');
       }
       /* 通訳者名簿：support_orgs.attachments.interpreters を参照。
          テンプレートの言語（ここではインドネシア語=id）に対応する通訳者だけを抽出する。
