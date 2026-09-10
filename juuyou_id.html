@@ -43,7 +43,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20260819.07</div>
+    <div class="ver">ver.20260910.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -130,11 +130,11 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>(a)税金（円）</label><input id="f_deductTax" oninput="p()"></div>
       <div class="fg"><label>(b)社会保険料（円）</label><input id="f_deductSocialIns" oninput="p()"></div>
       <div class="fg"><label>(c)雇用保険料（円）</label><input id="f_deductEmpIns" oninput="p()"></div>
-      <div class="fg"><label>(d)食費（円）</label><input id="f_deductFood" oninput="p()"></div>
-      <div class="fg"><label>(e)居住費（円）</label><input id="f_deductHousing" oninput="p()"></div>
-      <div class="fg"><label>(f)水道光熱費（円）</label><input id="f_deductUtility" oninput="p()"></div>
+      <div class="fg"><label>(d)食費（円）</label><input id="f_deductFood" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductFoodJippi" onchange="_setJippiJ('es_deductFood',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductFoodEst" type="hidden"></div>
+      <div class="fg"><label>(e)居住費（円）</label><input id="f_deductHousing" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductHousingJippi" onchange="_setJippiJ('es_deductHousing',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductHousingEst" type="hidden"></div>
+      <div class="fg"><label>(f)水道光熱費（円）</label><input id="f_deductUtility" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductUtilityJippi" onchange="_setJippiJ('es_deductUtility',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductUtilityEst" type="hidden"></div>
       <div class="fg"><label>(g)その他（名目）</label><input id="f_deductOther1Name" oninput="p()"></div>
-      <div class="fg"><label>(g)その他（円）</label><input id="f_deductOther1Amount" oninput="p()"></div>
+      <div class="fg"><label>(g)その他（円）</label><input id="f_deductOther1Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther1AmountJippi" onchange="_setJippiJ('es_deductOther1Amount',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductOther1AmountEst" type="hidden"></div>
       <div class="fg"><label>控除合計（円）</label><input id="f_deductTotal" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">６．手取り支給額</div>
@@ -173,7 +173,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1788851015"></script>
+<script src="ofusa_common.js?v=1789005130"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -279,35 +279,35 @@ function p(){
     </tr>
     <tr>
       <td class="ja">(d)食　　　費</td>
-      <td class="ja">（<span class="under">${ff('f_deductFood')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductFood')}</span>円）${_jSufJa('es_deductFood')}</td>
     </tr>
     <tr>
       <td class="vi">(d) Biaya makan</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductFood')}</span> yen）</td>
+      <td class="vi">（sekitar <span class="under">${ff('f_deductFood')}</span> yen）${_jSufLo('es_deductFood')}</td>
     </tr>
     <tr>
       <td class="ja">(e)居　住　費</td>
-      <td class="ja">（<span class="under">${ff('f_deductHousing')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductHousing')}</span>円）${_jSufJa('es_deductHousing')}</td>
     </tr>
     <tr>
       <td class="vi">(e) Biaya tempat tinggal</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductHousing')}</span> yen）</td>
+      <td class="vi">（sekitar <span class="under">${ff('f_deductHousing')}</span> yen）${_jSufLo('es_deductHousing')}</td>
     </tr>
     <tr>
       <td class="ja">(f)その他（水道光熱費）</td>
-      <td class="ja">（<span class="under">${ff('f_deductUtility')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductUtility')}</span>円）${_jSufJa('es_deductUtility')}</td>
     </tr>
     <tr>
       <td class="vi">(f) Lainnya (biaya utilitas listrik, air, dll)</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductUtility')}</span> yen）</td>
+      <td class="vi">（sekitar <span class="under">${ff('f_deductUtility')}</span> yen）${_jSufLo('es_deductUtility')}</td>
     </tr>
     <tr>
       <td class="ja">(g)その他（<span class="under">${f('f_deductOther1Name')}</span>）</td>
-      <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）</td>
+      <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）${_jSufJa('es_deductOther1Amount')}</td>
     </tr>
     <tr>
       <td class="vi">(g) Lainnya（<span class="under">${f('f_deductOther1Name')}</span>）</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductOther1Amount')}</span> yen）</td>
+      <td class="vi">（sekitar <span class="under">${ff('f_deductOther1Amount')}</span> yen）${_jSufLo('es_deductOther1Amount')}</td>
     </tr>
   </table>
   <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${ff('f_deductTotal')}</span>　円（合計）</div>
@@ -531,6 +531,13 @@ function _koujiTr(s){
          .filter(Boolean).join('、');
 }
 const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
+
+// ver.20260910.01: 実費フラグ（1-6号と同仕様）。案シスの雇用条件 deductXxxType(true) が
+//   共通 loadCaseToForm の橋渡しで es_deductXxxJippi/Est に入る。手動チェックも可。
+function _jpJ(base){ var cb=document.getElementById(base+'Jippi'); var est=document.getElementById(base+'Est'); return !!(cb&&cb.checked)||/実費/.test((est&&est.value)||''); }
+function _jSufJa(base){ return _jpJ(base)?'（実費）':''; }
+function _jSufLo(base){ return _jpJ(base)?'（biaya aktual）':''; }
+function _setJippiJ(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } p(); }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){

@@ -451,7 +451,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1788851015"></script>
+<script src="ofusa_common.js?v=1789005130"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1294,6 +1294,9 @@ function collectFormValues(){
   const data = {};
   getAllFormFields().forEach(formKey=>{
     const el = document.getElementById('es_'+formKey);
+    // ver.20260910.01: checkbox(実費フラグ等)は value が常に 'on' のため保存対象外
+    //   （チェック状態は hidden の es_*Est='実費' と 案シス側 deductXxxType で管理）
+    if(el && el.type==='checkbox') return;
     if(el && el.value.trim()!==''){
       // 動的手当フォーム (a1Name→allowance1Name, a1Amt→allowance1Amt 等)
       const am = formKey.match(/^a(\d)(Name|NameEn|Amt|Calc|CalcEn)$/);
