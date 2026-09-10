@@ -401,7 +401,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1789007699"></script>
+<script src="ofusa_common.js?v=1789008194"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1044,6 +1044,9 @@ function p(){
 const _FORM_TO_DB = {
   // officeAddress系
   'officeAddress':'officeAddr','officeAddressEn':'officeAddrEn',
+  // ver.20260910.03: 就業の場所の連絡先は 会社代表電話(co.tel)ではなく
+  //   雇用条件セットの「事業所電話番号」(officeContact) を優先する
+  'officeTel':'officeContact',
   // allowance: フォームはCalc、DBはCond
   'allowance1Calc':'allowance1Cond','allowance1CalcEn':'allowance1CondEn',
   'allowance2Calc':'allowance2Cond','allowance2CalcEn':'allowance2CondEn',
@@ -1109,6 +1112,9 @@ function setFormValues(esData){
   Object.keys(esData).forEach(dbKey=>{
     let val = esData[dbKey];
     if(val==null || val==='') return;
+    // ver.20260910.03: 旧Saysayが保存した officeTel キーが残っている場合、
+    //   案シス正キー officeContact があればそちらを優先（両方 es_officeTel に入るため）
+    if(dbKey==='officeTel' && esData.officeContact!=null && esData.officeContact!=='') return;
     const formKey = dbKeyToForm(dbKey);
 
     // 日付系は分割セット
