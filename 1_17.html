@@ -7,7 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
-  ver.20260826.11
+  ver.20260826.12
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
         Supabase Storage上のdocxテンプレート（全13件:
@@ -533,6 +533,7 @@ function dbRowToSupportOrg(r) {
     supportManagerKana:r.support_manager_kana||'', supportManagerTitle:r.support_manager_title||'',
     supporterCount:r.supporter_count||'', supportStaffCount:r.support_staff_count||'',
     supportStaffList:r.support_staff_list||[],
+    attachments:r.attachments||{},
     jobPermitNo:r.job_permit_no||'', jobPermitDate:r.job_permit_date||'',
     supportManagerName:r.support_manager_name||'', supportManagerNameEn:r.support_manager_name_en||'',
     supportManagerTitleEn:r.support_manager_title_en||'',
@@ -818,6 +819,12 @@ window.PLACEHOLDER_MAP = {
   '｛｛登録支援機関支援事業所英語住所｝｝':'so.officeAddressEn',
   '｛｛登録支援機関支援事業所電話番号｝｝':'so.officeTel',
   '｛｛登録支援機関支援責任者ふりがな｝｝':'so.supportManagerKana',
+  '｛｛別紙_支援責任者名簿｝｝':'so.staffListManagers',
+  '｛｛別紙_支援担当者名簿｝｝':'so.staffListStaffs',
+  '｛｛別紙_通訳者名簿｝｝':'so.interpreterList',
+  '｛｛別紙_支援責任者人数｝｝':'so.staffListManagersCount',
+  '｛｛別紙_支援担当者人数｝｝':'so.staffListStaffsCount',
+  '｛｛別紙_通訳者人数｝｝':'so.interpreterListCount',
   // === フォーム収集の標準情報（support_orgs.extra）フェーズ3 ===
   '｛｛登録支援機関対応時間_月｝｝':'so.ex_hourMon',
   '｛｛登録支援機関対応時間_火｝｝':'so.ex_hourTue',
@@ -1087,6 +1094,12 @@ window.PLACEHOLDER_MAP = {
   '｛｛登録支援機関支援事業所英語住所｝｝':'so.officeAddressEn',
   '｛｛登録支援機関支援事業所電話番号｝｝':'so.officeTel',
   '｛｛登録支援機関支援責任者ふりがな｝｝':'so.supportManagerKana',
+  '｛｛別紙_支援責任者名簿｝｝':'so.staffListManagers',
+  '｛｛別紙_支援担当者名簿｝｝':'so.staffListStaffs',
+  '｛｛別紙_通訳者名簿｝｝':'so.interpreterList',
+  '｛｛別紙_支援責任者人数｝｝':'so.staffListManagersCount',
+  '｛｛別紙_支援担当者人数｝｝':'so.staffListStaffsCount',
+  '｛｛別紙_通訳者人数｝｝':'so.interpreterListCount',
   '｛｛登録支援機関支援責任者役職｝｝':'so.supportManagerTitle',
   '｛｛登録支援機関支援責任者役職翻訳｝｝':'so.supportManagerTitleEn',
   '｛｛登録支援機関支援者数｝｝':'so.supporterCount',
@@ -1497,6 +1510,57 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
       if(_soF==='repNameEn') return _so.repNameEn||'';
       // 支援責任者
       if(_soF==='supportManagerKana') return _so.supportManagerKana||'';
+      /* ver.20260826.12: 別紙の名簿（支援責任者／支援担当者／通訳者）。
+         support_staff_list に責任者と担当者が混在しているため、役職(title)で振り分ける。
+         「マネージャー」「責任者」「manager」を含むものを支援責任者、それ以外を支援担当者とする。
+         件数可変のため1セル内に改行区切りで列挙する。 */
+      if(_soF==='staffListManagers' || _soF==='staffListStaffs' ||
+         _soF==='staffListManagersCount' || _soF==='staffListStaffsCount'){
+        var _list = Array.isArray(_so.supportStaffList) ? _so.supportStaffList : [];
+        var _isMgr = function(p){
+          var t = String((p&&(p.title||p.役職))||'');
+          var te = String((p&&(p.titleEn||p.title_en))||'');
+          return /マネージャー|責任者|管理者/.test(t) || /manager|supervisor/i.test(te);
+        };
+        var _mgrs = _list.filter(_isMgr);
+        var _stfs = _list.filter(function(p){ return !_isMgr(p); });
+        if(_soF==='staffListManagersCount') return String(_mgrs.length);
+        if(_soF==='staffListStaffsCount')   return String(_stfs.length);
+        var _fmtMgr = function(p, i){
+          var nm  = (p.name||p.氏名||'');
+          var nme = (p.nameEn||p.name_en||'');
+          var ti  = (p.title||p.役職||'役職なし');
+          var tie = (p.titleEn||p.title_en||'No position');
+          return (i+1)+'．'+nm+' （'+ti+'）\n'+nme+' （'+tie+'）';
+        };
+        var _fmtStf = function(p, i){
+          var nm  = (p.name||p.氏名||'');
+          var nme = (p.nameEn||p.name_en||'');
+          var ti  = (p.title||p.役職||'役職なし');
+          var tie = (p.titleEn||p.title_en||'No title');
+          return (i+1)+'．'+nm+' （'+ti+'）\n'+nme+' （'+tie+'）';
+        };
+        if(_soF==='staffListManagers') return _mgrs.map(_fmtMgr).join('\n');
+        if(_soF==='staffListStaffs')   return _stfs.map(_fmtStf).join('\n');
+      }
+      /* 通訳者名簿：support_orgs.attachments.interpreters を参照。
+         テンプレートの言語（ここではインドネシア語=id）に対応する通訳者だけを抽出する。
+         language_codes は配列・カンマ区切り文字列のどちらでも受け付ける。 */
+      if(_soF==='interpreterList' || _soF==='interpreterListCount'){
+        var _att = _so.attachments||{};
+        var _ips = Array.isArray(_att.interpreters) ? _att.interpreters : [];
+        var _wantLang = 'id';   // インドネシア語版テンプレート用
+        var _hasLang = function(p){
+          var lc = p && (p.language_codes || p.languageCodes || p.language_code || p.languageCode);
+          if(!lc) return false;
+          var arr = Array.isArray(lc) ? lc : String(lc).split(/[,\s\/]+/);
+          return arr.map(function(x){return String(x).trim().toLowerCase();}).indexOf(_wantLang) >= 0;
+        };
+        var _hit = _ips.filter(_hasLang);
+        if(_soF==='interpreterListCount') return String(_hit.length);
+        return _hit.map(function(p){ return (p.name||p.氏名||''); })
+                   .filter(Boolean).join('\n');
+      }
       if(_soF==='supportManagerEn') return _so.supportManagerNameEn||'';
       if(_soF==='supportManagerTitle') return _so.supportManagerTitle||'';
       if(_soF==='supportManagerTitleEn') return _so.supportManagerTitleEn||'';
@@ -1661,7 +1725,18 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
       function replacePH(text, noEscape) {
         var esc = noEscape ? _cleanOnly : _escXml;
         // PLACEHOLDER_MAP（日本語キー）の置換
-        Object.keys(PLACEHOLDER_MAP).forEach(function(phKey) {
+        /* ver.20260826.12: docx用エスケープ。
+         別紙の名簿など改行を含む値は、Wordの改行タグ<w:br/>に変換する。
+         （従来は\nを半角スペースに潰していたため、名簿が1行につながっていた） */
+      function _escDocx(v){
+        var s = String(v||'')
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'')
+          .replace(/\r\n?/g,'\n')
+          .replace(/\t/g,' ')
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return s.split('\n').join('</w:t><w:br/><w:t xml:space="preserve">');
+      }
+      Object.keys(PLACEHOLDER_MAP).forEach(function(phKey) {
           var val = rv(PLACEHOLDER_MAP[phKey]);
           var escaped = esc(val);
           ['{{'+phKey+'}}','{{ '+phKey+'}}','{{'+phKey+' }}','{{ '+phKey+' }}'].forEach(function(ph){
@@ -1749,7 +1824,7 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
       Object.keys(PLACEHOLDER_MAP).forEach(function(phKey){
         if(typeof PLACEHOLDER_MAP[phKey] !== 'string') return; // 関数型など非文字列は無視
         var val = rv(PLACEHOLDER_MAP[phKey]);
-        var escaped = String(val==null?'':val).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        var escaped = _escDocx(val);
         // {{プレースホルダー}} の形式で置換（run分割対応）
         var ph = '{{'+phKey+'}}';
         // 単純置換（1つのw:tに収まっている場合）
@@ -1768,15 +1843,13 @@ function processTemplateBytes(bytes, ci, c, mappingArr, rv, PLACEHOLDER_MAP, zip
       xml = xml.replace(/\{\{([^}\n]+)\}\}/g, function(match, field) {
         var k = field.trim();
         if(PLACEHOLDER_MAP[k]) return match; // PHMAPキーは後で処理
-        var val = rv(k);
-        return String(val||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return _escDocx(rv(k));
       });
       // 全角カッコ直接変数形式（｛｛so.xxx｝｝等）の単純置換
       xml = xml.replace(/｛｛([^｝\n]+)｝｝/g, function(match, field) {
         var k = field.trim();
         if(PLACEHOLDER_MAP[k]) return match;
-        var val = rv(k);
-        return String(val||'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'').replace(/[\r\n\t]/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return _escDocx(rv(k));
       });
       // run分割対応: w:tタグ間に分かれた{{...}}を処理
       // 全テキストノードを走査して結合→置換→再分割
