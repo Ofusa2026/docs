@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260910.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260910.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -867,6 +867,8 @@ function _ssFile(doc, lang){
   return doc + (noSuffix ? '' : ('_'+lang)) + '.html';
 }
 async function ssLoad(){
+  // ver.20260910.05: iframe を作り直すので前回の再貼付Observerを切る
+  try{ if(_ssObs){ _ssObs.disconnect(); _ssObs=null; } clearTimeout(_ssRemountT); }catch(e){}
   await ssBuildDocSelect();
   var doc=document.getElementById('ssDoc').value, lang=document.getElementById('ssLang').value;
   var body=document.getElementById('ssBody');
@@ -904,6 +906,27 @@ async function ssLoad(){
   };
   body.appendChild(fr);
 }
+// ver.20260910.05: 書類側が案件差込(p())で .doc を innerHTML で作り直すため、貼ったドラッグ用レイヤー(.ss-ov)が
+//   消えて枠を置けなくなる不具合を修正。貼付を _ssMountOverlays に分離し、MutationObserver で
+//   「.ss-ov の無い .doc」を検知したら自動で貼り直す（自分の描画でループしないよう60msデバウンス）。
+var _ssObs=null, _ssRemountT=null;
+function _ssMountOverlays(d){
+  var pages=d.querySelectorAll('.doc');
+  if(!pages.length){ ssMsg('用紙(.doc)が見つかりません'); return 0; }
+  pages.forEach(function(pg,pi){
+    if(getComputedStyle(pg).position==='static') pg.style.position='relative';
+    var ov=pg.querySelector('.ss-ov');
+    if(!ov){
+      ov=d.createElement('div'); ov.className='ss-ov';
+      ov.style.cssText='position:absolute;inset:0;z-index:9999;cursor:crosshair;';
+      pg.appendChild(ov);
+      ov.addEventListener('mousedown', function(ev){ _ssDrag(ev, pg, ov, pi+1, d); });
+    }
+    _ssPaint(pg, ov, pi+1, d);
+  });
+  ssMsg((ssMsgBase()||'')+'　用紙 '+pages.length+'ページ / スロット '+_ssSlots.length+'件');
+  return pages.length;
+}
 function _ssAttach(){
   try{
     var d=_ssFrame.contentDocument; if(!d) return;
@@ -918,20 +941,20 @@ function _ssAttach(){
         d.head.appendChild(_st);
       }
     }catch(e){}
-    var pages=d.querySelectorAll('.doc');
-    if(!pages.length){ ssMsg('用紙(.doc)が見つかりません'); return; }
-    pages.forEach(function(pg,pi){
-      if(getComputedStyle(pg).position==='static') pg.style.position='relative';
-      var ov=pg.querySelector('.ss-ov');
-      if(!ov){
-        ov=d.createElement('div'); ov.className='ss-ov';
-        ov.style.cssText='position:absolute;inset:0;z-index:9999;cursor:crosshair;';
-        pg.appendChild(ov);
-        ov.addEventListener('mousedown', function(ev){ _ssDrag(ev, pg, ov, pi+1, d); });
-      }
-      _ssPaint(pg, ov, pi+1, d);
-    });
-    ssMsg((ssMsgBase()||'')+'　用紙 '+pages.length+'ページ / スロット '+_ssSlots.length+'件');
+    _ssMountOverlays(d);
+    // .doc が再構築されて .ss-ov が消えたら貼り直す
+    try{
+      if(_ssObs){ _ssObs.disconnect(); _ssObs=null; }
+      var MO=(d.defaultView&&d.defaultView.MutationObserver)||window.MutationObserver;
+      _ssObs=new MO(function(){
+        var need=false;
+        Array.prototype.forEach.call(d.querySelectorAll('.doc'), function(pg){ if(!pg.querySelector('.ss-ov')) need=true; });
+        if(!need) return;
+        clearTimeout(_ssRemountT);
+        _ssRemountT=setTimeout(function(){ try{ _ssMountOverlays(d); }catch(e){} }, 60);
+      });
+      _ssObs.observe(d.body||d.documentElement, {childList:true, subtree:true});
+    }catch(e){}
   }catch(e){ ssMsg('読み込みエラー: '+(e.message||e)); }
 }
 function ssMsgBase(){ return (_ssSlots.some(function(s){return s._fromJa;}))?'日本語の位置を流用中':''; }
@@ -1440,6 +1463,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20260910.05',
+    date: '2026-09-10',
+    notify: false,
+    items: [
+      '🖊 署名欄設定で、書類を開いた後にドラッグしても枠が置けなくなる不具合を修正しました（案件データの差し込みで用紙が作り直された際にドラッグ用レイヤーが消えていたため、自動で貼り直すようにしました）。'
+    ]
+  },
   {
     version: 'ver.20260910.04',
     date: '2026-09-10',
