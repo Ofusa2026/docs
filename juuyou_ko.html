@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</title>
+<title>様式第２（第３条関係）雇用契約に係る重要事項事前説明書（韓国語）</title>
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
@@ -42,8 +42,8 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20260910.01</div>
+    <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（韓国語）</div>
+    <div class="ver">ver.20260910.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -111,8 +111,8 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     <div class="fs"><div class="fs-title">３．固定残業代</div>
       <div class="fg"><label>固定残業</label>
         <select id="f_fixedOT" onchange="onFixedOTSelect()">
-          <option value="無">無 / Tidak</option>
-          <option value="有">有 / Ada</option>
+          <option value="無">無 / 없음</option>
+          <option value="有">有 / 있음</option>
         </select>
       </div>
       <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」クリックでも切替可</div>
@@ -121,7 +121,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
         <div class="fg"><label>金額（円）</label><input id="f_fixedOTAmount" oninput="p()"></div>
       </div>
       <div class="fg"><label>計算方法（日）</label><input id="f_fixedOTCalc" oninput="p()"></div>
-      <div class="fg"><label>Cara menghitung (id)</label><input id="f_fixedOTCalcEn" oninput="p()"></div>
+      <div class="fg"><label>계산 방법 (ko)</label><input id="f_fixedOTCalcEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">４．月支払概算額</div>
       <div class="fg"><label>合計（円）</label><input id="f_salaryTotal" oninput="p()"></div>
@@ -142,19 +142,19 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     </div>
     <div class="fs"><div class="fs-title">７．業務内容</div>
       <div class="fg"><label>従事させる業務区分（日）</label><input id="f_workType" oninput="p()"></div>
-      <div class="fg"><label>Klasifikasi pekerjaan (id)</label><input id="f_workTypeEn" oninput="p()"></div>
+      <div class="fg"><label>업무 구분 (ko)</label><input id="f_workTypeEn" oninput="p()"></div>
       <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="_koujiSync()" placeholder="例：とび・土工工事業,舗装工事業"></div>
-      <div class="fg"><label>Jenis pekerjaan konstruksi (id)</label><input id="f_workCatEn" oninput="p()"></div>
+      <div class="fg"><label>종사하는 공사업의 종류 (ko)</label><input id="f_workCatEn" oninput="p()"></div>
       <div class="fg"><label>具体的職種・作業内容（日）</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
-      <div class="fg"><label>Pekerjaan khusus dan konten (id)</label><textarea id="f_workDetailEn" oninput="p()" rows="3"></textarea></div>
+      <div class="fg"><label>구체적인 직종·업무 내용 (ko)</label><textarea id="f_workDetailEn" oninput="p()" rows="3"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">８．昇給</div>
       <div class="fg"><label>昇給額（日）</label><input id="f_raiseAmount" oninput="p()"></div>
-      <div class="fg"><label>Nominal kenaikan gaji (id)</label><input id="f_raiseAmountEn" oninput="p()"></div>
+      <div class="fg"><label>승급액 (ko)</label><input id="f_raiseAmountEn" oninput="p()"></div>
       <div class="fg"><label>昇給条件（日）</label><input id="f_raiseCond" oninput="p()"></div>
-      <div class="fg"><label>Syarat kenaikan gaji (id)</label><input id="f_raiseCondEn" oninput="p()"></div>
+      <div class="fg"><label>승급 조건 (ko)</label><input id="f_raiseCondEn" oninput="p()"></div>
       <div class="fg"><label>昇給時期（日）</label><input id="f_raiseTime" oninput="p()"></div>
-      <div class="fg"><label>Periode kenaikan gaji (id)</label><input id="f_raiseTimeEn" oninput="p()"></div>
+      <div class="fg"><label>승급 시기 (ko)</label><input id="f_raiseTimeEn" oninput="p()"></div>
     </div>
   </div>
 </div>
@@ -201,48 +201,48 @@ function p(){
 <div class="page-num-label">P1</div>
 <div style="text-align:left;font-size:10pt;margin-bottom:2px;">様式第２（第３条関係）</div>
 <div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用契約に係る重要事項事前説明書</div>
-<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Penjelasan penting mengenai Kontrak Kerja</div>
+<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">고용계약에 관한 중요사항 사전설명</div>
 <div style="height:1.8em;">&nbsp;</div>
 <div style="height:1.8em;">&nbsp;</div>
 
 <div class="row ja">建設特定技能受入計画を申請予定である（特定技能所属機関名）<span class="under">${f('f_orgName')}</span>は、雇用契約に係る重要事項について、下記内容を事前に説明し、内容を理解させたうえで国土交通省へ申請する。</div>
-<div class="row vi">Kami, <span class="under">${f('f_orgNameEn')}</span> (nama organisasi afiliasi Keterampilan Khusus) berencana untuk mendaftarkan Rencana Penerimaan Keterampilan Khusus Kontruksi (Kensetsu Tokutei Ginou), terlebih dahulu menjelaskan hal-hal penting terkait kontrak kerja. Setelah memahami isinya, kami akan mendaftarkan kepada Kementerian Pertanahan, Infrastruktur, Transportasi, dan Pariwisata Jepang.</div>
+<div class="row vi">당사 <span class="under">${f('f_orgNameEn')}</span>(특정기능 소속기관명)은 건설분야 특정기능 수용계획의 인정 신청에 앞서, 고용계약에 관한 중요사항을 사전에 설명하고 그 내용을 이해하였음을 확인한 후, 일본 국토교통성에 신청합니다.</div>
 
 <div class="sec">
   <div class="sec-h">１．基本賃金</div>
-  <div class="sec-h-vi">Gaji pokok</div>
+  <div class="sec-h-vi">기본급</div>
   <div class="row ja">月額（<span class="under">${ff('f_salaryMonthly')}</span>円　手当<span class="under">&nbsp;</span>円、手当<span class="under">&nbsp;</span>円を含む。）</div>
-  <div class="row vi">Gaji bulanan（<span class="under">${ff('f_salaryMonthly')}</span> yen　Termasuk tunjangan <span class="under">&nbsp;</span> yen, tunjangan <span class="under">&nbsp;</span> yen）</div>
+  <div class="row vi">월급（<span class="under">${ff('f_salaryMonthly')}</span> 엔　그중 수당 <span class="under">&nbsp;</span> 엔, 수당 <span class="under">&nbsp;</span> 엔 포함）</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）</div>
-  <div class="sec-h-vi">Nominal dan cara perhitungan berbagai tunjangan (tidak termasuk upah tambahan lembur)</div>
+  <div class="sec-h-vi">각종 수당의 금액 및 계산 방법(시간외 근로 할증임금 제외)</div>
   <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${ff('f_allowance1Amount')}</span>円／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
-  <div class="row vi">(a)（tunjangan <span class="under">${f('f_allowance1NameEn')}</span>,　<span class="under">${ff('f_allowance1Amount')}</span> yen／Cara perhitungan：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
+  <div class="row vi">(a)（수당 <span class="under">${f('f_allowance1NameEn')}</span>,　<span class="under">${ff('f_allowance1Amount')}</span> 엔／계산 방법：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
   <div class="row ja">(b)（<span class="under">${f('f_allowance2Name')}</span>手当　<span class="under">${ff('f_allowance2Amount')}</span>円／計算方法：<span class="under">${f('f_allowance2Calc')}</span>）</div>
-  <div class="row vi">(b)（tunjangan <span class="under">${f('f_allowance2NameEn')}</span>,　<span class="under">${ff('f_allowance2Amount')}</span> yen／Cara perhitungan：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
+  <div class="row vi">(b)（수당 <span class="under">${f('f_allowance2NameEn')}</span>,　<span class="under">${ff('f_allowance2Amount')}</span> 엔／계산 방법：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
   <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${ff('f_allowance3Amount')}</span>円／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
-  <div class="row vi">(c)（tunjangan <span class="under">${f('f_allowance3NameEn')}</span>,　<span class="under">${ff('f_allowance3Amount')}</span> yen／Cara perhitungan：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
+  <div class="row vi">(c)（수당 <span class="under">${f('f_allowance3NameEn')}</span>,　<span class="under">${ff('f_allowance3Amount')}</span> 엔／계산 방법：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">３．固定残業代　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span>有　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span>無）</div>
-  <div class="sec-h-vi">Lembur Tetap　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> Ada　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> Tidak）</div>
+  <div class="sec-h-vi">고정 잔업수당　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> 있음　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> 없음）</div>
   <div class="row ja" style="font-size:9.5pt;">（固定残業代が有る場合は以下に記入）</div>
-  <div class="row vi">(Jika ada lembur tetap, silakan tulis di bawah)</div>
+  <div class="row vi">(고정 잔업수당이 있는 경우 아래에 기입)</div>
   <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${ff('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
-  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> Jam　<span class="under">${ff('f_fixedOTAmount')}</span> yen【Cara menghitung】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
+  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> 시간　<span class="under">${ff('f_fixedOTAmount')}</span> 엔【계산 방법】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
   <div class="row ja" style="font-size:9.5pt;">固定残業代を超えた労働時間分については割増賃金を追加で支払う。</div>
-  <div class="row vi">Gaji tambahan lembur akan dibayarkan untuk jam kerja yang melebihi jam lembur tetap.</div>
+  <div class="row vi">고정 잔업시간을 초과하는 시간외 근로에 대해서는 할증임금을 추가로 지급합니다.</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">４．１か月当たりの支払概算額（１＋２＋３）</div>
   <div class="row ja" style="font-size:9.5pt;">（１．基本賃金の月額に算入した手当については、二重に計上しないように注意すること。）</div>
-  <div class="row vi">(1. Perhatikan untuk tidak menghitung tunjangan dua kali yang termasuk dalam gaji pokok bulanan)</div>
+  <div class="row vi">(1의 월 기본급에 포함된 수당을 이중으로 계산하지 않도록 주의)</div>
   <div class="row ja" style="text-align:right;">約　<span class="under">${ff('f_salaryTotal')}</span>　円（合計）</div>
-  <div class="row vi" style="text-align:right;">Perkiraan pembayaran tiap bulan (1+2+3)　Sekitar　<span class="under">${ff('f_salaryTotal')}</span>　yen（Total）</div>
+  <div class="row vi" style="text-align:right;">월 지급 예상액(1+2+3)　약　<span class="under">${ff('f_salaryTotal')}</span>　엔（합계）</div>
 </div>
 </div>
 
@@ -251,87 +251,87 @@ function p(){
 
 <div class="sec">
   <div class="sec-h">５．賃金支払時に控除する項目</div>
-  <div class="sec-h-vi">Item yang akan dipotong saat pembayaran gaji</div>
+  <div class="sec-h-vi">임금 지급 시 공제되는 항목</div>
   <table class="tbl-amt">
     <tr>
       <td style="width:45%;" class="ja">(a)税　　　金</td>
       <td style="width:55%;" class="ja">（<span class="under">${ff('f_deductTax')}</span>円）</td>
     </tr>
     <tr>
-      <td class="vi">(a) Pajak</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductTax')}</span> yen）</td>
+      <td class="vi">(a) 세금</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductTax')}</span> 엔）</td>
     </tr>
     <tr>
       <td class="ja">(b)社会保険料</td>
       <td class="ja">（<span class="under">${ff('f_deductSocialIns')}</span>円）</td>
     </tr>
     <tr>
-      <td class="vi">(b) Premi asuransi sosial</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductSocialIns')}</span> yen）</td>
+      <td class="vi">(b) 사회보험료</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductSocialIns')}</span> 엔）</td>
     </tr>
     <tr>
       <td class="ja">(c)雇用保険料</td>
       <td class="ja">（<span class="under">${ff('f_deductEmpIns')}</span>円）</td>
     </tr>
     <tr>
-      <td class="vi">(c) Premi asuransi kerja</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductEmpIns')}</span> yen）</td>
+      <td class="vi">(c) 고용보험료</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductEmpIns')}</span> 엔）</td>
     </tr>
     <tr>
       <td class="ja">(d)食　　　費</td>
       <td class="ja">（<span class="under">${ff('f_deductFood')}</span>円）${_jSufJa('es_deductFood')}</td>
     </tr>
     <tr>
-      <td class="vi">(d) Biaya makan</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductFood')}</span> yen）${_jSufLo('es_deductFood')}</td>
+      <td class="vi">(d) 식비</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductFood')}</span> 엔）${_jSufLo('es_deductFood')}</td>
     </tr>
     <tr>
       <td class="ja">(e)居　住　費</td>
       <td class="ja">（<span class="under">${ff('f_deductHousing')}</span>円）${_jSufJa('es_deductHousing')}</td>
     </tr>
     <tr>
-      <td class="vi">(e) Biaya tempat tinggal</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductHousing')}</span> yen）${_jSufLo('es_deductHousing')}</td>
+      <td class="vi">(e) 주거비</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductHousing')}</span> 엔）${_jSufLo('es_deductHousing')}</td>
     </tr>
     <tr>
       <td class="ja">(f)その他（水道光熱費）</td>
       <td class="ja">（<span class="under">${ff('f_deductUtility')}</span>円）${_jSufJa('es_deductUtility')}</td>
     </tr>
     <tr>
-      <td class="vi">(f) Lainnya (biaya utilitas listrik, air, dll)</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductUtility')}</span> yen）${_jSufLo('es_deductUtility')}</td>
+      <td class="vi">(f) 기타(수도광열비)</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductUtility')}</span> 엔）${_jSufLo('es_deductUtility')}</td>
     </tr>
     <tr>
       <td class="ja">(g)その他（<span class="under">${f('f_deductOther1Name')}</span>）</td>
       <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）${_jSufJa('es_deductOther1Amount')}</td>
     </tr>
     <tr>
-      <td class="vi">(g) Lainnya（<span class="under">${f('f_deductOther1Name')}</span>）</td>
-      <td class="vi">（sekitar <span class="under">${ff('f_deductOther1Amount')}</span> yen）${_jSufLo('es_deductOther1Amount')}</td>
+      <td class="vi">(g) 기타（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="vi">（약 <span class="under">${ff('f_deductOther1Amount')}</span> 엔）${_jSufLo('es_deductOther1Amount')}</td>
     </tr>
   </table>
   <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${ff('f_deductTotal')}</span>　円（合計）</div>
-  <div class="row vi" style="text-align:right;">Besar potongan　sekitar　<span class="under">${ff('f_deductTotal')}</span>　yen（Total）</div>
+  <div class="row vi" style="text-align:right;">공제 금액　약　<span class="under">${ff('f_deductTotal')}</span>　엔（합계）</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">６．手取り支給額（４－５）　約　<span class="under">${ff('f_netPay')}</span>　円（合計）</div>
-  <div class="sec-h-vi">Pendapatan bersih (4-5)　sekitar　<span class="under">${ff('f_netPay')}</span>　yen（Total）</div>
+  <div class="sec-h-vi">실수령액 (4-5)　약　<span class="under">${ff('f_netPay')}</span>　엔（합계）</div>
   <div class="row ja" style="font-size:9pt;">※欠勤等がない場合であって、時間外労働の割増賃金等は除く。</div>
-  <div class="row vi" style="font-size:8.5pt;">※Dengan catatan tidak ada absen kerja dan tidak termasuk upah tambahan lembur.</div>
+  <div class="row vi" style="font-size:8.5pt;">※결근이 없는 경우이며, 시간외 근로의 할증임금은 포함하지 않습니다.</div>
 </div>
 
 <div class="sec">
   <div class="sec-h">７．業務内容（従事させる業務区分、従事させる工事業の種類、具体的職種及び作業内容）</div>
   <div class="row ja" style="font-size:9.5pt;">（職種名等だけでなく具体的にどのような現場でどのような業務に従事させるのか説明すること）</div>
-  <div class="sec-h-vi">Konten pekerjaan yang harus dilakukan (Klasifikasi pekerjaan dan jenis pekerjaan konstruksi yang dilakukan)<br>(Menjelaskan bukan hanya jenis pekerjaan, tetapi detail pekerjaan seperti apa, dan di mana lokasi lapangan kerjanya)</div>
+  <div class="sec-h-vi">종사하는 업무 내용(종사하는 업무 구분·공사업의 종류, 구체적 직종 및 작업 내용)<br>(직종명 등만이 아니라, 어떤 현장에서 어떤 업무에 종사하는지 구체적으로 설명하는 것)</div>
   <div style="padding:1mm 0;">
     <div class="row ja">従事させる業務区分：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
-    <div class="row vi">Klasifikasi pekerjaan：<span class="under" style="min-width:20em;">${f('f_workTypeEn')}</span></div>
+    <div class="row vi">업무 구분：<span class="under" style="min-width:20em;">${f('f_workTypeEn')}</span></div>
     <div class="row ja">従事させる工事業の種類：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
-    <div class="row vi">Jenis pekerjaan konstruksi yang dilakukan：<span class="under" style="min-width:20em;">${f('f_workCatEn')}</span></div>
+    <div class="row vi">종사하는 공사업의 종류：<span class="under" style="min-width:20em;">${f('f_workCatEn')}</span></div>
     <div class="row ja">従事させる具体的職種及び作業内容：<span class="under" style="min-width:20em;">${f('f_workDetail')}</span></div>
-    <div class="row vi">Pekerjaan khusus dan konten pekerjaan yang dilakukan：<span class="under" style="min-width:20em;">${f('f_workDetailEn')}</span></div>
+    <div class="row vi">구체적인 직종·종사 업무 내용：<span class="under" style="min-width:20em;">${f('f_workDetailEn')}</span></div>
   </div>
 </div>
 </div>
@@ -342,24 +342,24 @@ function p(){
 <div class="sec">
   <div class="sec-h">８．技能の習熟等に応じた昇給について</div>
   <div class="row ja" style="font-size:9.5pt;">（昇給額、昇給条件及び昇給時期について説明すること。従事させる具体的職種及び作業内容に応じた同等の技能を有する日本人が従事する場合の報酬と同等以上になるよう留意すること。）</div>
-  <div class="sec-h-vi">Mengenai kenaikan gaji berdasarkan kemampuan teknik yang didapat<br>(Penjelasan nominal kenaikan gaji, syarat kenaikan gaji, dan periode kenaikan gaji. Mohon perhatikan bahwa kenaikan nominal gaji sama dengan atau lebih tinggi dari karyawan Jepang yang memiliki keterampilan yang sama sesuai dengan jenis pekerjaan yang akan dilakukan)</div>
+  <div class="sec-h-vi">기능 습득에 따른 승급에 대하여<br>(승급액·승급 조건·승급 시기를 설명. 승급액은 종사하는 업무에 상응하는 동등한 기능을 가진 일본인과 동등액 이상이어야 함에 유의할 것)</div>
   <div style="padding:1mm 0;">
     <div class="row ja">昇給額：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
-    <div class="row vi">Nominal kenaikan gaji：<span class="under" style="min-width:20em;">${f('f_raiseAmountEn')}</span></div>
+    <div class="row vi">승급액：<span class="under" style="min-width:20em;">${f('f_raiseAmountEn')}</span></div>
     <div class="row ja">昇給条件：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
-    <div class="row vi">Syarat kenaikan gaji：<span class="under" style="min-width:20em;">${f('f_raiseCondEn')}</span></div>
+    <div class="row vi">승급 조건：<span class="under" style="min-width:20em;">${f('f_raiseCondEn')}</span></div>
     <div class="row ja">昇給時期：<span class="under" style="min-width:20em;">${f('f_raiseTime')}</span></div>
-    <div class="row vi">Periode kenaikan gaji：<span class="under" style="min-width:20em;">${f('f_raiseTimeEn')}</span></div>
+    <div class="row vi">승급 시기：<span class="under" style="min-width:20em;">${f('f_raiseTimeEn')}</span></div>
   </div>
 </div>
 
 <div class="sec">
   <div class="sec-h">９．従事させる業務区分、工事業等に応じた安全衛生教育及び技能の習得について</div>
   <div class="row ja" style="font-size:9.5pt;">（安全衛生教育の実施内容や、技能検定の受験時期や合格後の支給手当、昇給への反映等について説明すること）</div>
-  <div class="sec-h-vi">Mengenai Pendidikan Keselamatan Kerja dan perolehan keterampilan sesuai dengan kategori pekerjaan yang dilakukan<br>(Menjelaskan isi Pendidikan Keselamatan Kerja, waktu untuk mengikuti tes keterampilan, tunjangan setelah lulus, dan evaluasi kenaikan gaji)</div>
+  <div class="sec-h-vi">안전위생교육 및 종사 업무 구분에 따른 기능 습득에 대하여<br>(안전위생교육의 내용, 기능검정 수험 시기, 합격 시의 수당·승급 평가 등을 설명하는 것)</div>
   <div style="padding:1mm 0;">
     <div class="row ja">採用時、作業内容の変更、労働安全衛生法上に定める危険又は有害な業務、職長等の職務に従事することとなったとき、法令に安全衛生教育の実施が必要とされるときは安全衛生教育を実施する。受入れ後1年以内に建設キャリアアップシステムのレベル２に相当する技能教育を施す。また、受入れ後3年以内に技能検定1級、取得を目標とするため、社内勉強会の開催等を行う。</div>
-    <div class="row vi">Pada saat bekerja, ketika isi pekerjaan berubah, ketika seseorang akan melakukan pekerjaan berbahaya atau merugikan sebagaimana ditentukan dalam Undang-Undang Keselamatan dan Kesehatan Industri, atau ketika dia ditugaskan untuk bekerja sebagai mandor, dll., atau ketika penerapan pendidikan keselamatan dan kesehatan diwajibkan oleh hukum, pendidikan keselamatan dan kesehatan akan diberikan. Dalam satu tahun penerimaan, kami akan memberikan pelatihan teknis yang setara dengan tingkat 2 sistem peningkatan karir konstruksi. Selain itu, kami akan mengadakan sesi belajar internal dengan tujuan memperoleh sertifikasi keterampilan Tingkat 1 dalam waktu tiga tahun setelah penerimaan.</div>
+    <div class="row vi">고용 시, 업무 내용이 변경될 때, 노동안전위생법에 정해진 위험·유해 업무에 종사시킬 때, 직장(반장) 등으로 배치할 때 등 법령상 안전위생교육의 실시가 의무화되는 경우에는 안전위생교육을 실시합니다. 수용 후 1년 이내에 건설 커리어업 시스템 레벨2 상당의 기능 연수를 실시합니다. 또한 수용 후 3년 이내에 1급 기능검정 취득을 목표로 사내 학습회를 개최합니다.</div>
   </div>
 </div>
 </div>
@@ -370,25 +370,25 @@ function p(){
 <div class="sec">
   <div class="sec-h">10．個人情報の提供に係る同意について</div>
   <div class="row ja" style="font-size:9.5pt;">（建設特定技能受入計画の適正な実施を確保するため、建設キャリアアップシステムを運営する一般財団法人建設業振興基金、適正就労監理機関及び特定技能外国人受入事業実施法人へ認定受入計画に記載された内容（個人情報を含む。）を提供することに同意しているか）</div>
-  <div class="sec-h-vi">Mengenai persetujuan pemberian informasi data pribadi<br>(Untuk memastikan pelaksanaan program penerimaan Keterampilan Khusus (Tokutei Ginou) bidang konstruksi secara tepat, apakah Anda setuju untuk memberikan data yang tertulis dalam Sertifikasi Rencana Penerimaan (termasuk data pribadi) kepada yayasan dan organisasi yang mengoperasikan Sistem Peningkatan Karir Kontruksi)</div>
+  <div class="sec-h-vi">개인정보 제공 동의에 대하여<br>(건설분야 특정기능제도의 적정한 운영을 확보하기 위하여, 수용계획 인정증에 기재된 정보(개인정보 포함)를 건설 커리어업 시스템을 운영하는 재단·단체에 제공하는 것에 동의하는지 여부)</div>
   <div class="row ja">　　<input type="checkbox" class="chk-box" checked>同意している。　　　<input type="checkbox" class="chk-box">同意していない。</div>
-  <div class="row vi">　　☑ Setuju　　　☐ Tidak setuju</div>
+  <div class="row vi">　　☑ 동의함　　　☐ 동의하지 않음</div>
 </div>
 
 <div class="sec" style="margin-top:6mm;">
-  <div class="row ja">(西暦) <span class="under">${f('f_createY')}</span>年 <span class="under">${f('f_createM')}</span>月 <span class="under">${f('f_createD')}</span>日、前記１から10の内容について以下の者が十分に理解することができる言語（インドネシア語）にて説明し、内容を理解していることを確認した。</div>
-  <div class="row vi">Saya telah menerima dokumen ini dalam terjemahan Bahasa Indonesia pada tanggal <span class="under">${f('f_createD')}</span> bulan <span class="under">${f('f_createM')}</span> tahun <span class="under">${f('f_createY')}</span>, dan telah menerima penjelasan terkait isinya dan memahaminya dengan baik dari nomor 1 sampai dengan nomor 10.</div>
+  <div class="row ja">(西暦) <span class="under">${f('f_createY')}</span>年 <span class="under">${f('f_createM')}</span>月 <span class="under">${f('f_createD')}</span>日、前記１から10の内容について以下の者が十分に理解することができる言語（韓国語）にて説明し、内容を理解していることを確認した。</div>
+  <div class="row vi">본인은 (서기) <span class="under">${f('f_createY')}</span>년 <span class="under">${f('f_createM')}</span>월 <span class="under">${f('f_createD')}</span>일에 본 서류의 한국어 번역본을 수령하였으며, 앞의 1부터 10까지의 내용에 대하여 설명을 듣고 충분히 이해하였습니다.</div>
 </div>
 
 <div style="margin-top:8mm;text-align:left;font-size:10.5pt;">
-  <div style="margin-bottom:8mm;">（サイン / Tanda Tangan）　<span style="display:inline-block;border-bottom:1px solid #000;width:18em;">&nbsp;</span>　殿</div>
+  <div style="margin-bottom:8mm;">（サイン / 서명）　<span style="display:inline-block;border-bottom:1px solid #000;width:18em;">&nbsp;</span>　殿</div>
 </div>
 
 <table style="width:65%;margin-left:auto;margin-right:0;border-collapse:collapse;font-size:10pt;margin-top:4mm;">
   <tr>
     <td style="width:38%;padding:1mm 2mm;vertical-align:top;">
       <div class="ja">説明者</div>
-      <div class="vi">Yang menjelaskan</div>
+      <div class="vi">설명자</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja"><span class="under" style="min-width:14em;">${f('f_repName')}</span></div>
@@ -398,7 +398,7 @@ function p(){
   <tr>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja">特定技能所属機関名</div>
-      <div class="vi">Nama lembaga afiliasi keterampilan khusus</div>
+      <div class="vi">특정기능 소속기관명</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgName')}</span></div>
@@ -408,7 +408,7 @@ function p(){
   <tr>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja">所在地</div>
-      <div class="vi">Lokasi</div>
+      <div class="vi">소재지</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgAddress')}</span></div>
@@ -418,7 +418,7 @@ function p(){
   <tr>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja">電話番号</div>
-      <div class="vi">Nomor Telepon</div>
+      <div class="vi">전화번호</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgTel')}</span></div>
@@ -427,7 +427,7 @@ function p(){
   <tr>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja">代表者　役職・氏名</div>
-      <div class="vi">Perwakilan  Posisi・Nama</div>
+      <div class="vi">대표자 직책·성명</div>
     </td>
     <td style="padding:1mm 2mm;vertical-align:top;">
       <div class="ja"><span class="under" style="min-width:14em;">${f('f_repTitle')} ${f('f_repName')}</span></div>
@@ -438,14 +438,14 @@ function p(){
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
   _applyFontSize();
-  _applyJuuyouIdFontSize();
+  _applyJuuyouKoFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
   fitDocToPreview();
 }
-function _applyJuuyouIdFontSize(){
-  const st=document.getElementById('_juuyouIdFontStyle')||document.createElement('style');
-  st.id='_juuyouIdFontStyle'; document.head.appendChild(st);
+function _applyJuuyouKoFontSize(){
+  const st=document.getElementById('_juuyouKoFontStyle')||document.createElement('style');
+  st.id='_juuyouKoFontStyle'; document.head.appendChild(st);
   const s=_fontSize/10;
   st.textContent=[
     `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
@@ -469,7 +469,7 @@ function _applyJuuyouIdFontSize(){
 // そのため参照(雇用条件書セット)は昇給条件にだけ付ける。
 // OKで入れた値は setAutoDefault で印を付け、DB保存時 emp_sets には書き戻さない（実データ保護）。
 var _JK_JA={amt:"1,000円以上/月", cond:"経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。", time:"１年１回入社月頃"};
-var _JK_TR={amt:"Minimal 1.000 yen/bulan", cond:"Dilaksanakan berdasarkan lama pengalaman kerja, dengan mempertimbangkan tingkat penguasaan keterampilan dan sikap kerja.", time:"Satu kali dalam setahun, sekitar bulan mulai bekerja"};
+var _JK_TR={amt:"월 1,000엔 이상", cond:"근속연수를 기준으로 기능 습득 정도와 근무 태도를 고려하여 실시합니다.", time:"연 1회, 입사월 전후"};
 function _jKensetsuModal(){
   try{
     var _es=window._lastEmpSet||{};
@@ -511,7 +511,7 @@ function applyJKensetsu(){
   }catch(e){ closeJKensetsu(); }
 }
 
-var _KOUJI_TR={"土木工事業": "Pekerjaan teknik sipil", "建築工事業": "Pekerjaan konstruksi bangunan", "大工工事業": "Pekerjaan pertukangan kayu", "左官工事業": "Pekerjaan plester", "とび・土工工事業": "Pekerjaan perancah dan pekerjaan tanah", "石工事業": "Pekerjaan batu", "屋根工事業": "Pekerjaan atap", "電気工事業": "Pekerjaan listrik", "管工事業": "Pekerjaan perpipaan", "タイル・れんが・ブロック工事業": "Pekerjaan ubin, bata, dan blok", "鋼構造物工事業": "Pekerjaan struktur baja", "鉄筋工事業": "Pekerjaan besi tulangan", "舗装工事業": "Pekerjaan pengaspalan", "しゅんせつ工事業": "Pekerjaan pengerukan", "板金工事業": "Pekerjaan pelat logam", "ガラス工事業": "Pekerjaan kaca", "塗装工事業": "Pekerjaan pengecatan", "防水工事業": "Pekerjaan kedap air", "内装仕上工事業": "Pekerjaan finishing interior", "機械器具設置工事業": "Pekerjaan pemasangan mesin dan peralatan", "熱絶縁工事業": "Pekerjaan isolasi termal", "電気通信工事業": "Pekerjaan telekomunikasi", "造園工事業": "Pekerjaan lansekap", "さく井工事業": "Pekerjaan pengeboran sumur", "建具工事業": "Pekerjaan kusen dan pintu", "水道施設工事業": "Pekerjaan fasilitas air bersih", "消防施設工事業": "Pekerjaan fasilitas pemadam kebakaran", "清掃施設工事業": "Pekerjaan fasilitas kebersihan", "解体工事業": "Pekerjaan pembongkaran"};
+var _KOUJI_TR={"土木工事業": "토목공사업", "建築工事業": "건축공사업", "大工工事業": "목공사업", "左官工事業": "미장공사업", "とび・土工工事業": "비계·토공공사업", "石工事業": "석공사업", "屋根工事業": "지붕공사업", "電気工事業": "전기공사업", "管工事業": "배관공사업", "タイル・れんが・ブロック工事業": "타일·벽돌·블록공사업", "鋼構造物工事業": "강구조물공사업", "鉄筋工事業": "철근공사업", "舗装工事業": "포장공사업", "しゅんせつ工事業": "준설공사업", "板金工事業": "판금공사업", "ガラス工事業": "유리공사업", "塗装工事業": "도장공사업", "防水工事業": "방수공사업", "内装仕上工事業": "내장마감공사업", "機械器具設置工事業": "기계기구설치공사업", "熱絶縁工事業": "단열공사업", "電気通信工事業": "전기통신공사업", "造園工事業": "조경공사업", "さく井工事業": "착정공사업", "建具工事業": "창호공사업", "水道施設工事業": "수도시설공사업", "消防施設工事業": "소방시설공사업", "清掃施設工事業": "청소시설공사업", "解体工事業": "해체공사업"};
 // ver.20260715: 従事させる工事業の種類の訳欄(f_workCatEn)は値をセットする処理が無く常に空だった。
 // 建設業許可29業種は固定語彙なので辞書で訳す。辞書に無い語は原文のままにする（誤訳を出さない）。
 // ver.20260715: 従事工事業はアンシス未入力が9割のため手入力が前提。
@@ -536,7 +536,7 @@ const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:
 //   共通 loadCaseToForm の橋渡しで es_deductXxxJippi/Est に入る。手動チェックも可。
 function _jpJ(base){ var cb=document.getElementById(base+'Jippi'); var est=document.getElementById(base+'Est'); return !!(cb&&cb.checked)||/実費/.test((est&&est.value)||''); }
 function _jSufJa(base){ return _jpJ(base)?'（実費）':''; }
-function _jSufLo(base){ return _jpJ(base)?'（biaya aktual）':''; }
+function _jSufLo(base){ return _jpJ(base)?'（실비）':''; }
 function _setJippiJ(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } p(); }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
