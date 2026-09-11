@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260910.03</div>
+    <div class="ver">ver.20260911.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
@@ -448,7 +448,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1789089127"></script>
+<script src="ofusa_common.js?v=1789120794"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1347,8 +1347,8 @@ function maybeApplyKensetsuFormat(){
     const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
     if(!fld.includes('建設')) return;
     const rc=document.getElementById('es_raiseCondition');
-    if(rc && /経験年数に応じて昇給する/.test(rc.value||'')) return;
-    var kr=document.getElementById('km_raise'); if(kr) kr.value='年1回★月 1,000円以上/月 経験年数に応じて昇給する';
+    if(rc && /経験年数に(応じて昇給する|基づき必ず実施)/.test(rc.value||'')) return;
+    var kr=document.getElementById('km_raise'); if(kr) kr.value='年1回（入社月）に1,000円以上昇給。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
     var kb=document.getElementById('km_bonus'); if(kb) kb.value='年★回、★・★月（業績による）';
     var kt=document.getElementById('km_retire'); if(kt) kt.value='退職金共済による';
     var _es=window._lastEmpSet||{};
