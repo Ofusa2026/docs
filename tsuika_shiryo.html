@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>追加資料提出</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:25mm 25mm 25mm 25mm!important;font-size:11pt!important;line-height:1.9!important;min-height:auto!important;}
+.doc .p{margin:0;}
+.doc .ttl{text-align:center;font-size:14pt;letter-spacing:2px;margin-bottom:14mm;}
+.doc .sig{text-align:right;}
+.doc .ul{display:inline-block;min-width:8em;border-bottom:1px solid #000;text-align:left;padding:0 2px;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:25mm!important;font-size:11pt!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 追加資料提出</div>
+    <div class="ver">ver.20260910.05</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('tsuika_shiryo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">提出先</div>
+      <div class="fg"><label>提出先（申請受付番号から自動・編集可）</label><input id="f_bureau" oninput="p()" placeholder="例：東京出入国在留管理局"></div>
+    </div>
+    <div class="fs"><div class="fs-title">案件情報</div>
+      <div class="fg"><label>申請番号（受付番号）</label><input id="f_receiptNo" oninput="p()" placeholder="例：東オンCV12345"></div>
+      <div class="fg"><label>申請人</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">署名</div>
+      <div class="fg"><label>申請取次行政書士</label>
+        <select id="f_gyosei" onchange="p()">
+          <option value="田中　綾美">田中　綾美</option>
+          <option value="中林　俊介">中林　俊介</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1789086606"></script>
+<script>
+// 受付番号の先頭文字 → 提出先（フル名称・支局対応）
+var BUREAU_FULL={
+  '東':'東京出入国在留管理局',
+  '横':'東京出入国在留管理局横浜支局',
+  '名':'名古屋出入国在留管理局',
+  '阪':'大阪出入国在留管理局',
+  '神':'大阪出入国在留管理局神戸支局',
+  '札':'札幌出入国在留管理局',
+  '仙':'仙台出入国在留管理局',
+  '福':'福岡出入国在留管理局',
+  '那':'福岡出入国在留管理局那覇支局',
+  '広':'広島出入国在留管理局',
+  '中':'広島出入国在留管理局',
+  '高':'高松出入国在留管理局'
+};
+function bureauFullFromReceipt(rno){
+  var s=String(rno||'').trim(); if(!s) return '';
+  return BUREAU_FULL[s.charAt(0)]||'';
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="ttl">追加資料提出</div>
+<div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>　御中</div>
+<div class="p">申請番号：</div>
+<div class="p" style="margin-bottom:6mm;">${f('f_receiptNo')}</div>
+<div class="p" style="margin-bottom:6mm;">申請人：${f('f_applicant')}</div>
+<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>
+<div class="p">先般申請いたしました資料におきまして、申請書類の添付漏れがございました。</div>
+<div class="p">ご迷惑をお掛けし、誠に申し訳ございません。</div>
+<div class="p" style="margin-bottom:12mm;">申請資料一式を送付いたしますので、ご査収のほどよろしくお願いいたします。</div>
+<div class="p">こちらの不手際によりお手数をお掛けし、大変恐縮でございます。</div>
+<div class="p" style="margin-bottom:16mm;">お忙しいところ誠に恐れ入りますが、何卒よろしくお願い申し上げます。</div>
+<div class="p sig">大房行政書士法人</div>
+<div class="p sig">申請取次行政書士　${f('f_gyosei')}</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applyTsuikaFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applyTsuikaFontSize(){
+  const st=document.getElementById('_tsuikaFontStyle')||document.createElement('style');
+  st.id='_tsuikaFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=`.doc{font-size:${(11*s).toFixed(2)}pt!important} .doc .ttl{font-size:${(14*s).toFixed(2)}pt!important}`;
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info||!info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      sb('cases?select=applicant,company,receipt_no,case_no&id=eq.'+caseId),
+      companyId?sb('companies?select=name&id=eq.'+companyId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      // 申請番号：受付番号（無ければ入管の受付番号 case_no）
+      sf('f_receiptNo', (cas.receipt_no||cas.case_no||'').trim());
+      s('f_applicant', cas.applicant||'');
+      s('f_company', (co&&co.name)||cas.company||companyName||'');
+      // 提出先：受付番号の先頭文字から自動（例 東オン→東京出入国在留管理局）。手入力があれば尊重
+      const b=bureauFullFromReceipt(cas.receipt_no||cas.case_no||'');
+      if(b) sf('f_bureau', b);
+    }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tsuika_shiryo', {skipFieldRestore:true}); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
