@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20260911.02</div>
+    <div class="ver">ver.20260911.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -47,13 +47,8 @@
   </div>
   <div class="fp-inner">
     <div class="fs"><div class="fs-title">テンプレート</div>
-      <div class="fg"><label>書類タイトル</label>
-        <select id="f_title" onchange="p()">
-          <option value="追加資料提出">追加資料提出</option>
-          <option value="理由書">理由書</option>
-        </select>
-      </div>
-      <div class="fg"><label>本文テンプレ（選ぶと即反映）</label>
+      <input id="f_title" type="hidden" value="追加資料提出">
+      <div class="fg"><label>本文テンプレ（選ぶと即反映・タイトルも切替）</label>
         <select id="f_tpl" onchange="applyTemplate()">
           <option value="">— テンプレを選択 —</option>
           <option value="tsuika_std">追加資料｜添付漏れのお詫び（標準）</option>
@@ -101,7 +96,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1789088289"></script>
+<script src="ofusa_common.js?v=1789089127"></script>
 <script>
 // 受付番号の先頭文字 → 提出先（フル名称・支局対応）
 var BUREAU_FULL={
