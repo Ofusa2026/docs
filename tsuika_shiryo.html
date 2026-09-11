@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20260910.05</div>
+    <div class="ver">ver.20260911.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -46,19 +46,45 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
+    <div class="fs"><div class="fs-title">テンプレート</div>
+      <div class="fg"><label>書類タイトル</label>
+        <select id="f_title" onchange="p()">
+          <option value="追加資料提出">追加資料提出</option>
+          <option value="理由書">理由書</option>
+        </select>
+      </div>
+      <div class="fg"><label>本文テンプレを選んで反映</label>
+        <select id="f_tpl">
+          <option value="">— テンプレを選択 —</option>
+          <option value="tsuika_std">追加資料｜添付漏れのお詫び（標準）</option>
+          <option value="tsuika_shiteki">追加資料｜指摘事項に沿って提出</option>
+          <option value="tsuika_list">追加資料｜提出書類の一覧つき</option>
+          <option value="riyu_online">理由書｜オンライン入力ミスの訂正</option>
+          <option value="riyu_torisage">理由書｜取下げの経緯説明</option>
+          <option value="riyu_hosoku">理由書｜申請情報の補足</option>
+        </select>
+        <button class="btn" onclick="applyTemplate()" style="margin-top:4px;background:#2563eb;color:#fff;width:100%;">⬇ 本文に反映</button>
+      </div>
+    </div>
     <div class="fs"><div class="fs-title">提出先</div>
       <div class="fg"><label>提出先（申請受付番号から自動・編集可）</label><input id="f_bureau" oninput="p()" placeholder="例：東京出入国在留管理局"></div>
+      <div class="fg"><label>部門（任意）</label><input id="f_busho" oninput="p()" placeholder="例：就労審査第三部門"></div>
+      <div class="fg"><label>日付（任意・空なら非表示）</label><input id="f_date" oninput="p()" placeholder="例：2026年9月11日"></div>
     </div>
     <div class="fs"><div class="fs-title">案件情報</div>
-      <div class="fg"><label>申請番号（受付番号）</label><input id="f_receiptNo" oninput="p()" placeholder="例：東オンCV12345"></div>
-      <div class="fg"><label>申請人</label><input id="f_applicant" oninput="p()"></div>
-      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>申請番号（複数行OK・氏名併記OK）</label><textarea id="f_receiptNo" oninput="p()" rows="3" placeholder="例：東オンCV12345&#10;　　東オンCV12346　NGUYEN VAN B"></textarea></div>
+      <div class="fg"><label>申請人（空なら行ごと非表示）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>所属機関名（空なら行ごと非表示）</label><input id="f_company" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">本文（自由に編集できます）</div>
+      <div class="fg"><textarea id="f_body" oninput="p()" rows="14" style="font-size:12px;line-height:1.6;" placeholder="テンプレを選んで「本文に反映」か、直接入力してください"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">署名</div>
       <div class="fg"><label>申請取次行政書士</label>
         <select id="f_gyosei" onchange="p()">
           <option value="田中　綾美">田中　綾美</option>
           <option value="中林　俊介">中林　俊介</option>
+          <option value="大房　明良">大房　明良</option>
         </select>
       </div>
     </div>
@@ -76,7 +102,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1789086606"></script>
+<script src="ofusa_common.js?v=1789087718"></script>
 <script>
 // 受付番号の先頭文字 → 提出先（フル名称・支局対応）
 var BUREAU_FULL={
@@ -97,23 +123,54 @@ function bureauFullFromReceipt(rno){
   var s=String(rno||'').trim(); if(!s) return '';
   return BUREAU_FULL[s.charAt(0)]||'';
 }
+var TPL = {
+  tsuika_std: { title:'追加資料提出', body:
+'先般申請いたしました資料におきまして、申請書類の添付漏れがございました。\nご迷惑をお掛けし、誠に申し訳ございません。\n申請資料一式を送付いたしますので、ご査収のほどよろしくお願いいたします。\n\nこちらの不手際によりお手数をお掛けし、大変恐縮でございます。\nお忙しいところ誠に恐れ入りますが、何卒よろしくお願い申し上げます。' },
+  tsuika_shiteki: { title:'追加資料提出', body:
+'追加資料をお送りいたしますので、ご確認よろしくお願いいたします。\n\n＊指摘事項1\n（ここに指摘への回答・提出物を記載）\n\n書類の不備等多々ありお手数お掛け致しました。\nお忙しいところ大変恐れ入りますが、何卒よろしくお願いいたします。' },
+  tsuika_list: { title:'追加資料提出', body:
+'追加資料をお送りいたしますので、ご確認よろしくお願いいたします。\n\n１．提出資料一覧の表紙\n２．雇用条件書（参考様式第１－５号）\n３．雇用契約書（参考様式第１－６号）\n４．賃金の支払（参考様式第１－６号別紙）\n\n書類の不備等多々ありお手数お掛け致しました。\nお忙しいところ大変恐れ入りますが、何卒よろしくお願いいたします。' },
+  riyu_online: { title:'理由書', body:
+'以下の内容に関してご説明いたします。\n\n・オンラインシステム○○「（項目名）」の記載に関して\n表題の件に関して、「無」と記載しておりましたが、実際は下記が正しい記載となりますので訂正させていただきます。\nオンラインシステム上では変更できないため、このような形で提出させていただきます。\n以上、何卒ご理解いただきますようお願い申し上げます。\n\n（項目名）\n有／無　→有\n回数　　→１（回）' },
+  riyu_torisage: { title:'理由書', body:
+'以下の内容に関してご説明いたします。\n○○さんの申請取り下げ書に関して\n申請後、申請辞退のご連絡をいただきましたが\nご本人より取り下げ書へのご署名をいただくことが難しく、\n入管へ経緯を説明のうえ対応方法を仰いだところ\n経緯の説明を記載した理由書と併せて取り下げ書の提出にて確認いただける旨\nご指示いただきましたので本状の提出に至りました。\nお手数をおかけいたしますが、上記、申請取り下げにてご対応いただけますと幸いです。\n\n以上、何卒よろしくお願い申し上げます。' },
+  riyu_hosoku: { title:'理由書', body:
+'・就労先情報に関して\n－（施設名）\n　住所：（住所）\n\n・申請情報（○○）に関して\n\n申請情報に不足があり申し訳ございませんでした。' }
+};
+function applyTemplate(){
+  var k=(document.getElementById('f_tpl')||{}).value||'';
+  if(!k||!TPL[k]) { showToast('テンプレを選んでください'); return; }
+  var body=document.getElementById('f_body');
+  if(body.value.trim()!=='' && !confirm('本文を上書きしますか？（現在の本文は消えます）')) return;
+  body.value=TPL[k].body;
+  var t=document.getElementById('f_title'); if(t) t.value=TPL[k].title;
+  p(); showToast('📄 テンプレを反映しました');
+}
+function _ml(id, ph){
+  var val=v(id)||'';
+  if(!val) return '<span class="f" style="color:#aaa;background:#fff59d;padding:0 3px;">'+ph+'</span>';
+  return esc(val).replace(/\n/g,'<br>');
+}
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
+  const title=v('f_title')||'追加資料提出';
+  const busho=v('f_busho')||'';
+  const date=v('f_date')||'';
+  const showApplicant=!!v('f_applicant');
+  const showCompany=!!v('f_company');
+  const applicantLabel=(title==='理由書')?'氏名':'申請人';
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div class="ttl">追加資料提出</div>
-<div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>　御中</div>
+<div class="ttl">${esc(title)}</div>
+${date?`<div class="p" style="text-align:right;margin-bottom:4mm;">${esc(date)}</div>`:''}
+<div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>${busho?'　'+esc(busho):''}　御中</div>
 <div class="p">申請番号：</div>
-<div class="p" style="margin-bottom:6mm;">${f('f_receiptNo')}</div>
-<div class="p" style="margin-bottom:6mm;">申請人：${f('f_applicant')}</div>
-<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>
-<div class="p">先般申請いたしました資料におきまして、申請書類の添付漏れがございました。</div>
-<div class="p">ご迷惑をお掛けし、誠に申し訳ございません。</div>
-<div class="p" style="margin-bottom:12mm;">申請資料一式を送付いたしますので、ご査収のほどよろしくお願いいたします。</div>
-<div class="p">こちらの不手際によりお手数をお掛けし、大変恐縮でございます。</div>
-<div class="p" style="margin-bottom:16mm;">お忙しいところ誠に恐れ入りますが、何卒よろしくお願い申し上げます。</div>
+<div class="p" style="margin-bottom:6mm;">${_ml('f_receiptNo','es.receiptNo')}</div>
+${showApplicant?`<div class="p" style="margin-bottom:6mm;">${applicantLabel}：${f('f_applicant')}</div>`:''}
+${showCompany?`<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>`:''}
+<div class="p" style="margin-bottom:16mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
 <div class="p sig">大房行政書士法人</div>
 <div class="p sig">申請取次行政書士　${f('f_gyosei')}</div>
 </div>`;
@@ -155,6 +212,9 @@ async function loadFromDB(passedInfo){
       const b=bureauFullFromReceipt(cas.receipt_no||cas.case_no||'');
       if(b) sf('f_bureau', b);
     }
+    // 初回は標準テンプレ（追加資料・添付漏れ）を本文にセット
+    const body=document.getElementById('f_body');
+    if(body && body.value.trim()===''){ body.value=TPL.tsuika_std.body; }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
