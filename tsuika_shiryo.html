@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20260911.01</div>
+    <div class="ver">ver.20260911.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -53,8 +53,8 @@
           <option value="理由書">理由書</option>
         </select>
       </div>
-      <div class="fg"><label>本文テンプレを選んで反映</label>
-        <select id="f_tpl">
+      <div class="fg"><label>本文テンプレ（選ぶと即反映）</label>
+        <select id="f_tpl" onchange="applyTemplate()">
           <option value="">— テンプレを選択 —</option>
           <option value="tsuika_std">追加資料｜添付漏れのお詫び（標準）</option>
           <option value="tsuika_shiteki">追加資料｜指摘事項に沿って提出</option>
@@ -63,7 +63,6 @@
           <option value="riyu_torisage">理由書｜取下げの経緯説明</option>
           <option value="riyu_hosoku">理由書｜申請情報の補足</option>
         </select>
-        <button class="btn" onclick="applyTemplate()" style="margin-top:4px;background:#2563eb;color:#fff;width:100%;">⬇ 本文に反映</button>
       </div>
     </div>
     <div class="fs"><div class="fs-title">提出先</div>
@@ -102,7 +101,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1789087718"></script>
+<script src="ofusa_common.js?v=1789088289"></script>
 <script>
 // 受付番号の先頭文字 → 提出先（フル名称・支局対応）
 var BUREAU_FULL={
@@ -138,10 +137,10 @@ var TPL = {
 '・就労先情報に関して\n－（施設名）\n　住所：（住所）\n\n・申請情報（○○）に関して\n\n申請情報に不足があり申し訳ございませんでした。' }
 };
 function applyTemplate(){
+  // ver.20260911.02: 選択と同時に即反映（確認ダイアログ・反映ボタン廃止）
   var k=(document.getElementById('f_tpl')||{}).value||'';
-  if(!k||!TPL[k]) { showToast('テンプレを選んでください'); return; }
+  if(!k||!TPL[k]) return;
   var body=document.getElementById('f_body');
-  if(body.value.trim()!=='' && !confirm('本文を上書きしますか？（現在の本文は消えます）')) return;
   body.value=TPL[k].body;
   var t=document.getElementById('f_title'); if(t) t.value=TPL[k].title;
   p(); showToast('📄 テンプレを反映しました');
