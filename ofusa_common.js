@@ -120,6 +120,163 @@ async function sb(path,opts={}){
 //   優先順: ①cases.emp_set_idx（有効な数値）→ ②setName に申請人名を含む → ③setName に案件名を含む
 //          → ④入力済み項目数が最多のセット → ⑤0。
 //   ②〜④で決めた場合は cases.emp_set_idx に書き戻して、他書類（重要事項説明書・1-17等）とも揃える。
+
+// ============================================================
+// ver.20260911.07: 1-6号 AI判定（koyoujoukensho-check スキル移植）
+//   雇用条件書の入力値を ⛔/⚡/✅ で提出前チェックする。
+//   ・機械計算できる項目（最低賃金・控除合計・手取り・週=年÷52.14・休憩・年休）は JS で確定判定
+//   ・文言や整合の総合判断は Claude API（AI翻訳と同じ localStorage の ofusa_apiKey）に委譲
+//   ・過検知防止ルール（G4/G6/G8/G13/G16 相当）をプロンプトに埋め込み
+// ============================================================
+window.OFUSA_MIN_WAGE = { // 令和7年度(2025年10月改定)。毎年10月改定時に更新すること
+  "北海道":1075,"青森":1029,"岩手":1031,"宮城":1038,"秋田":1031,"山形":1032,"福島":1033,
+  "茨城":1074,"栃木":1068,"群馬":1063,"埼玉":1141,"千葉":1140,"東京":1226,"神奈川":1225,
+  "新潟":1050,"富山":1062,"石川":1054,"福井":1053,"山梨":1052,"長野":1061,"岐阜":1065,
+  "静岡":1097,"愛知":1140,"三重":1087,"滋賀":1080,"京都":1122,"大阪":1177,"兵庫":1116,
+  "奈良":1051,"和歌山":1045,"鳥取":1030,"島根":1033,"岡山":1047,"広島":1085,"山口":1043,
+  "徳島":1046,"香川":1036,"愛媛":1033,"高知":1023,"福岡":1057,"佐賀":1030,"長崎":1031,
+  "熊本":1034,"大分":1035,"宮崎":1023,"鹿児島":1026,"沖縄":1023 };
+function _mw16_num(id){
+  var e=document.getElementById(id); if(!e) return 0;
+  var t=String(e.value||'').replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[,，、\s　円]/g,'');
+  var n=parseFloat(t); return isNaN(n)?0:n;
+}
+function _mw16_val(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }
+function _mw16_pref(){
+  var src=(_mw16_val('es_officeAddress')||_mw16_val('es_orgAddress')||'');
+  for(var k in OFUSA_MIN_WAGE){ if(src.indexOf(k)>=0) return k; }
+  return '';
+}
+function _mw16_jippi(base){
+  var cb=document.getElementById(base+'Jippi'); var est=document.getElementById(base+'Est');
+  return !!(cb&&cb.checked)||/実費/.test((est&&est.value)||'');
+}
+function _aiCheck16Local(){
+  var checks=[];
+  function add(sev,cat,title,detail){ checks.push({severity:sev,category:cat,title:title,detail:detail,src:'計算'}); }
+  // D/E. 最低賃金（基本給ベース）
+  var pref=_mw16_pref();
+  var th=_mw16_num('es_monthlyH')+_mw16_num('es_monthlyMin')/60;
+  var hourly=_mw16_num('es_salaryHourly');
+  var monthly=_mw16_num('es_salaryMonthly');
+  if(!hourly && monthly && th>0) hourly=Math.round(monthly/th);
+  var isKensetsu=/建設/.test(_mw16_val('es_applicantField')+_mw16_val('es_applicantFieldEn'));
+  if(pref && hourly){
+    var mw=OFUSA_MIN_WAGE[pref];
+    if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（令和7年度）。基本給ベース（月給÷月所定労働時間）で判定。');
+    else add('ok','最低賃金','最低賃金クリア（'+pref+'）','時給換算 '+hourly+'円 ≥ '+mw+'円。');
+    if(isKensetsu){
+      var need=Math.ceil(mw*1.1);
+      if(hourly<mw*1.1) add('warn','建設報酬基準','建設の報酬基準（最賃×1.1）を下回る可能性','時給換算 '+hourly+'円 < '+need+'円（'+pref+'最賃'+mw+'円×1.1）。所定内賃金ベースで再確認を。');
+      else add('ok','建設報酬基準','建設の報酬基準（最賃×1.1）クリア','時給換算 '+hourly+'円 ≥ '+need+'円。');
+    }
+  } else if(!pref){
+    add('warn','最低賃金','就業場所の都道府県を判定できません','事業所所在地・所属機関住所から都道府県を読めませんでした。手動で最低賃金を確認してください。');
+  }
+  // G. 控除合計・手取り
+  var parts=[['es_deductTax','税金'],['es_deductSocialIns','社会保険料'],['es_deductEmpIns','雇用保険料']];
+  var jparts=[['es_deductFood','食費'],['es_deductHousing','居住費'],['es_deductUtility','水道光熱費'],['es_deductOther1Amount','その他①'],['es_deductOther2Amount','その他②'],['es_deductOther3Amount','その他③'],['es_deductOther4Amount','その他④']];
+  var sum=0, detail=[];
+  parts.forEach(function(x){ var n=_mw16_num(x[0]); if(n){sum+=n; detail.push(x[1]+n);} });
+  jparts.forEach(function(x){ var n=_mw16_num(x[0]); if(!n) return; if(_mw16_jippi(x[0])){ detail.push(x[1]+n+'(実費・除外)'); } else { sum+=n; detail.push(x[1]+n);} });
+  var dt=_mw16_num('es_deductTotal');
+  if(dt||sum){
+    if(Math.abs(sum-dt)<=1) add('ok','控除整合','控除内訳の合計と控除合計が一致','内訳計 '+sum+'円 ＝ 控除合計 '+dt+'円。');
+    else add('out','控除整合','控除内訳の合計と控除合計が不一致','内訳計 '+sum+'円 ≠ 控除合計 '+dt+'円（差 '+(sum-dt)+'円）。['+detail.join(' / ')+']');
+  }
+  var st=_mw16_num('es_salaryTotal')||monthly; var np=_mw16_num('es_netPay');
+  if(st&&dt&&np){
+    if(Math.abs((st-dt)-np)<=1) add('ok','手取り整合','手取り＝支払概算額−控除合計 が一致','' + st+'−'+dt+'＝'+np+'円。');
+    else add('out','手取り整合','手取り額が計算と不一致','支払概算 '+st+'−控除 '+dt+'＝'+(st-dt)+'円 ですが手取り欄は '+np+'円。');
+  }
+  // B. 週＝年÷52.14（G13）
+  var yh=_mw16_num('es_yearlyH')+_mw16_num('es_yearlyMin')/60;
+  var wh=_mw16_num('es_weeklyH')+_mw16_num('es_weeklyMin')/60;
+  var isNogyo=/農業|漁業/.test(_mw16_val('es_applicantField'));
+  if(yh&&wh){
+    var calc=yh/52.14;
+    if(Math.abs(calc-wh)>0.6) add('warn','労働時間','週所定労働時間が年間÷52.14と乖離','年間'+yh.toFixed(1)+'h÷52.14＝'+calc.toFixed(2)+'h に対し週欄 '+wh.toFixed(2)+'h。（週＝1日×日数では判定しません）');
+    else add('ok','労働時間','週所定労働時間は年間÷52.14と整合','週 '+wh.toFixed(2)+'h ≒ 年間÷52.14（'+calc.toFixed(2)+'h）。');
+    if(calc>40.05 && !isNogyo) add('out','労働時間','週の法定労働時間40hを超過','年間÷52.14＝'+calc.toFixed(2)+'h。変形労働時間制の要件を確認してください。');
+    if(calc>40.05 && isNogyo) add('ok','労働時間','週40h超だが農業・漁業のため適用除外','労基法41条により労働時間・休日規定は適用除外（年休は通常どおり）。');
+  }
+  // C. 休憩・年休
+  var dh=_mw16_num('es_dailyHours')+_mw16_num('es_dailyMins')/60; var br=_mw16_num('es_breakTime');
+  if(dh>8&&br<60) add('out','休憩','休憩が不足（8h超は60分必要）','1日 '+dh.toFixed(2)+'h に対し休憩 '+br+'分。');
+  else if(dh>6&&br<45) add('out','休憩','休憩が不足（6h超は45分必要）','1日 '+dh.toFixed(2)+'h に対し休憩 '+br+'分。');
+  else if(dh&&br) add('ok','休憩','休憩時間は法定を満たす','1日 '+dh.toFixed(2)+'h／休憩 '+br+'分。');
+  var pl=_mw16_num('es_paidLeave');
+  if(pl&&pl<10) add('out','年休','年次有給休暇が法定（10日）未満','6か月継続勤務後 '+pl+'日。10日以上必要。');
+  // E/H. 建設の昇給要件
+  if(isKensetsu){
+    var rc=_mw16_val('es_raiseCondition');
+    if(rc && !/1[,，]?000円/.test(rc)) add('warn','昇給','建設の昇給要件（月1,000円以上）が文言から読めません','昇給条件:「'+rc.substring(0,60)+'…」。年1回・1,000円/月以上の明記を推奨。');
+  }
+  return checks;
+}
+window.aiCheck16 = async function(){
+  var local=_aiCheck16Local();
+  // 収集: 全 es_* の入力値（空以外）
+  var vals={};
+  document.querySelectorAll('[id^="es_"]').forEach(function(e){
+    if(!e.id||e.id.includes('${')) return;
+    if(e.type==='checkbox'){ if(e.checked) vals[e.id]='checked'; return; }
+    var v=String(e.value||'').trim(); if(v) vals[e.id]=v;
+  });
+  var key=''; try{ key=localStorage.getItem('ofusa_apiKey')||localStorage.getItem('claudeApiKey')||''; }catch(e){}
+  var aiChecks=[]; var aiErr='';
+  if(key){
+    try{
+      _showCheckModal(local, [], true);
+      var prompt='あなたは特定技能の雇用条件書（参考様式1-6号）の提出前チェック担当です。以下の入力値（Saysayの1-6号フォーム）を点検し、追完になりやすい問題を指摘してください。\n'
+        +'【判定カテゴリ】氏名/日付整合・契約期間・休日/年休・賃金と手当の整合（日本語欄と翻訳(〜En)欄の数値食い違い含む）・昇給/賞与/退職金・社会保険/労働保険・変形労働（適用ありなら単位/年間カレンダーの言及）・シフト整合\n'
+        +'【過検知防止・重要】(1)週所定は「年間÷52.14」で判定済みなので再判定しない (2)代表者と相談窓口担当者は別人でよい (3)翻訳欄の値が空なのは指摘不要（未翻訳なだけ） (4)署名・押印はこの画面では確認できないので指摘しない (5)時間外「有」だけでは36協定必須ではない (6)機械計算済みの項目（最低賃金・控除合計・手取り・週時間・休憩・年休）は再指摘しない\n'
+        +'【機械計算の結果（参考・再指摘不要）】'+JSON.stringify(local.map(function(c){return c.severity+':'+c.title;}))+'\n'
+        +'【入力値】'+JSON.stringify(vals)+'\n'
+        +'出力はJSONのみ（前置き・コードブロック禁止）: {"checks":[{"severity":"out|warn|ok","category":"...","title":"...","detail":"..."}]} 。out=提出不可級、warn=要確認、ok=問題なし確認済み。最大10件、okは重要なもの2件まで。';
+      var r=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2500,messages:[{role:'user',content:prompt}]})
+      });
+      var j=await r.json();
+      var txt=(j&&j.content&&j.content[0]&&j.content[0].text)||'';
+      txt=txt.replace(/```json|```/g,'').trim();
+      var parsed=JSON.parse(txt);
+      (parsed.checks||[]).forEach(function(c){ c.src='AI'; aiChecks.push(c); });
+    }catch(e){ aiErr='AI判定でエラー: '+e.message+'（機械計算の結果のみ表示します）'; }
+  } else {
+    aiErr='AIのAPIキーが未設定のため、機械計算のチェックのみ表示しています（AI翻訳と同じAPIキー設定で全項目判定できます）。';
+  }
+  _showCheckModal(local, aiChecks, false, aiErr);
+};
+function _showCheckModal(local, aiChecks, loading, note){
+  var old=document.getElementById('aiCheck16Modal'); if(old) old.remove();
+  var all=(local||[]).concat(aiChecks||[]);
+  var sevOrder={out:0,warn:1,ok:2}; all.sort(function(a,b){var sa=(a.severity in sevOrder)?sevOrder[a.severity]:3, sb=(b.severity in sevOrder)?sevOrder[b.severity]:3; return sa-sb;});
+  var mark={out:'⛔',warn:'⚡',ok:'✅'};
+  var col={out:'#dc2626',warn:'#d97706',ok:'#16a34a'};
+  var rows=all.map(function(c){
+    return '<div style="border-left:4px solid '+(col[c.severity]||'#999')+';background:#fff;padding:8px 10px;margin-bottom:6px;border-radius:0 6px 6px 0;box-shadow:0 1px 2px rgba(0,0,0,.06);">'
+      +'<div style="font-weight:700;font-size:13px;">'+(mark[c.severity]||'')+' '+String(c.title||'').replace(/</g,'&lt;')
+      +' <span style="font-size:10px;color:#94a3b8;font-weight:400;">['+String(c.category||'')+'／'+(c.src||'AI')+']</span></div>'
+      +'<div style="font-size:12px;color:#475569;margin-top:2px;">'+String(c.detail||'').replace(/</g,'&lt;')+'</div></div>';
+  }).join('');
+  var outN=all.filter(function(c){return c.severity==='out';}).length;
+  var warnN=all.filter(function(c){return c.severity==='warn';}).length;
+  var html='<div id="aiCheck16Modal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;" onclick="if(event.target.id===\'aiCheck16Modal\')this.remove()">'
+    +'<div style="background:#f1f5f9;width:min(680px,92vw);max-height:86vh;overflow:auto;border-radius:12px;padding:16px 18px;font-family:sans-serif;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
+    +'<div style="font-weight:800;font-size:15px;">🧬 1-6号 AI判定'+(loading?'（AI判定中…）':'　⛔'+outN+'件／⚡'+warnN+'件')+'</div>'
+    +'<button onclick="document.getElementById(\'aiCheck16Modal\').remove()" style="border:none;background:#e2e8f0;border-radius:6px;padding:4px 10px;cursor:pointer;">閉じる</button></div>'
+    +(note?'<div style="font-size:11px;color:#b45309;background:#fef3c7;padding:6px 8px;border-radius:6px;margin-bottom:8px;">'+note+'</div>':'')
+    +(loading?'<div style="font-size:12px;color:#64748b;margin-bottom:8px;">計算チェックを先に表示しています。AIの総合判定を取得中…</div>':'')
+    +rows
+    +'<div style="font-size:10px;color:#94a3b8;margin-top:8px;">最低賃金は令和7年度(2025年10月改定)。判定は提出前の参考情報であり、最終確認は担当者が行ってください。</div>'
+    +'</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
 window.resolveEmpSetIdx = async function(co, cas, info){
   const sets = (co && Array.isArray(co.emp_sets)) ? co.emp_sets : [];
   const raw = (cas && cas.emp_set_idx != null && String(cas.emp_set_idx) !== '') ? String(cas.emp_set_idx)
