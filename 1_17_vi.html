@@ -356,7 +356,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.09</div>
+    <div class="ver">ver.20260913.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1338,14 +1338,44 @@ function aiCheck17(){ alert('1-17号のAI判定は未対応です。'); }
 function p17Fit(){
   var area=document.getElementById('pageArea'); if(!area) return;
   var sheet=area.querySelector('.sheet'); if(!sheet) return;
-  sheet.style.zoom='';                         // 一旦リセットして原寸幅を測る
-  var avail=area.clientWidth - 28;
+  var wrap=sheet.parentElement;                 // docP1
+  // 原寸に戻して基準幅を測る
+  sheet.style.transform='none'; sheet.style.zoom='';
   var w=sheet.offsetWidth || 1040;
-  var scale=avail / w;
-  if(scale>1) scale=1;
-  sheet.style.zoom=scale;                       // zoomはレイアウトごと縮む（Chrome）
+  var avail=area.clientWidth - 24;
+  if(avail<=0){ setTimeout(p17Fit,150); return; }   // 非表示iframe等で幅未確定→後で再実行
+  var scale=Math.min(1, avail/w);
+  // transform:scale で縮小（zoomより互換性が安定）。原点は左上。
+  sheet.style.transformOrigin='top left';
+  sheet.style.transform='scale('+scale+')';
+  // scaleは版面(offsetWidth/Height)を変えないので、親の箱を実効サイズに合わせて
+  // 右の空白・下の余白を除去する
+  if(wrap){
+    wrap.style.width=(w*scale)+'px';
+    wrap.style.height=(sheet.offsetHeight*scale)+'px';
+    wrap.style.overflow='hidden';
+  }
 }
 window.addEventListener('resize', function(){ if(!window._editMode) p17Fit(); });
+// iframeが後から表示される（タブ切替）ケース: 可視化・フォーカス・visibilitychangeで再フィット
+window.addEventListener('focus', function(){ if(!window._editMode) p17Fit(); });
+document.addEventListener('visibilitychange', function(){ if(!document.hidden && !window._editMode) p17Fit(); });
+(function(){
+  var area=document.getElementById('pageArea');
+  if(area && window.IntersectionObserver){
+    try{ new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting && !window._editMode) p17Fit(); }); }).observe(area); }catch(e){}
+  }
+  // 保険: 起動後しばらく定期的にfit（幅が遅れて確定する環境向け）
+  var n=0, t=setInterval(function(){ n++; if(!window._editMode) p17Fit(); if(n>=6) clearInterval(t); }, 400);
+})();
+// pageAreaの幅変化を監視して常にフィット（iframe内で初期幅が遅れて確定するケース対策）
+(function(){
+  function obs(){
+    var area=document.getElementById('pageArea'); if(!area||!window.ResizeObserver) return;
+    try{ new ResizeObserver(function(){ if(!window._editMode) p17Fit(); }).observe(area); }catch(e){}
+  }
+  if(document.readyState!=='loading') obs(); else document.addEventListener('DOMContentLoaded',obs);
+})();
 
 document.addEventListener('DOMContentLoaded', function(){
   if(typeof initCommon==='function'){ try{ initCommon(); }catch(e){} }
