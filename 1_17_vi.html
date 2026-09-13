@@ -348,6 +348,13 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 /* pageArea内のsheetは左寄せ・原寸 */
 #pageArea{ overflow:auto !important; padding:12px !important; align-items:flex-start !important; }
 #pageArea .sheet{ box-shadow:none; margin:0; transform-origin:top left; }
+
+/* ver.20260913.13: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
+#pageArea .sheet{ width:1040px !important; max-width:1040px !important; }
+#pageArea .sheet table.grid{ width:100% !important; table-layout:fixed !important; }
+#pageArea .sheet td{ overflow:hidden; }
+#pageArea .sheet .f{ display:inline; word-break:break-all; overflow-wrap:anywhere; }
+
 #p17scale{ display:inline-block; }
 .fid{ color:#aaa; font-size:9px; font-family:monospace; margin-left:4px; font-weight:normal; }
 </style>
@@ -356,7 +363,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.11</div>
+    <div class="ver">ver.20260913.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -451,7 +458,7 @@ function p(){
   var area=document.getElementById('pageArea');
   if(!area) return;
   area.innerHTML = P17_TEMPLATE();
-  p17Fit();
+  p17Fit(); requestAnimationFrame(p17Fit);
 }
 // テンプレート（本文。${f('...')} は common.js の f() で値/変数箱に）
 function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
@@ -1339,22 +1346,27 @@ function p17Fit(){
   var area=document.getElementById('pageArea'); if(!area) return;
   var sheet=area.querySelector('.sheet'); if(!sheet) return;
   var wrap=sheet.parentElement;                 // docP1
-  // 原寸に戻して基準幅を測る
   sheet.style.transform='none'; sheet.style.zoom='';
-  var w=sheet.offsetWidth || 1040;
+  if(wrap){ wrap.style.width=''; wrap.style.height=''; }
+  var w=1040;                                   // 版面は固定1040pxに強制済み
   var avail=area.clientWidth - 24;
-  if(avail<=0){ setTimeout(p17Fit,150); return; }   // 非表示iframe等で幅未確定→後で再実行
+  if(avail<=0){ requestAnimationFrame(p17Fit); return; }
   var scale=Math.min(1, avail/w);
-  // transform:scale で縮小（zoomより互換性が安定）。原点は左上。
   sheet.style.transformOrigin='top left';
   sheet.style.transform='scale('+scale+')';
-  // scaleは版面(offsetWidth/Height)を変えないので、親の箱を実効サイズに合わせて
-  // 右の空白・下の余白を除去する
   if(wrap){
     wrap.style.width=(w*scale)+'px';
     wrap.style.height=(sheet.offsetHeight*scale)+'px';
     wrap.style.overflow='hidden';
   }
+  // 念のため実測して、まだ溢れていたら追い込み（HiDPI等の丸め対策）
+  requestAnimationFrame(function(){
+    var b=sheet.getBoundingClientRect(), ar=area.getBoundingClientRect();
+    if(b.right > ar.right + 1){
+      var s2=scale*(ar.width-24)/b.width;
+      if(s2>0 && s2<scale){ sheet.style.transform='scale('+s2+')'; if(wrap){wrap.style.width=(w*s2)+'px';wrap.style.height=(sheet.offsetHeight*s2)+'px';} }
+    }
+  });
 }
 window.addEventListener('resize', function(){ if(!window._editMode) p17Fit(); });
 // iframeが後から表示される（タブ切替）ケース: 可視化・フォーカス・visibilitychangeで再フィット
