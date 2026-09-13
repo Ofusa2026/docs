@@ -151,7 +151,7 @@ function _mw16_jippi(base){
   var cb=document.getElementById(base+'Jippi'); var est=document.getElementById(base+'Est');
   return !!(cb&&cb.checked)||/実費/.test((est&&est.value)||'');
 }
-function _aiCheck16Local(){
+function _aiCheck16Local(rules){
   var checks=[];
   function add(sev,cat,title,detail,page){ checks.push({severity:sev,category:cat,title:title,detail:detail,src:'計算',page:page||''}); }
   // D/E. 最低賃金（基本給ベース）
@@ -185,9 +185,13 @@ function _aiCheck16Local(){
     else add('out','控除整合','控除内訳の合計と控除合計が不一致','内訳計 '+sum+'円 ≠ 控除合計 '+dt+'円（差 '+(sum-dt)+'円）。['+detail.join(' / ')+']','P7');
   }
   var st=_mw16_num('es_salaryTotal')||monthly; var np=_mw16_num('es_netPay');
-  if(st&&dt&&np){
-    if(Math.abs((st-dt)-np)<=1) add('ok','手取り整合','手取り＝支払概算額−控除合計 が一致','' + st+'−'+dt+'＝'+np+'円。','P7');
-    else add('out','手取り整合','手取り額が計算と不一致','支払概算 '+st+'−控除 '+dt+'＝'+(st-dt)+'円 ですが手取り欄は '+np+'円。','P7');
+  // 手取り＝支払概算総額−控除合計（実費は入れない）。控除合計は実費除外の内訳計を正とし、内訳が無ければ欄の値を使う
+  var deductBase=(sum>0)?sum:dt;
+  if(st&&np&&deductBase){
+    var expectedNet=st-deductBase;
+    var baseLabel=(sum>0)?'控除(実費除外の内訳計) '+deductBase:'控除合計欄 '+deductBase;
+    if(Math.abs(expectedNet-np)<=1) add('ok','手取り整合','手取り＝支払概算総額−控除合計（実費除外）が一致','支払概算 '+st+' − '+baseLabel+' ＝ '+np+'円。','P7');
+    else add('out','手取り整合','手取り額が計算と不一致','支払概算 '+st+' − '+baseLabel+' ＝ '+expectedNet+'円 のはずが、手取り欄は '+np+'円（差 '+(np-expectedNet)+'円）。','P7');
   }
   // B. 週＝年÷52.14（G13）
   var yh=_mw16_num('es_yearlyH')+_mw16_num('es_yearlyMin')/60;
@@ -207,6 +211,35 @@ function _aiCheck16Local(){
   else if(dh&&br) add('ok','休憩','休憩時間は法定を満たす','1日 '+dh.toFixed(2)+'h／休憩 '+br+'分。','P4');
   var pl=_mw16_num('es_paidLeave');
   if(pl&&pl<10) add('out','年休','年次有給休暇が法定（10日）未満','6か月継続勤務後 '+pl+'日。10日以上必要。','P4');
+  // 年間休日＋年間所定労働日数＝365（うるう年は考慮しない・365日固定）
+  var ah=_mw16_num('es_annualHolidays'); var yd=_mw16_num('es_yearlyDays');
+  if(ah&&yd){
+    var expectDays=365-ah;
+    if(yd===expectDays) add('ok','年間日数','年間休日と労働日数の整合（365日基準）','365 − 年間休日 '+ah+'日 ＝ 労働日 '+expectDays+'日。','P4');
+    else add('out','年間日数','年間休日と年間所定労働日数が365日基準と不一致','365 − 年間休日 '+ah+'日 ＝ '+expectDays+'日 のはずが、年間所定労働日数欄は '+yd+'日（差 '+(yd-expectDays)+'日）。うるう年は考慮せず365日で統一してください。','P4');
+  }
+  // 業務区分: 分野×業務区分のマスタ照合（案シス FIELD_CATEGORY_MAP と同一。DBのfield_categoriesから）
+  var fcMap=(rules&&rules.field_categories)||null;
+  var fldRaw=_mw16_val('es_applicantField');
+  var catRaw=_mw16_val('es_category');
+  if(fcMap&&fldRaw&&catRaw){
+    var norm=function(t){return String(t||'').replace(/[\s　]/g,'');};
+    var head=function(t){return norm(t).split('（')[0];};
+    var fld=norm(fldRaw), cat=norm(catRaw);
+    var fldKey=null;
+    for(var k in fcMap){ if(norm(k)===fld){ fldKey=k; break; } }
+    if(!fldKey){ for(var k2 in fcMap){ if(head(k2)===head(fldRaw) && (norm(k2).indexOf('１号')>=0)===(fld.indexOf('１号')>=0) && (norm(k2).indexOf('２号')>=0)===(fld.indexOf('２号')>=0)){ fldKey=k2; break; } } }
+    if(!fldKey){
+      add('warn','業務区分','分野名がマスタに見つかりません','分野「'+fldRaw+'」が分野別業務区分マスタに無いため照合できませんでした。分野名の表記を確認してください。','P2');
+    } else {
+      var list=fcMap[fldKey]||[];
+      var hit=list.some(function(c){ return norm(c)===cat; });
+      // 省略形（「土木」など括弧なし）のみ先頭一致を許可。括弧つきで不一致＝号数違い等は許可しない
+      if(!hit && cat.indexOf('（')<0) hit=list.some(function(c){ return head(c)===head(catRaw) && head(catRaw)!==''; });
+      if(hit) add('ok','業務区分','分野×業務区分の組み合わせはマスタと一致','分野「'+fldKey+'」の区分として「'+catRaw+'」を確認。','P2');
+      else add('out','業務区分','業務区分が分野のマスタにありません','分野「'+fldKey+'」に「'+catRaw+'」は登録されていません（号数違いを含む）。有効な区分: '+list.map(function(c){return c.split('（')[0];}).join('／'),'P2');
+    }
+  }
   // E/H. 建設の昇給要件
   if(isKensetsu){
     var rc=_mw16_val('es_raiseCondition');
@@ -225,7 +258,7 @@ async function _check16LoadRules(){
 }
 window.aiCheck16 = async function(){
   var rules = await _check16LoadRules();
-  var local=_aiCheck16Local();
+  var local=_aiCheck16Local(rules);
   var vals={};
   document.querySelectorAll('[id^="es_"]').forEach(function(e){
     if(!e.id||e.id.includes('${')) return;
