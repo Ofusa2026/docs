@@ -264,6 +264,51 @@ window.aiCheck16 = async function(){
     _renderCheckPanel(local, aiChecks, rules, {loading:false, note:aiErr});
   }
 };
+function _c16Keyword(c){
+  // 判定分類 → 書類内の目印テキスト（日本語行は全言語版に共通で存在する）
+  var t=(c.category||'')+(c.title||'');
+  var map=[
+    ['休憩','休憩時間'],['年休','年次有給休暇'],['休日','Ⅴ．休日'],
+    ['変形労働','変形労働時間制'],['シフト','交代制'],
+    ['労働時間','Ⅳ．労働時間'],
+    ['最低賃金','基本賃金'],['建設報酬基準','基本賃金'],
+    ['手当','諸手当'],['昇給','昇給'],['賞与','賞与'],['退職金','退職金'],
+    ['社保','社会保険'],['労働保険','社会保険'],['健康診断','健康診断'],
+    ['控除整合','控除する金額'],['手取り整合','手取り'],['別紙','賃金の支払'],
+    ['氏名','雇用契約期間'],['日付','雇用契約期間'],['契約期間','雇用契約期間'],['契約の更新','契約の更新'],
+    ['就業の場所','Ⅱ．就業の場所'],['業務','Ⅲ．従事すべき業務'],['分野','Ⅲ．従事すべき業務']
+  ];
+  for(var i=0;i<map.length;i++){ if(t.indexOf(map[i][0])>=0) return map[i][1]; }
+  return '';
+}
+function _c16AnchorY(c, docs, area, pageOrder){
+  var areaTop=area.getBoundingClientRect().top;
+  var kw=_c16Keyword(c);
+  var searchDocs=docs;
+  var idx=pageOrder.indexOf(c.page||'');
+  if(idx>=0 && docs[idx]) searchDocs=[docs[idx]].concat(docs); // 該当ページを優先して探索
+  if(kw){
+    for(var d=0;d<searchDocs.length;d++){
+      var els=searchDocs[d].querySelectorAll('div,td,span,p,b');
+      for(var i=0;i<els.length;i++){
+        var el=els[i];
+        if(el.offsetHeight>0 && el.offsetHeight<140 && el.textContent && el.textContent.indexOf(kw)>=0){
+          // なるべく深い要素へ
+          var deeper=el;
+          for(var g=0; g<4; g++){
+            var child=null;
+            for(var k=0;k<deeper.children.length;k++){ if(deeper.children[k].textContent.indexOf(kw)>=0){ child=deeper.children[k]; break; } }
+            if(child && child.offsetHeight>0) deeper=child; else break;
+          }
+          return deeper.getBoundingClientRect().top - areaTop;
+        }
+      }
+      if(d===0 && searchDocs.length>docs.length) continue; // 優先ページで見つからなければ全体へ
+    }
+  }
+  if(idx>=0 && docs[idx]) return docs[idx].offsetTop;
+  return 0;
+}
 function _renderCheckPanel(local, aiChecks, rules, opt){
   opt=opt||{};
   if(!document.getElementById('_check16PrintStyle')){
@@ -281,35 +326,10 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
   var pageOrder=['P1','P2','P3','P4','P5','P6','P7','P8'];
   var pageLabels={};
   if(rules&&rules.pages){ rules.pages.forEach(function(pg){ pageLabels[pg.page]=pg.label||''; }); }
-  var groups={};
-  all.forEach(function(c){ var pg=(c.page&&pageOrder.indexOf(c.page)>=0)?c.page:'全体'; (groups[pg]=groups[pg]||[]).push(c); });
-  var sevOrder={out:0,warn:1,ok:2};
-  function sortChecks(list){ list.sort(function(a,b){var sa=(a.severity in sevOrder)?sevOrder[a.severity]:3, sb=(b.severity in sevOrder)?sevOrder[b.severity]:3; return sa-sb;}); return list; }
-  function checkRow(c){
-    var hl = c.severity==='out' ? 'background:#fdecec;' : (c.severity==='warn'?'background:#fef9e7;':'');
-    return '<div style="display:flex;gap:6px;align-items:flex-start;padding:5px 7px;margin:3px 0;border-radius:6px;'+hl+'">'
-      +'<div style="flex:0 0 auto;font-size:13px;">'+(mark[c.severity]||'・')+'</div>'
-      +'<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:12px;line-height:1.4;">'+String(c.title||'').replace(/</g,'&lt;')+'</div>'
-      +'<div style="font-size:11px;color:#475569;margin-top:1px;line-height:1.5;">'+String(c.detail||'').replace(/</g,'&lt;')+'</div>'
-      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:1px;">'+String(c.category||'')+'／'+(c.src||'AI')+'</div></div></div>';
-  }
-  function rulesListHtml(){
-    if(!(rules&&rules.pages)) return '<div style="font-size:11px;color:#64748b;">判定ルールを読み込めませんでした。</div>';
-    var h='';
-    rules.pages.forEach(function(pg){
-      h+='<div style="margin:8px 0 2px;font-weight:700;font-size:11.5px;">'+pg.page+'｜'+String(pg.label||'')+'</div>';
-      (pg.rules||[]).forEach(function(r){
-        h+='<div style="font-size:11px;margin:2px 0 2px 8px;color:#334155;"><b>'+String(r.title||'')+'</b>'
-          +' <span style="font-size:9px;color:#fff;background:'+(r.engine==='calc'?'#0e7490':'#7c3aed')+';border-radius:4px;padding:0 4px;">'+(r.engine==='calc'?'自動計算':'AI判定')+'</span>'
-          +'<div style="font-size:10px;color:#64748b;line-height:1.5;">'+String(r.desc||'')+'</div></div>';
-      });
-    });
-    return h;
-  }
   var today=new Date();
-  var cardBase='background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.22);padding:10px 12px;box-sizing:border-box;font-family:\'Noto Sans JP\',sans-serif;';
+  var cardBase='background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.22);padding:9px 11px;box-sizing:border-box;font-family:\'Noto Sans JP\',sans-serif;';
   function headerCardHtml(width){
-    return '<div class="c16-card" style="'+cardBase+'width:'+width+'px;">'
+    return '<div class="c16-card" data-kind="header" style="'+cardBase+'width:'+width+'px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">'
       +'<div style="font-weight:800;font-size:13px;">🧬 AI判定結果</div>'
       +'<div style="display:flex;gap:4px;">'
@@ -319,15 +339,18 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
       +'　⛔'+outN+'　⚡'+warnN+'　✅'+okN
       +(opt.loading?'　<span style="color:#7c3aed;font-weight:700;">AI判定中…</span>':'')+'</div>'
       +(opt.note?'<div style="font-size:10px;color:#b45309;background:#fef3c7;padding:4px 6px;border-radius:6px;margin-top:5px;line-height:1.5;">'+opt.note+'</div>':'')
-      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:5px;">📋 判定項目の一覧は ⚙️設定（優先書類の設定）内の「🧬 1-6号 AI判定項目」で確認できます。</div>'
-      +'<div style="font-size:9px;color:#94a3b8;margin-top:5px;">最低賃金は令和7年度。判定は提出前の参考情報です。</div></div>';
+      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:5px;">各カードは指摘箇所の横に表示されます。📋 判定項目の一覧は ⚙️設定内の「🧬 1-6号 AI判定項目」で確認できます。</div></div>';
   }
-  function pageCardHtml(pg, list, width){
-    return '<div class="c16-card" data-page="'+pg+'" style="'+cardBase+'width:'+width+'px;">'
-      +'<div style="font-weight:800;font-size:11.5px;border-bottom:1.5px solid #0f172a;padding-bottom:2px;margin-bottom:3px;">📄 '+(pg==='全体'?'全体':pg+(pageLabels[pg]?'｜'+pageLabels[pg]:''))+'</div>'
-      +sortChecks(list).map(checkRow).join('')+'</div>';
+  function checkCardHtml(c, width){
+    var hl = c.severity==='out' ? 'border-left:4px solid #dc2626;background:#fff5f5;' : (c.severity==='warn'?'border-left:4px solid #d97706;background:#fffcf0;':'border-left:4px solid #16a34a;');
+    var pg=(c.page&&pageOrder.indexOf(c.page)>=0)?c.page:'';
+    return '<div class="c16-card" data-kind="check" style="'+cardBase+hl+'width:'+width+'px;">'
+      +'<div style="display:flex;gap:6px;align-items:flex-start;">'
+      +'<div style="flex:0 0 auto;font-size:13px;">'+(mark[c.severity]||'・')+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:12px;line-height:1.4;">'+String(c.title||'').replace(/</g,'&lt;')+'</div>'
+      +'<div style="font-size:11px;color:#475569;margin-top:1px;line-height:1.5;">'+String(c.detail||'').replace(/</g,'&lt;')+'</div>'
+      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:2px;">'+(pg?pg+'／':'')+String(c.category||'')+'／'+(c.src||'AI')+'</div></div></div></div>';
   }
-  // レイアウト判定: 書類右側の余白
   if(getComputedStyle(area).position==='static') area.style.position='relative';
   var doc=area.querySelector('.doc');
   var sideW=0, left=0;
@@ -337,46 +360,43 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
     sideW = Math.min(330, avail); left = docRight + 12;
   }
   if(doc && sideW>=200){
-    // ── サイドコメント方式（Googleドキュメントのコメント風・該当ページの横に配置）
+    // ── サイドコメント方式: 各指摘カードを「対象箇所の横」にアンカー
+    var docs=Array.prototype.slice.call(area.querySelectorAll('.doc'));
     var wrap=document.createElement('div');
     wrap.id='aiCheck16Panel';
     wrap.style.cssText='position:absolute;top:0;left:'+left+'px;width:'+sideW+'px;z-index:50;';
     wrap.innerHTML=headerCardHtml(sideW);
-    var docs=Array.prototype.slice.call(area.querySelectorAll('.doc'));
-    pageOrder.concat(['全体']).forEach(function(pg){
-      if(!groups[pg]||!groups[pg].length) return;
-      wrap.insertAdjacentHTML('beforeend', pageCardHtml(pg, groups[pg], sideW));
-    });
+    // アンカー位置を先に計算し、位置順に並べる
+    var items=all.map(function(c){ return {c:c, y:_c16AnchorY(c, docs, area, pageOrder)}; });
+    items.sort(function(a,b){ return a.y-b.y; });
+    items.forEach(function(it){ wrap.insertAdjacentHTML('beforeend', checkCardHtml(it.c, sideW)); });
     area.appendChild(wrap);
-    // ページ位置に合わせて縦位置を割付（重なりは下に送る）
     var cards=Array.prototype.slice.call(wrap.querySelectorAll('.c16-card'));
     var cursor=0;
-    cards.forEach(function(card){
-      var pg=card.getAttribute('data-page');
-      var want=0;
-      if(pg && pg!=='全体'){
-        var idx=pageOrder.indexOf(pg);
-        var d=docs[idx];
-        if(d) want=d.offsetTop;
-      } else if(pg==='全体'){
-        want=cursor;
-      }
+    cards.forEach(function(card,i){
+      var want = (i===0) ? 0 : items[i-1].y - 6; // 先頭はヘッダー
       var top=Math.max(want, cursor);
       card.style.position='absolute'; card.style.top=top+'px'; card.style.left='0';
-      cursor=top+card.offsetHeight+10;
+      cursor=top+card.offsetHeight+8;
     });
     wrap.style.height=cursor+'px';
     if(!opt.keepScroll){ try{ wrap.querySelector('.c16-card').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }
   } else {
-    // ── フォールバック: 画面が狭いときは従来どおり最上部にまとめて表示
+    // ── フォールバック: 画面が狭いときは最上部にまとめて表示（ページ順）
+    var sevOrder={out:0,warn:1,ok:2};
+    var groups={};
+    all.forEach(function(c){ var pg=(c.page&&pageOrder.indexOf(c.page)>=0)?c.page:'全体'; (groups[pg]=groups[pg]||[]).push(c); });
     var docW=(doc||{}).offsetWidth||794;
-    var html='<div id="aiCheck16Panel" style="width:'+docW+'px;max-width:96%;margin:0 auto 24px;'+cardBase+'padding:22px 28px;">'
-      +headerCardHtml(docW-56).replace(/width:\d+px/,'width:100%').replace('class="c16-card" ','')
-      +pageOrder.concat(['全体']).map(function(pg){
-          if(!groups[pg]||!groups[pg].length) return '';
-          return '<div style="margin-top:12px;">'+pageCardHtml(pg, groups[pg], docW-56).replace(/width:\d+px/,'width:100%').replace(/box-shadow:[^;]+;/,'').replace('class="c16-card" ','')+'</div>';
-        }).join('')
-      +'</div>';
+    var inner='';
+    pageOrder.concat(['全体']).forEach(function(pg){
+      if(!groups[pg]||!groups[pg].length) return;
+      groups[pg].sort(function(a,b){var sa=(a.severity in sevOrder)?sevOrder[a.severity]:3, sb=(b.severity in sevOrder)?sevOrder[b.severity]:3; return sa-sb;});
+      inner+='<div style="margin:12px 0 2px;font-weight:800;font-size:13px;border-bottom:2px solid #0f172a;padding-bottom:2px;">📄 '+(pg==='全体'?'全体':pg+(pageLabels[pg]?'｜'+pageLabels[pg]:''))+'</div>';
+      groups[pg].forEach(function(c){ inner+=checkCardHtml(c, docW-60).replace(/box-shadow:[^;]+;/,'').replace(/width:\d+px/,'width:100%').replace('class="c16-card" ',''); });
+    });
+    var html='<div id="aiCheck16Panel" style="width:'+docW+'px;max-width:96%;margin:0 auto 24px;'+cardBase+'padding:20px 26px;">'
+      +headerCardHtml(docW-52).replace(/width:\d+px/,'width:100%').replace('class="c16-card" ','')
+      +inner+'</div>';
     area.insertAdjacentHTML('afterbegin', html);
     var panel=document.getElementById('aiCheck16Panel');
     if(panel && !opt.keepScroll) panel.scrollIntoView({behavior:'smooth', block:'start'});
