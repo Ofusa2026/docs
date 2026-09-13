@@ -266,7 +266,6 @@ window.aiCheck16 = async function(){
 };
 function _renderCheckPanel(local, aiChecks, rules, opt){
   opt=opt||{};
-  // 印刷時は必ず非表示
   if(!document.getElementById('_check16PrintStyle')){
     var st=document.createElement('style'); st.id='_check16PrintStyle';
     st.textContent='@media print{#aiCheck16Panel{display:none!important}}';
@@ -279,66 +278,109 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
   var outN=all.filter(function(c){return c.severity==='out';}).length;
   var warnN=all.filter(function(c){return c.severity==='warn';}).length;
   var okN=all.filter(function(c){return c.severity==='ok';}).length;
-  // ページ順にグループ化
-  var pageOrder=['P1','P2','P3','P4','P5','P6','P7'];
+  var pageOrder=['P1','P2','P3','P4','P5','P6','P7','P8'];
   var pageLabels={};
   if(rules&&rules.pages){ rules.pages.forEach(function(pg){ pageLabels[pg.page]=pg.label||''; }); }
   var groups={};
   all.forEach(function(c){ var pg=(c.page&&pageOrder.indexOf(c.page)>=0)?c.page:'全体'; (groups[pg]=groups[pg]||[]).push(c); });
   var sevOrder={out:0,warn:1,ok:2};
-  function rowsFor(list){
-    list.sort(function(a,b){var sa=(a.severity in sevOrder)?sevOrder[a.severity]:3, sb=(b.severity in sevOrder)?sevOrder[b.severity]:3; return sa-sb;});
-    return list.map(function(c){
-      var hl = c.severity==='out' ? 'background:#fdecec;' : (c.severity==='warn'?'background:#fef9e7;':'');
-      return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 10px;margin:2px 0;border-radius:6px;'+hl+'">'
-        +'<div style="flex:0 0 auto;">'+(mark[c.severity]||'・')+'</div>'
-        +'<div style="flex:1;"><span style="font-weight:700;">'+String(c.title||'').replace(/</g,'&lt;')+'</span>'
-        +' <span style="font-size:10px;color:#94a3b8;">['+String(c.category||'')+'／'+(c.src||'AI')+']</span>'
-        +'<div style="font-size:12px;color:#475569;margin-top:1px;">'+String(c.detail||'').replace(/</g,'&lt;')+'</div></div></div>';
-    }).join('');
+  function sortChecks(list){ list.sort(function(a,b){var sa=(a.severity in sevOrder)?sevOrder[a.severity]:3, sb=(b.severity in sevOrder)?sevOrder[b.severity]:3; return sa-sb;}); return list; }
+  function checkRow(c){
+    var hl = c.severity==='out' ? 'background:#fdecec;' : (c.severity==='warn'?'background:#fef9e7;':'');
+    return '<div style="display:flex;gap:6px;align-items:flex-start;padding:5px 7px;margin:3px 0;border-radius:6px;'+hl+'">'
+      +'<div style="flex:0 0 auto;font-size:13px;">'+(mark[c.severity]||'・')+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:12px;line-height:1.4;">'+String(c.title||'').replace(/</g,'&lt;')+'</div>'
+      +'<div style="font-size:11px;color:#475569;margin-top:1px;line-height:1.5;">'+String(c.detail||'').replace(/</g,'&lt;')+'</div>'
+      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:1px;">'+String(c.category||'')+'／'+(c.src||'AI')+'</div></div></div>';
   }
-  var resultHtml='';
-  pageOrder.concat(['全体']).forEach(function(pg){
-    if(!groups[pg]||!groups[pg].length) return;
-    resultHtml+='<div style="margin:14px 0 4px;font-weight:800;font-size:13.5px;border-bottom:2px solid #0f172a;padding-bottom:2px;">'
-      +(pg==='全体'?'📎 全体':'📄 '+pg+(pageLabels[pg]?'｜'+pageLabels[pg]:''))+'</div>'+rowsFor(groups[pg]);
-  });
-  // 判定項目一覧（ページ順・常設）
-  var rulesHtml='';
-  if(rules&&rules.pages){
+  function rulesListHtml(){
+    if(!(rules&&rules.pages)) return '<div style="font-size:11px;color:#64748b;">判定ルールを読み込めませんでした。</div>';
+    var h='';
     rules.pages.forEach(function(pg){
-      rulesHtml+='<div style="margin:10px 0 2px;font-weight:700;font-size:12.5px;">'+pg.page+'｜'+String(pg.label||'')+'</div><ul style="margin:2px 0 6px 20px;padding:0;">';
+      h+='<div style="margin:8px 0 2px;font-weight:700;font-size:11.5px;">'+pg.page+'｜'+String(pg.label||'')+'</div>';
       (pg.rules||[]).forEach(function(r){
-        rulesHtml+='<li style="font-size:12px;margin:3px 0;color:#334155;"><b>'+String(r.title||'')+'</b>'
-          +' <span style="font-size:10px;color:#fff;background:'+(r.engine==='calc'?'#0e7490':'#7c3aed')+';border-radius:4px;padding:0 5px;">'+(r.engine==='calc'?'自動計算':'AI判定')+'</span>'
-          +'<div style="font-size:11px;color:#64748b;">'+String(r.desc||'')+'</div></li>';
+        h+='<div style="font-size:11px;margin:2px 0 2px 8px;color:#334155;"><b>'+String(r.title||'')+'</b>'
+          +' <span style="font-size:9px;color:#fff;background:'+(r.engine==='calc'?'#0e7490':'#7c3aed')+';border-radius:4px;padding:0 4px;">'+(r.engine==='calc'?'自動計算':'AI判定')+'</span>'
+          +'<div style="font-size:10px;color:#64748b;line-height:1.5;">'+String(r.desc||'')+'</div></div>';
       });
-      rulesHtml+='</ul>';
     });
-  } else {
-    rulesHtml='<div style="font-size:12px;color:#64748b;">判定ルール（settings.saysay_check16_rules）を読み込めませんでした。</div>';
+    return h;
   }
-  var docW=(area.querySelector('.doc')||{}).offsetWidth||794;
   var today=new Date();
-  var html='<div id="aiCheck16Panel" style="width:'+docW+'px;max-width:96%;margin:0 auto 24px;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.18);padding:26px 34px;font-family:\'Noto Sans JP\',sans-serif;box-sizing:border-box;">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-    +'<div><span style="background:#e2e8f0;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;">'+today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日</span></div>'
-    +'<div style="display:flex;gap:6px;">'
-    +'<button onclick="aiCheck16()" style="border:none;background:#b45309;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">🔁 再判定</button>'
-    +'<button onclick="document.getElementById(\'aiCheck16Panel\').remove()" style="border:none;background:#e2e8f0;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">✕ 閉じる</button></div></div>'
-    +'<div style="font-size:17px;font-weight:800;margin:10px 0 2px;text-decoration:underline;">🧬 1-6号 AI判定結果</div>'
-    +'<div style="font-size:12px;color:#475569;margin-bottom:4px;">⛔ 提出不可級 '+outN+'件　／　⚡ 要確認 '+warnN+'件　／　✅ 確認済み '+okN+'件'
-    +(opt.loading?'　<span style="color:#7c3aed;font-weight:700;">…AIの総合判定を取得中</span>':'')+'</div>'
-    +(opt.note?'<div style="font-size:11px;color:#b45309;background:#fef3c7;padding:6px 8px;border-radius:6px;margin:6px 0;">'+opt.note+'</div>':'')
-    +resultHtml
-    +'<details style="margin-top:18px;"><summary style="cursor:pointer;font-weight:800;font-size:13.5px;">📋 判定項目一覧（ページ順）— どんなチェックが入っているか</summary>'
-    +'<div style="font-size:11px;color:#64748b;margin:4px 0;">この一覧はDB（settings.saysay_check16_rules）から読み込んでいます。Claudeでチェックスキルを更新→DBを更新すると、Saysayの更新なしでここに反映されます。'+(rules&&rules.updated_at?'（最終更新: '+rules.updated_at+'）':'')+'</div>'
-    +rulesHtml+'</details>'
-    +'<div style="font-size:10px;color:#94a3b8;margin-top:10px;">最低賃金は令和7年度(2025年10月改定)。判定は提出前の参考情報であり、最終確認は担当者が行ってください。</div>'
-    +'</div>';
-  area.insertAdjacentHTML('afterbegin', html);
-  var panel=document.getElementById('aiCheck16Panel');
-  if(panel && !opt.keepScroll) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  var cardBase='background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.22);padding:10px 12px;box-sizing:border-box;font-family:\'Noto Sans JP\',sans-serif;';
+  function headerCardHtml(width){
+    return '<div class="c16-card" style="'+cardBase+'width:'+width+'px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">'
+      +'<div style="font-weight:800;font-size:13px;">🧬 AI判定結果</div>'
+      +'<div style="display:flex;gap:4px;">'
+      +'<button onclick="aiCheck16()" style="border:none;background:#b45309;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;">🔁</button>'
+      +'<button onclick="document.getElementById(\'aiCheck16Panel\').remove()" style="border:none;background:#e2e8f0;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;">✕</button></div></div>'
+      +'<div style="font-size:10.5px;color:#64748b;margin-top:2px;">'+today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate()
+      +'　⛔'+outN+'　⚡'+warnN+'　✅'+okN
+      +(opt.loading?'　<span style="color:#7c3aed;font-weight:700;">AI判定中…</span>':'')+'</div>'
+      +(opt.note?'<div style="font-size:10px;color:#b45309;background:#fef3c7;padding:4px 6px;border-radius:6px;margin-top:5px;line-height:1.5;">'+opt.note+'</div>':'')
+      +'<div style="font-size:9.5px;color:#94a3b8;margin-top:5px;">📋 判定項目の一覧は ⚙️設定（優先書類の設定）内の「🧬 1-6号 AI判定項目」で確認できます。</div>'
+      +'<div style="font-size:9px;color:#94a3b8;margin-top:5px;">最低賃金は令和7年度。判定は提出前の参考情報です。</div></div>';
+  }
+  function pageCardHtml(pg, list, width){
+    return '<div class="c16-card" data-page="'+pg+'" style="'+cardBase+'width:'+width+'px;">'
+      +'<div style="font-weight:800;font-size:11.5px;border-bottom:1.5px solid #0f172a;padding-bottom:2px;margin-bottom:3px;">📄 '+(pg==='全体'?'全体':pg+(pageLabels[pg]?'｜'+pageLabels[pg]:''))+'</div>'
+      +sortChecks(list).map(checkRow).join('')+'</div>';
+  }
+  // レイアウト判定: 書類右側の余白
+  if(getComputedStyle(area).position==='static') area.style.position='relative';
+  var doc=area.querySelector('.doc');
+  var sideW=0, left=0;
+  if(doc){
+    var docRight = doc.offsetLeft + doc.offsetWidth;
+    var avail = area.clientWidth - docRight - 20;
+    sideW = Math.min(330, avail); left = docRight + 12;
+  }
+  if(doc && sideW>=200){
+    // ── サイドコメント方式（Googleドキュメントのコメント風・該当ページの横に配置）
+    var wrap=document.createElement('div');
+    wrap.id='aiCheck16Panel';
+    wrap.style.cssText='position:absolute;top:0;left:'+left+'px;width:'+sideW+'px;z-index:50;';
+    wrap.innerHTML=headerCardHtml(sideW);
+    var docs=Array.prototype.slice.call(area.querySelectorAll('.doc'));
+    pageOrder.concat(['全体']).forEach(function(pg){
+      if(!groups[pg]||!groups[pg].length) return;
+      wrap.insertAdjacentHTML('beforeend', pageCardHtml(pg, groups[pg], sideW));
+    });
+    area.appendChild(wrap);
+    // ページ位置に合わせて縦位置を割付（重なりは下に送る）
+    var cards=Array.prototype.slice.call(wrap.querySelectorAll('.c16-card'));
+    var cursor=0;
+    cards.forEach(function(card){
+      var pg=card.getAttribute('data-page');
+      var want=0;
+      if(pg && pg!=='全体'){
+        var idx=pageOrder.indexOf(pg);
+        var d=docs[idx];
+        if(d) want=d.offsetTop;
+      } else if(pg==='全体'){
+        want=cursor;
+      }
+      var top=Math.max(want, cursor);
+      card.style.position='absolute'; card.style.top=top+'px'; card.style.left='0';
+      cursor=top+card.offsetHeight+10;
+    });
+    wrap.style.height=cursor+'px';
+    if(!opt.keepScroll){ try{ wrap.querySelector('.c16-card').scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} }
+  } else {
+    // ── フォールバック: 画面が狭いときは従来どおり最上部にまとめて表示
+    var docW=(doc||{}).offsetWidth||794;
+    var html='<div id="aiCheck16Panel" style="width:'+docW+'px;max-width:96%;margin:0 auto 24px;'+cardBase+'padding:22px 28px;">'
+      +headerCardHtml(docW-56).replace(/width:\d+px/,'width:100%').replace('class="c16-card" ','')
+      +pageOrder.concat(['全体']).map(function(pg){
+          if(!groups[pg]||!groups[pg].length) return '';
+          return '<div style="margin-top:12px;">'+pageCardHtml(pg, groups[pg], docW-56).replace(/width:\d+px/,'width:100%').replace(/box-shadow:[^;]+;/,'').replace('class="c16-card" ','')+'</div>';
+        }).join('')
+      +'</div>';
+    area.insertAdjacentHTML('afterbegin', html);
+    var panel=document.getElementById('aiCheck16Panel');
+    if(panel && !opt.keepScroll) panel.scrollIntoView({behavior:'smooth', block:'start'});
+  }
 }
 
 window.resolveEmpSetIdx = async function(co, cas, info){
