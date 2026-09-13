@@ -349,10 +349,10 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #pageArea{ overflow:auto !important; padding:12px !important; align-items:flex-start !important; }
 #pageArea .sheet{ box-shadow:none; margin:0; transform-origin:top left; }
 
-/* ver.20260913.17: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
+/* ver.20260913.18: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
 #pageArea .sheet{ width:1040px !important; max-width:1040px !important; }
 
-/* ver.20260913.17: sheetのpaddingはみ出し修正（box-sizing強制） */
+/* ver.20260913.18: sheetのpaddingはみ出し修正（box-sizing強制） */
 #pageArea .sheet{ box-sizing:border-box !important; }
 #pageArea .sheet, #pageArea .sheet *{ box-sizing:border-box; }
 
@@ -362,13 +362,44 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 
 #p17scale{ display:inline-block; }
 .fid{ color:#aaa; font-size:9px; font-family:monospace; margin-left:4px; font-weight:normal; }
+
+/* ================= ver.20260913.18: 印刷専用（1-6シェル対応） ================= */
+@media print{
+  @page{ size: A4 landscape; margin: 10mm; }
+  html, body{ background:#fff !important; }
+  /* シェル(サイドバー・上部メニュー・ページタブ)を全部隠す */
+  .app-bar, .fp, .page-nav, #pageNav, .fp-case, .fp-inner{ display:none !important; }
+  .main{ display:block !important; }
+  .pp, #ppOuter, #pageArea{
+    display:block !important; overflow:visible !important;
+    padding:0 !important; margin:0 !important; width:auto !important; height:auto !important;
+    background:#fff !important;
+  }
+  /* 縮小(transform/zoom)を解除して原寸で印刷 */
+  #pageArea .sheet, .sheet{
+    transform:none !important; zoom:1 !important;
+    width:100% !important; max-width:100% !important;
+    margin:0 !important; padding:0 !important; box-shadow:none !important;
+    box-sizing:border-box !important;
+  }
+  #docP1{ width:auto !important; height:auto !important; overflow:visible !important; }
+  /* 変数箱の背景ハイライトを消す（罫線・文字は残す） */
+  .f{ background:transparent !important; }
+  .f[style]{ background:transparent !important; }
+  span.f{ color:#000 !important; }
+  /* 未入力の変数プレースホルダ（灰色）は印刷しない */
+  .f[data-bind]:empty{ display:none; }
+  /* テーブルはページ跨ぎ可、cantSplit行のみ分割禁止 */
+  table.grid{ break-inside:auto; }
+  tr.nosplit{ break-inside:avoid; page-break-inside:avoid; }
+}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.17</div>
+    <div class="ver">ver.20260913.18</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
