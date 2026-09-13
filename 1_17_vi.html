@@ -346,13 +346,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 }
 
 /* pageArea内のsheetは左寄せ・原寸 */
-#pageArea{ overflow:auto !important; padding:12px !important; align-items:flex-start !important; }
+#pageArea{ overflow:auto !important; padding:16px !important; display:flex !important; flex-direction:column !important; align-items:center !important; }
+#docP1{ margin:0 auto !important; }
 #pageArea .sheet{ box-shadow:none; margin:0; transform-origin:top left; }
 
-/* ver.20260913.18: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
+/* ver.20260913.19: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
 #pageArea .sheet{ width:1040px !important; max-width:1040px !important; }
 
-/* ver.20260913.18: sheetのpaddingはみ出し修正（box-sizing強制） */
+/* ver.20260913.19: sheetのpaddingはみ出し修正（box-sizing強制） */
 #pageArea .sheet{ box-sizing:border-box !important; }
 #pageArea .sheet, #pageArea .sheet *{ box-sizing:border-box; }
 
@@ -363,7 +364,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #p17scale{ display:inline-block; }
 .fid{ color:#aaa; font-size:9px; font-family:monospace; margin-left:4px; font-weight:normal; }
 
-/* ================= ver.20260913.18: 印刷専用（1-6シェル対応） ================= */
+/* ================= ver.20260913.19: 印刷専用（1-6シェル対応） ================= */
 @media print{
   @page{ size: A4 landscape; margin: 10mm; }
   html, body{ background:#fff !important; }
@@ -399,7 +400,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.18</div>
+    <div class="ver">ver.20260913.19</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
