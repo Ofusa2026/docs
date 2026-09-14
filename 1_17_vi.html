@@ -352,10 +352,10 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #docP1{ margin:0 auto !important; }
 #pageArea .sheet{ box-shadow:none; margin:0; transform-origin:top left; }
 
-/* ver.20260913.28: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
+/* ver.20260913.32: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
 #pageArea .sheet{ width:1040px !important; max-width:1040px !important; }
 
-/* ver.20260913.28: sheetのpaddingはみ出し修正（box-sizing強制） */
+/* ver.20260913.32: sheetのpaddingはみ出し修正（box-sizing強制） */
 #pageArea .sheet{ box-sizing:border-box !important; }
 #pageArea .sheet, #pageArea .sheet *{ box-sizing:border-box; }
 
@@ -366,7 +366,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #p17scale{ display:inline-block; }
 .fid{ color:#aaa; font-size:9px; font-family:monospace; margin-left:4px; font-weight:normal; }
 
-/* ================= ver.20260913.28: 印刷専用（1-6シェル対応） ================= */
+/* ================= ver.20260913.32: 印刷専用（1-6シェル対応） ================= */
 @media print{
   @page{ size: A4 landscape; margin: 10mm; }
   html, body{ background:#fff !important; }
@@ -401,14 +401,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   td.vert p{ white-space:normal !important; font-size:.8em !important; line-height:1.05 !important; }
   td.vert{ overflow:hidden !important; }
 }
-/* ver.20260913.28: Word改ページ位置＝テーブル行の直前で改ページ */
+/* ver.20260913.32: Word改ページ位置＝テーブル行の直前で改ページ */
 #pageArea tr.pgrow > td{ border-top:3px double #4a5263 !important; }   /* 画面: 区切りを視認 */
 @media print{
   tr.pgrow{ break-before:page; page-break-before:always; }
   #pageArea tr.pgrow > td{ border-top-width:var(--thin) !important; border-top-style:solid !important; } /* 印刷は通常罫線 */
 }
 
-/* ver.20260913.28: 各Word表を1ページに収めるための印刷圧縮 */
+/* ver.20260913.32: 各Word表を1ページに収めるための印刷圧縮 */
 @media print{
   .sheet{ font-size:8pt !important; }
   .sheet p.ja{ line-height:1.15 !important; }
@@ -422,7 +422,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   #pageArea table.grid{ break-inside:avoid; page-break-inside:avoid; }
 }
 
-/* ver.20260913.28: 空ページ防止＝各表の前で改ページ（div.pagebreak廃止） */
+/* ver.20260913.32: 空ページ防止＝各表の前で改ページ（div.pagebreak廃止） */
 @media print{
   .tbl-wrap.pgstart{ break-before:page; page-break-before:always; }
   #pageArea .tbl-wrap{ break-inside:avoid; page-break-inside:avoid; }
@@ -430,9 +430,26 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 /* 画面プレビューでは表の間に区切り線 */
 #pageArea .tbl-wrap.pgstart{ border-top:2px dashed #999; margin-top:14px; padding-top:14px; }
 
-/* ver.20260913.28: 1ページ超の表は分割許可（空ページ防止） */
+/* ver.20260913.32: 1ページ超の表は分割許可（空ページ防止） */
 @media print{
   #t3, #t4c, #t8b, #t8c{ break-inside:auto !important; page-break-inside:auto !important; }
+}
+
+/* ver.20260913.32: 1-6式ページ分割（各テーブル=1 doc、横A4） */
+#pageArea{ display:block !important; padding:16px !important; background:#888 !important; }
+#pageArea .sheet{ width:auto !important; max-width:none !important; transform:none !important; zoom:1 !important; background:transparent !important; box-shadow:none !important; padding:0 !important; }
+#pageArea .doc.p17doc{
+  background:#fff !important; width:1040px !important; min-height:auto !important;
+  margin:0 auto 24px auto !important; padding:10mm 8mm !important;
+  box-shadow:0 4px 20px rgba(0,0,0,.5) !important; box-sizing:border-box !important;
+  overflow:visible !important; page-break-after:always; break-after:page;
+  font-size:12px !important; line-height:1.33 !important;
+}
+#pageArea .doc.p17doc .tbl-wrap{ margin:0 !important; border:0 !important; padding:0 !important; }
+/* 画面で横A4を領域幅に収める縮小はJSのp17Fitで各docにzoom */
+@media print{
+  #pageArea .doc.p17doc{ width:100% !important; margin:0 !important; box-shadow:none !important; padding:0 !important; zoom:1 !important; }
+  .app-bar,.fp,.page-nav,#pageNav{ display:none !important; }
 }
 </style>
 </head>
@@ -440,7 +457,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.28</div>
+    <div class="ver">ver.20260913.32</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -516,8 +533,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 </div>
 <div class="pp" id="ppOuter">
 <div class="page-nav" id="pageNav">
-  <span class="page-nav-label">ページ:</span>
-  <button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
+  <span class="page-nav-label">ページ:</span><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(8)">P8</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(9)">P9</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(10)">P10</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(11)">P11</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(12)">P12</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(13)">P13</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(14)">P14</button><button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
   <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
@@ -539,7 +555,7 @@ function p(){
 }
 // テンプレート（本文。${f('...')} は common.js の f() で値/変数箱に）
 function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
-<div class="sheet" id="p17sheet" lang="ja">
+<div class="sheet" id="p17sheet" lang="ja"><div class="doc p17doc">
 <p class="ja form-no">参考様式第１－１７号</p>
 <p class="vi form-no">Mẫu tham khảo 1-17</p>
 <h1 class="doc-title">１号特定技能外国人支援計画書</h1>
@@ -606,7 +622,8 @@ Họ và tên</p></td>
 </div>
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t2">
 <colgroup><col style="width:2.9814%"><col style="width:4.1894%"><col style="width:14.0590%"><col style="width:20.8443%"><col style="width:7.6463%"><col style="width:1.4779%"><col style="width:12.5618%"><col style="width:8.9186%"><col style="width:0.3855%"><col style="width:7.2223%"><col style="width:19.7134%"></colgroup>
 <tbody>
@@ -668,7 +685,8 @@ Họ và tên</p></td>
 </div>
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t3">
 <colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2969%"><col style="width:15.5769%"><col style="width:6.5197%"><col style="width:9.5813%"><col style="width:19.6037%"><col style="width:20.9779%"></colgroup>
 <tbody>
@@ -755,7 +773,8 @@ B. Ngôn ngữ thực hiện</p></td>
 
 
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t4b"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t4b"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
 <tr class="pgrow nosplit" style="height:2.11em">
 <td class="b-hknt vert" rowspan="5"><p class="ja a-center">Ⅳ　支援内容（続き）</p><p class="vi a-center">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
 <td class="b-tttt vert" rowspan="5"><p class="ja a-center" style="padding-left:0.63em">２　出入国する際の送迎</p><p class="vi a-center" style="padding-left:0.63em">2. Đưa đớn khi xuất nhập cảnh</p></td>
@@ -797,7 +816,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t4c"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t4c"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
 <tr class="pgrow nosplit" style="height:2.46em">
 <td class="b-nknt vert cont" rowspan="3">&nbsp;</td>
 <td class="b-ttnt vert" rowspan="3"><p class="ja a-center" style="padding-left:0.63em">３　適切な住居の確保に係る支援・生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em">3. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp/hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt</p></td>
@@ -949,7 +969,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t5">
 <colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:19.4759%"><col style="width:0.1278%"><col style="width:21.0291%"></colgroup>
 <tbody>
@@ -988,7 +1009,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t5b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:19.4759%"><col style="width:0.1278%"><col style="width:21.0291%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t5b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:19.4759%"><col style="width:0.1278%"><col style="width:21.0291%"></colgroup><tbody>
 <tr style="height:1.61em" class="pgrow">
 <td class="b-ttnt vert" rowspan="2"><p class="ja a-center">５　日本語学習の機会の提供</p><p class="vi a-center">5. Cung cấp cơ họi học tiếng Nhật</p></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
@@ -1039,7 +1061,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </div>
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t6">
 <colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:2.6846%"><col style="width:16.3247%"><col style="width:0.2748%"><col style="width:13.4931%"><col style="width:2.0773%"><col style="width:4.6980%"><col style="width:7.3122%"><col style="width:4.0844%"><col style="width:10.6552%"><col style="width:14.7843%"><col style="width:15.1934%"></colgroup>
 <tbody>
@@ -1077,7 +1100,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t6b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:2.6846%"><col style="width:16.3247%"><col style="width:0.2748%"><col style="width:13.4931%"><col style="width:2.0773%"><col style="width:4.6980%"><col style="width:7.3122%"><col style="width:4.0844%"><col style="width:10.6552%"><col style="width:14.7843%"><col style="width:15.1934%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t6b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:2.6846%"><col style="width:16.3247%"><col style="width:0.2748%"><col style="width:13.4931%"><col style="width:2.0773%"><col style="width:4.6980%"><col style="width:7.3122%"><col style="width:4.0844%"><col style="width:10.6552%"><col style="width:14.7843%"><col style="width:15.1934%"></colgroup><tbody>
 <tr style="height:2.76em" class="pgrow">
 <td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">イ　実施方法</p><p class="vi a-center" style="padding-left:0.63em">B. Phương pháp giải quyết</p></td>
 <td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">対応時間
@@ -1136,7 +1160,8 @@ Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung
 </div>
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t7">
 <colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:22.1221%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup>
 <tbody>
@@ -1180,7 +1205,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 
 
 
-<div class="tbl-wrap pgstart">
+</div>
+<div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t8">
 <colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup>
 <tbody>
@@ -1227,7 +1253,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t8b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8b"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr style="height:1.77em">
 <td class="b-tttt" colspan="2"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｄ．職業紹介事業の許可又は届出を受けて職業紹介を行うことができる場合は，就職先の紹介あっせんを行う</p><p class="vi">Trường hợp nhận được sự cho phép hoặc báo cáo của đơn vị giới thiệu việc làm, và có thể giới thiệu việc làm thì làm trung gian giới thiệu nơi làm việc</p></td>
 <td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f312" name="f312" data-label="８ 非自発的離職時の転職支援 ＞ ｄ．職業紹介事業の許可又は届出を受けて職業紹介を行うことがで">有（<input type="text" class="bl" id="f313" name="f313" data-label="８ 非自発的離職時の転職支援 ＞ ｄ．職業紹介事業の許可又は届出を受けて職業紹介を行うことがで｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f314" name="f314" data-label="８ 非自発的離職時の転職支援 ＞ ｄ．職業紹介事業の許可又は届出を受けて職業紹介を行うことがで">無（<input type="text" class="bl" id="f315" name="f315" data-label="８ 非自発的離職時の転職支援 ＞ ｄ．職業紹介事業の許可又は届出を受けて職業紹介を行うことがで｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
@@ -1272,7 +1299,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr style="height:8.36em" class="pgrow">
 <td class="b-nknt vert cont" rowspan="4">&nbsp;</td>
 <td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">９　定期的な面談の実施・行政機関への通報</p><p class="vi a-center" style="padding-left:0.63em">9. Thực hiện phỏng vấn định kỳ, báo cáo cho cơ quan hành chính</p></td>
@@ -1337,7 +1365,8 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 </tr>
 </tbody></table></div>
 
-<div class="tbl-wrap pgstart"><table class="grid" id="t8d"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
+</div>
+<div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8d"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr class="pgrow nosplit" style="height:6.30em">
 <td class="b-tktt vert" colspan="2"><p class="ja a-center" style="padding-left:0.63em">Ⅴ共生施策関係</p><p class="vi a-center" style="padding-left:0.63em">V. Quan hệ chính sách cộng sinh</p></td>
 <td class="b-tttk" colspan="7"><p class="ja" style="padding-left:2.52em">本計画の作成に当たり、地方公共団体が実施する共生社会の実現のための施策（共生施策）を確認しています。</p><p class="ja" style="padding-left:2.52em">共生施策を確認した地方公共団体（市区町村）名</p><p class="ja" style="padding-left:3.78em">・支援対象者が活動する事業所の所在地 （${f('es_officePref')}都・道・府・県${f('es_officeCity')}市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f381" name="f381" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:4.00em">年<input type="text" class="bl" id="f382" name="f382" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜： 年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f383" name="f383" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f384" name="f384" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f385" name="f385" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f386" name="f386" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="ja" style="padding-left:3.78em">・支援対象者の住居地</p><p class="ja" style="padding-left:6.30em">同上</p><p class="ja" style="padding-left:6.30em">異なる地方公共団体（<input type="text" class="bl" id="f387" name="f387" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜方公共団体（＿都・道・府・" style="width:5.00em">都・道・府・県<input type="text" class="bl" id="f388" name="f388" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜・道・府・県＿市・区・町・" style="width:5.00em">市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f389" name="f389" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:3.50em">年<input type="text" class="bl" id="f390" name="f390" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f391" name="f391" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f392" name="f392" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f393" name="f393" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f394" name="f394" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="vi" style="padding-left:2.52em">Khi lập kế hoạch này, đã kiểm tra chính sách nhằm thực hiện xã hội cộng sinh do đoàn thể công cộng địa phương triển khai (chính sách cộng sinh).</p><p class="vi" style="padding-left:2.52em">Tên đoàn thể công cộng địa phương (thành phố/quận/thị trấn/làng) đã kiểm tra chính sách công cộng</p><p class="ja" style="padding-left:3.78em">・Địa chỉ công ty nơi đối tượng được hỗ trợ hoạt động (Tỉnh${f('es_officePrefEn')}/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng${f('es_officeCityEn')})</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f397" name="f397" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f398" name="f398" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f399" name="f399" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f400" name="f400" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p><p class="ja" style="padding-left:3.78em">・Nơi cư trú của đối tượng được hỗ trợ</p><p class="vi" style="padding-left:6.30em">Như trên</p><p class="ja" style="padding-left:6.30em">Đoàn thể công cộng địa phương khác (Tỉnh<input type="text" class="bl" id="f401" name="f401" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜(Tỉnh＿/Tokyo" style="width:1.25em">/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng<input type="text" class="bl" id="f402" name="f402" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜n/làng＿)" style="width:10.25em">)</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f403" name="f403" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f404" name="f404" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f405" name="f405" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f406" name="f406" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p></td>
@@ -1393,7 +1422,7 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 <p class="ja" style="text-indent:22.00em">１号特定技能外国人の署名</p>
 <p class="vi" style="text-indent:27.50em">  Chữ ký của người nước ngoài có kỹ năng đặc định số 1</p>
   </div>
-</div>`; }
+</div></div>`; }
 
 // DB → サイドバー流し込み
 async function loadFromDB(passedInfo){
@@ -1452,31 +1481,12 @@ function aiCheck17(){ alert('1-17号のAI判定は未対応です。'); }
 // プレビューをプレビュー領域の幅に収める（横長A4を自動縮小）
 function p17Fit(){
   var area=document.getElementById('pageArea'); if(!area) return;
-  var sheet=area.querySelector('.sheet'); if(!sheet) return;
-  var wrap=sheet.parentElement;                 // docP1
-  // transformは.sheetのpaddingで基準がズレるため zoom を使う（DPR環境で確実に縮む）
-  sheet.style.zoom='';
-  sheet.style.transform='none';
-  if(wrap){ wrap.style.width=''; wrap.style.height=''; wrap.style.overflow=''; }
-  var w=1080;                                     // 版面1040+右padding/罫線の実効ぶん
+  var docs=area.querySelectorAll('.doc.p17doc'); if(!docs.length) return;
   var avail=area.clientWidth - 40;
   if(avail<=0){ requestAnimationFrame(p17Fit); return; }
+  var w=1120;                       // 横A4 doc の実効幅（右端余裕込み）
   var scale=Math.min(1, avail/w);
-  sheet.style.transformOrigin='top left';
-  sheet.style.transform='scale('+scale+')';
-  if(wrap){ wrap.style.width=(w*scale)+'px'; wrap.style.height=(sheet.offsetHeight*scale)+'px'; wrap.style.overflow='hidden'; }
-  // 追い込み: sheet内で最も右に出る子を実測し、領域を超えていたら比率でさらに縮小
-  requestAnimationFrame(function(){
-    var ar=area.getBoundingClientRect(); var mx=0;
-    sheet.querySelectorAll('table.grid').forEach(function(t){ var r=t.getBoundingClientRect().right; if(r>mx)mx=r; });
-    if(mx>ar.right-2){
-      var s2 = scale * (ar.width-40) / (mx - sheet.getBoundingClientRect().left);
-      if(s2>0 && s2<scale){
-        sheet.style.transform='scale('+s2+')';
-        if(wrap){ wrap.style.width=(w*s2)+'px'; wrap.style.height=(sheet.offsetHeight*s2)+'px'; }
-      }
-    }
-  });
+  docs.forEach(function(d){ d.style.zoom=''; d.style.transform='none'; d.style.zoom=scale; });
 }
 window.addEventListener('resize', function(){ if(!window._editMode) p17Fit(); });
 // iframeが後から表示される（タブ切替）ケース: 可視化・フォーカス・visibilitychangeで再フィット
@@ -1504,9 +1514,15 @@ document.addEventListener('DOMContentLoaded', function(){
   p();
   var q=new URLSearchParams(location.search).get('case');
   if(q){ loadFromDB({caseId:q}); }
-  setTimeout(p17Fit,100);
+  setTimeout(function(){ p17Fit(); if(typeof setupPageTracker==="function") setupPageTracker(); },120);
 });
 
+
+// ページ切替時も必ずフィット（common.scrollToPageの前後でzoom維持）
+(function(){
+  var _orig = window.scrollToPage;
+  window.scrollToPage = function(n){ if(window.p17Fit) p17Fit(); if(_orig) return _orig(n); };
+})();
 </script>
 </body>
 </html>
