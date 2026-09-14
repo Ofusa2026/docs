@@ -352,10 +352,10 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #docP1{ margin:0 auto !important; }
 #pageArea .sheet{ box-shadow:none; margin:0; transform-origin:top left; }
 
-/* ver.20260913.32: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
+/* ver.20260913.33: 版面を厳密に1040px固定＋セル内変数箱の横溢れ防止 */
 #pageArea .sheet{ width:1040px !important; max-width:1040px !important; }
 
-/* ver.20260913.32: sheetのpaddingはみ出し修正（box-sizing強制） */
+/* ver.20260913.33: sheetのpaddingはみ出し修正（box-sizing強制） */
 #pageArea .sheet{ box-sizing:border-box !important; }
 #pageArea .sheet, #pageArea .sheet *{ box-sizing:border-box; }
 
@@ -366,7 +366,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #p17scale{ display:inline-block; }
 .fid{ color:#aaa; font-size:9px; font-family:monospace; margin-left:4px; font-weight:normal; }
 
-/* ================= ver.20260913.32: 印刷専用（1-6シェル対応） ================= */
+/* ================= ver.20260913.33: 印刷専用（1-6シェル対応） ================= */
 @media print{
   @page{ size: A4 landscape; margin: 10mm; }
   html, body{ background:#fff !important; }
@@ -401,14 +401,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   td.vert p{ white-space:normal !important; font-size:.8em !important; line-height:1.05 !important; }
   td.vert{ overflow:hidden !important; }
 }
-/* ver.20260913.32: Word改ページ位置＝テーブル行の直前で改ページ */
+/* ver.20260913.33: Word改ページ位置＝テーブル行の直前で改ページ */
 #pageArea tr.pgrow > td{ border-top:3px double #4a5263 !important; }   /* 画面: 区切りを視認 */
 @media print{
   tr.pgrow{ break-before:page; page-break-before:always; }
   #pageArea tr.pgrow > td{ border-top-width:var(--thin) !important; border-top-style:solid !important; } /* 印刷は通常罫線 */
 }
 
-/* ver.20260913.32: 各Word表を1ページに収めるための印刷圧縮 */
+/* ver.20260913.33: 各Word表を1ページに収めるための印刷圧縮 */
 @media print{
   .sheet{ font-size:8pt !important; }
   .sheet p.ja{ line-height:1.15 !important; }
@@ -422,7 +422,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   #pageArea table.grid{ break-inside:avoid; page-break-inside:avoid; }
 }
 
-/* ver.20260913.32: 空ページ防止＝各表の前で改ページ（div.pagebreak廃止） */
+/* ver.20260913.33: 空ページ防止＝各表の前で改ページ（div.pagebreak廃止） */
 @media print{
   .tbl-wrap.pgstart{ break-before:page; page-break-before:always; }
   #pageArea .tbl-wrap{ break-inside:avoid; page-break-inside:avoid; }
@@ -430,12 +430,12 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 /* 画面プレビューでは表の間に区切り線 */
 #pageArea .tbl-wrap.pgstart{ border-top:2px dashed #999; margin-top:14px; padding-top:14px; }
 
-/* ver.20260913.32: 1ページ超の表は分割許可（空ページ防止） */
+/* ver.20260913.33: 1ページ超の表は分割許可（空ページ防止） */
 @media print{
   #t3, #t4c, #t8b, #t8c{ break-inside:auto !important; page-break-inside:auto !important; }
 }
 
-/* ver.20260913.32: 1-6式ページ分割（各テーブル=1 doc、横A4） */
+/* ver.20260913.33: 1-6式ページ分割（各テーブル=1 doc、横A4） */
 #pageArea{ display:block !important; padding:16px !important; background:#888 !important; }
 #pageArea .sheet{ width:auto !important; max-width:none !important; transform:none !important; zoom:1 !important; background:transparent !important; box-shadow:none !important; padding:0 !important; }
 #pageArea .doc.p17doc{
@@ -457,7 +457,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.32</div>
+    <div class="ver">ver.20260913.33</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1484,11 +1484,14 @@ function p17Fit(){
   var docs=area.querySelectorAll('.doc.p17doc'); if(!docs.length) return;
   var avail=area.clientWidth - 40;
   if(avail<=0){ requestAnimationFrame(p17Fit); return; }
-  var w=1120;                       // 横A4 doc の実効幅（右端余裕込み）
-  var scale=Math.min(1, avail/w);
-  docs.forEach(function(d){ d.style.zoom=''; d.style.transform='none'; d.style.zoom=scale; });
+  docs.forEach(function(d){
+    d.style.zoom='';                         // 原寸に戻す
+    var w=d.scrollWidth || d.offsetWidth || 1040;  // docの実幅（中身込み）
+    var scale=Math.min(1, avail/w);
+    d.style.zoom=scale;
+  });
 }
-window.addEventListener('resize', function(){ if(!window._editMode) p17Fit(); });
+window.addEventListener("resize", function(){ if(!window._editMode) p17Fit(); });
 // iframeが後から表示される（タブ切替）ケース: 可視化・フォーカス・visibilitychangeで再フィット
 window.addEventListener('focus', function(){ if(!window._editMode) p17Fit(); });
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && !window._editMode) p17Fit(); });
