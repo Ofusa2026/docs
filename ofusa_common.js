@@ -267,6 +267,7 @@ window.aiCheck16 = async function(){
   });
   var key=''; try{ key=localStorage.getItem('ofusa_apiKey')||localStorage.getItem('claudeApiKey')||''; }catch(e){}
   var aiChecks=[]; var aiErr='';
+  window._c16Last={checks:local.slice(), rules:rules};
   _renderCheckPanel(local, [], rules, {loading: !!key, note: key?'':'AIのAPIキーが未設定のため、自動計算のチェックのみ表示しています（AI翻訳と同じAPIキー設定で全項目判定できます）。'});
   if(key){
     try{
@@ -294,6 +295,7 @@ window.aiCheck16 = async function(){
       var parsed=JSON.parse(txt);
       (parsed.checks||[]).forEach(function(c){ c.src='AI'; aiChecks.push(c); });
     }catch(e){ aiErr='AI判定でエラー: '+e.message+'（自動計算の結果のみ表示しています）'; }
+    window._c16Last={checks:local.concat(aiChecks), rules:rules};
     _renderCheckPanel(local, aiChecks, rules, {loading:false, note:aiErr});
   }
 };
@@ -342,6 +344,122 @@ function _c16AnchorY(c, docs, area, pageOrder){
   if(idx>=0 && docs[idx]) return docs[idx].offsetTop;
   return 0;
 }
+
+// ver.20260913.06: AI判定結果 → 修正依頼の案内文生成（国交省の指摘事項スタイル）
+//   カンボジアスタッフは案シスの進捗コメントへ、日本メンバーはそのまま企業への連絡に使える丁寧文。
+window.openC16GuideText = function(){
+  var data=window._c16Last;
+  if(!data||!data.checks||!data.checks.length){ alert('先に「🧬 AI判定」を実行してください。'); return; }
+  var items=data.checks.filter(function(c){return c.severity==='out'||c.severity==='warn';});
+  if(!items.length){ alert('⛔・⚡の指摘はありません（案内文の対象なし）。'); return; }
+  var pageOrder=['P1','P2','P3','P4','P5','P6','P7','P8'];
+  var pageLabels={};
+  if(data.rules&&data.rules.pages){ data.rules.pages.forEach(function(pg){ pageLabels[pg.page]=pg.label||''; }); }
+  var sevOrder={out:0,warn:1};
+  items.sort(function(a,b){
+    var pa=pageOrder.indexOf(a.page||''), pb=pageOrder.indexOf(b.page||'');
+    if(pa<0)pa=99; if(pb<0)pb=99;
+    if(pa!==pb) return pa-pb;
+    var sa=(a.severity in sevOrder)?sevOrder[a.severity]:9, sb=(b.severity in sevOrder)?sevOrder[b.severity]:9;
+    return sa-sb;
+  });
+  // 既定の振り分け: 入力・計算ミス系＝当社側／事実確認が必要な系＝企業側（項目ごとに切替可）
+  var IN_HOUSE=['控除整合','手取り整合','年間日数','労働時間','業務区分','氏名・日付整合','翻訳','別紙'];
+  items.forEach(function(c){
+    var cat=String(c.category||'')+String(c.title||'');
+    c._side = IN_HOUSE.some(function(k){return cat.indexOf(k)>=0;}) ? 'in' : 'corp';
+  });
+  var co=(document.getElementById('es_orgName')||{}).value||'';
+  var applicant=(document.getElementById('es_applicantName')||{}).value||(window._lastCaseInfo&&window._lastCaseInfo.applicant)||'';
+  function sectionText(list, corp){
+    var t=''; var lastPage=null;
+    list.forEach(function(c){
+      var pg=(c.page&&pageOrder.indexOf(c.page)>=0)?c.page:null;
+      if(pg!==lastPage){
+        t+='■ '+(pg?(pg.replace('P','')+'ページ目'+(pageLabels[pg]?'（'+pageLabels[pg]+'）':'')):'全体')+'\n';
+        lastPage=pg;
+      }
+      var detail=String(c.detail||'').trim();
+      if(detail && !/[。]$/.test(detail)) detail+='。';
+      t+='・【'+String(c.title||'').trim()+'】\n';
+      if(corp){
+        var tail=(c.severity==='out')?'ご修正をお願いいたします。':'ご確認をお願いいたします。';
+        t+='　'+(detail||'')+tail+'\n';
+      } else {
+        t+='　'+(detail||'')+(c.severity==='out'?'→ 要修正（案シス／Saysayで修正）':'→ 要確認')+'\n';
+      }
+    });
+    return t;
+  }
+  function buildCorp(){
+    var list=items.filter(function(c){return c._side==='corp';});
+    var t='【雇用条件書（参考様式第1-6号）ご確認のお願い】\n\n';
+    if(co) t+=String(co).trim()+' ご担当者様\n\n';
+    t+='いつもお世話になっております。\n雇用条件書（参考様式第1-6号）'+(applicant?'（'+applicant+'様分）':'')+'について、\n下記の箇所のご確認・ご修正をお願いいたします。\n\n';
+    t+= list.length ? sectionText(list, true)+'\n' : '（企業様にご確認いただく事項はありません）\n\n';
+    t+='お手数をおかけしますが、ご確認のほどよろしくお願いいたします。\n';
+    return t;
+  }
+  function buildInHouse(){
+    var list=items.filter(function(c){return c._side==='in';});
+    var t='【1-6号 AI判定・当社側の修正メモ】'+(applicant?'（'+applicant+'）':'')+(co?' '+co:'')+'\n\n';
+    t+= list.length ? sectionText(list, false) : '（当社側で修正する事項はありません）\n';
+    return t;
+  }
+  function refresh(){
+    var a=document.getElementById('c16GuideCorp'); if(a) a.value=buildCorp();
+    var b=document.getElementById('c16GuideIn'); if(b) b.value=buildInHouse();
+    var cN=items.filter(function(c){return c._side==='corp';}).length;
+    var iN=items.length-cN;
+    var lb=document.getElementById('c16GuideCount'); if(lb) lb.textContent='企業側 '+cN+'件／当社側 '+iN+'件';
+  }
+  window._c16GuideToggle=function(i, side){
+    items[i]._side=side;
+    var row=document.getElementById('c16gi_'+i);
+    if(row){
+      row.querySelector('[data-s="corp"]').style.cssText=_c16PillCss(side==='corp','corp');
+      row.querySelector('[data-s="in"]').style.cssText=_c16PillCss(side==='in','in');
+    }
+    refresh();
+  };
+  window._c16PillCss=function(active, kind){
+    var base='border:none;border-radius:10px;padding:1px 8px;cursor:pointer;font-size:10px;margin-left:3px;';
+    if(kind==='corp') return base+(active?'background:#0e7490;color:#fff;font-weight:700;':'background:#e2e8f0;color:#64748b;');
+    return base+(active?'background:#7c3aed;color:#fff;font-weight:700;':'background:#e2e8f0;color:#64748b;');
+  };
+  var mark={out:'⛔',warn:'⚡'};
+  var rows=items.map(function(c,i){
+    return '<div id="c16gi_'+i+'" style="display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px dashed #e5e7eb;">'
+      +'<div style="flex:1;font-size:11px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(mark[c.severity]||'')+' '+String(c.title||'').replace(/</g,'&lt;')+'</div>'
+      +'<button data-s="corp" onclick="_c16GuideToggle('+i+',\'corp\')" style="'+_c16PillCss(c._side==='corp','corp')+'">企業側</button>'
+      +'<button data-s="in" onclick="_c16GuideToggle('+i+',\'in\')" style="'+_c16PillCss(c._side==='in','in')+'">当社側</button>'
+      +'</div>';
+  }).join('');
+  var old=document.getElementById('c16GuideModal'); if(old) old.remove();
+  var html='<div id="c16GuideModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;" onclick="if(event.target.id===\'c16GuideModal\')this.remove()">'
+    +'<div style="background:#fff;width:min(900px,94vw);max-height:90vh;display:flex;flex-direction:column;border-radius:12px;overflow:hidden;font-family:\'Noto Sans JP\',sans-serif;">'
+    +'<div style="padding:10px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">'
+    +'<div style="font-weight:800;font-size:14px;">📝 修正依頼の案内文　<span id="c16GuideCount" style="font-size:11px;color:#64748b;font-weight:400;"></span></div>'
+    +'<button onclick="document.getElementById(\'c16GuideModal\').remove()" style="border:none;background:#e2e8f0;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;">閉じる</button></div>'
+    +'<div style="padding:6px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;">'
+    +'<div style="font-size:10.5px;color:#64748b;margin-bottom:3px;">各指摘の担当を切り替えると、下の2つの文面に即反映されます（入力・計算ミス系は既定で当社側）。</div>'
+    +rows+'</div>'
+    +'<div style="display:flex;gap:12px;padding:10px 16px 14px;flex:1;min-height:0;flex-wrap:wrap;">'
+    +'<div style="flex:1;min-width:300px;display:flex;flex-direction:column;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+    +'<div style="font-weight:700;font-size:12px;color:#0e7490;">🏢 企業様への案内文（そのまま送付可）</div>'
+    +'<button onclick="var t=document.getElementById(\'c16GuideCorp\');t.select();navigator.clipboard.writeText(t.value).then(function(){showToast(\'📋 企業向けをコピーしました\');});" style="border:none;background:#0e7490;color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;">📋 コピー</button></div>'
+    +'<textarea id="c16GuideCorp" style="flex:1;min-height:300px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;line-height:1.7;font-family:inherit;resize:vertical;"></textarea></div>'
+    +'<div style="flex:1;min-width:300px;display:flex;flex-direction:column;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+    +'<div style="font-weight:700;font-size:12px;color:#7c3aed;">🏠 当社側の修正メモ（案シスコメント用）</div>'
+    +'<button onclick="var t=document.getElementById(\'c16GuideIn\');t.select();navigator.clipboard.writeText(t.value).then(function(){showToast(\'📋 当社側メモをコピーしました\');});" style="border:none;background:#7c3aed;color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;">📋 コピー</button></div>'
+    +'<textarea id="c16GuideIn" style="flex:1;min-height:300px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:12px;line-height:1.7;font-family:inherit;resize:vertical;"></textarea></div>'
+    +'</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  refresh();
+};
+
 function _renderCheckPanel(local, aiChecks, rules, opt){
   opt=opt||{};
   if(!document.getElementById('_check16PrintStyle')){
@@ -366,6 +484,7 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
       +'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">'
       +'<div style="font-weight:800;font-size:13px;">🧬 AI判定結果</div>'
       +'<div style="display:flex;gap:4px;">'
+      +'<button onclick="openC16GuideText()" title="修正依頼の案内文を生成（案シスコメント・企業連絡用）" style="border:none;background:#0e7490;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;">📝 案内文</button>'
       +'<button onclick="aiCheck16()" style="border:none;background:#b45309;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;">🔁</button>'
       +'<button onclick="document.getElementById(\'aiCheck16Panel\').remove()" style="border:none;background:#e2e8f0;border-radius:6px;padding:2px 8px;cursor:pointer;font-size:11px;">✕</button></div></div>'
       +'<div style="font-size:10.5px;color:#64748b;margin-top:2px;">'+today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate()
