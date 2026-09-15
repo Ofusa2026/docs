@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260913.01</div>
+    <div class="ver">ver.20260915.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -556,14 +556,6 @@ function p(){
     //   他言語版と同じくnEn/amt/calcEnを差し込む実装に統一。
     annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（ခံစားခွင့်　${ph(nEn,'NameEn')}　,${ph(amt,'Amount',true)} ယန်း／တွက်ချက်ပုံ：${ph(calcEn,'CalcEn')}）</div>`;
   });
-  // ver.20260825.03: 時間外手当（固定残業代）も別紙の手当明細に追加表示
-  if(v('es_fixedOTAmount')||v('es_fixedOTHours')){
-    const _g='g';
-    const _foAmt=v('es_fixedOTAmount'), _foH=v('es_fixedOTHours'), _foCalc=v('es_fixedOTCalc'), _foCalcEn=v('es_fixedOTCalcEn');
-    const _phF=(val,isMoney=false,_bk)=>{ if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f"${_bk?' data-bind="'+_bk+'"':''}>${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;} return''; };
-    annexAllow+=`<div>(${_g})（<span class="f">時間外手当（固定残業代）</span>　手当　月　${_phF(_foAmt,true,'es_fixedOTAmount')}円／計算方法：${_phF(_foCalc||( _foH?('月'+_foH+'時間分の時間外労働に対する固定残業代'):''),false,'es_fixedOTCalc')}）</div>`;
-    annexAllow+=`<div class="id">(${_g})（${_phF(_foCalcEn,false,'es_fixedOTCalcEn')||''}　,${_phF(_foAmt,true,'es_fixedOTAmount')}yen）</div>`;
-  }
 
   w.innerHTML=`
 <div class="doc" id="docP1">
@@ -1002,12 +994,12 @@ function p(){
     
     <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;">[ပုံသေအချိန်ပိုလစာရှိသည့်အခါတွင်]</span></div>
     <div style="margin-left:16px;">
-      <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
-      <div class="id" style="font-size:7.5pt;">(e) (ခံစားခွင့် ${f('es_fixedOTNameEn')} , ${ff('es_fixedOTAmount')} ယန်း</div>
-      <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
-      <div class="id" style="font-size:7.5pt;">・ထောက်ပံရန်လိုအပ်ချက်: သတ်မှတ်ချိန်ပြင်ပတွင် အလုပ်လုပ်ခြင်းရှိ/မရှိနှင့်မဆိုင်ပဲ ${f('es_fixedOTHours')} နာရီစာကို ထောက်ပံ့ငွေအဖြစ်ပေးပါမည်။</div>
-      <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
-      <div class="id" style="font-size:7.5pt;">(${f('es_fixedOTHours')} နာရီကို ကျော်လွန်ပြီးအလုပ်လုပ်သည့် အချိန်အတွက်ကို ထပ်ဆောင်းငွေပေးဆောင်ပါမည်)</div>
+      <div>(e)（${v('es_fixedOTName')?f('es_fixedOTName'):`<span class="f" data-bind="es_fixedOTName"></span>`}　手当　${v('es_fixedOTAmount')?ff('es_fixedOTAmount'):`<span class="f" data-bind="es_fixedOTAmount" data-bind-fmt="1"></span>`}円</div>
+      <div class="id" style="font-size:7.5pt;">(e) (ခံစားခွင့် ${v('es_fixedOTNameEn')?f('es_fixedOTNameEn'):`<span class="f" data-bind="es_fixedOTNameEn"></span>`} , ${v('es_fixedOTAmount')?ff('es_fixedOTAmount'):`<span class="f" data-bind="es_fixedOTAmount" data-bind-fmt="1"></span>`} ယန်း</div>
+      <div>・支給要件：時間外労働の有無にかかわらず、${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`}時間分の時間外手当として支給。</div>
+      <div class="id" style="font-size:7.5pt;">・ထောက်ပံရန်လိုအပ်ချက်: သတ်မှတ်ချိန်ပြင်ပတွင် အလုပ်လုပ်ခြင်းရှိ/မရှိနှင့်မဆိုင်ပဲ ${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`} နာရီစာကို ထောက်ပံ့ငွေအဖြစ်ပေးပါမည်။</div>
+      <div>（${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
+      <div class="id" style="font-size:7.5pt;">(${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`} နာရီကို ကျော်လွန်ပြီးအလုပ်လုပ်သည့် အချိန်အတွက်ကို ထပ်ဆောင်းငွေပေးဆောင်ပါမည်)</div>
     </div>
   </div>
 

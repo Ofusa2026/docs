@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260913.01</div>
+    <div class="ver">ver.20260915.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -554,14 +554,6 @@ function p(){
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
     annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr}) (${ph(nEn,'NameEn')} allowance , ${ph(amt,'Amount',true)} yen / Calculation method: ${ph(calcEn,'CalcEn')}）</div>`;
   });
-  // ver.20260825.03: 時間外手当（固定残業代）も別紙の手当明細に追加表示
-  if(v('es_fixedOTAmount')||v('es_fixedOTHours')){
-    const _g='g';
-    const _foAmt=v('es_fixedOTAmount'), _foH=v('es_fixedOTHours'), _foCalc=v('es_fixedOTCalc'), _foCalcEn=v('es_fixedOTCalcEn');
-    const _phF=(val,isMoney=false,_bk)=>{ if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;return`<span class="f"${_bk?' data-bind="'+_bk+'"':''}>${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;} return''; };
-    annexAllow+=`<div>(${_g})（<span class="f">時間外手当（固定残業代）</span>　手当　月　${_phF(_foAmt,true,'es_fixedOTAmount')}円／計算方法：${_phF(_foCalc||( _foH?('月'+_foH+'時間分の時間外労働に対する固定残業代'):''),false,'es_fixedOTCalc')}）</div>`;
-    annexAllow+=`<div class="id">(${_g})（${_phF(_foCalcEn,false,'es_fixedOTCalcEn')||''}　,${_phF(_foAmt,true,'es_fixedOTAmount')}yen）</div>`;
-  }
 
   w.innerHTML=`
 <div class="doc" id="docP1">
@@ -999,12 +991,12 @@ function p(){
     
     <div style="margin-top:4px;font-weight:bold;">【固定残業代がある場合】<br><span class="id" style="font-size:7.5pt;">[If there is fixed overtime pay]</span></div>
     <div style="margin-left:16px;">
-      <div>(e)（${f('es_fixedOTName')}　手当　${ff('es_fixedOTAmount')}円</div>
-      <div class="id" style="font-size:7.5pt;">(e) (${f('es_fixedOTNameEn')} allowance , ${ff('es_fixedOTAmount')} JPY</div>
-      <div>・支給要件：時間外労働の有無にかかわらず、${f('es_fixedOTHours')}時間分の時間外手当として支給。</div>
-      <div class="id" style="font-size:7.5pt;">・Payment conditions: Paid as ${f('es_fixedOTHours')} hours of overtime, regardless of whether overtime actually occurs.</div>
-      <div>（${f('es_fixedOTHours')}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
-      <div class="id" style="font-size:7.5pt;">(Overtime premium pay for overtime exceeding ${f('es_fixedOTHours')} hours will be paid additionally.)</div>
+      <div>(e)（${v('es_fixedOTName')?f('es_fixedOTName'):`<span class="f" data-bind="es_fixedOTName"></span>`}　手当　${v('es_fixedOTAmount')?ff('es_fixedOTAmount'):`<span class="f" data-bind="es_fixedOTAmount" data-bind-fmt="1"></span>`}円</div>
+      <div class="id" style="font-size:7.5pt;">(e) (${v('es_fixedOTNameEn')?f('es_fixedOTNameEn'):`<span class="f" data-bind="es_fixedOTNameEn"></span>`} allowance , ${v('es_fixedOTAmount')?ff('es_fixedOTAmount'):`<span class="f" data-bind="es_fixedOTAmount" data-bind-fmt="1"></span>`} JPY</div>
+      <div>・支給要件：時間外労働の有無にかかわらず、${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`}時間分の時間外手当として支給。</div>
+      <div class="id" style="font-size:7.5pt;">・Payment conditions: Paid as ${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`} hours of overtime, regardless of whether overtime actually occurs.</div>
+      <div>（${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`}時間を超える時間外労働分についての割増賃金は追加で支給。）</div>
+      <div class="id" style="font-size:7.5pt;">(Overtime premium pay for overtime exceeding ${v('es_fixedOTHours')?f('es_fixedOTHours'):`<span class="f" data-bind="es_fixedOTHours"></span>`} hours will be paid additionally.)</div>
     </div>
   </div>
 
