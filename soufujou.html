@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 書類送付状</div>
-    <div class="ver">ver.20260916.01</div>
+    <div class="ver">ver.20260916.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -46,6 +46,28 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
+    <div class="fs"><div class="fs-title">案件IDから関連をまとめて選択</div>
+      <div class="fg"><label>案件ID（case_〜 を貼り付け／受付番号・氏名でも可）</label>
+        <div style="display:flex;gap:4px;">
+          <input id="ms_key" placeholder="case_1789…" style="flex:1;min-width:0;" onkeydown="if(event.key==='Enter'){event.preventDefault();msSearch();}">
+          <button type="button" onclick="msSearch()" style="background:#2563eb;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;font-size:12px;flex-shrink:0;">検索</button>
+        </div>
+      </div>
+      <div id="ms_hit" style="display:none;font-size:11px;background:#eef4ff;border:1px solid #b9cbe8;border-radius:4px;padding:6px 8px;margin-bottom:6px;line-height:1.55;color:#1e3a5f;"></div>
+      <div id="ms_tabs" style="display:none;gap:4px;margin-bottom:6px;flex-wrap:wrap;"></div>
+      <div id="ms_ctrl" style="display:none;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11px;color:#8ab;">
+        <span id="ms_count">選択中 1件</span>
+        <span>
+          <button type="button" onclick="msAll(true)" style="font-size:11px;cursor:pointer;">全選択</button>
+          <button type="button" onclick="msAll(false)" style="font-size:11px;cursor:pointer;">解除</button>
+        </span>
+      </div>
+      <div id="ms_list" style="display:none;border:1px solid #ccc;border-radius:4px;max-height:200px;overflow:auto;background:#fff;"></div>
+      <div class="fg" style="margin-top:6px;">
+        <button type="button" id="ms_apply" onclick="msApply()" style="display:none;width:100%;background:#16a34a;color:#fff;border:none;border-radius:4px;padding:7px;cursor:pointer;font-size:12px;">▼ 選択した案件を書類へ反映</button>
+      </div>
+      <div id="ms_warn" style="display:none;font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;padding:6px 8px;margin-top:6px;color:#92400e;line-height:1.5;"></div>
+    </div>
     <div class="fs"><div class="fs-title">テンプレート</div>
       <input id="f_title" type="hidden" value="書類送付のご案内">
       <input id="f_namesAfter" type="hidden" value="">
@@ -222,6 +244,120 @@ async function loadFromDB(passedInfo){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
+// ===== 案件IDから関連をまとめて選択 =====
+var _msBase=null,_msScope='name',_msRows=[],_msSel={};
+async function msSearch(){
+  var key=(document.getElementById('ms_key').value||'').trim();
+  if(!key){ showToast('⚠️ 案件IDを入力してください'); return; }
+  try{
+    var sel='id,name,applicant,org,company,receipt_no,case_no';
+    var rows=[];
+    if(/^case_/i.test(key)){
+      rows=await sb('cases?select='+sel+'&id=eq.'+encodeURIComponent(key));
+    }
+    if(!rows||!rows.length){
+      var k=encodeURIComponent('*'+key+'*');
+      rows=await sb('cases?select='+sel+'&or=(receipt_no.ilike.'+k+',case_no.ilike.'+k+',applicant.ilike.'+k+',id.ilike.'+k+')&limit=5');
+    }
+    if(!rows||!rows.length){ showToast('⚠️ 見つかりませんでした'); return; }
+    _msBase=rows[0]; _msScope='name'; _msSel={}; _msSel[_msBase.id]=true;
+    var hit=document.getElementById('ms_hit');
+    hit.style.display='block';
+    hit.innerHTML='<b>'+esc(_msBase.applicant||'（申請人未設定）')+'</b>　／　'+esc(_msBase.company||'')+'　／　'+esc(_msBase.org||'')+'<br>案件名：'+esc(_msBase.name||'');
+    await msLoadScope();
+  }catch(e){ showToast('⚠️ 検索エラー: '+e.message); console.error(e); }
+}
+async function msLoadScope(){
+  var b=_msBase; if(!b) return;
+  var sel='id,name,applicant,org,company,receipt_no,case_no';
+  var q;
+  if(_msScope==='name') q='name=eq.'+encodeURIComponent(b.name||'');
+  else if(_msScope==='company') q='company=eq.'+encodeURIComponent(b.company||'');
+  else q='org=eq.'+encodeURIComponent(b.org||'');
+  try{
+    var rows=await sb('cases?select='+sel+'&'+q+'&order=name.asc,applicant.asc&limit=200');
+    _msRows=(rows||[]).filter(function(r){return r&&r.id;});
+    _msRows.sort(function(a,c){return (a.id===b.id?-1:0)-(c.id===b.id?-1:0);});
+    var keep={}; keep[b.id]=true;
+    _msRows.forEach(function(r){ if(_msSel[r.id]) keep[r.id]=true; });
+    _msSel=keep;
+    msRenderTabs(); msRenderList();
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); }
+}
+function msRenderTabs(){
+  var t=document.getElementById('ms_tabs');
+  t.style.display='flex';
+  var defs=[['name','同じ案件名'],['company','同じ所属機関'],['org','同じ登録支援機関']];
+  t.innerHTML=defs.map(function(d){
+    var on=(_msScope===d[0]);
+    return '<button type="button" onclick="msSetScope(\''+d[0]+'\')" style="font-size:11px;padding:3px 10px;border-radius:999px;cursor:pointer;border:1px solid '+(on?'#2563eb':'#889')+';background:'+(on?'#2563eb':'transparent')+';color:'+(on?'#fff':'#9ab')+';">'+d[1]+'</button>';
+  }).join('');
+}
+function msSetScope(s){ _msScope=s; msLoadScope(); }
+function msRenderList(){
+  var w=document.getElementById('ms_list');
+  w.style.display='block';
+  document.getElementById('ms_ctrl').style.display='flex';
+  document.getElementById('ms_apply').style.display='block';
+  w.innerHTML=_msRows.map(function(r){
+    var base=(r.id===_msBase.id);
+    var no=(r.receipt_no||r.case_no||'').trim();
+    var label=(no?esc(no)+'　':'')+esc(r.applicant||'（申請人未設定）')+(base?'（起点）':'')+(no?'':'<span style="color:#b45309;">　※受付番号なし</span>');
+    return '<label style="display:flex;gap:6px;align-items:flex-start;padding:6px 8px;border-bottom:1px solid #eee;font-size:12px;color:#333;cursor:pointer;'+(base?'background:#f0f6ff;':'')+'">'
+      +'<input type="checkbox" '+(_msSel[r.id]?'checked ':'')+(base?'disabled ':'')+'onchange="msToggle(\''+r.id+'\',this.checked)" style="margin-top:2px;">'
+      +'<span style="line-height:1.5;">'+label+'<br><span style="color:#888;font-size:10px;">'+esc(r.name||'')+'</span></span></label>';
+  }).join('');
+  msCount();
+}
+function msToggle(id,on){ if(_msBase&&id===_msBase.id) return; _msSel[id]=on; msCount(); }
+function msAll(on){
+  _msRows.forEach(function(r){ _msSel[r.id]=on||(r.id===_msBase.id); });
+  msRenderList();
+}
+function msCount(){
+  var n=_msRows.filter(function(r){return _msSel[r.id];}).length;
+  document.getElementById('ms_count').textContent='選択中 '+n+'件';
+}
+function msSelectedRows(){ return _msRows.filter(function(r){return _msSel[r.id];}); }
+function msWarn(msg){
+  var w=document.getElementById('ms_warn');
+  if(!msg){ w.style.display='none'; return; }
+  w.style.display='block'; w.innerHTML=msg;
+}
+function msApply(){
+  var rows=msSelectedRows();
+  if(!rows.length){ showToast('⚠️ 反映する案件を選択してください'); return; }
+  var s=function(id,val){var e=document.getElementById(id);if(e)e.value=val;};
+  var comps={}; rows.forEach(function(r){ comps[(r.company||'').trim()]=1; });
+  var compKeys=Object.keys(comps).filter(function(k){return k;});
+  var tplKey=(document.getElementById('f_tpl')||{}).value||'';
+  var kojin=(tplKey&&TPL[tplKey]&&TPL[tplKey].kojin);
+  if(kojin&&rows.length===1){
+    s('f_recipient', rows[0].applicant||'');
+    s('f_names','');
+  }else{
+    if(compKeys.length===1) s('f_recipient', compKeys[0]);
+    s('f_names', rows.map(function(r){return '－'+(r.applicant||'')+'様';}).join('\n'));
+  }
+  window._lastApplicant=(rows[0].applicant||'').trim();
+  if(compKeys.length===1) window._lastCompanyName=compKeys[0];
+  if(rows.length>=2){
+    var it=document.getElementById('f_items');
+    if(it&&it.value){
+      var ls=it.value.split('\n');
+      if(ls[0]&&!/名分/.test(ls[0])) ls[0]=ls[0]+'（'+rows.length+'名分）';
+      else if(ls[0]) ls[0]=ls[0].replace(/（\d+名分）/,'（'+rows.length+'名分）');
+      it.value=ls.join('\n');
+    }
+  }
+  var d=document.getElementById('f_date'); if(d&&!d.value) d.value=warekiToday();
+  var warns=[];
+  if(compKeys.length>1) warns.push('⚠️ 所属機関が複数混在しています。宛先を確認してください。');
+  if(kojin&&rows.length>1) warns.push('※ 個人向けテンプレで複数名が選択されています。宛先は所属機関にしました。');
+  msWarn(warns.join('<br>'));
+  p(); showToast('✅ '+rows.length+'件を反映しました');
+}
+
 initCaseSelect(); p();
 
 function fitDocToPreview(){
