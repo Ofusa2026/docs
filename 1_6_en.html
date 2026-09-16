@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20260916.03</div>
+    <div class="ver">ver.20260916.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -683,7 +683,7 @@ function p(){
         </table>
       </div>
       <!-- 縦線 -->
-      <div style="width:2px;background:#777;flex-shrink:0;"></div>
+      <div style="width:0;border-left:2px solid #777;flex-shrink:0;"></div>
       <!-- 右：派遣雇用 / 変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;">${cb(false,'hire_dispatch_id')}&nbsp;Dispatch employment (fill in the separate "Employment Conditions Statement")</span></div>
@@ -716,7 +716,7 @@ function p(){
         </table>
       </div>
       <!-- 縦線 -->
-      <div style="width:2px;background:#777;flex-shrink:0;"></div>
+      <div style="width:0;border-left:2px solid #777;flex-shrink:0;"></div>
       <!-- 右：変更の範囲 -->
       <div style="flex:1;padding:6px 12px 6px 8px;">
         <table style="width:100%;border-collapse:collapse;font-size:7.5pt;"><tr><td style="vertical-align:top;text-align:center;white-space:nowrap;padding:0 6px 0 0;width:46%;">（変更の範囲）</td><td style="vertical-align:top;">${cb(false,"change_none_disp")}&nbsp;変更の可能性なし（変更ある場合は以下に記入）</td></tr><tr><td class="id" style="vertical-align:top;text-align:center;font-size:6pt;padding:0 6px 0 0;">（Immediately after hiring）</td><td class="id" style="vertical-align:top;font-size:6pt;">${cb(false,"cb_auto_001")} &nbsp;No possibility of change (If there is a possibility of change, provide details below.)</td></tr></table>
