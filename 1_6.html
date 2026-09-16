@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20260916.01</div>
+    <div class="ver">ver.20260916.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -138,6 +138,7 @@
       <div class="fg"><label>連絡先<span class="fid">es.officeTel</span></label><input id="es_officeTel" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅱ 就業の場所（派遣先）</div>
+      <div class="fg"><button type="button" onclick="moveOfficeToDispatch()" style="width:100%;background:#7c3aed;color:#fff;padding:7px 4px;border:none;border-radius:4px;cursor:pointer;font-size:12px;">⇄ 直接雇用⇄派遣雇用を切替（内容を移動）</button></div>
       <div class="fg"><label>派遣先事業所名（日）<span class="fid">es.dispatchOfficeName</span></label><input id="es_dispatchOfficeName" oninput="p()"></div>
       <div class="fg"><label>派遣先事業所名（ID）<span class="fid">es.dispatchOfficeNameEn</span></label><input id="es_dispatchOfficeNameEn" oninput="p()"></div>
       <div class="fg"><label>派遣先所在地（日）<span class="fid">es.dispatchOfficeAddress</span></label><textarea id="es_dispatchOfficeAddress" oninput="p()" rows="2"></textarea></div>
@@ -464,6 +465,30 @@
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
 // 生値 v() で中身の有無を判定してから f() を呼ぶ。
+// ver.20260916.02: 直接雇用⇄派遣雇用のワンボタン切替。
+// 就業の場所の内容（事業所名・所在地・連絡先）を左右で移動し、
+// ■/□（hire_direct / hire_dispatch とインドネシア語行）も同時に切り替える。
+function moveOfficeToDispatch(){
+  var pairs=[['es_officeName','es_dispatchOfficeName'],['es_officeNameEn','es_dispatchOfficeNameEn'],['es_officeAddress','es_dispatchOfficeAddress'],['es_officeAddressEn','es_dispatchOfficeAddressEn'],['es_officeTel','es_dispatchOfficeTel']];
+  var g=function(id){var e=document.getElementById(id);return e?e.value:'';};
+  var s=function(id,val){var e=document.getElementById(id);if(e)e.value=val;};
+  var dispatchHas=pairs.some(function(pr){return (g(pr[1])||'').trim()!=='';});
+  if(!window.cbState) window.cbState={};
+  if(!dispatchHas){
+    // 直接雇用 → 派遣先へ移動
+    pairs.forEach(function(pr){ s(pr[1], g(pr[0])); s(pr[0],''); });
+    window.cbState['hire_direct']=false; window.cbState['hire_direct_id']=false;
+    window.cbState['hire_dispatch']=true; window.cbState['hire_dispatch_id']=true;
+    if(typeof showToast==='function') showToast('⇄ 派遣雇用に切り替えました');
+  }else{
+    // 派遣先 → 直接雇用へ戻す
+    pairs.forEach(function(pr){ s(pr[0], g(pr[1])); s(pr[1],''); });
+    window.cbState['hire_direct']=true; window.cbState['hire_direct_id']=true;
+    window.cbState['hire_dispatch']=false; window.cbState['hire_dispatch_id']=false;
+    if(typeof showToast==='function') showToast('⇄ 直接雇用に戻しました');
+  }
+  p();
+}
 function fOr(a, b){
   return (typeof v==='function' && String(v(a)||'').trim()) ? f(a) : ((typeof v==='function' && String(v(b)||'').trim()) ? f(b) : f(a));
 }
