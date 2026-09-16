@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>書類送付状</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:25mm 25mm 25mm 25mm!important;font-size:11pt!important;line-height:1.9!important;min-height:auto!important;}
+.doc .p{margin:0;}
+.doc .ttl{text-align:center;font-size:14pt;letter-spacing:2px;margin:8mm 0 10mm;}
+.doc .sig{text-align:right;}
+.doc .sender{text-align:right;font-size:10pt;line-height:1.7;margin-bottom:2mm;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:25mm!important;font-size:11pt!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 書類送付状</div>
+    <div class="ver">ver.20260916.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('soufujou')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">テンプレート</div>
+      <input id="f_title" type="hidden" value="書類送付のご案内">
+      <input id="f_namesAfter" type="hidden" value="">
+      <div class="fg"><label>送付状テンプレ（選ぶと即反映）</label>
+        <select id="f_tpl" onchange="applyTemplate()">
+          <option value="">— テンプレを選択 —</option>
+          <option value="sofu_sign_kigyo">送付状｜サイン書類（企業向け）</option>
+          <option value="sofu_sign_kojin">送付状｜サイン書類（個人向け）</option>
+          <option value="sofu_ohin">送付状｜押印書類</option>
+          <option value="sofu_zairyu">送付状｜在留カード・パスポート</option>
+          <option value="sofu_nintei">送付状｜建設受入計画 認定証</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">宛先・日付</div>
+      <div class="fg"><label>日付（空なら今日の和暦を自動）</label><input id="f_date" oninput="p()" placeholder="例：令和8年9月16日"></div>
+      <div class="fg"><label>宛先（「御中」「様」は不要・自動で御中）</label><input id="f_recipient" oninput="p()" placeholder="例：株式会社○○"></div>
+      <div class="fg"><label>氏名リスト（1行1名・－や様も含めて自由記入）</label><textarea id="f_names" oninput="p()" rows="3" placeholder="例：－NGUYEN VAN A様&#10;　　－NGUYEN VAN B様"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">本文（自由に編集できます）</div>
+      <div class="fg"><textarea id="f_body" oninput="p()" rows="5" style="font-size:12px;line-height:1.6;" placeholder="テンプレを選んで反映、または直接入力してください"></textarea></div>
+      <div class="fg"><label>結び</label><textarea id="f_closing" oninput="p()" rows="3" style="font-size:12px;line-height:1.6;"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">記（同封物）</div>
+      <div class="fg"><textarea id="f_items" oninput="p()" rows="3" style="font-size:12px;line-height:1.6;" placeholder="例：・サイン書類 一式&#10;　　・返信用封筒"></textarea></div>
+      <div class="fg"><label>注記（任意・空なら非表示）</label><textarea id="f_note" oninput="p()" rows="2" style="font-size:12px;line-height:1.6;" placeholder="例：※サインの上、サイン書類一式をご返送ください"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">差出人</div>
+      <div class="fg"><label>申請取次行政書士</label>
+        <select id="f_gyosei" onchange="p()">
+          <option value="田中　綾美">田中　綾美</option>
+          <option value="中林　俊介">中林　俊介</option>
+          <option value="大房　明良">大房　明良</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1789355507"></script>
+<script>
+var SENDER_ADDR='〒144-0052　東京都大田区蒲田5丁目11-10 FUNDES蒲田8階';
+var SENDER_TEL='TEL：03-6424-8849';
+var SENDER_FAX='FAX：03-6424-8854';
+function warekiToday(){
+  var d=new Date(); var r=d.getFullYear()-2018;
+  return '令和'+(r===1?'元':r)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+}
+var TPL = {
+  sofu_sign_kigyo: { kojin:false, namesAfter:false, body:
+'上記の方の特定技能申請用サイン書類をお送りいたしますので、ご本人にサインしていただく様お願い致します。ご確認の上ご査収いただけますようお願い申し上げます。',
+    closing:'ご不明な点等ございましたら、お気軽にご連絡ください。\n今後ともどうぞよろしくお願い致します。',
+    items:'・サイン書類 一式\n・返信用封筒',
+    note:'※サインの上、サイン書類一式をご返送ください\nよろしくお願いいたします。' },
+  sofu_sign_kojin: { kojin:true, namesAfter:false, body:
+'特定技能申請用サイン書類をお送りいたしますので、サインしていただく様お願い致します。ご確認の上ご査収いただけますようお願い申し上げます。',
+    closing:'ご不明な点等ございましたら、お気軽にご連絡ください。\n今後ともどうぞよろしくお願い致します。',
+    items:'・サイン書類 一式\n・返信用封筒',
+    note:'※サインの上、サイン書類一式をご返送ください\nよろしくお願いいたします。' },
+  sofu_ohin: { kojin:false, namesAfter:false, body:
+'上記申請人の押印書類をお送りいたしますので、ご確認の上ご査収いただけますようお願い申し上げます。',
+    closing:'ご不明な点等ございましたら、お気軽にご連絡ください。\n今後ともどうぞよろしくお願い致します。',
+    items:'・押印書類 一式\n・返信用封筒',
+    note:'※押印の上、押印書類一式をご返送ください\nよろしくお願いいたします。' },
+  sofu_zairyu: { kojin:false, namesAfter:true, body:
+'下記の方の新旧在留カード・パスポートをお送りいたしますので、ご確認の上ご査収いただけますようお願い申し上げます。',
+    closing:'今後ともどうぞよろしくお願い致します。',
+    items:'・新旧在留カード\n・パスポート',
+    note:'よろしくお願いいたします。' },
+  sofu_nintei: { kojin:false, namesAfter:false, body:
+'上記の方の建設特定技能受入計画認定証をお送りいたしますので、ご確認の上ご査収いただけますようお願い申し上げます。',
+    closing:'今後ともどうぞよろしくお願い致します。',
+    items:'・建設特定技能受入計画認定証',
+    note:'' }
+};
+function applyTemplate(){
+  var k=(document.getElementById('f_tpl')||{}).value||'';
+  if(!k||!TPL[k]) { p(); return; }
+  var t=TPL[k];
+  var set=function(id,val){var e=document.getElementById(id);if(e)e.value=val;};
+  set('f_body',t.body); set('f_closing',t.closing); set('f_items',t.items); set('f_note',t.note);
+  set('f_namesAfter', t.namesAfter?'1':'');
+  if(t.kojin){
+    // 個人向け：宛先＝申請人本人、氏名リストは使わない
+    if(window._lastApplicant){ set('f_recipient', window._lastApplicant); }
+    set('f_names','');
+  }else{
+    if(window._lastCompanyName){ var r=document.getElementById('f_recipient'); if(r&&!r.value) r.value=window._lastCompanyName; }
+    if(window._lastApplicant){ var n=document.getElementById('f_names'); if(n&&!n.value) n.value='－'+window._lastApplicant+'様'; }
+  }
+  p(); showToast('📄 テンプレを反映しました');
+}
+function _ml(id, ph){
+  var val=v(id)||'';
+  if(!val) return '<span class="f" style="color:#aaa;background:#fff59d;padding:0 3px;">'+ph+'</span>';
+  return esc(val).replace(/\n/g,'<br>');
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const date=v('f_date')||warekiToday();
+  const names=v('f_names')||'';
+  const namesAfter=v('f_namesAfter')==='1';
+  const note=v('f_note')||'';
+  const namesHtml=names?`<div class="p" style="margin:4mm 0;">${esc(names).replace(/\n/g,'<br>')}</div>`:'';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="p" style="text-align:right;margin-bottom:2mm;">${esc(date)}　</div>
+<div class="p" style="font-size:12pt;margin-bottom:4mm;"><span class="f">${f('f_recipient')}</span>　御中</div>
+<div class="sender">大房行政書士法人<br>申請取次行政書士<br>${f('f_gyosei')}<br>${esc(SENDER_ADDR)}<br>${esc(SENDER_TEL)}<br>${esc(SENDER_FAX)}</div>
+<div class="ttl">書類送付のご案内</div>
+<div class="p">拝啓、時下ますます清栄のこととお慶び申し上げます。<br>平素は格別のご高配を賜り、深く御礼申し上げます。</div>
+${namesAfter?'':namesHtml}
+<div class="p" style="margin-top:4mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
+${namesAfter?namesHtml:''}
+<div class="p" style="margin-top:4mm;">${_ml('f_closing','')}</div>
+<div class="p sig" style="margin-top:4mm;">敬具</div>
+<div class="p" style="text-align:center;margin:4mm 0;">記</div>
+<div class="p">${_ml('f_items','（同封物：・サイン書類 一式　など）')}</div>
+${note?`<div class="p" style="margin-top:6mm;">${esc(note).replace(/\n/g,'<br>')}</div>`:''}
+<div class="p sig" style="margin-top:8mm;">以上</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applySofuFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applySofuFontSize(){
+  const st=document.getElementById('_sofuFontStyle')||document.createElement('style');
+  st.id='_sofuFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=`.doc{font-size:${(11*s).toFixed(2)}pt!important} .doc .ttl{font-size:${(14*s).toFixed(2)}pt!important}`;
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info||!info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      sb('cases?select=applicant,company&id=eq.'+caseId),
+      companyId?sb('companies?select=name&id=eq.'+companyId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    if(cas){
+      window._lastApplicant=(cas.applicant||'').trim();
+      window._lastCompanyName=((co&&co.name)||cas.company||companyName||'').trim();
+      const kojin=(v('f_tpl')&&TPL[v('f_tpl')]&&TPL[v('f_tpl')].kojin);
+      if(kojin){ s('f_recipient', window._lastApplicant); }
+      else{
+        s('f_recipient', window._lastCompanyName);
+        if(window._lastApplicant) s('f_names','－'+window._lastApplicant+'様');
+      }
+    }
+    const d=document.getElementById('f_date'); if(d&&!d.value) d.value=warekiToday();
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'soufujou', {skipFieldRestore:true}); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

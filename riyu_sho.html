@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>理由書</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:25mm 25mm 25mm 25mm!important;font-size:11pt!important;line-height:1.9!important;min-height:auto!important;}
+.doc .p{margin:0;}
+.doc .ttl{text-align:center;font-size:14pt;letter-spacing:2px;margin-bottom:14mm;}
+.doc .sig{text-align:right;}
+.doc .ul{display:inline-block;min-width:8em;border-bottom:1px solid #000;text-align:center;padding:0 2px;}
+/* 旅券様式用 */
+.doc .rk-ttl{text-align:center;font-size:13pt;line-height:1.5;margin-bottom:8mm;}
+.doc .rk-ttl .en{font-size:10pt;letter-spacing:0;}
+.doc table.rk{width:100%;border-collapse:collapse;margin-bottom:8mm;}
+.doc table.rk th,.doc table.rk td{border:1px solid #000;padding:6px 10px;vertical-align:middle;font-weight:normal;text-align:left;}
+.doc table.rk th{width:32%;text-align:center;}
+.doc .rk-en{font-size:9pt;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:25mm!important;font-size:11pt!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 理由書</div>
+    <div class="ver">ver.20260916.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('riyu_sho')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">テンプレート</div>
+      <input id="f_title" type="hidden" value="理由書">
+      <input id="f_cbstate" type="hidden" value="">
+      <div class="fg"><label>本文テンプレ（選ぶと即反映）</label>
+        <select id="f_tpl" onchange="applyTemplate()">
+          <option value="">— テンプレを選択 —</option>
+          <option value="riyu_hosoku">理由書｜申請情報の補足</option>
+          <option value="riyu_online">理由書｜オンライン入力ミスの訂正</option>
+          <option value="riyu_torisage">理由書｜取下げの経緯説明</option>
+          <option value="riyu_gensen_zenshoku">理由書｜源泉徴収票（前就業先から発行不可）</option>
+          <option value="riyu_gensen_saihakko">理由書｜源泉徴収票（再発行不可）</option>
+          <option value="riyu_kessansho">理由書｜会社設立間もない（決算書省略）</option>
+          <option value="riyu_kokkosho">理由書｜国交省申請遅延のご説明</option>
+          <option value="riyu_kikoku">理由書｜帰国していたため（課税・源泉省略）</option>
+          <option value="ryoken">様式｜旅券が未取得である理由書（日英）</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs" id="fsTeishutsu"><div class="fs-title">提出先</div>
+      <div class="fg"><label>提出先（申請受付番号から自動・編集可）</label><input id="f_bureau" oninput="p()" placeholder="例：東京出入国在留管理局"></div>
+      <div class="fg"><label>部門（任意）</label><input id="f_busho" oninput="p()" placeholder="例：就労審査第三部門"></div>
+      <div class="fg"><label>日付（任意・空なら非表示）</label><input id="f_date" oninput="p()" placeholder="例：2026年9月16日"></div>
+    </div>
+    <div class="fs" id="fsAnken"><div class="fs-title">案件情報</div>
+      <div class="fg"><label>申請番号（複数行OK・氏名併記OK）</label><textarea id="f_receiptNo" oninput="p()" rows="3" placeholder="例：東オンCV12345&#10;　　東オンCV12346　NGUYEN VAN B"></textarea></div>
+      <div class="fg"><label>氏名（空なら行ごと非表示）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>所属機関名（空なら行ごと非表示）</label><input id="f_company" oninput="p()"></div>
+    </div>
+    <div class="fs" id="fsBody"><div class="fs-title">本文（自由に編集できます）</div>
+      <div class="fg"><textarea id="f_body" oninput="p()" rows="14" style="font-size:12px;line-height:1.6;" placeholder="テンプレを選んで反映、または直接入力してください"></textarea></div>
+    </div>
+    <div class="fs" id="fsSign"><div class="fs-title">署名</div>
+      <div class="fg"><label>申請取次行政書士</label>
+        <select id="f_gyosei" onchange="p()">
+          <option value="田中　綾美">田中　綾美</option>
+          <option value="中林　俊介">中林　俊介</option>
+          <option value="大房　明良">大房　明良</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs" id="fsRyoken" style="display:none;"><div class="fs-title">旅券未取得様式</div>
+      <div class="fg" style="font-size:10px;color:#666;line-height:1.5;">※理由のチェック欄（□）と、性別・続柄の丸囲みは<b>プレビュー上でクリック</b>して切り替えます。</div>
+      <div class="fg3">
+        <div class="fg"><label>申請予定 年</label><input id="f_r_planY" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="f_r_planM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_r_planD" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>その他の理由（理由３用）</label><input id="f_r_other" oninput="p()"></div>
+      <div class="fg"><label>氏名</label><input id="f_r_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>生年 年</label><input id="f_r_birthY" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="f_r_birthM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_r_birthD" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>国籍（地域）</label><input id="f_r_nationality" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>署名日 年</label><input id="f_r_dateY" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="f_r_dateM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_r_dateD" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>続柄その他（父・母以外のとき）</label><input id="f_r_relationOther" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1789355507"></script>
+<script>
+// 受付番号の先頭文字 → 提出先（フル名称・支局対応）
+var BUREAU_FULL={
+  '東':'東京出入国在留管理局',
+  '横':'東京出入国在留管理局横浜支局',
+  '名':'名古屋出入国在留管理局',
+  '阪':'大阪出入国在留管理局',
+  '神':'大阪出入国在留管理局神戸支局',
+  '札':'札幌出入国在留管理局',
+  '仙':'仙台出入国在留管理局',
+  '福':'福岡出入国在留管理局',
+  '那':'福岡出入国在留管理局那覇支局',
+  '広':'広島出入国在留管理局',
+  '中':'広島出入国在留管理局',
+  '高':'高松出入国在留管理局'
+};
+function bureauFullFromReceipt(rno){
+  var s=String(rno||'').trim(); if(!s) return '';
+  return BUREAU_FULL[s.charAt(0)]||'';
+}
+var TPL = {
+  riyu_hosoku: { body:
+'・就労先情報に関して\n－（施設名）\n　住所：（住所）\n\n・申請情報（○○）に関して\n\n申請情報に不足があり申し訳ございませんでした。' },
+  riyu_online: { body:
+'以下の内容に関してご説明いたします。\n\n・オンラインシステム○○「（項目名）」の記載に関して\n表題の件に関して、「無」と記載しておりましたが、実際は下記が正しい記載となりますので訂正させていただきます。\nオンラインシステム上では変更できないため、このような形で提出させていただきます。\n以上、何卒ご理解いただきますようお願い申し上げます。\n\n（項目名）\n有／無　→有\n回数　　→１（回）' },
+  riyu_torisage: { body:
+'以下の内容に関してご説明いたします。\n○○さんの申請取り下げ書に関して\n申請後、申請辞退のご連絡をいただきましたが\nご本人より取り下げ書へのご署名をいただくことが難しく、\n入管へ経緯を説明のうえ対応方法を仰いだところ\n経緯の説明を記載した理由書と併せて取り下げ書の提出にて確認いただける旨\nご指示いただきましたので本状の提出に至りました。\nお手数をおかけいたしますが、上記、申請取り下げにてご対応いただけますと幸いです。\n\n以上、何卒よろしくお願い申し上げます。' },
+  riyu_gensen_zenshoku: { body:
+'・源泉徴収票に関して\n\n上記に関して、前就業先から源泉徴収票をいただけない旨の連絡がありましたため、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+  riyu_gensen_saihakko: { body:
+'・源泉徴収票に関して\n\n上記に関して、前職にて発行依頼をいたしましたが、再発行はできないとのご連絡を頂戴したので、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+  riyu_kessansho: { body:
+'・参考様式1-11（決算書記載箇所）に関して\n\n上記の指摘事項に関して、企業様に確認したところ、会社設立（○○○○年○月）間もないため発行をすることができないとのご連絡を頂戴したため、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+  riyu_kokkosho: { body:
+'・国交省に関して\n\n上記に関して、○○○○年○月より、国交省申請に必要な企業様書類につきましてご準備をお願いしておりましたが、ご多忙のご事情もあり、準備が難しい状況が続いておりました。\n現状、まもなく国交省申請ができる段階にありますので、書類が揃い次第速やかに申請対応させていただきます。\nまた、特例期間に差し掛かる状況であることから、可能な限り早期に特定活動更新の許可をいただけますと幸いです。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+  riyu_kikoku: { body:
+'・課税証明書・源泉徴収に関して\n\n上記に関して、申請人は○○○○年○月から○○○○年○月まで帰国していたため、課税証明書・源泉徴収を発行することができないとのご連絡を頂戴したので、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' }
+};
+function isFormMode(){ return v('f_tpl')==='ryoken'; }
+function _syncPanels(){
+  var form=isFormMode();
+  var show=function(id,on){var e=document.getElementById(id);if(e)e.style.display=on?'':'none';};
+  show('fsTeishutsu',!form); show('fsAnken',!form); show('fsBody',!form); show('fsSign',!form);
+  show('fsRyoken',form);
+}
+function applyTemplate(){
+  var k=(document.getElementById('f_tpl')||{}).value||'';
+  _syncPanels();
+  if(k && TPL[k]){
+    var body=document.getElementById('f_body');
+    body.value=TPL[k].body;
+  }
+  p(); showToast('📄 テンプレを反映しました');
+}
+// cbState（チェック・丸囲み）を hidden input に同期してDB保存に載せる
+function _syncCbHidden(){
+  var e=document.getElementById('f_cbstate');
+  if(e){ try{ e.value=JSON.stringify(window.cbState||{}); }catch(_){} }
+}
+function _restoreCbHidden(){
+  var e=document.getElementById('f_cbstate');
+  if(!e||!e.value) return;
+  try{ var o=JSON.parse(e.value); if(o&&typeof o==='object'){ window.cbState=Object.assign(window.cbState||{},o); } }catch(_){}
+}
+// 元の toggleCb をラップして hidden 同期を追加
+(function(){
+  var _tcb=window.toggleCb;
+  window.toggleCb=function(id){ _tcb(id); _syncCbHidden(); };
+})();
+// 丸囲み選択（ローカル版：emp_sets自動保存を使わず、cbState＋hiddenで完結）
+function cirL(text, groupId, value){
+  var cur=(window.cbState&&window.cbState[groupId]!==undefined)?window.cbState[groupId]:'';
+  var on=(cur===value);
+  var st='display:inline-block;padding:0 5px;cursor:pointer;border-radius:999px;'+(on?'border:1px solid #333;':'border:1px solid transparent;');
+  return '<span class="cb-click" onclick="toggleCirL(\''+groupId+'\',\''+value+'\')" style="'+st+'">'+text+'</span>';
+}
+function toggleCirL(groupId,value){
+  if(!window.cbState) window.cbState={};
+  window.cbState[groupId]=(window.cbState[groupId]===value)?'':value;
+  _syncCbHidden(); p();
+}
+function _ml(id, ph){
+  var val=v(id)||'';
+  if(!val) return '<span class="f" style="color:#aaa;background:#fff59d;padding:0 3px;">'+ph+'</span>';
+  return esc(val).replace(/\n/g,'<br>');
+}
+function _blank(id, w){
+  // 値があれば下線つきで表示、無ければ下線の空欄（印刷時は手書き用に空白）
+  var val=v(id)||'';
+  return '<span class="ul" style="min-width:'+(w||'3em')+';">'+(val?esc(val):'&nbsp;')+'</span>';
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  _syncPanels();
+  if(isFormMode()){ _renderRyoken(w); }
+  else{ _renderLetter(w); }
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applyRiyuFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _renderLetter(w){
+  const busho=v('f_busho')||'';
+  const date=v('f_date')||'';
+  const showApplicant=!!v('f_applicant');
+  const showCompany=!!v('f_company');
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="ttl">理由書</div>
+${date?`<div class="p" style="text-align:right;margin-bottom:4mm;">${esc(date)}</div>`:''}
+<div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>${busho?'　'+esc(busho):''}　御中</div>
+<div class="p">申請番号：</div>
+<div class="p" style="margin-bottom:6mm;">${_ml('f_receiptNo','es.receiptNo')}</div>
+${showApplicant?`<div class="p" style="margin-bottom:6mm;">氏名：${f('f_applicant')}</div>`:''}
+${showCompany?`<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>`:''}
+<div class="p" style="margin-bottom:16mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
+<div class="p sig">大房行政書士法人</div>
+<div class="p sig">申請取次行政書士　${f('f_gyosei')}</div>
+</div>`;
+}
+function _renderRyoken(w){
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="rk-ttl">旅券が未取得である理由書<br><span class="en">STATEMENT FOR THE REASON THE PASSPORT<br>HAS NOT BEEN OBTAINED AS YET</span></div>
+<table class="rk">
+  <tr>
+    <th>未取得の理由<br><span class="rk-en">REASON</span></th>
+    <td style="line-height:1.7;">
+      １${cb(false,'r_reason1')}　旅券申請中<br>
+      <span class="rk-en">　PASSPORT HAS ALREADY BEEN APPLIED</span><br>
+      ２${cb(false,'r_reason2')}　旅券申請予定（${_blank('f_r_planY','3em')}年${_blank('f_r_planM','2em')}月${_blank('f_r_planD','2em')}日頃）<br>
+      <span class="rk-en">　I'M PLANNING TO APPLY FOR NEW PASSPORT（YEAR / MONTH / DAY）</span><br>
+      ３${cb(false,'r_reason3')}　その他（${_blank('f_r_other','12em')}）<br>
+      <span class="rk-en">　OTHERS</span>
+    </td>
+  </tr>
+</table>
+<table class="rk">
+  <tr><th colspan="2" style="text-align:center;">申請人　<span class="rk-en">APPLICANT</span></th></tr>
+  <tr>
+    <th>氏 名<br><span class="rk-en">NAME</span></th>
+    <td style="text-align:center;">${_blank('f_r_name','16em')}</td>
+  </tr>
+  <tr>
+    <th>生年月日<br><span class="rk-en">DATE OF BIRTH</span></th>
+    <td style="text-align:center;">${_blank('f_r_birthY','4em')}年　${_blank('f_r_birthM','2.5em')}月　${_blank('f_r_birthD','2.5em')}日<br><span class="rk-en">YEAR　　MONTH　　DAY</span></td>
+  </tr>
+  <tr>
+    <th>性 別<br><span class="rk-en">SEX</span></th>
+    <td style="text-align:center;">${cirL('男','r_sex','男')}　・　${cirL('女','r_sex','女')}<br><span class="rk-en">${cirL('MALE','r_sex','男')}　・　${cirL('FEMALE','r_sex','女')}</span></td>
+  </tr>
+  <tr>
+    <th>国 籍（地 域）<br><span class="rk-en">NATIONALITY</span></th>
+    <td style="text-align:center;">${_blank('f_r_nationality','14em')}</td>
+  </tr>
+</table>
+<div class="p" style="font-size:10pt;line-height:1.7;margin-bottom:2mm;">出生の場合は、住民票・出生届受理証明書の記載事項に間違いありません。<br>それ以外の場合は、現在所持している在留カードの氏名・生年月日・性別・国籍（地域）に変更はありません。</div>
+<div class="p rk-en" style="line-height:1.6;margin-bottom:8mm;">In case of birth, contents written on the Certificate of residence / the Certificate of acceptance of Birth report do not have the mistake.<br>NO changes in the name, date of birth, sex and nationality (region) of the residence card which is currently possessing.</div>
+<div class="p" style="margin-bottom:2mm;">上記のとおり間違いありません。<br><span class="rk-en">I hereby certify that the matters described above are all true.</span></div>
+<div class="p" style="margin-bottom:8mm;">　　　　${_blank('f_r_dateY','4em')}年<span class="rk-en">YEAR</span>　　${_blank('f_r_dateM','2.5em')}月<span class="rk-en">MONTH</span>　　${_blank('f_r_dateD','2.5em')}日<span class="rk-en">DAY</span></div>
+<div class="p" style="margin-bottom:6mm;">署名　<span class="ul" style="min-width:18em;">&nbsp;</span>　<span class="rk-en">（SIGNATURE）</span></div>
+<div class="p">本人との続柄（　${cirL('父','r_relation','父')}　・　${cirL('母','r_relation','母')}　・　${_blank('f_r_relationOther','5em')}　）</div>
+<div class="p rk-en">Relationship（　${cirL('Father','r_relation','父')}　・　${cirL('Mother','r_relation','母')}　・　　　　　）</div>
+</div>`;
+}
+function _applyRiyuFontSize(){
+  const st=document.getElementById('_riyuFontStyle')||document.createElement('style');
+  st.id='_riyuFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=`.doc{font-size:${(11*s).toFixed(2)}pt!important} .doc .ttl{font-size:${(14*s).toFixed(2)}pt!important}`;
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info||!info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos]=await Promise.all([
+      sb('cases?select=applicant,company,receipt_no,case_no&id=eq.'+caseId),
+      companyId?sb('companies?select=name&id=eq.'+companyId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      sf('f_receiptNo', (cas.receipt_no||cas.case_no||'').trim());
+      s('f_applicant', cas.applicant||'');
+      s('f_r_name', cas.applicant||'');
+      s('f_company', (co&&co.name)||cas.company||companyName||'');
+      const b=bureauFullFromReceipt(cas.receipt_no||cas.case_no||'');
+      if(b) sf('f_bureau', b);
+    }
+    _restoreCbHidden();
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); _restoreCbHidden(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'riyu_sho', {skipFieldRestore:true}); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

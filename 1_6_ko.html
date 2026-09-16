@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20260915.03</div>
+    <div class="ver">ver.20260916.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -136,6 +136,13 @@
       <div class="fg"><label>所在地（日）<span class="fid">es.officeAddress</span></label><textarea id="es_officeAddress" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>所在地（ID）<span class="fid">es.officeAddressEn</span></label><textarea id="es_officeAddressEn" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>連絡先<span class="fid">es.officeTel</span></label><input id="es_officeTel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅱ 就業の場所（派遣先）</div>
+      <div class="fg"><label>派遣先事業所名（日）<span class="fid">es.dispatchOfficeName</span></label><input id="es_dispatchOfficeName" oninput="p()"></div>
+      <div class="fg"><label>派遣先事業所名（ID）<span class="fid">es.dispatchOfficeNameEn</span></label><input id="es_dispatchOfficeNameEn" oninput="p()"></div>
+      <div class="fg"><label>派遣先所在地（日）<span class="fid">es.dispatchOfficeAddress</span></label><textarea id="es_dispatchOfficeAddress" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>派遣先所在地（ID）<span class="fid">es.dispatchOfficeAddressEn</span></label><textarea id="es_dispatchOfficeAddressEn" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>派遣先連絡先<span class="fid">es.dispatchOfficeTel</span></label><input id="es_dispatchOfficeTel" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅲ 業務内容</div>
       <div class="fg"><label>分野（日）<span class="fid">es.applicantField</span></label><input id="es_applicantField" oninput="p()"></div>
@@ -657,9 +664,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;">${cb(false,'hire_dispatch_id')}&nbsp;파견 고용(별지 「취업 조건 명시서」에 기입)</span></div>
         <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;">${cb(false,'change_none_direct_id')}&nbsp;변경 가능성 없음(변경이 있는 경우 아래에 기입)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id">사업소명</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">소재지</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
-          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">연락처</span></td><td style="padding:2px 4px;">&nbsp;</td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">事業所名<br><span class="id">사업소명</span></td><td style="padding:2px 4px;">${f('es_dispatchOfficeName')}<br><span class="id">${f('es_dispatchOfficeNameEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">소재지</span></td><td style="padding:2px 4px;">${f('es_dispatchOfficeAddress')}<br><span class="id">${f('es_dispatchOfficeAddressEn')}</span></td></tr>
+          <tr><td style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">연락처</span></td><td style="padding:2px 4px;">${f('es_dispatchOfficeTel')}<br><span class="id" style="font-size:7.5pt;">${f('es_dispatchOfficeTel')}</span></td></tr>
         </table>
       </div>
     </div>
