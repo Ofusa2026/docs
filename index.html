@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260914.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:10px;opacity:0.7;">ver.20260916.02</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -252,6 +252,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>追加資料提出<span class="item-sub">受付番号から提出先の入管局を自動判定</span></div>
     </div>
+    <div class="item" id="nav-riyu_sho" onclick="open_doc('riyu_sho')">
+      <span class="item-icon">📄</span>
+      <div>理由書<span class="item-sub">レター形式8種＋旅券未取得の理由書（日英併記）</span></div>
+    </div>
+    <div class="item" id="nav-soufujou" onclick="open_doc('soufujou')">
+      <span class="item-icon">📨</span>
+      <div>書類送付状<span class="item-sub">サイン書類・押印書類・在留カード等 5種</span></div>
+    </div>
     <div class="item" id="nav-suisenhyo" onclick="open_doc('suisenhyo')">
       <span class="item-icon">🇻🇳</span>
       <div>特定技能外国人表<span class="item-sub">交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</span></div>
@@ -330,6 +338,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-irai"></iframe>
     <iframe id="frame-torisage"></iframe>
     <iframe id="frame-tsuika_shiryo"></iframe>
+    <iframe id="frame-riyu_sho"></iframe>
+    <iframe id="frame-soufujou"></iframe>
     <iframe id="frame-suisenhyo"></iframe>
     <iframe id="frame-madoguchi"></iframe>
     <iframe id="frame-shinsei_henkou"></iframe>
@@ -426,6 +436,8 @@ const docs={
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1789355507'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1789355507'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1789355507'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1789355507'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1789355507'},
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1789355507'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1789355507'},
   'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1789355507'},
@@ -485,6 +497,8 @@ const docs={
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1789355507'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1789355507'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1789355507'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1789355507'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1789355507'},
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1789355507'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1789355507'},
   'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1789355507'},
@@ -1232,7 +1246,7 @@ var DGJ_DOC_LABELS = {
   '1_11':'1-11号','1_16':'1-16号 事前ガイダンス確認書',
   '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号','1_32':'1-32号',
   '1_1':'1-1号','iko':'移行準備説明書','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
-  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tsuika_shiryo':'追加資料提出',
+  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状',
   'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
   'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',
   'shinsei_henkou_org3':'申請書(所属機関)③','shinsei_henkou_org4':'申請書(所属機関)④'
@@ -1477,6 +1491,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20260916.02',
+    date: '2026-09-16',
+    notify: true,
+    items: [
+      '📄 <b>左メニューに「理由書」「書類送付状」を追加</b>しました（「追加資料提出」の下）。ファイル自体は9/16に作成済みでしたが、メニューに載っていなかったため直接URLでしか開けませんでした。',
+      '📝 <b>理由書</b>はレター形式のテンプレ8種（申請情報の補足／オンライン入力ミスの訂正／取下げの経緯説明／源泉徴収票が発行不可・再発行不可／会社設立間もない／国交省申請遅延／帰国していたため）に加え、様式「旅券が未取得である理由書」（日英併記）にも対応しています。',
+      '📨 <b>書類送付状</b>はテンプレ5種（サイン書類 企業向け／個人向け、押印書類、在留カード・パスポート、建設受入計画 認定証）。個人向けを選ぶと宛先が申請人本人に切り替わります。'
+    ]
+  },
   {
     version: 'ver.20260914.01',
     date: '2026-09-14',
