@@ -32,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 理由書</div>
-    <div class="ver">ver.20260916.01</div>
+    <div class="ver">ver.20260916.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -59,15 +59,23 @@
       <div class="fg"><label>本文テンプレ（選ぶと即反映）</label>
         <select id="f_tpl" onchange="applyTemplate()">
           <option value="">— テンプレを選択 —</option>
-          <option value="riyu_hosoku">理由書｜申請情報の補足</option>
-          <option value="riyu_online">理由書｜オンライン入力ミスの訂正</option>
-          <option value="riyu_torisage">理由書｜取下げの経緯説明</option>
-          <option value="riyu_gensen_zenshoku">理由書｜源泉徴収票（前就業先から発行不可）</option>
-          <option value="riyu_gensen_saihakko">理由書｜源泉徴収票（再発行不可）</option>
-          <option value="riyu_kessansho">理由書｜会社設立間もない（決算書省略）</option>
-          <option value="riyu_kokkosho">理由書｜国交省申請遅延のご説明</option>
-          <option value="riyu_kikoku">理由書｜帰国していたため（課税・源泉省略）</option>
-          <option value="ryoken">様式｜旅券が未取得である理由書（日英）</option>
+          <optgroup label="── 申請情報・訂正 ──">
+            <option value="riyu_hosoku">申請情報の補足</option>
+            <option value="riyu_online">オンライン入力ミスの訂正</option>
+            <option value="riyu_torisage">取下げの経緯説明</option>
+          </optgroup>
+          <optgroup label="── 書類の省略 ──">
+            <option value="riyu_gensen_zenshoku">源泉徴収票（前就業先から発行不可）</option>
+            <option value="riyu_gensen_saihakko">源泉徴収票（再発行不可）</option>
+            <option value="riyu_kessansho">会社設立間もない（決算書省略）</option>
+            <option value="riyu_kikoku">帰国していたため（課税・源泉省略）</option>
+          </optgroup>
+          <optgroup label="── その他の説明 ──">
+            <option value="riyu_kokkosho">国交省申請遅延のご説明</option>
+          </optgroup>
+          <optgroup label="── 様式（別レイアウト）──">
+            <option value="ryoken">旅券が未取得である理由書（日英）</option>
+          </optgroup>
         </select>
       </div>
     </div>
@@ -79,7 +87,7 @@
     <div class="fs" id="fsAnken"><div class="fs-title">案件情報</div>
       <div class="fg"><label>申請番号（複数行OK・氏名併記OK）</label><textarea id="f_receiptNo" oninput="p()" rows="3" placeholder="例：東オンCV12345&#10;　　東オンCV12346　NGUYEN VAN B"></textarea></div>
       <div class="fg"><label>氏名（空なら行ごと非表示）</label><input id="f_applicant" oninput="p()"></div>
-      <div class="fg"><label>所属機関名（空なら行ごと非表示）</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>特定技能所属機関（空なら行ごと非表示）</label><input id="f_company" oninput="p()"></div>
     </div>
     <div class="fs" id="fsBody"><div class="fs-title">本文（自由に編集できます）</div>
       <div class="fg"><textarea id="f_body" oninput="p()" rows="14" style="font-size:12px;line-height:1.6;" placeholder="テンプレを選んで反映、または直接入力してください"></textarea></div>
@@ -158,15 +166,15 @@ var TPL = {
   riyu_torisage: { body:
 '以下の内容に関してご説明いたします。\n○○さんの申請取り下げ書に関して\n申請後、申請辞退のご連絡をいただきましたが\nご本人より取り下げ書へのご署名をいただくことが難しく、\n入管へ経緯を説明のうえ対応方法を仰いだところ\n経緯の説明を記載した理由書と併せて取り下げ書の提出にて確認いただける旨\nご指示いただきましたので本状の提出に至りました。\nお手数をおかけいたしますが、上記、申請取り下げにてご対応いただけますと幸いです。\n\n以上、何卒よろしくお願い申し上げます。' },
   riyu_gensen_zenshoku: { body:
-'・源泉徴収票に関して\n\n上記に関して、前就業先から源泉徴収票をいただけない旨の連絡がありましたため、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+'・源泉徴収票に関して\n\n上記に関して、前就業先から源泉徴収票をいただけない旨の連絡がありましたため\nこの度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
   riyu_gensen_saihakko: { body:
-'・源泉徴収票に関して\n\n上記に関して、前職にて発行依頼をいたしましたが、再発行はできないとのご連絡を頂戴したので、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+'・源泉徴収票に関して\n\n上記に関して、前職にて発行依頼をいたしましたが再発行はできないとのご連絡を頂戴したので\nこの度の申請は、省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
   riyu_kessansho: { body:
-'・参考様式1-11（決算書記載箇所）に関して\n\n上記の指摘事項に関して、企業様に確認したところ、会社設立（○○○○年○月）間もないため発行をすることができないとのご連絡を頂戴したため、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+'・参考様式1-11（決算書記載箇所）\n\n上記の指摘事項に関して、企業様に確認したところ、会社設立（○○○○年○月）間もないため\n発行をすることができないとのご連絡を頂戴したため、\nこの度の申請は、省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' },
   riyu_kokkosho: { body:
-'・国交省に関して\n\n上記に関して、○○○○年○月より、国交省申請に必要な企業様書類につきましてご準備をお願いしておりましたが、ご多忙のご事情もあり、準備が難しい状況が続いておりました。\n現状、まもなく国交省申請ができる段階にありますので、書類が揃い次第速やかに申請対応させていただきます。\nまた、特例期間に差し掛かる状況であることから、可能な限り早期に特定活動更新の許可をいただけますと幸いです。\n\n何卒ご理解いただきますようお願い申し上げます。' },
+'・国交省に関して\n\n上記に関して、○○○○年○月より、国交省申請に必要な企業様書類につきましてご準備をお願いしておりましたが、ご多忙のご事情もあり、準備が難しい状況が続いておりました。\n現状、まもなく国交省申請ができる段階にありますので書類が揃い次第速やかに申請対応させていただきます。\nまた、特例期間に差し掛かる状況であることから、可能な限り早期に特定活動更新の許可をいただけますと幸いです。\n\n何卒ご理解いただきますようお願い申し上げます。' },
   riyu_kikoku: { body:
-'・課税証明書・源泉徴収に関して\n\n上記に関して、申請人は○○○○年○月から○○○○年○月まで帰国していたため、課税証明書・源泉徴収を発行することができないとのご連絡を頂戴したので、この度の申請は省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' }
+'・課税証明書・源泉徴収に関して\n\n上記に関して、申請人は○○○○年○月から○○○○年○月まで帰国していたため、\n課税証明書・源泉徴収を発行することができないとのご連絡を頂戴したので\nこの度の申請は、省略させていただきたく存じます。\n\n何卒ご理解いただきますようお願い申し上げます。' }
 };
 function isFormMode(){ return v('f_tpl')==='ryoken'; }
 function _syncPanels(){
@@ -247,7 +255,7 @@ ${date?`<div class="p" style="text-align:right;margin-bottom:4mm;">${esc(date)}<
 <div class="p">申請番号：</div>
 <div class="p" style="margin-bottom:6mm;">${_ml('f_receiptNo','es.receiptNo')}</div>
 ${showApplicant?`<div class="p" style="margin-bottom:6mm;">氏名：${f('f_applicant')}</div>`:''}
-${showCompany?`<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>`:''}
+${showCompany?`<div class="p" style="margin-bottom:10mm;">特定技能所属機関：　${f('f_company')}</div>`:''}
 <div class="p" style="margin-bottom:16mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
 <div class="p sig">大房行政書士法人</div>
 <div class="p sig">申請取次行政書士　${f('f_gyosei')}</div>
