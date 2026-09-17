@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 書類送付状</div>
-    <div class="ver">ver.20260916.02</div>
+    <div class="ver">ver.20260917.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -118,7 +118,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1789355507"></script>
+<script src="ofusa_common.js?v=1789607432"></script>
 <script>
 var SENDER_ADDR='〒144-0052　東京都大田区蒲田5丁目11-10 FUNDES蒲田8階';
 var SENDER_TEL='TEL：03-6424-8849';
@@ -229,10 +229,21 @@ async function loadFromDB(passedInfo){
       companyId?sb('companies?select=name&id=eq.'+companyId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0];
-    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
     if(cas){
       window._lastApplicant=(cas.applicant||'').trim();
       window._lastCompanyName=((co&&co.name)||cas.company||companyName||'').trim();
+    }
+    const d=document.getElementById('f_date'); if(d&&!d.value) d.value=warekiToday();
+    // ver.20260917.01: 二重入力の解消。宛名・氏名は「まとめて選択」に集約し、
+    //   案件選択時に同一案件名を全選択→一括反映する（手動の再入力不要）。
+    if(cas && typeof msSearch==='function'){
+      const keyEl=document.getElementById('ms_key');
+      if(keyEl){ keyEl.value=caseId; }
+      await msSearch();
+      if(typeof msAll==='function') msAll(true);
+      if(typeof msApply==='function') msApply();
+    } else if(cas){
+      const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
       const kojin=(v('f_tpl')&&TPL[v('f_tpl')]&&TPL[v('f_tpl')].kojin);
       if(kojin){ s('f_recipient', window._lastApplicant); }
       else{
@@ -240,7 +251,6 @@ async function loadFromDB(passedInfo){
         if(window._lastApplicant) s('f_names','－'+window._lastApplicant+'様');
       }
     }
-    const d=document.getElementById('f_date'); if(d&&!d.value) d.value=warekiToday();
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }

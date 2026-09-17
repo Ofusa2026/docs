@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20260916.02</div>
+    <div class="ver">ver.20260917.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -115,7 +115,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1789355507"></script>
+<script src="ofusa_common.js?v=1789607432"></script>
 <script>
 // 受付番号の先頭文字 → 提出先（フル名称・支局対応）
 var BUREAU_FULL={
@@ -208,20 +208,28 @@ async function loadFromDB(passedInfo){
       companyId?sb('companies?select=name&id=eq.'+companyId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0];
-    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
-    const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    if(cas){
-      // 申請番号：受付番号（無ければ入管の受付番号 case_no）
-      sf('f_receiptNo', (cas.receipt_no||cas.case_no||'').trim());
-      s('f_applicant', cas.applicant||'');
-      s('f_company', (co&&co.name)||cas.company||companyName||'');
-      // 提出先：受付番号の先頭文字から自動（例 東オン→東京出入国在留管理局）。手入力があれば尊重
-      const b=bureauFullFromReceipt(cas.receipt_no||cas.case_no||'');
-      if(b) sf('f_bureau', b);
-    }
     // 初回は標準テンプレ（追加資料・添付漏れ）を本文にセット
     const body=document.getElementById('f_body');
     if(body && body.value.trim()===''){ body.value=TPL.tsuika_std.body; }
+    // ver.20260917.01: 二重入力の解消。申請番号などは「まとめて選択」に集約し、
+    //   案件を選んだ時点で関連案件を検索→同一案件名で全選択→一括反映する（手動の再入力不要）。
+    //   起点1件だけの先行セットは行わない（msApplyが f_receiptNo 等をまとめて入れる）。
+    if(cas && typeof msSearch==='function'){
+      const keyEl=document.getElementById('ms_key');
+      if(keyEl){ keyEl.value=caseId; }
+      await msSearch();            // _msRows を同一案件名スコープで取得・起点を選択
+      // 同一案件名の関連案件を全選択（＝左で選んだ案件のまとまりをそのまま反映）
+      if(typeof msAll==='function') msAll(true);
+      if(typeof msApply==='function') msApply();  // 選択分を書類へ一括反映
+    } else if(cas){
+      // フォールバック（まとめ選択UIが無い場合のみ）
+      const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+      sf('f_receiptNo', (cas.receipt_no||cas.case_no||'').trim());
+      sf('f_applicant', cas.applicant||'');
+      sf('f_company', (co&&co.name)||cas.company||companyName||'');
+      const b=bureauFullFromReceipt(cas.receipt_no||cas.case_no||'');
+      if(b) sf('f_bureau', b);
+    }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
