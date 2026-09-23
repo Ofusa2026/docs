@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20260731.03</div>
+    <div class="ver">ver.20260923.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -67,6 +67,19 @@
       <div class="fg"><label>規程に基づく報酬（円）</label><input id="f_salaryRule" oninput="p()"></div>
       <div class="fg"><label>同等以上と考える理由</label><textarea id="f_jpReason" oninput="p()"></textarea></div>
       <div class="fg"><label>⑥その他（諸手当等）</label><textarea id="f_other2" oninput="p()"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">比較日本人（いない場合）</div>
+      <div class="fg"><label>①職務内容や責任の程度（申請人との差異も）</label><textarea id="f_nJobDesc" oninput="p()"></textarea></div>
+      <div class="fg"><label>年齢</label><input id="f_nAge" oninput="p()"></div>
+      <div class="fg"><label>性別</label><input id="f_nGender" oninput="p()"></div>
+      <div class="fg"><label>経験年数</label><input id="f_nExp" oninput="p()"></div>
+      <div class="fg"><label>③月給（円）</label><input id="f_nSalaryM" oninput="p()"></div>
+      <div class="fg"><label>③時間給（円）</label><input id="f_nSalaryH" oninput="p()"></div>
+      <div class="fg"><label>④規程の有無（有／無）</label><input id="f_nWageReg" oninput="p()"></div>
+      <div class="fg"><label>④規程に基づく月給（円）</label><input id="f_nSalaryRuleM" oninput="p()"></div>
+      <div class="fg"><label>④規程に基づく時間給（円）</label><input id="f_nSalaryRuleH" oninput="p()"></div>
+      <div class="fg"><label>⑤同等以上と考える理由</label><textarea id="f_nReason" oninput="p()"></textarea></div>
+      <div class="fg"><label>⑥その他（諸手当等）</label><textarea id="f_nOther" oninput="p()"></textarea></div>
     </div>
   </div>
 </div>
@@ -135,13 +148,13 @@ function p(){
 </div>
 <div style="font-size:12pt;font-weight:bold;margin-bottom:2mm;">３　比較対象となる日本人労働者がいない場合</div>
 <table class="tbl2" style="margin-bottom:3mm;">
-  <tr><td style="width:38%;">①最も近い職務を担う日本人労働者の職務内容や責任の程度</td><td colspan="2"></td></tr>
-  <tr><td>②最も近い職務を担う日本人労働者の年齢、性別及び経験年数</td><td colspan="2">（　　　歳）（　男　・　女　）（経験　　　年）</td></tr>
-  <tr><td>③最も近い職務を担う日本人労働者の報酬</td><td colspan="2">月給　　　　　　円　／　時間給　　　　　　円</td></tr>
-  <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>有　・　無</td></tr>
-  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>月給　　　　円　／　時間給　　　　円</td></tr>
-  <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2"></td></tr>
-  <tr><td>⑥その他</td><td colspan="2"></td></tr>
+  <tr><td style="width:38%;">①最も近い職務を担う日本人労働者の職務内容や責任の程度</td><td colspan="2">${v('f_nJobDesc')?f('f_nJobDesc'):''}</td></tr>
+  <tr><td>②最も近い職務を担う日本人労働者の年齢、性別及び経験年数</td><td colspan="2">${(v('f_nAge')||v('f_nGender')||v('f_nExp'))?`（${f('f_nAge')}歳）（${f('f_nGender')}）（経験　${f('f_nExp')}　年）`:'（　　　歳）（　男　・　女　）（経験　　　年）'}</td></tr>
+  <tr><td>③最も近い職務を担う日本人労働者の報酬</td><td colspan="2">${(v('f_nSalaryM')||v('f_nSalaryH'))?`月給　${ff('f_nSalaryM')}　円　／　時間給　${ff('f_nSalaryH')}　円`:'月給　　　　　　円　／　時間給　　　　　　円'}</td></tr>
+  <tr><td rowspan="2">④賃金規程の有無及び賃金規程に基づく賃金</td><td style="width:15%;">規程の有無</td><td>${v('f_nWageReg')?f('f_nWageReg'):'有　・　無'}</td></tr>
+  <tr><td>有の場合</td><td>賃金規程に基づき、申請人と役職、職務内容、責任の程度が同等の日本人労働者に支払われるべき報酬<br>${(v('f_nSalaryRuleM')||v('f_nSalaryRuleH'))?`月給　${ff('f_nSalaryRuleM')}　円　／　時間給　${ff('f_nSalaryRuleH')}　円`:'月給　　　　円　／　時間給　　　　円'}</td></tr>
+  <tr><td>⑤申請人に対する報酬が日本人が従事する場合の報酬の額と同等以上であると考える理由</td><td colspan="2">${v('f_nReason')?f('f_nReason'):''}</td></tr>
+  <tr><td>⑥その他</td><td colspan="2">${v('f_nOther')?f('f_nOther'):''}</td></tr>
 </table>
 <div style="font-size:9pt;margin-bottom:3mm;">
 （注意）<br>
