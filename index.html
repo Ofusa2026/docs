@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20260917.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20260925.01</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -547,7 +547,7 @@ let currentLang = 'id';
 const DOC_LANG_SUPPORT = {
   '1_3':  ['id','vi','th','km','my','en'],     // PDF方式
   '1_5':  ['id','vi','th','ne','my','km','en','ko','zh'],
-  '1_6':  ['id','vi','th','ne','my','km','en','ko'],
+  '1_6':  ['id','vi','th','ne','my','km','en','ko','zh'],
   '1_16': ['id','vi','th','ne','my','km','en','ko','zh'],
   'juuyou':['id','vi','km','my','ko','ne'],
 };
@@ -667,6 +667,7 @@ const LANG_FILES={
   'km':'1_6_km.html?v=1790238712',
   'en':'1_6_en.html?v=1790238712',
   'ko':'1_6_ko.html?v=1790238712',
+  'zh':'1_6_zh.html?v=1789607432',
   'id':'1_6.html?v=1790238712',
   'vi':'1_6_vi.html?v=1790238712',
   'th':'1_6_th.html?v=1790238712',
@@ -675,6 +676,7 @@ const LANG_FILES={
   'km':'1_6_km.html?v=1790238712',
   'en':'1_6_en.html?v=1790238712',
   'ko':'1_6_ko.html?v=1790238712',
+  'zh':'1_6_zh.html?v=1789607432',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
