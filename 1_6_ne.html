@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20260928.01</div>
+    <div class="ver">ver.20260929.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -584,7 +584,7 @@ function p(){
       return'';
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}円／計算方法：${ph(calc,'Calc')}）</div>`;
-    annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（${ph(nEn,'NameEn')} भत्ता , ${ph(amt,'Amount',true)} येन / गणना विधि: ${ph(calc,'Calc')}）</div>`;
+    annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr})（${ph(nEn,'NameEn')} भत्ता , ${ph(amt,'Amount',true)} येन / गणना विधि: ${ph(calcEn,'CalcEn')}）</div>`;
   });
 
   w.innerHTML=`
