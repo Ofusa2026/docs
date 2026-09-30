@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260821.07</div>
+    <div class="ver">ver.20260930.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -204,16 +204,16 @@ async function loadFromDB(passedInfo){
       }catch(_e){}
     }
     if(_soNo) s('f_soNo',_soNo);
-    // 書類作成日(f_docDate): 案件のdoc_create_dateを西暦で。無ければcontract_start→今日(西暦)
-    let _dd=(cas&&cas.doc_create_date)?fmtJDate(cas.doc_create_date):'';
-    if(!_dd && cas && cas.contract_start) _dd=fmtJDate(cas.contract_start);
-    if(!_dd){const n=new Date();_dd=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
-    document.getElementById('f_docDate').value=_dd;
-    // 契約年月日(f_contractStart): 案件のcontract_startを西暦で。無ければdoc_create_date→今日(西暦)
-    let _cs=(cas&&cas.contract_start)?fmtJDate(cas.contract_start):'';
-    if(!_cs && cas && cas.doc_create_date) _cs=fmtJDate(cas.doc_create_date);
-    if(!_cs){const n=new Date();_cs=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
-    { const _e=document.getElementById('f_contractStart'); if(_e)_e.value=_cs; }
+    // ver.20260930.01: 作成日(f_docDate)・契約年月日/契約期間開始日(f_contractStart)は
+    //   雇用条件書(1-6号)の作成日に合わせる。1-6号と同じ優先順:
+    //   cases.doc_create_date → 雇用条件セット(emp_sets)のcreateY/M/D → 今日
+    const _kIdx=parseInt((cas&&cas.emp_set_idx)||0)||0;
+    const _kEs=(co&&co.emp_sets&&co.emp_sets[_kIdx])||{};
+    let _koyoDate=(cas&&cas.doc_create_date)?fmtJDate(cas.doc_create_date):'';
+    if(!_koyoDate&&_kEs.createY&&_kEs.createM&&_kEs.createD) _koyoDate=`${_kEs.createY}年${parseInt(_kEs.createM)}月${parseInt(_kEs.createD)}日`;
+    if(!_koyoDate){const n=new Date();_koyoDate=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
+    document.getElementById('f_docDate').value=_koyoDate;
+    { const _e=document.getElementById('f_contractStart'); if(_e)_e.value=_koyoDate; }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
