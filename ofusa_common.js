@@ -759,12 +759,30 @@ function insEnrolled(dbKey){
   }catch(_e){ return true; }
 }
 // 定期健診の頻度フレーズ（日本語）。healthCheckFreqが年2回/半年系のときだけ「半年ごと」。既定は「1年ごと」。
-function healthFreqJP(){
+function healthFreqIsHalf(){
   try{
     var s=window._empLoadedSet||{}; var v=String(s.healthCheckFreq||'').trim();
-    if(/年\s*2\s*回|半年|2\s*回|半期|setengah|twice/i.test(v)) return 'その後半年ごとに実施';
-    return 'その後１年ごとに実施';
-  }catch(_e){ return 'その後１年ごとに実施'; }
+    return /年\s*2\s*回|半年|2\s*回|半期|setengah|twice/i.test(v);
+  }catch(_e){ return false; }
+}
+function healthFreqJP(){
+  return healthFreqIsHalf() ? 'その後半年ごとに実施' : 'その後１年ごとに実施';
+}
+// ver.20260930.01: 定期健診の頻度フレーズ（各言語の訳）。日本語（healthFreqJP）と同じ判定で「1年ごと／半年ごと」を切り替える
+var _HEALTH_FREQ_TR={
+  id:['setelah itu dilakukan setiap 1 tahun','setelah itu dilakukan setiap 6 bulan'],
+  en:['every 1 year afterwards','every 6 months afterwards'],
+  vi:['sau đó thực hiện mỗi năm 1 lần','sau đó thực hiện 6 tháng 1 lần'],
+  zh:['然后每1年实施','然后每半年实施'],
+  ko:['그 후 1년마다 실시','그 후 반년마다 실시'],
+  th:['ดำเนินการทุกปีหลังจากนั้น','ดำเนินการทุก 6 เดือนหลังจากนั้น'],
+  my:['နောက်ပိုင်း ၁ နှစ်အလိုက်ဆေးစစ်ခြင်း','နောက်ပိုင်း ၆ လအလိုက်ဆေးစစ်ခြင်း'],
+  ne:['त्यसपछि प्रत्येक १ वर्षमा','त्यसपछि प्रत्येक ६ महिनामा'],
+  km:['បន្ទាប់មកអនុវត្តម្តងក្នុងមួយឆ្នាំ','បន្ទាប់មកអនុវត្តរៀងរាល់ ៦ ខែម្តង']
+};
+function healthFreqTR(lang){
+  var t=_HEALTH_FREQ_TR[lang]||_HEALTH_FREQ_TR.en;
+  return healthFreqIsHalf() ? t[1] : t[0];
 }
 // ⑤: 現在ログイン中のユーザー識別子（メール等）を認証トークンから取得（保存ログ用）
 function _currentUserId(){
