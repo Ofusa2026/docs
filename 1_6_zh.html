@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20260916.04</div>
+    <div class="ver">ver.20260930.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -457,7 +457,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1790665302"></script>
+<script src="ofusa_common.js?v=1790737266"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1327,19 +1327,19 @@ function collectFormValues(){
 // 「akhir」等を入れるとベトナム語版にもインドネシア語が出てしまっていた。
 // 日本語の値(毎月末日/翌月5日 等)から各言語で組み立て、フィールドの中身に依存しないようにする。
 // 解析できない値・説明文つきの値だけ、従来どおり訳欄をそのまま出す。
-var _PAY_L={"everyD": "每月{d}日", "everyEnd": "每月最后一日", "nextD": "次月{d}日", "nextEnd": "次月最后一日", "curD": "当月{d}日", "curEnd": "当月最后一日"};
+var _PAY_L={"everyD": "每月{d}日", "everyEnd": "每月最后一日", "nextD": "次月{d}日", "nextEnd": "次月最后一日", "nextNextD": "隔月{d}日", "nextNextEnd": "隔月最后一日", "curD": "当月{d}日", "curEnd": "当月最后一日"};
 function fPayL(jaId, enId){
   var ja=String(v(jaId)||'').trim().replace(/[\s\u3000]/g,'');
   var en=String(v(enId)||'').trim();
   if(!ja) return f(enId);
   if(ja.length>12) return en?('<span class="f" data-bind="'+enId+'">'+esc(en)+'</span>'):f(enId);
-  var m=ja.match(/^(毎月|翌月|当月|翌)/);
-  var pre=m?(m[1]==='翌'?'翌月':m[1]):'毎月';
+  var m=ja.match(/^(毎月|翌々月|翌月|当月|翌々|翌)/);
+  var pre=m?(m[1]==='翌'?'翌月':(m[1]==='翌々'?'翌々月':m[1])):'毎月';
   var body=m?ja.slice(m[1].length):ja;
   if(body==='月末') body='末';
   var t='';
-  if(/^(末|末日)$/.test(body)) t=(pre==='翌月')?_PAY_L.nextEnd:(pre==='当月'?_PAY_L.curEnd:_PAY_L.everyEnd);
-  else { var mm=body.match(/^(\d+)日?$/); if(mm) t=((pre==='翌月')?_PAY_L.nextD:(pre==='当月'?_PAY_L.curD:_PAY_L.everyD)).replace('{d}',mm[1]); }
+  if(/^(末|末日)$/.test(body)) t=(pre==='翌々月')?_PAY_L.nextNextEnd:(pre==='翌月')?_PAY_L.nextEnd:(pre==='当月'?_PAY_L.curEnd:_PAY_L.everyEnd);
+  else { var mm=body.match(/^(\d+)日?$/); if(mm) t=((pre==='翌々月')?_PAY_L.nextNextD:(pre==='翌月')?_PAY_L.nextD:(pre==='当月'?_PAY_L.curD:_PAY_L.everyD)).replace('{d}',mm[1]); }
   if(!t) return en?('<span class="f" data-bind="'+enId+'">'+esc(en)+'</span>'):f(enId);
   return '<span class="f" data-bind="'+enId+'">'+esc(t)+'</span>';
 }

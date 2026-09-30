@@ -637,8 +637,8 @@ function payPhrase(raw, defPrefix){
   var s=String(raw||'').trim().replace(/[\s\u3000]/g,'');
   if(!s) return '';
   if(s.length>12) return s;                        // 「翌月25日（金融機関休業日の…）」等はそのまま
-  var m=s.match(/^(毎月|翌月|当月|翌)/);
-  var prefix = m ? (m[1]==='翌'?'翌月':m[1]) : (defPrefix||'毎月');
+  var m=s.match(/^(毎月|翌々月|翌月|当月|翌々|翌)/);
+  var prefix = m ? (m[1]==='翌'?'翌月':(m[1]==='翌々'?'翌々月':m[1])) : (defPrefix||'毎月');
   var body   = m ? s.slice(m[1].length) : s;
   if(body==='月末') body='末';
   if(!body) return prefix;                         // 値が「毎月」だけ
