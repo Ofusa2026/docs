@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３０号　休業期間に関する申立書</div>
-    <div class="ver">ver.20260714.03</div>
+    <div class="ver">ver.20261001.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -39,6 +39,7 @@
     <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
     <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
     <select id="caseSelect" onchange="loadFromDB()"></select>
+    <input id="f_cbstate" type="hidden" value="">
   </div>
   <div class="fp-inner">
     <div class="fs"><div class="fs-title">基本情報</div>
@@ -80,8 +81,13 @@
 <script src="ofusa_common.js?v=1790760733"></script>
 <script>
 function ck(on){return on?'■':'□';}
+// ver.20261001.01: 4.疎明資料のチェック欄をクリック切替式に。状態はf_cbstate(hidden)経由でDB保存に載る
+function _syncCbHidden(){var e=document.getElementById('f_cbstate');if(e){try{e.value=JSON.stringify(window.cbState||{});}catch(_){}}}
+function _restoreCbHidden(){var e=document.getElementById('f_cbstate');if(!e||!e.value)return;try{var o=JSON.parse(e.value);if(o&&typeof o==='object'){window.cbState=Object.assign(window.cbState||{},o);}}catch(_){}}
+(function(){var _t=window.toggleCb;window.toggleCb=function(id){_t(id);_syncCbHidden();};})();
 function p(){
   if(_editMode) return;
+  _restoreCbHidden(); // DB呼出でf_cbstateが復元された後の描画にも反映
   const w=document.getElementById('pageArea'); if(!w) return;
   const r=v('f_reason');
   const sanzen=r==='産前産後休業', ikuji=r==='育児休業', byoki=r==='病気・怪我';
@@ -108,18 +114,18 @@ function p(){
 <div style="margin-left:2em;margin-bottom:9px;">電話番号：${f('f_tel')}</div>
 <div style="margin-bottom:6px;">４．休業期間を疎明する資料（（１）又は（２）のいずれかの資料を合わせて添付すること）</div>
 <div style="margin-left:2em;margin-bottom:4px;">（１）産前産後休業・育児休業の場合</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　母子健康手帳の写し</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　産前産後休業・育児休業を取得したことを疎明する資料</div>
-<div style="margin-left:3em;margin-bottom:8px;">□　休業期間中のタイムカードの写し又は出勤簿の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_s1')}　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_s2')}　母子健康手帳の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_s3')}　産前産後休業・育児休業を取得したことを疎明する資料</div>
+<div style="margin-left:3em;margin-bottom:8px;">${cb(false,'somei_s4')}　休業期間中のタイムカードの写し又は出勤簿の写し</div>
 <div style="margin-left:2em;margin-bottom:4px;">（２）病気・怪我による休業の場合</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　医師の診断書、病院から発行された治療・入院等の事実を証明する資料（治療期間や入院期間が記載されているもの）</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　労災保険の支給決定通知書の写し（労災の場合に限る）</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中のタイムカードの写し又は出勤簿の写し</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中の給与明細書の写し</div>
-<div style="margin-left:3em;margin-bottom:3px;">□　休業期間中の給与が振り込まれている口座の通帳（直近の預貯金額を記帳しているもの）の写し</div>
-<div style="margin-left:3em;margin-bottom:9px;">□　休業期間中の給与振込口座指定・同意書の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b1')}　在留資格「特定技能１号」の在留諸申請に係る提出書類</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b2')}　医師の診断書、病院から発行された治療・入院等の事実を証明する資料（治療期間や入院期間が記載されているもの）</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b3')}　労災保険の支給決定通知書の写し（労災の場合に限る）</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b4')}　休業期間中のタイムカードの写し又は出勤簿の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b5')}　休業期間中の給与明細書の写し</div>
+<div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b6')}　休業期間中の給与が振り込まれている口座の通帳（直近の預貯金額を記帳しているもの）の写し</div>
+<div style="margin-left:3em;margin-bottom:9px;">${cb(false,'somei_b7')}　休業期間中の給与振込口座指定・同意書の写し</div>
 <div style="text-align:right;margin-bottom:4px;">${f('f_docDate')}</div>
 <div style="text-align:right;">申請人の署名　　　${f('f_applicant')}</div>`;
   _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
@@ -164,7 +170,7 @@ async function loadFromDB(passedInfo){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
-initCaseSelect(); p();
+initCaseSelect(); _restoreCbHidden(); p();
 
 function fitDocToPreview(){
   requestAnimationFrame(()=>{
