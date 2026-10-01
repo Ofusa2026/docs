@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３０号　休業期間に関する申立書</div>
-    <div class="ver">ver.20261001.02</div>
+    <div class="ver">ver.20261001.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -127,7 +127,8 @@ function p(){
 <div style="margin-left:3em;margin-bottom:3px;">${cb(false,'somei_b6')}　休業期間中の給与が振り込まれている口座の通帳（直近の預貯金額を記帳しているもの）の写し</div>
 <div style="margin-left:3em;margin-bottom:9px;">${cb(false,'somei_b7')}　休業期間中の給与振込口座指定・同意書の写し</div>
 <div style="text-align:right;margin-bottom:4px;">${f('f_docDate')}</div>
-<div style="text-align:right;">申請人の署名　　　<span style="display:inline-block;min-width:18em;border-bottom:1px solid #333;text-align:center;">&nbsp;</span></div>`;
+<div style="text-align:right;font-size:2em;margin-top:10px;margin-bottom:2px;">申請人の署名</div>
+<div style="text-align:right;"><span style="display:inline-block;min-width:36em;max-width:100%;border-bottom:1px solid #333;height:2.4em;">&nbsp;</span></div>`;
   _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
   _applyFontSize();
   _apply1_30FontSize();
