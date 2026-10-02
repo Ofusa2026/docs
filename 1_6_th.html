@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20260930.02</div>
+    <div class="ver">ver.20261002.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -457,7 +457,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1790760733"></script>
+<script src="ofusa_common.js?v=1790937876"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -542,7 +542,7 @@ function p(){
   const _kj=x=>rPos&&(_rcSet?_rcHas(x):true);
   const _wrNum=(pfx,i,se)=>{var v=(window._empLoadedSet&&window._empLoadedSet['workRule'+pfx+i+se])||'';return String(v).replace(/[^0-9]/g,'');};
   const _wrBlank='第&emsp;条〜第&emsp;条';
-  const _wr=pfx=>{var o=[];for(var i=1;i<=3;i++){var a=_wrNum(pfx,i,'From'),b=_wrNum(pfx,i,'To');if(a||b)o.push('第'+a+'条〜第'+b+'条');}return o.length?'<span class="f">'+o.join('，')+'</span>':(_wrBlank+'，'+_wrBlank+'，'+_wrBlank);};
+  const _wr=pfx=>{var o=[];for(var i=1;i<=3;i++){var a=_wrNum(pfx,i,'From'),b=_wrNum(pfx,i,'To');if(a||b)o.push((a&&b&&a!==b)?('第'+a+'条〜第'+b+'条'):('第'+(a||b)+'条'));}return o.length?'<span class="f">'+o.join('，')+'</span>':(_wrBlank+'，'+_wrBlank+'，'+_wrBlank);};
 
   // 手当（本文用）: フォームIDは es_a1Name, es_a1NameEn
   // 変形労働時間制: flexFlg(適用あり/なし)で判定、flexType(種類)を表示
@@ -782,7 +782,7 @@ function p(){
         </tr>
         <tr>
           <td colspan="2" style="text-align:right;font-size:7.5pt;padding-top:2px;">○詳細は，就業規則　${_wr('WorkHours')}<br>
-          <span class="id" style="font-size:7pt;">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่</span></td>
+          <span class="id" style="font-size:7pt;">${_wrHas('WorkHours')?_wrTR('WorkHours','th'):`○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่`}</span></td>
         </tr>
       </table>
     </div>
@@ -794,7 +794,7 @@ function p(){
     <div style="font-size:8.5pt;margin-left:8px;">
       <div>１．定例日：${v('es_fixedDay1')?f('es_fixedDay1'):''}${v('es_holidayOther')?'&emsp;その他（'+f('es_holidayOther')+'）':''}&emsp;年間合計休日日数（${f('es_annualHolidays')}日）<br><span class="id" style="font-size:7.5pt;">1. วันหยุดประจำ : ${v('es_fixedDay1En')?'ทุกวัน '+f('es_fixedDay1En')+' ของสัปดาห์, ':''}วันหยุดนักขัตฤกษ์ของประเทศญี่ปุ่น${(v('es_holidayOtherEn')||v('es_holidayOther'))?', อื่นๆ （'+fOr('es_holidayOtherEn','es_holidayOther')+'）':''} (จำนวนวันหยุดรวมต่อปี ${f('es_annualHolidays')} วัน)</span></div>
       <div style="margin-top:3px;">２．非定例日：${isWeeklyHolidayOK('es_nonRegWeeklyDays')?'週当たり&emsp;'+f('es_nonRegWeeklyDays')+'&emsp;日&emsp;':''}${isMonthlyHolidayOK('es_nonRegMonthlyDays')?'月当たり&emsp;'+f('es_nonRegMonthlyDays')+'&emsp;日&emsp;':''}${(v('es_otherHolidays')||v('es_nonRegOther'))?'その他（'+fOr2('es_otherHolidays','es_nonRegOther')+'）':''}<br><span class="id" style="font-size:7.5pt;">2. วันหยุดพิเศษ: ${[isWeeklyHolidayOK('es_nonRegWeeklyDays')?f('es_nonRegWeeklyDays')+' วันต่อสัปดาห์':'',isMonthlyHolidayOK('es_nonRegMonthlyDays')?f('es_nonRegMonthlyDays')+' วันต่อเดือน':'',(v('es_otherHolidaysEn')||v('es_nonRegOtherEn'))?'อื่นๆ ('+fOr('es_otherHolidaysEn','es_nonRegOtherEn')+')':''].filter(function(x){return x;}).join(', ')}</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Holiday')}<br><span class="id" style="font-size:7pt;">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Holiday')}<br><span class="id" style="font-size:7pt;">${_wrHas('Holiday')?_wrTR('Holiday','th'):`○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่`}</span></div>
     </div>
   </div>
 
@@ -806,7 +806,7 @@ function p(){
       <div style="text-align:right;margin-top:2px;font-size:8.5pt;break-inside:avoid;page-break-inside:avoid;">継続勤務６か月未満の年次有給休暇（${cb(false,'leave6_yes')}&nbsp;有&emsp;${cb(true,'leave6_no')}&nbsp;無）→&emsp;か月経過で&emsp;日<br><span class="id" style="font-size:7.5pt;">วันลาพักร้อนประจำปีในกรณีที่ทำงานต่อเนื่องยังไม่ครบ 6 เดือน (${cb(false,"cb_auto_002")} มี&emsp;${cb(true,"cb_auto_003")} ไม่มี) → ทำงานครบ เดือน ได้วันหยุด วัน</span></div>
       <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">２．その他の休暇&emsp;有給（<span style="display:inline-block;min-width:6em;">${f('es_otherPaid')}</span>）&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;無給（<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeave')}</span>）<br><span class="id" style="font-size:7.5pt;">2. วันลาอื่นๆ&emsp;ลาแบบได้รับค่าจ้าง (<span style="display:inline-block;min-width:6em;">${fOr('es_otherPaidEn','es_otherPaid')}</span>)&emsp;ลาแบบไม่ได้รับค่าจ้าง (<span style="display:inline-block;min-width:6em;">${f('es_unpaidLeaveEn')||f('es_unpaidLeave')}</span>)</span></div>
       <div style="margin-top:4px;break-inside:avoid;page-break-inside:avoid;">３．一時帰国休暇&emsp;乙が一時帰国を希望した場合は，上記１及び２の範囲内で必要な休暇を取得させることとする。<br><span class="id" style="font-size:7.5pt;">3. วันลากลับประเทศชั่วคราว ในกรณีที่ผู้รับจ้างต้องการกลับประเทศชั่วคราว ให้ลาหยุดเท่าที่จำเป็นภายในจำนวนวันลาในข้อ 1 หรือ 2 ด้านบน</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Leave')}<br><span class="id" style="font-size:7pt;">○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Leave')}<br><span class="id" style="font-size:7pt;">${_wrHas('Leave')?_wrTR('Leave','th'):`○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่ ( )ข้อที่ ถึงข้อที่`}</span></div>
     </div>
   </div>
 
@@ -947,7 +947,7 @@ function p(){
       <div>１．自己都合退職の手続&emsp;（退職する&nbsp;${f('es_resignNoticeDays')}&nbsp;日前に社長・工場長等に届けること）<br><span class="id" style="font-size:7.5pt;">1. ขั้นตอนสำหรับการลาออกด้วยเหตุผลส่วนตัว (แจ้งต่อประธานบริษัท ผู้จัดการโรงงาน ฯลฯ&emsp;${f('es_resignNoticeDays')}&emsp;วันก่อนลาออก)</span></div>
       <div style="margin-top:4px;">２．解雇の事由及び手続<br><span class="id" style="font-size:7.5pt;">2.  เหตุผลและขั้นตอนการเลิกจ้าง</span></div>
       <div style="margin-left:8px;">解雇は，やむを得ない事由がある場合に限り少なくとも30日前に予告をするか，又は30日分以上の平均賃金を支払って解雇する。特定技能外国人の責めに帰すべき事由に基づいて解雇する場合には，所轄労働基準監督署長の認定を受けることにより予告も平均賃金の支払も行わず即時解雇されることもあり得る。${v('es_severanceCondition')?'<br>'+f('es_severanceCondition'):''}<br><span class="id" style="font-size:7pt;margin-left:8px;">ในการเลิกจ้าง เฉพาะในกรณีที่มีเหตุอันหลีกเลี่ยงไม่ได้ อย่างน้อยที่สุดต้องแจ้งล่วงหน้า 30 วัน หรือเลิกจ้างโดยจ่ายค่าจ้างเฉลี่ยของระยะเวลาตั้งแต่ 30 วันขึ้นไป ในกรณีของการเลิกจ้างด้วยเหตุอันเนื่องมาจากความบกพร่องของแรงงานเฉพาะทางชาวต่างชาติ เมื่อได้รับการอนุมัติจากผู้อำนวยการกองกำกับดูแลมาตรฐานแรงงานที่มีอำนาจสั่งการ สามารถเลิกจ้างได้ทันทีโดยไม่ต้องมีการแจ้งล่วงหน้า และไม่จำเป็นต้องจ่ายค่าจ้างเฉลี่ย${v('es_severanceConditionEn')?'<br>'+f('es_severanceConditionEn'):''}</span></div>
-      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Retire')}<br><span class="id" style="font-size:7pt;">○รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่(  )ข้อที่  ถึงข้อที่</span></div>
+      <div style="font-size:7.5pt;">○詳細は，就業規則　${_wr('Retire')}<br><span class="id" style="font-size:7pt;">${_wrHas('Retire')?_wrTR('Retire','th'):`○รายละเอียดอยู่ในข้อบังคับการปฏิบัติงานข้อที่ ( ～ ),ถึงข้อที่ ( ～ ),ถึงข้อที่(  )ข้อที่  ถึงข้อที่`}</span></div>
     </div>
   </div>
 </div>

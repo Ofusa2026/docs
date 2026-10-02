@@ -759,6 +759,37 @@ function insEnrolled(dbKey){
   }catch(_e){ return true; }
 }
 // 定期健診の頻度フレーズ（日本語）。healthCheckFreqが年2回/半年系のときだけ「半年ごと」。既定は「1年ごと」。
+// ver.20261002.01: 就業規則の条番号（案シス workRule<区分><1-3><From/To>）を各言語の訳にも入れる
+function _wrPairs(pfx){
+  var s=window._empLoadedSet||{}, out=[];
+  for(var i=1;i<=3;i++){
+    var a=String(s['workRule'+pfx+i+'From']||'').replace(/[^0-9]/g,'');
+    var b=String(s['workRule'+pfx+i+'To']||'').replace(/[^0-9]/g,'');
+    if(a||b) out.push([a,b]);
+  }
+  return out;
+}
+function _wrHas(pfx){ return _wrPairs(pfx).length>0; }
+var _WR_TR={
+  id:{pre:'◦Detail ditetapkan dalam Peraturan Kerja ', post:'', sep:', ', one:function(n){return 'pasal '+n;}, rng:function(a,b){return 'pasal '+a+' sampai pasal '+b;}},
+  en:{pre:'○ Details are stipulated in ', post:' of the Work Rules', sep:', ', one:function(n){return 'Article '+n;}, rng:function(a,b){return 'Articles '+a+' to '+b;}},
+  vi:{pre:'◦Chi tiết xem trong Nội quy lao động ', post:'', sep:', ', one:function(n){return 'Điều '+n;}, rng:function(a,b){return 'Điều '+a+' đến Điều '+b;}},
+  zh:{pre:'◦详细内容参见就业规则 ', post:'', sep:'、', one:function(n){return '第'+n+'条';}, rng:function(a,b){return '第'+a+'条至第'+b+'条';}},
+  ko:{pre:'○ 자세한 내용은 취업 규칙 ', post:'', sep:', ', one:function(n){return '제'+n+'조';}, rng:function(a,b){return '제'+a+'조~제'+b+'조';}},
+  th:{pre:'○ รายละเอียดอยู่ในข้อบังคับการปฏิบัติงาน ', post:'', sep:', ', one:function(n){return 'ข้อที่ '+n;}, rng:function(a,b){return 'ข้อที่ '+a+' ถึงข้อที่ '+b;}},
+  my:{pre:'○အသေးစိတ်မှာ အလုပ်ခန့်စည်းမျဉ်း ', post:' တွင်ဖော်ပြသည်', sep:' ၊ ', one:function(n){return 'အချက် '+n;}, rng:function(a,b){return 'အချက် '+a+' မှ အချက် '+b;}},
+  ne:{pre:'○विस्तृत रूपमा, कामको नियमको ', post:' मा उल्लेख छ।', sep:', ', one:function(n){return 'धारा '+n;}, rng:function(a,b){return 'धारा '+a+' देखि धारा '+b;}},
+  km:{pre:'◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ ', post:'', sep:', ', one:function(n){return 'មាត្រា '+n;}, rng:function(a,b){return 'មាត្រា '+a+' ដល់មាត្រា '+b;}}
+};
+function _wrTR(pfx, lang){
+  var t=_WR_TR[lang]||_WR_TR.en;
+  var parts=_wrPairs(pfx).map(function(p){
+    var a=p[0], b=p[1];
+    if(a&&b&&a!==b) return t.rng(a,b);
+    return t.one(a||b);
+  });
+  return '<span class="f">'+t.pre+parts.join(t.sep)+t.post+'</span>';
+}
 function healthFreqIsHalf(){
   try{
     var s=window._empLoadedSet||{}; var v=String(s.healthCheckFreq||'').trim();
