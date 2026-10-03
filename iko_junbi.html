@@ -9,12 +9,12 @@
 .underline{text-decoration:underline;}
 .indent1{padding-left:2em;}
 .indent2{padding-left:4em;}
-.doc{padding:30mm!important;line-height:1.52!important}
+.doc{padding:26mm 30mm!important;line-height:1.52!important}
 @media print{
   .app-bar{display:none!important}
   .fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:30mm!important;line-height:1.52!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:26mm 30mm!important;line-height:1.52!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20260811.03</div>
+    <div class="ver">ver.20261003.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -183,13 +183,13 @@ function p(){
   <div>７　今次の受入れ機関が，申請人を適正に受け入れることが見込まれること（特定技能雇用契約及び１号特定技能外国人支援計画の基準等を定める省令に定める一定の欠格事由に該当しないこと等（注））</div>
   <div class="indent1">
     <div>■　該当　□　非該当（内容：${ul('　　　　　　　　　　　　　　　　　　　')}）</div>
-    <div style="font-size:9pt;margin-top:4px;">（注）次のいずれにも該当すること</div>
   </div>
 </div>
 </div>
 
 <div class="doc">
 <div class="page-num-label">P3</div>
+<div class="indent1" style="font-size:9pt;margin-bottom:4px;">（注）次のいずれにも該当すること</div>
 <div class="indent1" style="margin-bottom:24px;">
   <div>・　労働，社会保険及び租税に関する法令を遵守していること（保険料や税に滞納がないことを含む。）</div>
   <div>・　前科，暴力団関係等に該当しないこと</div>
