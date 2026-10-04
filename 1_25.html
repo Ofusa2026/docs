@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20260930.01</div>
+    <div class="ver">ver.20261005.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -213,7 +213,11 @@ async function loadFromDB(passedInfo){
     if(!_koyoDate&&_kEs.createY&&_kEs.createM&&_kEs.createD) _koyoDate=`${_kEs.createY}年${parseInt(_kEs.createM)}月${parseInt(_kEs.createD)}日`;
     if(!_koyoDate){const n=new Date();_koyoDate=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
     document.getElementById('f_docDate').value=_koyoDate;
-    { const _e=document.getElementById('f_contractStart'); if(_e)_e.value=_koyoDate; }
+    // ver.20261005.01: 契約年月日・契約期間開始日は案シスの雇用契約日(cases.contract_start)を最優先。
+    //   認定案件など雇用契約日が作成日より後の場合に、作成日で上書きされる不具合の修正。
+    //   未登録の案件のみ従来どおり雇用条件書作成日にフォールバック。
+    const _csDate=(cas&&cas.contract_start)?fmtJDate(cas.contract_start):'';
+    { const _e=document.getElementById('f_contractStart'); if(_e)_e.value=(_csDate||_koyoDate); }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
