@@ -13,6 +13,9 @@
 .ts-abs .j{font-family:'ＭＳ 明朝','MS Mincho','Yu Mincho','Hiragino Mincho ProN','IPAMincho','Noto Serif CJK JP',serif;font-size:10.5pt;}
 .ts-abs .e{font-family:'Times New Roman',Times,'Liberation Serif',serif;font-size:10pt;}
 .ts-abs svg.ln{position:absolute;left:0;top:0;width:210mm;height:297mm;}
+.ts-batch-only{display:none;}
+.ts-batch .ts-batch-only{display:block;}
+.ts-batch .ts-single-only,.ts-batch .ts-db-btn{display:none!important;}
 @media print{
   .app-bar,.fp,.page-nav{display:none!important}
   .main{display:block!important}
@@ -26,12 +29,12 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 手数料納付書（別記第84号様式）</div>
-    <div class="ver">ver.20261005.02</div>
+    <div class="ver">ver.20261005.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
-    <button class="btn" onclick="saveFormGeneric('tesuryo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn ts-db-btn" onclick="saveFormGeneric('tesuryo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -47,12 +50,13 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
+    <div class="fs ts-batch-only" id="tsBatchList"></div>
     <div class="fs"><div class="fs-title">作成日（年月日の欄）</div>
       <div class="fg"><label>年</label><input id="f_docY" oninput="p()" placeholder="2026"></div>
       <div class="fg"><label>月</label><input id="f_docM" oninput="p()" placeholder="10"></div>
       <div class="fg"><label>日</label><input id="f_docD" oninput="p()" placeholder="5"></div>
     </div>
-    <div class="fs"><div class="fs-title">番号・納付者氏名（案件から自動）</div>
+    <div class="fs ts-single-only"><div class="fs-title">番号・納付者氏名（案件から自動）</div>
       <div class="fg"><label>番号（申請受付番号）</label><input id="f_no" oninput="p()"></div>
       <div class="fg"><label>納付者氏名（申請人名）</label><input id="f_applicant" oninput="p()"></div>
     </div>
@@ -79,7 +83,7 @@
 <div class="pp">
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
-    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span id="tsPageBtns"><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button></span>
   </div>
   <div id="pageArea"></div>
 </div>
@@ -108,13 +112,13 @@ function tsFit(text, base, per, maxMm){   // 長い文字は、欄に収まる�
   var w=0; String(text||'').split('').forEach(function(ch){ w+=(/[ -~]/.test(ch)?0.52:1.0); });
   var need=w*base*0.3528*per; return (need>maxMm)?Math.max(5.5, Math.floor(base*maxMm/need*10)/10):base;
 }
-function p(){
-  if(_editMode) return;
-  const w=document.getElementById('pageArea'); if(!w) return;
+// 1人ぶん（1枚）の納付書。bind=true のときは、左の入力欄とつながる（1件ずつ作るとき）
+function tsPageHtml(no, nm, bind, pn){
   const kind=String(v('f_kind')||''), amt=tsComma(v('f_amount'));
-  const no=String(v('f_no')||''), nm=String(v('f_applicant')||'');
+  no=String(no||''); nm=String(nm||'');
+  const fb=function(id,txt){ return bind?('<span class="f" data-bind="'+id+'">'+esc(txt)+'</span>'):esc(txt); };
   const J=-0.3, E=-0.5;   // 文字の上端 → 行の上端 の補正（日本語／英語）
-  let h='<div class="doc ts-abs"><div class="page-num-label">P1</div>';
+  let h='<div class="doc ts-abs"><div class="page-num-label">P'+pn+'</div>';
   // --- 枠と線 ---
   h+='<svg class="ln" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
     +'<rect x="17.9" y="45.95" width="172.7" height="210.0" fill="none" stroke="#000" stroke-width="0.32"/>'
@@ -136,7 +140,7 @@ function p(){
   h+=tsA(130.9,28.0+J,'j','番','')+tsA(139.7,28.0+J,'j','号','');
   h+=tsA(134.3,33.2+E,'e','No.');
   const noPt=tsFit(no,10.5,1.0,42.5);
-  h+=tsA(146.2,(28.0+J+(10.5-noPt)*0.18).toFixed(2),'j','<span class="f" data-bind="f_no">'+esc(no)+'</span>','font-size:'+noPt+'pt;');
+  h+=tsA(146.2,(28.0+J+(10.5-noPt)*0.18).toFixed(2),'j',fb('f_no',no),'font-size:'+noPt+'pt;');
   // --- 年月日（作成日）---
   h+=tsA(143.7,50.8+J,'j','年','font-size:9.5pt;')+tsA(161.0,50.8+J,'j','月','font-size:9.5pt;')+tsA(178.5,50.8+J,'j','日','font-size:9.5pt;');
   h+=tsA(142.1,55.6+E,'e','Year')+tsA(158.0,55.6+E,'e','Month')+tsA(177.1,55.6+E,'e','Day');
@@ -174,16 +178,52 @@ function p(){
   // --- 納付者氏名 ---
   h+=tsA(122.1,240.0+J,'j','納付者氏名');
   const nmPt=tsFit(nm,10.5,1.0,41.5);
-  h+='<span class="a j" style="left:143.1mm;width:43.1mm;top:'+(239.4+J+(10.5-nmPt)*0.2).toFixed(2)+'mm;text-align:center;font-size:'+nmPt+'pt;"><span class="f" data-bind="f_applicant">'+esc(nm)+'</span></span>';
+  h+='<span class="a j" style="left:143.1mm;width:43.1mm;top:'+(239.4+J+(10.5-nmPt)*0.2).toFixed(2)+'mm;text-align:center;font-size:'+nmPt+'pt;">'+fb('f_applicant',nm)+'</span>';
   h+=tsA(156.7,245.9+J,'j','記')+tsA(168.8,245.9+J,'j','名');
   h+='<span class="a e" style="left:143.1mm;width:43.1mm;top:'+(250.9+E)+'mm;text-align:center;">Name</span>';
   // --- 注 ---
   h+=tsA(18.0,257.2+J,'j','（注）用紙の大きさは，日本産業規格Ａ列４番とする。');
   h+=tsA(18.6,262.0+E,'e','Note: Paper size must be A-4 as specified in the Japanese Industrial Standards.');
   h+='</div>';
-  w.innerHTML=h;
+  return h;
+}
+// ver.20261005.03: まとめて作る（案シスのレターパックから ?ids=案件ID,案件ID,… で開く）。1人1枚ずつ並べて、まとめて印刷できる
+var _tsBatch=null;
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  if(_tsBatch){ w.innerHTML=_tsBatch.length?_tsBatch.map(function(o,i){ return tsPageHtml(o.no,o.name,false,i+1); }).join(''):'<div style="padding:40px;color:#fff;font-family:sans-serif;">対象の案件が見つかりませんでした。</div>'; }
+  else w.innerHTML=tsPageHtml(v('f_no'), v('f_applicant'), true, 1);
+  tsNavSync();
   setupPageTracker();
   fitDocToPreview();
+}
+function tsNavSync(){
+  const box=document.getElementById('tsPageBtns'); if(!box) return;
+  const n=_tsBatch?Math.max(1,_tsBatch.length):1;
+  if(box.dataset.n===String(n)) return; box.dataset.n=String(n);
+  let h=''; for(let i=1;i<=Math.min(n,40);i++){ h+='<button class="pn-btn pn-btn-page'+(i===1?' active':'')+'" onclick="scrollToPage('+i+')">P'+i+'</button>'; }
+  if(n>40) h+='<span style="font-size:10px;color:#aaa;font-family:sans-serif;margin-left:6px;">…全'+n+'枚</span>';
+  box.innerHTML=h;
+}
+async function tsBatchInit(ids){
+  ids=ids.slice(0,100);
+  document.body.classList.add('ts-batch');
+  try{
+    const inList=ids.map(function(id){ return '"'+String(id).replace(/["(),]/g,'')+'"'; }).join(',');
+    const rows=await sb('cases?select=id,applicant,receipt_no,case_no,status&id=in.('+encodeURIComponent(inList)+')');
+    const by={}; (rows||[]).forEach(function(r){ by[r.id]=r; });
+    _tsBatch=ids.map(function(id){ return by[id]; }).filter(Boolean).map(function(r){ return { id:r.id, name:r.applicant||'', no:r.receipt_no||r.case_no||'', status:r.status||'' }; });
+  }catch(e){ _tsBatch=[]; showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
+  if(!v('f_docY')){ const n=new Date(); document.getElementById('f_docY').value=n.getFullYear(); document.getElementById('f_docM').value=n.getMonth()+1; document.getElementById('f_docD').value=n.getDate(); }
+  const box=document.getElementById('tsBatchList');
+  if(box){
+    const miss=_tsBatch.filter(function(o){ return !o.no; }).length;
+    box.innerHTML='<div class="fs-title">まとめて作成　'+_tsBatch.length+'名'+(ids.length>_tsBatch.length?('（'+(ids.length-_tsBatch.length)+'件は見つかりません）'):'')+'</div>'
+      +(miss?('<div style="font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:5px 8px;margin-bottom:6px;">⚠ 申請受付番号がない人が '+miss+'名います（番号の欄は空欄になります）</div>'):'')
+      +_tsBatch.map(function(o,i){ return '<div onclick="scrollToPage('+(i+1)+')" style="cursor:pointer;font-size:11px;line-height:1.5;padding:3px 0;border-bottom:1px solid #eef2f7;"><b>P'+(i+1)+'</b>　'+esc(o.name)+'<br><span style="color:'+(o.no?'#64748b':'#b45309')+';">'+(o.no?esc(o.no):'受付番号なし')+'</span></div>'; }).join('');
+  }
+  p(); showToast('✅ '+_tsBatch.length+'名ぶんを作りました。「🖨️ 印刷・PDF」でまとめて印刷できます');
 }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
@@ -211,7 +251,10 @@ async function loadFromDB(passedInfo){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
-initCaseSelect(); p();
+(function(){
+  var ids=[]; try{ ids=(new URLSearchParams(location.search||'').get('ids')||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean); }catch(e){}
+  if(ids.length){ p(); tsBatchInit(ids); } else { initCaseSelect(); p(); }
+})();
 
 function fitDocToPreview(){
   requestAnimationFrame(()=>{

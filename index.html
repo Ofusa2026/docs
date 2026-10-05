@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261005.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261005.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -444,7 +444,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1791168100'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1791168100'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1791168100'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791172717'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791173295'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1791168100'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1791168100'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1791168100'},
@@ -506,7 +506,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1791168100'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1791168100'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1791168100'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791172717'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791173295'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1791168100'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1791168100'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1791168100'},
@@ -1506,6 +1506,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261005.05',
+    date: '2026-10-05',
+    notify: true,
+    items: [
+      '📄 <b>手数料納付書を、レターパックの人数ぶんまとめて作れる</b>ようになりました。案シスの郵送交付（レターパックの行）や、パートの方ご依頼の郵送交付にある「📄 手数料納付書」を押すと、1人1枚ずつ並んで開きます。「🖨️ 印刷・PDF」でまとめて印刷できます。'
+    ]
+  },
   {
     version: 'ver.20261005.04',
     date: '2026-10-05',
