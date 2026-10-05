@@ -26,7 +26,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 手数料納付書（別記第84号様式）</div>
-    <div class="ver">ver.20261005.01</div>
+    <div class="ver">ver.20261005.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -56,8 +56,8 @@
       <div class="fg"><label>番号（申請受付番号）</label><input id="f_no" oninput="p()"></div>
       <div class="fg"><label>納付者氏名（申請人名）</label><input id="f_applicant" oninput="p()"></div>
     </div>
-    <div class="fs"><div class="fs-title">丸を付ける番号</div>
-      <div class="fg"><label>許可の種類（案件の申請種別から自動）</label>
+    <div class="fs"><div class="fs-title">丸を付ける番号（ふだんは付けない）</div>
+      <div class="fg"><label>付けたいときだけ選ぶ</label>
         <select id="f_kind" onchange="p()">
           <option value="">（丸を付けない）</option>
           <option value="1">1　在留資格の変更許可</option>
@@ -88,7 +88,7 @@
 <script>
 // ===== 手数料納付書（別記第八十四号様式）=====
 //   公式のPDF（入管庁 930002849.pdf）の文字と枠の位置を測り、ミリ単位で同じ場所に置いている
-//   案件から入れるもの：番号（申請受付番号）・納付者氏名（申請人名）・丸を付ける番号（変更＝1／更新＝2）・年月日（作成日＝今日）
+//   案件から入れるもの：番号（申請受付番号）・納付者氏名（申請人名）・年月日（作成日＝今日）。丸は自動では付けない
 //   金額は空欄のまま（必要なときだけ手で入れる）
 var TS_ROWS=[
   ['１','在留資格の変更許可','Change of status of residence'],
@@ -195,14 +195,13 @@ async function loadFromDB(passedInfo){
   if(!info || !info.caseId) return;
   const {caseId}=info;
   try{
-    const cases=await sb('cases?select=applicant,receipt_no,case_no,app_type,status&id=eq.'+caseId);
+    const cases=await sb('cases?select=applicant,receipt_no,case_no,status&id=eq.'+caseId);
     const cas=cases&&cases[0];
     const set=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(cas){
       set('f_applicant',cas.applicant||'');                 // 納付者氏名＝申請人名
       set('f_no',cas.receipt_no||cas.case_no||'');          // 番号＝申請受付番号
-      const at=String(cas.app_type||'');
-      if(!v('f_kind')) set('f_kind', at.indexOf('変更')>=0?'1':(at.indexOf('更新')>=0?'2':''));
+      // ver.20261005.02: 丸は自動では付けない（付けたいときだけ、左の欄で選ぶ）
       const st=String(cas.status||'');
       if(!(cas.receipt_no||cas.case_no)) showToast('⚠️ この案件には申請受付番号が入っていません');
       else if(st && st.indexOf('郵送交付')<0) showToast('⚠️ この案件のステータスは「'+st+'」です（郵送交付ではありません）');
