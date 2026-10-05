@@ -3585,6 +3585,21 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   var LANG_JA = {id:'インドネシア語',en:'英語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',ko:'韓国語',zh:'中国語'};
   var LANG_EN = {id:'Indonesian',en:'English',vi:'Vietnamese',th:'Thai',ne:'Nepali',my:'Burmese (Myanmar)',km:'Khmer',ko:'Korean',zh:'Simplified Chinese'};
+  // ver.20261005.01: 訳語固定の用語集（AI翻訳のゆれ防止）。
+  //   日本語欄が用語と完全一致 → APIを使わずこの訳語で確定。
+  //   文中に含まれる場合 → プロンプトに対訳指示として渡す。
+  //   ※長い語を先に並べること（外食業全般 を 外食業 より先に）
+  var GLOSS = {
+    th: [
+      ['外食業全般','อุตสาหกรรมร้านอาหารทั่วไป'],
+      ['外食業','อุตสาหกรรมการบริการอาหาร'],
+      ['身体介護等','งานบริบาล'],
+      ['介護分野','การบริบาล'],
+      ['介護','การบริบาล'],
+      ['みなし残業','ค่าล่วงเวลาแบบเหมาจ่าย'],
+      ['末','วันสุดท้าย']
+    ]
+  };
   function _apiKey(){
     try{ return localStorage.getItem('ofusa_apiKey') || localStorage.getItem('claudeApiKey') || ''; }catch(e){ return ''; }
   }
@@ -3619,6 +3634,24 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       return String(p.ja.value||'').trim()!=='';
     });
     if(!pairs.length){ if(typeof showToast==='function') showToast('日本語欄が空のため翻訳できません'); return; }
+    // ver.20261005.01: 用語集と完全一致する欄はAPIを使わず確定
+    var gl = GLOSS[lang]||[];
+    if(gl.length){
+      var rest=[], hitN=0;
+      pairs.forEach(function(pr2){
+        var jv=String(pr2.ja.value||'').replace(/[\s　]/g,'');
+        var tr='';
+        for(var gi=0;gi<gl.length;gi++){ if(gl[gi][0]===jv){ tr=gl[gi][1]; break; } }
+        if(tr){ pr2.en.value=tr; hitN++; pr2.en.style.background='#fef9c3'; setTimeout(function(){ pr2.en.style.background=''; },2500); }
+        else rest.push(pr2);
+      });
+      if(hitN && typeof p==='function'){ try{ p(); }catch(e){} }
+      if(!rest.length){
+        if(typeof showToast==='function') showToast('🌐 '+(LANG_JA[lang]||lang)+'に翻訳しました（内容を確認してDB保存してください）');
+        return;
+      }
+      pairs=rest;
+    }
     var el0 = onlyKey ? document.getElementById(onlyKey) : null;
     var mini = el0 && el0.nextElementSibling && el0.nextElementSibling.classList.contains('tr-mini') ? el0.nextElementSibling : null;
     if(mini){ mini.disabled=true; mini.textContent='…'; }
@@ -3636,6 +3669,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
           + '  例: 東京都港区南青山二丁目5-17 ポーラ青山ビル3F → 3F Pola Aoyama Bldg., 2-5-17 Minami-Aoyama, Minato-ku, Tokyo\n'
           + '  丁目・番地・号は 2-5-17 のようにハイフンでまとめ、都=Tokyo、道府県=そのままローマ字、市区町村は -shi/-ku/-cho/-mura を付ける。郵便番号は入力にあるときだけ残す。\n'
           + '  出力に [ADDRESS] の文字は含めないこと。\n') : '')
+        + (gl.length ? ('・次の用語が含まれる場合は、必ずこの対訳を使うこと：\n'
+          + gl.map(function(g){ return '  「'+g[0]+'」 → '+g[1]; }).join('\n') + '\n') : '')
         + '\n' + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
       var r = await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST',
