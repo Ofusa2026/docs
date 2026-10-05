@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>手数料納付書（別記第84号様式）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+/* 公式の様式（別記第八十四号様式）の位置を、ミリ単位で写した固定レイアウト */
+.doc.ts-abs{width:210mm!important;height:297mm!important;min-height:297mm!important;padding:0!important;position:relative;overflow:hidden;line-height:1!important;background:#fff;}
+.ts-abs .a{position:absolute;white-space:nowrap;line-height:1;color:#000;}
+.ts-abs .j{font-family:'ＭＳ 明朝','MS Mincho','Yu Mincho','Hiragino Mincho ProN','IPAMincho','Noto Serif CJK JP',serif;font-size:10.5pt;}
+.ts-abs .e{font-family:'Times New Roman',Times,'Liberation Serif',serif;font-size:10pt;}
+.ts-abs svg.ln{position:absolute;left:0;top:0;width:210mm;height:297mm;}
+@media print{
+  .app-bar,.fp,.page-nav{display:none!important}
+  .main{display:block!important}
+  .doc.ts-abs{box-shadow:none!important;margin:0!important;padding:0!important;width:210mm!important;height:296.6mm!important;min-height:0!important;overflow:hidden!important;zoom:1!important;}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .page-num-label{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 手数料納付書（別記第84号様式）</div>
+    <div class="ver">ver.20261005.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('tesuryo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">作成日（年月日の欄）</div>
+      <div class="fg"><label>年</label><input id="f_docY" oninput="p()" placeholder="2026"></div>
+      <div class="fg"><label>月</label><input id="f_docM" oninput="p()" placeholder="10"></div>
+      <div class="fg"><label>日</label><input id="f_docD" oninput="p()" placeholder="5"></div>
+    </div>
+    <div class="fs"><div class="fs-title">番号・納付者氏名（案件から自動）</div>
+      <div class="fg"><label>番号（申請受付番号）</label><input id="f_no" oninput="p()"></div>
+      <div class="fg"><label>納付者氏名（申請人名）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">丸を付ける番号</div>
+      <div class="fg"><label>許可の種類（案件の申請種別から自動）</label>
+        <select id="f_kind" onchange="p()">
+          <option value="">（丸を付けない）</option>
+          <option value="1">1　在留資格の変更許可</option>
+          <option value="2">2　在留期間の更新許可</option>
+          <option value="3">3　永住許可</option>
+          <option value="4">4　再入国の許可</option>
+          <option value="5">5　特定登録者カードの交付</option>
+          <option value="6">6　特定登録者カードの再交付</option>
+          <option value="7">7　就労資格証明書の交付</option>
+          <option value="8">8　在留カードの再交付</option>
+          <option value="9">9　難民旅行証明書の交付</option>
+        </select></div>
+    </div>
+    <div class="fs"><div class="fs-title">金額（ふだんは空欄）</div>
+      <div class="fg"><label>金額（円・数字だけ。空欄のままでOK）</label><input id="f_amount" oninput="p()" placeholder="空欄"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1791171925"></script>
+<script>
+// ===== 手数料納付書（別記第八十四号様式）=====
+//   公式のPDF（入管庁 930002849.pdf）の文字と枠の位置を測り、ミリ単位で同じ場所に置いている
+//   案件から入れるもの：番号（申請受付番号）・納付者氏名（申請人名）・丸を付ける番号（変更＝1／更新＝2）・年月日（作成日＝今日）
+//   金額は空欄のまま（必要なときだけ手で入れる）
+var TS_ROWS=[
+  ['１','在留資格の変更許可','Change of status of residence'],
+  ['２','在留期間の更新許可','Extension of period of stay'],
+  ['３','永住許可','Permanent residence'],
+  ['４','再入国(一回限り・数次有効)の許可','Single / Multiple Re-entry into Japan'],
+  ['５','特定登録者カードの交付','Issuance of Registered user card'],
+  ['６','特定登録者カードの再交付','Re-issuance of Registered user card'],
+  ['７','就労資格証明書の交付','Certificate of Qualification to Work'],
+  ['８','在留カードの再交付','Re-issuance(optional renewal) of Residence card'],
+  ['９','難民旅行証明書の交付','Refugee Travel Document']
+];
+var TS_ROW_TOP=[140.5,150.1,159.8,169.5,178.9,188.5,198.1,207.8,217.6];   // 各行（日本語）の文字の上端（mm）
+function tsComma(n){ var x=String(n==null?'':n).replace(/[^\d]/g,''); if(!x) return ''; return x.replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function tsA(x,y,cls,html,st){ return '<span class="a '+cls+'" style="left:'+x+'mm;top:'+y+'mm;'+(st||'')+'">'+html+'</span>'; }
+function tsFit(text, base, per, maxMm){   // 長い文字は、欄に収まるよう小さくする（pt）
+  var w=0; String(text||'').split('').forEach(function(ch){ w+=(/[ -~]/.test(ch)?0.52:1.0); });
+  var need=w*base*0.3528*per; return (need>maxMm)?Math.max(5.5, Math.floor(base*maxMm/need*10)/10):base;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const kind=String(v('f_kind')||''), amt=tsComma(v('f_amount'));
+  const no=String(v('f_no')||''), nm=String(v('f_applicant')||'');
+  const J=-0.3, E=-0.5;   // 文字の上端 → 行の上端 の補正（日本語／英語）
+  let h='<div class="doc ts-abs"><div class="page-num-label">P1</div>';
+  // --- 枠と線 ---
+  h+='<svg class="ln" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    +'<rect x="17.9" y="45.95" width="172.7" height="210.0" fill="none" stroke="#000" stroke-width="0.32"/>'
+    +'<path d="M125.8 45.95 V23.4 H190.6 V45.95" fill="none" stroke="#000" stroke-width="0.32"/>'
+    +'<rect x="155.85" y="64.35" width="27.2" height="29.9" fill="none" stroke="#000" stroke-width="0.18"/>'
+    +'<line x1="104.2" y1="115.45" x2="173.3" y2="115.45" stroke="#000" stroke-width="0.2"/>'
+    +'<line x1="143.1" y1="243.8" x2="186.2" y2="243.8" stroke="#000" stroke-width="0.4"/>'
+    +'<path d="M51.0 139.8 Q49.0 139.8 49.0 142.2 V178.8 Q49.0 181.2 47.0 181.2 Q49.0 181.2 49.0 183.6 V223.5 Q49.0 225.9 51.0 225.9" fill="none" stroke="#000" stroke-width="0.22"/>'
+    +'<path d="M133.3 139.8 Q135.3 139.8 135.3 142.2 V178.8 Q135.3 181.2 137.3 181.2 Q135.3 181.2 135.3 183.6 V223.5 Q135.3 225.9 133.3 225.9" fill="none" stroke="#000" stroke-width="0.22"/>';
+  const ki=TS_ROWS.findIndex(function(r,i){ return String(i+1)===kind; });
+  if(ki>=0) h+='<circle cx="55.05" cy="'+(TS_ROW_TOP[ki]+1.95).toFixed(2)+'" r="2.75" fill="none" stroke="#000" stroke-width="0.35"/>';
+  h+='</svg>';
+  // --- 上の見出し ---
+  h+=tsA(18.6,19.5+J,'j','別記第八十四号様式（第六十一条関係）');
+  h+=tsA(18.6,24.2+E,'e','Annex No. 84 (Related to Article 61)');
+  h+=tsA(19.0,36.4+J,'j','日本国政府法務省');
+  h+=tsA(18.6,41.2+E,'e','Ministry of Justice, Government of Japan');
+  // --- 番号の枠 ---
+  h+=tsA(130.9,28.0+J,'j','番','')+tsA(139.7,28.0+J,'j','号','');
+  h+=tsA(134.3,33.2+E,'e','No.');
+  const noPt=tsFit(no,10.5,1.0,42.5);
+  h+=tsA(146.2,(28.0+J+(10.5-noPt)*0.18).toFixed(2),'j','<span class="f" data-bind="f_no">'+esc(no)+'</span>','font-size:'+noPt+'pt;');
+  // --- 年月日（作成日）---
+  h+=tsA(143.7,50.8+J,'j','年','font-size:9.5pt;')+tsA(161.0,50.8+J,'j','月','font-size:9.5pt;')+tsA(178.5,50.8+J,'j','日','font-size:9.5pt;');
+  h+=tsA(142.1,55.6+E,'e','Year')+tsA(158.0,55.6+E,'e','Month')+tsA(177.1,55.6+E,'e','Day');
+  const dR=function(xr,id){ return '<span class="a j" style="right:'+(210-xr)+'mm;top:'+(50.8+J)+'mm;font-size:10pt;"><span class="f" data-bind="'+id+'">'+esc(String(v(id)||''))+'</span></span>'; };
+  h+=dR(143.0,'f_docY')+dR(160.4,'f_docM')+dR(177.9,'f_docD');
+  // --- 題 ---
+  h+='<span class="a j" style="left:74.0mm;top:'+(59.3-0.35)+'mm;width:60.7mm;font-size:14pt;display:flex;justify-content:space-between;"><span>手</span><span>数</span><span>料</span><span>納</span><span>付</span><span>書</span></span>';
+  h+='<span class="a e" style="left:60mm;width:88.7mm;top:'+(66.8-0.55)+'mm;text-align:center;font-size:11.5pt;">CERTIFICATE FOR PAYMENT OF FEE</span>';
+  // --- 印紙の枠 ---
+  h+='<span class="a j" style="left:155.85mm;width:27.2mm;top:'+(67.9+J)+'mm;text-align:center;">印</span>'
+    +'<span class="a j" style="left:155.85mm;width:27.2mm;top:'+(77.3+J-0.3)+'mm;text-align:center;">紙</span>'
+    +'<span class="a e" style="left:155.85mm;width:27.2mm;top:'+(86.2+E)+'mm;text-align:center;">Revenue Stamp</span>';
+  // --- 宛先 ---
+  h+='<span class="a j" style="left:23.1mm;top:'+(79.5-0.35)+'mm;width:54.4mm;font-size:13pt;display:flex;justify-content:space-between;"><span>法</span><span>務</span><span>大</span><span>臣</span></span>';
+  h+='<span class="a j" style="left:23.1mm;top:'+(84.6-0.35)+'mm;width:54.4mm;font-size:13pt;display:flex;justify-content:space-between;">'+'出入国在留管理庁長官'.split('').map(function(c){ return '<span>'+c+'</span>'; }).join('')+'</span>';
+  h+=tsA(83.5,84.6-0.35,'j','殿','font-size:13pt;');
+  h+=tsA(23.0,91.5+E,'e','To')+tsA(31.6,91.5+E,'e','the Minister of Justice')+tsA(31.6,95.7+E,'e','the Commissioner of the Immigration Services Agency');
+  // --- 金額（ふだんは空欄）---
+  h+=tsA(92.0,103.7+J,'j','金')+tsA(131.1,103.7+J,'j','円')+tsA(137.1,103.7+J,'j','也')+tsA(144.6,103.7+J,'j','（￥')+tsA(173.4,103.7+J,'j','）');
+  if(amt){ h+='<span class="a j" style="right:'+(210-129.5)+'mm;top:'+(103.7+J)+'mm;"><span class="f" data-bind="f_amount">'+esc(amt)+'</span></span>'
+            +'<span class="a j" style="right:'+(210-173.0)+'mm;top:'+(103.7+J)+'mm;">'+esc(amt)+'</span>'; }
+  h+=tsA(92.1,112.5+E,'e','Yen');
+  // --- 条文 ---
+  h+=tsA(31.8,120.0+J,'j','出入国管理及び難民認定法第67条，第67条の2又は第68条の規定により，');
+  h+=tsA(31.6,126.3+E,'e','In accordance with Article 67,67-2 or 68 of the Immigration Control and Refugee Recognition Act,');
+  h+=tsA(31.6,130.4+E,'e','I hereby pay the amount shown as fee for permission for');
+  // --- 一覧 ---
+  TS_ROWS.forEach(function(r,i){ const t=TS_ROW_TOP[i];
+    h+=tsA(53.2,t+J,'j',r[0]);
+    h+='<span class="a j" style="left:61.8mm;top:'+(t+J+(i===3?0.1:0))+'mm;width:58.9mm;display:flex;justify-content:space-between;'+(i===3?'font-size:9.8pt;':'')+'">'+r[1].split('').map(function(c){ return '<span>'+c+'</span>'; }).join('')+'</span>';   // 1文字ずつ均等に割り付け（公式と同じ幅）
+    h+=tsA(61.8,t+4.8+E,'e',r[2]);
+  });
+  h+=tsA(27.3,179.1+J,'j','上記金額を');
+  h+=tsA(139.3,179.1+J,'j','手数料として納付いたします。');
+  // --- 納付者氏名 ---
+  h+=tsA(122.1,240.0+J,'j','納付者氏名');
+  const nmPt=tsFit(nm,10.5,1.0,41.5);
+  h+='<span class="a j" style="left:143.1mm;width:43.1mm;top:'+(239.4+J+(10.5-nmPt)*0.2).toFixed(2)+'mm;text-align:center;font-size:'+nmPt+'pt;"><span class="f" data-bind="f_applicant">'+esc(nm)+'</span></span>';
+  h+=tsA(156.7,245.9+J,'j','記')+tsA(168.8,245.9+J,'j','名');
+  h+='<span class="a e" style="left:143.1mm;width:43.1mm;top:'+(250.9+E)+'mm;text-align:center;">Name</span>';
+  // --- 注 ---
+  h+=tsA(18.0,257.2+J,'j','（注）用紙の大きさは，日本産業規格Ａ列４番とする。');
+  h+=tsA(18.6,262.0+E,'e','Note: Paper size must be A-4 as specified in the Japanese Industrial Standards.');
+  h+='</div>';
+  w.innerHTML=h;
+  setupPageTracker();
+  fitDocToPreview();
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no,app_type,status&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const set=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      set('f_applicant',cas.applicant||'');                 // 納付者氏名＝申請人名
+      set('f_no',cas.receipt_no||cas.case_no||'');          // 番号＝申請受付番号
+      const at=String(cas.app_type||'');
+      if(!v('f_kind')) set('f_kind', at.indexOf('変更')>=0?'1':(at.indexOf('更新')>=0?'2':''));
+      const st=String(cas.status||'');
+      if(!(cas.receipt_no||cas.case_no)) showToast('⚠️ この案件には申請受付番号が入っていません');
+      else if(st && st.indexOf('郵送交付')<0) showToast('⚠️ この案件のステータスは「'+st+'」です（郵送交付ではありません）');
+    }
+    // 年月日＝作成日（今日）。未入力のときだけ入れる
+    if(!v('f_docY')){const n=new Date();document.getElementById('f_docY').value=n.getFullYear();document.getElementById('f_docM').value=n.getMonth()+1;document.getElementById('f_docD').value=n.getDate();}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tesuryo'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

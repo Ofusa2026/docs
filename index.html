@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261005.02</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261005.03</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -252,6 +252,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>申請取下書<span class="item-sub">参考様式11</span></div>
     </div>
+    <div class="item" id="nav-tesuryo" onclick="open_doc('tesuryo')">
+      <span class="item-icon">📄</span>
+      <div>手数料納付書<span class="item-sub">別記第84号様式（郵送交付の前に）</span></div>
+    </div>
     <div class="item" id="nav-tsuika_shiryo" onclick="open_doc('tsuika_shiryo')">
       <span class="item-icon">📄</span>
       <div>追加資料提出<span class="item-sub">受付番号から提出先の入管局を自動判定</span></div>
@@ -341,6 +345,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-ininjou"></iframe>
     <iframe id="frame-irai"></iframe>
     <iframe id="frame-torisage"></iframe>
+    <iframe id="frame-tesuryo"></iframe>
     <iframe id="frame-tsuika_shiryo"></iframe>
     <iframe id="frame-riyu_sho"></iframe>
     <iframe id="frame-soufujou"></iframe>
@@ -439,6 +444,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1791168100'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1791168100'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1791168100'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791172329'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1791168100'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1791168100'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1791168100'},
@@ -500,6 +506,7 @@ const docs={
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1791168100'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1791168100'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1791168100'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1791172329'},
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1791168100'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1791168100'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1791168100'},
@@ -1254,7 +1261,7 @@ var DGJ_DOC_LABELS = {
   '1_11':'1-11号','1_16':'1-16号 事前ガイダンス確認書',
   '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号','1_32':'1-32号',
   '1_1':'1-1号','iko':'移行準備説明書','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
-  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状',
+  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状',
   'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
   'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',
   'shinsei_henkou_org3':'申請書(所属機関)③','shinsei_henkou_org4':'申請書(所属機関)④'
@@ -1499,6 +1506,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261005.03',
+    date: '2026-10-05',
+    notify: true,
+    items: [
+      '📄 <b>手数料納付書（別記第84号様式）</b>を作れるようになりました。左の一覧の「手数料納付書」を開き、郵送交付の前の案件を選ぶと、番号（申請受付番号）・納付者氏名（申請人名）・年月日（作成日）が入り、変更は「1」、更新は「2」に丸が付きます。金額は空欄のままです。入管庁の様式と同じ配置で印刷されます。'
+    ]
+  },
   {
     version: 'ver.20261005.02',
     date: '2026-10-05',
