@@ -932,6 +932,9 @@ function _printApplicantName(){
     // ver.20260820.09: applicantName (プレフィックスなし) も候補に追加。
     //   1_6.html は id="applicantName" で保存しており、従来の候補では拾えなかった。
     var ids=['applicantName','es_applicantName','f_applicant','f_applicantName','es_applicant'];
+    // ver.20261005.02: 推薦票の f_applicantName は推薦表の申請者（大房明良など）で本人ではないため、案件の申請人を使う
+    var _k=null; try{ _k=(typeof _dgjInferDocKey==='function')?_dgjInferDocKey():null; }catch(_ke){}
+    if(_k==='suisenhyo') ids=[];
     for(var i=0;i<ids.length;i++){
       var el=document.getElementById(ids[i]);
       if(el && String(el.value||'').trim()) return String(el.value).trim();
@@ -964,7 +967,7 @@ var _PRINT_DOC_NAMES = {
   '1_5':'雇用契約書',
   '1_6':'雇用条件書',
   '1_11':'所属機関概要書',  // ver.20260911.06: 誤って健康診断個人票になっていたのを修正
-  '1_16':'事前ガイダンス確認書',
+  '1_16':'雇用の経緯に係る説明書',  // ver.20261005.02: 誤って事前ガイダンス確認書になっていたのを修正
   '1_17':'支援計画書',
   '1_23':'役員に関する誓約書',
   '1_25':'支援委託契約に関する説明書',
@@ -980,12 +983,44 @@ var _PRINT_DOC_NAMES = {
   'juuyou':'重要事項説明書',
   'madoguchi':'窓口',
   'suisenhyo':'推薦票',
-  'torisage':'取り下げ書',
+  'torisage':'申請取下書',
   'shinsei_henkou':'申請書(変更)',
   'shinsei_koushin':'申請書(更新)',
-  'shinsei_gjk':'申請書(認定)',
+  'shinsei_gjk':'申請書(更新・技人国)',
   'kyoryoku':'協力確認書',
-  'kyoryoku_kaigo':'協力確認書(介護)'
+  'kyoryoku_kaigo':'協力確認書(介護)',
+  // ver.20261005.02: 名前が無く様式番号だけになっていた書類・分野別の書類を追加
+  '1_10':'技能移転に係る申告書',
+  '1_32':'業務内容に関する誓約書',
+  '1_1':'介護_受入れ誓約書',
+  '2_1':'ビルクリーニング_受入れ誓約書',
+  '3_1':'工業製品製造業_受入れ誓約書',
+  '6_1':'建設_受入れ誓約書',
+  '6_2':'建設_2号機関の基準に関する誓約書',
+  '6_3':'建設_2号実務経験に係る申告書',
+  '7_1':'造船・舶用工業_受入れ誓約書',
+  '7_2':'造船・舶用工業_登録支援機関誓約書',
+  '8_1':'自動車整備_受入れ誓約書',
+  '8_2':'自動車整備_登録支援機関誓約書',
+  '9_1':'航空_受入れ誓約書',
+  '9_2':'航空_登録支援機関誓約書',
+  '10_1':'宿泊_受入れ誓約書',
+  '10_2':'宿泊_登録支援機関誓約書',
+  '11_1':'農業_受入れ誓約書（直接雇用）',
+  '11_3':'農業_受入れ誓約書（派遣形態）',
+  '11_4':'農業_登録支援機関誓約書',
+  '12_1':'漁業_受入れ誓約書',
+  '12_2':'漁業_登録支援機関誓約書',
+  '13_1':'飲食料品製造業_受入れ誓約書',
+  '13_2':'飲食料品製造業_登録支援機関誓約書',
+  '14_1':'外食業_受入れ誓約書',
+  '14_2':'外食業_登録支援機関誓約書',
+  '15_1':'自動車運送業_受入れ誓約書',
+  '15_2':'自動車運送業_登録支援機関誓約書',
+  '16_1':'鉄道_受入れ誓約書',
+  '16_2':'鉄道_登録支援機関誓約書',
+  '17_1':'林業_受入れ誓約書',
+  '18_1':'木材産業_受入れ誓約書'
 };
 
 function _printDocLabel(){
@@ -994,6 +1029,7 @@ function _printDocLabel(){
   //   フォールバック: title からパターン抽出（旧動作）
   try{
     var key = (typeof _dgjInferDocKey === 'function') ? _dgjInferDocKey() : null;
+    if(key==='tsuika_shiryo'){ var _tt=document.getElementById('f_title'); if(_tt && String(_tt.value||'').trim()) return String(_tt.value).trim(); }
     if(key && _PRINT_DOC_NAMES[key]) return _PRINT_DOC_NAMES[key];
   }catch(_e){}
   // フォールバック: titleからキーワード抽出
