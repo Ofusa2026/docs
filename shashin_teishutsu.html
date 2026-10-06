@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>写真提出用紙</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:14mm!important;line-height:1.6!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:14mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+.cirv{display:inline-block;padding:0 12px;cursor:pointer;}
+.cirv.cir-on{border:1.8px solid #000;border-radius:50%;}
+.sex-cir{display:inline-block;padding:0 5px;cursor:pointer;}
+.sex-cir.cir-on{border:1.8px solid #000;border-radius:50%;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 写真提出用紙</div>
+    <div class="ver">ver.20261006.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('shashin')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">申請人</div>
+      <div class="fg"><label>申請番号（受付番号）</label><input id="f_appNo" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()" placeholder="2000-01-31"></div>
+      <div class="fg"><label>性別（男／女）</label><input id="f_gender" oninput="p()" placeholder="男 または 女"></div>
+      <input type="hidden" id="f_cirstate" value="">
+      <div style="font-size:10px;color:#94a3b8;margin-top:4px;">💡 プレビューの値をクリックすると丸囲みのON/OFFを切り替えられます（性別は男・女をクリックで選択）</div>
+    </div>
+    <div class="fs"><div class="fs-title">📷 顔写真</div>
+      <div id="photoDropZone" ondragover="event.preventDefault();this.style.background='#334155';" ondragleave="this.style.background='';" ondrop="onPhotoDrop(event)" onclick="document.getElementById('photoFileInput').click()" style="border:2px dashed #64748b;border-radius:6px;padding:20px;text-align:center;cursor:pointer;font-size:12px;color:#94a3b8;transition:background .1s;">
+        <div id="photoPreviewSmall" style="display:none;margin-bottom:8px;">
+          <img id="photoPreviewImg" style="max-width:100%;max-height:150px;border-radius:4px;" alt="顔写真">
+        </div>
+        <div id="photoDropText">ここに写真をドラッグ&ドロップ<br>またはクリックして選択</div>
+      </div>
+      <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="onPhotoFileChange(this)">
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+        <button type="button" onclick="loadPhotoFromDrive()" style="font-size:11px;padding:3px 8px;background:#475569;color:#fff;border:none;border-radius:3px;cursor:pointer;">📁 人材フォルダから</button>
+        <button type="button" onclick="clearPhoto()" style="font-size:11px;padding:3px 8px;background:#7f1d1d;color:#fff;border:none;border-radius:3px;cursor:pointer;">クリア</button>
+      </div>
+      <div id="photoStatus" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1791258123"></script>
+<script>
+// ===== 丸囲み状態（クリックでON/OFF・DB保存対象） =====
+var _cir = { no:1, name:1, nat:1, birth:1 };
+function _syncCir(){ var e=document.getElementById('f_cirstate'); if(e) e.value=JSON.stringify(_cir); }
+function _restoreCir(){
+  var e=document.getElementById('f_cirstate');
+  if(e && e.value){ try{ var o=JSON.parse(e.value); if(o && typeof o==='object') _cir=Object.assign({no:1,name:1,nat:1,birth:1},o); }catch(_e){} }
+}
+function toggleCirF(k){ _cir[k]=_cir[k]?0:1; _syncCir(); p(); }
+function setGender(g){ var e=document.getElementById('f_gender'); if(e){ e.value=(e.value===g?'':g); } p(); }
+
+function _birthParts(){
+  var m=String(v('f_birthdate')||'').match(/(\d{4})[-\/年]\s*(\d{1,2})[-\/月]\s*(\d{1,2})/);
+  return m?{y:m[1],m:String(parseInt(m[2])),d:String(parseInt(m[3]))}:null;
+}
+function _cirWrap(key,inner,hasVal){
+  var on=_cir[key]&&hasVal;
+  return '<span class="cirv '+(on?'cir-on':'')+'" onclick="toggleCirF(\''+key+'\')" title="クリックで丸ON/OFF">'+inner+'</span>';
+}
+function p(){
+  if(_editMode) return;
+  _restoreCir(); _syncCir();
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const g=String(v('f_gender')||'');
+  const isF=/女|female/i.test(g), isM=(/男|male/i.test(g)&&!isF);
+  const bp=_birthParts();
+  const birthInner = bp
+    ? (bp.y+'<span style="margin:0 2px 0 4px;">年</span>'+bp.m+'<span style="margin:0 2px 0 4px;">月</span>'+bp.d+'<span style="margin-left:4px;">日</span>')
+    : '';
+  const hasPhoto = !!(window._photoData);
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="border:1.2px solid #000;min-height:255mm;padding:10mm 12mm;position:relative;box-sizing:border-box;">
+  <div style="text-align:center;font-size:15pt;font-weight:bold;letter-spacing:10px;margin-top:4mm;">写 真 提 出 用 紙</div>
+  <!-- 写真枠（縦4cm×横3cm） -->
+  <div style="position:absolute;top:18mm;right:10mm;width:38mm;height:50mm;border:1px solid #000;display:flex;align-items:center;justify-content:center;">
+    ${hasPhoto
+      ? '<img src="'+window._photoData+'" style="width:30mm;height:40mm;object-fit:cover;display:block;" alt="写真">'
+      : '<div style="width:28mm;height:38mm;border:1px solid #000;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:8.5pt;line-height:1.5;"><div>写　真</div><div style="font-size:8pt;">Photo</div><div style="font-size:6.5pt;">縦4cm×横3cm</div></div>'}
+  </div>
+  <!-- 記入欄 -->
+  <table style="width:100%;border-collapse:collapse;font-size:11pt;margin-top:72mm;">
+    <tr>
+      <td style="width:30%;padding:0 0 1mm;vertical-align:bottom;"><div style="font-size:11pt;letter-spacing:2px;">申 請 番 号</div><div style="font-size:7pt;color:#000;">Application number</div></td>
+      <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm 1mm;">${_cirWrap('no', f('f_appNo'), !!v('f_appNo'))}</td>
+    </tr>
+    <tr><td colspan="2" style="height:9mm;"></td></tr>
+    <tr>
+      <td style="padding:0 0 1mm;vertical-align:bottom;"><div style="font-size:11pt;"><span style="letter-spacing:2px;">氏</span><span style="display:inline-block;width:3em;"></span><span>名</span></div><div style="font-size:7pt;">Name</div></td>
+      <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm 1mm;">${_cirWrap('name', f('f_applicant'), !!v('f_applicant'))}</td>
+    </tr>
+    <tr><td colspan="2" style="height:9mm;"></td></tr>
+    <tr>
+      <td style="padding:0 0 1mm;vertical-align:bottom;"><div style="font-size:11pt;letter-spacing:1px;">国籍・地域</div><div style="font-size:7pt;">Nationality / Region</div></td>
+      <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm 1mm;">${_cirWrap('nat', f('f_nationality'), !!v('f_nationality'))}</td>
+    </tr>
+    <tr><td colspan="2" style="height:9mm;"></td></tr>
+    <tr>
+      <td style="padding:0 0 1mm;vertical-align:bottom;"><div style="font-size:11pt;letter-spacing:1px;">生 年 月 日</div><div style="font-size:7pt;">Date of Birth</div></td>
+      <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm 1mm;">
+        ${bp ? _cirWrap('birth', birthInner, true)
+             : '<span style="display:inline-block;width:100%;font-size:9pt;text-align:center;"><span style="margin-right:14mm;">年<span style="display:block;font-size:6.5pt;">Year</span></span><span style="margin-right:14mm;">月<span style="display:block;font-size:6.5pt;">Month</span></span><span>日<span style="display:block;font-size:6.5pt;">Day</span></span></span>'}
+      </td>
+    </tr>
+    <tr><td colspan="2" style="height:9mm;"></td></tr>
+    <tr>
+      <td style="padding:0;vertical-align:bottom;"><div style="font-size:11pt;"><span style="letter-spacing:2px;">性</span><span style="display:inline-block;width:3em;"></span><span>別</span></div><div style="font-size:7pt;">Sex</div></td>
+      <td style="vertical-align:bottom;padding:0 2mm;">
+        <span class="sex-cir ${isM?'cir-on':''}" onclick="setGender('男')" title="クリックで選択">男</span><span style="font-size:7pt;margin:0 1mm 0 1mm;">Male</span>
+        <span style="margin:0 4mm;">・</span>
+        <span class="sex-cir ${isF?'cir-on':''}" onclick="setGender('女')" title="クリックで選択">女</span><span style="font-size:7pt;margin-left:1mm;">Female</span>
+      </td>
+    </tr>
+  </table>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+// ===== 顔写真（窓口申請書類と同方式：localStorage・案件別） =====
+window._photoData = '';
+window._curCaseId = '';
+function _photoKey(){ return 'shashin_photo_' + (window._curCaseId || 'default'); }
+function _photoStatus(msg, isError){
+  var el = document.getElementById('photoStatus');
+  if(el){ el.textContent = msg||''; el.style.color = isError?'#fca5a5':'#94a3b8'; }
+}
+function _showPhoto(dataUrl){
+  window._photoData = dataUrl || '';
+  var small = document.getElementById('photoPreviewSmall');
+  var img = document.getElementById('photoPreviewImg');
+  var txt = document.getElementById('photoDropText');
+  if(img && small){ img.src = dataUrl||''; small.style.display = dataUrl?'block':'none'; }
+  if(txt){ txt.style.display = dataUrl ? 'none' : 'block'; }
+  p();
+}
+function _readFileAsDataURL(file){
+  return new Promise(function(res, rej){
+    var reader = new FileReader();
+    reader.onload = function(){ res(reader.result); };
+    reader.onerror = function(){ rej(new Error('読み込み失敗')); };
+    reader.readAsDataURL(file);
+  });
+}
+async function onPhotoDrop(e){
+  e.preventDefault();
+  var zone = document.getElementById('photoDropZone');
+  if(zone) zone.style.background = '';
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if(!files || !files[0]) return;
+  await _setPhotoFromFile(files[0]);
+}
+async function onPhotoFileChange(input){
+  if(!input || !input.files || !input.files[0]) return;
+  await _setPhotoFromFile(input.files[0]);
+  input.value = '';
+}
+async function _setPhotoFromFile(file){
+  if(!file.type.startsWith('image/')){ _photoStatus('画像ファイルを選んでください', true); return; }
+  try{
+    var dataUrl = await _readFileAsDataURL(file);
+    _showPhoto(dataUrl);
+    try{ localStorage.setItem(_photoKey(), dataUrl); }catch(_e){}
+    _photoStatus('✅ '+file.name+' を設定');
+  }catch(e){ _photoStatus('❌ '+e.message, true); }
+}
+function clearPhoto(){
+  _showPhoto('');
+  try{ localStorage.removeItem(_photoKey()); }catch(_e){}
+  _photoStatus('クリアしました');
+}
+async function loadPhotoFromDrive(){
+  if(!window._curCaseId){ _photoStatus('案件を選択してください', true); return; }
+  _photoStatus('🔍 人材フォルダを検索中...');
+  try{
+    var pr = await sb('persons?select=drive_urls&case_id=eq.'+window._curCaseId);
+    var driveUrls = pr && pr[0] && pr[0].drive_urls;
+    if(!driveUrls){ _photoStatus('人材フォルダURLが登録されていません', true); return; }
+    var urls = Array.isArray(driveUrls) ? driveUrls : (typeof driveUrls==='object' ? Object.values(driveUrls) : [driveUrls]);
+    urls = urls.filter(function(u){ return typeof u==='string' && u.indexOf('drive.google.com')>=0; });
+    if(urls.length === 0){ _photoStatus('Google DriveのURLが見つかりません', true); return; }
+    window.open(urls[0], '_blank');
+    _photoStatus('別タブで人材フォルダを開きました。顔写真をこちらへドラッグ&ドロップしてください', false);
+  }catch(e){ _photoStatus('❌ '+e.message, true); }
+}
+function _restorePhotoForCurrentCase(){
+  try{
+    var d = localStorage.getItem(_photoKey());
+    _showPhoto(d||'');
+  }catch(_e){}
+}
+
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  window._curCaseId = caseId;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      s('f_appNo',cas.receipt_no||cas.case_no||'');
+    }
+    const persons=await sb('persons?select=gender,nationality,birthdate&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_gender',pd.gender||'');
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',pd.birthdate||'');
+    }
+    _restorePhotoForCurrentCase();
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shashin'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
