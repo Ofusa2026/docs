@@ -136,7 +136,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20261006.02</div>
+    <div class="ver">ver.20261006.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -219,7 +219,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>性別</label><input id="f_p1Gender" oninput="p()"></div>
       <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
-      <div class="fg"><label>職業</label><input id="f_p1Job" oninput="p()"></div>
+      <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p1Job" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p1Occ" value="会社員" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p1School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -236,7 +237,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>性別</label><input id="f_p2Gender" oninput="p()"></div>
       <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
-      <div class="fg"><label>職業</label><input id="f_p2Job" oninput="p()"></div>
+      <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p2Job" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p2Occ" value="会社員" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p2School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -253,7 +255,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>性別</label><input id="f_p3Gender" oninput="p()"></div>
       <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
-      <div class="fg"><label>職業</label><input id="f_p3Job" oninput="p()"></div>
+      <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p3Job" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p3Occ" value="会社員" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p3School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -270,7 +273,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>性別</label><input id="f_p4Gender" oninput="p()"></div>
       <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
-      <div class="fg"><label>職業</label><input id="f_p4Job" oninput="p()"></div>
+      <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p4Job" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p4Occ" value="会社員" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p4School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -287,7 +291,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>性別</label><input id="f_p5Gender" oninput="p()"></div>
       <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
-      <div class="fg"><label>職業</label><input id="f_p5Job" oninput="p()"></div>
+      <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p5Job" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p5Occ" value="会社員" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p5School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p5VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -315,7 +320,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1791257066"></script>
+<script src="ofusa_common.js?v=1791257418"></script>
 <script>
 function _row(i){
   // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
@@ -329,7 +334,7 @@ function _row(i){
     <td class="col-gender">${cell('Gender')}</td>
     <td class="col-pass">${cell('Pass')}</td>
     <td class="col-prev">${cell('Prev')}</td>
-    <td class="col-job">${cell('Job')}</td>
+    <td class="col-job">${any?(v('f_p'+i+'Occ')?f('f_p'+i+'Occ'):'&nbsp;'):'&nbsp;'}</td>
   </tr>`;
 }
 function _kfRow(i){
@@ -695,15 +700,18 @@ async function suiLoadGroup(caseId, autoApply){
   try{ ps=await sb('persons?select=case_id,applicant_name_en,birthdate,passport&case_id=in.('+ids.map(encodeURIComponent).join(',')+')')||[]; }catch(e){}
   var pmap={}; ps.forEach(function(x){ pmap[x.case_id]=x; });
   _suiRows=rows.map(function(r){ var x=pmap[r.id]; return {id:r.id, name:(x&&x.applicant_name_en)||r.applicant||'(名前なし)', answered:!!(x&&(x.birthdate||x.passport))}; });
-  _suiSel={}; _suiRows.slice(0,5).forEach(function(r){ _suiSel[r.id]=true; });
+  _suiSel={}; _suiSel[base.id]=true;   // 最初は選んだ案件の人だけ（同じ案件の人は一覧から追加）
   suiRender();
   if(autoApply) await suiApply(true);
 }
+function suiCheckAll(){ _suiSel={}; _suiRows.slice(0,5).forEach(function(r){ _suiSel[r.id]=true; }); suiRender(); }
+function suiCheckOnlyBase(){ _suiSel={}; if(_suiBaseId) _suiSel[_suiBaseId]=true; suiRender(); }
 function suiRender(){
   var body=document.getElementById('suiGroupBody'), list=document.getElementById('suiGroupList'), btn=document.getElementById('suiApplyBtn');
   var n=_suiRows.filter(function(r){return _suiSel[r.id];}).length;
   if(body){
     body.innerHTML='同じ案件の人 <b style="color:#0f172a;">'+_suiRows.length+'名</b>・選択 <b style="color:'+(n>5?'#dc2626':'#16a34a')+';">'+n+'名</b>'
+      +(_suiRows.length>1?' <a href="javascript:void(0)" onclick="suiCheckAll()" style="margin-left:6px;color:#2563eb;">全員チェック</a> <a href="javascript:void(0)" onclick="suiCheckOnlyBase()" style="margin-left:4px;color:#64748b;">選んだ人だけ</a>':'')
       +(_suiRows.length>5?'<div style="color:#b45309;margin-top:2px;">推薦状は1枚5名までです。6名以上はチェックを入れ替えて2枚目を作成してください。</div>':'');
   }
   if(list){
@@ -828,6 +836,7 @@ function clearPerson(slot){
     const el=document.getElementById('f_p'+i+k);
     if(el) el.value='';
   });
+  const _oc=document.getElementById('f_p'+i+'Occ'); if(_oc) _oc.value='会社員';
   const btn=document.getElementById('p'+i+'Btn');
   if(btn) btn.classList.remove('has-data');
   const st=document.getElementById('p'+i+'Status');
