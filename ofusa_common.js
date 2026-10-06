@@ -3710,3 +3710,60 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(_inject,300); });
   else setTimeout(_inject,300);
 })();
+
+/* ===== ver.20261006.01: 赤字モード（書類の値クリックで文字色を赤⇔黒） =====
+ * 「🔴 赤字」ボタン(#redModeBtn)があるページで動作。モードON中に
+ * プレビューの値（.f[data-bind]）をクリックすると赤字⇔黒字が切り替わる。
+ * 状態は hidden の #es_redState（または #f_redstate）にJSONで保持し、
+ * 各書類のDB保存（emp_sets / saveFormGeneric）で一緒に保存・復元される。
+ */
+window._redMode = false;
+function _redGet(){
+  var e=document.getElementById('es_redState')||document.getElementById('f_redstate');
+  if(!e||!e.value) return {};
+  try{ var o=JSON.parse(e.value); return (o&&typeof o==='object'&&!Array.isArray(o))?o:{}; }catch(_e){ return {}; }
+}
+function _redPut(o){
+  var e=document.getElementById('es_redState')||document.getElementById('f_redstate');
+  if(e) e.value=(o&&Object.keys(o).length)?JSON.stringify(o):'';
+}
+function applyRedMarks(){
+  var area=document.getElementById('pageArea'); if(!area) return;
+  var set=_redGet();
+  area.querySelectorAll('.f[data-bind]').forEach(function(sp){
+    var key=sp.getAttribute('data-bind');
+    if(set[key]){ sp.style.color='#dc2626'; sp.dataset.redmark='1'; }
+    else if(sp.dataset.redmark){ sp.style.color=''; delete sp.dataset.redmark; }
+  });
+}
+function toggleRedMode(){
+  window._redMode=!window._redMode;
+  var b=document.getElementById('redModeBtn');
+  if(b){
+    b.style.background=window._redMode?'#991b1b':'#dc2626';
+    b.textContent=window._redMode?'🔴 赤字指定中':'🔴 赤字';
+  }
+  if(typeof showToast==='function') showToast(window._redMode
+    ? '🔴 赤字モードON：書類の値をクリックすると赤⇔黒が切り替わります（終わったらもう一度ボタンを押してOFF）'
+    : '赤字モードOFF（指定した赤字はDB保存で保持されます）');
+}
+document.addEventListener('click', function(e){
+  if(!window._redMode) return;
+  var area=document.getElementById('pageArea'); if(!area) return;
+  var sp=(e.target&&e.target.closest)?e.target.closest('.f[data-bind]'):null;
+  if(!sp || !area.contains(sp)) return;
+  e.preventDefault(); e.stopPropagation();
+  var key=sp.getAttribute('data-bind'); if(!key) return;
+  var set=_redGet();
+  if(set[key]) delete set[key]; else set[key]=1;
+  _redPut(set);
+  applyRedMarks();
+}, true);
+(function(){
+  var _t=null;
+  var mo=new MutationObserver(function(){ if(_t)clearTimeout(_t); _t=setTimeout(applyRedMarks,120); });
+  function _arm(){ var a=document.getElementById('pageArea'); if(a) mo.observe(a,{childList:true,subtree:true}); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', _arm);
+  else _arm();
+})();
+/* ===== /赤字モード ===== */
