@@ -136,7 +136,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20260821.01</div>
+    <div class="ver">ver.20261006.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -197,6 +197,14 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
         </select>
       </div>
       <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※各人材枠にcase IDを貼り付けて「投入」で人材情報を取得します。</div>
+    </div>
+
+    <div class="fs" id="suiGroupBox"><div class="fs-title">👥 ヒアリングフォームから反映</div>
+      <div id="suiGroupBody" style="font-size:11px;color:#64748b;padding:6px 6px 2px;font-family:sans-serif;">案件を選ぶと、同じ案件名の人が表示されます。</div>
+      <div id="suiGroupList" style="padding:0 6px;font-family:sans-serif;"></div>
+      <div style="padding:6px;">
+        <button type="button" id="suiApplyBtn" onclick="suiApply()" style="display:none;width:100%;background:#16a34a;color:#fff;border:none;border-radius:6px;padding:7px;cursor:pointer;font-size:12px;font-weight:700;">▼ チェックした人を表に反映</button>
+      </div>
     </div>
 
     <div class="fs"><div class="fs-title">人材1</div>
@@ -307,7 +315,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1791168100"></script>
+<script src="ofusa_common.js?v=1791257066"></script>
 <script>
 function _row(i){
   // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
@@ -582,6 +590,7 @@ async function importMainCase(){
   if(!_isUuid(cid)){ if(st){st.textContent='⚠️ UUID形式ではありません';st.style.color='#dc2626';} return; }
   if(st){ st.textContent='取得中...'; st.style.color='#888'; }
   await _loadCaseInfo({caseId:cid});
+  try{ await suiLoadGroup(cid, true); }catch(e){ console.warn('ヒアリング反映スキップ:', e.message); }
   if(st){ st.textContent='✅ 取得完了'; st.style.color='#16a34a'; }
 }
 
@@ -662,7 +671,66 @@ async function _loadCaseInfo(info){
 async function loadFromDB(info){
   if(info && info.caseId){
     await _loadCaseInfo(info);
+    try{ await suiLoadGroup(info.caseId, true); }catch(e){ console.warn('ヒアリング反映スキップ:', e.message); }
   }
+}
+
+/* ========== ver.20261006.02: ヒアリングフォームから一括反映 ========== */
+var _suiRows=[], _suiSel={}, _suiBaseId='';
+async function suiLoadGroup(caseId, autoApply){
+  _suiBaseId=caseId;
+  var body=document.getElementById('suiGroupBody'), list=document.getElementById('suiGroupList'), btn=document.getElementById('suiApplyBtn');
+  if(body) body.textContent='読み込み中…';
+  var base=await sb('cases?select=id,name,applicant&id=eq.'+encodeURIComponent(caseId));
+  base=base&&base[0];
+  if(!base){ if(body) body.textContent='案件が見つかりません'; return; }
+  var rows=[base];
+  if(base.name){
+    var g=await sb('cases?select=id,name,applicant&name=eq.'+encodeURIComponent(base.name)+'&order=applicant');
+    if(Array.isArray(g)&&g.length){ rows=[base].concat(g.filter(function(r){return r.id!==base.id;})); }
+  }
+  // ヒアリング回答の有無
+  var ids=rows.map(function(r){return r.id;});
+  var ps=[];
+  try{ ps=await sb('persons?select=case_id,applicant_name_en,birthdate,passport&case_id=in.('+ids.map(encodeURIComponent).join(',')+')')||[]; }catch(e){}
+  var pmap={}; ps.forEach(function(x){ pmap[x.case_id]=x; });
+  _suiRows=rows.map(function(r){ var x=pmap[r.id]; return {id:r.id, name:(x&&x.applicant_name_en)||r.applicant||'(名前なし)', answered:!!(x&&(x.birthdate||x.passport))}; });
+  _suiSel={}; _suiRows.slice(0,5).forEach(function(r){ _suiSel[r.id]=true; });
+  suiRender();
+  if(autoApply) await suiApply(true);
+}
+function suiRender(){
+  var body=document.getElementById('suiGroupBody'), list=document.getElementById('suiGroupList'), btn=document.getElementById('suiApplyBtn');
+  var n=_suiRows.filter(function(r){return _suiSel[r.id];}).length;
+  if(body){
+    body.innerHTML='同じ案件の人 <b style="color:#0f172a;">'+_suiRows.length+'名</b>・選択 <b style="color:'+(n>5?'#dc2626':'#16a34a')+';">'+n+'名</b>'
+      +(_suiRows.length>5?'<div style="color:#b45309;margin-top:2px;">推薦状は1枚5名までです。6名以上はチェックを入れ替えて2枚目を作成してください。</div>':'');
+  }
+  if(list){
+    list.innerHTML=_suiRows.map(function(r,i){
+      var on=!!_suiSel[r.id];
+      return '<label style="display:flex;align-items:center;gap:6px;padding:4px 2px;border-top:1px solid #eef2f7;cursor:pointer;">'
+        +'<input type="checkbox" '+(on?'checked':'')+' onchange="_suiSel[\''+r.id+'\']=this.checked;suiRender();" style="margin:0;">'
+        +'<span style="flex:1;min-width:0;font-size:11.5px;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.id===_suiBaseId?'⭐ ':'')+String(r.name).replace(/</g,'&lt;')+'</span>'
+        +(r.answered?'<span style="font-size:9.5px;padding:1px 6px;border-radius:8px;background:#dcfce7;color:#15803d;white-space:nowrap;">回答あり</span>'
+                    :'<span style="font-size:9.5px;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#b45309;white-space:nowrap;">未回答</span>')
+        +'</label>';
+    }).join('');
+  }
+  if(btn){ btn.style.display=_suiRows.length?'block':'none'; btn.disabled=(n===0||n>5); btn.style.opacity=(n===0||n>5)?'.5':'1'; btn.textContent=n>5?'⚠ 5名までにしてください':'▼ チェックした人を表に反映（'+n+'名）'; }
+}
+async function suiApply(silent){
+  var targets=_suiRows.filter(function(r){return _suiSel[r.id];}).slice(0,5);
+  window._suiBulk=true;
+  for(var i=1;i<=5;i++) clearPerson(i);
+  for(var k=0;k<targets.length;k++){
+    var slot=k+1; var inp=document.getElementById('f_p'+slot+'Cid');
+    if(inp) inp.value=targets[k].id;
+    await importPerson(slot);
+  }
+  window._suiBulk=false;
+  p();
+  if(!silent) showToast('✅ '+targets.length+'名をヒアリングフォームから反映しました');
 }
 
 /* ========== case ID 貼り付け方式 ========== */
@@ -752,11 +820,11 @@ async function importPerson(slot){
     st.className=foundPersons?'cid-status ok':'cid-status warn';
   }
   p();
-  showToast('✅ 人材'+slot+'に投入しました');
+  if(!window._suiBulk) showToast('✅ 人材'+slot+'に投入しました');
 }
 function clearPerson(slot){
   const i=slot;
-  ['Name','Birth','Gender','Pass','Prev','Job','Cid'].forEach(k=>{
+  ['Name','Birth','Gender','Pass','Prev','Job','School','VnContact','Cid'].forEach(k=>{
     const el=document.getElementById('f_p'+i+k);
     if(el) el.value='';
   });
@@ -804,6 +872,7 @@ window.addEventListener('message', async function(e){
   const inp=document.getElementById('caseIdPaste');
   if(inp) inp.value=info.caseId;
   await _loadCaseInfo(info);
+  try{ await suiLoadGroup(info.caseId, true); }catch(e2){ console.warn('ヒアリング反映スキップ:', e2.message); }
   const st=document.getElementById('mainCidStatus');
   if(st){ st.textContent='✅ indexから取得'; st.style.color='#16a34a'; }
 });
