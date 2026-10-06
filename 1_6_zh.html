@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20261005.01</div>
+    <div class="ver">ver.20261006.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1512,6 +1512,17 @@ async function loadFromDB(passedInfo){
 
     // 4. 雇用条件データをフォームにセット
     if(esData){ setFormValues(esData); window._lastEmpSet=esData; }
+    // ver.20261006.01: 契約期間は案件（アンシスの契約開始日・終了日）を優先。
+    //   雇用条件セット側の contractStart/End は案件に日付が無い場合のみ使う。
+    if(cas){
+      const _owDate=(prefix,val)=>{ if(!val) return;
+        const m=String(val).match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/); if(!m) return;
+        const _s=(id,v)=>{const e=document.getElementById(id); if(e) e.value=v;};
+        _s('es_'+prefix+'Y',m[1]); _s('es_'+prefix+'M',String(parseInt(m[2]))); _s('es_'+prefix+'D',String(parseInt(m[3])));
+      };
+      _owDate('contractStart', cas.contract_start);
+      _owDate('contractEnd',   cas.contract_end);
+    }
     _jippiDefault();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
