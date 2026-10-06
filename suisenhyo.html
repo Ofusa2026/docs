@@ -136,7 +136,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20261006.03</div>
+    <div class="ver">ver.20261006.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -216,7 +216,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="cid-status" id="p1Status"></div>
       <div class="fg"><label>氏名(英字)</label><input id="f_p1Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p1Birth" placeholder="1995/04/01" oninput="p()"></div>
-      <div class="fg"><label>性別</label><input id="f_p1Gender" oninput="p()"></div>
+      <div class="fg"><label>性別 <span style="font-weight:400;color:#94a3b8;font-size:9px;">（選ぶと案シスの人材情報にも保存）</span></label><select id="f_p1Gender" onchange="suiGenderChange(1)" style="width:100%;padding:5px 6px;border:1px solid #cbd5e0;border-radius:4px;font-size:12px;"><option value="">— 未入力 —</option><option value="男">男</option><option value="女">女</option></select></div>
       <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p1Job" oninput="p()"></div>
@@ -234,7 +234,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="cid-status" id="p2Status"></div>
       <div class="fg"><label>氏名(英字)</label><input id="f_p2Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p2Birth" oninput="p()"></div>
-      <div class="fg"><label>性別</label><input id="f_p2Gender" oninput="p()"></div>
+      <div class="fg"><label>性別 <span style="font-weight:400;color:#94a3b8;font-size:9px;">（選ぶと案シスの人材情報にも保存）</span></label><select id="f_p2Gender" onchange="suiGenderChange(2)" style="width:100%;padding:5px 6px;border:1px solid #cbd5e0;border-radius:4px;font-size:12px;"><option value="">— 未入力 —</option><option value="男">男</option><option value="女">女</option></select></div>
       <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p2Job" oninput="p()"></div>
@@ -252,7 +252,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="cid-status" id="p3Status"></div>
       <div class="fg"><label>氏名(英字)</label><input id="f_p3Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p3Birth" oninput="p()"></div>
-      <div class="fg"><label>性別</label><input id="f_p3Gender" oninput="p()"></div>
+      <div class="fg"><label>性別 <span style="font-weight:400;color:#94a3b8;font-size:9px;">（選ぶと案シスの人材情報にも保存）</span></label><select id="f_p3Gender" onchange="suiGenderChange(3)" style="width:100%;padding:5px 6px;border:1px solid #cbd5e0;border-radius:4px;font-size:12px;"><option value="">— 未入力 —</option><option value="男">男</option><option value="女">女</option></select></div>
       <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p3Job" oninput="p()"></div>
@@ -270,7 +270,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="cid-status" id="p4Status"></div>
       <div class="fg"><label>氏名(英字)</label><input id="f_p4Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p4Birth" oninput="p()"></div>
-      <div class="fg"><label>性別</label><input id="f_p4Gender" oninput="p()"></div>
+      <div class="fg"><label>性別 <span style="font-weight:400;color:#94a3b8;font-size:9px;">（選ぶと案シスの人材情報にも保存）</span></label><select id="f_p4Gender" onchange="suiGenderChange(4)" style="width:100%;padding:5px 6px;border:1px solid #cbd5e0;border-radius:4px;font-size:12px;"><option value="">— 未入力 —</option><option value="男">男</option><option value="女">女</option></select></div>
       <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p4Job" oninput="p()"></div>
@@ -288,7 +288,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="cid-status" id="p5Status"></div>
       <div class="fg"><label>氏名(英字)</label><input id="f_p5Name" oninput="p()"></div>
       <div class="fg"><label>生年月日</label><input id="f_p5Birth" oninput="p()"></div>
-      <div class="fg"><label>性別</label><input id="f_p5Gender" oninput="p()"></div>
+      <div class="fg"><label>性別 <span style="font-weight:400;color:#94a3b8;font-size:9px;">（選ぶと案シスの人材情報にも保存）</span></label><select id="f_p5Gender" onchange="suiGenderChange(5)" style="width:100%;padding:5px 6px;border:1px solid #cbd5e0;border-radius:4px;font-size:12px;"><option value="">— 未入力 —</option><option value="男">男</option><option value="女">女</option></select></div>
       <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p5Job" oninput="p()"></div>
@@ -320,7 +320,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1791257418"></script>
+<script src="ofusa_common.js?v=1791258123"></script>
 <script>
 function _row(i){
   // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
@@ -560,8 +560,9 @@ function _ymd(d){
 function _gender(g){
   if(!g) return '';
   const s=String(g);
-  if(/男|male|^M$/i.test(s)) return '男';
-  if(/女|female|^F$/i.test(s)) return '女';
+  // ver.20261006.04: 'female' に 'male' が含まれるため女性を先に判定（Female が男になっていた）
+  if(/女|female|^F$|nữ|nu$/i.test(s)) return '女';
+  if(/男|male|^M$|nam$/i.test(s)) return '男';
   return s;
 }
 
@@ -697,9 +698,9 @@ async function suiLoadGroup(caseId, autoApply){
   // ヒアリング回答の有無
   var ids=rows.map(function(r){return r.id;});
   var ps=[];
-  try{ ps=await sb('persons?select=case_id,applicant_name_en,birthdate,passport&case_id=in.('+ids.map(encodeURIComponent).join(',')+')')||[]; }catch(e){}
+  try{ ps=await sb('persons?select=case_id,applicant_name_en,birthdate,passport,gender&case_id=in.('+ids.map(encodeURIComponent).join(',')+')')||[]; }catch(e){}
   var pmap={}; ps.forEach(function(x){ pmap[x.case_id]=x; });
-  _suiRows=rows.map(function(r){ var x=pmap[r.id]; return {id:r.id, name:(x&&x.applicant_name_en)||r.applicant||'(名前なし)', answered:!!(x&&(x.birthdate||x.passport))}; });
+  _suiRows=rows.map(function(r){ var x=pmap[r.id]; return {id:r.id, name:(x&&x.applicant_name_en)||r.applicant||'(名前なし)', answered:!!(x&&(x.birthdate||x.passport)), noGender:!(x&&String(x.gender||'').trim())}; });
   _suiSel={}; _suiSel[base.id]=true;   // 最初は選んだ案件の人だけ（同じ案件の人は一覧から追加）
   suiRender();
   if(autoApply) await suiApply(true);
@@ -720,6 +721,7 @@ function suiRender(){
       return '<label style="display:flex;align-items:center;gap:6px;padding:4px 2px;border-top:1px solid #eef2f7;cursor:pointer;">'
         +'<input type="checkbox" '+(on?'checked':'')+' onchange="_suiSel[\''+r.id+'\']=this.checked;suiRender();" style="margin:0;">'
         +'<span style="flex:1;min-width:0;font-size:11.5px;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.id===_suiBaseId?'⭐ ':'')+String(r.name).replace(/</g,'&lt;')+'</span>'
+        +(r.noGender?'<span style="font-size:9.5px;padding:1px 6px;border-radius:8px;background:#fee2e2;color:#b91c1c;white-space:nowrap;margin-right:3px;">性別なし</span>':'')
         +(r.answered?'<span style="font-size:9.5px;padding:1px 6px;border-radius:8px;background:#dcfce7;color:#15803d;white-space:nowrap;">回答あり</span>'
                     :'<span style="font-size:9.5px;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#b45309;white-space:nowrap;">未回答</span>')
         +'</label>';
@@ -737,7 +739,7 @@ async function suiApply(silent){
     await importPerson(slot);
   }
   window._suiBulk=false;
-  p();
+  p(); suiMarkGender();
   if(!silent) showToast('✅ '+targets.length+'名をヒアリングフォームから反映しました');
 }
 
@@ -811,8 +813,11 @@ async function importPerson(slot){
         try{ extra=JSON.parse(extra); }catch(e){ extra={}; }
       }
       extra=extra||{};
-      s('f_p'+i+'School', extra.sendingOrgOrSchool||'');
-      s('f_p'+i+'VnContact', extra.homeRelativeInfo||'');
+      // ver.20261006.04: 案シスの申請人ヒアリング「大使館推薦票」の帯の欄（vnSendingOrg / vnFamilyAddress / vnFamilyTel）を優先。
+      //   空のときだけ旧「推薦状タブ」の欄（sendingOrgOrSchool / homeRelativeInfo）を使う
+      s('f_p'+i+'School', extra.vnSendingOrg||extra.sendingOrgOrSchool||'');
+      var _vnA=String(extra.vnFamilyAddress||'').trim(), _vnT=String(extra.vnFamilyTel||'').trim();
+      s('f_p'+i+'VnContact', (_vnA||_vnT) ? [_vnA,_vnT].filter(Boolean).join(' / ') : String(extra.homeRelativeInfo||'').replace(/\n+/g,' / '));
       filled=true;
     }
   }catch(e){ console.warn('persons取得スキップ:',e.message); }
@@ -828,7 +833,33 @@ async function importPerson(slot){
     st.className=foundPersons?'cid-status ok':'cid-status warn';
   }
   p();
+  suiMarkGender();
   if(!window._suiBulk) showToast('✅ 人材'+slot+'に投入しました');
+}
+
+/* ver.20261006.04: 性別は選択式。選ぶと案シスの人材情報（persons.gender）にも保存 */
+function suiMarkGender(){
+  for(var i=1;i<=5;i++){
+    var g=document.getElementById('f_p'+i+'Gender'), nm=document.getElementById('f_p'+i+'Name');
+    if(!g) continue;
+    var need=!!(nm&&String(nm.value||'').trim()) && !g.value;
+    g.style.borderColor=need?'#ef4444':'#cbd5e0'; g.style.background=need?'#fef2f2':'#fff';
+  }
+}
+async function suiGenderChange(slot){
+  var g=document.getElementById('f_p'+slot+'Gender'); var v=g?g.value:'';
+  p(); suiMarkGender();
+  var cid=String((document.getElementById('f_p'+slot+'Cid')||{}).value||'').trim();
+  if(!cid||!v){ return; }
+  try{
+    var r=await sb('persons?case_id=eq.'+encodeURIComponent(cid),{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({gender:v})});
+    if(Array.isArray(r)&&r.length){
+      showToast('💾 性別を案シスの人材情報にも保存しました');
+      var row=_suiRows.find(function(x){return x.id===cid;}); if(row){ row.noGender=false; suiRender(); }
+    } else {
+      showToast('⚠️ 案シスに人材情報がないため、推薦票の中だけ反映しました');
+    }
+  }catch(e){ showToast('⚠️ 案シスへの保存に失敗しました: '+e.message); }
 }
 function clearPerson(slot){
   const i=slot;
