@@ -7,11 +7,11 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
-.doc{padding:10mm 18mm!important;line-height:1.6!important;min-height:auto!important}
+.doc{padding:9mm 18mm!important;line-height:1.6!important;min-height:auto!important}
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:10mm 18mm!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:9mm 18mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 .tt-line{border-bottom:1px solid #000;}
@@ -24,7 +24,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 在留カード記載事項訂正願出書（参考様式５）</div>
-    <div class="ver">ver.20261007.01</div>
+    <div class="ver">ver.20261007.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -106,66 +106,63 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:10.5pt;margin-bottom:2mm;">参考様式５</div>
-<div style="border:1.2px solid #000;min-height:258mm;padding:6mm 10mm;box-sizing:border-box;">
-  <div style="text-align:right;font-size:10.5pt;letter-spacing:4px;">番　号</div>
-  <div style="text-align:right;font-size:9.5pt;margin-bottom:1mm;">No,&nbsp;<span style="display:inline-block;min-width:9em;border-bottom:1px solid #000;text-align:center;">${f('f_no')}</span></div>
-  <div style="text-align:right;font-size:10.5pt;letter-spacing:2px;">年　月　日</div>
-  <div style="text-align:right;font-size:9.5pt;margin-bottom:4mm;">Date:&nbsp;<span style="display:inline-block;min-width:9em;border-bottom:1px solid #000;text-align:center;">${f('f_docDate')}</span></div>
-  <div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:4px;margin-bottom:1mm;">在　留　カ　ー　ド　記　載　事　項　訂　正　願　出　書</div>
-  <div style="text-align:center;font-size:10.5pt;margin-bottom:6mm;">APPLICATION FOR CORRECTION OF AN ITEM ON THE RESIDENCE CARD</div>
-  <div style="text-align:center;font-size:11pt;margin-bottom:1mm;"><span style="display:inline-block;min-width:7em;border-bottom:1px solid #000;text-align:center;">${f('f_bureau')}</span>出入国在留管理局長　殿</div>
-  <div style="text-align:center;font-size:9.5pt;margin-bottom:6mm;">To the Director General of the&emsp;<span style="display:inline-block;min-width:7em;border-bottom:1px solid #000;text-align:center;">${ben?esc(ben):'&nbsp;'}</span>&emsp;Regional Immigration Services Bureau</div>
+<div style="font-size:10.5pt;margin-bottom:1.5mm;">参考様式５</div>
+<div style="border:1.2px solid #000;min-height:252mm;padding:6mm 9mm;box-sizing:border-box;">
+  <div style="text-align:right;font-size:10.5pt;letter-spacing:6px;padding-right:8mm;">番　号</div>
+  <div style="text-align:right;font-size:10pt;margin-bottom:1mm;">No,&nbsp;<span style="display:inline-block;min-width:10em;border-bottom:1px solid #000;text-align:center;">${f('f_no')}</span></div>
+  <div style="text-align:right;font-size:10.5pt;letter-spacing:3px;padding-right:6mm;">年　月　日</div>
+  <div style="text-align:right;font-size:10pt;margin-bottom:2mm;">Date:&nbsp;<span style="display:inline-block;min-width:10em;border-bottom:1px solid #000;text-align:center;">${f('f_docDate')}</span></div>
+  <div style="text-align:center;font-size:12.5pt;letter-spacing:0.45em;white-space:nowrap;margin-bottom:1.5mm;">在留カード記載事項訂正願出書</div>
+  <div style="text-align:center;font-size:10.5pt;margin-bottom:5mm;">APPLICATION FOR CORRECTION OF AN ITEM ON THE RESIDENCE CARD</div>
+  <div style="text-align:center;font-size:11pt;margin-bottom:1mm;"><span style="display:inline-block;min-width:8em;border-bottom:1px solid #000;text-align:center;">${f('f_bureau')}</span>出入国在留管理局長　殿</div>
+  <div style="font-size:9.5pt;margin-bottom:5mm;text-align:center;white-space:nowrap;">To the Director General of the&emsp;<span style="display:inline-block;min-width:6em;text-align:center;">${ben?esc(ben):'&emsp;'}</span>&emsp;Regional Immigration Services Bureau</div>
   <div style="font-size:10.5pt;margin-bottom:1mm;">　在留カードの記載事項の訂正をお願いします。</div>
-  <div style="font-size:9.5pt;margin-bottom:5mm;">　I hereby request the correction of the item on my residence card.</div>
+  <div style="font-size:10pt;margin-bottom:4mm;">　I hereby request the correction of the item on my residence card.</div>
   <div style="text-align:center;font-size:11pt;">記</div>
-  <div style="text-align:center;font-size:9.5pt;margin-bottom:3mm;">Notice</div>
+  <div style="text-align:center;font-size:10pt;margin-bottom:2mm;">Notice</div>
+  <div style="text-align:right;font-size:10pt;padding-right:2mm;">${mMale}</div>
   <table style="width:100%;border-collapse:collapse;">
     <tr>
-      <td style="width:32%;vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">１　氏名，性別</span></td>
+      <td style="width:29%;white-space:nowrap;vertical-align:bottom;font-size:10.5pt;">１　氏名，性別</td>
       <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_applicant')}</td>
-      <td style="width:17%;vertical-align:bottom;padding-left:4mm;font-size:9.5pt;line-height:1.5;">${mMale}<br>${mFemale}</td>
+      <td style="width:15%;vertical-align:bottom;font-size:10pt;text-align:right;padding-left:2mm;white-space:nowrap;">${mFemale}</td>
     </tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Name and Sex</td><td></td><td></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;">Name and Sex</td><td></td><td></td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">２　生 年 月 日</span></td>
-      <td colspan="2" style="vertical-align:bottom;">
-        <span style="display:inline-block;width:70%;border-bottom:1px solid #000;text-align:center;">
-          ${bp?esc(bp.y):'&emsp;&emsp;'}　年　${bp?esc(bp.m):'&emsp;'}　月　${bp?esc(bp.d):'&emsp;'}　日
-        </span>
-      </td>
+      <td style="vertical-align:bottom;font-size:10.5pt;">２　生 年 月 日</td>
+      <td colspan="2" style="vertical-align:bottom;"><span style="display:inline-block;width:62%;border-bottom:1px solid #000;text-align:center;">${bp?esc(bp.y):'&emsp;&emsp;'}　年　${bp?esc(bp.m):'&emsp;'}　月　${bp?esc(bp.d):'&emsp;'}　日</span></td>
     </tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Date of Birth</td><td colspan="2" class="r5-en" style="padding-left:10mm;">　Year　　　　Month　　　　Day</td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;">Date of Birth</td><td colspan="2" style="font-size:9pt;"><span style="display:inline-block;width:62%;text-align:center;">Year&emsp;&emsp;&emsp;&emsp;Month&emsp;&emsp;&emsp;&emsp;Day</span></td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">３　国籍・地域</span></td>
-      <td colspan="2" style="vertical-align:bottom;"><span style="display:inline-block;width:70%;border-bottom:1px solid #000;padding:0 2mm;">${f('f_nationality')}</span></td>
+      <td style="vertical-align:bottom;font-size:10.5pt;">３　国籍・地域</td>
+      <td colspan="2" style="vertical-align:bottom;"><span style="display:inline-block;width:55%;border-bottom:1px solid #000;padding:0 2mm;box-sizing:border-box;">${f('f_nationality')}</span></td>
     </tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Nationality/Region</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;">Nationality/Region</td><td colspan="2"></td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">４　住　居　地</span></td>
+      <td style="vertical-align:bottom;font-size:10.5pt;">４　住　居　地</td>
       <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_address')}</td>
     </tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Address in Japan</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;">Address in Japan</td><td colspan="2"></td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">５　在留カード番号</span></td>
+      <td style="vertical-align:bottom;font-size:10.5pt;">５　在留カード番号</td>
       <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_cardNo')}</td>
     </tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Residence Card No.</td><td colspan="2"></td></tr>
-    <tr><td style="padding:1mm 0;"><span class="r5-lbl">６　訂 正 の内 容</span></td><td colspan="2"></td></tr>
-    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Details of the correction</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;">Residence Card No.</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:10.5pt;padding-top:1mm;">６　訂 正 の内 容</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 1.5mm 1.2em;" colspan="3">Details of the correction</td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0 1mm 8mm;"><span class="r5-lbl">誤った記載</span></td>
+      <td style="vertical-align:bottom;font-size:10.5pt;padding-left:3em;">誤った記載</td>
       <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_wrong')}</td>
     </tr>
-    <tr><td class="r5-en" style="padding:0 0 2mm 8mm;">Incorrect item</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 2mm 3em;">Incorrect item</td><td colspan="2"></td></tr>
     <tr>
-      <td style="vertical-align:bottom;padding:1mm 0 1mm 8mm;"><span class="r5-lbl">正しい記載</span></td>
+      <td style="vertical-align:bottom;font-size:10.5pt;padding-left:3em;">正しい記載</td>
       <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_correct')}</td>
     </tr>
-    <tr><td class="r5-en" style="padding:0 0 2mm 8mm;">Correct item</td><td colspan="2"></td></tr>
+    <tr><td style="font-size:9pt;padding:0 0 2mm 3em;">Correct item</td><td colspan="2"></td></tr>
   </table>
-  <div style="margin-top:9mm;text-align:center;font-size:10.5pt;">願出者署名<span style="display:inline-block;min-width:16em;border-bottom:1px solid #000;">&nbsp;</span></div>
-  <div style="margin-top:1mm;text-align:center;font-size:9.5pt;padding-left:10em;">（ Applicant's Signature ）</div>
+  <div style="break-inside:avoid;"><div style="margin-top:6mm;font-size:10.5pt;text-align:center;">願出者署名<span style="display:inline-block;min-width:17em;border-bottom:1px solid #000;">&nbsp;</span></div>
+  <div style="font-size:10pt;text-align:center;padding-left:13em;margin-top:1mm;">（ Applicant's Signature ）</div></div>
 </div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
