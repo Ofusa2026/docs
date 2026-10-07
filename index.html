@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261006.05</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261007.01</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -272,6 +272,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📷</span>
       <div>写真提出用紙<span class="item-sub">案件IDで自動入力・顔写真をドラッグ&amp;ドロップ</span></div>
     </div>
+    <div class="item" id="nav-zairyu_teisei" onclick="open_doc('zairyu_teisei')">
+      <span class="item-icon">🪪</span>
+      <div>在留カード記載事項訂正願出書（参考様式５）<span class="item-sub">案件IDで氏名・住居地・在留カード番号などを自動入力</span></div>
+    </div>
     <div class="item" id="nav-suisenhyo" onclick="open_doc('suisenhyo')">
       <span class="item-icon">🇻🇳</span>
       <div>特定技能外国人表<span class="item-sub">交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</span></div>
@@ -354,6 +358,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-riyu_sho"></iframe>
     <iframe id="frame-soufujou"></iframe>
     <iframe id="frame-shashin_teishutsu"></iframe>
+    <iframe id="frame-zairyu_teisei"></iframe>
     <iframe id="frame-suisenhyo"></iframe>
     <iframe id="frame-madoguchi"></iframe>
     <iframe id="frame-shinsei_henkou"></iframe>
@@ -454,6 +459,7 @@ const docs={
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1791263157'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1791263157'},
   'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1791263157'},   // ver.20261006.05
+  'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1791350000'},   // ver.20261007.01
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1791263157'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1791263157'},
   'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1791263157'},
@@ -1267,7 +1273,7 @@ var DGJ_DOC_LABELS = {
   '1_11':'1-11号','1_16':'1-16号 事前ガイダンス確認書',
   '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号','1_32':'1-32号',
   '1_1':'1-1号','iko':'移行準備説明書','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
-  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状','shashin_teishutsu':'写真提出用紙',
+  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状','shashin_teishutsu':'写真提出用紙','zairyu_teisei':'在留カード記載事項訂正願出書（参考様式５）',
   'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
   'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',
   'shinsei_henkou_org3':'申請書(所属機関)③','shinsei_henkou_org4':'申請書(所属機関)④'
@@ -1512,6 +1518,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261007.01',
+    date: '2026-10-07',
+    notify: true,
+    items: [
+      '🪪 在留カード記載事項訂正願出書（参考様式５）ページを追加しました（案件IDで氏名・性別・生年月日・国籍・住居地・在留カード番号・提出先局を自動入力）'
+    ]
+  },
   {
     version: 'ver.20261006.05',
     date: '2026-10-06',
