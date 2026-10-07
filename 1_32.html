@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20260929.03</div>
+    <div class="ver">ver.20261007.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -59,6 +59,11 @@
       <div class="fg"><label>④ 技能実習生・１号特定技能外国人との職務内容の違い</label><textarea id="f_jobDiff" rows="4" oninput="p()"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">２　指導を受ける対象者（入力した行のみ表示）</div>
+      <div class="fg" id="t2WhoWrap" style="display:none;">
+        <label>この書類の２号特定技能外国人（ヒアリングフォーム回答の紐づけ）</label>
+        <select id="f_t2Who" onchange="var h=document.getElementById('f_t2WhoSel');if(h)h.value=this.value;applyT2Targets(true);"></select>
+      </div>
+      <input type="hidden" id="f_t2WhoSel" value="">
       <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">外国人の場合は氏名欄に在留カード番号も記載</div>
       <div class="fg"><label>① 氏名（＋在留カード番号）</label><input id="f_t1Name" oninput="p()"></div>
       <div class="fg"><label>① 事業所及び所属部署名</label><input id="f_t1Dept" oninput="p()"></div>
@@ -169,6 +174,52 @@ ${tRows}
   fitDocToPreview();
 }
 function _wareki32(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+// ver.20261007.01: 指導対象者を「どの２号外国人の対象か」で絞り込む。
+//   フォーム回答の t2Targets[].group/person（this=今回申請・now=既存２号、person=各リストの番号）と
+//   t2NamesThis / t2NamesNow を使って紐づけし、f_t2Who セレクタで選んだ人の対象者のみ①〜⑤へ反映する。
+window._t2Form=null;
+function _t2BuildOptions(fr){
+  const parse=x=>{ if(Array.isArray(x)) return x; try{const a=JSON.parse(x||'[]');return Array.isArray(a)?a:[];}catch(_e){return [];} };
+  const nThis=parse(fr.t2NamesThis), nNow=parse(fr.t2NamesNow);
+  const names={}, order=[];
+  nThis.forEach((nm,i)=>{const k='this-'+(i+1); names[k]=String(nm||'').trim(); order.push(k);});
+  nNow.forEach((nm,i)=>{const k='now-'+(i+1); names[k]=String(nm||'').trim(); order.push(k);});
+  const targets=Array.isArray(fr.t2Targets)?fr.t2Targets:[];
+  const grouped=targets.some(t=>t && t.group && t.person);
+  window._t2Form={targets, names, order, grouped};
+  const sel=document.getElementById('f_t2Who'), wrap=document.getElementById('t2WhoWrap');
+  if(!sel) return;
+  sel.innerHTML='';
+  const add=(vv,txt)=>{const o=document.createElement('option');o.value=vv;o.textContent=txt;sel.appendChild(o);};
+  add('','── 選択してください ──');
+  order.forEach(k=>{ if(names[k]) add(k,(k.indexOf('this')===0?'今回申請：':'既存２号：')+names[k]); });
+  add('all','（全員まとめて表示）');
+  if(wrap) wrap.style.display=(grouped && order.length)?'':'none';
+}
+function applyT2Targets(manual){
+  const tf=window._t2Form; if(!tf) return;
+  const sel=document.getElementById('f_t2Who');
+  const who=sel?sel.value:'';
+  let list=tf.targets;
+  if(tf.grouped){
+    if(who && who!=='all'){
+      const m=who.match(/^(this|now)-(\d+)$/);
+      list=m?tf.targets.filter(t=>t && String(t.group)===m[1] && String(t.person)===m[2]):[];
+    }else if(!who){ list=[]; }
+  }
+  for(let n=1;n<=5;n++){ ['Name','Dept','Pos','Job'].forEach(sfx=>{const e=document.getElementById('f_t'+n+sfx); if(e)e.value='';}); }
+  list.slice(0,5).forEach((t,i)=>{
+    const n=i+1;
+    const nm=[t.name,t.card].filter(Boolean).join('　');
+    const s2=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    s2('f_t'+n+'Name',nm); s2('f_t'+n+'Dept',t.dept); s2('f_t'+n+'Pos',t.position); s2('f_t'+n+'Job',t.job);
+  });
+  p();
+  if(manual && typeof showToast==='function'){
+    const nm=tf.names[who];
+    showToast(who==='all' ? '指導対象者を全員分表示しました' : (nm?('「'+nm+'」の指導対象者（'+Math.min(list.length,5)+'名）を反映しました'):'指導対象者をクリアしました'));
+  }
+}
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -214,15 +265,30 @@ async function loadFromDB(passedInfo){
           sf('f_jobDesc', fr.t2JobDetail);
           sf('f_jobDiff', fr.t2JobDiff);
           const tg = Array.isArray(fr.t2Targets) ? fr.t2Targets : [];
-          tg.slice(0,5).forEach((t,i)=>{
-            const n=i+1;
-            const nm=[t.name, t.card].filter(Boolean).join('　');
-            sf('f_t'+n+'Name', nm);
-            sf('f_t'+n+'Dept', t.dept);
-            sf('f_t'+n+'Pos', t.position);
-            sf('f_t'+n+'Job', t.job);
-          });
-          if(fr.t2Dept||fr.t2JobDetail||tg.length) showToast('📋 2号ヒアリングフォームの回答を反映しました');
+          // ver.20261007.01: 対象者はgroup/personで「どの２号外国人の対象か」を判定して反映
+          _t2BuildOptions(fr);
+          const sel2=document.getElementById('f_t2Who');
+          if(sel2){
+            // ①保存済みの選択（hidden f_t2WhoSel）を復元 → ②申請人名と一致する候補を自動選択
+            const savedWho=v('f_t2WhoSel');
+            if(savedWho && Array.from(sel2.options).some(o=>o.value===savedWho)) sel2.value=savedWho;
+            if(!sel2.value && window._t2Form){
+              const norm=s=>String(s||'').replace(/[\s　・，、]/g,'');
+              const cand=[v('f_applicant'), cas&&cas.applicant, pe&&pe.applicant_name_en].map(norm).filter(Boolean);
+              let hit='';
+              for(const k of window._t2Form.order){
+                const nm=norm(window._t2Form.names[k]);
+                if(nm && cand.some(c=>c===nm)){ hit=k; break; }
+              }
+              if(!hit && window._t2Form.grouped && window._t2Form.order.length===1) hit=window._t2Form.order[0];
+              if(!window._t2Form.grouped) hit='all';
+              if(hit){ sel2.value=hit; const h=document.getElementById('f_t2WhoSel'); if(h)h.value=hit; }
+            }
+          }
+          applyT2Targets(false);
+          if(window._t2Form && window._t2Form.grouped && sel2 && !sel2.value){
+            showToast('⚠️ 指導対象者が複数の２号外国人に紐づいています。入力欄の「この書類の２号特定技能外国人」から選択してください');
+          } else if(fr.t2Dept||fr.t2JobDetail||tg.length) showToast('📋 2号ヒアリングフォームの回答を反映しました');
         }
       }
     }catch(_e){ console.warn('[1_32] tokutei2_pledge load:', _e); }
