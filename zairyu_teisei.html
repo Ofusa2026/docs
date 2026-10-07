@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在留カード記載事項訂正願出書（参考様式５）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:10mm 18mm!important;line-height:1.6!important;min-height:auto!important}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:10mm 18mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+.tt-line{border-bottom:1px solid #000;}
+.tt-circle{border:1.6px solid #000;border-radius:50%;padding:0 5px;}
+.r5-lbl{font-size:10.5pt;}
+.r5-en{font-size:8.5pt;}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 在留カード記載事項訂正願出書（参考様式５）</div>
+    <div class="ver">ver.20261007.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('zairyu_teisei')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">提出先・日付</div>
+      <div class="fg"><label>提出先局（受付番号から自動）</label><input id="f_bureau" oninput="p()" placeholder="例：東京"></div>
+      <div class="fg"><label>番号（No. 通常は空欄）</label><input id="f_no" oninput="p()"></div>
+      <div class="fg"><label>日付（Date）</label><input id="f_docDate" oninput="p()" placeholder="2026年10月7日"></div>
+    </div>
+    <div class="fs"><div class="fs-title">願出者（申請人）</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>性別（男／女）</label><input id="f_gender" oninput="p()" placeholder="男 または 女"></div>
+      <div class="fg"><label>生年月日</label><input id="f_birthdate" oninput="p()" placeholder="2000-01-31"></div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>住居地</label><textarea id="f_address" rows="2" oninput="p()"></textarea></div>
+      <div class="fg"><label>在留カード番号</label><input id="f_cardNo" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">６ 訂正の内容</div>
+      <div class="fg"><label>誤った記載</label><input id="f_wrong" oninput="p()"></div>
+      <div class="fg"><label>正しい記載</label><input id="f_correct" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1791258123"></script>
+<script>
+var BUREAU_MAP={ '東':['東京','TOKYO'],'阪':['大阪','OSAKA'],'名':['名古屋','NAGOYA'],'福':['福岡','FUKUOKA'],
+  '横':['横浜','YOKOHAMA'],'神':['神戸','KOBE'],'広':['広島','HIROSHIMA'],'仙':['仙台','SENDAI'],
+  '高':['高松','TAKAMATSU'],'札':['札幌','SAPPORO'],'那':['那覇','NAHA'],'中':['広島','HIROSHIMA'] };
+function bureauFromReceipt(rno){
+  var s=String(rno||'').trim(); if(!s) return null;
+  return BUREAU_MAP[s.charAt(0)]||null;
+}
+function bureauEn(jp){
+  jp=String(jp||'').trim();
+  for(var k in BUREAU_MAP){ if(BUREAU_MAP[k][0]===jp) return BUREAU_MAP[k][1]; }
+  return '';
+}
+function _bp5(){
+  var m=String(v('f_birthdate')||'').match(/(\d{4})[-\/年]\s*(\d{1,2})[-\/月]\s*(\d{1,2})/);
+  return m?{y:m[1],m:String(parseInt(m[2])),d:String(parseInt(m[3]))}:null;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const g=String(v('f_gender')||'');
+  const isF=/女|female/i.test(g), isM=(/男|male/i.test(g)&&!isF);
+  const mMale=isM?'<span class="tt-circle">男</span>&nbsp;Male':'男&nbsp;Male';
+  const mFemale=isF?'<span class="tt-circle">女</span>&nbsp;Female':'女&nbsp;Female';
+  const ben=bureauEn(v('f_bureau'));
+  const bp=_bp5();
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:10.5pt;margin-bottom:2mm;">参考様式５</div>
+<div style="border:1.2px solid #000;min-height:258mm;padding:6mm 10mm;box-sizing:border-box;">
+  <div style="text-align:right;font-size:10.5pt;letter-spacing:4px;">番　号</div>
+  <div style="text-align:right;font-size:9.5pt;margin-bottom:1mm;">No,&nbsp;<span style="display:inline-block;min-width:9em;border-bottom:1px solid #000;text-align:center;">${f('f_no')}</span></div>
+  <div style="text-align:right;font-size:10.5pt;letter-spacing:2px;">年　月　日</div>
+  <div style="text-align:right;font-size:9.5pt;margin-bottom:4mm;">Date:&nbsp;<span style="display:inline-block;min-width:9em;border-bottom:1px solid #000;text-align:center;">${f('f_docDate')}</span></div>
+  <div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:4px;margin-bottom:1mm;">在　留　カ　ー　ド　記　載　事　項　訂　正　願　出　書</div>
+  <div style="text-align:center;font-size:10.5pt;margin-bottom:6mm;">APPLICATION FOR CORRECTION OF AN ITEM ON THE RESIDENCE CARD</div>
+  <div style="text-align:center;font-size:11pt;margin-bottom:1mm;"><span style="display:inline-block;min-width:7em;border-bottom:1px solid #000;text-align:center;">${f('f_bureau')}</span>出入国在留管理局長　殿</div>
+  <div style="text-align:center;font-size:9.5pt;margin-bottom:6mm;">To the Director General of the&emsp;<span style="display:inline-block;min-width:7em;border-bottom:1px solid #000;text-align:center;">${ben?esc(ben):'&nbsp;'}</span>&emsp;Regional Immigration Services Bureau</div>
+  <div style="font-size:10.5pt;margin-bottom:1mm;">　在留カードの記載事項の訂正をお願いします。</div>
+  <div style="font-size:9.5pt;margin-bottom:5mm;">　I hereby request the correction of the item on my residence card.</div>
+  <div style="text-align:center;font-size:11pt;">記</div>
+  <div style="text-align:center;font-size:9.5pt;margin-bottom:3mm;">Notice</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td style="width:32%;vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">１　氏名，性別</span></td>
+      <td style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_applicant')}</td>
+      <td style="width:17%;vertical-align:bottom;padding-left:4mm;font-size:9.5pt;line-height:1.5;">${mMale}<br>${mFemale}</td>
+    </tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Name and Sex</td><td></td><td></td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">２　生 年 月 日</span></td>
+      <td colspan="2" style="vertical-align:bottom;">
+        <span style="display:inline-block;width:70%;border-bottom:1px solid #000;text-align:center;">
+          ${bp?esc(bp.y):'&emsp;&emsp;'}　年　${bp?esc(bp.m):'&emsp;'}　月　${bp?esc(bp.d):'&emsp;'}　日
+        </span>
+      </td>
+    </tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Date of Birth</td><td colspan="2" class="r5-en" style="padding-left:10mm;">　Year　　　　Month　　　　Day</td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">３　国籍・地域</span></td>
+      <td colspan="2" style="vertical-align:bottom;"><span style="display:inline-block;width:70%;border-bottom:1px solid #000;padding:0 2mm;">${f('f_nationality')}</span></td>
+    </tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Nationality/Region</td><td colspan="2"></td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">４　住　居　地</span></td>
+      <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_address')}</td>
+    </tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Address in Japan</td><td colspan="2"></td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0;"><span class="r5-lbl">５　在留カード番号</span></td>
+      <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_cardNo')}</td>
+    </tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Residence Card No.</td><td colspan="2"></td></tr>
+    <tr><td style="padding:1mm 0;"><span class="r5-lbl">６　訂 正 の内 容</span></td><td colspan="2"></td></tr>
+    <tr><td class="r5-en" style="padding-bottom:2mm;">　　Details of the correction</td><td colspan="2"></td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0 1mm 8mm;"><span class="r5-lbl">誤った記載</span></td>
+      <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_wrong')}</td>
+    </tr>
+    <tr><td class="r5-en" style="padding:0 0 2mm 8mm;">Incorrect item</td><td colspan="2"></td></tr>
+    <tr>
+      <td style="vertical-align:bottom;padding:1mm 0 1mm 8mm;"><span class="r5-lbl">正しい記載</span></td>
+      <td colspan="2" style="border-bottom:1px solid #000;vertical-align:bottom;padding:0 2mm;">${f('f_correct')}</td>
+    </tr>
+    <tr><td class="r5-en" style="padding:0 0 2mm 8mm;">Correct item</td><td colspan="2"></td></tr>
+  </table>
+  <div style="margin-top:9mm;text-align:center;font-size:10.5pt;">願出者署名<span style="display:inline-block;min-width:16em;border-bottom:1px solid #000;">&nbsp;</span></div>
+  <div style="margin-top:1mm;text-align:center;font-size:9.5pt;padding-left:10em;">（ Applicant's Signature ）</div>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  try{
+    const cases=await sb('cases?select=applicant,receipt_no,case_no&id=eq.'+caseId);
+    const cas=cases&&cases[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      if(!v('f_bureau')){ const b=bureauFromReceipt(cas.receipt_no||cas.case_no||''); if(b) document.getElementById('f_bureau').value=b[0]; }
+    }
+    const persons=await sb('persons?select=gender,nationality,birthdate,jp_address,jp_detail_address,residence_card&case_id=eq.'+caseId);
+    const pd=persons&&persons[0];
+    if(pd){
+      s('f_gender',pd.gender||'');
+      s('f_nationality',pd.nationality||'');
+      s('f_birthdate',pd.birthdate||'');
+      s('f_address',[pd.jp_address,pd.jp_detail_address].filter(Boolean).join(''));
+      s('f_cardNo',pd.residence_card||'');
+    }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info); opt.textContent='（indexから選択）';
+      sel.appendChild(opt); sel.value=opt.value;
+    }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'zairyu_teisei'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
