@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20261003.01</div>
+    <div class="ver">ver.20261008.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -255,12 +255,28 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     if(personName) s('f_name',personName);
     if(nationality) s('f_nationality',nationality);
-    if(cas&&cas.applicant_field) s('f_field',stripParens(cas.applicant_field));
-    // 業務区分: emp_setsから取得
+    // ver.20261008.01: 分野は 案件(cases.applicant_field) → 雇用条件セット(applicantField) の順で取得。
+    //   「建設分野（特定技能１号）」のような表記は括弧と末尾の「分野」を除き、正式な特定産業分野名（建設 等）にする
     const empSetIdx=parseInt((cas&&cas.emp_set_idx)||info.empSetIdx||0)||0;
     const es=empSets[empSetIdx]||{};
-    const cat=es.category||es.applicantCategory||es.categoryName||'';
-    if(cat) s('f_category',stripParens(cat));
+    const normField=sx=>{ sx=stripParens(sx||''); return sx.replace(/分野$/,'').trim(); };
+    // ver.20261008.02: 複数区分に対応（category/category2…を全部集めて「・」で連結・重複除去）
+    const _collect=(obj,base,norm)=>{
+      const out=[];
+      [base,base+'2',base+'3',base+'4',base+'5'].forEach(k=>{
+        let vv=(norm||stripParens)(obj&&obj[k]||'');
+        vv=(vv||'').trim();
+        if(vv && out.indexOf(vv)<0) out.push(vv);
+      });
+      return out;
+    };
+    const fieldsU=_collect(es,'applicantField',normField);
+    const fieldVal=(cas&&cas.applicant_field)?normField(cas.applicant_field):fieldsU.join('・');
+    if(fieldVal) s('f_field',fieldVal);
+    // 業務区分: emp_setsから取得（土木・建築、ライフライン・設備 など複数も連結）
+    const cats=_collect(es,'category',stripParens);
+    const catVal=cats.length?cats.join('・'):stripParens(es.applicantCategory||es.categoryName||'');
+    if(catVal) s('f_category',catVal);
     s('f_orgName',coName);
     s('f_soName',orgName);
     if(soNo) s('f_soNo',soNo);
