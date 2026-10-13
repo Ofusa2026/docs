@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.07</div>
+    <div class="ver">ver.20261013.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -628,7 +628,7 @@ function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
 </tr>
 <tr class="nosplit" style="height:3.87em">
 <td class="b-tttt"><p class="ja">２　住所</p><p class="vi a-center">Địa chỉ</p></td>
-<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_coZip')}　${f('es_coAddress')}</p><p class="ja">${f('es_coAddressEn')}</p><p class="ja a-right">（電話${f('es_coTel')}）</p><p class="vi a-right">(Điện thoại)</p></td>
+<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_coZip')}　${f('es_coAddress')}</p><p class="ja">${f('es_coAddressEn')}</p><p class="ja a-right">（電話${f('es_coTel')}）</p><p class="vi a-right">(Điện thoại ${f('es_coTel')})</p></td>
 </tr>
 <tr class="nosplit" style="height:6.62em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">３　支援業務を行う事務所の所在地</p><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">（２と異なる場合に記入）</p><p class="vi" style="padding-left:2.17em;text-indent:-1.00em">Địa điểm văn phòng cung cấp nghiệp vụ hỗ trợ</p><p class="vi" style="padding-left:2.17em;text-indent:-1.00em">(Điền vào nếu khác với mục 2)</p></td>
@@ -640,12 +640,16 @@ Khái quát về tổ chức thực hiện công tác hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援責任者</p><p class="vi a-center">Người chịu trách nhiệm hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">（ふりがな）</p><p class="ja a-center">氏　　名</p><p class="vi a-center">(Furigana)
 Họ và tên</p></td>
-<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span>${f('es_coMgrKana')}</td>
+<!-- ver.20261013.08: Ⅱ-4 支援責任者の ふりがな・氏名・役職 は変数を外して空欄にする。
+     companies.support_manager_name/title は「別紙参照」「なし」等が入っており、
+     この欄にそのまま印字すると書類として成立しないため。
+     Ⅳ 支援内容の担当者欄(es.coMgrName 34箇所)は従来どおり変数のまま。 -->
+<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center">役　　職</p><p class="vi a-center">Chức vụ</p></td>
-<td class="b-tttk fld" rowspan="2"><span class="sp">&nbsp;</span>${f('es_coMgrTitle')}</td>
+<td class="b-tttk fld" rowspan="2"><span class="sp">&nbsp;</span></td>
 </tr>
 <tr class="nosplit" style="height:3.94em">
-<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span>${f('es_coMgrName')}</td>
+<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span></td>
 </tr>
 <tr class="nosplit" style="height:4.68em">
 <td class="b-tttt"><p class="ja a-center">支援を行っている</p><p class="ja a-center">１号特定技能外国人数</p><p class="vi a-center">Số người nước ngoài có kỹ năng đặc định số 1 đang hỗ trợ</p></td>
