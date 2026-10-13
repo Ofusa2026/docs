@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.01</div>
+    <div class="ver">ver.20261013.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1469,9 +1469,29 @@ async function loadFromDB(passedInfo){
   if(!info||!info.caseId) return;
   var caseId=info.caseId, companyId=info.companyId, companyName=info.companyName;
   var _s=function(id,val){var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val;};
+  /* ver.20261013.02: 住所文字列を 都道府県／市区町村／以降 に分割（1_17.html Word版 splitAddress と同一仕様） */
+  var _splitAddr=function(str){
+    if(!str) return {pref:'',city:'',rest:''};
+    var pm=String(str).match(/^(北海道|東京都|(?:京都|大阪)府|.{2,3}県)/);
+    var pref=pm?pm[1]:''; var r1=pm?String(str).substring(pref.length):String(str);
+    var cm=r1.match(/^(.+?[市区町村郡])/);
+    var city=cm?cm[1]:''; var rest=cm?r1.substring(city.length):r1;
+    return {pref:pref,city:city,rest:rest};
+  };
+  /* 電話番号を3分割して es_<base>1/2/3 にセット */
+  var _setTel=function(base,tel){
+    var t=String(tel||'').split(/[-－ー]/);
+    _s(base+'1',t[0]); _s(base+'2',t[1]); _s(base+'3',t[2]);
+  };
+  /* "2026-10-01" / "2026年10月1日" を es_<base>Y/M/D にセット（月日は先頭0を落とす） */
+  var _setYMD=function(base,val){
+    var a=String(val||'').replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
+    if(a.length<3||!a[0]) return;
+    _s(base+'Y',a[0]); _s(base+'M',String(parseInt(a[1],10)||a[1])); _s(base+'D',String(parseInt(a[2],10)||a[2]));
+  };
   try{
     var res=await Promise.all([
-      sb('cases?select=id,name,applicant,company_id,doc_create_date&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,company_id,doc_create_date,emp_set_idx,so_office_idx&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     var cas=res[0]&&res[0][0]; var _pd=res[1]&&res[1][0]; var pd=(_pd&&_pd.data)||_pd||{};
@@ -1496,6 +1516,25 @@ async function loadFromDB(passedInfo){
         _s('es_coMgrTitle',co.support_manager_title||co.rep_title); _s('es_coMgrTitleEn',co.support_manager_title_en||co.rep_title_en);
         _s('es_coMgrKana',co.support_manager_kana);
         _s('es_coAuthorName',co.author_name||co.rep_name);
+
+        /* ver.20261013.02: 雇用条件セット(companies.emp_sets[])由来の項目。
+           どのセットを使うかは cases.emp_set_idx で決まるが未設定の案件が多いため、
+           共通処理 resolveEmpSetIdx（申請人名・案件名から自動解決）に任せる。 */
+        var _esIdx = 0;
+        if(typeof window.resolveEmpSetIdx==='function'){
+          try{ _esIdx = await window.resolveEmpSetIdx(co, cas, info); }catch(_e){ _esIdx = 0; }
+        }
+        var _es = (Array.isArray(co.emp_sets) ? co.emp_sets : [])[_esIdx] || {};
+        _s('es_cohabitants',   _es.cohabitants);
+        /* 居住費は emp_set 上は deductHousing（給与控除の居住費）に入っている。
+           housingFee というキーは殆どの企業に存在しない。Word版 rv() と同じ扱い。 */
+        _s('es_housingFee',    _es.deductHousing||_es.housingFee);
+        _s('es_actualCostDesc',_es.actualCostDesc);
+        /* 事業所の都道府県・市区町村は単独キーが殆ど無く、officeAddr から切り出す。 */
+        var _oa = _es.officeAddr||_es.officeAddress||'';
+        var _sp = _splitAddr(_oa);
+        _s('es_officePref', _es.officePref||_sp.pref);
+        _s('es_officeCity', _es.officeCity||_sp.city);
       }
     }
     // 登録支援機関
@@ -1511,7 +1550,34 @@ async function loadFromDB(passedInfo){
         _s('es_soName',so.name); _s('es_soNameEn',so.name_en); _s('es_soNameKana',so.name_kana);
         _s('es_soRegNo',so.reg_no); _s('es_soZip',so.zip); _s('es_soAddress',so.address);
         _s('es_soRepName',so.rep_name); _s('es_soRepNameEn',so.rep_name_en); _s('es_soRepKana',so.rep_name_kana);
-      }}catch(e){}
+
+        /* ver.20261013.02: 以下はサイドバー項目・本文の ${f()} は既にあるのに
+           取得処理が無く、案件を読み込んでも常に空欄だった項目。 */
+        // ２ 登録年月日
+        _setYMD('es_soReg', so.reg_date);
+        // ４ 住所の電話番号
+        _setTel('es_soTel', so.tel);
+        // ７ 支援業務を行う体制の概要（支援責任者・人数）
+        _s('es_soMgrKana', so.support_manager_kana);
+        _s('es_soMgr', so.support_manager_name||so.support_manager);
+        _s('es_soMgrTitle', so.support_manager_title);
+        _s('es_soSupporterCount', so.supporter_count);
+        _s('es_soSupportStaffCount', so.support_staff_count);
+
+        /* ６ 支援を行う事務所の所在地。
+           support_orgs.offices[] は複数事業所の配列で、案件ごとに
+           cases.so_office_idx でどれを使うか決まる（未設定なら先頭）。
+           事業所側に値が無い場合は本部(so.zip/address/tel)にフォールバックする。 */
+        var _oIdx = parseInt((cas&&cas.so_office_idx)||0, 10) || 0;
+        var _offs = Array.isArray(so.offices) ? so.offices : [];
+        var _off  = _offs[_oIdx] || _offs[0] || {};
+        var _offAddr = _off.officeAddress
+          || ((_off.officePref||'')+(_off.officeCity||'')+(_off.officeAddressDetail||''))
+          || so.address;
+        _s('es_soOfficeZip', _off.officeZip||so.zip);
+        _s('es_soOfficeAddress', _offAddr);
+        _setTel('es_soOfficeTel', _off.officeTel||so.tel);
+      }}catch(e){ console.warn('[1-17] 登録支援機関の取得に失敗:', e); }
     }
     p();
     if(typeof showToast==='function') showToast('案件を読み込みました');
