@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20261013.04</div>
+    <div class="ver">ver.20261013.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -491,6 +491,9 @@ window.BLANK_REQUIRED = function(){
   var _shiftOn=/あり|有/.test((typeof v==='function'&&v('es_shiftFlg'))||'') || !!(window.cbState && window.cbState['shift_work']);
   if(_shiftOn){ req.push('es_shift1Start','es_shift1End'); }
   else { req.push('es_startTime','es_endTime','es_dailyHours'); }
+  // 変形労働「適用あり」なら単位が必須
+  var _bfF=(typeof v==='function'&&v('es_flexFlg'))||'';
+  if(_bfF && !/適用なし|^なし$|^無$|適用しない/.test(_bfF)) req.push('es_flexUnit','es_flexUnitEn');
   // 昇給「有」（チェック）なら時期・金額等が必須
   if(!(window.cbState && window.cbState['raise_yes']===false)) req.push('es_raiseCondition','es_raiseConditionEn');
   // 賞与「有」なら時期・金額等が必須
@@ -787,7 +790,7 @@ function p(){
       </div>
       <div style="font-size:8.5pt;margin-top:4px;margin-left:8px;">(2)【次の制度が労働者に適用される場合】<br><span class="id" style="font-size:7.5pt;" data-key="53">【အောက်ပါစနစ်များသည် အလုပ်သမားနှင့် သက်ဆိုင်အကျုံးဝင်ပါက】</span></div>
       <div style="margin-left:16px;font-size:8pt;">
-        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制：（<span class="f">${esc((flexTypeShown||'　　').replace(/単位/g,''))}</span>）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
+        ${cb(flexOn,'flex_work')}&nbsp;変形労働時間制：（${flexTypeShown?('<span class="f" data-bind="es_flexUnit">'+esc(flexTypeShown.replace(/単位/g,''))+'</span>'):f('es_flexUnit')}）単位の変形労働時間制${v('es_flexDetail')?'<br><span style="font-size:8pt;">'+esc(v('es_flexDetail'))+'</span>':''}<br>
         <span class="id" style="font-size:7pt;" data-key="54">${cb(flexOn,'flex_work_id')} ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်: (<span class="f">${esc(v('es_flexUnitEn')||({'1ヶ月':'၁ လ','１ヶ月':'၁ လ','1か月':'၁ လ','1カ月':'၁ လ','1年':'၁ နှစ်','１年':'၁ နှစ်','1週間':'၁ ပတ်','１週間':'၁ ပတ်'}[flexTypeShown.replace(/単位/g,'').trim()])||flexTypeShown.replace(/単位/g,'')||'　　')}</span>) အခြေခံ ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်</span>
         <div style="font-size:7.5pt;">※ １年単位の変形労働時間制を採用している場合には，乙が十分に理解できる言語を併記した年間カレンダーの写し及び労働基準監督署へ届け出た変形労働時間制に関する協定書の写しを添付する。<br><span class="id" style="font-size:6.5pt;" data-key="55">တစ်နှစ်တာအခြေခံ ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်ကို အသုံးပြုပါက၊ အလုပ်သမား (乙) နားလည်နိုင်သော ဘာသာစကားဖြင့် ဖော်ပြထားသည့် နှစ်စဉ်အလုပ်ချိန်ပြက္ခဒိန် မိတ္တူနှင့် အလုပ်သမားစံချိန်စံညွှန်း ကြီးကြပ်ရေးရုံးသို့ တင်သွင်းထားသော ပြောင်းလဲသတ်မှတ်ထားသော အလုပ်ချိန်စနစ်ဆိုင်ရာ သဘောတူညီချက်စာချုပ်၏ မိတ္တူကို ပူးတွဲတင်ပြရမည်။</span></div>
         <div style="margin-top:2px;">${cb(shiftOn,'shift_work')}&nbsp;交代制として，次の勤務時間の組合せによる。<br><span class="id" style="font-size:7pt;" data-key="56">လှည့်ကျ အလုပ်ချိန်စနစ်ဖြင့် အောက်ပါ အလုပ်ချိန်အစီအစဉ်များအတိုင်း တာဝန်ထမ်းဆောင်ရမည်။</span></div>
