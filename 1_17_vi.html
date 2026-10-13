@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.05</div>
+    <div class="ver">ver.20261013.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -613,7 +613,7 @@ function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
 </tr>
 <tr class="nosplit" style="height:5.73em">
 <td class="b-ttkt"><p class="ja">３　生年月日</p><p class="vi">Ngày tháng năm sinh</p></td>
-<td class="b-ttkt" colspan="3"><p class="ja">${f('f_birthY')}年${f('f_birthM')}月${f('f_birthD')}日</p><p class="vi">           Ngày    tháng    năm</p></td>
+<td class="b-ttkt" colspan="3"><p class="ja">${f('f_birthY')}年${f('f_birthM')}月${f('f_birthD')}日</p><p class="vi">Ngày ${f('f_birthD')} tháng ${f('f_birthM')} năm ${f('f_birthY')}</p></td>
 <td class="b-ttkt" colspan="3"><p class="ja">４　国籍・地域</p><p class="vi">Quốc tịch/Khu vực</p></td>
 <td class="b-ttkk" colspan="2"><p class="ja a-center">ベトナム</p><p class="vi a-center">Việt Nam</p></td>
 </tr>
@@ -1507,8 +1507,9 @@ async function loadFromDB(passedInfo){
       if(typeof showToast==='function') showToast('⚠ 申請人の国籍は「'+_nat+'」です。ベトナム語版ではなく該当言語の1-17をお使いください。');
     }
     _s('f_gender', pd.gender||'');
-    var bd=(pd.birthday||pd.birth_date||pd.birthDate||'').toString().replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
-    if(bd.length>=3){_s('f_birthY',bd[0]);_s('f_birthM',String(parseInt(bd[1],10)||bd[1]));_s('f_birthD',String(parseInt(bd[2],10)||bd[2]));}
+    /* ver.20261013.06: persons の列名は birthdate。従来は birthday / birth_date /
+       birthDate の3通りしか見ておらず、どれにも一致せず生年月日が常に空だった。 */
+    _setYMD('f_birth', pd.birthdate||pd.birthday||pd.birth_date||pd.birthDate);
     // 作成日
     var dc=(cas&&cas.doc_create_date||'').toString().replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
     if(dc.length>=3){_s('es_createY',dc[0]);_s('es_createM',String(parseInt(dc[1],10)||dc[1]));_s('es_createD',String(parseInt(dc[2],10)||dc[2]));}
