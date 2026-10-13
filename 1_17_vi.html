@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.10</div>
+    <div class="ver">ver.20261013.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -557,7 +557,9 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>代表者 氏名(英)<span class="fid">es.soRepNameEn</span></label><input id="es_soRepNameEn" oninput="p()"></div>
 <div class="fg"><label>事務所 郵便番号<span class="fid">es.soOfficeZip</span></label><input id="es_soOfficeZip" oninput="p()"></div>
 <div class="fg"><label>事務所 住所<span class="fid">es.soOfficeAddress</span></label><textarea id="es_soOfficeAddress" oninput="p()" rows="2"></textarea></div>
-<div class="fg3"><div class="fg"><label>事務所TEL1<span class="fid">es.soOfficeTel1</span></label><input id="es_soOfficeTel1" oninput="p()"></div><div class="fg"><label>TEL2<span class="fid">es.soOfficeTel2</span></label><input id="es_soOfficeTel2" oninput="p()"></div><div class="fg"><label>TEL3<span class="fid">es.soOfficeTel3</span></label><input id="es_soOfficeTel3" oninput="p()"></div></div>
+<!-- ver.20261013.11: 事務所 住所(英)を追加。電話は3分割をやめ1本にする。 -->
+<div class="fg"><label>事務所 住所(英)<span class="fid">es.soOfficeAddressEn</span></label><textarea id="es_soOfficeAddressEn" oninput="p()" rows="2"></textarea></div>
+<div class="fg"><label>事務所 電話番号<span class="fid">es.soOfficeTel</span></label><input id="es_soOfficeTel" oninput="p()"></div>
 <div class="fg"><label>支援責任者 ふりがな<span class="fid">es.soMgrKana</span></label><input id="es_soMgrKana" oninput="p()"></div>
 <div class="fg"><label>支援責任者 氏名<span class="fid">es.soMgr</span></label><input id="es_soMgr" oninput="p()"></div>
 <div class="fg"><label>支援責任者 役職<span class="fid">es.soMgrTitle</span></label><input id="es_soMgrTitle" oninput="p()"></div>
@@ -696,12 +698,12 @@ Họ tên người đại diện</p></td>
 <td class="b-tttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_soRepKana')}</td>
 </tr>
 <tr class="nosplit" style="height:3.39em">
-<td class="b-tttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_soRepName')}</td>
+<td class="b-tttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_soRepName')}<br>${f('es_soRepNameEn')}</td>
 </tr>
 <tr class="nosplit" style="height:6.29em">
 <td class="b-tttt" colspan="2"><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">６　支援を行う事務所の所在地
 Địa chỉ văn phòng thực hiện hỗ trợ</p></td>
-<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_soOfficeZip')}　${f('es_soOfficeAddress')}</p><p class="ja a-right">（電話${f('es_soOfficeTel1')}－${f('es_soOfficeTel2')}－${f('es_soOfficeTel3')}）</p><p class="vi a-right">(Điện thoại      -      -       )</p></td>
+<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_soOfficeZip')}　${f('es_soOfficeAddress')}</p><p class="ja">${f('es_soOfficeAddressEn')}</p><p class="ja a-right">（電話${f('es_soOfficeTel')}）</p><p class="vi a-right">(Điện thoại ${f('es_soOfficeTel')})</p></td>
 </tr>
 <tr class="nosplit" style="height:2.09em">
 <td class="b-nkkt vert cont" rowspan="4">&nbsp;</td>
@@ -1486,11 +1488,8 @@ async function loadFromDB(passedInfo){
     var city=cm?cm[1]:''; var rest=cm?r1.substring(city.length):r1;
     return {pref:pref,city:city,rest:rest};
   };
-  /* 電話番号を3分割して es_<base>1/2/3 にセット */
-  var _setTel=function(base,tel){
-    var t=String(tel||'').split(/[-－ー]/);
-    _s(base+'1',t[0]); _s(base+'2',t[1]); _s(base+'3',t[2]);
-  };
+  /* ver.20261013.11: 電話番号の3分割ヘルパー(_setTel)は、全ての電話欄を
+     「案シスの値をそのまま1本で表示」に統一したため不要になり削除した。 */
   /* "2026-10-01" / "2026年10月1日" を es_<base>Y/M/D にセット（月日は先頭0を落とす） */
   var _setYMD=function(base,val){
     var a=String(val||'').replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
@@ -1594,7 +1593,10 @@ async function loadFromDB(passedInfo){
           || so.address;
         _s('es_soOfficeZip', _off.officeZip||so.zip);
         _s('es_soOfficeAddress', _offAddr);
-        _setTel('es_soOfficeTel', _off.officeTel||so.tel);
+        /* ver.20261013.11: 事務所の住所(英)。事務所側に無ければ本部の英語住所へ。
+           電話は3分割をやめ案シスの値をそのまま1本で入れる。 */
+        _s('es_soOfficeAddressEn', _off.officeAddressEn||so.address_en);
+        _s('es_soOfficeTel', _off.officeTel||so.tel);
       }}catch(e){ console.warn('[1-17] 登録支援機関の取得に失敗:', e); }
     }
     p();
