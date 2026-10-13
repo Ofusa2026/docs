@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20260913.42</div>
+    <div class="ver">ver.20261013.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1500,10 +1500,17 @@ async function loadFromDB(passedInfo){
     }
     // 登録支援機関
     if(typeof findSupportOrg==='function'){
-      try{ var so=await findSupportOrg(info.orgName||''); if(so){
+      /* ver.20261013.01: findSupportOrg は第2引数(列指定)を省くと
+         'name,address,support_manager' の3列しか取得しないため、
+         name_en / name_kana / reg_no / zip / rep_name / rep_name_en が
+         常に undefined になり、登録支援機関欄がほぼ空だった。
+         他書類(10_2等)に倣い列を明示する。1-17は項目が多いため '*' を渡す。
+         併せて so.rep_kana は support_orgs に存在しない列名のため
+         正しい rep_name_kana に修正。 */
+      try{ var so=await findSupportOrg(info.orgName||'', '*'); if(so){
         _s('es_soName',so.name); _s('es_soNameEn',so.name_en); _s('es_soNameKana',so.name_kana);
         _s('es_soRegNo',so.reg_no); _s('es_soZip',so.zip); _s('es_soAddress',so.address);
-        _s('es_soRepName',so.rep_name); _s('es_soRepNameEn',so.rep_name_en); _s('es_soRepKana',so.rep_kana);
+        _s('es_soRepName',so.rep_name); _s('es_soRepNameEn',so.rep_name_en); _s('es_soRepKana',so.rep_name_kana);
       }}catch(e){}
     }
     p();
