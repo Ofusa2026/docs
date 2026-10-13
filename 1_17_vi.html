@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.09</div>
+    <div class="ver">ver.20261013.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -549,7 +549,9 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>名称(英)<span class="fid">es.soNameEn</span></label><input id="es_soNameEn" oninput="p()"></div>
 <div class="fg"><label>郵便番号<span class="fid">es.soZip</span></label><input id="es_soZip" oninput="p()"></div>
 <div class="fg"><label>住所(日)<span class="fid">es.soAddress</span></label><textarea id="es_soAddress" oninput="p()" rows="2"></textarea></div>
-<div class="fg3"><div class="fg"><label>電話1<span class="fid">es.soTel1</span></label><input id="es_soTel1" oninput="p()"></div><div class="fg"><label>電話2<span class="fid">es.soTel2</span></label><input id="es_soTel2" oninput="p()"></div><div class="fg"><label>電話3<span class="fid">es.soTel3</span></label><input id="es_soTel3" oninput="p()"></div></div>
+<!-- ver.20261013.10: 住所(英)を追加。電話は所属機関と同様に3分割をやめ1本にする。 -->
+<div class="fg"><label>住所(英)<span class="fid">es.soAddressEn</span></label><textarea id="es_soAddressEn" oninput="p()" rows="2"></textarea></div>
+<div class="fg"><label>電話番号<span class="fid">es.soTel</span></label><input id="es_soTel" oninput="p()"></div>
 <div class="fg"><label>代表者 ふりがな<span class="fid">es.soRepKana</span></label><input id="es_soRepKana" oninput="p()"></div>
 <div class="fg"><label>代表者 氏名<span class="fid">es.soRepName</span></label><input id="es_soRepName" oninput="p()"></div>
 <div class="fg"><label>代表者 氏名(英)<span class="fid">es.soRepNameEn</span></label><input id="es_soRepNameEn" oninput="p()"></div>
@@ -685,7 +687,7 @@ Họ và tên</p></td>
 </tr>
 <tr class="nosplit" style="height:4.39em">
 <td class="b-tttt" colspan="2"><p class="ja">４　住所</p><p class="vi a-center">Địa chỉ</p></td>
-<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_soZip')}　${f('es_soAddress')}</p><p class="ja a-right">（電話${f('es_soTel1')}－${f('es_soTel2')}－${f('es_soTel3')}）</p><p class="vi a-right">(Điện thoại      -      -       )</p></td>
+<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_soZip')}　${f('es_soAddress')}</p><p class="ja">${f('es_soAddressEn')}</p><p class="ja a-right">（電話${f('es_soTel')}）</p><p class="vi a-right">(Điện thoại ${f('es_soTel')})</p></td>
 </tr>
 <tr class="nosplit" style="height:0.72em">
 <td class="b-tttt vert" rowspan="2"><p class="ja a-center">法人の場合</p><p class="vi a-center">Trường hợp là pháp nhân</p></td>
@@ -1564,14 +1566,15 @@ async function loadFromDB(passedInfo){
       try{ var so=await findSupportOrg(info.orgName||'', '*'); if(so){
         _s('es_soName',so.name); _s('es_soNameEn',so.name_en); _s('es_soNameKana',so.name_kana);
         _s('es_soRegNo',so.reg_no); _s('es_soZip',so.zip); _s('es_soAddress',so.address);
+        _s('es_soAddressEn',so.address_en);   // ver.20261013.10: 住所(英)
         _s('es_soRepName',so.rep_name); _s('es_soRepNameEn',so.rep_name_en); _s('es_soRepKana',so.rep_name_kana);
 
         /* ver.20261013.02: 以下はサイドバー項目・本文の ${f()} は既にあるのに
            取得処理が無く、案件を読み込んでも常に空欄だった項目。 */
         // ２ 登録年月日
         _setYMD('es_soReg', so.reg_date);
-        // ４ 住所の電話番号
-        _setTel('es_soTel', so.tel);
+        // ４ 住所の電話番号（ver.20261013.10: 3分割をやめ案シスの値をそのまま1本で）
+        _s('es_soTel', so.tel);
         // ７ 支援業務を行う体制の概要（支援責任者・人数）
         _s('es_soMgrKana', so.support_manager_kana);
         _s('es_soMgr', so.support_manager_name||so.support_manager);
