@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20261013.01</div>
+    <div class="ver">ver.20261013.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -460,7 +460,46 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1791867458"></script>
+<script src="ofusa_common.js?v=1791882949"></script>
+<script>
+// ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
+window.BLANK_REQUIRED = function(){
+  const req=[
+    'es_createY','es_createM','es_createD','applicantName',
+    'es_orgName','es_orgNameEn','es_orgAddress','es_orgAddressEn','es_orgTel',
+    'es_repTitle','es_repTitleEn','es_repName','es_repNameEn',
+    'es_contractStartY','es_contractStartM','es_contractStartD',
+    'es_contractEndY','es_contractEndM','es_contractEndD',
+    'es_officeName','es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel',
+    'es_applicantField','es_applicantFieldEn','es_category','es_categoryEn',
+    'es_breakTime','es_weeklyH','es_weeklyDays','es_monthlyH','es_monthlyDays','es_yearlyH','es_yearlyDays',
+    'es_annualHolidays','es_paidLeave','es_paidLeaveEn',
+    'es_ot60under','es_ot60over','es_otPrescribed','es_holidayLegal','es_holidayNonLegal','es_nightPremium',
+    'es_payCutoff','es_payCutoffEn','es_payDay','es_payDayEn',
+    'es_deductTax','es_deductSocialIns','es_deductEmpIns','es_deductFood','es_deductHousing','es_deductUtility',
+    'es_deductTotal','es_salaryTotal','es_netPay',
+    'es_resignNoticeDays',
+    'es_healthCheckY','es_healthCheckM',
+    'es_contactDept','es_contactDeptEn','es_contactPerson','es_contactPersonEn','es_contactTel'
+  ];
+  const has=id=>String((typeof v==='function'&&v(id))||'').trim()!=='';
+  // 基本給：月給・日給・時給のいずれか1つ必須（全部空なら3欄とも対象）
+  if(!has('es_salaryMonthly')&&!has('es_salaryDaily')&&!has('es_salaryHourly')){
+    req.push('es_salaryMonthly','es_salaryDaily','es_salaryHourly');
+  }
+  // シフト制なら1本目の始業・終業、シフトなしなら始業・終業・1日所定時間が必須
+  var _shiftOn=/あり|有/.test((typeof v==='function'&&v('es_shiftFlg'))||'') || !!(window.cbState && window.cbState['shift_work']);
+  if(_shiftOn){ req.push('es_shift1Start','es_shift1End'); }
+  else { req.push('es_startTime','es_endTime','es_dailyHours'); }
+  // 昇給「有」（チェック）なら時期・金額等が必須
+  if(!(window.cbState && window.cbState['raise_yes']===false)) req.push('es_raiseCondition','es_raiseConditionEn');
+  // 賞与「有」なら時期・金額等が必須
+  if(/有/.test((typeof v==='function'&&v('es_bonus'))||'')) req.push('es_bonusCondition','es_bonusConditionEn');
+  // 退職金「有」なら詳細・支給条件が必須
+  if(/有/.test((typeof v==='function'&&v('es_retirement'))||'')) req.push('es_retirementDetail','es_retirementDetailEn','es_severanceCondition','es_severanceConditionEn');
+  return req;
+};
+</script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。

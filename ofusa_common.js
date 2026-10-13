@@ -3778,6 +3778,9 @@ window._blankMode = false;
 (function(){
   var st=document.createElement('style');
   st.textContent='.f-blank{background:#fde047 !important;display:inline-block;min-width:5em;min-height:1em;border-radius:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    /* ON中は画面上の「値入り欄の黄色」を消し、必須の空欄だけが黄色に見えるようにする */
+    +'body.blank-mode #pageArea .f[data-bind]{background:transparent !important;}'
+    +'body.blank-mode #pageArea .f.f-blank[data-bind]{background:#fde047 !important;}'
     +'@media print{span.f.f-blank,span.f.f-blank[style*="monospace"],span.f.f-blank[style*="color:#aaa"]{'
     +'visibility:visible !important;display:inline-block !important;color:transparent !important;'
     +'background:#fde047 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'
@@ -3788,9 +3791,17 @@ window._blankMode = false;
 function applyBlankMarks(){
   var area=document.getElementById('pageArea'); if(!area) return;
   var on=!!window._blankMode;
+  // ver.20261013.02: ページが必須リスト(window.BLANK_REQUIRED)を定義している場合は
+  //   必須入力箇所のみを対象にする（任意欄の空欄は黄色にしない）。
+  //   未定義ページは従来どおり全空欄を対象にする。
+  var reqSet=null;
+  if(on && typeof window.BLANK_REQUIRED==='function'){
+    try{ reqSet={}; (window.BLANK_REQUIRED()||[]).forEach(function(k){ reqSet[k]=1; }); }catch(_e){ reqSet=null; }
+  }
   area.querySelectorAll('.f[data-bind]').forEach(function(sp){
     var isEmpty=(sp.getAttribute('style')||'').indexOf('color:#aaa')>=0;
-    if(on&&isEmpty){ if(!sp.classList.contains('f-blank')) sp.classList.add('f-blank'); }
+    var target=isEmpty && (!reqSet || reqSet[sp.getAttribute('data-bind')]);
+    if(on&&target){ if(!sp.classList.contains('f-blank')) sp.classList.add('f-blank'); }
     else if(sp.classList.contains('f-blank')) sp.classList.remove('f-blank');
   });
   var note=area.querySelector('.blank-note');
@@ -3809,6 +3820,7 @@ function applyBlankMarks(){
 }
 function toggleBlankMode(){
   window._blankMode=!window._blankMode;
+  try{ document.body.classList.toggle('blank-mode', window._blankMode); }catch(_e){}
   var b=document.getElementById('blankModeBtn');
   if(b){
     b.style.background=window._blankMode?'#a16207':'#eab308';
