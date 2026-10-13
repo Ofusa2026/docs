@@ -51,12 +51,13 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261006.02</div>
+    <div class="ver">ver.20261013.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
     <button class="btn btn-save" onclick="saveForm()">💾 DB保存</button>
     <button class="btn" id="redModeBtn" onclick="toggleRedMode()" style="background:#dc2626;color:#fff;">🔴 赤字</button>
+    <button class="btn" id="blankModeBtn" onclick="toggleBlankMode()" style="background:#eab308;color:#fff;">🟡 空欄チェック</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button><button class="btn" onclick="discardEditedFromDB()" title="保存済みの直接編集版を破棄して初期表示に戻す">♻️ 編集版破棄</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -459,7 +460,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1791270335"></script>
+<script src="ofusa_common.js?v=1791867458"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。

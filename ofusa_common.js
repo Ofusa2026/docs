@@ -3767,3 +3767,63 @@ document.addEventListener('click', function(e){
   else _arm();
 })();
 /* ===== /赤字モード ===== */
+
+/* ===== ver.20261013.01: 空欄チェックモード（未入力欄を黄色でハイライト） =====
+ * 「🟡 空欄チェック」ボタン(#blankModeBtn)があるページで動作。
+ * ONにすると未入力の欄（.f[data-bind]のプレースホルダ表示）だけ黄色の帯になり、
+ * 印刷・PDFにも黄色が出る（print-color-adjust:exact）。書類上部に
+ * 「黄色の箇所が空欄です…」の注意書きも印字される。保存はしない一時表示。
+ */
+window._blankMode = false;
+(function(){
+  var st=document.createElement('style');
+  st.textContent='.f-blank{background:#fde047 !important;display:inline-block;min-width:5em;min-height:1em;border-radius:2px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+    +'@media print{span.f.f-blank,span.f.f-blank[style*="monospace"],span.f.f-blank[style*="color:#aaa"]{'
+    +'visibility:visible !important;display:inline-block !important;color:transparent !important;'
+    +'background:#fde047 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'
+    +'.blank-note{position:absolute;top:2mm;left:0;right:0;text-align:center;font-size:8pt;font-weight:600;color:#92400e;background:#fef9c3;padding:1px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+  if(document.head) document.head.appendChild(st);
+  else document.addEventListener('DOMContentLoaded',function(){document.head.appendChild(st);});
+})();
+function applyBlankMarks(){
+  var area=document.getElementById('pageArea'); if(!area) return;
+  var on=!!window._blankMode;
+  area.querySelectorAll('.f[data-bind]').forEach(function(sp){
+    var isEmpty=(sp.getAttribute('style')||'').indexOf('color:#aaa')>=0;
+    if(on&&isEmpty){ if(!sp.classList.contains('f-blank')) sp.classList.add('f-blank'); }
+    else if(sp.classList.contains('f-blank')) sp.classList.remove('f-blank');
+  });
+  var note=area.querySelector('.blank-note');
+  if(on){
+    if(!note){
+      var doc=area.querySelector('.doc');
+      if(doc){
+        try{ if(getComputedStyle(doc).position==='static') doc.style.position='relative'; }catch(_e){}
+        var n=document.createElement('div');
+        n.className='blank-note';
+        n.textContent='※ 黄色の箇所が空欄です。ご確認のうえ、記入内容をお知らせください。';
+        doc.insertBefore(n, doc.firstChild);
+      }
+    }
+  }else if(note){ note.remove(); }
+}
+function toggleBlankMode(){
+  window._blankMode=!window._blankMode;
+  var b=document.getElementById('blankModeBtn');
+  if(b){
+    b.style.background=window._blankMode?'#a16207':'#eab308';
+    b.textContent=window._blankMode?'🟡 空欄チェック中':'🟡 空欄チェック';
+  }
+  applyBlankMarks();
+  if(typeof showToast==='function') showToast(window._blankMode
+    ? '🟡 空欄チェックON：未入力の欄が黄色で表示されます（印刷・PDFにも黄色が出ます）'
+    : '空欄チェックOFF');
+}
+(function(){
+  var _t=null;
+  var mo=new MutationObserver(function(){ if(!window._blankMode) return; if(_t)clearTimeout(_t); _t=setTimeout(applyBlankMarks,150); });
+  function _arm(){ var a=document.getElementById('pageArea'); if(a) mo.observe(a,{childList:true,subtree:true}); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', _arm);
+  else _arm();
+})();
+/* ===== /空欄チェックモード ===== */
