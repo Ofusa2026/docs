@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.02</div>
+    <div class="ver">ver.20261013.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -522,7 +522,8 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>申請人 氏名(ローマ字)<span class="fid">applicant</span></label><input id="f_applicant" oninput="p()"></div>
 <div class="fg3"><div class="fg"><label>生年 年<span class="fid">birthY</span></label><input id="f_birthY" oninput="p()"></div><div class="fg"><label>月<span class="fid">birthM</span></label><input id="f_birthM" oninput="p()"></div><div class="fg"><label>日<span class="fid">birthD</span></label><input id="f_birthD" oninput="p()"></div></div>
 <div class="fg"><label>性別<span class="fid">gender</span></label><input id="f_gender" oninput="p()"></div>
-<div class="fg"><label>国籍・地域<span class="fid">nationality</span></label><input id="f_nationality" oninput="p()"></div>
+<!-- ver.20261013.03: 国籍・地域は本文に「ベトナム / Việt Nam」を直接埋め込んだため入力欄を廃止。
+     1-6号と同じく、申請人の国籍＝言語ごとにファイルを分ける方式（1_17_vi / 1_17_id …）。 -->
 </div>
 <div class="fs"><div class="fs-title">特定技能所属機関</div>
 <div class="fg"><label>ふりがな<span class="fid">es.coNameKana</span></label><input id="es_coNameKana" oninput="p()"></div>
@@ -614,7 +615,7 @@ function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
 <td class="b-ttkt"><p class="ja">３　生年月日</p><p class="vi">Ngày tháng năm sinh</p></td>
 <td class="b-ttkt" colspan="3"><p class="ja">${f('f_birthY')}年${f('f_birthM')}月${f('f_birthD')}日</p><p class="vi">           Ngày    tháng    năm</p></td>
 <td class="b-ttkt" colspan="3"><p class="ja">４　国籍・地域</p><p class="vi">Quốc tịch/Khu vực</p></td>
-<td class="b-ttkk fld" colspan="2"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f009" name="f009" data-label="Ⅰ 支援対象者 ＞ ４ 国籍・地域"></textarea></td>
+<td class="b-ttkk" colspan="2"><p class="ja a-center">ベトナム</p><p class="vi a-center">Việt Nam</p></td>
 </tr>
 <tr class="nosplit" style="height:0.24em">
 <td class="b-kkkt vert" rowspan="8"><p class="ja a-center">Ⅱ　特定技能所属機関</p><p class="vi a-center">II. Cơ quan liên kết kỹ năng đặc định</p></td>
@@ -1497,7 +1498,14 @@ async function loadFromDB(passedInfo){
     var cas=res[0]&&res[0][0]; var _pd=res[1]&&res[1][0]; var pd=(_pd&&_pd.data)||_pd||{};
     // 申請人
     _s('f_applicant', (pd.applicant_name_en||pd.applicantNameEn||pd.nameEn)|| (cas&&cas.applicant)||'');
-    _s('f_nationality', pd.nationality||pd.nationality_ja||'');
+    /* ver.20261013.03: 国籍は本文に「ベトナム」を埋め込み済みなので流し込まない。
+       ただしベトナム以外の申請人でこのファイルを開くと書類に誤った国籍が載るため、
+       取得した国籍が一致しない場合だけ警告を出す（言語別ファイルの取り違え防止）。 */
+    var _nat=String(pd.nationality||pd.nationality_ja||'').trim();
+    if(_nat && !/ベトナム|越南|Viet|Việt/i.test(_nat)){
+      console.warn('[1-17vi] 申請人の国籍が「'+_nat+'」ですが、この書類はベトナム語版です。');
+      if(typeof showToast==='function') showToast('⚠ 申請人の国籍は「'+_nat+'」です。ベトナム語版ではなく該当言語の1-17をお使いください。');
+    }
     _s('f_gender', pd.gender||'');
     var bd=(pd.birthday||pd.birth_date||pd.birthDate||'').toString().replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
     if(bd.length>=3){_s('f_birthY',bd[0]);_s('f_birthM',String(parseInt(bd[1],10)||bd[1]));_s('f_birthD',String(parseInt(bd[2],10)||bd[2]));}
