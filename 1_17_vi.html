@@ -493,7 +493,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.06</div>
+    <div class="ver">ver.20261013.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -532,7 +532,8 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>郵便番号<span class="fid">es.coZip</span></label><input id="es_coZip" oninput="p()"></div>
 <div class="fg"><label>住所(日)<span class="fid">es.coAddress</span></label><textarea id="es_coAddress" oninput="p()" rows="2"></textarea></div>
 <div class="fg"><label>住所(英)<span class="fid">es.coAddressEn</span></label><textarea id="es_coAddressEn" oninput="p()" rows="2"></textarea></div>
-<div class="fg3"><div class="fg"><label>電話1<span class="fid">es.coTel1</span></label><input id="es_coTel1" oninput="p()"></div><div class="fg"><label>電話2<span class="fid">es.coTel2</span></label><input id="es_coTel2" oninput="p()"></div><div class="fg"><label>電話3<span class="fid">es.coTel3</span></label><input id="es_coTel3" oninput="p()"></div></div>
+<!-- ver.20261013.07: 電話は「－」区切りの3分割をやめ、案シスの値をそのまま1本で表示する。 -->
+<div class="fg"><label>電話番号<span class="fid">es.coTel</span></label><input id="es_coTel" oninput="p()"></div>
 <div class="fg"><label>支援責任者 ふりがな<span class="fid">es.coMgrKana</span></label><input id="es_coMgrKana" oninput="p()"></div>
 <div class="fg"><label>支援責任者 氏名<span class="fid">es.coMgrName</span></label><input id="es_coMgrName" oninput="p()"></div>
 <div class="fg"><label>支援責任者 氏名(英)<span class="fid">es.coMgrNameEn</span></label><input id="es_coMgrNameEn" oninput="p()"></div>
@@ -623,11 +624,11 @@ function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
 <td class="b-kttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_coNameKana')}</td>
 </tr>
 <tr class="nosplit" style="height:3.51em">
-<td class="b-tttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_coName')}</td>
+<td class="b-tttk fld" colspan="8"><span class="sp">&nbsp;</span>${f('es_coName')}<br>${f('es_coNameEn')}</td>
 </tr>
 <tr class="nosplit" style="height:3.87em">
 <td class="b-tttt"><p class="ja">２　住所</p><p class="vi a-center">Địa chỉ</p></td>
-<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_coZip')}　${f('es_coAddress')}</p><p class="ja a-right">（電話${f('es_coTel1')}－${f('es_coTel2')}－${f('es_coTel3')}）</p><p class="vi a-right">(Điện thoại      -      -       )</p></td>
+<td class="b-tttk" colspan="8"><p class="ja">〒${f('es_coZip')}　${f('es_coAddress')}</p><p class="ja">${f('es_coAddressEn')}</p><p class="ja a-right">（電話${f('es_coTel')}）</p><p class="vi a-right">(Điện thoại)</p></td>
 </tr>
 <tr class="nosplit" style="height:6.62em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">３　支援業務を行う事務所の所在地</p><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">（２と異なる場合に記入）</p><p class="vi" style="padding-left:2.17em;text-indent:-1.00em">Địa điểm văn phòng cung cấp nghiệp vụ hỗ trợ</p><p class="vi" style="padding-left:2.17em;text-indent:-1.00em">(Điền vào nếu khác với mục 2)</p></td>
@@ -1520,7 +1521,8 @@ async function loadFromDB(passedInfo){
         _s('es_coName',co.name); _s('es_coNameEn',co.name_en);
         _s('es_coNameKana',co.name_kana||co.kana);
         _s('es_coZip',co.zip); _s('es_coAddress',(co.pref||'')+(co.city||'')+(co.address||'')); _s('es_coAddressEn',co.address_en);
-        var t=(co.tel||'').split(/[-－]/); _s('es_coTel1',t[0]); _s('es_coTel2',t[1]); _s('es_coTel3',t[2]);
+        /* ver.20261013.07: 案シスの電話番号をそのまま入れる（3分割・「－」補完をやめた）。 */
+        _s('es_coTel', co.tel);
         _s('es_coMgrName',co.support_manager_name||co.rep_name); _s('es_coMgrNameEn',co.support_manager_name_en||co.rep_name_en);
         _s('es_coMgrTitle',co.support_manager_title||co.rep_title); _s('es_coMgrTitleEn',co.support_manager_title_en||co.rep_title_en);
         _s('es_coMgrKana',co.support_manager_kana);
