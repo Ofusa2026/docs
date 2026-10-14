@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261014.01</div>
+    <div class="ver">ver.20261014.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -534,6 +534,13 @@ function moveOfficeToDispatch(){
 function fOr(a, b){
   return (typeof v==='function' && String(v(a)||'').trim()) ? f(a) : ((typeof v==='function' && String(v(b)||'').trim()) ? f(b) : f(a));
 }
+// ver.20261014.02: 初回の定期健診の「月」。案シスに「4,10」（年2回）のように入っているときは最初の月だけ出す（保存値はそのまま）
+function fHcM(){
+  var id=String(v('es_healthCheckM')||'').trim()?'es_healthCheckM':'es_healthCheckM2';
+  var m=String(v(id)||'').trim().split(/[,、，・\s]+/).filter(Boolean);
+  if(m.length<=1) return f(id);
+  return '<span class="f">'+esc(m[0].replace(/月$/,''))+'</span>';
+}
 // ver.20260716: 候補を順に見て、最初に値が入っているものを表示する。
 // f() は未入力でもプレースホルダの<span>を返し常に truthy なので || では判定できない。
 function fOr2(){
@@ -578,7 +585,8 @@ function p(){
   const rAuto=rn==='auto',rPos=rn==='possible',rNone=rn==='none';
   // ver.20260903: 更新の判断基準＋就業規則の条文を案シスから反映（未指定なら従来どおり）
   const _norm=x=>String(x==null?'':x).replace(/[，、]/g,'、').replace(/\s/g,'');
-  const _rcArr=((window._empLoadedSet&&window._empLoadedSet.contractRenewalCond)||'').toString().split(/[、,]/).map(x=>x.trim()).filter(Boolean);
+  // ver.20261014.02: 「労働者の勤務成績、態度」のように「、」を含む項目があるので、決まった項目を先に取り出してから残り（その他）を分ける
+  const _rcArr=(()=>{let r=String((window._empLoadedSet&&window._empLoadedSet.contractRenewalCond)||'').replace(/[，]/g,'、');const out=[];['契約期間満了時の業務量','労働者の勤務成績、態度','従事している業務の進捗状況','労働者の業務を遂行する能力','会社の経営状況'].sort((a,b)=>b.length-a.length).forEach(o=>{if(r.replace(/\s/g,'').indexOf(o)>=0){out.push(o);r=r.replace(/\s/g,'').split(o).join('、');}});const rest=r.split(/[、,]/).map(x=>x.trim()).filter(Boolean).join('、');if(rest)out.push(rest);return out;})();
   const _rcArrN=_rcArr.map(_norm);
   const _rcSet=_rcArr.length>0;
   const _rcStd=['契約期間満了時の業務量','労働者の勤務成績，態度','従事している業務の進捗状況','労働者の業務を遂行する能力','会社の経営状況'].map(_norm);
@@ -1009,7 +1017,7 @@ function p(){
       <div>１．社会保険の加入状況・労働保険の適用状況（${cb(insEnrolled('insPension'),"ins_kousei")}&nbsp;厚生年金，${cb(insEnrolled('insKenpo'),"ins_kenko")}&nbsp;健康保険，${cb(insEnrolled('insEmp'),"ins_koyo")}&nbsp;雇用保険，${cb(insEnrolled('insLabor'),"ins_rousai")}&nbsp;労災保険，</div>
       <div style="margin-left:16px;">${cb(false,"ins_kokumin")}&nbsp;国民年金，${cb(false,"ins_kokumin_kenko")}&nbsp;国民健康保険，${cb(!!otherIns(),"ins_other")}&nbsp;その他（${otherIns()?'&nbsp;'+esc(otherIns())+'&nbsp;':'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'}））<br><span class="id" style="font-size:7pt;">Joining social insurance / employment insurance. (${cb(insEnrolled('insPension'),"ins_kousei_id")}&nbsp;Employees' pension insurance, ${cb(insEnrolled('insKenpo'),"ins_kenko_id")}&nbsp;Health insurance, ${cb(insEnrolled('insEmp'),"ins_koyo_id")}&nbsp;Employment insurance, ${cb(insEnrolled('insLabor'),"ins_rousai_id")}&nbsp;Industrial accident insurance,</span><br><span class="id" style="font-size:7pt;margin-left:16px;">${cb(false,"ins_kokumin_id")}&nbsp;National pension, ${cb(false,"ins_kokumin_kenko_id")}&nbsp;National health insurance, ${cb(!!otherIns(),"ins_other_id")}&nbsp;Others (${otherInsEn()?' '+esc(otherInsEn())+' ':' '}))</span></div>
       <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>月<br><span class="id" style="font-size:7.5pt;">Health check at the time of hiring: Month &nbsp;&nbsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>&nbsp;&nbsp; Year &nbsp;&nbsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>&nbsp;&nbsp;</span></div>
-      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span>月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month <span style="display:inline-block;min-width:2.5em;text-align:center;">${fOr('es_healthCheckM','es_healthCheckM2')}</span> Year <span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span> (${healthFreqTR('en')})</span></div>
+      <div style="margin-top:4px;">３．初回の定期健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${fHcM()}</span>月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month <span style="display:inline-block;min-width:2.5em;text-align:center;">${fHcM()}</span> Year <span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span> (${healthFreqTR('en')})</span></div>
       <div style="margin-top:4px;">４．次の窓口に対して通常の労働者との間の待遇の相違（内容・理由）等について説明を求めることができる。<br><span class="id" style="font-size:7.5pt;">You may request an explanation of the differences in treatment (details, reasons, etc.) compared with regular workers from the following point of contact.</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者職氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Name of department&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Name of person in charge&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(Contact information&emsp;${f('es_contactTel')})</span></div>
       <div style="margin-top:4px;">５．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">Point of contact for matters concerning the improvement of employment management etc.</span></div>
