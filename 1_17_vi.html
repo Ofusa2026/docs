@@ -321,6 +321,15 @@ input.bl{                                /* 行中の記入欄（〒・年月日
   border-radius: 1em;
 }
 .chc .opt input:focus-visible + span{ background: #dbe9ff; }
+/* ver.20261015.01: 常に〇が付く固定選択肢。
+   「支援の適正性を確保していることの有無」のように答が必ず「有」になる欄は、
+   ラジオを置かず選択済みの見た目だけを埋め込む（国籍・ほか0名と同じ方針）。
+   見た目は input:checked + span と同一。 */
+.chc .fixed{
+  outline: 1.2px solid currentColor;
+  outline-offset: 1px;
+  border-radius: 1em;
+}
 
 /* 記入欄の位置を分かりやすくする（画面のみ・切替可能） */
 body.hl textarea.f,
@@ -345,7 +354,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
     outline: 0 !important;
   }
   body.hl textarea.f, body.hl input.bl, body.hl input.cb{ background: transparent !important; }
-  .chc .opt input:checked + span{ outline-color: #000; }
+  .chc .opt input:checked + span, .chc .fixed{ outline-color: #000; }
 }
 
 /* pageArea内のsheetは左寄せ・原寸 */
@@ -493,7 +502,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261013.12</div>
+    <div class="ver">ver.20261015.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -721,7 +730,7 @@ Họ và tên</p></td>
 <tr class="nosplit" style="height:5.80em">
 <td class="b-tttt"><p class="ja a-center">支援を行っている</p><p class="ja a-center">１号特定技能外国人数</p><p class="vi a-center">Số người nước ngoài có kỹ năng đặc định số 1 đang hỗ trợ</p></td>
 <td class="b-tttt" colspan="3"><p class="ja a-right">${f('es_soSupporterCount')}名</p><p class="vi a-right">người</p></td>
-<td class="b-ttkk" colspan="4" rowspan="2"><p class="ja a-center">支援の適正性を確保していることの有無</p><p class="ja">・支援責任者が特定技能所属機関の役員の配偶者、２親等以内の親族、特定技能所属機関の役員と社会生活において密接な関係にある者、過去５年以内に特定技能所属機関の役員又は職員であった者ではないこと</p><p class="ja" style="padding-left:0.90em">・支援責任者及び支援担当者が登録支援機関の登録拒否事由に該当しないこと</p><p class="vi a-center" style="padding-left:0.90em">Tính phù hợp của việc hỗ trợ có được đảm bảo hay không</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không được là vợ hặc chồng hay họ hàng trong vòng 2 đời của viên chức cơ quan trực thuộc kỹ năng đặc định, hoặc người có mối quan hệ thân thiết với viên chức của cơ quan trực thuộc kỹ năng đặc định, hay từng là viên chức hoặc nhân viên của cơ quan trực thuộc kỹ năng đặc định trong vòng 5 năm trở lại.</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không liên quan đến lý do từ chối đăng ký của tổ chức hỗ trợ đăng ký.</p><p class="ja a-center"><span class="chc"><label class="opt"><input type="radio" name="f043" value="有" data-label="登録支援機関 ＞ 名"><span>有</span></label>　　　　　　<label class="opt"><input type="radio" name="f043" value="無" data-label="登録支援機関 ＞ 名"><span>無</span></label></span></p><p class="vi a-center">Có          Không</p></td>
+<td class="b-ttkk" colspan="4" rowspan="2"><p class="ja a-center">支援の適正性を確保していることの有無</p><p class="ja">・支援責任者が特定技能所属機関の役員の配偶者、２親等以内の親族、特定技能所属機関の役員と社会生活において密接な関係にある者、過去５年以内に特定技能所属機関の役員又は職員であった者ではないこと</p><p class="ja" style="padding-left:0.90em">・支援責任者及び支援担当者が登録支援機関の登録拒否事由に該当しないこと</p><p class="vi a-center" style="padding-left:0.90em">Tính phù hợp của việc hỗ trợ có được đảm bảo hay không</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không được là vợ hặc chồng hay họ hàng trong vòng 2 đời của viên chức cơ quan trực thuộc kỹ năng đặc định, hoặc người có mối quan hệ thân thiết với viên chức của cơ quan trực thuộc kỹ năng đặc định, hay từng là viên chức hoặc nhân viên của cơ quan trực thuộc kỹ năng đặc định trong vòng 5 năm trở lại.</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không liên quan đến lý do từ chối đăng ký của tổ chức hỗ trợ đăng ký.</p><p class="ja a-center"><span class="chc"><span class="fixed">有</span>　　　　　　<span>無</span></span></p><p class="vi a-center">Có          Không</p></td>
 </tr>
 <tr class="nosplit" style="height:5.07em">
 <td class="b-ttkt"><p class="ja a-center">支援担当者数</p><p class="vi a-center">Số người phụ trách hỗ trợ</p></td>
