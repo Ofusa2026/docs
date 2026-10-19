@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－２２号　支援担当者の履歴書</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+/* 原本（入管庁 参考様式第１－２２号 Word）の実寸どおり:
+   A4縦・余白15mm・行グリッド16pt・ＭＳ明朝10.5pt
+   表: 列幅(mm) 35.0/13.5/13.5/50.4/22.5/47.0・行高(mm) 9.8/15.0/7.6(見出し)/7.8×8/8.0（Word表示時の実高）
+   タイトル: 16pt・字間8.5pt（9文字で約77.8mm）
+   外枠・氏名欄と②③の間・④の上下 1.5pt、内線0.5pt、ふりがなと氏名の間は点線 */
+.doc{width:210mm!important;height:297mm!important;min-height:0!important;padding:15mm!important;
+  font-family:'MS Mincho','ＭＳ 明朝','Yu Mincho','Hiragino Mincho ProN',serif!important;font-size:10.5pt!important;line-height:16pt!important;overflow:hidden!important;}
+.doc .g{line-height:16pt;min-height:16pt;}
+.doc .ttl{text-align:center;margin:26pt 0 23pt;line-height:16pt;}
+.doc .ttl span{display:inline-block;width:77.8mm;font-size:16pt;text-align:justify;text-align-last:justify;}
+.doc .rt{width:180mm;border-collapse:collapse;table-layout:fixed;border:1.5pt solid #000;}
+.doc .rt td{border:0.5pt solid #000;padding:0 1mm;vertical-align:middle;overflow:hidden;font-size:10.5pt;line-height:14pt;}
+.doc .rt td.c{text-align:center;}
+.doc .rt .tk-r{border-right:1.5pt solid #000;}
+.doc .rt .tk-l{border-left:1.5pt solid #000;}
+.doc .rt .tk-t{border-top:1.5pt solid #000;}
+.doc .rt .tk-b{border-bottom:1.5pt solid #000;}
+.doc .rt .kana{border-bottom:0.5pt dotted #000;font-size:9pt;}
+.doc .rt .nm{border-top:0.5pt dotted #000;font-size:13pt;}
+.doc .circ{display:inline-block;width:1.5em;height:1.5em;line-height:1.5em;text-align:center;border:1px solid #000;border-radius:50%;margin:-0.25em 0;}
+.doc .sp{line-height:12pt;margin:16pt 0;}
+/* 左パネル：学歴・職歴エディタ */
+.hr-row{display:grid;grid-template-columns:4.2em 2.8em 1fr 20px;gap:4px;margin-bottom:4px;align-items:center;}
+.hr-row input{width:100%;box-sizing:border-box;font-size:11px;padding:4px 5px;}
+.hr-row button{border:none;background:none;color:#94a3b8;cursor:pointer;font-size:13px;padding:0;}
+.hr-row button:hover{color:#dc2626;}
+.hr-head{display:grid;grid-template-columns:4.2em 2.8em 1fr 20px;gap:4px;font-size:9.5px;color:#64748b;margin-bottom:2px;}
+.hr-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.hr-tools button{font-size:11px;padding:5px 9px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-weight:600;color:#334155;}
+@media print{
+  @page{size:A4 portrait;margin:0;}
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp,.page-nav,.page-num-label{display:none!important}
+  .main{display:block!important}
+  .pp{padding:0!important;overflow:visible!important}
+  #pageArea{padding:0!important;display:block!important}
+  .doc{zoom:1!important;box-shadow:none!important;margin:0!important;width:210mm!important;height:297mm!important;min-height:0!important;padding:15mm!important;
+    font-size:10.5pt!important;line-height:16pt!important;break-after:auto;}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－２２号　支援担当者の履歴書</div>
+    <div class="ver">ver.20261019.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_22')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div id="rsItakuNote" style="display:none;margin:0 0 8px;padding:7px 9px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;line-height:1.5;"></div>
+    <div class="fs"><div class="fs-title">支援担当者</div>
+      <div class="fg" id="rsPickWrap" style="display:none;"><label>支援担当者を選ぶ（案シスに複数登録あり）</label><select id="rsPick" onchange="rsPickName(this.value)"></select></div>
+      <div class="fg"><label>（ふりがな）</label><input id="f_kana" oninput="p()" placeholder="ほうむ はなこ"></div>
+      <div class="fg"><label>① 氏名</label><input id="f_name" oninput="p()"></div>
+      <div class="fg"><label>② 性別</label><select id="f_gender" onchange="p()"><option value=""></option><option>男</option><option>女</option></select></div>
+      <div class="fg"><label>③ 生年月日（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_bYear" oninput="p()" style="width:4.5em;" placeholder="1980"><input id="f_bMonth" oninput="p()" style="width:3em;"><input id="f_bDay" oninput="p()" style="width:3em;"></div></div>
+    </div>
+    <div class="fs"><div class="fs-title">④ 学歴・職歴（最終学歴・主たる職歴）</div>
+      <div class="hr-head"><span>年</span><span>月</span><span>内容</span><span></span></div>
+      <div id="hrList"></div>
+      <div class="hr-tools">
+        <button onclick="hrAdd()">＋ 行を追加</button>
+        <button onclick="hrAdd('現在に至る')">＋「現在に至る」</button>
+      </div>
+      <textarea id="f_histJson" style="display:none;"></textarea>
+    </div>
+    <div class="fs"><div class="fs-title">⑤ 資格・免許</div>
+      <div class="fg"><textarea id="f_license" oninput="p()" rows="2" placeholder="例：中国語検定○級（無ければ「なし」）"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg"><label>年 / 月 / 日</label><div style="display:flex;gap:4px;"><input id="f_docYear" oninput="p()" style="width:4.5em;"><input id="f_docMonth" oninput="p()" style="width:3em;"><input id="f_docDay" oninput="p()" style="width:3em;"></div></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1792408950"></script>
+<script>
+// ============================================================
+// 参考様式第１－２２号　支援担当者の履歴書
+//   氏名は案シスの所属機関「支援担当者」から自動。
+//   学歴・職歴は隠し欄 f_histJson に JSON で保持（DB保存＝companies.extra['1_22']）。
+// ============================================================
+const RS_ROWS = 8;    // 学歴・職歴の行数（記載が多い時は自動で増える）
+let _hist = [];
+function _rsEsc(s){ return (typeof esc==='function') ? esc(String(s==null?'':s)) : String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function hrSync(){ const t=document.getElementById('f_histJson'); if(t) t.value=JSON.stringify(_hist); }
+function hrLoadFromField(){ const t=document.getElementById('f_histJson'); try{ const a=JSON.parse(t&&t.value||'[]'); _hist=Array.isArray(a)?a:[]; }catch(e){ _hist=[]; } }
+function hrAdd(text){ _hist.push({y:'',m:'',t:text||''}); hrSync(); hrRender(); p();
+  setTimeout(()=>{ const l=document.querySelectorAll('#hrList .hr-y'); if(l.length && !text) l[l.length-1].focus(); },30); }
+function hrDel(i){ _hist.splice(i,1); hrSync(); hrRender(); p(); }
+function hrSet(i,k,val){ if(!_hist[i]) return; _hist[i][k]=val; hrSync(); p(); }
+function hrRender(){
+  const box=document.getElementById('hrList'); if(!box) return;
+  if(!_hist.length){ _hist=[{y:'',m:'',t:''},{y:'',m:'',t:''},{y:'',m:'',t:''}]; hrSync(); }
+  box.innerHTML=_hist.map((r,i)=>`<div class="hr-row">
+    <input class="hr-y" value="${_rsEsc(r.y)}" placeholder="2010" oninput="hrSet(${i},'y',this.value)">
+    <input value="${_rsEsc(r.m)}" placeholder="4" oninput="hrSet(${i},'m',this.value)">
+    <input value="${_rsEsc(r.t)}" placeholder="${i===0?'○○大学○○学部卒業':i===1?'株式会社○○入社 総務課配属':'総務課主任'}" oninput="hrSet(${i},'t',this.value)">
+    <button onclick="hrDel(${i})" title="この行を削除">✕</button>
+  </div>`).join('');
+}
+function rsPickName(n){ const e=document.getElementById('f_name'); if(e){ e.value=n; p(); } }
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const g=v('f_gender');
+  const gm=(x)=> g===x ? `<span class="circ">${x}</span>` : x;
+  const by=v('f_bYear'), bm=v('f_bMonth'), bd=v('f_bDay');
+  const birth = `${by?_rsEsc(by):'　　'}年　${bm?_rsEsc(bm):'　　'}月　${bd?_rsEsc(bd):'　　'}日生`;
+  const rows=_hist.filter(r=>r.y||r.m||r.t);
+  const H=[7.8,7.8,7.8,7.8,7.8,7.8,7.8,7.8];   // 学歴・職歴の行高 mm（原本をWordで開いた時の実高）
+  const n=Math.max(H.length, rows.length);
+  let hist='';
+  for(let i=0;i<n;i++){
+    const r=rows[i]||{}; const h=H[i]||7.8; const last=(i===n-1)?' tk-b':'';
+    hist+=`<tr style="height:${h}mm;"><td class="c${last}">${_rsEsc(r.y||'')}</td><td class="c${last}">${_rsEsc(r.m||'')}</td><td colspan="3" class="tk-r${last}">${_rsEsc(r.t||'')}</td></tr>`;
+  }
+  const y=v('f_docYear'), m=v('f_docMonth'), d=v('f_docDay');
+  // 列(mm): ラベル35.0 | 年13.5 | 月13.5 | 50.4 | ②③ラベル22.5 | 値47.0（合計181.9→本文幅180mmに比例配分）
+  const C=[35.0,13.5,13.5,50.4,22.5,47.0].map(x=>(x/181.9*180).toFixed(2));
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="g" style="font-size:11pt;">参考様式第１－２２号</div>
+<div class="ttl"><span>支援担当者の履歴書</span></div>
+<table class="rt">
+  <colgroup>${C.map(x=>`<col style="width:${x}mm">`).join('')}</colgroup>
+  <tr style="height:9.8mm;">
+    <td rowspan="2"><div style="font-size:8pt;line-height:10pt;padding-left:1em;">（ふりがな）</div><div>①氏名</div></td>
+    <td colspan="3" class="kana tk-r">${f('f_kana')}</td>
+    <td class="tk-l">②性別</td><td class="c">${gm('男')}　・　${gm('女')}</td>
+  </tr>
+  <tr style="height:15mm;">
+    <td colspan="3" class="nm tk-r">${f('f_name')}</td>
+    <td class="tk-l">③生年月日</td><td style="text-align:right;white-space:nowrap;">${birth}</td>
+  </tr>
+  <tr style="height:7.6mm;">
+    <td rowspan="${n+1}" class="tk-t tk-b">④学歴・職歴</td>
+    <td class="c tk-t">年</td><td class="c tk-t">月</td><td colspan="3" class="c tk-t tk-r">最終学歴・主たる職歴</td>
+  </tr>
+  ${hist}
+  <tr style="height:8mm;"><td class="tk-t">⑤資格・免許</td><td colspan="5" class="tk-t">${f('f_license')}</td></tr>
+</table>
+<div class="g"></div><div class="g"></div><div class="g"></div>
+<div class="g" style="font-size:11pt;">　上記の記載内容は、事実と相違ありません。</div>
+<div class="sp" style="text-align:right;">${y?_rsEsc(y):'　　　　　　　　　　'}年　　　　${m?_rsEsc(m):''}月　　　　${d?_rsEsc(d):''}日　　作成</div>
+<div class="sp" style="padding-left:81.5mm;">支援担当者の氏名　　${f('f_name')}</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyRsFontSize();
+  const lbl=document.getElementById('fontSizeLabel'); if(lbl) lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+// A+/A- は記入欄の文字（氏名・職歴など）だけを拡大縮小する（枠の寸法は原本どおり固定）
+function _applyRsFontSize(){
+  const st=document.getElementById('_rsFontStyle')||document.createElement('style');
+  st.id='_rsFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[
+    `.doc{font-size:10.5pt!important}`,
+    `.doc .rt td{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.doc .rt td.kana{font-size:${(9*s).toFixed(2)}pt!important}`,
+    `.doc .rt td.nm{font-size:${(13*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  try{
+    const caseId=info.caseId;
+    const cs=await sb('cases?select=company,company_id,doc_create_date&id=eq.'+caseId); const cas=cs&&cs[0];
+    const SEL='id,name,support_org_name,support_manager_name,support_manager_title,support_staff';
+    let co=null; const cid=info.companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb(`companies?select=${SEL}&id=eq.${cid}`); co=r&&r[0]; }
+    const cname=info.companyName||(cas&&cas.company);
+    if(!co && cname){ const r=await sb(`companies?select=${SEL}&name=eq.${encodeURIComponent(cname)}`); co=r&&r[0]; }
+    co=co||{};
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
+    // 氏名：案シス 所属機関の「支援担当者」。複数登録（「、」区切り等）なら選べるようにする
+    const raw=String(co.support_staff||'').trim();
+    const names=raw && !/別紙/.test(raw) ? raw.split(/[、,，\/／\n]+/).map(x=>x.trim()).filter(Boolean) : [];
+    const pw=document.getElementById('rsPickWrap'), pk=document.getElementById('rsPick');
+    if(names.length>1 && pw && pk){
+      pk.innerHTML=names.map(n=>`<option>${_rsEsc(n)}</option>`).join('');
+      pw.style.display='';
+      const cur=v('f_name'); if(cur && names.includes(cur)) pk.value=cur;
+    }else if(pw){ pw.style.display='none'; }
+    s('f_name', names[0]||'');
+    // 作成日 = 書類作成日（cases.doc_create_date）。無ければ今日。
+    if(!v('f_docYear')){
+      const dcd=(cas&&cas.doc_create_date)?String(cas.doc_create_date).split(/[-\/]/):[];
+      const n=new Date();
+      s('f_docYear',String(parseInt(dcd[0]||n.getFullYear(),10))); s('f_docMonth',String(parseInt(dcd[1]||(n.getMonth()+1),10))); s('f_docDay',String(parseInt(dcd[2]||n.getDate(),10)));
+    }
+    // 登録支援機関に全部委託している会社では、この書類は通常不要
+    const note=document.getElementById('rsItakuNote');
+    const norm=x=>String(x||'').replace(/[\s　]/g,'');
+    if(note){
+      const org=co.support_org_name||'', nm=co.name||cname||'';
+      if(org && norm(org)!==norm(nm) && !/自社/.test(org)){
+        note.style.display=''; note.innerHTML=`ℹ️ この会社は登録支援機関「${_rsEsc(org)}」に支援を委託しています。<br>この書類は、通常<b>自社で支援する場合</b>に提出します。`;
+      }else note.style.display='none';
+    }
+    hrLoadFromField(); hrRender(); p();
+    showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); hrRender(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    const scale = ppW < docW ? ppW / docW : 1;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  // 前の案件の値が残らないよう、いったん空にする
+  ['f_kana','f_name','f_gender','f_bYear','f_bMonth','f_bDay','f_license','f_docYear','f_docMonth','f_docDay','f_histJson'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+  _hist=[];
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_22'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
