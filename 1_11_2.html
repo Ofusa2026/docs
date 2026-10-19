@@ -70,7 +70,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📋 参考様式第１－１１－２号　受け入れた中長期在留者リスト</div>
-    <div class="ver">ver.20261020.01</div>
+    <div class="ver">ver.20261019.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -102,7 +102,7 @@
       <div style="font-size:10.5px;color:#64748b;line-height:1.5;margin-bottom:4px;">案シスで同じ所属機関の案件から自動で一覧を作ります。✔ が付いた人だけ書類に載ります（許可済みの人とこの案件の人に自動で✔）。案シスに無い人は「＋ 行を追加」で入れてください。</div>
       <div class="lr-tools">
         <button class="pri" onclick="lrReloadFromDB()">🔄 案シスから読み込み</button>
-        <button id="lrFormBtn" class="pri" style="display:none;background:#0369a1;border-color:#0369a1;" onclick="lrLoadFromForm()">📝 ヒアリングフォームから読み込み</button>
+        <button id="lrFormBtn" class="pri" style="display:none;background:#0369a1;border-color:#0369a1;" onclick="lrLoadFromForm()">📝 自社支援の回答から読み込み</button>
         <button onclick="lrAdd()">＋ 行を追加</button>
         <button onclick="lrAllOn(true)">全員ON</button>
         <button onclick="lrAllOn(false)">全員OFF</button>
@@ -127,7 +127,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792453770"></script>
+<script src="ofusa_common.js?v=1791258123"></script>
 <script>
 // ============================================================
 // 参考様式第１－１１－２号　受け入れた中長期在留者リスト
@@ -172,7 +172,7 @@ function lrRenderSum(){
   if(fw){
     const fe=parseInt(String(_lrFE||'').replace(/[^0-9]/g,''),10);
     if(LR_MODE==='ukeire' && !isNaN(fe) && fe>0 && n<fe){
-      fw.style.display=''; fw.innerHTML=`⚠️ ヒアリングフォームでは、いまの外国人従業員は <b>${fe}名</b> と回答されています。<br>この一覧の記載は ${n}名 なので、載せ漏れがないか確認してください。`;
+      fw.style.display=''; fw.innerHTML=`⚠️ 所属機関の情報では、いまの外国人従業員は <b>${fe}名</b> です。<br>この一覧の記載は ${n}名 なので、載せ漏れがないか確認してください。`;
     }else fw.style.display='none';
   }
 }
@@ -382,15 +382,49 @@ async function _lrBuildFromDB(info, ctx){
 //   form_responses(form_type=company) の response.selfSupport（ssMode=self のとき）
 //   選任の根拠 basis='1' → accept.list（1-11-2）／ basis='2' → consult.list（1-11-3）＋ rireki（1-20・1-22）
 //   case_id は 'co_'+会社ID（会社用リンク）か 案件ID（案件用リンク）
-let _lrSS=null, _lrFE='';
+// 自社支援の回答の取得：①案シスの所属機関 extra.selfSupport（「🤝 自社支援」タブで取り込み・修正したもの）を優先
+//   ②まだ取り込んでいなければ ヒアリングフォーム（form_responses, form_type=company）の最新の回答
+//   戻り値 {ss, src:'anshis'|'form'|'', newer:bool, fe:'外国人従業員数'}
+async function _ssFetchSelfSupport(coId, caseId){
+  const out={ss:null, src:'', newer:false, fe:''};
+  let ssAt='';
+  if(coId){
+    try{
+      const r=await sb(`companies?select=foreign_employees,ss:extra->selfSupport,ssAt:extra->>selfSupportAt&id=eq.${encodeURIComponent(coId)}`);
+      const c=r&&r[0];
+      if(c){
+        if(c.ss && typeof c.ss==='object' && Object.keys(c.ss).length){ out.ss=c.ss; out.src='anshis'; ssAt=c.ssAt||''; }
+        if(c.foreign_employees!=null && String(c.foreign_employees).trim()!=='') out.fe=String(c.foreign_employees);
+      }
+    }catch(e){ console.warn('[selfSupport]',e); }
+  }
+  const ids=[]; if(coId) ids.push('co_'+coId); if(caseId) ids.push(caseId);
+  if(ids.length){
+    const q=ids.map(x=>`"${x}"`).join(',');
+    try{
+      const r=await sb(`form_responses?select=response,submitted_at&form_type=eq.company&case_id=in.(${encodeURIComponent(q)})&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=10`)||[];
+      for(const x of r){
+        const rs=x&&x.response||{};
+        if(rs.ssMode==='self' && rs.selfSupport){
+          if(!out.ss){ out.ss=rs.selfSupport; out.src='form'; }
+          else if(out.src==='anshis' && x.submitted_at && ssAt && String(x.submitted_at)>String(ssAt)) out.newer=true;
+          break;
+        }
+      }
+      if(out.fe===''){ for(const x of r){ const rs=x&&x.response||{}; if(rs.foreignEmployees!=null && String(rs.foreignEmployees).trim()!==''){ out.fe=String(rs.foreignEmployees); break; } } }
+    }catch(e){ console.warn('[form]',e); }
+  }
+  return out;
+}
+function _ssSrcHtml(r){
+  let h = r.src==='anshis' ? '🤝 案シスの「自社支援」タブの内容を使っています' : '📝 ヒアリングフォーム（自社支援）の回答を使っています<br><span style="color:#64748b;">（案シスにはまだ取り込まれていません）</span>';
+  if(r.newer) h+='<br><span style="color:#b45309;font-weight:700;">⚠️ 案シスに取り込んでいない新しいフォーム回答があります。案シスで取り込むと反映されます。</span>';
+  return h;
+}
+let _lrSS=null, _lrFE='', _lrSrc={};
 async function _lrFetchForm(info, ctx){
-  _lrSS=null; _lrFE='';
-  const ids=[]; if(ctx.co&&ctx.co.id) ids.push('co_'+ctx.co.id); if(info&&info.caseId) ids.push(info.caseId);
-  if(!ids.length) return;
-  const q=ids.map(x=>`"${x}"`).join(',');
-  let r=[];
-  try{ r=await sb(`form_responses?select=response,submitted_at&form_type=eq.company&case_id=in.(${encodeURIComponent(q)})&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=10`)||[]; }catch(e){ console.warn('[form]',e); }
-  for(const x of r){ const rs=x&&x.response||{}; if(!_lrSS && rs.ssMode==='self' && rs.selfSupport) _lrSS=rs.selfSupport; if(_lrFE==='' && rs.foreignEmployees!=null && String(rs.foreignEmployees).trim()!=='') _lrFE=String(rs.foreignEmployees); }
+  _lrSrc=await _ssFetchSelfSupport(ctx.co&&ctx.co.id, info&&info.caseId);
+  _lrSS=_lrSrc.ss; _lrFE=_lrSrc.fe;
 }
 function _lrFormRows(){
   const ss=_lrSS; if(!ss) return [];
@@ -408,17 +442,17 @@ function _lrRenderFormInfo(){
   const b=String(ss.basis||'');
   const bTxt = b==='1' ? '①受入れ実績（→ 1-11-2号）' : b==='2' ? '②生活相談の経験（→ 1-11-3号・1-20号・1-22号）' : '未回答';
   const need = LR_MODE==='ukeire' ? '1' : '2';
-  let h=`📝 ヒアリングフォーム（自社支援）の回答あり<br>支援責任者・担当者の選任の根拠：<b>${bTxt}</b>`;
+  let h=_ssSrcHtml(_lrSrc)+`<br>支援責任者・担当者の選任の根拠：<b>${bTxt}</b>`;
   if(b && b!==need) h+=`<br><span style="color:#b45309;font-weight:700;">⚠️ この会社は${b==='1'?'①':'②'}を選んでいるため、通常この書類（${LR_MODE==='ukeire'?'1-11-2号':'1-11-3号'}）は使いません。</span>`;
   if(LR_MODE==='ukeire' && ss.accept && ss.accept.exempt) h+='<br>（フォームでは「受入れた中長期在留者リストの提出を省略」と回答）';
   if(rows.length) h+=`<br>フォームの一覧：${rows.length}名`;
   el.innerHTML=h; el.style.display='';
 }
 function lrLoadFromForm(){
-  const rows=_lrFormRows(); if(!rows.length){ showToast('⚠️ ヒアリングフォームに一覧の回答がありません'); return; }
-  if(_lrRows.length && !confirm('いまの一覧を、ヒアリングフォームの回答で作り直します（手入力した行は消えます）。よろしいですか？')) return;
+  const rows=_lrFormRows(); if(!rows.length){ showToast('⚠️ 自社支援の回答に一覧がありません'); return; }
+  if(_lrRows.length && !confirm('いまの一覧を、自社支援の回答で作り直します（手入力した行は消えます）。よろしいですか？')) return;
   _lrRows=rows; lrSync(); lrRenderEditor(); p();
-  showToast(`✅ ヒアリングフォームから${rows.length}名を読み込みました`);
+  showToast(`✅ 自社支援の回答から${rows.length}名を読み込みました`);
 }
 async function lrReloadFromDB(){
   const info=window._lastCaseInfo;
@@ -513,7 +547,7 @@ window.addEventListener('message', async function(e){
   }
   // 前の案件の値が残らないよう、入力欄と一覧をいったん空にする
   ['f_docYear','f_docMonth','f_docDay','f_company','f_repTitle','f_repName','f_rowsJson'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  _lrRows=[]; _lrSS=null; _lrFE='';
+  _lrRows=[]; _lrSS=null; _lrFE=''; _lrSrc={};
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_11_2'); }
   if(typeof loadFromDB==='function') loadFromDB(info);
 });
