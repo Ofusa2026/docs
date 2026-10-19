@@ -53,7 +53,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２０号　支援責任者の履歴書</div>
-    <div class="ver">ver.20261019.01</div>
+    <div class="ver">ver.20261020.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -75,7 +75,9 @@
   </div>
   <div class="fp-inner">
     <div id="rsItakuNote" style="display:none;margin:0 0 8px;padding:7px 9px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:11px;line-height:1.5;"></div>
+    <div id="rsFormInfo" style="display:none;margin:0 0 8px;padding:7px 9px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-size:11px;line-height:1.55;"></div>
     <div class="fs"><div class="fs-title">支援責任者</div>
+      <div id="rsFormBtnWrap" style="display:none;margin:0 0 8px;"><button onclick="rsLoadFromForm(true)" style="font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid #0369a1;background:#0369a1;color:#fff;cursor:pointer;font-weight:600;">📝 ヒアリングフォームから読み込み</button></div>
       <div class="fg" id="rsPickWrap" style="display:none;"><label>支援責任者を選ぶ（案シスに複数登録あり）</label><select id="rsPick" onchange="rsPickName(this.value)"></select></div>
       <div class="fg"><label>（ふりがな）</label><input id="f_kana" oninput="p()" placeholder="ほうむ はなこ"></div>
       <div class="fg"><label>① 氏名</label><input id="f_name" oninput="p()"></div>
@@ -111,7 +113,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792408950"></script>
+<script src="ofusa_common.js?v=1792453770"></script>
 <script>
 // ============================================================
 // 参考様式第１－２０号　支援責任者の履歴書
@@ -137,7 +139,81 @@ function hrRender(){
     <button onclick="hrDel(${i})" title="この行を削除">✕</button>
   </div>`).join('');
 }
-function rsPickName(n){ const e=document.getElementById('f_name'); if(e){ e.value=n; p(); } }
+function rsPickName(n){
+  const e=document.getElementById('f_name'); if(e){ e.value=n; }
+  // フォームに同じ人の回答があれば、その人の内容に入れ替える
+  if(_rsFormPerson(n)) rsLoadFromForm(true, true); else p();
+}
+// ---- ヒアリングフォーム（会社・特定技能1号）の【自社支援】の回答 ----
+//   response.selfSupport（ssMode=self）: supportManagerName/Kana、attachments.support_staff[{name,kana,…}]
+//   rireki.mgr / rireki.staff[i] = {gender, birth(YYYY-MM-DD), hist:[{y,m,text}], licenses}（選任の根拠②のときだけ）
+const RS_ROLE='support_manager_name'==='support_manager_name' ? 'mgr' : 'staff';
+let _rsSS=null;
+async function _rsFetchForm(coId, caseId){
+  _rsSS=null;
+  const ids=[]; if(coId) ids.push('co_'+coId); if(caseId) ids.push(caseId);
+  if(!ids.length) return;
+  const q=ids.map(x=>`"${x}"`).join(',');
+  try{
+    const r=await sb(`form_responses?select=response,submitted_at&form_type=eq.company&case_id=in.(${encodeURIComponent(q)})&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=10`)||[];
+    for(const x of r){ const rs=x&&x.response||{}; if(rs.ssMode==='self' && rs.selfSupport){ _rsSS=rs.selfSupport; break; } }
+  }catch(e){ console.warn('[form]',e); }
+}
+function _rsFormNames(){
+  const ss=_rsSS; if(!ss) return [];
+  if(RS_ROLE==='mgr') return ss.supportManagerName ? [String(ss.supportManagerName).trim()] : [];
+  return ((ss.attachments||{}).support_staff||[]).map(x=>String(x&&x.name||'').trim()).filter(Boolean);
+}
+// 氏名に対応するフォームの人（{name,kana,rk}）
+function _rsFormPerson(name){
+  const ss=_rsSS; if(!ss) return null;
+  const nz=x=>String(x||'').replace(/[\s　]/g,'');
+  const rk=ss.rireki||{};
+  if(RS_ROLE==='mgr'){
+    if(!ss.supportManagerName) return null;
+    if(name && nz(name)!==nz(ss.supportManagerName)) return null;
+    return {name:ss.supportManagerName, kana:ss.supportManagerKana||'', rk:rk.mgr||null};
+  }
+  const st=(ss.attachments||{}).support_staff||[];
+  let i = name ? st.findIndex(x=>nz(x&&x.name)===nz(name)) : 0;
+  if(i<0) return null;
+  const x=st[i]||{}; if(!x.name) return null;
+  return {name:x.name, kana:x.kana||'', rk:(rk.staff||[])[i]||null};
+}
+// force=false: 空欄だけ埋める（DB保存済みの内容を優先）／ force=true: フォームの内容で上書き
+function rsLoadFromForm(force, quiet){
+  // 画面の氏名と同じ人の回答だけを使う（別人の内容を入れない）。氏名が空なら最初の人
+  const per=_rsFormPerson(v('f_name'));
+  if(!per){ if(force&&!quiet) showToast('⚠️ この氏名の回答がヒアリングフォームにありません'); return false; }
+  if(force && !quiet && (v('f_kana')||_hist.some(r=>r.y||r.m||r.t)) && !confirm('ヒアリングフォームの回答で入れ直します（いまの入力は上書きされます）。よろしいですか？')) return false;
+  const set=(id,val)=>{ const e=document.getElementById(id); if(!e||val==null||val==='') return; if(force||!e.value) e.value=val; };
+  set('f_name', per.name); set('f_kana', per.kana);
+  const rk=per.rk;
+  if(rk){
+    set('f_gender', rk.gender||'');
+    const b=String(rk.birth||'').match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if(b){ set('f_bYear',String(+b[1])); set('f_bMonth',String(+b[2])); set('f_bDay',String(+b[3])); }
+    set('f_license', rk.licenses||'');
+    const hs=(rk.hist||[]).filter(h=>h&&(h.y||h.m||h.text)).map(h=>({y:String(h.y||''),m:String(h.m||''),t:String(h.text||'')}));
+    if(hs.length && (force || !_hist.some(r=>r.y||r.m||r.t))){ _hist=hs; hrSync(); hrRender(); }
+  }
+  p();
+  if(force && !quiet) showToast('✅ ヒアリングフォームの回答を入れました');
+  return true;
+}
+function _rsRenderFormInfo(){
+  const el=document.getElementById('rsFormInfo'), bw=document.getElementById('rsFormBtnWrap'); if(!el) return;
+  const ss=_rsSS;
+  if(!ss){ el.style.display='none'; if(bw) bw.style.display='none'; return; }
+  const b=String(ss.basis||'');
+  const bTxt = b==='1' ? '①受入れ実績（→ 1-11-2号）' : b==='2' ? '②生活相談の経験（→ 1-11-3号・1-20号・1-22号）' : '未回答';
+  let h=`📝 ヒアリングフォーム（自社支援）の回答あり<br>支援責任者・担当者の選任の根拠：<b>${bTxt}</b>`;
+  if(b==='1') h+='<br><span style="color:#b45309;font-weight:700;">⚠️ ①を選んでいるため、通常この履歴書は使いません（フォームでも履歴書の項目は聞いていません）。</span>';
+  const per=_rsFormPerson(v('f_name'));
+  if(per && per.rk) h+='<br>この人の履歴書の回答：あり';
+  el.innerHTML=h; el.style.display='';
+  if(bw) bw.style.display = (_rsFormNames().length) ? '' : 'none';
+}
 
 function p(){
   if(_editMode) return;
@@ -224,7 +300,12 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val&&!e.value)e.value=val;};
     // 氏名：案シス 所属機関の「支援責任者」。複数登録（「、」区切り等）なら選べるようにする
     const raw=String(co.support_manager_name||'').trim();
-    const names=raw && !/別紙/.test(raw) ? raw.split(/[、,，\/／\n]+/).map(x=>x.trim()).filter(Boolean) : [];
+    // ヒアリングフォーム（自社支援）の回答を先に取る（新しい回答の氏名を優先）
+    await _rsFetchForm(co.id||cid, caseId);
+    const nz=x=>String(x||'').replace(/[\s　]/g,'');
+    const names=[];
+    _rsFormNames().concat(raw && !/別紙/.test(raw) ? raw.split(/[、,，\/／\n]+/).map(x=>x.trim()).filter(Boolean) : [])
+      .forEach(n=>{ if(n && !names.some(x=>nz(x)===nz(n))) names.push(n); });
     const pw=document.getElementById('rsPickWrap'), pk=document.getElementById('rsPick');
     if(names.length>1 && pw && pk){
       pk.innerHTML=names.map(n=>`<option>${_rsEsc(n)}</option>`).join('');
@@ -247,7 +328,9 @@ async function loadFromDB(passedInfo){
         note.style.display=''; note.innerHTML=`ℹ️ この会社は登録支援機関「${_rsEsc(org)}」に支援を委託しています。<br>この書類は、通常<b>自社で支援する場合</b>に提出します。`;
       }else note.style.display='none';
     }
-    hrLoadFromField(); hrRender(); p();
+    hrLoadFromField(); hrRender();
+    rsLoadFromForm(false, true);   // フォームの回答で空欄を埋める（DB保存済みの内容はそのまま）
+    _rsRenderFormInfo(); p();
     showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
@@ -286,7 +369,7 @@ window.addEventListener('message', async function(e){
   }
   // 前の案件の値が残らないよう、いったん空にする
   ['f_kana','f_name','f_gender','f_bYear','f_bMonth','f_bDay','f_license','f_docYear','f_docMonth','f_docDay','f_histJson'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  _hist=[];
+  _hist=[]; _rsSS=null;
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_20'); }
   if(typeof loadFromDB==='function') loadFromDB(info);
 });
