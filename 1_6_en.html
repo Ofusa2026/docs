@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261014.02</div>
+    <div class="ver">ver.20261020.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -428,6 +428,11 @@
         <div class="fg"><label>雇入時健診（年）<span class="fid">es.healthCheckY2</span></label><input id="es_healthCheckY2" oninput="p()"></div>
         <div class="fg"><label>（月）<span class="fid">es.healthCheckM2</span></label><input id="es_healthCheckM2" oninput="p()"></div>
       </div>
+      <div class="fg"><label>待遇相違窓口部署（日）<span class="fid">es.diffContactDept</span></label><input id="es_diffContactDept" oninput="p()"></div>
+      <div class="fg"><label>待遇相違窓口部署（ID）<span class="fid">es.diffContactDeptEn</span></label><input id="es_diffContactDeptEn" oninput="p()"></div>
+      <div class="fg"><label>待遇相違担当者（日）<span class="fid">es.diffContactPerson</span></label><input id="es_diffContactPerson" oninput="p()"></div>
+      <div class="fg"><label>待遇相違担当者（ID）<span class="fid">es.diffContactPersonEn</span></label><input id="es_diffContactPersonEn" oninput="p()"></div>
+      <div class="fg"><label>待遇相違連絡先<span class="fid">es.diffContactTel</span></label><input id="es_diffContactTel" oninput="p()"></div>
       <div class="fg"><label>相談窓口部署（日）<span class="fid">es.contactDept</span></label><input id="es_contactDept" oninput="p()"></div>
       <div class="fg"><label>相談窓口部署（ID）<span class="fid">es.contactDeptEn</span></label><input id="es_contactDeptEn" oninput="p()"></div>
       <div class="fg"><label>担当者名（日）<span class="fid">es.contactPerson</span></label><input id="es_contactPerson" oninput="p()"></div>
@@ -1019,7 +1024,7 @@ function p(){
       <div style="margin-top:4px;">２．雇入れ時の健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>月<br><span class="id" style="font-size:7.5pt;">Health check at the time of hiring: Month &nbsp;&nbsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${f('es_healthCheckM2')}</span>&nbsp;&nbsp; Year &nbsp;&nbsp;<span style="display:inline-block;min-width:4em;text-align:center;">${f('es_healthCheckY2')}</span>&nbsp;&nbsp;</span></div>
       <div style="margin-top:4px;">３．初回の定期健康診断&emsp;<span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span>年&emsp;<span style="display:inline-block;min-width:2.5em;text-align:center;">${fHcM()}</span>月（${healthFreqJP()}）<br><span class="id" style="font-size:7.5pt;">First regular health check: Month <span style="display:inline-block;min-width:2.5em;text-align:center;">${fHcM()}</span> Year <span style="display:inline-block;min-width:4em;text-align:center;">${fOr('es_healthCheckY','es_healthCheckY2')}</span> (${healthFreqTR('en')})</span></div>
       <div style="margin-top:4px;">４．次の窓口に対して通常の労働者との間の待遇の相違（内容・理由）等について説明を求めることができる。<br><span class="id" style="font-size:7.5pt;">You may request an explanation of the differences in treatment (details, reasons, etc.) compared with regular workers from the following point of contact.</span></div>
-      <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者職氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Name of department&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Name of person in charge&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(Contact information&emsp;${f('es_contactTel')})</span></div>
+      <div>部署名&emsp;${fOr('es_diffContactDept','es_contactDept')}&emsp;&emsp;担当者職氏名&emsp;${fOr('es_diffContactPerson','es_contactPerson')}&emsp;&emsp;連絡先（${fOr('es_diffContactTel','es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Name of department&emsp;${fOr('es_diffContactDeptEn','es_contactDeptEn')}&emsp;&emsp;Name of person in charge&emsp;${fOr('es_diffContactPersonEn','es_contactPersonEn')}&emsp;&emsp;(Contact information&emsp;${fOr('es_diffContactTel','es_contactTel')})</span></div>
       <div style="margin-top:4px;">５．雇用管理の改善等に関する事項に係る相談窓口<br><span class="id" style="font-size:7.5pt;">Point of contact for matters concerning the improvement of employment management etc.</span></div>
       <div>部署名&emsp;${f('es_contactDept')}&emsp;&emsp;担当者職氏名&emsp;${f('es_contactPerson')}&emsp;&emsp;連絡先（${f('es_contactTel')}）<br><span class="id" style="font-size:7.5pt;">Name of department&emsp;${f('es_contactDeptEn')}&emsp;&emsp;Name of person in charge&emsp;${f('es_contactPersonEn')}&emsp;&emsp;(Contact information&emsp;${f('es_contactTel')})</span></div>
       <div style="margin-top:4px;">６．本契約終了後に乙が帰国するに当たり，乙が帰国旅費を負担することができないときは，甲が当該旅費を負担するとともに，帰国が円滑になされるよう必要な措置を講じることとする。<br><span class="id" style="font-size:7pt;">If the specified skilled worker is unable to pay for the travel expenses to return to his or her home country after the termination of this contract, the organization shall pay for the travel expenses and take necessary measures to ensure smooth departure.</span></div>
