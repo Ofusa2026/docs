@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261020.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261020.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1548,6 +1548,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261020.04',
+    date: '2026-10-20',
+    notify: true,
+    items: [
+      '🔄 案シスで雇用条件を直したのに、Saysayで案件IDを入れると前の内容が出る不具合を直しました。これまでは書類で一度「💾 DB保存」すると、その時の内容がずっと優先されていました。今後は欄ごとに<b>新しい方</b>が入ります（案シスで後から直した欄は案シスの内容、Saysayで後から直した欄はSaysayの内容）。直接編集した文面はこれまでどおり残ります'
+    ]
+  },
   {
     version: 'ver.20261020.03',
     date: '2026-10-20',

@@ -1,5 +1,15 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261020.04
+ * - fix(loadFormGenericFromDB): 書類ごとの「💾 DB保存」値が、あとから案シスで直した雇用条件を
+ *   常に上書きしていた（「DBが正」）。セキテックで7/20保存の「超過勤務」が10/20修正の
+ *   「固定残業代」を潰して発覚。雇用条件と書類保存は相互に書き換わるため、
+ *   「新しい方が勝つ」に変更（欄ごと）:
+ *   ・保存時に、その時点の雇用条件の値(_empVals)を一緒に記録しておく
+ *   ・読込時、雇用条件の値が記録時から変わっていれば → 案シス側が新しいので雇用条件を採用
+ *     変わっていなければ → 書類で直した値（保存値）を採用
+ *   ・記録の無い旧保存は、雇用条件の更新日時(updatedAt/_savedAt)と保存日時(_savedAt)を比べ、新しい方を採用
+ *   ・雇用条件に無い書類固有の欄は、従来どおり保存値を採用。直接編集版の復元も従来どおり
  * ver.20260901.01
  * - feat(resolveEmpSetIdx): cases.emp_set_idx が空のとき emp_sets[0] 固定だったのを、
  *   申請人名/案件名/入力済み項目数でセットを自動選択し cases.emp_set_idx に書き戻すよう変更。
@@ -2343,6 +2353,8 @@ async function loadCaseToForm(info, docKey, opts){
           if(el){
             el.value = isEmpty ? '' : val;
             elSet = true;
+            // ver.20261020.04: 雇用条件(emp_sets)から入れた欄と値を記録（最新優先の判定に使う）
+            if(window._empTracking) window._empFilled[id] = el.value;
           }
         }
       }
@@ -2482,6 +2494,9 @@ async function loadCaseToForm(info, docKey, opts){
       const m = String(v).match(/(\d{4})[-\/年\.](\d{1,2})[-\/月\.](\d{1,2})/);
       return m ? {y:m[1], m:String(parseInt(m[2],10)), d:String(parseInt(m[3],10))} : null;
     };
+    // ver.20261020.04: ここから下で雇用条件から入れた欄を _empFilled に記録する
+    window._empFilled = {};
+    window._empTracking = !opts.skipFieldRestore;
     if(!opts.skipFieldRestore) Object.keys(es).forEach(k => {
       if(_ES_SKIP.includes(k)) return;
       setValMulti(['es_'+k, 'f_'+k], es[k]);
@@ -2589,6 +2604,7 @@ async function loadCaseToForm(info, docKey, opts){
       if(cb){ cb.checked = isJippi; cb.dataset.jippiInit = '1'; }
       if(est){ est.value = isJippi ? '実費' : ''; }
     });
+    window._empTracking = false; // ver.20261020.04: 雇用条件由来の記録はここまで
 
     // === 作成日 ===
     // ver.20260710: 全書類の作成日を案件の書類作成日(cases.doc_create_date)に統一する。
@@ -2887,6 +2903,20 @@ async function saveFormGeneric(docKey, opts){
       ...values,
       _savedAt: new Date().toISOString(),
     };
+    // ver.20261020.04: 保存時点の雇用条件の値を記録。次回読込時に、雇用条件がこの後で
+    //   変わった欄だけ雇用条件を採用し、変わっていない欄は書類で直した値を採用する（最新優先）
+    try{
+      const _rev = opts.revMap || _docRevMapFor(docKey);
+      const _ev = {};
+      Object.keys(values).forEach(id => {
+        const v0 = _empValueFor(id, _rev);
+        if(v0 !== undefined) _ev[id] = v0;
+      });
+      extra[docKey][String(idx)]._empVals = _ev;
+      if(opts.revMap) extra[docKey][String(idx)]._rev = opts.revMap;
+      const _es0 = window._empLoadedSet || {};
+      extra[docKey][String(idx)]._empUpdatedAt = _es0.updatedAt || _es0._savedAt || null;
+    }catch(_e){ console.warn('[save empVals]', _e); }
 
     // 直接編集版HTMLも保存（編集中/フリーズ時のみ・ファイル名単位のキーで言語別に分離）
     // ※ toggleEditMode() は編集終了時に _htmlFrozen=true を立てるため、
@@ -2978,6 +3008,31 @@ function collectAllFormValues(){
   return result;
 }
 
+// ===== ver.20261020.04: 雇用条件と書類保存の「最新優先」判定ヘルパー =====
+// 書類ページが独自に持つ「入力欄→雇用条件キー」の対応表（今は重要事項説明書の _J_REV のみ）
+function _docRevMapFor(docKey){
+  try{ if(docKey === 'juuyou' && typeof _J_REV !== 'undefined' && _J_REV) return _J_REV; }catch(_e){}
+  return null;
+}
+// その入力欄の「雇用条件側の今の値」を返す。雇用条件と関係ない欄は undefined
+function _empValueFor(id, rev){
+  const filled = window._empFilled || {};
+  if(Object.prototype.hasOwnProperty.call(filled, id)) return String(filled[id] == null ? '' : filled[id]);
+  if(rev){
+    const es = window._empLoadedSet || {};
+    let key = rev[id];
+    if(!key && /En$/.test(id) && rev[id.slice(0,-2)]) key = rev[id.slice(0,-2)] + 'En';
+    if(key) return String(es[key] == null ? '' : es[key]);
+  }
+  return undefined;
+}
+function _empTs(es){
+  const a = Date.parse((es && es.updatedAt) || '') || 0;
+  const b = Date.parse((es && es._savedAt) || '') || 0;
+  return Math.max(a, b);
+}
+const _normEV = (x) => String(x == null ? '' : x).trim();
+
 // DBから書類別データを取得して入力欄に反映
 async function loadFormGenericFromDB(docKey, info){
   if(!info || !info.caseId) return;
@@ -3008,17 +3063,39 @@ async function loadFormGenericFromDB(docKey, info){
     // フォーム値が無くても直接編集版の復元は行う。
     if(data){
       // 既存の値を上書きしない（loadCaseToFormで既にセットされている可能性）
+      // ver.20261020.04: 「DBが正」で常に保存値を上書きしていたのをやめ、欄ごとに新しい方を採用する
+      const _rev = data._rev || _docRevMapFor(docKey);
+      const _base = (data._empVals && typeof data._empVals === 'object') ? data._empVals : null;
+      const _docTs = Date.parse(data._savedAt || '') || 0;
+      const _empNewer = _empTs(window._empLoadedSet) > _docTs; // 旧保存（記録なし）の判定用
+      let _nKeptEmp = 0;
       Object.keys(data).forEach(id => {
         if(id.startsWith('_')) return; // _savedAt等
         const el = document.getElementById(id);
         if(!el) return;
         if(el.type === 'checkbox' || el.type === 'radio'){
           el.checked = !!data[id];
-        } else {
-          // 既に値があってもDBの値で上書き(DBが正)
-          el.value = data[id] || '';
+          return;
         }
+        const ev = _empValueFor(id, _rev);
+        if(ev !== undefined){
+          let useEmp;
+          if(_base && Object.prototype.hasOwnProperty.call(_base, id)){
+            // 保存後に雇用条件側でこの欄が変わった → 雇用条件が新しい
+            useEmp = _normEV(_base[id]) !== _normEV(ev);
+          }else{
+            // 旧保存：雇用条件の更新日時と保存日時を比べる
+            useEmp = _empNewer;
+          }
+          if(useEmp){
+            if(_normEV(el.value) !== _normEV(ev)) el.value = ev;
+            if(_normEV(data[id]) !== _normEV(ev)) _nKeptEmp++;
+            return;
+          }
+        }
+        el.value = data[id] || '';
       });
+      if(_nKeptEmp) console.log('[loadFormGenericFromDB] 雇用条件の方が新しい欄を採用:', _nKeptEmp, '件');
       if(typeof p === 'function') p();
       if(typeof applyMoneyFormatting === 'function') applyMoneyFormatting();
     }
