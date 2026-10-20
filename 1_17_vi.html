@@ -500,7 +500,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261020.10</div>
+    <div class="ver">ver.20261020.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -525,6 +525,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 </div>
 <div class="fp-inner">
 <div class="fs"><div class="fs-title">作成日・申請人</div>
+<!-- ver.20261020.11: Ⅳ-2「出入国する際の送迎」は申請種別で記載が変わる。
+     認定＝これから入国するので 有（雇用開始日）、それ以外＝入国済み。
+     案件読込で cases.app_type から自動セットするが、手で直せるようにしておく。 -->
+<div class="fg3">
+  <div class="fg"><label>申請種別<span class="fid">es.appType</span></label><input id="es_appType" oninput="p()" placeholder="認定 / 変更"></div>
+  <div class="fg"><label>雇用開始日<span class="fid">es.contractStart</span></label><input id="es_contractStart" oninput="p()" placeholder="2026/09/01"></div>
+  <div class="fg"><label>出迎え空港<span class="fid">es.arrivalAirport</span></label><input id="es_arrivalAirport" oninput="p()" placeholder="成田国際空港"></div>
+</div>
 <div class="fg3"><div class="fg"><label>年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div><div class="fg"><label>月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div><div class="fg"><label>日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div></div>
 <div class="fg"><label>申請人 氏名(ローマ字)<span class="fid">applicant</span></label><input id="f_applicant" oninput="p()"></div>
 <div class="fg3"><div class="fg"><label>生年 年<span class="fid">birthY</span></label><input id="f_birthY" oninput="p()"></div><div class="fg"><label>月<span class="fid">birthM</span></label><input id="f_birthM" oninput="p()"></div><div class="fg"><label>日<span class="fid">birthD</span></label><input id="f_birthD" oninput="p()"></div></div>
@@ -601,7 +609,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
      f044 … 事前ガイダンス「実施予定」の 有
      f051 … 事前ガイダンス「実施方法」のテレビ電話装置
    外した状態も保持されるので、チェックを消したままにできる。 */
-window._p17Check = window._p17Check || { f044:true, f051:true };
+/* 既定でチェックを入れる欄。案件を切り替えたときはここへ戻す。
+     f044 … 事前ガイダンス「実施予定」の 有
+     f051 … 事前ガイダンス「実施方法」のテレビ電話装置
+     f076 … 出入国の送迎 ｂ「実施予定」の 有（契約終了後適宜実施）
+     f082 … 出入国の送迎 ｂ「実施方法」の 出国予定空港等
+     f084 … 出入国の送迎 ｂ「実施方法」の 送迎方法 */
+function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true }; }
+window._p17Check = window._p17Check || _p17DefaultChecks();
 document.addEventListener('change', function(e){
   var t=e.target;
   if(t && t.type==='checkbox' && t.id) window._p17Check[t.id] = t.checked;
@@ -626,7 +641,19 @@ function p(){
   p17Fit(); requestAnimationFrame(p17Fit);
 }
 // テンプレート（本文。${f('...')} は common.js の f() で値/変数箱に）
-function P17_TEMPLATE(){ return `<div class="doc" id="docP1">
+function P17_TEMPLATE(){
+/* ver.20261020.11: Ⅳ-2「出入国する際の送迎」の ａ は申請種別で記載が変わる。
+   認定  … これから入国するので「有（雇用開始日）」、実施方法は出迎え空港と送迎方法にチェック。
+   それ以外（変更）… 既に入国済みなので「無（入国済み）」、実施方法は空欄のまま。
+   ※更新・申請なしは1-17を作らない運用のため、変更と同じ扱いでよい。 */
+var _nintei = /認定/.test(v('es_appType')||'');
+var _mukaeA = _nintei
+  ? `<p class="ja a-center"><input type="checkbox" class="cb" id="f065" name="f065" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（有）">有（${f('es_contractStart')}）</p><p class="vi"> Có (${f('es_contractStart')})</p><p class="ja a-center"><input type="checkbox" class="cb" id="f067" name="f067" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（無）">無（　　　　　　）</p><p class="vi">Không (                 )</p>`
+  : `<p class="ja a-center"><input type="checkbox" class="cb" id="f065" name="f065" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（有）">有（　　　　　　）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f067" name="f067" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（無）">無（入国済み）</p><p class="vi">Không (Đã vào nước)</p>`;
+var _houhouA = _nintei
+  ? `<p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜出迎え空港等">　出迎え空港等  Sân bay đón</p><p class="ja">（${f('es_arrivalAirport')}）</p><p class="vi"> (Sân bay ${f('es_arrivalAirport')})</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法">　送迎方法（公共交通機関）</p><p class="vi">  Phương pháp đưa đón (phương tiện giao thông công cộng)</p>`
+  : `<p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜出迎え空港等">　出迎え空港等  Sân bay đón</p><p class="ja">（<input type="text" class="bl" id="f073" name="f073" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜（＿空港）" style="width:9.00em">空港）</p><p class="vi"> (Sân bay                )</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法">　送迎方法（<input type="text" class="bl" id="f075" name="f075" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法（＿）" style="width:8.00em">）</p><p class="vi">  Phương pháp đưa đón (             )</p>`;
+return `<div class="doc" id="docP1">
 <div class="sheet" id="p17sheet" lang="ja"><div class="p17page"><div class="doc p17doc">
 <p class="ja form-no">参考様式第１－１７号</p>
 <p class="vi form-no">Mẫu tham khảo 1-17</p>
@@ -868,11 +895,11 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr class="nosplit" style="height:4.72em">
 <td class="b-tttt" colspan="2"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ａ．到着空港等での出迎え及び特定技能所属機関又は住居までの送迎</p><p class="vi">Đón tại sân bay đến và đưa về cơ quan liên kết kỹ năng đặc định hoặc đưa về nơi ở</p></td>
-<td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f065" name="f065" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え及び特定技能所属機関又は住居までの送">有（<input type="text" class="bl" id="f066" name="f066" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え及び特定技能所属機関又は住居までの送｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f067" name="f067" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え及び特定技能所属機関又は住居までの送">無（<input type="text" class="bl" id="f068" name="f068" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え及び特定技能所属機関又は住居までの送｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
+<td class="b-tttt">${_mukaeA}</td>
 <td class="b-tttt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
 <td class="b-tttt fld" colspan="2"><p class="ja a-center">別紙参照</p><p class="vi a-center">Xem tài liệu đính kèm.</p></td>
 <td class="b-tttt" colspan="2"><p class="ja">〒<input type="text" class="bl" id="f071" name="f071" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜〒＿－" style="width:3.00em">－</p></td>
-<td class="b-tttk"><p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" data-label="Ⅳ 支援内容（続き） ＞ 有・無">　出迎え空港等  Sân bay đón</p><p class="ja">（<input type="text" class="bl" id="f073" name="f073" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜（＿空港）" style="width:9.00em">空港）</p><p class="vi"> (Sân bay                )</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" data-label="Ⅳ 支援内容（続き） ＞ 有・無">　送迎方法（<input type="text" class="bl" id="f075" name="f075" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜送迎方法（＿）" style="width:8.00em">）</p><p class="vi">  Phương pháp đưa đón (             )</p></td>
+<td class="b-tttk">${_houhouA}</td>
 </tr>
 <tr class="nosplit" style="height:4.59em">
 <td class="b-tttt" colspan="2"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｂ．出国予定空港等までの送迎及び保安検査場入場までの出国手続の補助</p><p class="vi">Đưa đến sân bay xuất cảnh dự kiến và hỗ trợ các thủ tục xuất cảnh cho đến khi vào nơi kiểm tra an ninh</p></td>
@@ -880,7 +907,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
 <td class="b-tttt fld" colspan="2"><p class="ja a-center">別紙参照</p><p class="vi a-center">Xem tài liệu đính kèm.</p></td>
 <td class="b-tttt" colspan="2"><p class="ja">〒<input type="text" class="bl" id="f081" name="f081" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜〒＿－" style="width:3.00em">－</p></td>
-<td class="b-tttk"><p class="ja"><input type="checkbox" class="cb" id="f082" name="f082" data-label="Ⅳ 支援内容（続き） ＞ 有・無">　出国予定空港等 Sân bay xuất cảnh dự kiến</p><p class="ja">　（<input type="text" class="bl" id="f083" name="f083" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜（＿空港／未定）" style="width:8.00em">空港／未定）</p><p class="vi">  (Sân bay             /chưa xác định)</p><p class="ja"><input type="checkbox" class="cb" id="f084" name="f084" data-label="Ⅳ 支援内容（続き） ＞ 有・無">送迎方法（<input type="text" class="bl" id="f085" name="f085" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜送迎方法（＿）" style="width:9.00em">）</p><p class="vi"> Phương pháp đưa đón (               )</p></td>
+<td class="b-tttk"><p class="ja"><input type="checkbox" class="cb" id="f082" name="f082" data-label="Ⅳ 支援内容（続き） ＞ 有・無">　出国予定空港等 Sân bay xuất cảnh dự kiến</p><!-- ver.20261020.11: ｂ の出国予定空港・送迎方法は作成時点では決まらないため「未定」で固定。 --><p class="ja">　（　未定　）</p><p class="vi">  (chưa xác định)</p><p class="ja"><input type="checkbox" class="cb" id="f084" name="f084" data-label="Ⅳ 支援内容（続き） ＞ ｂ．実施方法｜送迎方法">送迎方法（　未定　）</p><p class="vi"> Phương pháp đưa đón (chưa xác định)</p></td>
 </tr>
 <tr class="nosplit" style="height:3.98em">
 <td class="b-tttt" colspan="2"><p class="ja">（自由記入）</p><p class="vi">(Điền tự do)</p></td>
@@ -1528,7 +1555,7 @@ async function loadFromDB(passedInfo){
   };
   try{
     var res=await Promise.all([
-      sb('cases?select=id,name,applicant,company_id,org,doc_create_date,emp_set_idx,so_office_idx&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,company_id,org,doc_create_date,emp_set_idx,so_office_idx,app_type,contract_start&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     var cas=res[0]&&res[0][0]; var _pd=res[1]&&res[1][0]; var pd=(_pd&&_pd.data)||_pd||{};
@@ -1546,6 +1573,17 @@ async function loadFromDB(passedInfo){
     /* ver.20261013.06: persons の列名は birthdate。従来は birthday / birth_date /
        birthDate の3通りしか見ておらず、どれにも一致せず生年月日が常に空だった。 */
     _setYMD('f_birth', pd.birthdate||pd.birthday||pd.birth_date||pd.birthDate);
+
+    /* ver.20261020.11: Ⅳ-2「出入国する際の送迎」の出し分けに使う3項目。
+       申請種別は cases.app_type（認定/変更/更新/申請なし）。
+       雇用開始日は人材側を優先し、無ければ案件側を使う（Word版 rv() と同じ順）。
+       出迎え空港は案件データに無いため既定値を入れる。手で直せる。 */
+    _s('es_appType', (cas&&cas.app_type)||'');
+    var _cs = pd.contract_start || pd.contractStart || (cas&&cas.contract_start) || '';
+    var _m  = String(_cs).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    if(_m) _s('es_contractStart', _m[1]+'/'+('0'+_m[2]).slice(-2)+'/'+('0'+_m[3]).slice(-2));
+    var _ap=document.getElementById('es_arrivalAirport');
+    if(_ap && !_ap.value) _ap.value='成田国際空港';
     // 作成日
     var dc=(cas&&cas.doc_create_date||'').toString().replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
     if(dc.length>=3){_s('es_createY',dc[0]);_s('es_createM',String(parseInt(dc[1],10)||dc[1]));_s('es_createD',String(parseInt(dc[2],10)||dc[2]));}
@@ -1784,6 +1822,9 @@ if(!window._selectCaseListenerAdded){
     try{
       document.querySelectorAll('input[id^="es_"],input[id^="f_"],textarea[id^="es_"],textarea[id^="f_"]').forEach(function(el){ el.value=''; });
       window._fieldData={};
+      /* ver.20261020.11: チェック状態も既定へ戻す。
+         残すと前の案件で外したチェックが次の案件に持ち越される。 */
+      window._p17Check = _p17DefaultChecks();
     }catch(_e){ console.warn('[1-17vi] 入力欄クリア失敗:', _e); }
     /* 書類内の案件セレクトも選択状態を合わせる（無ければ項目を足す）。 */
     var sel=document.getElementById('caseSelect');
