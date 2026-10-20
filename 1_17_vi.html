@@ -502,7 +502,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261015.01</div>
+    <div class="ver">ver.20261020.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -593,7 +593,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792454298"></script>
+<script src="ofusa_common.js?v=1792459072"></script>
 <script>
 
 // ===== 1-17 プレビュー描画 =====
@@ -1507,7 +1507,7 @@ async function loadFromDB(passedInfo){
   };
   try{
     var res=await Promise.all([
-      sb('cases?select=id,name,applicant,company_id,doc_create_date,emp_set_idx,so_office_idx&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,company_id,org,doc_create_date,emp_set_idx,so_office_idx&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     var cas=res[0]&&res[0][0]; var _pd=res[1]&&res[1][0]; var pd=(_pd&&_pd.data)||_pd||{};
@@ -1608,9 +1608,84 @@ async function loadFromDB(passedInfo){
         _s('es_soOfficeTel', _off.officeTel||so.tel);
       }}catch(e){ console.warn('[1-17] 登録支援機関の取得に失敗:', e); }
     }
+    // ver.20261020.03: 自社支援（案件の登録支援機関が空欄）は、支援責任者を所属機関の「🤝 自社支援」から入れる
+    //   （所属機関の support_manager_〜 は登録支援機関の担当者が入る欄なので、自社支援には使わない）
+    try{ await _p17SelfSupport(cas, (typeof co!=='undefined'&&co)?co:null, caseId); }catch(e){ console.warn('[1-17 自社支援]', e); }
     p();
     if(typeof showToast==='function') showToast('案件を読み込みました');
   }catch(e){ console.error(e); alert('読込エラー: '+e.message); }
+}
+
+// ===== ver.20261020.03: 自社支援（1-11-2号・1-11-3号・1-20号・1-22号と同じ読み方） =====
+async function _ssFetchSelfSupport(coId, caseId){
+  const out={ss:null, src:'', newer:false, fe:''};
+  let ssAt='';
+  if(coId){
+    try{
+      const r=await sb(`companies?select=foreign_employees,ss:extra->selfSupport,ssAt:extra->>selfSupportAt&id=eq.${encodeURIComponent(coId)}`);
+      const c=r&&r[0];
+      if(c){
+        if(c.ss && typeof c.ss==='object' && Object.keys(c.ss).length){ out.ss=c.ss; out.src='anshis'; ssAt=c.ssAt||''; }
+        if(c.foreign_employees!=null && String(c.foreign_employees).trim()!=='') out.fe=String(c.foreign_employees);
+      }
+    }catch(e){ console.warn('[selfSupport]',e); }
+  }
+  const ids=[]; if(coId) ids.push('co_'+coId); if(caseId) ids.push(caseId);
+  if(ids.length){
+    const q=ids.map(x=>`"${x}"`).join(',');
+    try{
+      const r=await sb(`form_responses?select=response,submitted_at&form_type=eq.company&case_id=in.(${encodeURIComponent(q)})&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=10`)||[];
+      for(const x of r){
+        const rs=x&&x.response||{};
+        if(rs.ssMode==='self' && rs.selfSupport){
+          if(!out.ss){ out.ss=rs.selfSupport; out.src='form'; }
+          else if(out.src==='anshis' && x.submitted_at && ssAt && String(x.submitted_at)>String(ssAt)) out.newer=true;
+          break;
+        }
+      }
+      if(out.fe===''){ for(const x of r){ const rs=x&&x.response||{}; if(rs.foreignEmployees!=null && String(rs.foreignEmployees).trim()!==''){ out.fe=String(rs.foreignEmployees); break; } } }
+    }catch(e){ console.warn('[form]',e); }
+  }
+  return out;
+}
+function _ssSrcHtml(r){
+  let h = r.src==='anshis' ? '🤝 案シスの「自社支援」タブの内容を使っています' : '📝 ヒアリングフォーム（自社支援）の回答を使っています<br><span style="color:#64748b;">（案シスにはまだ取り込まれていません）</span>';
+  if(r.newer) h+='<br><span style="color:#b45309;font-weight:700;">⚠️ 案シスに取り込んでいない新しいフォーム回答があります。案シスで取り込むと反映されます。</span>';
+  return h;
+}
+
+function _p17SsNote(html, warn){
+  var el=document.getElementById('p17SsNote');
+  if(!el){
+    var anchor=document.getElementById('es_coNameKana'); var fg=anchor&&anchor.closest('.fg'); if(!fg) return;
+    el=document.createElement('div'); el.id='p17SsNote';
+    fg.parentNode.insertBefore(el, fg);
+  }
+  el.style.cssText='margin:0 0 8px;padding:7px 9px;border-radius:7px;font-size:11px;line-height:1.5;'+(warn?'background:#fffbeb;border:1px solid #fcd34d;color:#92400e;':'background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;');
+  el.innerHTML=html;
+}
+async function _p17SelfSupport(cas, co, caseId){
+  var old=document.getElementById('p17SsNote'); if(old) old.remove();
+  if(!cas || String(cas.org||'').trim()) return;   // 登録支援機関に委託している案件は今までどおり
+  var coId=(co&&co.id)||cas.company_id||'';
+  var r=await _ssFetchSelfSupport(coId, caseId);
+  var ss=r&&r.ss;
+  if(!ss){
+    _p17SsNote('🤝 自社支援の案件ですが、自社支援の内容（支援責任者など）がまだ登録されていません。<br>案シスの所属機関案内から「① 企業情報＋自社支援」を送り、回答を取り込んでください。', true);
+    return;
+  }
+  var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=(val==null?'':String(val)); };
+  set('es_coMgrKana', ss.supportManagerKana);
+  set('es_coMgrName', ss.supportManagerName);
+  set('es_coMgrTitle', ss.supportManagerTitle);
+  set('es_coMgrTitleEn', ss.supportManagerTitleEn);
+  // 支援責任者の英語の氏名は自社支援のフォームで聞いていない。代表者と同じ人なら代表者の英語名を使う
+  var _rep=String((co&&co.rep_name)||'').replace(/\s/g,''), _mgr=String(ss.supportManagerName||'').replace(/\s/g,'');
+  set('es_coMgrNameEn', (_rep && _rep===_mgr) ? ((co&&co.rep_name_en)||'') : '');
+  var h = r.src==='anshis' ? '🤝 自社支援：支援責任者は案シスの「自社支援」タブの内容を使っています' : '📝 自社支援：支援責任者はヒアリングフォームの回答を使っています（案シスにはまだ取り込まれていません）';
+  if(r.newer) h+='<br>⚠️ 案シスに取り込んでいない新しいフォーム回答があります。';
+  if(!(_rep && _rep===_mgr)) h+='<br>支援責任者の氏名（英）は手で入れてください。';
+  _p17SsNote(h, !!r.newer);
 }
 // DB保存（今は最小：将来 emp_set 等へ）
 async function saveForm(){ alert('この様式のDB保存は未実装です（印刷・PDFはご利用いただけます）。'); }

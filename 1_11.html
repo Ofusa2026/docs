@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20260804.10</div>
+    <div class="ver">ver.20261020.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -117,6 +117,42 @@
       <div class="fg"><label>純資産（前々年度）</label><input id="f_assetsY2" oninput="p()"></div>
       <div class="fg"><label>純資産（前々々年度）</label><input id="f_assetsY3" oninput="p()"></div>
     </div>
+    <div class="fs"><div class="fs-title">４・５ 自社支援（登録支援機関に全部委託なら空欄）</div>
+      <div id="ss11Note" style="font-size:11px;line-height:1.5;color:#64748b;margin:0 0 6px;">案件を読み込むと、自社支援の案件なら案シスの「🤝 自社支援」の内容が入ります。</div>
+      <div class="fg"><label>４ 該当する欄</label><select id="ss_basis" onchange="p()"><option value="">（なし）</option><option value="1">（１）受入れ実績</option><option value="2">（２）生活相談の経験</option><option value="3">（３）同程度に適正に実施</option></select></div>
+      <div class="fg"><label>（１）直近１年前の受入れ・管理人数</label><input id="ss_acc1" oninput="p()" placeholder="名"></div>
+      <div class="fg"><label>（１）直近２年前の受入れ・管理人数</label><input id="ss_acc2" oninput="p()" placeholder="名"></div>
+      <div class="fg"><label>（１）法令遵守</label><select id="ss_law" onchange="p()"><option value=""></option><option>法令遵守</option><option>法令違反・行政指導あり</option></select></div>
+      <div class="fg"><label>（２）支援責任者 期間（から）</label><input id="ss_mFrom" oninput="p()" placeholder="例: 2024-04-01"></div>
+      <div class="fg"><label>（２）支援責任者 期間（まで）</label><input id="ss_mTo" oninput="p()" placeholder="例: 2026-03-31"></div>
+      <div class="fg"><label>（２）支援責任者 機関名称</label><input id="ss_mOrg" oninput="p()"></div>
+      <div class="fg"><label>（２）支援責任者 所在地</label><input id="ss_mAddr" oninput="p()"></div>
+      <div class="fg"><label>（２）支援責任者 業務内容</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_mC1" onchange="p()"> 生活に必要な契約</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_mC2" onchange="p()"> 生活オリエンテーション</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_mC3" onchange="p()"> 定期的な面談</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_mC4" onchange="p()"> その他</label></div>
+      <div class="fg"><label>（２）支援責任者 その他の内容</label><input id="ss_mOther" oninput="p()"></div>
+      <div class="fg"><label>（２）支援責任者 報酬の有無</label><select id="ss_mPaid" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>（２）支援担当者 期間（から）</label><input id="ss_sFrom" oninput="p()" placeholder="例: 2024-04-01"></div>
+      <div class="fg"><label>（２）支援担当者 期間（まで）</label><input id="ss_sTo" oninput="p()" placeholder="例: 2026-03-31"></div>
+      <div class="fg"><label>（２）支援担当者 機関名称</label><input id="ss_sOrg" oninput="p()"></div>
+      <div class="fg"><label>（２）支援担当者 所在地</label><input id="ss_sAddr" oninput="p()"></div>
+      <div class="fg"><label>（２）支援担当者 業務内容</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_sC1" onchange="p()"> 生活に必要な契約</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_sC2" onchange="p()"> 生活オリエンテーション</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_sC3" onchange="p()"> 定期的な面談</label>
+        <label style="display:block;font-weight:normal;"><input type="checkbox" id="ss_sC4" onchange="p()"> その他</label></div>
+      <div class="fg"><label>（２）支援担当者 その他の内容</label><input id="ss_sOther" oninput="p()"></div>
+      <div class="fg"><label>（２）支援担当者 報酬の有無</label><select id="ss_sPaid" onchange="p()"><option value=""></option><option>有</option><option>無</option></select></div>
+      <div class="fg"><label>過去５年間の是正勧告</label><select id="ss_corr" onchange="p()"><option value=""></option><option>是正勧告なし</option><option>是正勧告あり</option></select></div>
+      <div class="fg"><label>５ 支援対象者（申請人）氏名</label><input id="ss_app" oninput="p()"></div>
+      <div class="fg"><label>５ 申請人 所属部署・役職</label><input id="ss_appDept" oninput="p()"></div>
+      <div class="fg"><label>５ 支援責任者 氏名</label><input id="ss_mgrName" oninput="p()"></div>
+      <div class="fg"><label>５ 支援責任者 所属部署・役職</label><input id="ss_mgrDept" oninput="p()"></div>
+      <div class="fg"><label>５ 支援担当者 氏名</label><input id="ss_stfName" oninput="p()"></div>
+      <div class="fg"><label>５ 支援担当者 所属部署・役職</label><input id="ss_stfDept" oninput="p()"></div>
+    </div>
     <div class="fs"><div class="fs-title">離職状況</div>
       <div class="fg"><label>日本人自発的離職</label><input id="f_jpVQ" oninput="p()" placeholder="名"></div>
       <div class="fg"><label>日本人非自発的離職</label><input id="f_jpIQ" oninput="p()" placeholder="名"></div>
@@ -143,10 +179,16 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792454298"></script>
+<script src="ofusa_common.js?v=1792459072"></script>
 <script>
 const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
 const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
+// ver.20261020.03: ４・５（自社支援）の表示用
+const _esc11=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const _s11=id=>_esc11(v(id));
+const _ck=b=>b?'■':'□';
+const _cb11=id=>{const e=document.getElementById(id);return _ck(!!(e&&e.checked));};
+const _ymd11=id=>{const t=String(v(id)||'').trim();const m=t.match(/^(\d{4})[-\/.年](\d{1,2})[-\/.月](\d{1,2})/);return m?(m[1]+'年'+(+m[2])+'月'+(+m[3])+'日'):(t?_esc11(t):'　　年　　月　　日');};
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
@@ -334,69 +376,69 @@ function p(){
     <td colspan="2">受入れ期間中の法令遵守</td>
   </tr>
   <tr>
-    <td rowspan="3" style="width:5%;text-align:center;vertical-align:middle;">（１）<br>□</td>
+    <td rowspan="3" style="width:5%;text-align:center;vertical-align:middle;">（１）<br>${_ck(v('ss_basis')==='1')}</td>
     <td rowspan="3" style="width:18%;vertical-align:middle;text-align:center;">過去２年間にわたり中長期在留者の受入れを適正に行った実績</td>
     <td style="width:12%;">直近１年前</td>
-    <td colspan="2" style="width:12%;text-align:right;">　名</td>
-    <td colspan="2">□　法令遵守<br>□　法令違反・行政指導あり</td>
+    <td colspan="2" style="width:12%;text-align:right;">${_s11('ss_acc1')}名</td>
+    <td colspan="2">${_ck(v('ss_law')==='法令遵守')}　法令遵守<br>${_ck(v('ss_law')==='法令違反・行政指導あり')}　法令違反・行政指導あり</td>
   </tr>
   <tr>
     <td>直近２年前</td>
-    <td colspan="2" style="text-align:right;">　名</td>
-    <td colspan="2">□　法令遵守<br>□　法令違反・行政指導あり</td>
+    <td colspan="2" style="text-align:right;">${_s11('ss_acc2')}名</td>
+    <td colspan="2">${_ck(v('ss_law')==='法令遵守')}　法令遵守<br>${_ck(v('ss_law')==='法令違反・行政指導あり')}　法令違反・行政指導あり</td>
   </tr>
   <tr>
     <td>添付書類</td>
     <td colspan="4" style="font-size:7pt;">※以下の添付書類を提出すること。ただし，監理団体として実習監理を行っている場合や登録支援機関として１号特定技能外国人の支援を行っている場合は，添付書類の提出不要。<br>□　受け入れた中長期在留者リスト（参考様式第１－１１－２号）</td>
   </tr>
   <tr>
-    <td rowspan="26" style="width:5%;text-align:center;vertical-align:middle;">（２）<br>□</td>
+    <td rowspan="26" style="width:5%;text-align:center;vertical-align:middle;">（２）<br>${_ck(v('ss_basis')==='2')}</td>
     <td rowspan="26" style="width:18%;vertical-align:middle;font-size:8pt;">支援責任者及び支援担当者が過去２年間に中長期在留者（注）の生活相談業務に従事した経験を有すること</td>
     <td colspan="5" style="text-align:center;font-size:8pt;font-weight:bold;">生活相談業務の内容</td>
   </tr>
   <tr>
     <td rowspan="9" style="text-align:center;vertical-align:middle;font-size:8pt;width:8%;">支援<br>責任者</td>
     <td style="font-size:8pt;width:15%;">生活相談<br>業務期間</td>
-    <td colspan="3" style="font-size:8pt;">年　　月　　日〜　　　　年　　月　　日</td>
+    <td colspan="3" style="font-size:8pt;">${_ymd11('ss_mFrom')}〜${_ymd11('ss_mTo')}</td>
   </tr>
   <tr>
     <td rowspan="2" style="font-size:8pt;">生活相談業務に従事した機関</td>
-    <td colspan="3" style="font-size:8pt;">機関名称：</td>
+    <td colspan="3" style="font-size:8pt;">機関名称：${_s11('ss_mOrg')}</td>
   </tr>
-  <tr><td colspan="3" style="font-size:8pt;">所在地：</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">所在地：${_s11('ss_mAddr')}</td></tr>
   <tr>
     <td rowspan="5" style="font-size:8pt;">生活相談<br>業務内容</td>
     <td colspan="3" style="font-size:7pt;">※以下いずれか１つ以上にチェックマークを付すこと。</td>
   </tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　生活に必要な契約に係る支援に関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　生活オリエンテーションに関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　定期的な面談に関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　その他（　　　　　　　　　　　　　　　　　　　）</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_mC1')}　生活に必要な契約に係る支援に関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_mC2')}　生活オリエンテーションに関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_mC3')}　定期的な面談に関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_mC4')}　その他（${_s11('ss_mOther')||'　　　　　　　　　　　　　　　　　　　'}）</td></tr>
   <tr>
     <td style="font-size:8pt;">報酬の有無</td>
-    <td colspan="3" style="font-size:8pt;">□　有　　□　無</td>
+    <td colspan="3" style="font-size:8pt;">${_ck(v('ss_mPaid')==='有')}　有　　${_ck(v('ss_mPaid')==='無')}　無</td>
   </tr>
   <tr>
     <td rowspan="9" style="text-align:center;vertical-align:middle;font-size:8pt;width:8%;">支援<br>担当者</td>
     <td style="font-size:8pt;">生活相談<br>業務期間</td>
-    <td colspan="3" style="font-size:8pt;">年　　月　　日〜　　　　年　　月　　日</td>
+    <td colspan="3" style="font-size:8pt;">${_ymd11('ss_sFrom')}〜${_ymd11('ss_sTo')}</td>
   </tr>
   <tr>
     <td rowspan="2" style="font-size:8pt;">生活相談業務に従事した機関</td>
-    <td colspan="3" style="font-size:8pt;">機関名称：</td>
+    <td colspan="3" style="font-size:8pt;">機関名称：${_s11('ss_sOrg')}</td>
   </tr>
-  <tr><td colspan="3" style="font-size:8pt;">所在地：</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">所在地：${_s11('ss_sAddr')}</td></tr>
   <tr>
     <td rowspan="5" style="font-size:8pt;">生活相談<br>業務内容</td>
     <td colspan="3" style="font-size:7pt;">※以下いずれか１つ以上にチェックマークを付すこと。</td>
   </tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　生活に必要な契約に係る支援に関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　生活オリエンテーションに関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　定期的な面談に関するもの</td></tr>
-  <tr><td colspan="3" style="font-size:8pt;">□　その他（　　　　　　　　　　　　　　　　　　　）</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_sC1')}　生活に必要な契約に係る支援に関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_sC2')}　生活オリエンテーションに関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_sC3')}　定期的な面談に関するもの</td></tr>
+  <tr><td colspan="3" style="font-size:8pt;">${_cb11('ss_sC4')}　その他（${_s11('ss_sOther')||'　　　　　　　　　　　　　　　　　　　'}）</td></tr>
   <tr>
     <td style="font-size:8pt;">報酬の有無</td>
-    <td colspan="3" style="font-size:8pt;">□　有　　□　無</td>
+    <td colspan="3" style="font-size:8pt;">${_ck(v('ss_sPaid')==='有')}　有　　${_ck(v('ss_sPaid')==='無')}　無</td>
   </tr>
   <tr>
     <td rowspan="7" style="font-size:8pt;">添付書類</td>
@@ -415,11 +457,11 @@ function p(){
   <tr><td colspan="3" style="font-size:7pt;">□　対象者の生活相談業務に係る契約書及びその契約に基づき報酬を受けたことを証する書類</td></tr>
   <tr><td colspan="3" style="font-size:7pt;">□　その他（　　　　　　　　　　　　　　　　　　　）</td></tr>
   <tr>
-    <td style="text-align:center;vertical-align:middle;">（３）<br>□</td>
+    <td style="text-align:center;vertical-align:middle;">（３）<br>${_ck(v('ss_basis')==='3')}</td>
     <td colspan="2">（１）及び（２）に掲げるもののほか，これらの者と同程度に支援業務を適正に実施することができること</td>
     <td style="font-size:7pt;">添付書類</td>
     <td style="font-size:7pt;">□　この欄に該当することを立証する資料</td>
-    <td colspan="2" style="font-size:7pt;">過去５年間に労働基準監督署から是正勧告を受けたことの有無<br>□　是正勧告あり<br>□　是正勧告なし</td>
+    <td colspan="2" style="font-size:7pt;">過去５年間に労働基準監督署から是正勧告を受けたことの有無<br>${_ck(v('ss_corr')==='是正勧告あり')}　是正勧告あり<br>${_ck(v('ss_corr')==='是正勧告なし')}　是正勧告なし</td>
   </tr>
 </table>
 </div>
@@ -450,7 +492,7 @@ function p(){
     <th style="width:13%;">氏名</th>
     <th style="width:13%;">所属部署<br>役職</th>
   </tr>
-  <tr style="height:3em;"><td style="text-align:center;">1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr style="height:3em;"><td style="text-align:center;">1</td><td>${_s11('ss_app')}</td><td>${_s11('ss_appDept')}</td><td>${_s11('ss_mgrName')}</td><td>${_s11('ss_mgrDept')}</td><td>${_s11('ss_stfName')}</td><td>${_s11('ss_stfDept')}</td></tr>
   <tr style="height:3em;"><td style="text-align:center;">2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
   <tr style="height:3em;"><td style="text-align:center;">3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 </table>
@@ -491,7 +533,7 @@ async function loadFromDB(passedInfo){
   if(!info || !info.caseId) return;
   const {caseId,companyId,companyName}=info;
   try{
-    const SEL='name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra';
+    const SEL='id,name,author_name,author_title,sales_y1,sales_y2,sales_y3,ordinary_pl_y1,ordinary_pl_y2,ordinary_pl_y3,net_pl_y1,net_pl_y2,net_pl_y3,net_assets_y1,net_assets_y2,net_assets_y3,jp_voluntary_quit,jp_involuntary_quit,fn_voluntary_quit,fn_involuntary_quit,officers,extra';
     // 会社解決: companyId → companyName → cases.company_id/company フォールバック
     // ※ company_id未設定の案件でも cases.company（会社名）から会社を引けるようにする
     let co=null;
@@ -530,8 +572,94 @@ async function loadFromDB(passedInfo){
     const officers=Array.isArray(co.officers)?co.officers:[];
     officers.forEach((o,i)=>{if(i>=20)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');s(`off${i+1}Title`,o.title||'');});
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    // ver.20261020.03: ４・５（自社支援）— 案件の登録支援機関が空欄なら、案シスの「🤝 自社支援」（未取込ならフォーム回答）から入れる
+    try{ await _ss11Load(co, caseId); }catch(e){ console.warn('[1-11 自社支援]', e); }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+
+
+// ===== ver.20261020.03: 自社支援（1-11-2号・1-11-3号・1-20号・1-22号と同じ読み方） =====
+async function _ssFetchSelfSupport(coId, caseId){
+  const out={ss:null, src:'', newer:false, fe:''};
+  let ssAt='';
+  if(coId){
+    try{
+      const r=await sb(`companies?select=foreign_employees,ss:extra->selfSupport,ssAt:extra->>selfSupportAt&id=eq.${encodeURIComponent(coId)}`);
+      const c=r&&r[0];
+      if(c){
+        if(c.ss && typeof c.ss==='object' && Object.keys(c.ss).length){ out.ss=c.ss; out.src='anshis'; ssAt=c.ssAt||''; }
+        if(c.foreign_employees!=null && String(c.foreign_employees).trim()!=='') out.fe=String(c.foreign_employees);
+      }
+    }catch(e){ console.warn('[selfSupport]',e); }
+  }
+  const ids=[]; if(coId) ids.push('co_'+coId); if(caseId) ids.push(caseId);
+  if(ids.length){
+    const q=ids.map(x=>`"${x}"`).join(',');
+    try{
+      const r=await sb(`form_responses?select=response,submitted_at&form_type=eq.company&case_id=in.(${encodeURIComponent(q)})&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=10`)||[];
+      for(const x of r){
+        const rs=x&&x.response||{};
+        if(rs.ssMode==='self' && rs.selfSupport){
+          if(!out.ss){ out.ss=rs.selfSupport; out.src='form'; }
+          else if(out.src==='anshis' && x.submitted_at && ssAt && String(x.submitted_at)>String(ssAt)) out.newer=true;
+          break;
+        }
+      }
+      if(out.fe===''){ for(const x of r){ const rs=x&&x.response||{}; if(rs.foreignEmployees!=null && String(rs.foreignEmployees).trim()!==''){ out.fe=String(rs.foreignEmployees); break; } } }
+    }catch(e){ console.warn('[form]',e); }
+  }
+  return out;
+}
+function _ssSrcHtml(r){
+  let h = r.src==='anshis' ? '🤝 案シスの「自社支援」タブの内容を使っています' : '📝 ヒアリングフォーム（自社支援）の回答を使っています<br><span style="color:#64748b;">（案シスにはまだ取り込まれていません）</span>';
+  if(r.newer) h+='<br><span style="color:#b45309;font-weight:700;">⚠️ 案シスに取り込んでいない新しいフォーム回答があります。案シスで取り込むと反映されます。</span>';
+  return h;
+}
+
+const SS11_IDS=['ss_basis','ss_acc1','ss_acc2','ss_law','ss_corr','ss_app','ss_appDept','ss_mgrName','ss_mgrDept','ss_stfName','ss_stfDept']
+  .concat(['m','s'].reduce((a,k)=>a.concat(['From','To','Org','Addr','Other','Paid','C1','C2','C3','C4'].map(x=>'ss_'+k+x)),[]));
+function _ss11Clear(){ SS11_IDS.forEach(id=>{const e=document.getElementById(id); if(!e) return; if(e.type==='checkbox') e.checked=false; else e.value='';}); }
+function _ss11Note(html, kind){
+  const el=document.getElementById('ss11Note'); if(!el) return;
+  const st={ok:'background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;',warn:'background:#fffbeb;border:1px solid #fcd34d;color:#92400e;',info:'background:#f8fafc;border:1px solid #e2e8f0;color:#475569;'}[kind||'info'];
+  el.style.cssText='font-size:11px;line-height:1.5;margin:0 0 6px;padding:6px 8px;border-radius:7px;'+st;
+  el.innerHTML=html;
+}
+async function _ss11Load(co, caseId){
+  _ss11Clear();
+  const cs=await sb(`cases?select=org,applicant,company_id&id=eq.${encodeURIComponent(caseId)}`); const cas=cs&&cs[0];
+  if(!cas) return;
+  if(String(cas.org||'').trim()){ _ss11Note('登録支援機関（'+String(cas.org).replace(/</g,'&lt;')+'）に委託している案件のため、４・５は記載不要です。','info'); return; }
+  const r=await _ssFetchSelfSupport((co&&co.id)||cas.company_id||'', caseId);
+  const ss=r&&r.ss;
+  const set=(id,val)=>{const e=document.getElementById(id); if(e) e.value=(val==null?'':String(val));};
+  const chk=(id,on)=>{const e=document.getElementById(id); if(e) e.checked=!!on;};
+  set('ss_app', cas.applicant||'');
+  if(!ss){ _ss11Note('🤝 自社支援の案件ですが、自社支援の内容がまだ登録されていません。<br>案シスの所属機関案内から「① 企業情報＋自社支援」を送り、回答を取り込んでください。','warn'); return; }
+  const j=(a,b)=>[a,b].map(x=>String(x||'').trim()).filter(Boolean).join('　');
+  set('ss_basis', ss.basis||'');
+  const ac=ss.accept||{};
+  if(ss.basis==='1'){ set('ss_acc1', ac.y1); set('ss_acc2', ac.y2); set('ss_law', ac.law); }
+  if(ss.basis==='2'){
+    const cn=ss.consult||{};
+    [['m',cn.mgr],['s',cn.staff]].forEach(([k,o])=>{ o=o||{}; const c=o.contents||[];
+      set('ss_'+k+'From',o.from); set('ss_'+k+'To',o.to); set('ss_'+k+'Org',o.orgName); set('ss_'+k+'Addr',o.orgAddr);
+      chk('ss_'+k+'C1', c.indexOf('生活に必要な契約に係る支援に関するもの')>=0);
+      chk('ss_'+k+'C2', c.indexOf('生活オリエンテーションに関するもの')>=0);
+      chk('ss_'+k+'C3', c.indexOf('定期的な面談に関するもの')>=0);
+      chk('ss_'+k+'C4', c.indexOf('その他')>=0);
+      set('ss_'+k+'Other',o.other); set('ss_'+k+'Paid',o.paid); });
+  }
+  set('ss_corr', ss.corrective||'');
+  const st0=(((ss.attachments||{}).support_staff)||[])[0]||{};
+  set('ss_mgrName', ss.supportManagerName); set('ss_mgrDept', j(ss.supportManagerDept, ss.supportManagerTitle));
+  set('ss_stfName', st0.name); set('ss_stfDept', j(st0.dept, st0.title));
+  let h = r.src==='anshis' ? '🤝 案シスの「自社支援」タブの内容を使っています' : '📝 ヒアリングフォーム（自社支援）の回答を使っています（案シスにはまだ取り込まれていません）';
+  if(r.newer) h+='<br>⚠️ 案シスに取り込んでいない新しいフォーム回答があります。';
+  if(!ss.basis) h+='<br>「４」の該当する欄が回答にありません。手で選んでください。';
+  h+='<br>申請人の所属部署・役職は手で入れてください。';
+  _ss11Note(h, r.newer?'warn':'ok');
 }
 
 window.addEventListener('message', async function(e){
