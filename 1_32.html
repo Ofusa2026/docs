@@ -7,16 +7,41 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
-.doc{padding:12mm 13mm!important;line-height:1.45!important;min-height:auto!important}
-.t32{width:100%;border-collapse:collapse;margin-bottom:4mm;}
-.t32 th,.t32 td{border:1px solid #333;padding:4px 6px;font-size:9.5pt;vertical-align:top;}
-.t32 th{background:#f3f4f6;font-weight:normal;text-align:left;}
-.t32k{width:34%;}
-.t32 .lbl{white-space:nowrap;}
+/* 入管庁 参考様式第1-32号（新様式 001468039）の実寸: A4縦・余白 上下10mm/左右15mm・行グリッド14.5pt・本文10.5pt
+   留意事項は赤・太字9pt（原本どおり）。P1=1の表と2の見出し／P2=指導対象者の表・留意事項・参考表(宿泊まで)／P3=参考表の残り・署名欄 */
+.doc{width:210mm!important;height:297mm!important;min-height:0!important;padding:10mm 15mm!important;overflow:hidden!important;
+  font-family:'MS Mincho','ＭＳ 明朝','Yu Mincho','Hiragino Mincho ProN',serif!important;font-size:10.5pt!important;line-height:14.5pt!important;}
+.doc .g{min-height:14.5pt;}
+.doc .ttl{font-size:16pt;font-weight:bold;text-align:justify;text-align-last:justify;line-height:22pt;margin:6pt 0 4pt;}
+.doc .h12{font-size:12pt;font-weight:bold;line-height:18pt;}
+.doc .red{color:#f00;}
+.doc .url{color:#00f;text-decoration:underline;}
+.doc .nt{font-size:9pt;font-weight:bold;color:#f00;line-height:14.5pt;}
+.doc .hang{padding-left:9pt;text-indent:-9pt;}
+.doc .ul{text-decoration:underline;}
+.doc .uline{display:inline-block;border-bottom:1px solid #000;vertical-align:bottom;}
+.doc .fill{color:#000;font-weight:normal;}
+.doc table.t1,.doc table.t2,.doc table.t3{border-collapse:collapse;table-layout:fixed;}
+.doc table.t1 td,.doc table.t2 td,.doc table.t2 th,.doc table.t3 td{border:1px solid #000;padding:1pt 3pt;vertical-align:top;line-height:13pt;}
+.doc table.t1 td.lb{font-size:10pt;}
+.doc table.t1 td.v,.doc table.t2 td.v{font-size:10pt;white-space:pre-wrap;word-break:break-all;}
+.doc table.t2 th{font-weight:normal;text-align:center;vertical-align:middle;line-height:11pt;}
+.doc table.t2 td.no{text-align:center;vertical-align:middle;font-size:12pt;}
+.doc table.t2 td.cardbox{border-top:1px dotted #000;height:4.5mm;padding:0;text-align:center;vertical-align:middle;font-size:8pt;line-height:4.5mm;}
+.doc table.t2 td.cardbox.dl{border-left:1px dotted #000;}
+.doc table.t2 td.cardbox.dr{border-right:1px dotted #000;}
+.doc table.t3 td{text-align:left;vertical-align:middle;font-size:10pt;}
+.doc table.t3 td.c{text-align:center;}
 @media print{
-  .app-bar,.fp{display:none!important}
+  @page{size:A4 portrait;margin:0;}
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp,.page-nav,.page-num-label{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:12mm 13mm!important}
+  .pp{padding:0!important;overflow:visible!important}
+  #pageArea{padding:0!important;display:block!important}
+  .doc{zoom:1!important;box-shadow:none!important;margin:0!important;width:210mm!important;height:297mm!important;min-height:0!important;padding:10mm 15mm!important;
+    font-size:10.5pt!important;line-height:14.5pt!important;break-after:page;page-break-after:always;}
+  .doc:last-child{break-after:auto;page-break-after:auto;}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
@@ -25,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261007.01</div>
+    <div class="ver">ver.20261023.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -64,27 +89,51 @@
         <select id="f_t2Who" onchange="var h=document.getElementById('f_t2WhoSel');if(h)h.value=this.value;applyT2Targets(true);"></select>
       </div>
       <input type="hidden" id="f_t2WhoSel" value="">
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">外国人の場合は氏名欄に在留カード番号も記載</div>
-      <div class="fg"><label>① 氏名（＋在留カード番号）</label><input id="f_t1Name" oninput="p()"></div>
-      <div class="fg"><label>① 事業所及び所属部署名</label><input id="f_t1Dept" oninput="p()"></div>
-      <div class="fg"><label>① 役職又は地位</label><input id="f_t1Pos" oninput="p()"></div>
-      <div class="fg"><label>① 指導を受ける職務内容</label><input id="f_t1Job" oninput="p()"></div>
-      <div class="fg"><label>② 氏名（＋在留カード番号）</label><input id="f_t2Name" oninput="p()"></div>
-      <div class="fg"><label>② 事業所及び所属部署名</label><input id="f_t2Dept" oninput="p()"></div>
-      <div class="fg"><label>② 役職又は地位</label><input id="f_t2Pos" oninput="p()"></div>
-      <div class="fg"><label>② 指導を受ける職務内容</label><input id="f_t2Job" oninput="p()"></div>
-      <div class="fg"><label>③ 氏名（＋在留カード番号）</label><input id="f_t3Name" oninput="p()"></div>
-      <div class="fg"><label>③ 事業所及び所属部署名</label><input id="f_t3Dept" oninput="p()"></div>
-      <div class="fg"><label>③ 役職又は地位</label><input id="f_t3Pos" oninput="p()"></div>
-      <div class="fg"><label>③ 指導を受ける職務内容</label><input id="f_t3Job" oninput="p()"></div>
-      <div class="fg"><label>④ 氏名（＋在留カード番号）</label><input id="f_t4Name" oninput="p()"></div>
-      <div class="fg"><label>④ 事業所及び所属部署名</label><input id="f_t4Dept" oninput="p()"></div>
-      <div class="fg"><label>④ 役職又は地位</label><input id="f_t4Pos" oninput="p()"></div>
-      <div class="fg"><label>④ 指導を受ける職務内容</label><input id="f_t4Job" oninput="p()"></div>
-      <div class="fg"><label>⑤ 氏名（＋在留カード番号）</label><input id="f_t5Name" oninput="p()"></div>
-      <div class="fg"><label>⑤ 事業所及び所属部署名</label><input id="f_t5Dept" oninput="p()"></div>
-      <div class="fg"><label>⑤ 役職又は地位</label><input id="f_t5Pos" oninput="p()"></div>
-      <div class="fg"><label>⑤ 指導を受ける職務内容</label><input id="f_t5Job" oninput="p()"></div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fff;">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:3px;">①</div>
+        <div class="fg"><label>氏名</label><input id="f_t1Name" oninput="p()"></div>
+        <div class="fg"><label>在留カード番号（外国人のみ・12桁）</label><input id="f_t1Card" oninput="p()" placeholder="AB12345678CD"></div>
+        <div class="fg"><label>事業所及び所属部署名</label><input id="f_t1Dept" oninput="p()"></div>
+        <div class="fg"><label>役職又は地位</label><input id="f_t1Pos" oninput="p()"></div>
+        <div class="fg"><label>指導を受ける職務内容</label><input id="f_t1Job" oninput="p()"></div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fff;">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:3px;">②</div>
+        <div class="fg"><label>氏名</label><input id="f_t2Name" oninput="p()"></div>
+        <div class="fg"><label>在留カード番号（外国人のみ・12桁）</label><input id="f_t2Card" oninput="p()" placeholder="AB12345678CD"></div>
+        <div class="fg"><label>事業所及び所属部署名</label><input id="f_t2Dept" oninput="p()"></div>
+        <div class="fg"><label>役職又は地位</label><input id="f_t2Pos" oninput="p()"></div>
+        <div class="fg"><label>指導を受ける職務内容</label><input id="f_t2Job" oninput="p()"></div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fff;">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:3px;">③</div>
+        <div class="fg"><label>氏名</label><input id="f_t3Name" oninput="p()"></div>
+        <div class="fg"><label>在留カード番号（外国人のみ・12桁）</label><input id="f_t3Card" oninput="p()" placeholder="AB12345678CD"></div>
+        <div class="fg"><label>事業所及び所属部署名</label><input id="f_t3Dept" oninput="p()"></div>
+        <div class="fg"><label>役職又は地位</label><input id="f_t3Pos" oninput="p()"></div>
+        <div class="fg"><label>指導を受ける職務内容</label><input id="f_t3Job" oninput="p()"></div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fff;">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:3px;">④</div>
+        <div class="fg"><label>氏名</label><input id="f_t4Name" oninput="p()"></div>
+        <div class="fg"><label>在留カード番号（外国人のみ・12桁）</label><input id="f_t4Card" oninput="p()" placeholder="AB12345678CD"></div>
+        <div class="fg"><label>事業所及び所属部署名</label><input id="f_t4Dept" oninput="p()"></div>
+        <div class="fg"><label>役職又は地位</label><input id="f_t4Pos" oninput="p()"></div>
+        <div class="fg"><label>指導を受ける職務内容</label><input id="f_t4Job" oninput="p()"></div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 8px;margin-bottom:6px;background:#fff;">
+        <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:3px;">⑤</div>
+        <div class="fg"><label>氏名</label><input id="f_t5Name" oninput="p()"></div>
+        <div class="fg"><label>在留カード番号（外国人のみ・12桁）</label><input id="f_t5Card" oninput="p()" placeholder="AB12345678CD"></div>
+        <div class="fg"><label>事業所及び所属部署名</label><input id="f_t5Dept" oninput="p()"></div>
+        <div class="fg"><label>役職又は地位</label><input id="f_t5Pos" oninput="p()"></div>
+        <div class="fg"><label>指導を受ける職務内容</label><input id="f_t5Job" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">留意事項（理由など）</div>
+      <div class="fg"><label>３ 同一の事業所・部署ではない場合の理由</label><textarea id="f_reason3" rows="2" oninput="p()" placeholder="同一の事業所・部署なら空欄のまま"></textarea></div>
+      <div class="fg"><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="f_short5" onchange="p()" style="width:15px;height:15px;margin:0;"> ５ 指導対象者数を一時的に充足していない</label></div>
+      <div class="fg"><label>５ その理由</label><textarea id="f_reason5" rows="2" oninput="p()" placeholder="例：採用プロセス中のため（○月入社予定）"></textarea></div>
     </div>
   </div>
 </div>
@@ -93,6 +142,7 @@
     <span class="page-nav-label">ページ:</span>
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
@@ -101,77 +151,118 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792475583"></script>
+<script src="ofusa_common.js?v=1792746119"></script>
 <script>
+// 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
+const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
+function _tParts(n){
+  let nm=v('f_t'+n+'Name'), cd=v('f_t'+n+'Card');
+  // 旧形式（氏名欄に「氏名　在留カード番号」）の保存データも分けて表示
+  if(!cd){ const m=String(nm||'').match(_CARD_RE); if(m){ nm=m[1]; cd=m[2]; } }
+  return {nm, cd:String(cd||'').replace(/[\s　-]/g,'').toUpperCase()};
+}
 function _tRow(n){
-  // 指導対象者の行（入力があるときのみ）
-  const nm=v('f_t'+n+'Name'), dp=v('f_t'+n+'Dept'), ps=v('f_t'+n+'Pos'), jb=v('f_t'+n+'Job');
-  if(!nm && !dp && !ps && !jb) return '';
-  const mark=['①','②','③','④','⑤'][n-1];
-  return `<tr><td style="text-align:center;width:2em;">${mark}</td><td style="width:30%;">${f('f_t'+n+'Name')}</td><td style="width:24%;">${f('f_t'+n+'Dept')}</td><td style="width:16%;">${f('f_t'+n+'Pos')}</td><td>${f('f_t'+n+'Job')}</td></tr>`;
+  const mark='①②③④⑤'[n-1];
+  const {nm,cd}=_tParts(n);
+  const esc2=x=>(typeof esc==='function')?esc(x):String(x||'');
+  let cells='';
+  for(let i=0;i<12;i++) cells+=`<td class="cardbox${i>0?' dl':''}${i<11?' dr':''}">${esc2(cd.charAt(i)||'')}</td>`;
+  const nmHtml = nm ? `<span class="f" data-bind="f_t${n}Name">${esc2(nm)}</span>` : '';
+  return `<tr style="height:10mm;"><td rowspan="2" class="no">${mark}</td><td colspan="12" class="v" style="vertical-align:middle;border-bottom:none;">${nmHtml}</td>`+
+    `<td rowspan="2" class="v">${f('f_t'+n+'Dept')}</td><td rowspan="2" class="v">${f('f_t'+n+'Pos')}</td><td rowspan="2" class="v">${f('f_t'+n+'Job')}</td></tr>`+
+    `<tr>${cells}</tr>`;
+}
+function _ymd32(){
+  const s=v('f_docDate'); const m=String(s||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  return m ? `${m[1]}年　${+m[2]}月　${+m[3]}日` : `２０　　　　年　　　月　　　日`;
 }
 function p(){
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
-  let tRows='';
-  for(let i=1;i<=5;i++) tRows+=_tRow(i);
-  if(!tRows) tRows=`<tr><td style="text-align:center;width:2em;">①</td><td style="width:30%;">${f('f_t1Name')}</td><td style="width:24%;">${f('f_t1Dept')}</td><td style="width:16%;">${f('f_t1Pos')}</td><td>${f('f_t1Job')}</td></tr>`;
+  let tRows=''; for(let i=1;i<=5;i++) tRows+=_tRow(i);
+  const C2=[6.8].concat(Array(12).fill(4.6)).concat([22.5,22.5,70.0]);
+  const r3=v('f_reason3'), r5=v('f_reason5'), sh5=!!(document.getElementById('f_short5')||{}).checked;
+  // 理由欄：「（理由：」＋記入（無ければ空白）＋行末の「）」（原本どおり行の右端に閉じかっこ）
+  const reason=(val,id)=> `<span style="display:flex;"><span>（理由：</span><span class="fill" style="flex:1;padding:0 4pt;">${val?f(id):''}</span><span>）</span></span>`;
+  const t3=[['ビルクリーニング分野','２名以上'],['工業製品製造業分野','２名以上'],['建設分野','２名以上'],['造船・舶用工業分野','２名以上'],['自動車整備分野','１名以上'],['航空分野','空港グランドハンドリング区分は１名以上'],['宿泊分野','２名以上'],['農業分野','２名以上'],['漁業分野',''],['飲食料品製造業分野','２名以上'],['外食業分野','']];
+  const t3row=r=>`<tr style="height:7.5mm;"><td class="c">${r[0]}</td><td>${r[1]}</td></tr>`;
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="text-align:left;font-size:10.5pt;margin-bottom:6px;">参考様式第１－３２号</div>
-<div style="font-size:15pt;font-weight:bold;text-align:center;margin:3mm 0;">２号特定技能外国人の業務内容に関する誓約書</div>
-<div style="margin-bottom:8px;">　当特定技能所属機関は、２号特定技能外国人　<span style="display:inline-block;min-width:14em;border-bottom:1px solid #333;text-align:center;">${f('f_applicant')}</span>　との間で特定技能雇用契約を締結するに当たって、各特定産業分野における分野別方針及び特定の分野に係る要領別冊に定めている２号特定技能外国人の従事する業務内容を確認した上で、当該外国人が従事する業務内容と相違のないことを誓約するとともに、当該業務内容を以下のとおり申告します。</div>
-<div style="font-size:8.5pt;margin-bottom:2px;">※　分野別運用方針（URL：https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri01_00132.html）</div>
-<div style="font-size:8.5pt;margin-bottom:8px;">　　要領別冊（URL：https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00201.html）</div>
-<div style="font-weight:bold;margin-bottom:4px;">１　当該２号特定技能外国人の業務内容</div>
-<table class="t32">
-<tr><th class="t32k">①　所属部署名</th><td>${f('f_dept')}</td></tr>
-<tr><th class="t32k">②　役職又は地位</th><td>${f('f_position')}</td></tr>
-<tr><th class="t32k">③　当該外国人が従事する具体的な職務内容（製造物、収穫物、作業工程など）</th><td>${f('f_jobDesc')}</td></tr>
-<tr><th class="t32k">④　技能実習生又は１号特定技能外国人が従事する場合、それら外国人と当該２号特定技能外国人の職務内容の違い（各特定産業分野における分野別方針で定めている２号特定技能外国人の従事する業務内容に相違のないよう記載すること）</th><td>${f('f_jobDiff')}</td></tr>
+<div class="g" style="font-size:11pt;">参考様式第１－３２号</div>
+<div class="g"></div>
+<div class="ttl">２号特定技能外国人の業務内容に関する誓約書</div>
+<div class="g"></div>
+<div style="text-indent:10.5pt;">当特定技能所属機関は、２号特定技能外国人<span class="uline" style="min-width:55mm;text-align:center;text-indent:0;">${f('f_applicant')}</span>との間で特定技能雇用契約を締結するに当たって、各特定産業分野における分野別方針及び特定の分野に係る要領別冊に定めている２号特定技能外国人の従事する業務内容を確認した上で、当該外国人が従事する業務内容と相違のないことを誓約するとともに、当該業務内容を以下のとおり申告します。</div>
+<div style="font-size:9pt;font-weight:bold;text-indent:9pt;"><span class="red">※　分野別運用方針</span>（URL：<span class="url">https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri01_00132.html</span>）</div>
+<div style="font-size:9pt;font-weight:bold;padding-left:27pt;"><span class="red">要領別冊</span>（URL：<span class="url">https://www.moj.go.jp/isa/applications/ssw/nyuukokukanri07_00201.html</span>）</div>
+<div class="g"></div>
+<div class="h12">１　当該２号特定技能外国人の業務内容</div>
+<table class="t1" style="width:177.7mm;">
+  <colgroup><col style="width:55.5mm"><col style="width:122.2mm"></colgroup>
+  <tr style="height:7.5mm;"><td class="lb" style="vertical-align:middle;">①　所属部署名</td><td class="v" style="vertical-align:middle;">${f('f_dept')}</td></tr>
+  <tr style="height:7.5mm;"><td class="lb" style="vertical-align:middle;">②　役職又は地位</td><td class="v" style="vertical-align:middle;">${f('f_position')}</td></tr>
+  <tr style="height:40mm;"><td class="lb" style="vertical-align:middle;padding-left:13pt;text-indent:-10pt;">③　当該外国人が従事する具体的な職務内容（製造物、収穫物、作業工程など）</td><td class="v">${f('f_jobDesc')}</td></tr>
+  <tr style="height:45mm;"><td class="lb" style="vertical-align:middle;padding-left:13pt;text-indent:-10pt;">④　技能実習生又は１号特定技能外国人が従事する場合、それら外国人と当該２号特定技能外国人の職務内容の違い（各特定産業分野における分野別方針で定めている２号特定技能外国人の従事する業務内容に相違のないよう記載すること）</td><td class="v">${f('f_jobDiff')}</td></tr>
 </table>
-<div style="font-weight:bold;margin-bottom:4px;">２　当該２号特定技能外国人に指導を受ける対象者一覧</div>
-<table class="t32">
-<tr><th style="width:2em;"></th><th>対象者の氏名<br><span style="font-size:8pt;">※外国人の場合は在留カード番号も記載</span></th><th>事業所及び<br>所属部署名</th><th>役職又は地位</th><th>指導を受ける職務内容</th></tr>
-${tRows}
-</table>
-<div style="font-size:8.5pt;font-weight:bold;margin-bottom:2px;">※　留意事項</div>
-<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">１　在留資格認定証明書の交付又は在留諸申請の許否に大きく影響するため、全て具体的に記載すること。なお、記載内容と実際の内容に相違がある場合、在留資格が取り消される可能性があるほか、虚偽の内容を記載した場合、特定技能所属機関としての欠格事由に該当することとなるため、留意すること。</div>
-<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">２　事業所、事業内容、所属部署、役職、職務内容などで、複数該当するものがある場合については、全ての内容を記載すること。</div>
-<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">３　対象者については、２号特定技能外国人と同一の事業所に出勤し、原則同一の所属部署に所属する者であって、フルタイムで業務に従事する者に限る。</div>
-<div style="font-size:8.5pt;margin-left:1em;margin-bottom:1px;">４　在留諸申請時点で、他の２号特定技能外国人に指導を受けている者については記載しないこと。</div>
-<div style="font-size:8.5pt;margin-left:1em;margin-bottom:0;">５　記載する枠が足りない場合は、適宜追加すること。</div>
+<div class="g"></div>
+<div class="h12">２　当該２号特定技能外国人に指導を受ける対象者一覧</div>
 </div>
 <div class="doc">
 <div class="page-num-label">P2</div>
-<div style="font-weight:bold;margin-bottom:4px;">（参考）特定産業分野ごとの指導を受ける必要な対象者数</div>
-<table class="t32" style="width:80%;">
-<tr><th>特定技能２号対象の特定産業分野</th><th style="width:36%;">必要な対象者数</th></tr>
-<tr><td>ビルクリーニング分野</td><td>２名以上</td></tr>
-<tr><td>工業製品製造業分野</td><td>２名以上</td></tr>
-<tr><td>建設分野</td><td>２名以上</td></tr>
-<tr><td>造船・舶用工業分野</td><td>２名以上</td></tr>
-<tr><td>自動車整備分野</td><td>１名以上</td></tr>
-<tr><td>航空分野</td><td>空港グランドハンドリング区分は１名以上</td></tr>
-<tr><td>宿泊分野</td><td>２名以上</td></tr>
-<tr><td>農業分野</td><td>２名以上</td></tr>
-<tr><td>漁業分野</td><td></td></tr>
-<tr><td>飲食料品製造業分野</td><td>２名以上</td></tr>
-<tr><td>外食業分野</td><td></td></tr>
+<table class="t2" style="width:177mm;">
+  <colgroup>${C2.map(x=>`<col style="width:${x}mm">`).join('')}</colgroup>
+  <tr style="height:9mm;"><th></th><th colspan="12" style="font-size:10.5pt;">対象者の氏名<br><span style="font-size:6pt;">※外国人の場合は在留カード番号も記載</span></th><th style="font-size:6.5pt;">事業所及び<br>所属部署名</th><th style="font-size:8pt;">役職又は地位</th><th style="font-size:10.5pt;">指導を受ける職務内容</th></tr>
+  ${tRows}
 </table>
-<div style="font-size:8.5pt;margin-bottom:14mm;">※　必要な対象者数の記載がない特定産業分野又は業務区分については、指導を受ける対象者が不在でも差し支えないが、当該対象者が在籍する場合は必ず記載すること。</div>
-<div style="margin-bottom:8px;">作成年月日：${f('f_docDate')}</div>
-<div style="margin-bottom:10px;">上記の記載内容は、事実と相違ありません。</div>
-<div style="margin-bottom:8px;">２号特定技能外国人の署名　　<span style="display:inline-block;min-width:18em;border-bottom:1px solid #333;text-align:center;">&nbsp;</span></div>
-<div style="margin-bottom:8px;">特定技能所属機関の氏名又は名称　　<span style="display:inline-block;min-width:18em;">${f('f_company')}</span></div>
-<div>作成責任者の氏名及び役職　　<span style="display:inline-block;min-width:18em;">${f('f_author')}</span></div>
+<div class="nt">※　留意事項</div>
+<div class="nt hang">１　在留資格認定証明書の交付又は在留諸申請の許否に大きく影響するため、全て具体的に記載すること。なお、記載内容と実際の内容に相違がある場合、在留資格が取り消される可能性があるほか、虚偽の内容を記載した場合、特定技能所属機関としての欠格事由に該当することとなるため、留意すること。</div>
+<div class="nt hang">２　事業所、事業内容、所属部署、役職、職務内容などで、複数該当するものがある場合については、全ての内容を記載すること。</div>
+<div class="nt">３　対象者については、原則として、２号特定技能外国人と<span class="ul">同一の事業所に出勤</span>し、<span class="ul">同一の部署に所属する者とする。ただし、特定産業分野の特性により同一の事業所や部署ではない場合は、当該事情を勘案した上で個別に判断しますので、その理由を以下に記載してください</span>。※必要に応じて別紙を添付いただいても差し支えありません。</div>
+<div class="nt">${reason(r3,'f_reason3')}</div>
+<div class="nt">４　在留諸申請時点で他の２号特定技能外国人に指導を受けている者については、専門性の異なる２号特定技能外国人が同一人に対して指導を行う場合や、特定産業分野特有の事情がある場合等、合理的な理由があると認められる場合には、指導対象者に含むこととします。</div>
+<div class="nt hang">５　申請時点において指導対象者が採用プロセス中であり確定していない場合等、<span class="ul">特定産業分野ごとに必要とされる指導対象者数を一時的に充足していない場合は、以下の内容を理解の上でチェックを入れるとともに、理由を記載してください。※必要に応じて別紙を添付いただいても差し支えありません</span>。</div>
+<div class="nt" style="padding-left:10.5pt;">${sh5?'<span style="color:#000;">☑</span>':'□'}　今般の申請に当たって、特定産業分野ごとに必要とされる指導対象者数を充足していませんが、この状況は、以下の理由欄記載のとおり一時的なものであり、次回の在留期間更新許可申請の際に指導対象者数を充足していない場合は、次回の在留期間更新許可申請が不許可となり得ることを理解しています。</div>
+<div class="nt hang">${reason(r5,'f_reason5')}</div>
+<div class="nt">６　記載する枠が足りない場合は、適宜追加すること。</div>
+<div class="g"></div>
+<div class="h12">（参考）特定産業分野ごとの指導を受ける必要な対象者数</div>
+<table class="t3" style="width:179.8mm;">
+  <colgroup><col style="width:68mm"><col style="width:111.8mm"></colgroup>
+  <tr style="height:7.2mm;"><td class="c">特定技能２号対象の特定産業分野</td><td class="c">必要な対象者数</td></tr>
+  ${t3.slice(0,7).map(t3row).join('')}
+</table>
+</div>
+<div class="doc">
+<div class="page-num-label">P3</div>
+<table class="t3" style="width:179.8mm;">
+  <colgroup><col style="width:68mm"><col style="width:111.8mm"></colgroup>
+  ${t3.slice(7).map(t3row).join('')}
+</table>
+<div class="nt hang">※　航空分野（航空機整備区分）、漁業分野及び外食業分野については、指導を受ける対象者がいない場合も差し支えないが、当該対象者が在籍する場合は上記２に記載すること。</div>
+<div class="g"></div>
+<div style="text-align:right;font-weight:bold;">作成年月日：${_ymd32()}</div>
+<div class="g"></div>
+<div style="font-weight:bold;">上記の記載内容は、事実と相違ありません。</div>
+<div class="g"></div><div class="g"></div>
+<div style="font-weight:bold;padding-left:38mm;">２号特定技能外国人の署名　<span class="uline" style="min-width:55mm;">&nbsp;</span></div>
+<div class="g"></div>
+<div style="font-weight:bold;text-align:right;">特定技能所属機関の氏名又は名称　<span class="uline" style="min-width:60mm;text-align:left;font-weight:normal;">${f('f_company')}</span></div>
+<div class="g"></div>
+<div style="font-weight:bold;text-align:right;">作成責任者の氏名及び役職　<span class="uline" style="min-width:60mm;text-align:left;font-weight:normal;">${f('f_author')}</span></div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
-  _applyFontSize();
+  _apply132FontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
   fitDocToPreview();
+}
+// A+/A- は記入欄の文字だけを拡大縮小（枠の寸法・様式の文字は原本どおり固定）
+function _apply132FontSize(){
+  const st=document.getElementById('_132FontStyle')||document.createElement('style');
+  st.id='_132FontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10.5;
+  st.textContent=[`.doc{font-size:10.5pt!important}`,`.doc td.v{font-size:${(10*s).toFixed(2)}pt!important}`].join('');
 }
 function _wareki32(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
 // ver.20261007.01: 指導対象者を「どの２号外国人の対象か」で絞り込む。
@@ -207,12 +298,12 @@ function applyT2Targets(manual){
       list=m?tf.targets.filter(t=>t && String(t.group)===m[1] && String(t.person)===m[2]):[];
     }else if(!who){ list=[]; }
   }
-  for(let n=1;n<=5;n++){ ['Name','Dept','Pos','Job'].forEach(sfx=>{const e=document.getElementById('f_t'+n+sfx); if(e)e.value='';}); }
+  for(let n=1;n<=5;n++){ ['Name','Card','Dept','Pos','Job'].forEach(sfx=>{const e=document.getElementById('f_t'+n+sfx); if(e)e.value='';}); }
   list.slice(0,5).forEach((t,i)=>{
     const n=i+1;
-    const nm=[t.name,t.card].filter(Boolean).join('　');
     const s2=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
-    s2('f_t'+n+'Name',nm); s2('f_t'+n+'Dept',t.dept); s2('f_t'+n+'Pos',t.position); s2('f_t'+n+'Job',t.job);
+    // ver.20261023.01: 新様式は在留カード番号を別の12マスに書くため、氏名と分けて入れる
+    s2('f_t'+n+'Name',t.name); s2('f_t'+n+'Card',t.card); s2('f_t'+n+'Dept',t.dept); s2('f_t'+n+'Pos',t.position); s2('f_t'+n+'Job',t.job);
   });
   p();
   if(manual && typeof showToast==='function'){
@@ -303,7 +394,7 @@ function fitDocToPreview(){
     const area = document.getElementById('pageArea');
     if(!pp || !area) return;
     const ppW = pp.clientWidth - 40;
-    const docW = 794;
+    const docW = 794;  // 210mm
     if(ppW < docW){
       const scale = ppW / docW;
       area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
