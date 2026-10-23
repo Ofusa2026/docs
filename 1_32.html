@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261023.02</div>
+    <div class="ver">ver.20261023.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -152,7 +152,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792747100"></script>
+<script src="ofusa_common.js?v=1792748157"></script>
 <script>
 // 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
 const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
@@ -347,9 +347,14 @@ async function loadFromDB(passedInfo){
     //   回答キー: t2Dept/t2Position/t2JobDetail/t2JobDiff/t2Targets[{name,card,dept,position,job}]
     //   フォームの回答は雇用条件フォールバックより優先（企業が直接書いた内容のため）。
     try{
-      if(companyId){
-        const frs = await sb(`form_responses?select=response&form_type=eq.tokutei2_pledge&case_id=eq.${encodeURIComponent('co_'+companyId)}&deleted_at=is.null&order=created_at.desc&limit=1`);
-        const fr = frs && frs[0] && frs[0].response;
+      // ver.20261023.03: 2号だけのフォーム（tokutei2_pledge）に加えて、企業フォームと一緒に聞いた回答（company_tokutei2 の③）も読む。
+      //   会社IDが渡されないとき（案件だけ選んだとき）は案件の所属機関IDを使う。2号の内容が入っていない回答（①②だけのリンク）は飛ばす。
+      const _cid = companyId || (cas && cas.company_id) || '';
+      if(_cid){
+        const frs = await sb(`form_responses?select=response,form_type,created_at&form_type=in.(tokutei2_pledge,company_tokutei2)&case_id=eq.${encodeURIComponent('co_'+_cid)}&deleted_at=is.null&order=created_at.desc&limit=10`);
+        const _hasT2 = r => r && (r.t2Field || r.t2JobDetail || r.t2Dept || (Array.isArray(r.t2Targets) && r.t2Targets.length));
+        const _hit = (frs||[]).find(x => _hasT2(x && x.response));
+        const fr = _hit && _hit.response;
         if(fr){
           const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
           sf('f_dept', fr.t2Dept);
