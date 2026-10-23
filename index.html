@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261023.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261023.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20260808.04: 選択案件バー + 書類ジャーナル (MVP Component 1) -->
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -445,8 +445,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1792748157';
-window.__DOCS_CACHE_BUSTER__ = '1792748157';
+window.__DOCS_CACHE_BUSTER__ = '1792754157';
+window.__DOCS_CACHE_BUSTER__ = '1792754157';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1230,7 +1230,7 @@ async function idxJumpByPaste(){
       companyId:row.company_id,
       companyName:row.company||row.org||'',
       orgName:row.org||'',
-      empSetIdx:row.emp_set_idx||0,
+      empSetIdx:(row.emp_set_idx!=null?String(row.emp_set_idx):''),   // ver.20261023.04: 未選択を0（1番目のセット）として渡さない
       // ver.20260820.11: 印刷PDFのファイル名生成用に申請人名も渡す
       applicant:row.applicant||row.name||'',
       // ver.20260820.16: 優先書類マップ判定に使う3情報
@@ -1481,6 +1481,15 @@ window.addEventListener('message', function(e){
     } catch(err){}
     return;
   }
+  // ver.20261023.04: 書類側で雇用条件セットが選ばれた → 手元の案件情報にも入れる（保存・まとめ印刷が古い値を見ないように）
+  if(e.data.type === 'EMP_SET_CHOSEN'){
+    try{
+      var _cid=String(e.data.caseId||''), _ix=String(e.data.idx==null?'':e.data.idx);
+      if(_cid && idxSelectedCase && String(idxSelectedCase.caseId)===_cid) idxSelectedCase.empSetIdx=_ix;
+      var _row=(idxAllCases||[]).find(function(c){ return String(c.id)===_cid; }); if(_row) _row.emp_set_idx=_ix;
+    }catch(err){}
+    return;
+  }
   // GET_CASE_INFO: 子から案件情報を要求された(DB保存等)
   if(e.data.type === 'GET_CASE_INFO'){
     try {
@@ -1548,6 +1557,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261023.04',
+    date: '2026-10-23',
+    notify: true,
+    items: [
+      '📑 雇用条件セットが選ばれていない案件で、<b>1番目のセットを黙って使わない</b>ようにしました。書類を開くと「雇用条件セットを選んでください」の画面が出るので、この人のセットを選んでください（選んだセットは案件に保存されます）。これまで自動で選んでいたセットには「おすすめ」の印が付きます',
+      '💾 雇用条件セットを選ばないまま1-6号の「DB保存」を押すと、<b>1番目のセットに上書き</b>していました。今日からは上書きせず、「新しいセットとして保存しますか？」と聞きます',
+      '🖨️ まとめ印刷は、雇用条件セットが選ばれていないと止まります（先に書類を開いて選んでください）。1-17号（Word版）も、選ばれていないと作成しません'
+    ]
+  },
   {
     version: 'ver.20261023.03',
     date: '2026-10-23',
@@ -2495,6 +2514,22 @@ function _pmChangeField(v){
 async function printPriorityDocs(keepField){
   if(!idxSelectedCase){ alert('先に案件を選択してください。'); return; }
   var c=idxSelectedCase;
+  // ver.20261023.04: 雇用条件セットが選ばれていないときは、まとめ印刷をしない
+  //   （まとめ印刷は見えない画面で書類を開くので、そこでは選ぶ画面を出せない＝雇用条件が空の書類になる）
+  try{
+    var _cr=await idxSb('cases?select=emp_set_idx,company_id&id=eq.'+encodeURIComponent(c.caseId));
+    var _cRow=_cr&&_cr[0]; var _ix=_cRow&&_cRow.emp_set_idx; var _coid=(_cRow&&_cRow.company_id)||c.companyId;
+    if(_coid){
+      var _co=await idxSb('companies?select=emp_sets&id=eq.'+encodeURIComponent(_coid));
+      var _sets=(_co&&_co[0]&&_co[0].emp_sets)||[]; if(typeof _sets==='string'){ try{ _sets=JSON.parse(_sets); }catch(e){ _sets=[]; } }
+      var _ok=(_ix!=null && String(_ix)!=='' && Array.isArray(_sets) && _sets[parseInt(_ix,10)]);
+      if(Array.isArray(_sets) && _sets.length && !_ok){
+        alert('この案件は、雇用条件セットが選ばれていません。\n\n先に「1-6号」などの書類を開くと、雇用条件セットを選ぶ画面が出ます。\nこの人のセットを選んでから、もう一度まとめ印刷をしてください。\n（選ばないまま印刷すると、雇用条件が空の書類になります）');
+        return;
+      }
+      if(_ok) c.empSetIdx=String(_ix);
+    }
+  }catch(_e){ console.warn('[pm] empSet check', _e); }
   var info={caseId:c.caseId, companyId:c.companyId, companyName:c.companyName||'', applicant:c.applicant||'',
     residenceStatus:c.residenceStatus||'', applicantField:c.applicantField||'', appType:c.appType||'', nationality:c.nationality||'', orgName:c.orgName||''};
   var fieldSrc = info.applicantField ? '案件' : '';

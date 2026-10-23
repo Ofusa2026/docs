@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２５号　登録支援機関との支援委託契約に関する説明書</div>
-    <div class="ver">ver.20261005.01</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -70,7 +70,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 let _itekiHatou = ''; // ''=未選択 'gaitou'=該当 'higaitou'=非該当
 
@@ -168,8 +168,9 @@ async function loadFromDB(passedInfo){
       s('f_company',co.name||'');
       s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
       s('f_soName',(cas&&cas.org)||co.support_org_name||'');
-      const idx=parseInt((cas&&cas.emp_set_idx)||0)||0;
-      const es=(co.emp_sets||[])[idx]||{};
+      // ver.20261023.04: 雇用条件セットが未選択なら1番目を使わず、選んでもらう（共通 resolveEmpSetIdx）
+      const idx=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
+      const es=(idx>=0?(co.emp_sets||[])[idx]:null)||{};
       // 支援委託費は案件(cases.support_fee)に保存されている。旧データ用にemp_setsもフォールバック
       const _sf=(cas&&cas.support_fee)||es.supportFee||'';
       if(_sf) s('f_supportFee',_sf);
@@ -207,8 +208,8 @@ async function loadFromDB(passedInfo){
     // ver.20260930.01: 作成日(f_docDate)・契約年月日/契約期間開始日(f_contractStart)は
     //   雇用条件書(1-6号)の作成日に合わせる。1-6号と同じ優先順:
     //   cases.doc_create_date → 雇用条件セット(emp_sets)のcreateY/M/D → 今日
-    const _kIdx=parseInt((cas&&cas.emp_set_idx)||0)||0;
-    const _kEs=(co&&co.emp_sets&&co.emp_sets[_kIdx])||{};
+    const _kIdx=(co&&typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;   // ver.20261023.04: 未選択なら1番目を使わない
+    const _kEs=(co&&co.emp_sets&&_kIdx>=0&&co.emp_sets[_kIdx])||{};
     let _koyoDate=(cas&&cas.doc_create_date)?fmtJDate(cas.doc_create_date):'';
     if(!_koyoDate&&_kEs.createY&&_kEs.createM&&_kEs.createD) _koyoDate=`${_kEs.createY}年${parseInt(_kEs.createM)}月${parseInt(_kEs.createD)}日`;
     if(!_koyoDate){const n=new Date();_koyoDate=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日`;}

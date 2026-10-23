@@ -1,5 +1,12 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261023.04
+ * - fix(resolveEmpSetIdx): 雇用条件セットが未選択のとき、1番目（や自動で選んだセット）を黙って使わない。
+ *   「雇用条件セットを選んでください」の画面を出し、選んだセットを cases.emp_set_idx に保存して使う。
+ *   キャンセル／見えない枠（まとめ印刷・案シスからの作成）では -1（雇用条件は空）を返す。
+ *   これまでの自動選択は「おすすめ」の印として見せるだけ（empSetGuessIdx）。
+ * - fix(saveEmpSetWithMode): 未選択のまま保存すると1番目のセットに上書きしていたのを、新しいセットとして保存するか聞くように。
+ * - renderEmpSetSelector: 未選択なら「-- 選んでください --」と赤い注意を出す（先頭の仮表示はしない）
  * ver.20261020.04
  * - fix(loadFormGenericFromDB): 書類ごとの「💾 DB保存」値が、あとから案シスで直した雇用条件を
  *   常に上書きしていた（「DBが正」）。セキテックで7/20保存の「超過勤務」が10/20修正の
@@ -565,44 +572,154 @@ function _renderCheckPanel(local, aiChecks, rules, opt){
   }
 }
 
-window.resolveEmpSetIdx = async function(co, cas, info){
-  const sets = (co && Array.isArray(co.emp_sets)) ? co.emp_sets : [];
-  const raw = (cas && cas.emp_set_idx != null && String(cas.emp_set_idx) !== '') ? String(cas.emp_set_idx)
-            : (info && info.empSetIdx != null && String(info.empSetIdx) !== '') ? String(info.empSetIdx) : '';
-  if(raw !== '' && !isNaN(parseInt(raw,10)) && sets[parseInt(raw,10)]) return parseInt(raw,10);
-  if(sets.length <= 1) return 0;
-  const norm = v => String(v||'').replace(/[\s\u3000]+/g,'').toLowerCase();
+// ver.20261023.04: 雇用条件セットが未選択のとき、1番目（や自動で選んだセット）を黙って使わない。
+//   これまでは未選択なら自動で選んで cases.emp_set_idx に書き戻していたため、同じ会社の別の人のセットで
+//   書類ができてしまうことがあった（同名会社の取り違え・RHIJHAL の件）。
+//   いまは「どの雇用条件セットか選んでください」の画面を出し、選んだものを案件に保存して使う。
+//   キャンセル・裏で開いている画面（まとめ印刷・案シスからの作成）では選ばずに -1 を返す（雇用条件の欄は空）。
+//   ・自動で選んでいた候補は「おすすめ」の印として見せるだけ（empSetGuessIdx）
+window.empSetGuessIdx = function(sets, cas, info){
+  sets = Array.isArray(sets) ? sets : [];
+  if(!sets.length) return -1;
+  const norm = v => String(v||'').replace(/[\s　]+/g,'').toLowerCase();
   const names = [];
   if(cas && cas.applicant) names.push(norm(cas.applicant));
   if(info && info.applicantName) names.push(norm(info.applicantName));
   if(info && info.applicantNameEn) names.push(norm(info.applicantNameEn));
+  if(info && info.applicant) names.push(norm(info.applicant));
   const caseName = norm(cas && cas.name);
-  let best = -1, bestScore = -1;
+  let best = -1, bestScore = -1, bestNameHit = false;
   sets.forEach((es, i) => {
     if(!es) return;
     const sn = norm(es.setName || es.name);
-    let score = 0;
-    if(sn && names.some(n => n && n.length >= 3 && sn.indexOf(n) >= 0)) score += 1000;
-    if(sn && caseName && caseName.length >= 3 && (sn.indexOf(caseName) >= 0 || caseName.indexOf(sn) >= 0)) score += 500;
-    // 入力済み項目数（未完成セットより完成セットを優先）
+    let score = 0, hit = false;
+    if(sn && names.some(n => n && n.length >= 3 && sn.indexOf(n) >= 0)){ score += 1000; hit = true; }
+    if(sn && caseName && caseName.length >= 3 && (sn.indexOf(caseName) >= 0 || caseName.indexOf(sn) >= 0)){ score += 500; hit = true; }
     let filled = 0;
     Object.keys(es).forEach(k => { if(k.charAt(0)!=='_' && es[k]!=null && String(es[k])!=='' && typeof es[k]!=='object') filled++; });
     score += Math.min(filled, 400);
-    if(score > bestScore){ bestScore = score; best = i; }
+    if(score > bestScore){ bestScore = score; best = i; bestNameHit = hit; }
   });
-  if(best < 0) best = 0;
-  // 書き戻し（失敗しても読込は続行）
-  try{
-    const caseId = (cas && cas.id) || (info && info.caseId);
-    if(caseId){
-      await sb('cases?id=eq.'+caseId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({emp_set_idx: String(best)})});
-      if(cas) cas.emp_set_idx = String(best);
-      if(info) info.empSetIdx = String(best);
-      console.log('[emp_set] idx auto-resolved & saved:', best, (sets[best]&&(sets[best].setName||sets[best].name))||'');
-      if(typeof showToast==='function') showToast('雇用条件セットを自動選択しました: '+((sets[best]&&(sets[best].setName||sets[best].name))||('#'+(best+1))));
-    }
-  }catch(_e){ console.warn('[emp_set] idx write-back failed', _e); }
+  window._empGuessNameHit = bestNameHit;
   return best;
+};
+// この画面が「見えない枠」の中か（まとめ印刷・案シスからの書類作成は画面の外の枠で開く）。見えないときは選ぶ画面を出さない
+function _empFrameHidden(){
+  try{
+    if(window.self === window.top) return false;
+    const fe = window.frameElement;
+    if(!fe) return true;
+    const w = fe.ownerDocument && fe.ownerDocument.defaultView;
+    const cs = w ? w.getComputedStyle(fe) : null;
+    if(cs && (cs.display === 'none' || cs.visibility === 'hidden')) return true;
+    const r = fe.getBoundingClientRect();
+    if(r.width < 50 || r.height < 50) return true;
+    if(r.right <= 0 || r.bottom <= 0) return true;
+    if(w && (r.left >= w.innerWidth || r.top >= w.innerHeight)) return true;
+    return false;
+  }catch(e){ return true; }
+}
+function _empEsc(v){ return String(v==null?'':v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// 雇用条件セットを選ぶ画面。o:{sets, guess, coName, orgName, applicant}  → 選んだ番号（キャンセルは -1）
+window.chooseEmpSetDialog = function(o){
+  return new Promise(resolve => {
+    const sets = o.sets || [];
+    const old = document.getElementById('_empChooseModal'); if(old) old.remove();
+    const wrap = document.createElement('div');
+    wrap.id = '_empChooseModal';
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:14px;font-family:sans-serif;';
+    const rows = sets.map((es, i) => {
+      es = es || {};
+      const nm = es.setName || es.name || ('条件セット' + (i+1));
+      const fld = es.applicantField || es.field || '';
+      const cat = es.category || '';
+      const cre = (es.createY && es.createM) ? (es.createY + '年' + parseInt(es.createM,10) + '月' + (es.createD ? parseInt(es.createD,10) + '日' : '')) : '';
+      const pay = es.salaryMonthly ? ('月給 ' + es.salaryMonthly) : (es.salaryHourly ? ('時給 ' + es.salaryHourly) : '');
+      const sub = [fld && ('分野：' + fld), cat && ('業務区分：' + cat), pay, cre && ('作成 ' + cre)].filter(Boolean).map(_empEsc).join('　／　');
+      const tag = (i === o.guess) ? '<span style="display:inline-block;margin-left:6px;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;">💡 おすすめ' + (window._empGuessNameHit ? '（名前が一致）' : '') + '</span>' : '';
+      return '<label class="_ecRow" data-i="' + i + '" style="display:flex;gap:10px;align-items:flex-start;border:2px solid #e2e8f0;border-radius:10px;padding:9px 12px;margin-bottom:8px;cursor:pointer;background:#fff;">'
+        + '<input type="radio" name="_ecPick" value="' + i + '" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;">'
+        + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:#0f172a;">' + (i+1) + '. ' + _empEsc(nm) + tag + '</div>'
+        + (sub ? '<div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.5;">' + sub + '</div>' : '')
+        + '</div></label>';
+    }).join('');
+    wrap.innerHTML = '<div style="background:#fff;border-radius:14px;width:min(600px,96vw);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.3);">'
+      + '<div style="padding:16px 18px 12px;border-bottom:1px solid #e2e8f0;">'
+      +   '<div style="font-size:16px;font-weight:800;color:#0f172a;">📑 雇用条件セットを選んでください</div>'
+      +   '<div style="font-size:13px;color:#334155;margin-top:6px;line-height:1.6;">この案件は、まだ雇用条件セットが選ばれていません。<b>この人の雇用条件</b>を選んでください。選んだセットはこの案件に保存されます。</div>'
+      +   '<div style="font-size:12.5px;color:#334155;margin-top:6px;line-height:1.6;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;">'
+      +     '申請人：<b>' + _empEsc(o.applicant || '—') + '</b>　／　所属機関：<b>' + _empEsc(o.coName || '—') + '</b>' + (o.orgName ? '（登録支援機関：' + _empEsc(o.orgName) + '）' : '')
+      +   '</div>'
+      +   '<div style="font-size:11.5px;color:#92400e;margin-top:6px;">※ 1番目のセットが、この人のものとは限りません。名前や分野・給与を見て選んでください。所属機関が違うときは、案シスで所属機関を直してください。</div>'
+      + '</div>'
+      + '<div style="padding:12px 18px;overflow:auto;">' + rows + '</div>'
+      + '<div style="padding:12px 18px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #f1f5f9;flex-wrap:wrap;">'
+      +   '<button data-k="cancel" style="background:#fff;color:#334155;border:1px solid #cbd5e1;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">選ばない（雇用条件は空のまま）</button>'
+      +   '<button data-k="ok" id="_ecOk" disabled style="background:#2563eb;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:800;cursor:not-allowed;opacity:.45;">このセットを使う</button>'
+      + '</div></div>';
+    let sel = -1;
+    const paint = () => {
+      wrap.querySelectorAll('._ecRow').forEach(r => {
+        const on = parseInt(r.getAttribute('data-i'),10) === sel;
+        r.style.borderColor = on ? '#2563eb' : '#e2e8f0'; r.style.background = on ? '#eff6ff' : '#fff';
+        const rb = r.querySelector('input'); if(rb) rb.checked = on;
+      });
+      const ok = wrap.querySelector('#_ecOk');
+      ok.disabled = sel < 0; ok.style.opacity = sel < 0 ? '.45' : '1'; ok.style.cursor = sel < 0 ? 'not-allowed' : 'pointer';
+    };
+    const close = v => { try{ wrap.remove(); }catch(e){} resolve(v); };
+    wrap.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('button[data-k]');
+      if(b){ const k = b.getAttribute('data-k'); if(k === 'cancel'){ close(-1); return; } if(k === 'ok' && sel >= 0){ close(sel); } return; }
+      const r = e.target.closest && e.target.closest('._ecRow');
+      if(r){ sel = parseInt(r.getAttribute('data-i'),10); paint(); }
+    });
+    (document.body || document.documentElement).appendChild(wrap);
+    paint();
+  });
+};
+var _empAskPending = window._empAskPending = window._empAskPending || {};    // caseId → 選ぶ画面の Promise（同じ読み込みの中で2回出さない）
+var _empAskCanceled = window._empAskCanceled = window._empAskCanceled || {};   // caseId → 「選ばない」を押した時刻（すぐあとの読み込みで聞き直さない）
+window.resolveEmpSetIdx = async function(co, cas, info){
+  const sets = (co && Array.isArray(co.emp_sets)) ? co.emp_sets : [];
+  const raw = (cas && cas.emp_set_idx != null && String(cas.emp_set_idx) !== '') ? String(cas.emp_set_idx)
+            : (info && info.empSetIdx != null && String(info.empSetIdx) !== '') ? String(info.empSetIdx) : '';
+  if(raw !== '' && !isNaN(parseInt(raw,10)) && parseInt(raw,10) >= 0 && sets[parseInt(raw,10)]) return parseInt(raw,10);
+  if(!sets.length) return 0;   // セットが1つも無い会社：sets[0] は無いので雇用条件は空のまま（従来どおり）
+  const caseId = (cas && cas.id) || (info && info.caseId) || '';
+  if(_empFrameHidden()){
+    console.warn('[emp_set] 未選択のため雇用条件は空のまま（見えない画面のため選ぶ画面は出しません）', caseId);
+    return -1;
+  }
+  if(caseId && _empAskCanceled[caseId] && (Date.now() - _empAskCanceled[caseId]) < 15000) return -1;
+  if(caseId && _empAskPending[caseId]) return await _empAskPending[caseId];
+  const run = (async () => {
+    const guess = window.empSetGuessIdx(sets, cas, info);
+    const idx = await window.chooseEmpSetDialog({ sets: sets, guess: guess,
+      coName: (co && co.name) || (info && info.companyName) || '',
+      orgName: (co && co.support_org_name) || (cas && cas.org) || (info && info.orgName) || '',
+      applicant: (cas && cas.applicant) || (info && (info.applicant || info.applicantName)) || '' });
+    if(idx < 0){
+      if(caseId) _empAskCanceled[caseId] = Date.now();
+      if(typeof showToast==='function') showToast('雇用条件セットが選ばれていないため、雇用条件の欄は空のままです（上の「雇用条件セット」からも選べます）');
+      return -1;
+    }
+    try{
+      if(caseId){
+        await sb('cases?id=eq.'+caseId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({emp_set_idx: String(idx)})});
+        try{ if(window.parent && window.parent !== window) window.parent.postMessage({type:'EMP_SET_CHOSEN', caseId: caseId, idx: String(idx)}, '*'); }catch(_e){}
+      }
+      if(typeof showToast==='function') showToast('雇用条件セットを選んで保存しました: '+((sets[idx]&&(sets[idx].setName||sets[idx].name))||('#'+(idx+1))));
+    }catch(_e){
+      console.warn('[emp_set] idx save failed', _e);
+      alert('雇用条件セットの保存に失敗しました（この画面では選んだセットで表示します）: ' + (_e && _e.message || _e));
+    }
+    if(cas) cas.emp_set_idx = String(idx);
+    if(info) info.empSetIdx = String(idx);
+    return idx;
+  })();
+  if(caseId) _empAskPending[caseId] = run;
+  try{ return await run; } finally { if(caseId) delete _empAskPending[caseId]; }
 };
 
 // ===== 登録支援機関(support_orgs)の名前照合 =====
@@ -3241,6 +3358,20 @@ document.addEventListener('click', function(e){
         return;
       }
       var empty=(info.empSetIdx===undefined||info.empSetIdx===null||String(info.empSetIdx)==='');
+      // ver.20261023.04: 選ばれていない（-1）ときは、どのセットも仮表示しない。欄は空のまま、ここから選んでもらう
+      var none=!(typeof idx==='number' && idx>=0 && sets[idx]);
+      if(none){
+        var optsN='<option value="" selected>-- 選んでください --</option>'+sets.map(function(s,i){
+          return '<option value="'+i+'">'+_empSetLabel(s,i).replace(/</g,'&lt;')+'</option>';
+        }).join('');
+        slot.innerHTML='<div style="background:#fee2e2;border:1px solid #dc2626;border-radius:6px;padding:8px;margin-bottom:6px;">'+
+          '<div style="font-size:12px;font-weight:bold;color:#b91c1c;">⚠️ 雇用条件セットが選ばれていません</div>'+
+          '<div style="font-size:11px;color:#7f1d1d;line-height:1.5;margin-top:3px;">雇用条件の欄は空のままです（全'+sets.length+'件）。<br>下から<b>この人の雇用条件</b>を選んでください（選ぶとこの案件に保存されます）。</div>'+
+          '</div>'+
+          '<label style="font-size:11px;font-weight:bold;color:#334155;display:block;">📑 雇用条件セット <span style="color:#b91c1c;">(未選択)</span></label>'+
+          '<select id="empSetSelect" onchange="onEmpSetSelectChange()" style="width:100%;padding:4px;border:2px solid #dc2626;border-radius:3px;font-size:11px;">'+optsN+'</select>';
+        return;
+      }
       var opts=sets.map(function(s,i){
         return '<option value="'+i+'"'+(i===idx?' selected':'')+'>'+_empSetLabel(s,i).replace(/</g,'&lt;')+'</option>';
       }).join('');
@@ -3265,6 +3396,7 @@ document.addEventListener('click', function(e){
   window.onEmpSetSelectChange=async function(){
     try{
       var sel=document.getElementById('empSetSelect'); if(!sel) return;
+      if(sel.value==='') return;   // ver.20261023.04: 「-- 選んでください --」は何もしない
       var newIdx=parseInt(sel.value,10)||0;
       var info=window._lastCaseInfo; if(!info||!info.caseId) return;
       await sb('cases?id=eq.'+info.caseId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({emp_set_idx:String(newIdx)})});
@@ -3370,6 +3502,12 @@ document.addEventListener('click', function(e){
     var cos=await sb('companies?select=id,emp_sets&id=eq.'+companyId);
     var co=cos&&cos[0]; if(!co) throw new Error('会社が見つかりません');
     var empSets=co.emp_sets?JSON.parse(JSON.stringify(co.emp_sets)):[];
+    // ver.20261023.04: 雇用条件セットが選ばれていないときは、1番目のセットに上書きしない（別の人のセットを書き換えてしまうため）
+    var _unsel=(curIdx===''||curIdx==null||isNaN(parseInt(curIdx,10))||parseInt(curIdx,10)<0||(mode!=='new'&&!empSets[parseInt(curIdx,10)]));
+    if(_unsel && mode!=='new'){
+      if(!window.confirm('この案件は、雇用条件セットが選ばれていません。\n\n［OK］新しい雇用条件セットとして保存し、この案件に紐づけます\n［キャンセル］保存しません（上の「雇用条件セット」でこの人のセットを選んでから保存してください）')) return {saved:false};
+      mode='new';
+    }
     var idx=parseInt(curIdx||0)||0;
     if(mode==='new'){
       var defName='条件セット'+(empSets.length+1);
@@ -3468,6 +3606,10 @@ function _cirAutoSave(groupId, value){
       try{
         var ctx = window._empCtx;
         var idx = window._empLoadedIdx;
+        if(ctx && ctx.companyId && idx !== null && idx !== undefined && idx !== '' && parseInt(idx,10) < 0){   // ver.20261023.04: 雇用条件セットが未選択(-1)なら保存しない
+          showToast('ℹ️ 雇用条件セットが選ばれていないため保存していません（上の「雇用条件セット」で選んでください）');
+          return;
+        }
         if(!ctx || !ctx.companyId || idx === null || idx === undefined || idx === ''){
           showToast('ℹ️ 案件が未選択のため保存していません（DB保存を押してください）');
           return;

@@ -182,7 +182,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20260811.04</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -792,7 +792,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -2015,8 +2015,9 @@ async function loadFromDB(passedInfo){
     }
     // 雇用条件書セット（emp_sets）から契約条件を引く
     let es={};
-    const idx=(info.empSetIdx!==undefined&&info.empSetIdx!=='')?info.empSetIdx:(cas&&cas.emp_set_idx);
-    if(co&&Array.isArray(co.emp_sets)&&/^[0-9]+$/.test(String(idx))) es=co.emp_sets[+idx]||{};
+    // ver.20261023.04: 未選択なら選んでもらう（これまでは空のまま／トップからは1番目が渡っていた）
+    const idx=(co&&typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
+    if(co&&Array.isArray(co.emp_sets)&&idx>=0) es=co.emp_sets[idx]||{};
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     s('f_fname',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'');
     // 業務区分は emp_set.category → cases.job_category のフォールバック（重説と同じ流儀）

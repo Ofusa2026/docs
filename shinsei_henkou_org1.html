@@ -29,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用1）　特定技能</div>
-    <div class="ver">ver.20260715.03</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -118,7 +118,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
 function setPick(id, val){
@@ -317,8 +317,9 @@ async function loadFromDB(passedInfo){
     }
     // 雇用条件書セット（emp_sets）から契約条件を引く
     let es={};
-    const idx=(info.empSetIdx!==undefined&&info.empSetIdx!=='')?info.empSetIdx:(cas&&cas.emp_set_idx);
-    if(co&&Array.isArray(co.emp_sets)&&/^[0-9]+$/.test(String(idx))) es=co.emp_sets[+idx]||{};
+    // ver.20261023.04: 未選択なら選んでもらう（これまでは空のまま／トップからは1番目が渡っていた）
+    const idx=(co&&typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
+    if(co&&Array.isArray(co.emp_sets)&&idx>=0) es=co.emp_sets[idx]||{};
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     s('f_fname',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'');
     // 業務区分は emp_set.category → cases.job_category のフォールバック（重説と同じ流儀）

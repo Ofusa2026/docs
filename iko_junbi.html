@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20261008.02</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -91,7 +91,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -257,8 +257,9 @@ async function loadFromDB(passedInfo){
     if(nationality) s('f_nationality',nationality);
     // ver.20261008.01: 分野は 案件(cases.applicant_field) → 雇用条件セット(applicantField) の順で取得。
     //   「建設分野（特定技能１号）」のような表記は括弧と末尾の「分野」を除き、正式な特定産業分野名（建設 等）にする
-    const empSetIdx=parseInt((cas&&cas.emp_set_idx)||info.empSetIdx||0)||0;
-    const es=empSets[empSetIdx]||{};
+    // ver.20261023.04: 雇用条件セットが未選択なら1番目を使わず、選んでもらう（共通 resolveEmpSetIdx）
+    const empSetIdx=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx({emp_sets:empSets,name:coName},cas,info):-1;
+    const es=(empSetIdx>=0?empSets[empSetIdx]:null)||{};
     const normField=sx=>{ sx=stripParens(sx||''); return sx.replace(/分野$/,'').trim(); };
     // ver.20261008.02: 複数区分に対応（category/category2…を全部集めて「・」で連結・重複除去）
     const _collect=(obj,base,norm)=>{

@@ -7,6 +7,7 @@
 <!--
   ========================================================
   OFUSA docs 1_17.html
+  ver.20261023.04（雇用条件セット未選択では作成しない／会社は案件の会社IDで引く）
   ver.20260826.14
   --------------------------------------------------------
   役割: 1-17号（支援計画書）専用の自動生成ツール。
@@ -557,6 +558,7 @@ async function loadCaseById(caseId, companyId){
 
   // 企業（companyId指定があればそれで、なければorg名で）
   var coRow = null;
+  companyId = companyId || (cRow && cRow.company_id) || '';   // ver.20261023.04: 案件の会社IDで引く（同じ名前の会社が別の機関にもあるため、名前だけで探さない）
   if(companyId){
     var r = await _sb.from("companies").select("*").eq("id", companyId).single();
     if(!r.error) coRow = r.data;
@@ -2750,7 +2752,13 @@ async function onGenerate(){
     if(!currentCase) throw new Error("案件が見つかりません: " + caseId);
     renderCaseInfo();
 
+    // ver.20261023.04: 取り直した案件で雇用条件セットが選ばれていれば、それを使う。選ばれていなければ作らない（1番目を使わない）
+    if(!currentEmpSetIdx && currentCase.empSetIdx!=null && String(currentCase.empSetIdx)!=="") currentEmpSetIdx = String(currentCase.empSetIdx);
     var empSetIdx = currentEmpSetIdx || "";
+    var _coChk = (companies||[]).find(function(x){ return x && x.id === currentCase.companyId; }) || null;
+    if(empSetIdx === "" && _coChk && Array.isArray(_coChk.empSets) && _coChk.empSets.length){
+      throw new Error("雇用条件セットが選ばれていません。Saysayの1-6号など（選ぶ画面が出ます）や案シスの基本情報で、この人の雇用条件セットを選んでから、もう一度作成してください");
+    }
 
     // グローバル選択状態をセット（processTemplateBytesが参照）
     _selectedDocType = tpl.group_name || "";

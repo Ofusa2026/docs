@@ -500,7 +500,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261020.11</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -599,7 +599,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -1604,9 +1604,9 @@ async function loadFromDB(passedInfo){
         /* ver.20261013.02: 雇用条件セット(companies.emp_sets[])由来の項目。
            どのセットを使うかは cases.emp_set_idx で決まるが未設定の案件が多いため、
            共通処理 resolveEmpSetIdx（申請人名・案件名から自動解決）に任せる。 */
-        var _esIdx = 0;
+        var _esIdx = -1;   // ver.20261023.04: 未選択・失敗のときは1番目を使わない（雇用条件の欄は空）
         if(typeof window.resolveEmpSetIdx==='function'){
-          try{ _esIdx = await window.resolveEmpSetIdx(co, cas, info); }catch(_e){ _esIdx = 0; }
+          try{ _esIdx = await window.resolveEmpSetIdx(co, cas, info); }catch(_e){ _esIdx = -1; }
         }
         var _es = (Array.isArray(co.emp_sets) ? co.emp_sets : [])[_esIdx] || {};
         _s('es_cohabitants',   _es.cohabitants);

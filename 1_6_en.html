@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261020.05</div>
+    <div class="ver">ver.20261023.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -465,7 +465,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1792748157"></script>
+<script src="ofusa_common.js?v=1792754157"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1511,8 +1511,8 @@ async function loadFromDB(passedInfo){
         const empSets = co.emp_sets || [];
         // ver.20260901.01: idx未設定なら共通の resolveEmpSetIdx で申請人名/案件名から自動選択（cases.emp_set_idx にも書き戻し）
         const idx = (typeof window.resolveEmpSetIdx==='function') ? await window.resolveEmpSetIdx(co, cas, info)
-                  : (empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0);
-        esData = empSets[idx] || empSets[0] || null;
+                  : (empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : -1);
+        esData = (idx>=0 ? empSets[idx] : null) || null;   // ver.20261023.04: 未選択(-1)なら1番目を使わない（雇用条件は空のまま）
         // ①: 雇用条件セットセレクタを描画＋読込idx/セット記録（in-doc選択時のため）
         try{
           window._empLoadedIdx = idx;
@@ -1654,7 +1654,8 @@ async function saveForm(){
   if(!companyId){ alert('会社IDが取得できませんでした\n（案件管理で会社を紐付けてください）'); return; }
 
   try{
-    const idx = empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : 0;
+    // ver.20261023.04: 読み込んだセット（選ぶ画面・上の欄で選んだもの）を優先。未選択なら1番目に上書きしない（保存時に新しいセットにするか聞く）
+    const idx = (typeof window._empLoadedIdx==='number' && window._empLoadedIdx>=0) ? window._empLoadedIdx : (empSetIdx !== '' && empSetIdx != null ? parseInt(empSetIdx) : -1);
     // 現在のフォーム値を収集
     const newData = collectFormValues();
     // ver.20260819.09: ユーザー注記(_userNotes)もemp_setに保存
