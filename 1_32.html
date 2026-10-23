@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261023.01</div>
+    <div class="ver">ver.20261023.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -131,6 +131,7 @@
       </div>
     </div>
     <div class="fs"><div class="fs-title">留意事項（理由など）</div>
+      <div id="t2DupInfo" style="display:none;margin:0 0 8px;padding:7px 9px;border-radius:8px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;font-size:11px;line-height:1.55;"></div>
       <div class="fg"><label>３ 同一の事業所・部署ではない場合の理由</label><textarea id="f_reason3" rows="2" oninput="p()" placeholder="同一の事業所・部署なら空欄のまま"></textarea></div>
       <div class="fg"><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="f_short5" onchange="p()" style="width:15px;height:15px;margin:0;"> ５ 指導対象者数を一時的に充足していない</label></div>
       <div class="fg"><label>５ その理由</label><textarea id="f_reason5" rows="2" oninput="p()" placeholder="例：採用プロセス中のため（○月入社予定）"></textarea></div>
@@ -151,7 +152,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1792746119"></script>
+<script src="ofusa_common.js?v=1792747100"></script>
 <script>
 // 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
 const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
@@ -355,6 +356,13 @@ async function loadFromDB(passedInfo){
           sf('f_position', fr.t2Position);
           sf('f_jobDesc', fr.t2JobDetail);
           sf('f_jobDiff', fr.t2JobDiff);
+          // ver.20261023.02: 新様式の留意事項３・５（2号ヒアリングフォーム form ver.20261023.01〜）
+          sf('f_reason3', fr.t2SameOffice==='いいえ' ? fr.t2Reason3 : '');
+          sf('f_reason5', fr.t2Short5==='checked' ? fr.t2Reason5 : '');
+          { const c5=document.getElementById('f_short5'); if(c5 && fr.t2Short5==='checked') c5.checked=true; }
+          // 留意事項４（他の２号にも指導を受ける人を含める理由）は様式に欄がないため、入力欄の上に表示して確認してもらう
+          { const di=document.getElementById('t2DupInfo'); if(di){ const r=String(fr.t2DupReason||'').trim();
+              di.style.display=r?'':'none'; di.textContent=r?('📝 フォームの回答：他の２号にも指導を受けている人を含める理由「'+r+'」（様式に欄がないため、必要に応じて別紙で説明）'):''; } }
           const tg = Array.isArray(fr.t2Targets) ? fr.t2Targets : [];
           // ver.20261007.01: 対象者はgroup/personで「どの２号外国人の対象か」を判定して反映
           _t2BuildOptions(fr);
