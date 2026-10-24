@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261023.03</div>
+    <div class="ver">ver.20261024.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -175,7 +175,9 @@ function _tRow(n){
 }
 function _ymd32(){
   const s=v('f_docDate'); const m=String(s||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
-  return m ? `${m[1]}年　${+m[2]}月　${+m[3]}日` : `２０　　　　年　　　月　　　日`;
+  if(m) return `${m[1]}年　${+m[2]}月　${+m[3]}日`;
+  // ver.20261024.01: 空欄でも「２０　年　月　日」の空テンプレは出さず、作成した日（今日）を表示する
+  const n=new Date(); return `${n.getFullYear()}年　${n.getMonth()+1}月　${n.getDate()}日`;
 }
 function p(){
   if(_editMode) return;
@@ -399,6 +401,10 @@ async function loadFromDB(passedInfo){
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
+// ver.20261024.01: 作成年月日が自動で入らないことがあった（過去のDB保存で f_docDate が
+//   空のまま保存されていると、読込後に保存値で空に上書きされる）ため、
+//   ページを開いた時点で今日の日付を既定値として入れる（手入力があればそのまま）
+if(!v('f_docDate')){const _n=new Date();document.getElementById('f_docDate').value=`${_n.getFullYear()}年${_n.getMonth()+1}月${_n.getDate()}日`;}
 initCaseSelect(); p();
 
 function fitDocToPreview(){
