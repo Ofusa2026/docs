@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261024.01</div>
+    <div class="ver">ver.20261024.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -244,7 +244,7 @@ function p(){
 </table>
 <div class="nt hang">※　航空分野（航空機整備区分）、漁業分野及び外食業分野については、指導を受ける対象者がいない場合も差し支えないが、当該対象者が在籍する場合は上記２に記載すること。</div>
 <div class="g"></div>
-<div style="text-align:right;font-weight:bold;">作成年月日：${_ymd32()}</div>
+<div style="text-align:right;font-weight:bold;">作成年月日：<span class="f" data-bind="f_docDate">${_ymd32()}</span></div>
 <div class="g"></div>
 <div style="font-weight:bold;">上記の記載内容は、事実と相違ありません。</div>
 <div class="g"></div><div class="g"></div>
