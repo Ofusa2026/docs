@@ -1,5 +1,8 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261026.02
+ * - feat(doPrint): PDF印刷時に「案件読込から何分かかったか」をトーストで表示
+ *   （印刷ダイアログを閉じたあとに出る）。所要時間を本人がその場で確認できる。
  * ver.20261026.01
  * - feat(利用ログ): だれが（ログインメール）・どの書類で・どの案件を読み込み（load）、
  *   いつPDF印刷（print）・DB保存（save）したかを Supabase saysay_logs に記録。
@@ -1217,6 +1220,15 @@ function doPrint(){
       }catch(_pe){}
     }, 1000);
   }
+  // ver.20261026.02: 案件読込からの所要時間を表示（スピード改善の目安）
+  try{
+    if(typeof _SLOG_LOADED_AT!=='undefined' && _SLOG_LOADED_AT && typeof showToast==='function'){
+      var _elMs=Date.now()-_SLOG_LOADED_AT;
+      var _elMin=Math.floor(_elMs/60000), _elSec=Math.round((_elMs%60000)/1000);
+      if(_elSec===60){ _elMin+=1; _elSec=0; }
+      showToast('🖨 PDF印刷：案件読込から '+(_elMin>0?(_elMin+'分'):'')+_elSec+'秒');
+    }
+  }catch(_tm){}
   // ver.20260808.05: 案件書類ジャーナルへ記録（MVP Component 1 - 全書類展開）
   try{ dgjLogFromContext('print'); }catch(_){}
 }
