@@ -1,5 +1,10 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261026.01
+ * - feat(利用ログ): だれが（ログインメール）・どの書類で・どの案件を読み込み（load）、
+ *   いつPDF印刷（print）・DB保存（save）したかを Supabase saysay_logs に記録。
+ *   session_id で同一画面を追跡し、ms_since_load（案件読込からの経過ミリ秒）で
+ *   書類作成の所要時間を測れる。記録に失敗しても画面の動作には影響しない。
  * ver.20261023.04
  * - fix(resolveEmpSetIdx): 雇用条件セットが未選択のとき、1番目（や自動で選んだセット）を黙って使わない。
  *   「雇用条件セットを選んでください」の画面を出し、選んだセットを cases.emp_set_idx に保存して使う。
@@ -1174,6 +1179,7 @@ function _printDocLabel(){
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
+  try{ slog('print'); }catch(_sl){} // ver.20261026.01: 利用ログ（PDF印刷）
   var orig = document.title;
   // ver.20260820.08: 親フレーム(index.html)のtitleも書き換える。
   //   Chrome の PDF保存ダイアログの名前欄には、iframe内でwindow.print()を呼んでも
@@ -2410,6 +2416,8 @@ async function loadCaseToForm(info, docKey, opts){
   // グローバルに最新の案件情報を保存（DB保存・他機能で使う）
   window._lastCaseInfo = info;
   window._fieldData = {}; // ver.20260612: 案件読込ごとにDBフォールバック値をリセット
+  // ver.20261026.01: 利用ログ（案件読込）
+  try{ _SLOG_LOADED_AT=Date.now(); _slogCtxFromInfo(info); slog('load'); }catch(_sl){}
   // ver.20260819.06: 入力欄クリアは各書類の SELECT_CASE ハンドラ側で loadFromDB
   //   より先に実行するため、ここでは行わない（ここでクリアするとloadFromDBで
   //   セットされた値まで消えてしまう）。
@@ -2916,6 +2924,7 @@ if(typeof window !== 'undefined' && window.parent && window.parent !== window){
    - 各書類HTMLから saveFormGeneric('1_4') のように呼び出す
    ========================================================== */
 async function saveFormGeneric(docKey, opts){
+  try{ slog('save', {doc_key:String(docKey||'')}); }catch(_sl){} // ver.20261026.01: 利用ログ（DB保存）
   opts = opts || {};
   // 案件情報を取得：caseSelect → window._lastCaseInfo → 親から問い合わせ
   let info = null;
@@ -4062,3 +4071,45 @@ function toggleBlankMode(){
   else _arm();
 })();
 /* ===== /空欄チェックモード ===== */
+
+/* ===== ver.20261026.01: 利用ログ（saysay_logs） =====
+   だれが（ログインメール）・どの書類（doc_key/ファイル名）で・どの案件IDを
+   読み込んだか（load）、いつPDF印刷したか（print）、いつDB保存したか（save）を
+   Supabase の saysay_logs テーブルに記録する。
+   - user_email: 親index.htmlのログイン（SELECT_CASEで渡されるトークン）から取得
+   - session_id: 画面を開くたびに変わるID。load→print を紐づけて所要時間を出す
+   - ms_since_load: 案件読込からの経過ミリ秒（printの行＝書類作成にかかった時間）
+   記録はfire-and-forget。失敗しても書類作成・印刷には影響しない。 */
+var _SLOG_SESSION=(Math.random().toString(36).slice(2,10)+Date.now().toString(36));
+var _SLOG_LOADED_AT=null;
+var _SLOG_CTX={caseId:'',companyId:''};
+function _slogCtxFromInfo(info){ try{ _SLOG_CTX={caseId:String((info&&info.caseId)||''), companyId:String((info&&info.companyId)||'')}; }catch(_e){} }
+function _slogUser(){
+  try{
+    var tok=window.__OFUSA_SB_TOKEN||'';
+    if(!tok){ try{ if(window.parent&&window.parent!==window&&window.parent.IDX_TOKEN) tok=window.parent.IDX_TOKEN; }catch(_x){} }
+    if(tok&&String(tok).split('.').length>=3){
+      var b=String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+      while(b.length%4) b+='=';
+      var p=JSON.parse(decodeURIComponent(escape(atob(b))));
+      return p.email||p.sub||'';
+    }
+  }catch(_e){}
+  return '';
+}
+function slog(event, extra){
+  try{
+    var key=''; try{ key=(typeof _dgjInferDocKey==='function')?(_dgjInferDocKey()||''):''; }catch(_k){}
+    var who=''; try{ who=(typeof _printApplicantName==='function')?(_printApplicantName()||''):''; }catch(_w){}
+    var body={ event:String(event||''), user_email:_slogUser(), doc_key:key,
+      file:(location.pathname.split('/').pop()||''),
+      case_id:_SLOG_CTX.caseId, company_id:_SLOG_CTX.companyId,
+      applicant:who, session_id:_SLOG_SESSION,
+      ms_since_load:(_SLOG_LOADED_AT?(Date.now()-_SLOG_LOADED_AT):null) };
+    if(extra){ for(var k in extra){ if(Object.prototype.hasOwnProperty.call(extra,k)) body[k]=extra[k]; } }
+    fetch(SB_URL+'/rest/v1/saysay_logs',{method:'POST',keepalive:true,
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(body)}).catch(function(){});
+  }catch(_e){}
+}
+/* ===== /利用ログ ===== */
