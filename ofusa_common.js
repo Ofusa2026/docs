@@ -1,5 +1,10 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261026.03
+ * - fix(利用ログ): user_email が空になる経路があった（書類タブ切替時はトークンが渡らない／
+ *   親index.htmlの IDX_TOKEN は let 宣言で window から読めない）。
+ *   Saysayログイン情報（localStorage の sb-<ref>-auth-token。同一ドメインなので読める）から
+ *   メールを取るのを最優先にし、次に受け取ったトークン、最後に親画面を見る。
  * ver.20261026.02
  * - feat(doPrint): PDF印刷時に「案件読込から何分かかったか」をトーストで表示
  *   （印刷ダイアログを閉じたあとに出る）。所要時間を本人がその場で確認できる。
@@ -4097,6 +4102,18 @@ var _SLOG_LOADED_AT=null;
 var _SLOG_CTX={caseId:'',companyId:''};
 function _slogCtxFromInfo(info){ try{ _SLOG_CTX={caseId:String((info&&info.caseId)||''), companyId:String((info&&info.companyId)||'')}; }catch(_e){} }
 function _slogUser(){
+  // ①Saysayのログイン情報（supabase-js が localStorage に保存。同一ドメインなので書類ページからも読める）
+  try{
+    var raw=null;
+    try{ raw=localStorage.getItem('sb-ehwlgbwpycglmopiqyty-auth-token'); }catch(_ls){}
+    if(!raw){ try{ for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(/^sb-.*-auth-token$/.test(k||'')){ raw=localStorage.getItem(k); break; } } }catch(_ls2){} }
+    if(raw){
+      var o=JSON.parse(raw); if(Array.isArray(o)) o=o[0];
+      var em=o && ((o.user && o.user.email) || (o.currentSession && o.currentSession.user && o.currentSession.user.email));
+      if(em) return em;
+    }
+  }catch(_e0){}
+  // ②受け取ったトークン（SELECT_CASE 同梱）③親画面
   try{
     var tok=window.__OFUSA_SB_TOKEN||'';
     if(!tok){ try{ if(window.parent&&window.parent!==window&&window.parent.IDX_TOKEN) tok=window.parent.IDX_TOKEN; }catch(_x){} }
