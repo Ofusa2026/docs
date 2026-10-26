@@ -2,7 +2,9 @@
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
  * ver.20261026.04
  * - feat(編集HTMLの受け皿): 直接編集・スタイル編集（余白・枠線・文字移動）・文字サイズを、
- *   新テーブル saysay_html_store に「雇用条件（company_id＋雇用条件セット番号）×書類ファイル」単位で
+ *   新テーブル saysay_html_store に「雇用条件（company_id＋雇用条件セットの固定ID _uid）×書類ファイル」単位で
+ *   （_uid は編集版を初めて保存するときに DB関数 set_emp_set_uid で emp_sets[n] に1回だけ付ける。
+ *    セット削除で番号がずれても紐づけが崩れない。複製で重複・古い画面の保存で消えた場合は付け直す）
  *   DB保存のたびに履歴保存し、同じ雇用条件の案件を開くと最新版を呼び戻す。
  *   ・これまでは案件ごと(extra._edited)にしか残らず、同じ雇用条件の別の申請人では呼び戻されなかった
  *   ・1-6号はスタイル編集だけでは保存対象にならなかった → 受け皿側はスタイル編集も対象
@@ -4186,6 +4188,34 @@ async function _htmlStoreCompanyId(o){
 function _htmlStoreHasEdits(){
   return !!(window._htmlFrozen || (typeof _editMode!=='undefined' && _editMode) || window._styleDirty);
 }
+// --- 雇用条件セットの固定ID（companies.emp_sets[n]._uid）で紐づける ---
+//   ・IDが無いセットには、編集版を初めて保存するときに1回だけ付ける（DB関数 set_emp_set_uid で原子的に）
+//   ・案シスでセットを複製してIDが重複した場合（前のセットと同じID）は、新しいIDを付け直す
+//   ・案シスの古い画面からの保存でIDが消えた場合は、セット番号＋セット名で探し直してIDを付け直す
+function _htmlStoreNewUid(){ return 'es_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function _htmlStoreStampLocal(idx, uid){
+  try{ if(window._empLoadedSet && (window._empLoadedIdx==null || parseInt(window._empLoadedIdx,10)===idx)) window._empLoadedSet._uid=uid; }catch(_e){}
+  try{ if(window._empCtx && window._empCtx.empSets && window._empCtx.empSets[idx]) window._empCtx.empSets[idx]._uid=uid; }catch(_e){}
+}
+async function _htmlStoreSets(cid){
+  var r=await sb('companies?select=emp_sets&id=eq.'+encodeURIComponent(cid));
+  return (r && r[0] && Array.isArray(r[0].emp_sets)) ? r[0].emp_sets : [];
+}
+async function _htmlStoreAssignUid(cid, idx, uid, force){
+  var got=await sb('rpc/set_emp_set_uid',{method:'POST',body:JSON.stringify({p_company_id:cid,p_idx:idx,p_uid:uid,p_force:!!force})});
+  var u=(typeof got==='string' && got) ? got : uid;
+  _htmlStoreStampLocal(idx, u);
+  return u;
+}
+// その雇用条件セットの固定IDを返す（assign=true なら無い／重複のとき付ける）
+async function _htmlStoreSetUid(cid, idx, assign){
+  var sets=await _htmlStoreSets(cid);
+  var set=sets[idx]; if(!set || typeof set!=='object') return {uid:null, setName:'', ok:false};
+  var uid=set._uid||'';
+  var dup=!!uid && sets.some(function(s,i){ return i<idx && s && s._uid===uid; });
+  if((!uid || dup) && assign){ uid=await _htmlStoreAssignUid(cid, idx, _htmlStoreNewUid(), dup); dup=false; }
+  return {uid:(uid&&!dup)?uid:null, setName:String(set.setName||''), ok:true, sets:sets};
+}
 async function _htmlStoreSave(o){
   o=o||{};
   if(!_htmlStoreHasEdits()) return false;
@@ -4198,14 +4228,16 @@ async function _htmlStoreSave(o){
   var html=(typeof getBindResetHtml==='function') ? getBindResetHtml() : area.innerHTML;
   if(!html) return false;
   var fs=(typeof _fontSize!=='undefined') ? _fontSize : null;
-  var key=cid+'|'+idx+'|'+doc;
   var sig=html.length+':'+fs+':'+html.slice(0,200)+html.slice(-200);
   try{ var h=0; for(var i=0;i<html.length;i++){ h=((h<<5)-h+html.charCodeAt(i))|0; } sig+=':'+h; }catch(_h){}
-  if(window._htmlStoreLast[key]===sig) return true; // 前回と同じ内容 → 追加しない
+  var lk=cid+'|'+idx+'|'+doc;
+  if(window._htmlStoreLast[lk]===sig) return true; // 前回と同じ内容 → 追加しない
+  var st=await _htmlStoreSetUid(cid, idx, true);
+  if(!st.ok || !st.uid) return false;
   var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
   await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
-    body:JSON.stringify({company_id:cid, emp_set_idx:idx, doc_file:doc, case_id:caseId, html:html, font_size:fs, saved_by:by})});
-  window._htmlStoreLast[key]=sig;
+    body:JSON.stringify({company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:html, font_size:fs, saved_by:by})});
+  window._htmlStoreLast[lk]=sig;
   window._styleDirty=false;
   return true;
 }
@@ -4216,9 +4248,11 @@ async function _htmlStoreDiscard(o){
   var idx=_htmlStoreIdx(o.empSetIdx);
   var doc=_htmlStoreDocFile();
   if(!cid || idx===null || !doc) return false;
+  var st=await _htmlStoreSetUid(cid, idx, true);
+  if(!st.ok || !st.uid) return false;
   var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
   await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
-    body:JSON.stringify({company_id:cid, emp_set_idx:idx, doc_file:doc, case_id:caseId, html:'', discarded:true, saved_by:by})});
+    body:JSON.stringify({company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:'', discarded:true, saved_by:by})});
   delete window._htmlStoreLast[cid+'|'+idx+'|'+doc];
   return true;
 }
@@ -4229,8 +4263,22 @@ async function _htmlStoreRestore(info){
   var idx=_htmlStoreIdx(window._empLoadedIdx);
   var doc=_htmlStoreDocFile();
   if(!cid || idx===null || !doc) return false;
-  var rows=await sb('saysay_html_store?select=html,font_size,discarded,saved_at,case_id&company_id=eq.'+encodeURIComponent(cid)+
-    '&emp_set_idx=eq.'+idx+'&doc_file=eq.'+encodeURIComponent(doc)+'&order=saved_at.desc&limit=1');
+  var st=await _htmlStoreSetUid(cid, idx, false);
+  if(!st.ok) return false;
+  var base='saysay_html_store?select=html,font_size,discarded,saved_at,case_id,emp_set_uid&company_id=eq.'+encodeURIComponent(cid)+'&doc_file=eq.'+encodeURIComponent(doc);
+  var rows;
+  if(st.uid){
+    rows=await sb(base+'&emp_set_uid=eq.'+encodeURIComponent(st.uid)+'&order=saved_at.desc&limit=1');
+  }else{
+    // IDが無い（案シスの古い画面からの保存で消えた／複製で重複）→ セット番号＋セット名で探し直す
+    rows=await sb(base+'&emp_set_idx=eq.'+idx+'&set_name=eq.'+encodeURIComponent(st.setName)+'&order=saved_at.desc&limit=1');
+    var r0=rows&&rows[0];
+    if(r0 && r0.emp_set_uid){
+      var usedElse=(st.sets||[]).some(function(s,i){ return i!==idx && s && s._uid===r0.emp_set_uid; });
+      if(!usedElse){ try{ await _htmlStoreAssignUid(cid, idx, r0.emp_set_uid, true); }catch(_a){} }
+      else rows=[];
+    }
+  }
   var r=rows&&rows[0];
   if(!r || r.discarded || !r.html) return false;
   var at=Date.parse(r.saved_at)||0;
@@ -4255,7 +4303,7 @@ async function _htmlStoreRestore(info){
   if(typeof showToast==='function'){
     var w=new Date(at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
     var other=(r.case_id && info.caseId && r.case_id!==info.caseId) ? '（同じ雇用条件の別の案件で編集）' : '';
-    showToast('📝 雇用条件に保存された編集版を呼び戻しました ('+w+')'+other);
+    showToast('📝 雇用条件「'+(st.setName||'')+'」の編集版を呼び戻しました ('+w+')'+other);
   }
   return true;
 }
