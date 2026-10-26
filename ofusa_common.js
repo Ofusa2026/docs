@@ -1,5 +1,14 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261026.04
+ * - feat(編集HTMLの受け皿): 直接編集・スタイル編集（余白・枠線・文字移動）・文字サイズを、
+ *   新テーブル saysay_html_store に「雇用条件（company_id＋雇用条件セット番号）×書類ファイル」単位で
+ *   DB保存のたびに履歴保存し、同じ雇用条件の案件を開くと最新版を呼び戻す。
+ *   ・これまでは案件ごと(extra._edited)にしか残らず、同じ雇用条件の別の申請人では呼び戻されなかった
+ *   ・1-6号はスタイル編集だけでは保存対象にならなかった → 受け皿側はスタイル編集も対象
+ *   ・上部の文字サイズ(A-/A+)もHTMLと一緒に保存・復元
+ *   ・案件ごとの編集版と受け皿の新しい方を採用（最新優先）。変数欄(data-bind)は呼び戻し後に最新値で再描画
+ *   ・「♻️ 編集版破棄」で破棄印(discarded)を入れ、それ以降は呼び戻さない
  * ver.20261026.03
  * - fix(利用ログ): user_email が空になる経路があった（書類タブ切替時はトークンが渡らない／
  *   親index.htmlの IDX_TOKEN は let 宣言で window から読めない）。
@@ -2791,6 +2800,8 @@ async function loadCaseToForm(info, docKey, opts){
     if(docKey && typeof loadFormGenericFromDB === 'function'){
       await loadFormGenericFromDB(docKey, info);
     }
+    // ver.20261026.04: 雇用条件に紐づく編集HTML（受け皿）を呼び戻す（案件ごとの編集版より新しければ採用）
+    try{ await _htmlStoreRestore(info); }catch(_hs){ console.warn('[htmlStore restore]', _hs); }
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
@@ -3090,6 +3101,8 @@ async function saveFormGeneric(docKey, opts){
       headers: {'Prefer':'return=minimal'},
       body: JSON.stringify({ extra })
     });
+    // ver.20261026.04: 編集HTMLを雇用条件に紐づけて受け皿へ保存
+    try{ await _htmlStoreSave({companyId:companyId, caseId:info.caseId, empSetIdx:idx}); }catch(_hs){ console.warn('[htmlStore save]', _hs); }
 
     // opts.revMap があれば、確認済みマップの欄だけ emp_sets（案件マスタ）にも反映
     // ルール: ホワイトリストのみ / 空欄はスキップ / 差分のみ書込（破損防止）
@@ -3247,7 +3260,9 @@ async function loadFormGenericFromDB(docKey, info){
       const _edKey = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
       const _ed = co.extra && co.extra['_edited'] && co.extra['_edited'][_edKey] && info && info.caseId && co.extra['_edited'][_edKey][info.caseId];
       const _area = document.getElementById('pageArea');
+      window._editedRestoredAt = 0; // ver.20261026.04: 受け皿（雇用条件単位）と新しさを比べる用
       if(_ed && _ed.html && _area){
+        window._editedRestoredAt = _ed._savedAt ? (Date.parse(_ed._savedAt)||0) : 0;
         // ver.20260808.06: 復元中フラグを立てて他の書き換えをブロック
         window._editedRestoring = true;
         _area.innerHTML = _ed.html;
@@ -3300,6 +3315,8 @@ async function discardEditedGeneric(){
     try{ if(typeof enableDocEditing === 'function') enableDocEditing(false); }catch(e){}
     const _eb = document.getElementById('editModeBtn');
     if(_eb){ _eb.textContent = '✏️ 直接編集'; _eb.classList.remove('edit-mode-on'); }
+    // ver.20261026.04: 雇用条件の受け皿にも破棄印を入れる（以後この雇用条件では呼び戻さない）
+    try{ await _htmlStoreDiscard({companyId:cid, caseId:info.caseId}); }catch(_hs){}
     if(typeof p === 'function') p();
     if(typeof showToast==='function') showToast('♻️ 編集版を破棄しました');
   }catch(e){ console.error('[discardEditedGeneric]', e); if(typeof showToast==='function') showToast('⚠️ エラー: '+e.message); }
@@ -4142,3 +4159,121 @@ function slog(event, extra){
   }catch(_e){}
 }
 /* ===== /利用ログ ===== */
+
+/* ===== ver.20261026.04: 編集HTMLの受け皿（saysay_html_store） =====
+   直接編集・スタイル編集（余白・枠線・文字移動）・文字サイズを、
+   「雇用条件（company_id＋雇用条件セット番号）× 書類ファイル（例 1_6_vi）」単位で保存し、
+   同じ雇用条件の案件を開いたときに最新版を呼び戻す。
+   - 保存：DB保存のたびに、編集あり（直接編集中／編集版フリーズ中／スタイル編集あり）なら1行追加（履歴）。
+           前回保存と同じ内容ならスキップ。
+   - 呼戻：案件ごとの編集版（extra._edited）より新しければこちらを採用。変数欄は applyBindings で最新値に。
+   - 破棄：「♻️ 編集版破棄」で discarded=true の行を追加 → 以後は呼び戻さない（新しく編集保存すれば復活）。 */
+window._htmlStoreLast = window._htmlStoreLast || {};
+function _htmlStoreDocFile(){ return ((location.pathname.split('/').pop()||'').replace(/\.html.*$/,'')) || ''; }
+function _htmlStoreIdx(explicit){
+  var cand = [explicit, window._lastCaseInfo && window._lastCaseInfo.empSetIdx, window._empLoadedIdx];
+  for(var i=0;i<cand.length;i++){
+    var v=cand[i]; if(v===undefined||v===null||v==='') continue;
+    var n=parseInt(v,10); if(!isNaN(n) && n>=0) return n;
+  }
+  return null;
+}
+async function _htmlStoreCompanyId(o){
+  var cid = (o&&o.companyId) || (window._lastCaseInfo && window._lastCaseInfo.companyId) || '';
+  if(!cid && o && o.caseId){ try{ var q=await sb('cases?select=company_id&id=eq.'+encodeURIComponent(o.caseId)); if(q&&q[0]) cid=q[0].company_id||''; }catch(_e){} }
+  return cid;
+}
+function _htmlStoreHasEdits(){
+  return !!(window._htmlFrozen || (typeof _editMode!=='undefined' && _editMode) || window._styleDirty);
+}
+async function _htmlStoreSave(o){
+  o=o||{};
+  if(!_htmlStoreHasEdits()) return false;
+  var area=document.getElementById('pageArea'); if(!area) return false;
+  var caseId=o.caseId || (window._lastCaseInfo && window._lastCaseInfo.caseId) || '';
+  var cid=await _htmlStoreCompanyId({companyId:o.companyId, caseId:caseId});
+  var idx=_htmlStoreIdx(o.empSetIdx);
+  var doc=_htmlStoreDocFile();
+  if(!cid || idx===null || !doc) return false;
+  var html=(typeof getBindResetHtml==='function') ? getBindResetHtml() : area.innerHTML;
+  if(!html) return false;
+  var fs=(typeof _fontSize!=='undefined') ? _fontSize : null;
+  var key=cid+'|'+idx+'|'+doc;
+  var sig=html.length+':'+fs+':'+html.slice(0,200)+html.slice(-200);
+  try{ var h=0; for(var i=0;i<html.length;i++){ h=((h<<5)-h+html.charCodeAt(i))|0; } sig+=':'+h; }catch(_h){}
+  if(window._htmlStoreLast[key]===sig) return true; // 前回と同じ内容 → 追加しない
+  var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
+  await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
+    body:JSON.stringify({company_id:cid, emp_set_idx:idx, doc_file:doc, case_id:caseId, html:html, font_size:fs, saved_by:by})});
+  window._htmlStoreLast[key]=sig;
+  window._styleDirty=false;
+  return true;
+}
+async function _htmlStoreDiscard(o){
+  o=o||{};
+  var caseId=o.caseId || (window._lastCaseInfo && window._lastCaseInfo.caseId) || '';
+  var cid=await _htmlStoreCompanyId({companyId:o.companyId, caseId:caseId});
+  var idx=_htmlStoreIdx(o.empSetIdx);
+  var doc=_htmlStoreDocFile();
+  if(!cid || idx===null || !doc) return false;
+  var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
+  await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
+    body:JSON.stringify({company_id:cid, emp_set_idx:idx, doc_file:doc, case_id:caseId, html:'', discarded:true, saved_by:by})});
+  delete window._htmlStoreLast[cid+'|'+idx+'|'+doc];
+  return true;
+}
+async function _htmlStoreRestore(info){
+  info=info||window._lastCaseInfo||{};
+  var area=document.getElementById('pageArea'); if(!area) return false;
+  var cid=await _htmlStoreCompanyId({companyId:info.companyId, caseId:info.caseId});
+  var idx=_htmlStoreIdx(window._empLoadedIdx);
+  var doc=_htmlStoreDocFile();
+  if(!cid || idx===null || !doc) return false;
+  var rows=await sb('saysay_html_store?select=html,font_size,discarded,saved_at,case_id&company_id=eq.'+encodeURIComponent(cid)+
+    '&emp_set_idx=eq.'+idx+'&doc_file=eq.'+encodeURIComponent(doc)+'&order=saved_at.desc&limit=1');
+  var r=rows&&rows[0];
+  if(!r || r.discarded || !r.html) return false;
+  var at=Date.parse(r.saved_at)||0;
+  if(window._editedRestoredAt && window._editedRestoredAt>=at) return false; // 案件ごとの編集版の方が新しい
+  window._editedRestoring=true;
+  area.innerHTML=r.html;
+  window._htmlFrozen=true; window._editedRestored=true;
+  if(r.font_size!==null && r.font_size!==undefined && typeof _applyFontSize==='function'){
+    try{ _fontSize=parseFloat(r.font_size)||_fontSize; _applyFontSize(); var lbl=document.getElementById('fontSizeLabel'); if(lbl) lbl.textContent=_fontSize+'pt'; }catch(_f){}
+  }
+  if(typeof applyBindings==='function') applyBindings();
+  try{ if(typeof applyMoneyFormatting==='function') applyMoneyFormatting(); }catch(_m){}
+  window._editedRestoring=false;
+  // 呼び戻した内容を「前回保存」として覚え、そのままDB保存しても行を増やさない
+  try{
+    var html=(typeof getBindResetHtml==='function')?getBindResetHtml():area.innerHTML;
+    var fs=(typeof _fontSize!=='undefined')?_fontSize:null;
+    var sig=html.length+':'+fs+':'+html.slice(0,200)+html.slice(-200);
+    var h=0; for(var i=0;i<html.length;i++){ h=((h<<5)-h+html.charCodeAt(i))|0; } sig+=':'+h;
+    window._htmlStoreLast[cid+'|'+idx+'|'+doc]=sig;
+  }catch(_s){}
+  if(typeof showToast==='function'){
+    var w=new Date(at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    var other=(r.case_id && info.caseId && r.case_id!==info.caseId) ? '（同じ雇用条件の別の案件で編集）' : '';
+    showToast('📝 雇用条件に保存された編集版を呼び戻しました ('+w+')'+other);
+  }
+  return true;
+}
+// 書類独自の保存（1-6号の saveForm 等）・破棄にも受け皿の保存／破棄を付ける
+window.addEventListener('load', function(){
+  try{
+    if(typeof window.saveForm==='function' && !window.saveForm.__htmlStoreWrapped){
+      var _origSave=window.saveForm;
+      var w=async function(){ var r=await _origSave.apply(this, arguments);
+        try{ await _htmlStoreSave({}); }catch(_e){ console.warn('[htmlStore save]', _e); } return r; };
+      w.__htmlStoreWrapped=true; window.saveForm=w;
+    }
+    if(typeof window.discardEditedFromDB==='function' && !window.discardEditedFromDB.__htmlStoreWrapped){
+      var _origDis=window.discardEditedFromDB;
+      var d=async function(){ var before=window._htmlFrozen; var r=await _origDis.apply(this, arguments);
+        try{ if(before && !window._htmlFrozen) await _htmlStoreDiscard({}); }catch(_e){} return r; };
+      d.__htmlStoreWrapped=true; window.discardEditedFromDB=d;
+    }
+  }catch(_e){ console.warn('[htmlStore wrap]', _e); }
+});
+/* ===== /編集HTMLの受け皿 ===== */
