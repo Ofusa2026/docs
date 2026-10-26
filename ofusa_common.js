@@ -11,6 +11,7 @@
  *   ・上部の文字サイズ(A-/A+)もHTMLと一緒に保存・復元
  *   ・案件ごとの編集版と受け皿の新しい方を採用（最新優先）。変数欄(data-bind)は呼び戻し後に最新値で再描画
  *   ・「♻️ 編集版破棄」で破棄印(discarded)を入れ、それ以降は呼び戻さない
+ *   ・直接編集中の10秒ごとの自動保存は下書きとして同じ1行を上書きし、DB保存・編集終了で確定（履歴を増やさない）
  * ver.20261026.03
  * - fix(利用ログ): user_email が空になる経路があった（書類タブ切替時はトークンが渡らない／
  *   親index.htmlの IDX_TOKEN は let 宣言で window から読めない）。
@@ -4231,12 +4232,29 @@ async function _htmlStoreSave(o){
   var sig=html.length+':'+fs+':'+html.slice(0,200)+html.slice(-200);
   try{ var h=0; for(var i=0;i<html.length;i++){ h=((h<<5)-h+html.charCodeAt(i))|0; } sig+=':'+h; }catch(_h){}
   var lk=cid+'|'+idx+'|'+doc;
-  if(window._htmlStoreLast[lk]===sig) return true; // 前回と同じ内容 → 追加しない
+  // 直接編集中の自動保存（10秒ごと）は「下書き」として同じ1行を上書きし、履歴を増やさない。
+  // 「💾 DB保存」を押したとき／編集モードを終えたとき（自動保存以外）にその行を確定させる。
+  var isAuto=!!window._autosaving;
+  var draft=(window._htmlStoreDraft && window._htmlStoreDraft.key===lk) ? window._htmlStoreDraft : null;
+  if(window._htmlStoreLast[lk]===sig){ if(!isAuto) window._htmlStoreDraft=null; return true; } // 前回と同じ内容 → 追加しない
   var st=await _htmlStoreSetUid(cid, idx, true);
   if(!st.ok || !st.uid) return false;
   var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
-  await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
-    body:JSON.stringify({company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:html, font_size:fs, saved_by:by})});
+  var rowBody={company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:html, font_size:fs, saved_by:by};
+  var done=false;
+  if(draft){
+    try{
+      var up=await sb('saysay_html_store?id=eq.'+draft.id+'&select=id',{method:'PATCH',headers:{'Prefer':'return=representation'},
+        body:JSON.stringify({html:html, font_size:fs, case_id:caseId, saved_by:by, saved_at:new Date().toISOString()})});
+      done=!!(up && up.length);
+    }catch(_p){ done=false; }
+  }
+  if(!done){
+    var ins=await sb('saysay_html_store?select=id',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rowBody)});
+    window._htmlStoreDraft=(isAuto && ins && ins[0]) ? {id:ins[0].id, key:lk} : null;
+  }else if(!isAuto){
+    window._htmlStoreDraft=null; // 確定
+  }
   window._htmlStoreLast[lk]=sig;
   window._styleDirty=false;
   return true;
@@ -4254,10 +4272,12 @@ async function _htmlStoreDiscard(o){
   await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
     body:JSON.stringify({company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:'', discarded:true, saved_by:by})});
   delete window._htmlStoreLast[cid+'|'+idx+'|'+doc];
+  window._htmlStoreDraft=null;
   return true;
 }
 async function _htmlStoreRestore(info){
   info=info||window._lastCaseInfo||{};
+  window._htmlStoreDraft=null; // 案件を開き直したら、前の編集の下書きは確定扱い
   var area=document.getElementById('pageArea'); if(!area) return false;
   var cid=await _htmlStoreCompanyId({companyId:info.companyId, caseId:info.caseId});
   var idx=_htmlStoreIdx(window._empLoadedIdx);
