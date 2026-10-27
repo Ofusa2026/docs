@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20260917.01</div>
+    <div class="ver">ver.20261027.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -85,8 +85,8 @@
       <div class="fg"><label>日付（任意・空なら非表示）</label><input id="f_date" oninput="p()" placeholder="例：2026年9月11日"></div>
     </div>
     <div class="fs"><div class="fs-title">案件情報</div>
-      <div class="fg"><label>申請番号（複数行OK・氏名併記OK）</label><textarea id="f_receiptNo" oninput="p()" rows="3" placeholder="例：東オンCV12345&#10;　　東オンCV12346　NGUYEN VAN B"></textarea></div>
-      <div class="fg"><label>申請人（空なら行ごと非表示）</label><input id="f_applicant" oninput="p()"></div>
+      <div class="fg"><label>申請番号（複数行OK）</label><textarea id="f_receiptNo" oninput="p()" rows="3" placeholder="例：東オンCV12345&#10;東オンCV12346"></textarea></div>
+      <div class="fg"><label>申請人（複数行OK・空なら行ごと非表示）</label><textarea id="f_applicant" oninput="p()" rows="3" placeholder="例：NGUYEN VAN A&#10;NGUYEN VAN B"></textarea></div>
       <div class="fg"><label>所属機関名（空なら行ごと非表示）</label><input id="f_company" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">本文（自由に編集できます）</div>
@@ -175,7 +175,9 @@ ${date?`<div class="p" style="text-align:right;margin-bottom:4mm;">${esc(date)}<
 <div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>${busho?'　'+esc(busho):''}　御中</div>
 <div class="p">申請番号：</div>
 <div class="p" style="margin-bottom:6mm;">${_ml('f_receiptNo','es.receiptNo')}</div>
-${showApplicant?`<div class="p" style="margin-bottom:6mm;">${applicantLabel}：${f('f_applicant')}</div>`:''}
+${showApplicant?(/\n/.test(String(v('f_applicant')).trim())
+  ?`<div class="p">${applicantLabel}：</div><div class="p" style="margin-bottom:6mm;">${f('f_applicant')}</div>`
+  :`<div class="p" style="margin-bottom:6mm;">${applicantLabel}：${f('f_applicant')}</div>`):''}
 ${showCompany?`<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>`:''}
 <div class="p" style="margin-bottom:16mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
 <div class="p sig">大房行政書士法人</div>
@@ -321,16 +323,17 @@ function msApply(){
     var e0=document.getElementById('f_r_name'); if(e0) e0.value=rows[0].applicant||'';
     p(); showToast('✅ 反映しました'); return;
   }
+  // ver.20261027.01: 申請番号の行には番号だけを入れ、氏名は「申請人」欄に改行で並べる（同じ順番）
   var lines=rows.map(function(r){
     var no=(r.receipt_no||r.case_no||'').trim();
-    return no ? no+'　'+(r.applicant||'') : (r.applicant||'')+'（受付番号なし）';
+    return no ? no : '（受付番号なし）';
   });
   var s=function(id,val){var e=document.getElementById(id);if(e)e.value=val;};
   s('f_receiptNo', lines.join('\n'));
   var comps={}; rows.forEach(function(r){ comps[(r.company||'').trim()]=1; });
   var compKeys=Object.keys(comps).filter(function(k){return k;});
   s('f_company', compKeys.length===1?compKeys[0]:'');
-  s('f_applicant', rows.length===1?(rows[0].applicant||''):'');
+  s('f_applicant', rows.map(function(r){ return (r.applicant||'').trim(); }).filter(Boolean).join('\n'));
   var bureaus={};
   rows.forEach(function(r){ var b=bureauFullFromReceipt(r.receipt_no||r.case_no||''); if(b) bureaus[b]=1; });
   var bk=Object.keys(bureaus);
