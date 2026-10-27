@@ -11,6 +11,13 @@
 .doc .p{margin:0;}
 .doc .ttl{text-align:center;font-size:14pt;letter-spacing:2px;margin-bottom:14mm;}
 .doc .sig{text-align:right;}
+/* ver.20261027.02: 申請番号・申請人・所属機関名を「項目名：値」の表にし、「：」をそろえて値を右の列に1件1行で並べる */
+.doc .kv{border-collapse:collapse;margin:0 0 10mm 0;}
+.doc .kv td{padding:0;vertical-align:top;border:none;}
+.doc .kv td.k{width:5.2em;white-space:nowrap;text-align:justify;text-align-last:justify;}
+.doc .kv td.c{width:1em;text-align:center;}
+.doc .kv td.v{padding-left:0.5em;}
+.doc .kv tr.gap td{height:3mm;line-height:0;font-size:0;}
 .doc .ul{display:inline-block;min-width:8em;border-bottom:1px solid #000;text-align:left;padding:0 2px;}
 @media print{
   html,body,.main,.pp,#pageArea{background:#fff!important}
@@ -25,7 +32,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 追加資料提出</div>
-    <div class="ver">ver.20261027.01</div>
+    <div class="ver">ver.20261027.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -173,12 +180,11 @@ function p(){
 <div class="ttl">${esc(title)}</div>
 ${date?`<div class="p" style="text-align:right;margin-bottom:4mm;">${esc(date)}</div>`:''}
 <div class="p" style="margin-bottom:10mm;"><span class="f">${f('f_bureau')}</span>${busho?'　'+esc(busho):''}　御中</div>
-<div class="p">申請番号：</div>
-<div class="p" style="margin-bottom:6mm;">${_ml('f_receiptNo','es.receiptNo')}</div>
-${showApplicant?(/\n/.test(String(v('f_applicant')).trim())
-  ?`<div class="p">${applicantLabel}：</div><div class="p" style="margin-bottom:6mm;">${f('f_applicant')}</div>`
-  :`<div class="p" style="margin-bottom:6mm;">${applicantLabel}：${f('f_applicant')}</div>`):''}
-${showCompany?`<div class="p" style="margin-bottom:10mm;">所属機関名：　${f('f_company')}</div>`:''}
+<table class="kv">
+<tr><td class="k">申請番号</td><td class="c">：</td><td class="v">${_ml('f_receiptNo','es.receiptNo')}</td></tr>
+${showApplicant?`<tr class="gap"><td colspan="3"></td></tr><tr><td class="k">${applicantLabel}</td><td class="c">：</td><td class="v">${f('f_applicant')}</td></tr>`:''}
+${showCompany?`<tr class="gap"><td colspan="3"></td></tr><tr><td class="k">所属機関名</td><td class="c">：</td><td class="v">${f('f_company')}</td></tr>`:''}
+</table>
 <div class="p" style="margin-bottom:16mm;">${_ml('f_body','（本文：テンプレを選んで反映、または直接入力）')}</div>
 <div class="p sig">大房行政書士法人</div>
 <div class="p sig">申請取次行政書士　${f('f_gyosei')}</div>
