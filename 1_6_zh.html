@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20261028.02</div>
+    <div class="ver">ver.20261028.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -533,6 +533,18 @@ function _syncSubOfficeSection(){
   if(bt){ bt.disabled=on; bt.style.opacity=on?'.45':''; bt.style.cursor=on?'not-allowed':'pointer'; bt.title=on?'直接雇用②（2つ目の就業先）がある人は切り替えられません':''; }
 }
 function fDO(id){ return f(_hasSubOffice() ? id.replace('es_dispatchOffice','es_subOffice') : id); }
+// ver.20261028.03: 直接編集版（保存したHTML）を戻したときも②を出す。右側の欄の変数（data-bind）を、②があれば es_subOffice*、なければ es_dispatchOffice* に付け替えてから流し込む
+//   直接編集版はフォームから作り直さない（p() を通らない）ので、applyBindings の前で付け替え＋入力欄の出し入れ・切替ボタンもそろえる
+function _subOfficeRebind(){
+  var area=document.getElementById('pageArea'); if(!area) return;
+  var on=_hasSubOffice(), from=on?'es_dispatchOffice':'es_subOffice', to=on?'es_subOffice':'es_dispatchOffice';
+  area.querySelectorAll('[data-bind^="'+from+'"]').forEach(function(sp){ sp.setAttribute('data-bind', sp.getAttribute('data-bind').replace(from,to)); });
+}
+(function(){
+  var _ab=window.applyBindings; if(typeof _ab!=='function' || _ab._subOfficeWrapped) return;
+  var w=function(){ try{ _syncSubOfficeSection(); _subOfficeRebind(); }catch(e){} return _ab.apply(this, arguments); };
+  w._subOfficeWrapped=true; window.applyBindings=w;
+})();
 function moveOfficeToDispatch(){
   // ver.20261028.02: 直接雇用②がある人は切り替えない（書類の右側の欄は②を出すので、1つ目を派遣先へ移すと書類から消える）
   if(typeof _hasSubOffice==='function' && _hasSubOffice()){ var _m='⚠️ 直接雇用②（2つ目の就業先）がある人は、直接雇用⇄派遣雇用の切り替えはできません。切り替えるときは、案シスの雇用条件セットで②を消してください。'; if(typeof showToast==='function') showToast(_m); else alert(_m); return; }
