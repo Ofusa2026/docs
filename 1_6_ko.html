@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20261028.01</div>
+    <div class="ver">ver.20261028.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -526,9 +526,16 @@ window.BLANK_REQUIRED = function(){
 //   入力欄（#fsSubOffice）は中身があるときだけ出す。雇用条件書では右側の欄（派遣雇用の欄）に、②があるときは派遣先の代わりに②を出す（fDO の1箇所）
 var SUB_OFFICE_IDS=['es_subOfficeName','es_subOfficeNameEn','es_subOfficeAddress','es_subOfficeAddressEn','es_subOfficeTel'];
 function _hasSubOffice(){ return SUB_OFFICE_IDS.some(function(id){ var e=document.getElementById(id); return !!(e && String(e.value||'').trim()); }); }
-function _syncSubOfficeSection(){ var s=document.getElementById('fsSubOffice'); if(s) s.style.display=_hasSubOffice()?'':'none'; }
+function _syncSubOfficeSection(){
+  var on=_hasSubOffice(), s=document.getElementById('fsSubOffice'); if(s) s.style.display=on?'':'none';
+  // ver.20261028.02: ②があるときは「直接雇用⇄派遣雇用を切替」を押せなくする（押すと1つ目が書類から消えるため）
+  var bt=document.querySelector('button[onclick="moveOfficeToDispatch()"]');
+  if(bt){ bt.disabled=on; bt.style.opacity=on?'.45':''; bt.style.cursor=on?'not-allowed':'pointer'; bt.title=on?'直接雇用②（2つ目の就業先）がある人は切り替えられません':''; }
+}
 function fDO(id){ return f(_hasSubOffice() ? id.replace('es_dispatchOffice','es_subOffice') : id); }
 function moveOfficeToDispatch(){
+  // ver.20261028.02: 直接雇用②がある人は切り替えない（書類の右側の欄は②を出すので、1つ目を派遣先へ移すと書類から消える）
+  if(typeof _hasSubOffice==='function' && _hasSubOffice()){ var _m='⚠️ 直接雇用②（2つ目の就業先）がある人は、直接雇用⇄派遣雇用の切り替えはできません。切り替えるときは、案シスの雇用条件セットで②を消してください。'; if(typeof showToast==='function') showToast(_m); else alert(_m); return; }
   var pairs=[['es_officeName','es_dispatchOfficeName'],['es_officeNameEn','es_dispatchOfficeNameEn'],['es_officeAddress','es_dispatchOfficeAddress'],['es_officeAddressEn','es_dispatchOfficeAddressEn'],['es_officeTel','es_dispatchOfficeTel']];
   var g=function(id){var e=document.getElementById(id);return e?e.value:'';};
   var s=function(id,val){var e=document.getElementById(id);if(e)e.value=val;};
