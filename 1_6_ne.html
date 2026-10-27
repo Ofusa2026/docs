@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261028.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -133,14 +133,21 @@
         </select>
       </div>
     </div>
-    <div class="fs"><div class="fs-title">Ⅱ 就業の場所</div>
+    <div class="fs"><div class="fs-title">Ⅱ 就業の場所（直接雇用）</div>
       <div class="fg"><label>事業所名（日）<span class="fid">es.officeName</span></label><input id="es_officeName" oninput="p()"></div>
       <div class="fg"><label>事業所名（ID）<span class="fid">es.officeNameEn</span></label><input id="es_officeNameEn" oninput="p()"></div>
       <div class="fg"><label>所在地（日）<span class="fid">es.officeAddress</span></label><textarea id="es_officeAddress" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>所在地（ID）<span class="fid">es.officeAddressEn</span></label><textarea id="es_officeAddressEn" oninput="p()" rows="2"></textarea></div>
       <div class="fg"><label>連絡先<span class="fid">es.officeTel</span></label><input id="es_officeTel" oninput="p()"></div>
     </div>
-    <div class="fs"><div class="fs-title">Ⅱ 就業の場所（派遣先）</div>
+    <div class="fs" id="fsSubOffice" style="display:none;"><div class="fs-title">Ⅱ 就業の場所（直接雇用②）</div>
+      <div class="fg"><label>事業所名②（日）<span class="fid">es.subOfficeName</span></label><input id="es_subOfficeName" oninput="p()"></div>
+      <div class="fg"><label>事業所名②（ID）<span class="fid">es.subOfficeNameEn</span></label><input id="es_subOfficeNameEn" oninput="p()"></div>
+      <div class="fg"><label>所在地②（日）<span class="fid">es.subOfficeAddress</span></label><textarea id="es_subOfficeAddress" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>所在地②（ID）<span class="fid">es.subOfficeAddressEn</span></label><textarea id="es_subOfficeAddressEn" oninput="p()" rows="2"></textarea></div>
+      <div class="fg"><label>連絡先②<span class="fid">es.subOfficeTel</span></label><input id="es_subOfficeTel" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">Ⅱ 就業の場所（派遣雇用）</div>
       <div class="fg"><button type="button" onclick="moveOfficeToDispatch()" style="width:100%;background:#7c3aed;color:#fff;padding:7px 4px;border:none;border-radius:4px;cursor:pointer;font-size:12px;">⇄ 直接雇用⇄派遣雇用を切替（内容を移動）</button></div>
       <div class="fg"><label>派遣先事業所名（日）<span class="fid">es.dispatchOfficeName</span></label><input id="es_dispatchOfficeName" oninput="p()"></div>
       <div class="fg"><label>派遣先事業所名（ID）<span class="fid">es.dispatchOfficeNameEn</span></label><input id="es_dispatchOfficeNameEn" oninput="p()"></div>
@@ -515,6 +522,12 @@ window.BLANK_REQUIRED = function(){
 // ver.20260916.02: 直接雇用⇄派遣雇用のワンボタン切替。
 // 就業の場所の内容（事業所名・所在地・連絡先）を左右で移動し、
 // ■/□（hire_direct / hire_dispatch とインドネシア語行）も同時に切り替える。
+// ver.20261028.01: 就業の場所（直接雇用②）＝2つ目の就業先。案シスの雇用条件セットで手入力したときだけ入る（subOffice*。ヒアリングフォームでは聞かない）
+//   入力欄（#fsSubOffice）は中身があるときだけ出す。雇用条件書では右側の欄（派遣雇用の欄）に、②があるときは派遣先の代わりに②を出す（fDO の1箇所）
+var SUB_OFFICE_IDS=['es_subOfficeName','es_subOfficeNameEn','es_subOfficeAddress','es_subOfficeAddressEn','es_subOfficeTel'];
+function _hasSubOffice(){ return SUB_OFFICE_IDS.some(function(id){ var e=document.getElementById(id); return !!(e && String(e.value||'').trim()); }); }
+function _syncSubOfficeSection(){ var s=document.getElementById('fsSubOffice'); if(s) s.style.display=_hasSubOffice()?'':'none'; }
+function fDO(id){ return f(_hasSubOffice() ? id.replace('es_dispatchOffice','es_subOffice') : id); }
 function moveOfficeToDispatch(){
   var pairs=[['es_officeName','es_dispatchOfficeName'],['es_officeNameEn','es_dispatchOfficeNameEn'],['es_officeAddress','es_dispatchOfficeAddress'],['es_officeAddressEn','es_dispatchOfficeAddressEn'],['es_officeTel','es_dispatchOfficeTel']];
   var g=function(id){var e=document.getElementById(id);return e?e.value:'';};
@@ -561,6 +574,7 @@ function otherIns(){ try{ return String((window._empLoadedSet||{}).socialInsuran
 function otherInsEn(){ try{ var s=window._empLoadedSet||{}; return String(s.socialInsuranceEn||s.socialInsurance||'').trim(); }catch(_e){ return ''; } }
 function p(){
   try{_syncJippi();}catch(e){}
+  try{_syncSubOfficeSection();}catch(e){}   // ver.20261028.01
   if(_editMode) return; // 直接編集中はフォームからの再描画をブロック
   if(_currentDoc==='iko'){ p_iko(); return; }
   resetCbSeq();
@@ -747,9 +761,9 @@ function p(){
         <div style="font-size:8.5pt;margin-bottom:2px;"><br><br>${cb(false,'hire_dispatch')}&nbsp;派遣雇用（別紙「就業条件明示書」に記入）<br><span class="id" style="font-size:7.5pt;margin-bottom:4px;">${cb(false,'hire_dispatch_id')}&nbsp;कामदार सप्लाई गर्ने संस्थाबाट रोजगारी (संलग्न "कामको नियमहरू प्रकाश पार्ने पत्र" मा भर्नुहोस्)</span></div>
         <div style="font-size:7.5pt;">（変更の範囲）${cb(false,'change_none_direct')}&nbsp;変更の可能性なし（変更ある場合は以下に記入）<br><span class="id" style="font-size:6pt;">${cb(false,'change_none_direct_id')}&nbsp;परिवर्तनको सम्भावना छैन (परिवर्तन भएमा तल लेख्नुहोस्)</span></div>
         <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:3px;">
-          <tr><td class="ul-label" style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id">कामको स्थान</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_dispatchOfficeName')}<br><span class="id">${f('es_dispatchOfficeNameEn')}</span></td></tr>
-          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">स्थान</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_dispatchOfficeAddress')}<br><span class="id">${f('es_dispatchOfficeAddressEn')}</span></td></tr>
-          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">सम्पर्क नं</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${f('es_dispatchOfficeTel')}<br><span class="id" style="font-size:7.5pt;">${f('es_dispatchOfficeTel')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;width:70px;vertical-align:top;">事業所名<br><span class="id">कामको स्थान</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${fDO('es_dispatchOfficeName')}<br><span class="id">${fDO('es_dispatchOfficeNameEn')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">所在地<br><span class="id">स्थान</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${fDO('es_dispatchOfficeAddress')}<br><span class="id">${fDO('es_dispatchOfficeAddressEn')}</span></td></tr>
+          <tr><td class="ul-label" style="padding:2px 4px;vertical-align:top;">連絡先<br><span class="id">सम्पर्क नं</span></td><td class="ul-cell" style="padding:2px 4px;vertical-align:top;">${fDO('es_dispatchOfficeTel')}<br><span class="id" style="font-size:7.5pt;">${fDO('es_dispatchOfficeTel')}</span></td></tr>
         </table>
       </div>
     </div>
