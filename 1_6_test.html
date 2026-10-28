@@ -402,7 +402,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1792983579"></script>
+<script src="ofusa_common.js?v=1793152465"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -1473,7 +1473,7 @@ async function saveForm(){
     // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6_my'][caseId] に保存
     let _editedSaved=false;
     try{
-      if(window._htmlFrozen || _editMode){
+      if(window._htmlFrozen || _editMode || window._styleDirty){
         const _area=document.getElementById('pageArea');
         if(_area && info.caseId){
           // ⑦: read-modify-write競合を避け、DB側で該当パスのみ原子的に更新（jsonb_set RPC）

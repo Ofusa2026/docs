@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20261028.03</div>
+    <div class="ver">ver.20261028.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -472,7 +472,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1792983579"></script>
+<script src="ofusa_common.js?v=1793152465"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1716,7 +1716,7 @@ async function saveForm(){
     // 直接編集中/フリーズ中なら、編集版HTMLも extra['_edited']['1_6_ko'][caseId] に保存
     let _editedSaved=false;
     try{
-      if(window._htmlFrozen || _editMode){
+      if(window._htmlFrozen || _editMode || window._styleDirty){
         const _area=document.getElementById('pageArea');
         if(_area && info.caseId){
           // ⑦: read-modify-write競合を避け、DB側で該当パスのみ原子的に更新（jsonb_set RPC）

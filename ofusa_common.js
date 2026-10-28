@@ -1,6 +1,16 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
- * ver.20261026.04
+ * ver.20261028.01
+ * - feat(直接編集): 直接編集の後に、書類の形が変わる変更（チェック欄・シフト行など）をサイドバーでしたら、
+ *   書類の上に黄色いお知らせを出す（「♻️ 破棄して作り直す」「このまま使う」）。印刷時も確認
+ * ver.20261027.03
+ * - change: 「❓ 使い方」はポップアップではなく、書類の上に開閉パネルで表示
+ * ver.20261027.02
+ * - feat: 「✏️ 直接編集」の横に「❓ 使い方」ボタン（正しい手順①〜④・やっていいこと／いけないこと）
+ * ver.20261027.01
+ * - fix(直接編集): 変数欄（es.xxx・差し込み値）の中に打った文字が、DB保存・読込・サイドバー変更で消えていた。
+ *   編集終了・保存の前に、書き足しは変数欄の外へ移し、値の書き換えは入力欄へ反映する（_reconcileBindEdits）
+ * - fix(直接編集): 直接編集後にサイドバーを変えると書類が作り直されて編集が全部消えていた → 変数欄の差し替えだけにする
  * - feat(編集HTMLの受け皿): 直接編集・スタイル編集（余白・枠線・文字移動）・文字サイズを、
  *   新テーブル saysay_html_store に「雇用条件（company_id＋雇用条件セットの固定ID _uid）×書類ファイル」単位で
  *   （_uid は編集版を初めて保存するときに DB関数 set_emp_set_uid で emp_sets[n] に1回だけ付ける。
@@ -978,6 +988,8 @@ function _currentUserId(){
    ============================================================ */
 function applyBindings(){
   const area=document.getElementById('pageArea');if(!area)return;
+  // ver.20261027.01: 変数欄の中に直接打った文字を、流し直しで消さない
+  try{ if(typeof _reconcileBindEdits==='function' && !window._bindReconciling) _reconcileBindEdits(); }catch(_e){}
   // ver.20260827.03: 保存済みの直接編集版HTMLは修正前マークアップのスナップショットのため、
   //   テンプレ側のレイアウト修正（合計金額の1行化・Ⅷ退職の分割禁止 ver.20260827.02）が
   //   届かない。編集版を持つ案件にも効くよう、復元後にスタイルを後付けする。
@@ -1010,6 +1022,7 @@ function applyBindings(){
       span.textContent=label;
     }
   });
+  try{ _snapBinds(); }catch(_e){} // ver.20261027.01: 流し込んだ後の中身を基準にする
   return spans.length; // data-bind スパン数を返す（0=旧形式）
 }
 /* data-bind スパンをプレースホルダー（変数名）に戻す */
@@ -1026,9 +1039,97 @@ function resetBindings(){
 //   直接編集版DB保存の際、data-bindスパンに焼き込まれた値を含んだまま保存すると
 //   別案件から戻ってきた時にその値が焼き込まれたまま残る問題がある。
 //   保存時にはプレースホルダ化して、復元時にapplyBindings()で正しい値を流し込む。
+/* ver.20261027.01: 直接編集で「変数の欄（灰色の es.xxx や差し込まれた値）」の中に文字を打つと、
+   保存時に変数欄はプレースホルダへ戻し、読込時・サイドバー変更時に値を流し直すため、
+   打った文字が消えていた（例：終業の欄に「23:00）※前記時間帯のうち、シフト制」と入力 → 保存後に es.endTime）。
+   対策：編集開始時の変数欄の中身を覚えておき、編集終了・保存の前に見比べて
+     ・元の値の前後に書き足した文字 → 変数欄の外（普通の文字）へ移す
+     ・値そのものを書き換えた → サイドバーの入力欄へ反映（他の言語の同じ欄・DBにも反映）
+     ・中身を全部消した → この書類ではその欄を固定の空欄にする
+   ことで、打った文字が消えないようにする。 */
+window._bindSnap = window._bindSnap || new WeakMap();
+function _snapBinds(){
+  try{
+    const area=document.getElementById('pageArea'); if(!area) return;
+    area.querySelectorAll('[data-bind]').forEach(function(sp){ window._bindSnap.set(sp, sp.innerHTML); });
+  }catch(e){}
+}
+function _bindHtmlToText(h){
+  const d=document.createElement('div');
+  d.innerHTML=String(h||'').replace(/<br\s*\/?>/gi,'\n');
+  return (d.textContent||'').replace(/​/g,'').replace(/ /g,' ');
+}
+function _reconcileBindEdits(opts){
+  opts=opts||{};
+  const area=document.getElementById('pageArea'); if(!area) return 0;
+  if(window._bindReconciling) return 0;
+  window._bindReconciling=true;
+  const synced={}; let n=0;
+  try{
+    area.querySelectorAll('[data-bind]').forEach(function(sp){
+      if(!window._bindSnap.has(sp)) return;
+      const before=window._bindSnap.get(sp);
+      const now=sp.innerHTML;
+      if(now===before) return;
+      const tNow=_bindHtmlToText(now), tBefore=_bindHtmlToText(before);
+      if(tNow===tBefore) return; // 見た目の文字が同じ（改行コード等の差だけ）
+      const id=sp.getAttribute('data-bind');
+      const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
+      // ①元の中身の前後に書き足した → 書き足し分を変数欄の外へ
+      const i=now.indexOf(before);
+      if(before && i>=0){
+        const pre=now.slice(0,i), post=now.slice(i+before.length);
+        sp.innerHTML=before;
+        if(_bindHtmlToText(pre).trim()) sp.insertAdjacentHTML('beforebegin', pre);
+        if(_bindHtmlToText(post).trim()) sp.insertAdjacentHTML('afterend', post);
+        n++; return;
+      }
+      // 元が空欄（es.xxx）で、ラベルを残したまま書き足した → ラベル以外を外へ
+      const iL=tNow.indexOf(label);
+      if(iL>=0 && tBefore===label){
+        const pre=tNow.slice(0,iL), post=tNow.slice(iL+label.length);
+        sp.innerHTML=before;
+        if(pre.trim()) sp.insertAdjacentText('beforebegin', pre);
+        if(post.trim()) sp.insertAdjacentText('afterend', post);
+        n++; return;
+      }
+      const val=tNow.replace(/^\s+|\s+$/g,'');
+      const inp=document.getElementById(id);
+      // ③全部消した／入力欄が無い／文章を打った（改行・※・。を含む、または長い）
+      //   → この書類では打ったとおりの固定の文字にする（以後差し替えない・入力欄は変えない）
+      const _isSentence = /\n|※|。/.test(val) || val.length>30;
+      if(!val || !inp || inp.tagName==='SELECT' || _isSentence){
+        sp.removeAttribute('data-bind');
+        sp.style.color=''; sp.style.fontSize=''; sp.style.fontFamily='';
+        n++; return;
+      }
+      // ②値を書き換えた → サイドバーの入力欄へ反映
+      if(String(inp.value||'')!==val){
+        inp.value=val;
+        try{ if(window._fieldData) window._fieldData[id]=val; }catch(_e){}
+        let lb=id;
+        try{ const fg=inp.closest('.fg'); const l=fg&&fg.querySelector('label'); if(l){ const c=l.cloneNode(true); c.querySelectorAll('.fid').forEach(x=>x.remove()); lb=(c.textContent||'').trim()||id; } }catch(_e){}
+        synced[id]=lb;
+      }
+      sp.style.color=''; sp.style.fontSize=''; sp.style.fontFamily='';
+      n++;
+    });
+  }catch(e){ console.warn('[reconcileBindEdits]', e); }
+  window._bindReconciling=false;
+  _snapBinds();
+  const ids=Object.keys(synced);
+  if(ids.length){
+    try{ if(typeof applyBindings==='function') applyBindings(); }catch(_e){}
+    try{ if(typeof showToast==='function') showToast('📝 書類上で書き換えた「'+ids.map(k=>synced[k]).join('・')+'」を入力欄にも反映しました'); }catch(_e){}
+  }
+  if(n){ try{ if(typeof markEditedDirty==='function' && _editMode) markEditedDirty(); }catch(_e){} }
+  return n;
+}
 function getBindResetHtml(){
   const area=document.getElementById('pageArea');
   if(!area) return '';
+  // ver.20261027.01: 保存前に、変数欄の中に打った文字を外へ逃がす／入力欄へ反映（自動保存の途中では行わない＝入力中のカーソルを動かさない）
+  try{ if(!window._autosaving) _reconcileBindEdits(); }catch(_e){}
   const snapshot = area.cloneNode(true);
   try{
     snapshot.querySelectorAll('[data-bind]').forEach(function(span){
@@ -1199,6 +1300,12 @@ function _printDocLabel(){
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
+  // ver.20261028.01: 書類の形が変わる変更が、直接編集した書類に出ていないまま印刷しようとしたら確認
+  try{
+    if(window._tplStructChanged && document.getElementById('_structNotice')){
+      if(!confirm('サイドバーで変えた内容のうち、直接編集した書類に出ていないものがあります。\n（画面上部の黄色いお知らせを確認してください）\n\nこのまま印刷しますか？')) return;
+    }
+  }catch(_pw){}
   try{ slog('print'); }catch(_sl){} // ver.20261026.01: 利用ログ（PDF印刷）
   var orig = document.title;
   // ver.20260820.08: 親フレーム(index.html)のtitleも書き換える。
@@ -1499,6 +1606,8 @@ function toggleEditMode(){
     if(btn){btn.textContent='✅ 完了して保存';btn.classList.add('edit-mode-on');btn.title='編集モードを終了して自動的にDB保存します';}
     if(area)area.classList.add('edit-mode');
     enableDocEditing(true);
+    try{ _structSetBase(); }catch(_e){} // ver.20261028.01: 書類の形の基準を覚える
+    try{ _snapBinds(); }catch(_e){} // ver.20261027.01: 編集開始時の変数欄を覚える
     // ver.20260808.07: 編集中の自動保存を開始
     _startAutosave();
     // ver.20260808.07: 未保存表示（画面枠を赤くする）
@@ -1507,6 +1616,7 @@ function toggleEditMode(){
     _editLock=false;
     if(btn){btn.textContent='✏️ 直接編集';btn.classList.remove('edit-mode-on');btn.title='';}
     if(area)area.classList.remove('edit-mode');
+    try{ _reconcileBindEdits(); }catch(_e){} // ver.20261027.01: 変数欄の中に打った文字を残す
     enableDocEditing(false);
     // 直接編集した内容を破棄しないよう、終了時にHTMLをフリーズして保持する。
     // （以前はここで p() を呼んでフォーム値から作り直していたため、手編集が消えていた）
@@ -2805,6 +2915,7 @@ async function loadCaseToForm(info, docKey, opts){
     }
     // ver.20261026.04: 雇用条件に紐づく編集HTML（受け皿）を呼び戻す（案件ごとの編集版より新しければ採用）
     try{ await _htmlStoreRestore(info); }catch(_hs){ console.warn('[htmlStore restore]', _hs); }
+    try{ _structNoticeHide(); window._tplSigBase=null; if(window._htmlFrozen) _structSetBase(); }catch(_sb){} // ver.20261028.01
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
@@ -2956,6 +3067,7 @@ if(typeof window !== 'undefined' && window.parent && window.parent !== window){
    ========================================================== */
 async function saveFormGeneric(docKey, opts){
   try{ slog('save', {doc_key:String(docKey||'')}); }catch(_sl){} // ver.20261026.01: 利用ログ（DB保存）
+  try{ if(!window._autosaving) _reconcileBindEdits(); }catch(_rc){} // ver.20261027.01
   opts = opts || {};
   // 案件情報を取得：caseSelect → window._lastCaseInfo → 親から問い合わせ
   let info = null;
@@ -4329,10 +4441,35 @@ async function _htmlStoreRestore(info){
 }
 // 書類独自の保存（1-6号の saveForm 等）・破棄にも受け皿の保存／破棄を付ける
 window.addEventListener('load', function(){
+  // ver.20261027.01: 直接編集を終えた書類（フリーズ中）でサイドバーを変えると、p() が書類を作り直して
+  //   直接編集した文字・余白がすべて消えていた。フリーズ中は変数欄の差し替え(applyBindings)だけにする。
+  //   （作り直したいときは「♻️ 編集版破棄」。data-bind の無い古い形式は従来どおり作り直す）
+  try{
+    if(typeof window.p==='function' && !window.p.__frozenGuard){
+      var _origP=window.p;
+      var gp=function(){
+        try{
+          var _em=(typeof _editMode!=='undefined') && _editMode;
+          if(window._htmlFrozen && !_em && !window._editedRestoring && !window._tplSigRendering && typeof applyBindings==='function'){
+            var nb=applyBindings();
+            if(nb){ try{ _structCheckSoon(); }catch(_sc){} return; }
+          }
+        }catch(_e){}
+        var r=_origP.apply(this, arguments);
+        try{ if(!window._htmlFrozen && !window._tplSigRendering) _structNoticeHide(); }catch(_sh){}
+        return r;
+      };
+      gp.__frozenGuard=true; window.p=gp; window._origPRender=_origP;
+    }
+  }catch(_pg){ console.warn('[p frozen guard]', _pg); }
   try{
     if(typeof window.saveForm==='function' && !window.saveForm.__htmlStoreWrapped){
       var _origSave=window.saveForm;
-      var w=async function(){ var r=await _origSave.apply(this, arguments);
+      var w=async function(){
+        // ver.20261027.01: 変数欄の中に打った文字を、入力欄の値を集める前に整える／利用ログ（1-6号のDB保存）
+        try{ if(!window._autosaving) _reconcileBindEdits(); }catch(_rc){}
+        try{ if(!window._autosaving) slog('save', {doc_key:String(window._empDocKey||'1_6')}); }catch(_sl){}
+        var r=await _origSave.apply(this, arguments);
         try{ await _htmlStoreSave({}); }catch(_e){ console.warn('[htmlStore save]', _e); } return r; };
       w.__htmlStoreWrapped=true; window.saveForm=w;
     }
@@ -4345,3 +4482,152 @@ window.addEventListener('load', function(){
   }catch(_e){ console.warn('[htmlStore wrap]', _e); }
 });
 /* ===== /編集HTMLの受け皿 ===== */
+
+/* ===== 直接編集の使い方ボタン（ver.20261027.02） =====
+   「✏️ 直接編集」ボタンの横に「❓ 使い方」を出し、正しい手順・やっていいこと／いけないことを表示する。 */
+(function(){
+  var HTML =
+   '<div style="font-size:16px;font-weight:bold;color:#1e293b;margin-bottom:4px;">✏️ 直接編集の使い方</div>'+
+   '<div style="font-size:12px;color:#64748b;margin-bottom:14px;">この順番なら、直接編集した文字・余白は消えません。</div>'+
+   '<div style="font-size:13px;font-weight:bold;color:#7c3aed;margin-bottom:6px;">正しい手順</div>'+
+   '<ol class="_hw-steps">'+
+     '<li><b>① サイドバーで値を入れる</b><br>時刻・金額・名前など。終わったら「💾 DB保存」。</li>'+
+     '<li><b>② 「✏️ 直接編集」で書類の上を直す</b><br>注記や言い回しは、<u>灰色の欄（es.xxx）や値の外</u>に書く。</li>'+
+     '<li><b>③ 「✅ 完了して保存」で終える</b><br>直接編集と雇用条件がまとめて保存される。</li>'+
+     '<li><b>④ 次に開くと自動で呼び戻される</b><br>同じ案件・同じ雇用条件の別の申請人でも「📝 …呼び戻しました」と出る。</li>'+
+   '</ol>'+
+   '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">'+
+     '<div class="_hw-box" style="border-color:#16a34a;background:#f0fdf4;">'+
+       '<div style="font-weight:bold;color:#15803d;margin-bottom:6px;">⭕ やっていいこと</div>'+
+       '<ul>'+
+         '<li>完了後に、時刻・金額・名前などの<b>値</b>をサイドバーで直す（値だけ入れ替わり、編集は残る）</li>'+
+         '<li>灰色の欄の中にうっかり書いた → 保存時に自動で整える（書き足しは欄の外へ／値の書き換えはサイドバーへ反映）</li>'+
+         '<li>余白・枠線・文字サイズの調整（一緒に保存される）</li>'+
+       '</ul>'+
+     '</div>'+
+     '<div class="_hw-box" style="border-color:#dc2626;background:#fef2f2;">'+
+       '<div style="font-weight:bold;color:#b91c1c;margin-bottom:6px;">❌ やってはいけないこと</div>'+
+       '<ul>'+
+         '<li>保存せずに<b>別の案件へ切り替える・画面を閉じる</b>（消える）</li>'+
+         '<li>完了後に<b>チェック欄・シフト行など書類の形が変わる変更</b>（編集した書類には出ない。書類の上に<b>黄色いお知らせ</b>が出る）<br>→ お知らせの「♻️ 編集版を破棄して作り直す」→ もう一度直接編集</li>'+
+         '<li>「♻️ 編集版破棄」をむやみに押す（直接編集がすべて元に戻る）</li>'+
+         '<li>言語版は別々：ネパール語版で直しても、日本語版・他の言語版には反映されない</li>'+
+       '</ul>'+
+     '</div>'+
+   '</div>'+
+   '<div style="margin-top:14px;padding:10px 12px;background:#f1f5f9;border-radius:8px;font-size:12.5px;color:#334155;">迷ったら <b>サイドバー → 💾 DB保存 → ✏️ 直接編集 → ✅ 完了して保存</b></div>'+
+   '<div style="text-align:right;margin-top:14px;"><button id="_hwClose" style="padding:7px 18px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">閉じる</button></div>';
+  // ver.20261027.03: ポップアップではなく、ツールバーのすぐ下（書類の上）に開閉パネルとして出す
+  window.showEditHowto=function(){
+    try{
+      var pnl=document.getElementById('_hwOver');
+      var btn=document.getElementById('editHowtoBtn');
+      if(pnl){ pnl.parentNode.removeChild(pnl); if(btn){ btn.style.background='#fff'; btn.style.color='#7c3aed'; } return; }
+      if(!document.getElementById('_hwStyle')){
+        var st=document.createElement('style'); st.id='_hwStyle';
+        st.textContent='#_hwOver ._hw-steps{margin:0;padding:0;list-style:none;display:flex;gap:8px;flex-wrap:wrap;font-size:12.5px;line-height:1.55;color:#1e293b;}'+
+          '#_hwOver ._hw-steps li{flex:1 1 170px;background:#f5f3ff;border-left:4px solid #7c3aed;border-radius:6px;padding:7px 10px;}'+
+          '#_hwOver ._hw-box{flex:1 1 250px;border:1px solid;border-radius:8px;padding:9px 12px;font-size:12px;line-height:1.55;color:#1e293b;}'+
+          '#_hwOver ._hw-box ul{margin:0;padding-left:18px;} #_hwOver ._hw-box li{margin-bottom:3px;}'+
+          '@media print{#_hwOver{display:none!important;}}';
+        document.head.appendChild(st);
+      }
+      var w=document.createElement('div'); w.id='_hwOver';
+      w.style.cssText='background:#fff;border:2px solid #7c3aed;border-radius:10px;margin:8px 12px;padding:14px 18px;font-family:sans-serif;box-sizing:border-box;';
+      w.innerHTML=HTML.replace('>閉じる</button>','>▲ 閉じる</button>');
+      var area=document.getElementById('pageArea');
+      if(area && area.parentNode) area.parentNode.insertBefore(w, area);
+      else document.body.insertBefore(w, document.body.firstChild);
+      if(btn){ btn.style.background='#7c3aed'; btn.style.color='#fff'; }
+      w.querySelector('#_hwClose').onclick=function(){ window.showEditHowto(); };
+      try{ w.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+    }catch(e){ console.warn('[showEditHowto]', e); }
+  };
+  function addBtn(){
+    try{
+      var eb=document.getElementById('editModeBtn');
+      if(!eb || document.getElementById('editHowtoBtn')) return;
+      var b=document.createElement('button');
+      b.id='editHowtoBtn'; b.type='button';
+      b.className=eb.className||'';
+      b.textContent='❓ 使い方';
+      b.title='直接編集の正しい手順';
+      b.style.cssText='margin-left:4px;background:#fff;color:#7c3aed;border:1px solid #7c3aed;';
+      b.onclick=function(e){ e.preventDefault(); window.showEditHowto(); };
+      eb.insertAdjacentElement('afterend', b);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBtn); else addBtn();
+  window.addEventListener('load', addBtn);
+})();
+
+/* ===== 直接編集後の「書類の形が変わる変更」のお知らせ（ver.20261028.01） =====
+   直接編集した書類（フリーズ中）は、サイドバーの値（灰色の欄）だけを差し替える。
+   チェック欄・シフト行など、書類の形そのものが変わる変更は出ないので、
+   サイドバー変更のたびに「元の様式で作り直したらどうなるか」を裏で作って比べ、違えば知らせる。 */
+function _tplSig(){
+  var area=document.getElementById('pageArea'); if(!area || typeof window._origPRender!=='function') return null;
+  var saved=area.innerHTML, sx=window.scrollX, sy=window.scrollY, at=area.scrollTop;
+  var em=(typeof _editMode!=='undefined')?_editMode:false, fr=window._htmlFrozen, sig=null;
+  window._tplSigRendering=true;
+  try{
+    try{ _editMode=false; }catch(_e){}
+    window._htmlFrozen=false;
+    window._origPRender();
+    var c=area.cloneNode(true);
+    c.querySelectorAll('[data-bind]').forEach(function(sp){ sp.textContent=''; });
+    c.querySelectorAll('.user-note').forEach(function(n){ n.remove(); });
+    sig=(c.textContent||'').replace(/[\s\u200B\u00A0]+/g,'');
+  }catch(e){ console.warn('[tplSig]', e); sig=null; }
+  finally{
+    area.innerHTML=saved;
+    try{ _editMode=em; }catch(_e){}
+    window._htmlFrozen=fr;
+    window._tplSigRendering=false;
+    try{ window.scrollTo(sx,sy); area.scrollTop=at; }catch(_e){}
+    try{ if(typeof applyBindings==='function') applyBindings(); }catch(_e){}
+  }
+  return sig;
+}
+function _structSetBase(){ window._tplSigBase=_tplSig(); window._tplStructChanged=false; }
+var _structTimer=null;
+function _structCheckSoon(){
+  if(_structTimer) clearTimeout(_structTimer);
+  _structTimer=setTimeout(function(){
+    _structTimer=null;
+    try{
+      if(!window._htmlFrozen || ((typeof _editMode!=='undefined') && _editMode)) return;
+      var sig=_tplSig(); if(sig==null) return;
+      if(window._tplSigBase==null){ window._tplSigBase=sig; return; }
+      if(sig!==window._tplSigBase) _structNoticeShow(); else _structNoticeHide();
+    }catch(e){ console.warn('[structCheck]', e); }
+  }, 600);
+}
+function _structNoticeHide(){
+  window._tplStructChanged=false;
+  var n=document.getElementById('_structNotice'); if(n && n.parentNode) n.parentNode.removeChild(n);
+}
+function _structNoticeShow(){
+  window._tplStructChanged=true;
+  if(document.getElementById('_structNotice')) return;
+  var area=document.getElementById('pageArea'); if(!area || !area.parentNode) return;
+  var w=document.createElement('div'); w.id='_structNotice';
+  w.style.cssText='background:#fefce8;border:2px solid #eab308;border-radius:10px;margin:8px 12px;padding:12px 16px;font-family:sans-serif;font-size:13px;line-height:1.6;color:#422006;box-sizing:border-box;';
+  w.innerHTML=
+    '<div style="font-weight:bold;font-size:14px;margin-bottom:4px;">⚠️ サイドバーで変えた内容のうち、直接編集した書類に出ていないものがあります</div>'+
+    '<div style="margin-bottom:10px;">チェック欄・シフト行など、<b>書類の形が変わる変更</b>は、直接編集した書類には反映されません（時刻・金額・名前などの値は反映済みです）。<br>'+
+    '反映するには、編集版を破棄して作り直し、必要な直接編集をもう一度してください。</div>'+
+    '<button type="button" id="_snRebuild" style="padding:7px 14px;font-size:13px;font-weight:bold;border:1px solid #b91c1c;background:#dc2626;color:#fff;border-radius:6px;cursor:pointer;margin-right:8px;">♻️ 編集版を破棄して作り直す</button>'+
+    '<button type="button" id="_snKeep" style="padding:7px 14px;font-size:13px;border:1px solid #a16207;background:#fff;color:#713f12;border-radius:6px;cursor:pointer;">このまま（直接編集した書類を使う）</button>';
+  area.parentNode.insertBefore(w, area);
+  w.querySelector('#_snRebuild').onclick=async function(){
+    try{
+      if(typeof window.discardEditedFromDB==='function') await window.discardEditedFromDB();
+      else if(typeof discardEditedGeneric==='function') await discardEditedGeneric();
+      else { window._htmlFrozen=false; if(typeof p==='function') p(); }
+    }catch(e){ console.warn('[structRebuild]', e); }
+    if(!window._htmlFrozen){ _structNoticeHide(); window._tplSigBase=null; }
+  };
+  w.querySelector('#_snKeep').onclick=function(){ _structSetBase(); _structNoticeHide(); };
+  try{ w.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(_e){}
+}
