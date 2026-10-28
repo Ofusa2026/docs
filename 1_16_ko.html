@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261028.03</div>
+    <div class="ver">ver.20261028.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -432,24 +432,36 @@ const AGENCY_MASTER = {
   '株式会社マックス':{addr:'東京都大田区蒲田５丁目２８番４号　ＥＣＳ第２７ビル２０２', tel:'03-5711-0805', license:'13-ユ-302361', type:'有料'},
 };
 // ver.20261028.03: 「DB保存」で、取次機関（国外）の欄を案件の送り出し機関（cases.senddashi_org / senddashi_payment）にも書き戻す（案シスの案件画面「送り出し機関情報」に出る）
-//   ・「取次ぎの有無」が「有」のときだけ。欄がぜんぶ空のときは書き換えない（読み込めなかっただけで案件の値を消さないため）
+//   ver.20261028.04: この画面で取次機関の欄（取次ぎの有無・氏名・所在国・所在地・電話・費用・名目）を手で直したときだけ書き戻す（_ttDirty）。
+//     フォームの保存値は会社ごとに共用なので、直していないのに前の人の内容を案件へ書き込まないため。
+//     「取次ぎの有無」を「無」にしたときは「送り出し機関省略」として書く
+//   ・「取次ぎの有無」が「有」で欄がぜんぶ空のときは書き換えない（読み込めなかっただけで案件の値を消さないため）
 //   ・支払いは「費用(求職者)額」「費用(求人者)額」のどちらか一方だけ入っているときに書く（求職者＝申請人／求人者＝所属機関。両方・どちらも空なら書き換えない）
+window._ttDirty=false;
+(function(){
+  var on=function(e){ var t=e && e.target; if(t && t.id && (t.id==='es_toritsugi' || t.id.indexOf('f_tt_')===0)) window._ttDirty=true; };
+  document.addEventListener('input', on, true); document.addEventListener('change', on, true);
+})();
 async function _ttSyncToCase(){
   try{
     var info=null, sel=document.getElementById('caseSelect');
     if(sel && sel.value){ try{ info=JSON.parse(sel.value); }catch(e){} }
     if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId) info=window._lastCaseInfo;
     if(!info || !info.caseId) return;
+    if(!window._ttDirty) return;
     var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
-    if(g('es_toritsugi')!=='有') return;
     var patch={};
+    if(g('es_toritsugi')!=='有'){ patch={ senddashi_org:{ not_used:true }, senddashi_payment:{ not_used:true } }; }
+    else {
     var org={ name:g('f_tt_name'), country:g('f_tt_country'), address:g('f_tt_addr'), tel:g('f_tt_tel') };
     if(org.name || org.country || org.address || org.tel) patch.senddashi_org=org;
     var fs=g('f_tt_fee_seeker').replace(/[,，円\s]/g,''), fe=g('f_tt_fee_employer').replace(/[,，円\s]/g,'');
     if(fs && !fe) patch.senddashi_payment={ payer:'申請人', amount:fs };
     else if(fe && !fs) patch.senddashi_payment={ payer:'所属機関', amount:fe };
+    }
     if(!Object.keys(patch).length) return;
     await sb('cases?id=eq.'+encodeURIComponent(info.caseId), { method:'PATCH', headers:{ 'Prefer':'return=minimal' }, body:JSON.stringify(patch) });
+    window._ttDirty=false;
     if(typeof showToast==='function') showToast('🔁 送り出し機関（取次機関欄）を案件にも反映しました');
   }catch(e){
     console.warn('[doc 1_16] senddashi sync failed:', e);
@@ -515,32 +527,39 @@ async function loadFromDB(passedInfo){
     // ver.20261028.02: 送り出し機関（取次機関欄）に自動反映＋名目「紹介料・送出し費用」を自動セット
     // ver.20261028.03: 案件（cases.senddashi_*）の値を先に見る。案件がどちらも空（null）のときだけ受信トレイ（intake_requests）の値。
     //   案シスで「送り出し機関省略」にした案件は {not_used:true} が入っているので、受信トレイの値は出さない
+    // ver.20261028.04: 送り出し機関の情報（入力 or 省略）がある案件は、取次機関の欄をその案件の内容で入れ直す（空の欄も空にする）。
+    //   この画面のフォーム保存値は会社ごと（同じ会社のほかの人と共用）なので、そのままだと前の人の送り出し機関が残るため。
+    //   情報が何も無い案件（更新・変更や古い案件）は、今までどおり触らない
     try{
+      var _pj=function(x){ if(x && typeof x==='string'){ try{ x=JSON.parse(x);}catch(_){ x=null; } } return (x && typeof x==='object') ? x : null; };
       var _useCase = !!(cas && (cas.senddashi_org || cas.senddashi_payment));
-      var _so = _useCase ? cas.senddashi_org : (ir && ir.senddashi_org);
-      if(_so && typeof _so==='string'){ try{ _so=JSON.parse(_so);}catch(_){ _so=null; } }
-      if(_so && !_so.not_used){
-        s('f_tt_name', _so.name||'');
-        s('f_tt_country', _so.country||'');
-        s('f_tt_addr', _so.address||'');
-        s('f_tt_tel', _so.tel||'');
+      var _so = _pj(_useCase ? cas.senddashi_org : (ir && ir.senddashi_org));
+      var _sp = _pj(_useCase ? cas.senddashi_payment : (ir && ir.senddashi_payment));
+      var S=function(id, val){ var e=document.getElementById(id); if(e) e.value=(val==null?'':String(val)); };
+      if(_so || _sp){
+        var _omit = !!(_so && _so.not_used);
         var _tsel=document.getElementById('es_toritsugi');
-        if(_tsel) _tsel.value='有';
-      }
-      var _sp = _useCase ? cas.senddashi_payment : (ir && ir.senddashi_payment);
-      if(_sp && typeof _sp==='string'){ try{ _sp=JSON.parse(_sp);}catch(_){ _sp=null; } }
-      if(_sp && !_sp.not_used){
-        var _amt = _sp.amount||'';
-        var _payer = _sp.payer||'';
-        if(_payer==='申請人'){
-          s('f_tt_fee_seeker', String(_amt||''));
-          s('f_tt_nom_seeker', '紹介料・送出し費用');
-        } else if(_payer==='所属機関'){
-          s('f_tt_fee_employer', String(_amt||''));
-          s('f_tt_nom_employer', '紹介料・送出し費用');
+        if(_omit){
+          S('f_tt_name',''); S('f_tt_country',''); S('f_tt_addr',''); S('f_tt_tel','');
+          if(_tsel) _tsel.value='無';
+        } else if(_so){
+          S('f_tt_name', _so.name); S('f_tt_country', _so.country); S('f_tt_addr', _so.address); S('f_tt_tel', _so.tel);
+          if(_tsel) _tsel.value='有';
         }
-        // 「支払なし」のときは何もしない（名目も空のまま）
+        var _payer = (_sp && !_sp.not_used) ? (_sp.payer||'') : (_omit ? '支払なし' : '');
+        var _amt = (_sp && !_sp.not_used) ? String(_sp.amount||'') : '';
+        if(_payer==='申請人'){
+          S('f_tt_fee_seeker', _amt); S('f_tt_nom_seeker', '紹介料・送出し費用');
+          S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
+        } else if(_payer==='所属機関'){
+          S('f_tt_fee_employer', _amt); S('f_tt_nom_employer', '紹介料・送出し費用');
+          S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', '');
+        } else if(_payer==='支払なし'){
+          // 支払なし（または省略）のときは、費用の欄も名目も空にする
+          S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', ''); S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
+        }
       }
+      window._ttDirty=false;   // ここまでは読み込み。これ以降に取次機関の欄を手で直したときだけ、DB保存で案件へ書き戻す
     }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
