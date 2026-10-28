@@ -39,12 +39,12 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261028.02</div>
+    <div class="ver">ver.20261028.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
     <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
-    <button class="btn" onclick="saveFormGeneric('1_16')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveFormGeneric('1_16').then(function(){ _ttSyncToCase(); })" style="background:#16a34a;color:white;">🛢 DB保存</button>
     <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
@@ -431,6 +431,31 @@ function _apply1_16_koFontSize(){
 const AGENCY_MASTER = {
   '株式会社マックス':{addr:'東京都大田区蒲田５丁目２８番４号　ＥＣＳ第２７ビル２０２', tel:'03-5711-0805', license:'13-ユ-302361', type:'有料'},
 };
+// ver.20261028.03: 「DB保存」で、取次機関（国外）の欄を案件の送り出し機関（cases.senddashi_org / senddashi_payment）にも書き戻す（案シスの案件画面「送り出し機関情報」に出る）
+//   ・「取次ぎの有無」が「有」のときだけ。欄がぜんぶ空のときは書き換えない（読み込めなかっただけで案件の値を消さないため）
+//   ・支払いは「費用(求職者)額」「費用(求人者)額」のどちらか一方だけ入っているときに書く（求職者＝申請人／求人者＝所属機関。両方・どちらも空なら書き換えない）
+async function _ttSyncToCase(){
+  try{
+    var info=null, sel=document.getElementById('caseSelect');
+    if(sel && sel.value){ try{ info=JSON.parse(sel.value); }catch(e){} }
+    if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId) info=window._lastCaseInfo;
+    if(!info || !info.caseId) return;
+    var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+    if(g('es_toritsugi')!=='有') return;
+    var patch={};
+    var org={ name:g('f_tt_name'), country:g('f_tt_country'), address:g('f_tt_addr'), tel:g('f_tt_tel') };
+    if(org.name || org.country || org.address || org.tel) patch.senddashi_org=org;
+    var fs=g('f_tt_fee_seeker').replace(/[,，円\s]/g,''), fe=g('f_tt_fee_employer').replace(/[,，円\s]/g,'');
+    if(fs && !fe) patch.senddashi_payment={ payer:'申請人', amount:fs };
+    else if(fe && !fs) patch.senddashi_payment={ payer:'所属機関', amount:fe };
+    if(!Object.keys(patch).length) return;
+    await sb('cases?id=eq.'+encodeURIComponent(info.caseId), { method:'PATCH', headers:{ 'Prefer':'return=minimal' }, body:JSON.stringify(patch) });
+    if(typeof showToast==='function') showToast('🔁 送り出し機関（取次機関欄）を案件にも反映しました');
+  }catch(e){
+    console.warn('[doc 1_16] senddashi sync failed:', e);
+    if(typeof showToast==='function') showToast('⚠️ 案件への送り出し機関の反映に失敗しました：'+e.message);
+  }
+}
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -443,7 +468,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,cos,intakes]=await Promise.all([
-      caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('cases?select=applicant,doc_create_date,senddashi_org,senddashi_payment&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee,senddashi_org,senddashi_payment&case_id=eq.'+caseId):Promise.resolve([])
@@ -486,34 +511,37 @@ async function loadFromDB(passedInfo){
       //   金額として解釈できる値だけを採用する。「25,000円」「20万円」等の表記ゆれも拾う。
       const _as=document.getElementById('es_assen');
       if(_as && _isRealFee(ir.intro_fee)) _as.value='有';
-      // ver.20261028.02: 送り出し機関（取次機関欄）に自動反映＋名目「紹介料・送出し費用」を自動セット
-      try{
-        var _so = ir.senddashi_org;
-        if(_so && typeof _so==='string'){ try{ _so=JSON.parse(_so);}catch(_){ _so=null; } }
-        if(_so && !_so.not_used){
-          s('f_tt_name', _so.name||'');
-          s('f_tt_country', _so.country||'');
-          s('f_tt_addr', _so.address||'');
-          s('f_tt_tel', _so.tel||'');
-          var _tsel=document.getElementById('es_toritsugi');
-          if(_tsel) _tsel.value='有';
-        }
-        var _sp = ir.senddashi_payment;
-        if(_sp && typeof _sp==='string'){ try{ _sp=JSON.parse(_sp);}catch(_){ _sp=null; } }
-        if(_sp && !_sp.not_used){
-          var _amt = _sp.amount||'';
-          var _payer = _sp.payer||'';
-          if(_payer==='申請人'){
-            s('f_tt_fee_seeker', String(_amt||''));
-            s('f_tt_nom_seeker', '紹介料・送出し費用');
-          } else if(_payer==='所属機関'){
-            s('f_tt_fee_employer', String(_amt||''));
-            s('f_tt_nom_employer', '紹介料・送出し費用');
-          }
-          // 「支払なし」のときは何もしない（名目も空のまま）
-        }
-      }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
     }
+    // ver.20261028.02: 送り出し機関（取次機関欄）に自動反映＋名目「紹介料・送出し費用」を自動セット
+    // ver.20261028.03: 案件（cases.senddashi_*）の値を先に見る。案件がどちらも空（null）のときだけ受信トレイ（intake_requests）の値。
+    //   案シスで「送り出し機関省略」にした案件は {not_used:true} が入っているので、受信トレイの値は出さない
+    try{
+      var _useCase = !!(cas && (cas.senddashi_org || cas.senddashi_payment));
+      var _so = _useCase ? cas.senddashi_org : (ir && ir.senddashi_org);
+      if(_so && typeof _so==='string'){ try{ _so=JSON.parse(_so);}catch(_){ _so=null; } }
+      if(_so && !_so.not_used){
+        s('f_tt_name', _so.name||'');
+        s('f_tt_country', _so.country||'');
+        s('f_tt_addr', _so.address||'');
+        s('f_tt_tel', _so.tel||'');
+        var _tsel=document.getElementById('es_toritsugi');
+        if(_tsel) _tsel.value='有';
+      }
+      var _sp = _useCase ? cas.senddashi_payment : (ir && ir.senddashi_payment);
+      if(_sp && typeof _sp==='string'){ try{ _sp=JSON.parse(_sp);}catch(_){ _sp=null; } }
+      if(_sp && !_sp.not_used){
+        var _amt = _sp.amount||'';
+        var _payer = _sp.payer||'';
+        if(_payer==='申請人'){
+          s('f_tt_fee_seeker', String(_amt||''));
+          s('f_tt_nom_seeker', '紹介料・送出し費用');
+        } else if(_payer==='所属機関'){
+          s('f_tt_fee_employer', String(_amt||''));
+          s('f_tt_nom_employer', '紹介料・送出し費用');
+        }
+        // 「支払なし」のときは何もしない（名目も空のまま）
+      }
+    }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
