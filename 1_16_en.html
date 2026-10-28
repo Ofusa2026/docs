@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１６号（英語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20260827.04</div>
+    <div class="ver">ver.20261028.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -446,7 +446,7 @@ async function loadFromDB(passedInfo){
       caseId?sb('cases?select=applicant,doc_create_date&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
-      caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee&case_id=eq.'+caseId):Promise.resolve([])
+      caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee,senddashi_org,senddashi_payment&case_id=eq.'+caseId):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
@@ -486,6 +486,31 @@ async function loadFromDB(passedInfo){
       //   金額として解釈できる値だけを採用する。「25,000円」「20万円」等の表記ゆれも拾う。
       const _as=document.getElementById('es_assen');
       if(_as && _isRealFee(ir.intro_fee)) _as.value='有';
+      // ver.20261028.01: 送り出し機関（取次機関欄）に自動反映
+      try{
+        var _so = ir.senddashi_org;
+        if(_so && typeof _so==='string'){ try{ _so=JSON.parse(_so);}catch(_){ _so=null; } }
+        if(_so && !_so.not_used){
+          s('f_tt_name', _so.name||'');
+          s('f_tt_country', _so.country||'');
+          s('f_tt_addr', _so.address||'');
+          s('f_tt_tel', _so.tel||'');
+          var _tsel=document.getElementById('es_toritsugi');
+          if(_tsel) _tsel.value='有';
+        }
+        var _sp = ir.senddashi_payment;
+        if(_sp && typeof _sp==='string'){ try{ _sp=JSON.parse(_sp);}catch(_){ _sp=null; } }
+        if(_sp && !_sp.not_used){
+          var _amt = _sp.amount||'';
+          var _payer = _sp.payer||'';
+          if(_payer==='申請人'){
+            s('f_tt_fee_seeker', String(_amt||''));
+          } else if(_payer==='所属機関'){
+            s('f_tt_fee_employer', String(_amt||''));
+          }
+          // 「支払なし」のときは何もしない
+        }
+      }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
     }
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
