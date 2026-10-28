@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考格式第１－１６号（中国語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261028.01</div>
+    <div class="ver">ver.20261028.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -486,7 +486,7 @@ async function loadFromDB(passedInfo){
       //   金額として解釈できる値だけを採用する。「25,000円」「20万円」等の表記ゆれも拾う。
       const _as=document.getElementById('es_assen');
       if(_as && _isRealFee(ir.intro_fee)) _as.value='有';
-      // ver.20261028.01: 送り出し機関（取次機関欄）に自動反映
+      // ver.20261028.02: 送り出し機関（取次機関欄）に自動反映＋名目「紹介料・送出し費用」を自動セット
       try{
         var _so = ir.senddashi_org;
         if(_so && typeof _so==='string'){ try{ _so=JSON.parse(_so);}catch(_){ _so=null; } }
@@ -505,10 +505,12 @@ async function loadFromDB(passedInfo){
           var _payer = _sp.payer||'';
           if(_payer==='申請人'){
             s('f_tt_fee_seeker', String(_amt||''));
+            s('f_tt_nom_seeker', '紹介料・送出し費用');
           } else if(_payer==='所属機関'){
             s('f_tt_fee_employer', String(_amt||''));
+            s('f_tt_nom_employer', '紹介料・送出し費用');
           }
-          // 「支払なし」のときは何もしない
+          // 「支払なし」のときは何もしない（名目も空のまま）
         }
       }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
     }
