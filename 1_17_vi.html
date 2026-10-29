@@ -502,7 +502,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261029.02</div>
+    <div class="ver">ver.20261029.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -581,6 +581,28 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>支援責任者 氏名<span class="fid">es.soMgr</span></label><input id="es_soMgr" oninput="p()"></div>
 <div class="fg"><label>支援責任者 役職<span class="fid">es.soMgrTitle</span></label><input id="es_soMgrTitle" oninput="p()"></div>
 <div class="fg3"><div class="fg"><label>支援外国人数<span class="fid">es.soSupporterCount</span></label><input id="es_soSupporterCount" oninput="p()"></div><div class="fg"><label>支援担当者数<span class="fid">es.soSupportStaffCount</span></label><input id="es_soSupportStaffCount" oninput="p()"></div></div>
+</div>
+<!-- ver.20261029.03: 登録支援機関のヒアリング回答（support_orgs.extra／言語別設定）から入る欄。手でも直せる。 -->
+<div class="fs"><div class="fs-title">登録支援機関ヒアリング</div>
+<div id="p17HearingNote" style="font-size:11px;color:#666;margin:0 0 6px;"></div>
+<div style="font-size:11px;color:#555;margin:2px 0;">対応時間（数字のみ・対応なしは「-」）</div>
+<div class="fg3"><div class="fg"><label>月 開始<span class="fid">es.hMonF</span></label><input id="es_hMonF" oninput="p()"></div><div class="fg"><label>月 終了<span class="fid">es.hMonT</span></label><input id="es_hMonT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>火 開始<span class="fid">es.hTueF</span></label><input id="es_hTueF" oninput="p()"></div><div class="fg"><label>火 終了<span class="fid">es.hTueT</span></label><input id="es_hTueT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>水 開始<span class="fid">es.hWedF</span></label><input id="es_hWedF" oninput="p()"></div><div class="fg"><label>水 終了<span class="fid">es.hWedT</span></label><input id="es_hWedT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>木 開始<span class="fid">es.hThuF</span></label><input id="es_hThuF" oninput="p()"></div><div class="fg"><label>木 終了<span class="fid">es.hThuT</span></label><input id="es_hThuT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>金 開始<span class="fid">es.hFriF</span></label><input id="es_hFriF" oninput="p()"></div><div class="fg"><label>金 終了<span class="fid">es.hFriT</span></label><input id="es_hFriT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>土 開始<span class="fid">es.hSatF</span></label><input id="es_hSatF" oninput="p()"></div><div class="fg"><label>土 終了<span class="fid">es.hSatT</span></label><input id="es_hSatT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>日 開始<span class="fid">es.hSunF</span></label><input id="es_hSunF" oninput="p()"></div><div class="fg"><label>日 終了<span class="fid">es.hSunT</span></label><input id="es_hSunT" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>祝日 開始<span class="fid">es.hHolF</span></label><input id="es_hHolF" oninput="p()"></div><div class="fg"><label>祝日 終了<span class="fid">es.hHolT</span></label><input id="es_hHolT" oninput="p()"></div></div>
+<div class="fg"><label>相談 電話<span class="fid">es.cmTel</span></label><input id="es_cmTel" oninput="p()"></div>
+<div class="fg"><label>相談 メール<span class="fid">es.cmMail</span></label><input id="es_cmMail" oninput="p()"></div>
+<div class="fg"><label>相談 その他<span class="fid">es.cmOther</span></label><input id="es_cmOther" oninput="p()"></div>
+<div class="fg"><label>緊急時 電話<span class="fid">es.emTel</span></label><input id="es_emTel" oninput="p()"></div>
+<div class="fg"><label>緊急時 メール<span class="fid">es.emMail</span></label><input id="es_emMail" oninput="p()"></div>
+<div class="fg"><label>緊急時 その他<span class="fid">es.emOther</span></label><input id="es_emOther" oninput="p()"></div>
+<div class="fg"><label>定期面談 実施予定（9-ア-ａ）<span class="fid">es.meetSchedule</span></label><input id="es_meetSchedule" oninput="p()"></div>
+<div class="fg"><label>生活オリエンテーション 時間<span class="fid">es.orientHours</span></label><input id="es_orientHours" oninput="p()"></div>
+<div class="fg3"><div class="fg"><label>共生施策 確認日 年<span class="fid">es.symY</span></label><input id="es_symY" oninput="p()"></div><div class="fg"><label>月<span class="fid">es.symM</span></label><input id="es_symM" oninput="p()"></div><div class="fg"><label>日<span class="fid">es.symD</span></label><input id="es_symD" oninput="p()"></div></div>
 </div>
 <div class="fs"><div class="fs-title">住居・共生施策</div>
 <div class="fg"><label>同居人数<span class="fid">es.cohabitants</span></label><input id="es_cohabitants" oninput="p()"></div>
@@ -1110,7 +1132,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr style="height:2.61em">
 <td class="b-tttt" colspan="2"><p class="ja">ウ　実施予定時間</p><p class="vi">C. Thời gian dự kiến thực hiện</p></td>
-<td class="b-tttk" colspan="6"><p class="ja">合計<input type="text" class="bl" id="f204" name="f204" data-label="Ⅳ 支援内容（続き） ＞ ウ 実施予定時間｜合計＿時間" style="width:6.00em">時間</p><p class="vi">Tổng cộng       tiếng</p></td>
+<td class="b-tttk" colspan="6"><p class="ja">合計${f('es_orientHours')}時間</p><p class="vi">Tổng cộng       tiếng</p></td>
 </tr>
 </tbody></table></div>
 
@@ -1220,38 +1242,38 @@ Ngày trong tuần</p></td>
 <td class="b-tttk"><p class="ja a-center">金 Thứ Sáu</p></td>
 </tr>
 <tr style="height:2.18em">
-<td class="b-tttt" colspan="2"><p class="ja a-center">時　～　時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt" colspan="3"><p class="ja a-center">時　～　時
+<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hMonF')}時　～　${f('es_hMonT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttt" colspan="3"><p class="ja a-center">${f('es_hTueF')}時　～　${f('es_hTueT')}時
 giờ -   giờ</p></td>
-<td class="b-tttt" colspan="2"><p class="ja a-center">時　～　時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt"><p class="ja a-center">時　～　時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttk"><p class="ja a-center">時　～　時
+<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hWedF')}時　～　${f('es_hWedT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttt"><p class="ja a-center">${f('es_hThuF')}時　～　${f('es_hThuT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttk"><p class="ja a-center">${f('es_hFriF')}時　～　${f('es_hFriT')}時
 giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.53em">
 <td class="b-tttt"><p class="ja a-center">土曜</p><p class="vi a-center">Thứ Bảy</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">時<input type="text" class="bl" id="f247" name="f247" data-label="Ⅳ 支援内容（続き） ＞ 土曜｜時＿～ 時 g" style="width:2.00em">～<input type="text" class="bl" id="f248" name="f248" data-label="Ⅳ 支援内容（続き） ＞ 土曜｜時 ～＿時 giờ" style="width:2.00em">時
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSatF')}時～${f('es_hSatT')}時
 giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.18em">
 <td class="b-tttt"><p class="ja a-center">日曜</p><p class="vi a-center">Chủ Nhật</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">時<input type="text" class="bl" id="f249" name="f249" data-label="Ⅳ 支援内容（続き） ＞ 日曜｜時＿～ 時 g" style="width:2.00em">～<input type="text" class="bl" id="f250" name="f250" data-label="Ⅳ 支援内容（続き） ＞ 日曜｜時 ～＿時 giờ" style="width:2.00em">時
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSunF')}時～${f('es_hSunT')}時
 giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.07em">
 <td class="b-tttt"><p class="ja a-center">祝日
 Ngày lễ</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">時<input type="text" class="bl" id="f251" name="f251" data-label="Ⅳ 支援内容（続き） ＞ 祝日Ngày lễ｜時＿～ 時 g" style="width:2.00em">～<input type="text" class="bl" id="f252" name="f252" data-label="Ⅳ 支援内容（続き） ＞ 祝日Ngày lễ｜時 ～＿時 giờ" style="width:2.00em">時
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hHolF')}時～${f('es_hHolT')}時
 giờ -   giờ</p></td>
 </tr>
 <tr class="nosplit" style="height:7.76em">
 <td class="b-tttt vert"><p class="ja a-center" style="padding-left:0.63em">相談方法</p><p class="vi a-center" style="padding-left:0.63em">Phương pháp thảo luận</p></td>
 <td class="b-tttk" colspan="10"><p class="ja">以下の方法により実施（該当するものを全てチェックすること。）
-Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f253" name="f253" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f254" name="f254" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　電　　話（<input type="text" class="bl" id="f255" name="f255" data-label="Ⅳ 支援内容（続き） ＞ 相談方法｜電 話（＿－ －" style="width:4.00em">－<input type="text" class="bl" id="f256" name="f256" data-label="Ⅳ 支援内容（続き） ＞ 相談方法｜（ －＿－" style="width:4.00em">－<input type="text" class="bl" id="f257" name="f257" data-label="Ⅳ 支援内容（続き） ＞ 相談方法｜－ －＿）" style="width:5.00em">）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f258" name="f258" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　メ ー ル（<input type="text" class="bl" id="f259" name="f259" data-label="Ⅳ 支援内容（続き） ＞ 相談方法｜メ ー ル（＿）" style="width:20.00em">）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f260" name="f260" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　そ の 他（<input type="text" class="bl" id="f261" name="f261" data-label="Ⅳ 支援内容（続き） ＞ 相談方法｜そ の 他（＿）" style="width:20.00em">）</p><p class="vi">   Khác (                                             )</p></td>
+Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f253" name="f253" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f254" name="f254" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　電　　話（${f('es_cmTel')}）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f258" name="f258" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　メ ー ル（${f('es_cmMail')}）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f260" name="f260" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　そ の 他（${f('es_cmOther')}）</p><p class="vi">   Khác (                                             )</p></td>
 </tr>
 <tr class="nosplit" style="height:7.81em">
 <td class="b-tttt vert"><p class="ja a-center" style="padding-left:0.63em">緊急時対応</p><p class="vi a-center" style="padding-left:0.63em">Giải quyết lúc khẩn cấp</p></td>
-<td class="b-tttk" colspan="10"><p class="ja">緊急時は，以下の方法により実施（該当するものを全てチェックすること。）</p><p class="vi">Khi khẩn cấp, thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f262" name="f262" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f263" name="f263" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　電　　話（<input type="text" class="bl" id="f264" name="f264" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応｜電 話（＿－ －" style="width:4.00em">－<input type="text" class="bl" id="f265" name="f265" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応｜（ －＿－" style="width:4.00em">－<input type="text" class="bl" id="f266" name="f266" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応｜－ －＿）" style="width:5.00em">）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f267" name="f267" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　メ ー ル（<input type="text" class="bl" id="f268" name="f268" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応｜メ ー ル（＿）" style="width:20.00em">）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f269" name="f269" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　そ の 他（<input type="text" class="bl" id="f270" name="f270" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応｜そ の 他（＿）" style="width:20.00em">）</p><p class="vi">   Khác (                                             )</p></td>
+<td class="b-tttk" colspan="10"><p class="ja">緊急時は，以下の方法により実施（該当するものを全てチェックすること。）</p><p class="vi">Khi khẩn cấp, thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f262" name="f262" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f263" name="f263" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　電　　話（${f('es_emTel')}）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f267" name="f267" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　メ ー ル（${f('es_emMail')}）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f269" name="f269" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　そ の 他（${f('es_emOther')}）</p><p class="vi">   Khác (                                             )</p></td>
 </tr>
 <tr style="height:3.42em">
 <td class="b-tttt" colspan="4"><p class="ja">ウ　実施言語</p><p class="vi">B.  Ngôn ngữ thực hiện</p></td>
@@ -1419,7 +1441,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr style="height:6.97em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当該外国人及びその監督をする立場にある者それぞれと定期的な面談（3か月に1回以上）を実施する</p><p class="vi">Để kiểm tra tình trạng lao động và tình trạng sinh hoạt của người nước ngoài có kỹ năng đặc định số 1, định kỳ phỏng vấn người nước ngoài đó và người đang ở vị trí quan sát (ít nhất 3 tháng một lần)</p></td>
-<td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f353" name="f353" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">有（<input type="text" class="bl" id="f354" name="f354" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f355" name="f355" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">無（<input type="text" class="bl" id="f356" name="f356" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
+<td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f353" name="f353" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">有（${f('es_meetSchedule')}）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f355" name="f355" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">無（<input type="text" class="bl" id="f356" name="f356" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-ttnt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
 <td class="b-tttt fld"><p class="ja a-center">別紙参照</p><p class="vi a-center">Xem tài liệu đính kèm.</p></td>
 <td class="b-tttt"><p class="ja">〒<input type="text" class="bl" id="f359" name="f359" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜〒＿－" style="width:3.00em">－</p></td>
@@ -1469,7 +1491,7 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 <div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8d"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr class="pgrow nosplit" style="height:6.30em">
 <td class="b-tktt vert" colspan="2"><p class="ja a-center" style="padding-left:0.63em">Ⅴ共生施策関係</p><p class="vi a-center" style="padding-left:0.63em">V. Quan hệ chính sách cộng sinh</p></td>
-<td class="b-tttk" colspan="7"><p class="ja" style="padding-left:2.52em">本計画の作成に当たり、地方公共団体が実施する共生社会の実現のための施策（共生施策）を確認しています。</p><p class="ja" style="padding-left:2.52em">共生施策を確認した地方公共団体（市区町村）名</p><p class="ja" style="padding-left:3.78em">・支援対象者が活動する事業所の所在地 （${f('es_officePref')}都・道・府・県${f('es_officeCity')}市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f381" name="f381" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:4.00em">年<input type="text" class="bl" id="f382" name="f382" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜： 年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f383" name="f383" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f384" name="f384" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f385" name="f385" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f386" name="f386" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="ja" style="padding-left:3.78em">・支援対象者の住居地</p><p class="ja" style="padding-left:6.30em">同上</p><p class="ja" style="padding-left:6.30em">異なる地方公共団体（<input type="text" class="bl" id="f387" name="f387" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜方公共団体（＿都・道・府・" style="width:5.00em">都・道・府・県<input type="text" class="bl" id="f388" name="f388" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜・道・府・県＿市・区・町・" style="width:5.00em">市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f389" name="f389" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:3.50em">年<input type="text" class="bl" id="f390" name="f390" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f391" name="f391" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f392" name="f392" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f393" name="f393" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f394" name="f394" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="vi" style="padding-left:2.52em">Khi lập kế hoạch này, đã kiểm tra chính sách nhằm thực hiện xã hội cộng sinh do đoàn thể công cộng địa phương triển khai (chính sách cộng sinh).</p><p class="vi" style="padding-left:2.52em">Tên đoàn thể công cộng địa phương (thành phố/quận/thị trấn/làng) đã kiểm tra chính sách công cộng</p><p class="ja" style="padding-left:3.78em">・Địa chỉ công ty nơi đối tượng được hỗ trợ hoạt động (Tỉnh${f('es_officePrefEn')}/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng${f('es_officeCityEn')})</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f397" name="f397" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f398" name="f398" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f399" name="f399" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f400" name="f400" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p><p class="ja" style="padding-left:3.78em">・Nơi cư trú của đối tượng được hỗ trợ</p><p class="vi" style="padding-left:6.30em">Như trên</p><p class="ja" style="padding-left:6.30em">Đoàn thể công cộng địa phương khác (Tỉnh<input type="text" class="bl" id="f401" name="f401" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜(Tỉnh＿/Tokyo" style="width:1.25em">/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng<input type="text" class="bl" id="f402" name="f402" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜n/làng＿)" style="width:10.25em">)</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f403" name="f403" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f404" name="f404" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f405" name="f405" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f406" name="f406" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p></td>
+<td class="b-tttk" colspan="7"><p class="ja" style="padding-left:2.52em">本計画の作成に当たり、地方公共団体が実施する共生社会の実現のための施策（共生施策）を確認しています。</p><p class="ja" style="padding-left:2.52em">共生施策を確認した地方公共団体（市区町村）名</p><p class="ja" style="padding-left:3.78em">・支援対象者が活動する事業所の所在地 （${f('es_officePref')}都・道・府・県${f('es_officeCity')}市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：${f('es_symY')}年${f('es_symM')}月${f('es_symD')}日　　確認方法：　<input type="checkbox" class="cb" id="f384" name="f384" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f385" name="f385" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f386" name="f386" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="ja" style="padding-left:3.78em">・支援対象者の住居地</p><p class="ja" style="padding-left:6.30em">同上</p><p class="ja" style="padding-left:6.30em">異なる地方公共団体（<input type="text" class="bl" id="f387" name="f387" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜方公共団体（＿都・道・府・" style="width:5.00em">都・道・府・県<input type="text" class="bl" id="f388" name="f388" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜・道・府・県＿市・区・町・" style="width:5.00em">市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f389" name="f389" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:3.50em">年<input type="text" class="bl" id="f390" name="f390" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f391" name="f391" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f392" name="f392" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f393" name="f393" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f394" name="f394" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="vi" style="padding-left:2.52em">Khi lập kế hoạch này, đã kiểm tra chính sách nhằm thực hiện xã hội cộng sinh do đoàn thể công cộng địa phương triển khai (chính sách cộng sinh).</p><p class="vi" style="padding-left:2.52em">Tên đoàn thể công cộng địa phương (thành phố/quận/thị trấn/làng) đã kiểm tra chính sách công cộng</p><p class="ja" style="padding-left:3.78em">・Địa chỉ công ty nơi đối tượng được hỗ trợ hoạt động (Tỉnh${f('es_officePrefEn')}/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng${f('es_officeCityEn')})</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f397" name="f397" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f398" name="f398" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f399" name="f399" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f400" name="f400" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p><p class="ja" style="padding-left:3.78em">・Nơi cư trú của đối tượng được hỗ trợ</p><p class="vi" style="padding-left:6.30em">Như trên</p><p class="ja" style="padding-left:6.30em">Đoàn thể công cộng địa phương khác (Tỉnh<input type="text" class="bl" id="f401" name="f401" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜(Tỉnh＿/Tokyo" style="width:1.25em">/Tokyo/Osaka/Hokkaido, Thành phố/quận/thị trấn/làng<input type="text" class="bl" id="f402" name="f402" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜n/làng＿)" style="width:10.25em">)</p><p class="ja" style="padding-left:6.30em">Ngày kiểm tra: Ngày   tháng   năm<input type="text" class="bl" id="f403" name="f403" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜năm＿Cách k" style="width:2.75em">Cách kiểm tra:　<input type="checkbox" class="cb" id="f404" name="f404" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Trang Web　 <input type="checkbox" class="cb" id="f405" name="f405" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> Cách khác (<input type="text" class="bl" id="f406" name="f406" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜khác (＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">Ghi chú:</p></td>
 </tr>
 </tbody></table>
 </div>
@@ -1662,6 +1684,8 @@ async function loadFromDB(passedInfo){
            電話は3分割をやめ案シスの値をそのまま1本で入れる。 */
         _s('es_soOfficeAddressEn', _off.officeAddressEn||so.address_en);
         _s('es_soOfficeTel', _off.officeTel||so.tel);
+        // ver.20261029.03: 登録支援機関のヒアリング回答（対応時間・相談方法・定期面談など）
+        try{ await _p17Hearing(so, _s); }catch(e){ console.warn('[1-17 ヒアリング]', e); }
       }}catch(e){ console.warn('[1-17] 登録支援機関の取得に失敗:', e); }
     }
     // ver.20261020.03: 自社支援（案件の登録支援機関が空欄）は、支援責任者を所属機関の「🤝 自社支援」から入れる
@@ -1672,6 +1696,76 @@ async function loadFromDB(passedInfo){
   }catch(e){ console.error(e); alert('読込エラー: '+e.message); }
 }
 
+// ===== ver.20261029.03: 登録支援機関ヒアリングの流し込み =====
+/* 読み方は Word版 1_17.html の so.ex_〜 と同じ（support_orgs.extra）。
+   ・対応時間は登録支援機関により extra.supportHours と extra.hours の2通りで保存されているので両方読む。
+   ・ベトナム語の言語別設定（support_org_by_language, language_code='vi'）に値があればそちらを優先する。
+   ・チェック欄は _p17Check に入れる（本文は描画のたびに作り直すため）。 */
+async function _p17Hearing(so, _s){
+  var ex = (so && so.extra) || {};
+  var lo = null;
+  try{
+    var r = await sb('rpc/get_org_langs', {method:'POST', body: JSON.stringify({p_org_id: so.id})});
+    var langs = (r && r.langs) || [];
+    lo = langs.filter(function(x){ return x && x.language_code==='vi'; })[0] || null;
+  }catch(_e){ lo = null; }
+  lo = lo || {};
+  var C = window._p17Check = window._p17Check || {};
+  var used = [];
+  // 対応時間
+  var H = ex.supportHours || ex.hours || {};
+  var hh = function(t){ if(!t) return ''; var m=String(t).match(/^(\d{1,2})(?::(\d{2}))?/); if(!m) return String(t); var h=String(parseInt(m[1],10)); return (m[2] && m[2]!=='00') ? h+':'+m[2] : h; };
+  var dmap = {Mon:'mon',Tue:'tue',Wed:'wed',Thu:'thu',Fri:'fri',Sat:'sat',Sun:'sun',Hol:'hol'};
+  var anyH = false;
+  Object.keys(dmap).forEach(function(d){
+    var h = H[dmap[d]] || {};
+    if(h.none){ _s('es_h'+d+'F','-'); _s('es_h'+d+'T','-'); anyH=true; return; }
+    if(h.from||h.to){ _s('es_h'+d+'F', hh(h.from)); _s('es_h'+d+'T', hh(h.to)); anyH=true; }
+  });
+  if(anyH) used.push('対応時間');
+  // 相談方法・緊急時対応
+  var setGroup = function(o, ids){
+    if(!o || typeof o!=='object' || !Object.keys(o).length) return false;
+    C[ids[0]] = !!o.f2f; C[ids[1]] = !!o.tel; C[ids[2]] = !!o.mail;
+    C[ids[3]] = !!(o.other && String(o.other).trim());
+    return true;
+  };
+  var CM = Object.assign({}, ex.consultMethods||{});
+  if(lo.consult_phone){ CM.telNo = lo.consult_phone; CM.tel = true; }
+  if(lo.consult_email){ CM.mailAddr = lo.consult_email; CM.mail = true; }
+  if(setGroup(CM, ['f253','f254','f258','f260'])){
+    _s('es_cmTel', CM.telNo); _s('es_cmMail', CM.mailAddr); _s('es_cmOther', CM.other); used.push('相談方法');
+  }
+  var EC = ex.emergencyContact || {};
+  if(setGroup(EC, ['f262','f263','f267','f269'])){
+    _s('es_emTel', EC.telNo); _s('es_emMail', EC.mailAddr); _s('es_emOther', EC.other); used.push('緊急時対応');
+  }
+  // 定期面談（9-ア-ａ と末尾の本人希望欄）
+  var RM = ex.regularMeeting || {};
+  var sched = lo.meeting_frequency || RM.schedule || '';
+  var meth  = String(lo.meeting_method || RM.method || '');
+  var mk = /オンライン|faceOnline/i.test(meth) ? 'faceOnline' : (/無線|船舶|radio/i.test(meth) ? 'radio' : (/対面|face/i.test(meth) ? 'face' : ''));
+  if(sched){ _s('es_meetSchedule', sched); C.f353 = true; C.f355 = false; }
+  if(mk){
+    C.f360 = mk==='face'; C.f361 = mk==='faceOnline'; C.f362 = mk==='radio';
+    C.f408 = mk==='faceOnline'; C.f409 = mk==='face';
+  }
+  if(sched||mk) used.push('定期面談');
+  // 生活オリエンテーションの時間
+  var oh = String(lo.orientation_hours || (ex.implHours && ex.implHours.orientation) || '');
+  var ohm = oh.match(/(\d+(?:\.\d+)?)/);
+  if(ohm){ _s('es_orientHours', ohm[1]); used.push('生活オリエンテーション時間'); }
+  // 共生施策（確認日・ホームページで確認）
+  var SC = ex.symbiosisCheck || {};
+  var dm = String(SC.date || SC.other || '').match(/(\d{4})\s*[-\/年.]\s*(\d{1,2})\s*[-\/月.]\s*(\d{1,2})/);
+  if(dm){ _s('es_symY', dm[1]); _s('es_symM', String(parseInt(dm[2],10))); _s('es_symD', String(parseInt(dm[3],10))); }
+  if(SC.hp) C.f384 = true;
+  if(dm || SC.hp) used.push('共生施策');
+  var note = document.getElementById('p17HearingNote');
+  if(note) note.innerHTML = used.length
+    ? '📝 登録支援機関のヒアリング回答から入れました：' + used.join('・') + (lo.support_org_id ? '<br>（ベトナム語の言語別設定を優先）' : '')
+    : '⚠ この登録支援機関のヒアリング回答がまだありません。';
+}
 // ===== ver.20261020.03: 自社支援（1-11-2号・1-11-3号・1-20号・1-22号と同じ読み方） =====
 async function _ssFetchSelfSupport(coId, caseId){
   const out={ss:null, src:'', newer:false, fe:''};
