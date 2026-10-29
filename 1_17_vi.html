@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261029.05</div>
+    <div class="ver">ver.20261029.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -630,6 +630,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>居住費(円/月)<span class="fid">es.housingFee</span></label><input id="es_housingFee" oninput="p()"></div>
 <div class="fg"><label>実費相当の説明<span class="fid">es.actualCostDesc</span></label><textarea id="es_actualCostDesc" oninput="p()" rows="2"></textarea></div>
 <div class="fg3"><div class="fg"><label>事業所 都道府県<span class="fid">es.officePref</span></label><input id="es_officePref" oninput="p()"></div><div class="fg"><label>市区町村<span class="fid">es.officeCity</span></label><input id="es_officeCity" oninput="p()"></div></div>
+<div class="fg3"><div class="fg"><label>事業所 都道府県(英)<span class="fid">es.officePrefEn</span></label><input id="es_officePrefEn" oninput="p()"></div><div class="fg"><label>市区町村(英)<span class="fid">es.officeCityEn</span></label><input id="es_officeCityEn" oninput="p()"></div></div>
 </div>
 </div>
 </div>
@@ -666,6 +667,17 @@ document.addEventListener('change', function(e){
   var t=e.target;
   if(t && t.type==='checkbox' && t.id) window._p17Check[t.id] = t.checked;
 });
+/* ver.20261029.06: 本文の文字欄（有（　）の中など）も、描画のたびに作り直されて
+   左パネルを触った瞬間に消えていた。チェック欄と同じく入力を記録して描画後に戻す。 */
+window._p17Text = window._p17Text || {};
+document.addEventListener('input', function(e){
+  var t=e.target; if(!t || !t.id) return;
+  if(t.closest && t.closest('#pageArea') && (t.matches('input.bl') || t.matches('textarea.f'))) window._p17Text[t.id]=t.value;
+});
+function _p17RestoreTexts(){
+  var st=window._p17Text||{};
+  Object.keys(st).forEach(function(id){ try{ var el=document.getElementById(id); if(el && el.type!=='checkbox') el.value=st[id]; }catch(_){} });
+}
 function _p17RestoreChecks(){
   var st=window._p17Check||{};
   Object.keys(st).forEach(function(id){
@@ -705,6 +717,7 @@ function p(){
   if(!area) return;
   area.innerHTML = P17_TEMPLATE();
   _p17RestoreChecks();
+  _p17RestoreTexts();
   _p17BuildNav();
   p17Fit(); requestAnimationFrame(p17Fit);
 }
@@ -1605,6 +1618,10 @@ async function loadFromDB(passedInfo){
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     var cas=res[0]&&res[0][0]; var _pd=res[1]&&res[1][0]; var pd=(_pd&&_pd.data)||_pd||{};
+    /* ver.20261029.06: URL（?case=案件ID）で直接開いたときは所属機関・登録支援機関が渡されず、
+       両方とも空のままだった。案件データの company_id / org を代わりに使う。 */
+    if(!companyId && cas && cas.company_id) companyId = cas.company_id;
+    if(cas && cas.org && !(info && info.orgName)) info = Object.assign({}, info, {orgName: cas.org});
     // 申請人
     _s('f_applicant', (pd.applicant_name_en||pd.applicantNameEn||pd.nameEn)|| (cas&&cas.applicant)||'');
     /* ver.20261013.03: 国籍は本文に「ベトナム」を埋め込み済みなので流し込まない。
@@ -1665,6 +1682,10 @@ async function loadFromDB(passedInfo){
         var _sp = _splitAddr(_oa);
         _s('es_officePref', _es.officePref||_sp.pref);
         _s('es_officeCity', _es.officeCity||_sp.city);
+        /* ver.20261029.06: 英語の都道府県・市区町村は読込処理が無く常に空だった。
+           英語住所「475-2 Okubo-machi, Ota-shi, Gunma」の末尾＝都道府県、その前＝市区町村。 */
+        var _ea = String(_es.officeAddrEn||'').split(',').map(function(x){return x.trim();}).filter(function(x){ return x && !/^japan$/i.test(x); });
+        if(_ea.length>=2){ _s('es_officePrefEn', _es.officePrefEn||_ea[_ea.length-1]); _s('es_officeCityEn', _es.officeCityEn||_ea[_ea.length-2]); }
       }
     }
     // 登録支援機関
@@ -1678,7 +1699,7 @@ async function loadFromDB(passedInfo){
          正しい rep_name_kana に修正。 */
       try{ var so=await findSupportOrg(info.orgName||'', '*'); if(so){
         _s('es_soName',so.name); _s('es_soNameEn',so.name_en); _s('es_soNameKana',so.name_kana);
-        _s('es_soRegNo',so.reg_no); _s('es_soZip',so.zip); _s('es_soAddress',so.address);
+        _s('es_soRegNo',so.reg_no); _s('es_soZip',so.zip||(Array.isArray(so.offices)&&so.offices[0]&&so.offices[0].officeZip)||''); _s('es_soAddress',so.address);
         _s('es_soAddressEn',so.address_en);   // ver.20261013.10: 住所(英)
         _s('es_soRepName',so.rep_name); _s('es_soRepNameEn',so.rep_name_en); _s('es_soRepKana',so.rep_name_kana);
 
@@ -1943,6 +1964,7 @@ if(!window._selectCaseListenerAdded){
       /* ver.20261020.11: チェック状態も既定へ戻す。
          残すと前の案件で外したチェックが次の案件に持ち越される。 */
       window._p17Check = _p17DefaultChecks();
+      window._p17Text = {};   // ver.20261029.06: 前の案件の本文の文字も持ち越さない
     }catch(_e){ console.warn('[1-17vi] 入力欄クリア失敗:', _e); }
     /* 書類内の案件セレクトも選択状態を合わせる（無ければ項目を足す）。 */
     var sel=document.getElementById('caseSelect');
