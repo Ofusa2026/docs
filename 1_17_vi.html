@@ -496,13 +496,34 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #pageArea .doc.p17doc p.ja{ line-height:1.4; }
 #pageArea .doc.p17doc p.vi{ line-height:1.35; }
 #pageArea .doc.p17doc td.vert p{ line-height:1.3; letter-spacing:.02em; }
+
+/* ver.20261029.04: 画面の1ページ＝印刷の紙1枚。画面でもA4横の比率（297:210）の紙に見せる。 */
+#pageArea .doc.p17doc{ min-height:735px !important; }
+@media print{
+  .p17page{ break-after:page; page-break-after:always; break-inside:avoid; page-break-inside:avoid; }
+  .p17page:last-child{ break-after:auto; page-break-after:auto; }
+  /* 紙に収まらないページだけ印刷時に縮める（値は各ページの style="--pz:…"） */
+  .p17page{ zoom:var(--pz,1); }
+  #pageArea .doc.p17doc{ min-height:0 !important; }
+}
+
+/* ver.20261029.05: 縦書き見出し（Ⅳ・項目番号など）が細い列からはみ出してベトナム語が切れていた。
+   日本語・ベトナム語の2行が列幅に収まるよう、文字と行間を詰める（長いときは縦方向に折り返す）。 */
+#pageArea .doc.p17doc td.vert{ padding:.15em 0 !important; }
+#pageArea .doc.p17doc td.vert p{ margin:0 !important; padding-left:0 !important; line-height:1.05 !important; letter-spacing:0 !important; white-space:normal !important; }
+#pageArea .doc.p17doc td.vert p.ja{ font-size:.85em !important; }
+#pageArea .doc.p17doc td.vert p.vi{ font-size:.7em !important; }
+@media print{
+  #pageArea .doc.p17doc td.vert p.ja{ font-size:.78em !important; }
+  #pageArea .doc.p17doc td.vert p.vi{ font-size:.62em !important; }
+}
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261029.03</div>
+    <div class="ver">ver.20261029.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -614,7 +635,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 </div>
 <div class="pp" id="ppOuter">
 <div class="page-nav" id="pageNav">
-  <span class="page-nav-label">ページ:</span><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(8)">P8</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(9)">P9</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(10)">P10</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(11)">P11</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(12)">P12</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(13)">P13</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(14)">P14</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(15)">P15</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(16)">P16</button><button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
+  <span class="page-nav-label">ページ:</span><span id="p17PageBtns"><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(5)">P5</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(6)">P6</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(7)">P7</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(8)">P8</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(9)">P9</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(10)">P10</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(11)">P11</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(12)">P12</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(13)">P13</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(14)">P14</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(15)">P15</button><button class="pn-btn pn-btn-page" onclick="scrollToPage(16)">P16</button></span><button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
   <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
@@ -655,6 +676,28 @@ function _p17RestoreChecks(){
   });
 }
 
+/* ver.20261029.04: ページボタンは実際のページ（.p17page）の数で作る。
+   共通の scrollToPage / setupPageTracker は '.doc' を数えるが、1-17 は外枠の #docP1 も
+   '.doc' のため1つずれていた（P13 を押すと12ページ目が出る）。1-17 では .p17page を数える。 */
+function _p17Pages(){ var a=document.getElementById('pageArea'); return a ? a.querySelectorAll('.p17page') : []; }
+function _p17BuildNav(){
+  var box=document.getElementById('p17PageBtns'); if(!box) return;
+  var n=_p17Pages().length; if(!n || box.children.length===n) return;
+  var h=''; for(var i=1;i<=n;i++) h+='<button class="pn-btn pn-btn-page'+(i===1?' active':'')+'" onclick="scrollToPage('+i+')">P'+i+'</button>';
+  box.innerHTML=h;
+}
+function scrollToPage(n){
+  var ps=_p17Pages(); if(ps[n-1]) ps[n-1].scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.pn-btn-page').forEach(function(b,i){ b.classList.toggle('active', i===n-1); });
+}
+function setupPageTracker(){
+  var area=document.getElementById('pageArea'); if(!area || area._p17Tracker) return; area._p17Tracker=true;
+  area.addEventListener('scroll', function(){
+    var top=area.getBoundingClientRect().top, act=0;
+    _p17Pages().forEach(function(d,i){ if(d.getBoundingClientRect().top-top<100) act=i; });
+    document.querySelectorAll('.pn-btn-page').forEach(function(b,i){ b.classList.toggle('active', i===act); });
+  });
+}
 // ===== 1-17 プレビュー描画 =====
 function p(){
   if(window._editMode) return;
@@ -662,6 +705,7 @@ function p(){
   if(!area) return;
   area.innerHTML = P17_TEMPLATE();
   _p17RestoreChecks();
+  _p17BuildNav();
   p17Fit(); requestAnimationFrame(p17Fit);
 }
 // テンプレート（本文。${f('...')} は common.js の f() で値/変数箱に）
@@ -755,7 +799,7 @@ Họ và tên</p></td>
 <colgroup><col style="width:2.9814%"><col style="width:4.1894%"><col style="width:14.0590%"><col style="width:20.8443%"><col style="width:7.6463%"><col style="width:1.4779%"><col style="width:12.5618%"><col style="width:8.9186%"><col style="width:0.3855%"><col style="width:7.2223%"><col style="width:19.7134%"></colgroup>
 <tbody>
 <tr class="nosplit" style="height:5.36em">
-<td class="b-kknt vert" rowspan="7"><p class="ja a-center">　登録支援機関</p><p class="vi a-center">III. Cơ quan hỗ trợ có đăng ký</p></td>
+<td class="b-kknt vert" rowspan="11"><p class="ja a-center">　登録支援機関</p><p class="vi a-center">III. Cơ quan hỗ trợ có đăng ký</p></td>
 <td class="b-kttt" colspan="2"><p class="ja">１　登録番号</p><p class="vi a-center">Mã số đăng ký</p></td>
 <td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">登${f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">Đăng</p></td>
 <td class="b-kttt" colspan="3"><p class="ja a-center">２　登録年月日</p><p class="vi a-center" style="padding-left:1.89em;text-indent:-1.00em">Ngày tháng năm đăng ký</p></td>
@@ -787,7 +831,6 @@ Họ tên người đại diện</p></td>
 <td class="b-tttk" colspan="8"><p class="ja">〒${f('es_soOfficeZip')}　${f('es_soOfficeAddress')}</p><p class="ja">${f('es_soOfficeAddressEn')}</p><p class="ja a-right">（電話${f('es_soOfficeTel')}）</p><p class="vi a-right">(Điện thoại ${f('es_soOfficeTel')})</p></td>
 </tr>
 <tr class="nosplit" style="height:2.09em">
-<td class="b-nkkt vert cont" rowspan="4">&nbsp;</td>
 <td class="b-ttkt" colspan="2" rowspan="4"><p class="ja" style="padding-left:2.17em;text-indent:-1.00em">７　支援業務を行う体制の概要</p><p class="vi" style="padding-left:2.17em;text-indent:-1.00em">Khái quát về tổ chức thực hiện công tác hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援責任者</p><p class="vi a-center">Người chịu trách nhiệm hỗ trợ</p></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center">（ふりがな）</p><p class="ja a-center">氏　　名</p><p class="vi a-center">		(Furigana)
@@ -813,14 +856,14 @@ Họ và tên</p></td>
 
 
 </div></div>
-<div class="p17page"><div class="doc p17doc"><div class="tbl-wrap">
+<div class="p17page" style="--pz:.88"><div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t3">
 <colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2969%"><col style="width:15.5769%"><col style="width:6.5197%"><col style="width:9.5813%"><col style="width:19.6037%"><col style="width:20.9779%"></colgroup>
 <tbody>
 <tr class="nosplit" style="height:0.43em">
-<td class="b-kknt vert" rowspan="7"><p class="ja a-center">Ⅳ　支援内容</p><p class="vi a-center">IV NộI dung hỗ trợ</p></td>
-<td class="b-ktnt vert" rowspan="7"><p class="ja a-center">１　事前ガイダンスの提供</p><p class="vi a-center">1.Cung cấp hưỡng dẫn trước</p></td>
-<td class="b-ktnt vert" rowspan="7"><p class="ja a-center">ア　情報提供内容等</p><p class="vi a-center">A.NộI dung về cung cấp thông tin</p></td>
+<td class="b-kknt vert" rowspan="15"><p class="ja a-center">Ⅳ　支援内容</p><p class="vi a-center">IV NộI dung hỗ trợ</p></td>
+<td class="b-ktnt vert" rowspan="15"><p class="ja a-center">１　事前ガイダンスの提供</p><p class="vi a-center">1.Cung cấp hưỡng dẫn trước</p></td>
+<td class="b-ktnt vert" rowspan="13"><p class="ja a-center">ア　情報提供内容等</p><p class="vi a-center">A.NộI dung về cung cấp thông tin</p></td>
 <td class="b-kttt" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
 <td class="b-kttt" rowspan="2"><p class="ja a-center">実施予定</p><p class="vi a-center">Dự kiến thực hiện</p></td>
 <td class="b-kttt" rowspan="2"><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">委託の</p><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">有　無
@@ -846,10 +889,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr class="nosplit" style="height:2.15em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｃ．入国に当たっての手続に関する事項</p><p class="vi">Hạng mục liên quan đến thủ tục khi nhập cảnh</p></td>
-
-
 <td class="b-ttnt fld" rowspan="3"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f056" name="f056" data-label="Ⅳ 支援内容 ＞ 有・無 〈支援内容ごとに異なる場合にはそれがわかるように以下"></textarea></td>
-
 </tr>
 <tr class="nosplit" style="height:3.63em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｄ．保証金の徴収，契約の不履行についての違約金契約等の締結の禁止</p><p class="vi">Cấm trưng thu tiền bảo lãnh, ký các hợp đồng tiền phạt hợp đồng khi không thực hiện hợp đồng</p></td>
@@ -858,15 +898,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｅ．入国の準備に関し外国の機関に支払った費用について，当該費用の額及び内訳を十分に理解して支払わなければならないこと</p><p class="vi">Về chi phí đã thanh toán cho cơ quan nước ngoài liên quan đến việc chuẩn bị nhập cảnh, phải thanh toán khi đã hiểu đầy đủ về số tiền đó và chi tiết của nó.</p></td>
 </tr>
 <tr class="nosplit" style="height:2.82em">
-<td class="b-nkht vert cont" rowspan="8">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="8">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="6">&nbsp;</td>
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｆ．支援に要する費用を負担させないこととしていること</p><p class="vi">Không bị bắt phải chịu trách nhiệm về chi phí cần thiết cho việc hỗ trợ</p></td>
-
-
-
 <td class="b-nttt cont" rowspan="6">&nbsp;</td>
-
 </tr>
 <tr class="nosplit" style="height:1.14em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｇ．入国する際の送迎に関する支援の内容</p><p class="vi">Nội dung hỗ trợ liên quan đến đưa đón khi nhập cảnh</p></td>
@@ -945,10 +978,10 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 
 </div></div>
 <div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t4c"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
-<tr class="pgrow nosplit" style="height:2.46em">
-<td class="b-nknt vert cont" rowspan="3">&nbsp;</td>
-<td class="b-ttnt vert" rowspan="3"><p class="ja a-center" style="padding-left:0.63em">３　適切な住居の確保に係る支援・生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em">3. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp/hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt</p></td>
-<td class="b-ttnt vert" rowspan="3"><p class="ja a-center">ア　適切な住居の確保に係る支援</p><p class="vi a-center">A. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp</p></td>
+<tr class="nosplit" style="height:2.46em">
+<td class="b-nknt vert cont" rowspan="6"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
+<td class="b-ttnt vert" rowspan="6"><p class="ja a-center" style="padding-left:0.63em">３　適切な住居の確保に係る支援・生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em">3. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp/hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt</p></td>
+<td class="b-ttnt vert" rowspan="6"><p class="ja a-center">ア　適切な住居の確保に係る支援</p><p class="vi a-center">A. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">実施予定</p><p class="vi a-center">Dự kiến thực hiện</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">委託の</p><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">			有　無
@@ -970,9 +1003,6 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-ttnk fld"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f101" name="f101" data-label="Ⅳ 支援内容（続き） ＞ 有・無"></textarea></td>
 </tr>
 <tr class="nosplit" style="height:6.11em">
-<td class="b-nkht vert cont" rowspan="3">&nbsp;</td>
-<td class="b-ntht vert cont" rowspan="3">&nbsp;</td>
-<td class="b-ntht vert cont" rowspan="3">&nbsp;</td>
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｂ．自ら賃借人となって賃貸借契約を締結した上で，１号特定技能外国人の合意の下，住居として提供する</p><p class="vi">Bản thân tự làm người thuê, sau khi ký hợp đồng cho thuê rồi cung cấp cho người nước ngoài có kỹ năng đặc định số 1 làm nơi ở sau khi đã có được sự đồng ý của người đó</p></td>
 <td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f102" name="f102" data-label="Ⅳ 支援内容（続き） ＞ ｂ．自ら賃借人となって賃貸借契約を締結した上で，１号特定技能">有（<input type="text" class="bl" id="f103" name="f103" data-label="Ⅳ 支援内容（続き） ＞ ｂ．自ら賃借人となって賃貸借契約を締結した上で，１号特定技能｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f104" name="f104" data-label="Ⅳ 支援内容（続き） ＞ ｂ．自ら賃借人となって賃貸借契約を締結した上で，１号特定技能">無（<input type="text" class="bl" id="f105" name="f105" data-label="Ⅳ 支援内容（続き） ＞ ｂ．自ら賃借人となって賃貸借契約を締結した上で，１号特定技能｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-tttt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
@@ -995,9 +1025,11 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttt" colspan="2"><p class="ja">〒<input type="text" class="bl" id="f122" name="f122" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜〒＿－" style="width:3.00em">－</p></td>
 <td class="b-nttk fld"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f123" name="f123" data-label="Ⅳ 支援内容（続き） ＞ 有・無"></textarea></td>
 </tr>
+</tbody></table></div></div></div>
+<div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t4d"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
 <tr class="nosplit" style="height:4.51em">
-<td class="b-hknt vert" rowspan="6">&nbsp;</td>
-<td class="b-htnt vert" rowspan="6"><p class="ja a-center" style="padding-left:0.63em">３　適切な住居の確保に係る支援・生活に必要な契約に関する支援（続き）</p><p class="vi a-center" style="padding-left:0.63em">3. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp/hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt (tiếp theo)</p></td>
+<td class="b-hknt vert" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
+<td class="b-htnt vert" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">３　適切な住居の確保に係る支援・生活に必要な契約に関する支援（続き）</p><p class="vi a-center" style="padding-left:0.63em">3. Hỗ trợ liên quan đến bảo đảm nơi ở thích hợp/hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt (tiếp theo)</p></td>
 <td class="b-httt fld" rowspan="2"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f124" name="f124" data-label="３ 適切な住居の確保に係る支援・生活に必要な契約に関する支援"></textarea></td>
 <td class="b-httt" rowspan="2"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｄ　情報提供する又は住居として提供する住居の概要（確保予定の場合を含む）</p><p class="vi">Khái quát về nơi ở sẽ cung cấp thông tin hoặc làm nơi ở (gồm cả trường hợp dự định sẽ giữ)</p></td>
 <td class="b-httk" colspan="7"><p class="ja"><input type="checkbox" class="cb" id="f125" name="f125" data-label="ｄ 情報提供する又は住居として提供する住居の概要（確保予定の">在留資格変更許可申請（又は在留資格認定証明書交付申請）の時点で確保しているもの</p><p class="vi"> Bất động sản giữ ở thời điểm làm đơn xin phép thay đổi tư cách lưu trú (hoặc Đơn xin cấp Giấy chứng minh công nhận tư cách lưu trú)</p><p class="ja"><input type="checkbox" class="cb" id="f126" name="f126" data-label="ｄ 情報提供する又は住居として提供する住居の概要（確保予定の">在留資格変更許可申請（又は在留資格認定証明書交付申請）の後に確保するもの</p><p class="vi"> Bất động sản giữ sau khi làm đơn xin phép thay đổi tư cách lưu trú (hoặc Đơn xin cấp Giấy chứng minh công nhận tư cách lưu trú)</p></td>
@@ -1013,7 +1045,7 @@ Nội dung cụ thể của cơ sở lưu trú cung cấp</p><p class="ja" style
 Giải thích...</p><p class="ja">${f('es_actualCostDesc')}</p></td>
 </tr>
 <tr style="height:1.66em">
-<td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">イ　生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em"> B. Hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt</p></td>
+<td class="b-ttnt vert" rowspan="6"><p class="ja a-center" style="padding-left:0.63em">イ　生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em"> B. Hỗ trợ liên quan đến hợp đồng cần thiết cho sinh hoạt</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">実施予定</p><p class="vi a-center">Dự kiến thực hiện</p></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">委託の</p><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">			有　無
@@ -1043,9 +1075,6 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttk"><p class="ja"><input type="checkbox" class="cb" id="f161" name="f161" data-label="有・無">　手続に係る情報提供</p><p class="vi">   Cung cấp thông tin liên quan đến thủ tục</p><p class="ja"><input type="checkbox" class="cb" id="f162" name="f162" data-label="有・無">　必要に応じて手続に同行</p><p class="vi">    Đi cùng làm thủ tục nếu cần thiết</p><p class="ja"><input type="checkbox" class="cb" id="f163" name="f163" data-label="有・無">　その他（<input type="text" class="bl" id="f164" name="f164" data-label="有・無｜その他（＿）" style="width:9.00em">）</p><p class="vi">    Khác (                    )</p></td>
 </tr>
 <tr style="height:3.35em">
-<td class="b-nktt vert cont" rowspan="7">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="2">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="2">&nbsp;</td>
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｃ．電気・水道・ガス等のライフラインに関する手続の補助</p><p class="vi">Hỗ trợ thủ tục liên quan đến các tiện nghi sinh hoạt như điện, nước, ga,…</p></td>
 <td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f165" name="f165" data-label="ｃ．電気・水道・ガス等のライフラインに関する手続の補助">有（<input type="text" class="bl" id="f166" name="f166" data-label="ｃ．電気・水道・ガス等のライフラインに関する手続の補助｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f167" name="f167" data-label="ｃ．電気・水道・ガス等のライフラインに関する手続の補助">無（<input type="text" class="bl" id="f168" name="f168" data-label="ｃ．電気・水道・ガス等のライフラインに関する手続の補助｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-tttt" colspan="2"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
@@ -1061,7 +1090,10 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttt" colspan="2"><p class="ja">〒<input type="text" class="bl" id="f182" name="f182" data-label="有・無｜〒＿－" style="width:3.00em">－</p></td>
 <td class="b-tttk fld"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f183" name="f183" data-label="有・無"></textarea></td>
 </tr>
-<tr style="height:2.01em" class="pgrow">
+</tbody></table></div></div></div>
+<div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t4e"><colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:1.8664%"><col style="width:9.5302%"><col style="width:12.9051%"><col style="width:6.6858%"><col style="width:21.0163%"></colgroup><tbody>
+<tr style="height:2.01em">
+<td class="b-nktt vert cont" rowspan="5"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
 <td class="b-tttt vert" rowspan="5"><p class="ja a-center" style="padding-left:0.63em">４　生活オリエンテーションの実施</p><p class="vi a-center" style="padding-left:0.63em">4. Thực hiện buổi giới thiệu hướng dẫn về môi trường sinh hoạt mới</p></td>
 <td class="b-tttt vert" rowspan="5"><p class="ja a-center" style="padding-left:0.63em">ア　情報提供内容等</p><p class="vi a-center" style="padding-left:0.63em">A. Nội dung cung cấp thông tin</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
@@ -1334,8 +1366,8 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup>
 <tbody>
 <tr style="height:1.82em">
-<td class="b-nknt fld" rowspan="4"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f287" name="f287" data-label="８ 非自発的離職時の転職支援"></textarea></td>
-<td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">８　非自発的離職時の転職支援</p><p class="vi a-center" style="padding-left:0.63em">8. Hỗ trợ chuyển việc khi bỏ việc không do tự phát</p></td>
+<td class="b-nknt vert" rowspan="7"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
+<td class="b-ttnt vert" rowspan="7"><p class="ja a-center" style="padding-left:0.63em">８　非自発的離職時の転職支援</p><p class="vi a-center" style="padding-left:0.63em">8. Hỗ trợ chuyển việc khi bỏ việc không do tự phát</p></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">実施予定</p><p class="vi a-center">Dự kiến thực hiện</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">委託の</p><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">			有　無
@@ -1365,8 +1397,6 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 <td class="b-tttk fld"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f303" name="f303" data-label="８ 非自発的離職時の転職支援 ＞ 有・無"></textarea></td>
 </tr>
 <tr style="height:1.73em">
-<td class="b-nkht cont" rowspan="3">&nbsp;</td>
-<td class="b-ntht vert cont" rowspan="3">&nbsp;</td>
 <td class="b-tttt" colspan="2"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｃ．１号特定技能外国人の希望条件，技能水準，日本語能力等を踏まえ，適切に職業相談・職業紹介が受けられるよう又は円滑に就職活動が行えるよう推薦状を作成する</p><p class="vi">Dựa trên điều kiện mong muốn, tiêu chuẩn kỹ năng, năng lực tiếng Nhật,… của người nước ngoài có kỹ năng đặc định số 1, soạn Bản tiến cử để có thể tiếp nhận thảo luận việc làm, giới thiệc việc làm thích hợp hoặc để hoạt động xin việc được diễn ra thuận lợi</p></td>
 <td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f304" name="f304" data-label="８ 非自発的離職時の転職支援 ＞ ｃ．１号特定技能外国人の希望条件，技能水準，日本語能力等を踏">有（<input type="text" class="bl" id="f305" name="f305" data-label="８ 非自発的離職時の転職支援 ＞ ｃ．１号特定技能外国人の希望条件，技能水準，日本語能力等を踏｜有（＿）" style="width:9.00em">）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f306" name="f306" data-label="８ 非自発的離職時の転職支援 ＞ ｃ．１号特定技能外国人の希望条件，技能水準，日本語能力等を踏">無（<input type="text" class="bl" id="f307" name="f307" data-label="８ 非自発的離職時の転職支援 ＞ ｃ．１号特定技能外国人の希望条件，技能水準，日本語能力等を踏｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-tttt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
@@ -1422,11 +1452,11 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tbody></table></div>
 
 </div></div>
-<div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
+<div class="p17page" style="--pz:.88"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr style="height:8.36em" class="pgrow">
-<td class="b-nknt vert cont" rowspan="4">&nbsp;</td>
-<td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">９　定期的な面談の実施・行政機関への通報</p><p class="vi a-center" style="padding-left:0.63em">9. Thực hiện phỏng vấn định kỳ, báo cáo cho cơ quan hành chính</p></td>
-<td class="b-ttnt vert" rowspan="4"><p class="ja a-center" style="padding-left:0.63em">ア　面談内容等</p><p class="vi a-center" style="padding-left:0.63em">A. Nội dung phỏng vấn</p></td>
+<td class="b-nknt vert cont" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
+<td class="b-ttnt vert" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">９　定期的な面談の実施・行政機関への通報</p><p class="vi a-center" style="padding-left:0.63em">9. Thực hiện phỏng vấn định kỳ, báo cáo cho cơ quan hành chính</p></td>
+<td class="b-ttnt vert" rowspan="7"><p class="ja a-center" style="padding-left:0.63em">ア　面談内容等</p><p class="vi a-center" style="padding-left:0.63em">A. Nội dung phỏng vấn</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">支援内容</p><p class="vi a-center">Nội dung hỗ trợ</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center">実施予定</p><p class="vi a-center">Dự kiến thực hiện</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">委託の</p><p class="ja a-center" style="padding-left:0.08em;text-indent:-0.08em">			有　無
@@ -1460,9 +1490,6 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 <td class="b-ttnk fld"><span class="sp">&nbsp;</span><textarea class="f" rows="1" id="f367" name="f367" data-label="Ⅳ 支援内容（続き） ＞ ｂ．再確認のため，生活オリエンテーションにおいて提供した情報"></textarea></td>
 </tr>
 <tr style="height:5.59em">
-<td class="b-nktt vert cont" rowspan="4">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="4">&nbsp;</td>
-<td class="b-nttt vert cont" rowspan="3">&nbsp;</td>
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｃ．労働基準法その他の労働に関する法令の規定に違反していることを知ったときは，労働基準監督署その他の関係行政機関へ通報する</p><p class="vi">Khi đã biết về việc đang vi phạm luật tiêu chuẩn lao động và các quy định luật pháp liên quan đến lao động khác, thông báo cho người quan sát tiêu chuẩn lao động và cơ quan hành chính có liên quan khác</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja"><input type="checkbox" class="cb" id="f368" name="f368" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ">有（認知次第実施）</p><p class="vi"> Có (Thực hiện khi đã nhận thức rõ)</p><p class="ja"><input type="checkbox" class="cb" id="f369" name="f369" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ">無（<input type="text" class="bl" id="f370" name="f370" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-nttt cont" rowspan="2">&nbsp;</td>
