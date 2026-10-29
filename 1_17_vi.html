@@ -267,6 +267,8 @@ input.cb:focus-visible{ outline: 2px solid #0b57d0; outline-offset: 1px; }
 .b-nknt{border-width:0 var(--thin) 0 var(--thick)}
 .b-nktt{border-width:0 var(--thin) var(--thin) var(--thick)}
 .b-nnkn{border-width:0 0 var(--thick) 0}
+/* ver.20261029.02: 作成日の行は下線だけにする（table.grid td の細線指定に負けて上・左右にも線が出ていた） */
+table.grid td.b-nnkn{border-width:0 0 var(--thick) 0 !important}
 .b-nthk{border-width:0 var(--thick) var(--hair) var(--thin)}
 .b-ntht{border-width:0 var(--thin) var(--hair) var(--thin)}
 .b-nttk{border-width:0 var(--thick) var(--thin) var(--thin)}
@@ -500,7 +502,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261029.01</div>
+    <div class="ver">ver.20261029.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
