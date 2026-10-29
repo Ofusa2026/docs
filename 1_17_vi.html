@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261029.06</div>
+    <div class="ver">ver.20261030.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -678,6 +678,22 @@ function _p17RestoreTexts(){
   var st=window._p17Text||{};
   Object.keys(st).forEach(function(id){ try{ var el=document.getElementById(id); if(el && el.type!=='checkbox') el.value=st[id]; }catch(_){} });
 }
+/* ver.20261030.01: 本文の記入欄（有（　）など）は幅が固定で、長い文字が途中で切れていた。
+   文字が収まらないときは欄を広げ（セルの幅まで）、それでも収まらなければ文字を小さくする。 */
+function _p17FitInput(el){
+  if(!el || !el.matches || !el.matches('#pageArea input.bl')) return;
+  if(!el.dataset.w0) el.dataset.w0 = el.style.width || '';
+  el.style.width = el.dataset.w0; el.style.fontSize = '';
+  if(!el.value || el.scrollWidth <= el.clientWidth+1) return;
+  var td = el.closest('td'); var room = td ? td.clientWidth - 4 : 0;
+  var other = 0; if(td){ var p = el.parentNode; other = Math.max(0, (p.scrollWidth||0) - el.offsetWidth); }
+  var maxW = Math.max(el.offsetWidth, room - Math.min(other, room*0.5));
+  el.style.width = Math.min(el.scrollWidth + 6, maxW) + 'px';
+  var fs = 100;
+  while(el.scrollWidth > el.clientWidth+1 && fs > 60){ fs -= 8; el.style.fontSize = fs + '%'; }
+}
+function _p17FitInputs(){ document.querySelectorAll('#pageArea input.bl').forEach(_p17FitInput); }
+document.addEventListener('input', function(e){ _p17FitInput(e.target); });
 function _p17RestoreChecks(){
   var st=window._p17Check||{};
   Object.keys(st).forEach(function(id){
@@ -719,6 +735,7 @@ function p(){
   _p17RestoreChecks();
   _p17RestoreTexts();
   _p17BuildNav();
+  requestAnimationFrame(_p17FitInputs);
   p17Fit(); requestAnimationFrame(p17Fit);
 }
 // テンプレート（本文。${f('...')} は common.js の f() で値/変数箱に）
@@ -814,7 +831,7 @@ Họ và tên</p></td>
 <tr class="nosplit" style="height:5.36em">
 <td class="b-kknt vert" rowspan="11"><p class="ja a-center">　登録支援機関</p><p class="vi a-center">III. Cơ quan hỗ trợ có đăng ký</p></td>
 <td class="b-kttt" colspan="2"><p class="ja">１　登録番号</p><p class="vi a-center">Mã số đăng ký</p></td>
-<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">登${f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">Đăng</p></td>
+<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">${/登/.test(v('es_soRegNo')||'') ? f('es_soRegNo') : '登'+f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">Đăng</p></td>
 <td class="b-kttt" colspan="3"><p class="ja a-center">２　登録年月日</p><p class="vi a-center" style="padding-left:1.89em;text-indent:-1.00em">Ngày tháng năm đăng ký</p></td>
 <td class="b-kttk" colspan="3"><p class="ja a-right">${f('es_soRegY')}年${f('es_soRegM')}月${f('es_soRegD')}日</p><p class="vi a-right">Ngày ${f('es_soRegD')} tháng ${f('es_soRegM')} năm ${f('es_soRegY')}</p></td>
 </tr>
@@ -857,12 +874,12 @@ Họ và tên</p></td>
 </tr>
 <tr class="nosplit" style="height:5.80em">
 <td class="b-tttt"><p class="ja a-center">支援を行っている</p><p class="ja a-center">１号特定技能外国人数</p><p class="vi a-center">Số người nước ngoài có kỹ năng đặc định số 1 đang hỗ trợ</p></td>
-<td class="b-tttt" colspan="3"><p class="ja a-right">${f('es_soSupporterCount')}名</p><p class="vi a-right">người</p></td>
+<td class="b-tttt" colspan="3"><p class="ja a-right">${f('es_soSupporterCount')}${/名\s*$/.test(v('es_soSupporterCount')||'') ? '' : '名'}</p><p class="vi a-right">người</p></td>
 <td class="b-ttkk" colspan="4" rowspan="2"><p class="ja a-center">支援の適正性を確保していることの有無</p><p class="ja">・支援責任者が特定技能所属機関の役員の配偶者、２親等以内の親族、特定技能所属機関の役員と社会生活において密接な関係にある者、過去５年以内に特定技能所属機関の役員又は職員であった者ではないこと</p><p class="ja" style="padding-left:0.90em">・支援責任者及び支援担当者が登録支援機関の登録拒否事由に該当しないこと</p><p class="vi a-center" style="padding-left:0.90em">Tính phù hợp của việc hỗ trợ có được đảm bảo hay không</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không được là vợ hặc chồng hay họ hàng trong vòng 2 đời của viên chức cơ quan trực thuộc kỹ năng đặc định, hoặc người có mối quan hệ thân thiết với viên chức của cơ quan trực thuộc kỹ năng đặc định, hay từng là viên chức hoặc nhân viên của cơ quan trực thuộc kỹ năng đặc định trong vòng 5 năm trở lại.</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không liên quan đến lý do từ chối đăng ký của tổ chức hỗ trợ đăng ký.</p><p class="ja a-center"><span class="chc"><span class="fixed">有</span>　　　　　　<span>無</span></span></p><p class="vi a-center">Có          Không</p></td>
 </tr>
 <tr class="nosplit" style="height:5.07em">
 <td class="b-ttkt"><p class="ja a-center">支援担当者数</p><p class="vi a-center">Số người phụ trách hỗ trợ</p></td>
-<td class="b-ttkt" colspan="3"><p class="ja a-right">${f('es_soSupportStaffCount')}名</p><p class="vi a-right">người</p></td>
+<td class="b-ttkt" colspan="3"><p class="ja a-right">${f('es_soSupportStaffCount')}${/名\s*$/.test(v('es_soSupportStaffCount')||'') ? '' : '名'}</p><p class="vi a-right">người</p></td>
 </tr>
 </tbody></table>
 </div>
@@ -1173,7 +1190,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr style="height:2.63em">
 <td class="b-tttt" colspan="2"><p class="ja">イ　実施言語</p><p class="vi">B. Ngôn ngữ thực hiện</p></td>
-<td class="b-tttk" colspan="6"><p class="ja" style="text-indent:9.00em">語<input type="text" class="bl" id="f203" name="f203" data-label="Ⅳ 支援内容（続き） ＞ イ 実施言語｜語＿（支援担当者" style="width:4.00em">（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名</p><p class="vi">Tiếng	(Trường hợp người phiên dịch không phải là nhân viên đảm trách việc hỗ trợ) Họ tên/Nơi trực thuộc của phiên dịch viên</p></td>
+<td class="b-tttk" colspan="6"><!-- ver.20261030.01: 1-イと同じく、ベトナム語版なので実施言語を固定し、通訳者は別紙の名簿を参照する。 --><p class="ja" style="padding-left:0.06em">ベトナム語　（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名　　別紙参照</p><p class="vi">Tiếng Việt Nam	(Trường hợp người phiên dịch không phải là nhân viên đảm trách việc hỗ trợ) Họ tên/Nơi trực thuộc của phiên dịch viên　Xem tờ đính kèm</p></td>
 </tr>
 <tr style="height:2.61em">
 <td class="b-tttt" colspan="2"><p class="ja">ウ　実施予定時間</p><p class="vi">C. Thời gian dự kiến thực hiện</p></td>
@@ -1322,7 +1339,7 @@ Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung
 </tr>
 <tr style="height:3.42em">
 <td class="b-tttt" colspan="4"><p class="ja">ウ　実施言語</p><p class="vi">B.  Ngôn ngữ thực hiện</p></td>
-<td class="b-tttk" colspan="8"><p class="ja" style="text-indent:11.00em">語　　（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名</p><p class="vi">Tiếng 			(Trường hợp không do người đảm trách hỗ trợ phiên dịch) Họ tên/Nơi trực thuộc của phiên dịch viên</p></td>
+<td class="b-tttk" colspan="8"><!-- ver.20261030.01: 1-イと同じく、ベトナム語版なので実施言語を固定し、通訳者は別紙の名簿を参照する。 --><p class="ja" style="padding-left:0.06em">ベトナム語　（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名　　別紙参照</p><p class="vi">Tiếng Việt Nam	(Trường hợp người phiên dịch không phải là nhân viên đảm trách việc hỗ trợ) Họ tên/Nơi trực thuộc của phiên dịch viên　Xem tờ đính kèm</p></td>
 </tr>
 </tbody></table>
 </div>
@@ -1523,7 +1540,7 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 </tr>
 <tr style="height:2.62em">
 <td class="b-tttt" colspan="2"><p class="ja">イ　実施言語</p><p class="vi"> B. Ngôn ngữ thực hiện</p></td>
-<td class="b-tttk" colspan="5"><p class="ja" style="text-indent:11.00em">語　（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名</p><p class="vi">Tiếng		(Trường hợp người phiên dịch không phải là nhân viên đảm trách việc hỗ trợ) Họ tên/Nơi trực thuộc của phiên dịch viên</p></td>
+<td class="b-tttk" colspan="5"><!-- ver.20261030.01: 1-イと同じく、ベトナム語版なので実施言語を固定し、通訳者は別紙の名簿を参照する。 --><p class="ja" style="padding-left:0.06em">ベトナム語　（支援担当者以外の者が通訳を担う場合）通訳者の所属・氏名　　別紙参照</p><p class="vi">Tiếng Việt Nam	(Trường hợp người phiên dịch không phải là nhân viên đảm trách việc hỗ trợ) Họ tên/Nơi trực thuộc của phiên dịch viên　Xem tờ đính kèm</p></td>
 </tr>
 </tbody></table></div>
 
@@ -1740,6 +1757,9 @@ async function loadFromDB(passedInfo){
     //   （所属機関の support_manager_〜 は登録支援機関の担当者が入る欄なので、自社支援には使わない）
     try{ await _p17SelfSupport(cas, (typeof co!=='undefined'&&co)?co:null, caseId); }catch(e){ console.warn('[1-17 自社支援]', e); }
     p();
+    // ver.20261030.01: 保存した入力があれば戻す
+    window._lastCaseInfo = window._lastCaseInfo || info;
+    if(!window._p17SkipSaved){ try{ await _p17LoadSaved(); }catch(e){ console.warn('[1-17 保存の読込]', e); } }
     if(typeof showToast==='function') showToast('案件を読み込みました');
   }catch(e){ console.error(e); alert('読込エラー: '+e.message); }
 }
@@ -1809,10 +1829,61 @@ async function _p17Hearing(so, _s){
   if(dm){ _s('es_symY', dm[1]); _s('es_symM', String(parseInt(dm[2],10))); _s('es_symD', String(parseInt(dm[3],10))); }
   if(SC.hp) C.f384 = true;
   if(dm || SC.hp) used.push('共生施策');
+  // ver.20261030.01: 各支援の実施予定（extra.implSchedules）と住居確保の方針（extra.housingPolicy／言語別設定）
+  var T = window._p17Text = window._p17Text || {};
+  var review = [];
+  var parse = function(v){
+    v = String(v||'').trim(); if(!v) return null;
+    var no = /^無/.test(v) || (/無/.test(v) && !/有/.test(v));
+    var inner = '';
+    var m = v.match(/[（(]([^（）()]*)[）)][」』]?\s*$/) || v.match(/[（(]([^（）()]*)[）)]/);
+    if(m) inner = m[1].trim();
+    if(inner.length > 12){
+      var seg = inner.split(/[／\/]/).map(function(x){return x.trim();}).filter(Boolean);
+      if(/適宜実施/.test(inner)) inner='適宜実施';
+      else if(seg.length>1 && seg[seg.length-1].length<=14) inner=seg[seg.length-1];
+      else { review.push(v); inner=''; }
+    }
+    return { no: no, text: inner };
+  };
+  var apply = function(v, rows, textAllowed){
+    var r = parse(v); if(!r) return false;
+    rows.forEach(function(x){
+      C[x[0]] = !r.no; C[x[2]] = r.no;
+      if(textAllowed!==false){ if(!r.no && x[1] && r.text) T[x[1]] = r.text; if(r.no && x[3] && r.text) T[x[3]] = r.text; }
+    });
+    return true;
+  };
+  var IS = ex.implSchedules || {};
+  var HP = Object.assign({}, ex.housingPolicy||{});
+  if(lo.housing_policy_a) HP.a = lo.housing_policy_a;
+  if(lo.housing_policy_b) HP.b = lo.housing_policy_b;
+  if(lo.housing_policy_c) HP.c = lo.housing_policy_c;
+  var sch = 0;
+  if(apply(IS.guidance,    [['f044',null,'f046','f047']])) sch++;
+  if(apply(HP.a || IS.housing, [['f094','f095','f096','f097']])) sch++;
+  if(apply(HP.b,           [['f102','f103','f104','f105']])) sch++;
+  if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
+  if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
+  if(apply(IS.orientation, [['f184','f185','f186','f187']])) sch++;
+  if(apply(IS.japanese,    [['f205','f206','f207','f208'],['f213','f214','f215','f216'],['f220','f221','f222','f223']])) sch++;
+  // 相談・苦情は回答が「直接面談・電話…」など方法の列挙なので、有にチェックだけ入れる（欄には「適宜実施」が印字済み）
+  if(String(IS.consultation||'').trim()){ C.f235 = true; C.f237 = false; sch++; }
+  if(apply(IS.exchange,    [['f271','f272','f273','f274']])) sch++;
+  if(apply(IS.jobchange,   [['f288','f289','f290','f291'],['f296','f297','f298','f299'],['f304','f305','f306','f307'],
+                            ['f312','f313','f314','f315'],['f320','f321','f322','f323'],['f329','f330','f331','f332'],['f337','f338','f339','f340']])) sch++;
+  if(sch) used.push('実施予定（'+sch+'項目）');
+  if(review.length){
+    window._p17Review = review;
+  } else window._p17Review = [];
   var note = document.getElementById('p17HearingNote');
   if(note) note.innerHTML = used.length
     ? '📝 登録支援機関のヒアリング回答から入れました：' + used.join('・') + (lo.support_org_id ? '<br>（ベトナム語の言語別設定を優先）' : '')
     : '⚠ この登録支援機関のヒアリング回答がまだありません。';
+  if(note && window._p17Review && window._p17Review.length){
+    note.innerHTML += '<br><span style="color:#b45309">⚠ 次の回答は長いので（　）内を空けています。必要なら本文に書いてください：<br>・'
+      + window._p17Review.map(function(x){ return String(x).replace(/</g,'&lt;'); }).join('<br>・') + '</span>';
+  }
 }
 // ===== ver.20261020.03: 自社支援（1-11-2号・1-11-3号・1-20号・1-22号と同じ読み方） =====
 async function _ssFetchSelfSupport(coId, caseId){
@@ -1886,7 +1957,63 @@ async function _p17SelfSupport(cas, co, caseId){
   _p17SsNote(h, !!r.newer);
 }
 // DB保存（今は最小：将来 emp_set 等へ）
-async function saveForm(){ alert('この様式のDB保存は未実装です（印刷・PDFはご利用いただけます）。'); }
+/* ver.20261030.01: DB保存。左パネルの全欄・本文の文字・チェックを案件ごとに saysay_form_state へ追記保存する。
+   案件を開くと、最新の保存があれば案件データ・ヒアリングより優先して戻す。 */
+var P17_DOC = '1_17_vi.html';
+function _p17CaseId(){ var i = window._lastCaseInfo || {}; return i.caseId || new URLSearchParams(location.search).get('case') || ''; }
+function _p17Collect(){
+  var side = {};
+  document.querySelectorAll('.fp input[id^="es_"],.fp input[id^="f_"],.fp textarea[id^="es_"],.fp textarea[id^="f_"]').forEach(function(el){ if(el.value!=='') side[el.id]=el.value; });
+  var text = {};
+  document.querySelectorAll('#pageArea input.bl, #pageArea textarea.f').forEach(function(el){ if(el.id && el.value!=='') text[el.id]=el.value; });
+  var chk = {};
+  document.querySelectorAll('#pageArea input.cb[id]').forEach(function(el){ if(!el.disabled) chk[el.id]=!!el.checked; });
+  return { v:1, side:side, text:text, check:chk };
+}
+async function saveForm(){
+  var cid = _p17CaseId();
+  if(!cid){ alert('案件を選んでから保存してください。'); return; }
+  try{
+    var by = (typeof _slogUserName==='function' && _slogUserName()) || (typeof _slogUser==='function' && _slogUser()) || '';
+    await sb('saysay_form_state', {method:'POST', headers:{'Prefer':'return=minimal'},
+      body: JSON.stringify({ case_id:cid, doc_file:P17_DOC, state:_p17Collect(), saved_by: by||null })});
+    _p17SavedNote(new Date().toISOString(), by, false);
+    if(typeof showToast==='function') showToast('💾 保存しました');
+  }catch(e){ console.error(e); alert('保存に失敗しました: '+e.message); }
+}
+function _p17SavedNote(at, by, loaded){
+  var el = document.getElementById('p17SavedNote');
+  if(!el){
+    var box = document.querySelector('.fp-inner') || document.querySelector('.fp'); if(!box) return;
+    el = document.createElement('div'); el.id='p17SavedNote';
+    el.style.cssText='margin:0 0 8px;padding:7px 9px;border-radius:7px;font-size:11px;line-height:1.5;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;';
+    box.insertBefore(el, box.firstChild);
+  }
+  var d=''; try{ var t=new Date(at); d=t.getFullYear()+'/'+(t.getMonth()+1)+'/'+t.getDate()+' '+('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2); }catch(_){}
+  el.innerHTML = (loaded ? '💾 前回の保存（'+d+(by?'・'+String(by).replace(/</g,'&lt;'):'')+'）を読み込みました。'
+                          : '💾 保存しました（'+d+'）')
+    + (loaded ? '<br><a href="#" onclick="_p17Reload();return false;" style="color:#1d4ed8">保存を使わず、案件データから作り直す</a>' : '');
+}
+async function _p17LoadSaved(){
+  var cid = _p17CaseId(); if(!cid) return false;
+  var rows = await sb('saysay_form_state?select=state,saved_at,saved_by&case_id=eq.'+encodeURIComponent(cid)+'&doc_file=eq.'+encodeURIComponent(P17_DOC)+'&order=saved_at.desc&limit=1');
+  var r = rows && rows[0]; if(!r || !r.state) return false;
+  var st = r.state;
+  Object.keys(st.side||{}).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=st.side[id]; });
+  window._p17Text  = Object.assign({}, st.text||{});
+  window._p17Check = Object.assign(_p17DefaultChecks(), st.check||{});
+  p();
+  _p17SavedNote(r.saved_at, r.saved_by, true);
+  return true;
+}
+async function _p17Reload(){
+  if(!confirm('保存した内容を使わず、案件データとヒアリング回答から作り直します。（保存した内容は消えません）')) return;
+  document.querySelectorAll('input[id^="es_"],input[id^="f_"],textarea[id^="es_"],textarea[id^="f_"]').forEach(function(el){ el.value=''; });
+  window._p17Check=_p17DefaultChecks(); window._p17Text={};
+  window._p17SkipSaved = true;
+  try{ await loadFromDB(window._lastCaseInfo || {caseId:_p17CaseId()}); } finally { window._p17SkipSaved = false; }
+  var el=document.getElementById('p17SavedNote'); if(el) el.innerHTML='案件データとヒアリング回答から作り直しました。必要なら「💾 DB保存」で保存してください。';
+}
 // AI判定（1-17は未対応）
 function aiCheck17(){ alert('1-17号のAI判定は未対応です。'); }
 
