@@ -41,7 +41,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書＋別紙 経歴証明書</div>
-    <div class="ver">ver.20260831.06</div>
+    <div class="ver">ver.20261029.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -97,6 +97,8 @@
       <div class="fg"><label>③ 開始（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_s3y" oninput="p()" style="width:4em;"><input id="f_s3m" oninput="p()" style="width:3em;"><input id="f_s3d" oninput="p()" style="width:3em;"></div></div>
       <div class="fg"><label>③ 終了（年 / 月 / 日）</label><div style="display:flex;gap:4px;"><input id="f_e3y" oninput="p()" style="width:4em;"><input id="f_e3m" oninput="p()" style="width:3em;"><input id="f_e3d" oninput="p()" style="width:3em;"></div></div>
       <div class="fg"><label>③ 就業日数</label><input id="f_n3" oninput="p()" style="width:5em;"></div>
+      <div id="extraPeriods"></div>
+      <div class="fg"><button type="button" onclick="_addPeriod63()" style="font-size:11px;padding:3px 8px;cursor:pointer;">＋ 期間の行を追加</button></div>
       <div class="fg"><label>合計（空欄なら自動計算）</label><input id="f_total" oninput="p()" style="width:5em;"></div>
     </div>
   </div>
@@ -122,11 +124,27 @@ function _term(n){
   const y=(id)=>`<span class="ul uly">${f(id)}</span>`;
   return `${y('f_s'+n+'y')}年${u('f_s'+n+'m')}月${u('f_s'+n+'d')}日～ ${y('f_e'+n+'y')}年${u('f_e'+n+'m')}月${u('f_e'+n+'d')}日`;
 }
+// ver.20261029.01: 期間の行（4行目以降は必要なときだけ作る）
+const _CIRC63='①②③④⑤⑥⑦⑧⑨⑩';
+function _periodRows63(){ let n=3; while(document.getElementById('f_s'+(n+1)+'y')) n++; return n; }
+function _addPeriod63(){
+  const n=_periodRows63()+1; if(n>10) return;
+  const c=_CIRC63[n-1], box=document.getElementById('extraPeriods'); if(!box) return;
+  const ymd=(pre)=>`<div style="display:flex;gap:4px;"><input id="f_${pre}${n}y" oninput="p()" style="width:4em;"><input id="f_${pre}${n}m" oninput="p()" style="width:3em;"><input id="f_${pre}${n}d" oninput="p()" style="width:3em;"></div>`;
+  box.insertAdjacentHTML('beforeend',
+    `<div class="fg"><label>${c} 開始（年 / 月 / 日）</label>${ymd('s')}</div>`+
+    `<div class="fg"><label>${c} 終了（年 / 月 / 日）</label>${ymd('e')}</div>`+
+    `<div class="fg"><label>${c} 就業日数</label><input id="f_n${n}" oninput="p()" style="width:5em;"></div>`);
+  p();
+}
+function _periodTableRows63(){
+  let h=''; for(let i=1;i<=_periodRows63();i++){ h+=`<tr><td>${_CIRC63[i-1]}</td><td class="m">${_term(i)}</td><td class="r">${_days('f_n'+i)}</td></tr>`; } return h;
+}
 function _days(id){ return `<span class="ul" style="min-width:4em;">${f(id)}</span>　日`; }
 function _total(){
   let t=v('f_total'); if(t) return t;
   let sum=0, any=false;
-  for(let i=1;i<=3;i++){ const x=parseInt((v('f_n'+i)||'').replace(/[^0-9]/g,''),10); if(!isNaN(x)){sum+=x;any=true;} }
+  for(let i=1;i<=_periodRows63();i++){ const x=parseInt((v('f_n'+i)||'').replace(/[^0-9]/g,''),10); if(!isNaN(x)){sum+=x;any=true;} }
   return any?String(sum):'';
 }
 function p(){
@@ -194,9 +212,7 @@ function p(){
 <table class="tb">
   <colgroup><col style="width:8mm"><col style="width:89.5mm"><col style="width:52.5mm"></colgroup>
   <tr><td class="c" colspan="2">就業期間</td><td class="c">就業日数</td></tr>
-  <tr><td>①</td><td class="m">${_term(1)}</td><td class="r">${_days('f_n1')}</td></tr>
-  <tr><td>②</td><td class="m">${_term(2)}</td><td class="r">${_days('f_n2')}</td></tr>
-  <tr><td>③</td><td class="m">${_term(3)}</td><td class="r">${_days('f_n3')}</td></tr>
+  ${_periodTableRows63()}
   <tr><td class="c" colspan="2">合計</td><td class="r"><span class="ul" style="min-width:4em;">${tot?'<span class="f">'+tot+'</span>':f('f_total')}</span>　日</td></tr>
 </table>
 <div class="p">※必要に応じ行を追加すること。</div>
@@ -220,6 +236,41 @@ function _apply6_3FontSize(){
     `.doc .t63 td,.doc .tb td{font-size:${(10.5*s).toFixed(2)}pt!important;line-height:${(18*s).toFixed(2)}pt!important}`,
     `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
   ].join('');
+}
+// ver.20261029.01: 6-3号ヒアリングフォームの回答（t2Ccus）→ 書類の入力欄
+function _apply63FromForm(r, sf){
+  const days=(x)=>{ const n=parseInt(String(x==null?'':x).replace(/[^0-9]/g,''),10); return isNaN(n)?'':String(n); };
+  sf('f_job', r.job||'');
+  sf('f_call', r.call||'');
+  const no=String(r.accumulated||'').indexOf('いいえ')===0;
+  // ③：必要日数を満たしていれば様式の記載例どおり「1年（215日）以上」の形、足りなければ実際の日数
+  const _lbl={108:'0.5年（108日）',215:'1年（215日）',430:'2年（430日）',645:'3年（645日）'}[parseInt(r.needDays,10)];
+  const _tot=parseInt(days(r.totalDays!==undefined?r.totalDays:r.ccusDays)||'0',10), _need=parseInt(r.needDays,10);
+  if(r.ccusDays!==undefined && r.ccusDays!==''){
+    sf('f_days1', (_lbl && _need && _tot>=_need) ? (_lbl+'以上') : (days(r.ccusDays)+'日'));
+  }
+  if(no){
+    if(r.workerId) sf('f_ccusId', r.workerId);
+    if(r.careerDays) sf('f_days2', days(r.careerDays)+'日');
+    // 経歴の期間（日付は yyyy-mm-dd）
+    const per=Array.isArray(r.periods)?r.periods:[];
+    while(_periodRows63()<per.length && _periodRows63()<10) _addPeriod63();
+    for(let i=1;i<=_periodRows63();i++){ ['s','e'].forEach(k=>['y','m','d'].forEach(q=>{ const el=document.getElementById('f_'+k+i+q); if(el) el.value=''; })); const ne=document.getElementById('f_n'+i); if(ne) ne.value=''; }
+    per.forEach((x,i)=>{
+      const n=i+1; if(n>10) return;
+      const put=(k,dt)=>{ const m=String(dt||'').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(!m) return; sf('f_'+k+n+'y',String(parseInt(m[1],10))); sf('f_'+k+n+'m',String(parseInt(m[2],10))); sf('f_'+k+n+'d',String(parseInt(m[3],10))); };
+      put('s',x.from); put('e',x.to); sf('f_n'+n, days(x.days));
+    });
+    const te=document.getElementById('f_total'); if(te) te.value='';
+    // 証明者：別の会社なら回答の会社（所属機関なら会社情報のまま）
+    if(String(r.certType||'').indexOf('別の会社')===0){
+      ['f_certCo','f_certTitle','f_certName','f_certCcusId'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      sf('f_certCo', r.certCo||''); sf('f_certTitle', r.certTitle||''); sf('f_certName', r.certName||''); sf('f_certCcusId', r.certCoId||'');
+    }
+  }else{
+    // 全て蓄積されている：④・別紙の期間は使わない
+    const d2=document.getElementById('f_days2'); if(d2) d2.value='';
+  }
 }
 function _ymd63(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
 async function loadFromDB(passedInfo){
@@ -263,7 +314,15 @@ async function loadFromDB(passedInfo){
     }else if(!v('f_docYear')){
       const n=new Date();sf('f_docYear',String(n.getFullYear()));sf('f_docMonth',String(n.getMonth()+1));sf('f_docDay',String(n.getDate()));
     }
-    p(); showToast('✅ データを読み込みました');
+    // ver.20261029.01: 6-3号ヒアリングフォーム（form_type=tokutei2_jitsumu）の最新の回答を反映
+    let _frMsg='';
+    try{
+      const frs=await sb(`form_responses?select=response,submitted_at,created_at&form_type=eq.tokutei2_jitsumu&case_id=eq.${encodeURIComponent(caseId)}&deleted_at=is.null&order=created_at.desc&limit=5`);
+      const fr=(frs||[]).map(x=>x&&x.response).map(r=>{ if(typeof r==='string'){ try{return JSON.parse(r);}catch(e){return null;} } return r; })
+        .map(r=>r&&r.t2Ccus).find(c=>c&&(c.jobCode||c.job||c.accumulated));
+      if(fr){ _apply63FromForm(fr, sf); _frMsg='（ヒアリングフォームの回答を反映）'; }
+    }catch(e2){ console.error('6-3 form response load error (ignored):', e2); }
+    p(); showToast('✅ データを読み込みました'+_frMsg);
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
 initCaseSelect(); p();
