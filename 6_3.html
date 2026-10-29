@@ -41,7 +41,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書＋別紙 経歴証明書</div>
-    <div class="ver">ver.20261029.01</div>
+    <div class="ver">ver.20261029.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -247,7 +247,8 @@ function _apply63FromForm(r, sf){
   const _lbl={108:'0.5年（108日）',215:'1年（215日）',430:'2年（430日）',645:'3年（645日）'}[parseInt(r.needDays,10)];
   const _tot=parseInt(days(r.totalDays!==undefined?r.totalDays:r.ccusDays)||'0',10), _need=parseInt(r.needDays,10);
   if(r.ccusDays!==undefined && r.ccusDays!==''){
-    sf('f_days1', (_lbl && _need && _tot>=_need) ? (_lbl+'以上') : (days(r.ccusDays)+'日'));
+    // 全て蓄積されている：満たしていれば「1年（215日）以上」の形／蓄積されていない：③はCCUSにたまっている分の日数（④は経歴証明書の合計）
+    sf('f_days1', (!no && _lbl && _need && _tot>=_need) ? (_lbl+'以上') : (days(r.ccusDays)+'日'));
   }
   if(no){
     if(r.workerId) sf('f_ccusId', r.workerId);
