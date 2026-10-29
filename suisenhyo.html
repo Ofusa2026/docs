@@ -136,7 +136,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20261006.04</div>
+    <div class="ver">ver.20261029.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -220,7 +220,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>旅券番号</label><input id="f_p1Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p1Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p1Job" oninput="p()"></div>
-      <div class="fg"><label>職業（推薦状）</label><input id="f_p1Occ" value="会社員" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p1Occ" placeholder="分野名（例：外食業）" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p1School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -238,7 +238,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>旅券番号</label><input id="f_p2Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p2Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p2Job" oninput="p()"></div>
-      <div class="fg"><label>職業（推薦状）</label><input id="f_p2Occ" value="会社員" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p2Occ" placeholder="分野名（例：外食業）" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p2School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -256,7 +256,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>旅券番号</label><input id="f_p3Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p3Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p3Job" oninput="p()"></div>
-      <div class="fg"><label>職業（推薦状）</label><input id="f_p3Occ" value="会社員" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p3Occ" placeholder="分野名（例：外食業）" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p3School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -274,7 +274,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>旅券番号</label><input id="f_p4Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p4Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p4Job" oninput="p()"></div>
-      <div class="fg"><label>職業（推薦状）</label><input id="f_p4Occ" value="会社員" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p4Occ" placeholder="分野名（例：外食業）" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p4School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -292,7 +292,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>旅券番号</label><input id="f_p5Pass" oninput="p()"></div>
       <div class="fg"><label>従前の在留資格</label><input id="f_p5Prev" oninput="p()"></div>
       <div class="fg"><label>特定技能職業（交付申請書・分野）</label><input id="f_p5Job" oninput="p()"></div>
-      <div class="fg"><label>職業（推薦状）</label><input id="f_p5Occ" value="会社員" oninput="p()"></div>
+      <div class="fg"><label>職業（推薦状）</label><input id="f_p5Occ" placeholder="分野名（例：外食業）" oninput="p()"></div>
       <div class="fg"><label>送出機関名（実習生）／学校名（留学）</label><input id="f_p5School" oninput="p()" placeholder="技能実習の送出機関 / 留学の学校名"></div>
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p5VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
@@ -334,7 +334,7 @@ function _row(i){
     <td class="col-gender">${cell('Gender')}</td>
     <td class="col-pass">${cell('Pass')}</td>
     <td class="col-prev">${cell('Prev')}</td>
-    <td class="col-job">${any?(v('f_p'+i+'Occ')?f('f_p'+i+'Occ'):'&nbsp;'):'&nbsp;'}</td>
+    <td class="col-job">${any?(v('f_p'+i+'Occ')?f('f_p'+i+'Occ'):(v('f_p'+i+'Job')?f('f_p'+i+'Job'):'&nbsp;')):'&nbsp;'}</td>
   </tr>`;
 }
 function _kfRow(i){
@@ -357,6 +357,8 @@ function _kfRow(i){
 }
 
 function p(){
+  // ver.20261029.01: 以前の保存データに残っている「会社員」は分野名に置き換える
+  try{ for(var _i=1;_i<=5;_i++){ var _o=document.getElementById('f_p'+_i+'Occ'), _j=document.getElementById('f_p'+_i+'Job'); if(_o&&_j&&String(_o.value).trim()==='会社員'&&String(_j.value).trim()) _o.value=String(_j.value).trim(); } }catch(_e){}
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
   const visa=document.getElementById('f_visaType');
@@ -786,6 +788,8 @@ async function importPerson(slot){
       if(cas.applicant_field){
         const _bunya=String(cas.applicant_field).replace(/[（(].*$/,'').replace(/分野$/,'').trim();
         s('f_p'+i+'Job', _bunya);
+        // ver.20261029.01: 推薦状の「職業」も「会社員」ではなく分野名を入れる
+        s('f_p'+i+'Occ', _bunya);
       }
     }
   }catch(e){ console.warn('cases取得スキップ:',e.message); }
@@ -867,7 +871,7 @@ function clearPerson(slot){
     const el=document.getElementById('f_p'+i+k);
     if(el) el.value='';
   });
-  const _oc=document.getElementById('f_p'+i+'Occ'); if(_oc) _oc.value='会社員';
+  const _oc=document.getElementById('f_p'+i+'Occ'); if(_oc) _oc.value='';
   const btn=document.getElementById('p'+i+'Btn');
   if(btn) btn.classList.remove('has-data');
   const st=document.getElementById('p'+i+'Status');
