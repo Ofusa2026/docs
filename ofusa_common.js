@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261029.01
+ * - feat(利用ログ): saysay_logs に案シスで選んだ担当者名(user_name)も記録（共有アカウント mail@ でも人を区別）
  * ver.20261028.01
  * - feat(直接編集): 直接編集の後に、書類の形が変わる変更（チェック欄・シフト行など）をサイドバーでしたら、
  *   書類の上に黄色いお知らせを出す（「♻️ 破棄して作り直す」「このまま使う」）。印刷時も確認
@@ -4258,11 +4260,17 @@ function _slogUser(){
   }catch(_e){}
   return '';
 }
+// ver.20261029.01: 案シスで選んだ担当者名（共有アカウント mail@ でも、ログイン時に選んだ人を記録する）
+function _slogUserName(){
+  try{ if(window.parent&&window.parent!==window&&window.parent.currentUser) return String(window.parent.currentUser); }catch(_p){}
+  try{ return String(localStorage.getItem('ofusa_currentUser')||''); }catch(_l){}
+  return '';
+}
 function slog(event, extra){
   try{
     var key=''; try{ key=(typeof _dgjInferDocKey==='function')?(_dgjInferDocKey()||''):''; }catch(_k){}
     var who=''; try{ who=(typeof _printApplicantName==='function')?(_printApplicantName()||''):''; }catch(_w){}
-    var body={ event:String(event||''), user_email:_slogUser(), doc_key:key,
+    var body={ event:String(event||''), user_email:_slogUser(), user_name:_slogUserName(), doc_key:key,
       file:(location.pathname.split('/').pop()||''),
       case_id:_SLOG_CTX.caseId, company_id:_SLOG_CTX.companyId,
       applicant:who, session_id:_SLOG_SESSION,
