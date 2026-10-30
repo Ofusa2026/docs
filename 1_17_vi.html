@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261030.01</div>
+    <div class="ver">ver.20261030.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1781,7 +1781,10 @@ async function _p17Hearing(so, _s){
   var C = window._p17Check = window._p17Check || {};
   var used = [];
   // 対応時間
-  var H = ex.supportHours || ex.hours || {};
+  /* ver.20261030.02: 対応時間は O-Link（extra.hours）とヒアリングフォーム（extra.supportHours）の2か所にある。
+     中身が空の方を先に読んで空欄になる機関があったため、値の入っている方を使う。両方あれば O-Link を優先。 */
+  var _hasH = function(o){ return !!o && typeof o==='object' && Object.keys(o).some(function(k){ var x=o[k]||{}; return x.none===true || !!x.from || !!x.to; }); };
+  var H = _hasH(ex.hours) ? ex.hours : (_hasH(ex.supportHours) ? ex.supportHours : {});
   var hh = function(t){ if(!t) return ''; var m=String(t).match(/^(\d{1,2})(?::(\d{2}))?/); if(!m) return String(t); var h=String(parseInt(m[1],10)); return (m[2] && m[2]!=='00') ? h+':'+m[2] : h; };
   var dmap = {Mon:'mon',Tue:'tue',Wed:'wed',Thu:'thu',Fri:'fri',Sat:'sat',Sun:'sun',Hol:'hol'};
   var anyH = false;
