@@ -13,6 +13,7 @@
 .ja{font-size:10.5pt;}
 .vi{color:#555;font-size:9.5pt;margin-top:0.5mm;}
 .sec{margin-bottom:3.5mm;}
+.sec.allow4 .row{margin-bottom:0.8mm;}
 .sec-h{font-size:11pt;font-weight:bold;margin-bottom:1mm;}
 .sec-h-vi{color:#555;font-size:9.5pt;margin-bottom:1.5mm;}
 .box{border:1px solid #000;padding:2mm 3mm;margin-bottom:2.5mm;}
@@ -43,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（カンボジア語）</div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261030.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -107,6 +108,13 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       </div>
       <div class="fg"><label>(c)計算方法（日）</label><input id="f_allowance3Calc" oninput="p()"></div>
       <div class="fg"><label>(c)計算方法（ローマ字）</label><input id="f_allowance3CalcEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(d)手当名（日）</label><input id="f_allowance4Name" oninput="p()"></div>
+        <div class="fg"><label>(d)手当名（ローマ字）</label><input id="f_allowance4NameEn" oninput="p()"></div>
+        <div class="fg"><label>(d)金額（円）</label><input id="f_allowance4Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(d)計算方法（日）</label><input id="f_allowance4Calc" oninput="p()"></div>
+      <div class="fg"><label>(d)計算方法（ローマ字）</label><input id="f_allowance4CalcEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">３．固定残業代</div>
       <div class="fg"><label>固定残業</label>
@@ -173,7 +181,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793331836"></script>
+<script src="ofusa_common.js?v=1793348437"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -191,6 +199,8 @@ function toggleFixedOT(val){
   p();
 }
 function p(){
+  // ver.20261030.09: (d)4つ目の手当は入力があるときだけ表示（1ページに収めるため手当欄の行間を少し詰める）
+  const _a4On=['f_allowance4Name','f_allowance4NameEn','f_allowance4Amount','f_allowance4Calc','f_allowance4CalcEn'].some(function(k){var e=document.getElementById(k);return e&&String(e.value||'').trim();});
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
   const fixedOT = _fixedOTState || '無';
@@ -215,7 +225,7 @@ function p(){
   <div class="row vi">ប្រាក់ខែ（<span class="under">${ff('f_salaryMonthly')}</span> យ៉េន　រួមបញ្ចូលប្រាក់ឧបត្ថម្ភ <span class="under">&nbsp;</span> យ៉េន, ប្រាក់ឧបត្ថម្ភ <span class="under">&nbsp;</span> យ៉េន）</div>
 </div>
 
-<div class="sec">
+<div class="sec${_a4On?' allow4':''}">
   <div class="sec-h">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）</div>
   <div class="sec-h-vi">ចំនួនទឹកប្រាក់ឧបត្ថម្ភផ្សេងៗ និងវិធីគណនា（លើកលែងប្រាក់បន្ថែមនៃការធ្វើការថែមម៉ោង）</div>
   <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${ff('f_allowance1Amount')}</span>円／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
@@ -224,6 +234,10 @@ function p(){
   <div class="row vi">(b)（<span class="under">${f('f_allowance2NameEn')}</span> ប្រាក់ឧបត្ថម្ភ,　<span class="under">${ff('f_allowance2Amount')}</span> យ៉េន／វិធីគណនា：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
   <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${ff('f_allowance3Amount')}</span>円／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
   <div class="row vi">(c)（<span class="under">${f('f_allowance3NameEn')}</span> ប្រាក់ឧបត្ថម្ភ,　<span class="under">${ff('f_allowance3Amount')}</span> យ៉េន／វិធីគណនា：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
+  ${_a4On?`
+  <div class="row ja">(d)（<span class="under">${f('f_allowance4Name')}</span>手当　<span class="under">${ff('f_allowance4Amount')}</span>円／計算方法：<span class="under">${f('f_allowance4Calc')}</span>）</div>
+  <div class="row vi">(d)（<span class="under">${f('f_allowance4NameEn')}</span> ប្រាក់ឧបត្ថម្ភ,　<span class="under">${ff('f_allowance4Amount')}</span> យ៉េន／វិធីគណនា：<span class="under">${f('f_allowance4CalcEn')}</span>）</div>
+  `:''}
 </div>
 
 <div class="sec">
@@ -530,7 +544,7 @@ function _koujiTr(s){
   return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||t):'';})
          .filter(Boolean).join('、');
 }
-const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
+const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_allowance4Calc:'allowance4Cond',f_allowance4Amount:'allowance4Amount',f_allowance4Name:'allowance4Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
 
 // ver.20260910.01: 実費フラグ（1-6号と同仕様）。案シスの雇用条件 deductXxxType(true) が
 //   共通 loadCaseToForm の橋渡しで es_deductXxxJippi/Est に入る。手動チェックも可。
@@ -570,6 +584,9 @@ async function loadFromDB(passedInfo){
     S('f_allowance3Calc', _es.allowance3Cond); S('f_allowance3CalcEn', _es.allowance3CondEn);
     S('f_allowance3Amount', _es.allowance3Amount);
     S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
+    S('f_allowance4Calc', _es.allowance4Cond); S('f_allowance4CalcEn', _es.allowance4CondEn);   // ver.20261030.09: (d)4つ目の手当
+    S('f_allowance4Amount', _es.allowance4Amount);
+    S('f_allowance4Name', _es.allowance4Name); S('f_allowance4NameEn', _es.allowance4NameEn);
     S('f_workType', _es.category || (cas&&cas.job_category)); S('f_workTypeEn', _es.categoryEn || (cas&&cas.job_category_en));
     S('f_workCat', (per&&per.kokko_jyuji_koujigyo)?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
     if(per&&per.kokko_jyuji_koujigyo){ var _e=document.getElementById('f_workCatEn');
