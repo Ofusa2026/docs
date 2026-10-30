@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261030.02</div>
+    <div class="ver">ver.20261030.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -579,6 +579,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>支援責任者 役職(英)<span class="fid">es.coMgrTitleEn</span></label><input id="es_coMgrTitleEn" oninput="p()"></div>
 <div class="fg"><label>作成責任者 氏名<span class="fid">es.coAuthorName</span></label><input id="es_coAuthorName" oninput="p()"></div>
 </div>
+<input type="hidden" id="es_selfMode" value="">
 <div class="fs"><div class="fs-title">登録支援機関</div>
 <div class="fg"><label>登録番号<span class="fid">es.soRegNo</span></label><input id="es_soRegNo" oninput="p()"></div>
 <div class="fg3"><div class="fg"><label>登録 年<span class="fid">es.soRegY</span></label><input id="es_soRegY" oninput="p()"></div><div class="fg"><label>月<span class="fid">es.soRegM</span></label><input id="es_soRegM" oninput="p()"></div><div class="fg"><label>日<span class="fid">es.soRegD</span></label><input id="es_soRegD" oninput="p()"></div></div>
@@ -674,6 +675,10 @@ document.addEventListener('input', function(e){
   var t=e.target; if(!t || !t.id) return;
   if(t.closest && t.closest('#pageArea') && (t.matches('input.bl') || t.matches('textarea.f'))) window._p17Text[t.id]=t.value;
 });
+/* ver.20261030.03: ラジオ（Ⅱ欄４ 中立性の有・無など）も描画のたびに消えていたので、name ごとに保持する。 */
+window._p17Radio = window._p17Radio || {};
+document.addEventListener('change', function(e){ var t=e.target; if(t && t.type==='radio' && t.name && t.closest && t.closest('#pageArea')) window._p17Radio[t.name]=t.value; });
+function _p17RestoreRadios(){ var st=window._p17Radio||{}; Object.keys(st).forEach(function(n){ document.querySelectorAll('#pageArea input[type=radio][name="'+n+'"]').forEach(function(r){ r.checked=(r.value===st[n]); }); }); }
 function _p17RestoreTexts(){
   var st=window._p17Text||{};
   Object.keys(st).forEach(function(id){ try{ var el=document.getElementById(id); if(el && el.type!=='checkbox') el.value=st[id]; }catch(_){} });
@@ -734,6 +739,7 @@ function p(){
   area.innerHTML = P17_TEMPLATE();
   _p17RestoreChecks();
   _p17RestoreTexts();
+  _p17RestoreRadios();
   _p17BuildNav();
   requestAnimationFrame(_p17FitInputs);
   p17Fit(); requestAnimationFrame(p17Fit);
@@ -803,12 +809,12 @@ Họ và tên</p></td>
      companies.support_manager_name/title は「別紙参照」「なし」等が入っており、
      この欄にそのまま印字すると書類として成立しないため。
      Ⅳ 支援内容の担当者欄(es.coMgrName 34箇所)は従来どおり変数のまま。 -->
-<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span></td>
+<td class="b-tttt" colspan="3"><p class="ja a-center">${v('es_selfMode') ? f('es_coMgrKana') : ''}</p></td>
 <td class="b-tttt" colspan="2" rowspan="2"><p class="ja a-center">役　　職</p><p class="vi a-center">Chức vụ</p></td>
-<td class="b-tttk fld" rowspan="2"><span class="sp">&nbsp;</span></td>
+<td class="b-tttk" rowspan="2"><p class="ja a-center">${v('es_selfMode') ? f('es_coMgrTitle') : ''}</p><p class="vi a-center">${v('es_selfMode') ? f('es_coMgrTitleEn') : ''}</p></td>
 </tr>
 <tr class="nosplit" style="height:3.94em">
-<td class="b-tttt fld" colspan="3"><span class="sp">&nbsp;</span></td>
+<td class="b-tttt" colspan="3"><p class="ja a-center">${v('es_selfMode') ? f('es_coMgrName') : ''}</p><p class="vi a-center">${v('es_selfMode') ? f('es_coMgrNameEn') : ''}</p></td>
 </tr>
 <tr class="nosplit" style="height:4.68em">
 <td class="b-tttt"><p class="ja a-center">支援を行っている</p><p class="ja a-center">１号特定技能外国人数</p><p class="vi a-center">Số người nước ngoài có kỹ năng đặc định số 1 đang hỗ trợ</p></td>
@@ -1705,8 +1711,36 @@ async function loadFromDB(passedInfo){
         if(_ea.length>=2){ _s('es_officePrefEn', _es.officePrefEn||_ea[_ea.length-1]); _s('es_officeCityEn', _es.officeCityEn||_ea[_ea.length-2]); }
       }
     }
+    // ver.20261030.03: 自社支援の判定（登録支援機関が空、または「企業単独」「自社支援」）。
+    //   注意書き３のとおり Ⅲ欄（登録支援機関）は全部委託のときだけ書くので、自社支援では読まない。
+    /* ver.20261030.04: 判定の順番
+         1) 案件の登録支援機関が「企業単独」「自社支援」 → 自社支援（案シスで自社支援を選ぶと「企業単独」が入る）
+         2) 案件の登録支援機関が他の名前 → その登録支援機関に委託
+         3) 案件の登録支援機関が空 → 所属機関に設定された登録支援機関を見る
+              「企業単独」なら自社支援／登録支援機関名ならそこに委託
+              空・「要振り分け」なら、所属機関に自社支援の内容が登録されていれば自社支援、無ければ判定できないので知らせる
+       案件側が空でも所属機関側に登録支援機関が入っている委託案件があり、以前は自社支援と誤判定していた。 */
+    var _SELF_RE = /^(企業単独|自社支援|自社)$/;
+    var _orgNm = String((cas&&cas.org)||'').trim();
+    var _coSo  = String((typeof co!=='undefined' && co && co.support_org_name) || '').trim();
+    var _isSelf = false, _selfWhy = '', _orgUnknown = false;
+    if(_orgNm){
+      _isSelf = _SELF_RE.test(_orgNm); _selfWhy = _isSelf ? '案件の登録支援機関が「'+_orgNm+'」' : '';
+    } else if(_coSo && _coSo!=='要振り分け'){
+      if(_SELF_RE.test(_coSo)){ _isSelf = true; _selfWhy = '所属機関の登録支援機関が「'+_coSo+'」'; }
+      else { info = Object.assign({}, info, {orgName: _coSo}); }
+    } else {
+      var _hasSs = !!(typeof co!=='undefined' && co && co.extra && co.extra.selfSupport && Object.keys(co.extra.selfSupport).length);
+      if(_hasSs){ _isSelf = true; _selfWhy = '登録支援機関が未設定で、所属機関に自社支援の内容が登録されている'; }
+      else _orgUnknown = true;
+    }
+    window._p17SelfWhy = _selfWhy;
+    var _sm=document.getElementById('es_selfMode'); if(_sm) _sm.value = _isSelf ? '1' : '';
+    if(_orgUnknown){
+      _p17SsNote('⚠ この案件は登録支援機関が決まっていません（案件・所属機関とも空、または「要振り分け」）。<br>委託なら案シスで登録支援機関を、自社支援なら「企業単独」を選んでから開き直してください。', true);
+    } else { var _on=document.getElementById('p17SsNote'); if(_on && !_isSelf) _on.remove(); }
     // 登録支援機関
-    if(typeof findSupportOrg==='function'){
+    if(!_isSelf && typeof findSupportOrg==='function'){
       /* ver.20261013.01: findSupportOrg は第2引数(列指定)を省くと
          'name,address,support_manager' の3列しか取得しないため、
          name_en / name_kana / reg_no / zip / rep_name / rep_name_en が
@@ -1755,7 +1789,7 @@ async function loadFromDB(passedInfo){
     }
     // ver.20261020.03: 自社支援（案件の登録支援機関が空欄）は、支援責任者を所属機関の「🤝 自社支援」から入れる
     //   （所属機関の support_manager_〜 は登録支援機関の担当者が入る欄なので、自社支援には使わない）
-    try{ await _p17SelfSupport(cas, (typeof co!=='undefined'&&co)?co:null, caseId); }catch(e){ console.warn('[1-17 自社支援]', e); }
+    if(_isSelf){ try{ await _p17SelfSupport(cas, (typeof co!=='undefined'&&co)?co:null, caseId); }catch(e){ console.warn('[1-17 自社支援]', e); } }
     p();
     // ver.20261030.01: 保存した入力があれば戻す
     window._lastCaseInfo = window._lastCaseInfo || info;
@@ -1772,7 +1806,7 @@ async function loadFromDB(passedInfo){
 async function _p17Hearing(so, _s){
   var ex = (so && so.extra) || {};
   var lo = null;
-  try{
+  if(so && so.id) try{
     var r = await sb('rpc/get_org_langs', {method:'POST', body: JSON.stringify({p_org_id: so.id})});
     var langs = (r && r.langs) || [];
     lo = langs.filter(function(x){ return x && x.language_code==='vi'; })[0] || null;
@@ -1831,6 +1865,9 @@ async function _p17Hearing(so, _s){
   var dm = String(SC.date || SC.other || '').match(/(\d{4})\s*[-\/年.]\s*(\d{1,2})\s*[-\/月.]\s*(\d{1,2})/);
   if(dm){ _s('es_symY', dm[1]); _s('es_symM', String(parseInt(dm[2],10))); _s('es_symD', String(parseInt(dm[3],10))); }
   if(SC.hp) C.f384 = true;
+  // ver.20261030.03: 日付の無い「その他」（例：市役所窓口）は、確認方法の「その他の方法（　）」へ
+  var _scOther = String(SC.other||'').trim();
+  if(!dm && _scOther && _scOther.length<=20){ C.f385 = true; (window._p17Text = window._p17Text || {}).f386 = _scOther; }
   if(dm || SC.hp) used.push('共生施策');
   // ver.20261030.01: 各支援の実施予定（extra.implSchedules）と住居確保の方針（extra.housingPolicy／言語別設定）
   var T = window._p17Text = window._p17Text || {};
@@ -1841,6 +1878,7 @@ async function _p17Hearing(so, _s){
     var inner = '';
     var m = v.match(/[（(]([^（）()]*)[）)][」』]?\s*$/) || v.match(/[（(]([^（）()]*)[）)]/);
     if(m) inner = m[1].trim();
+    else if(!/^[有無]/.test(v) && v.length<=14) inner = v.replace(/冝/g,'宜');   // ver.20261030.03: 自社支援の「入社日」「適冝」など
     if(inner.length > 12){
       var seg = inner.split(/[／\/]/).map(function(x){return x.trim();}).filter(Boolean);
       if(/適宜実施/.test(inner)) inner='適宜実施';
@@ -1881,7 +1919,7 @@ async function _p17Hearing(so, _s){
   } else window._p17Review = [];
   var note = document.getElementById('p17HearingNote');
   if(note) note.innerHTML = used.length
-    ? '📝 登録支援機関のヒアリング回答から入れました：' + used.join('・') + (lo.support_org_id ? '<br>（ベトナム語の言語別設定を優先）' : '')
+    ? ((so && so.id) ? '📝 登録支援機関のヒアリング回答から入れました：' : '🤝 所属機関の自社支援の内容から入れました：') + used.join('・') + (lo.support_org_id ? '<br>（ベトナム語の言語別設定を優先）' : '')
     : '⚠ この登録支援機関のヒアリング回答がまだありません。';
   if(note && window._p17Review && window._p17Review.length){
     note.innerHTML += '<br><span style="color:#b45309">⚠ 次の回答は長いので（　）内を空けています。必要なら本文に書いてください：<br>・'
@@ -1938,12 +1976,14 @@ function _p17SsNote(html, warn){
 }
 async function _p17SelfSupport(cas, co, caseId){
   var old=document.getElementById('p17SsNote'); if(old) old.remove();
-  if(!cas || String(cas.org||'').trim()) return;   // 登録支援機関に委託している案件は今までどおり
+  if(!cas) return;   // ver.20261030.03: 自社支援かどうかは呼び出し側（_isSelf）で判定済み
   var coId=(co&&co.id)||cas.company_id||'';
   var r=await _ssFetchSelfSupport(coId, caseId);
   var ss=r&&r.ss;
   if(!ss){
-    _p17SsNote('🤝 自社支援の案件ですが、自社支援の内容（支援責任者など）がまだ登録されていません。<br>案シスの所属機関案内から「① 企業情報＋自社支援」を送り、回答を取り込んでください。', true);
+    // ver.20261030.04: 自社支援の内容が無いのに、所属機関の代表者などを支援責任者として印字しないよう空にする
+    ['es_coMgrKana','es_coMgrName','es_coMgrNameEn','es_coMgrTitle','es_coMgrTitleEn'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+    _p17SsNote((window._p17SelfWhy ? '<b>自社支援として作成</b>（'+window._p17SelfWhy+'）<br>' : '')+'🤝 自社支援の案件ですが、自社支援の内容（支援責任者など）がまだ登録されていません。<br>案シスの所属機関案内から「① 企業情報＋自社支援」を送り、回答を取り込んでください。', true);
     return;
   }
   var set=function(id,val){ var e=document.getElementById(id); if(e) e.value=(val==null?'':String(val)); };
@@ -1954,9 +1994,26 @@ async function _p17SelfSupport(cas, co, caseId){
   // 支援責任者の英語の氏名は自社支援のフォームで聞いていない。代表者と同じ人なら代表者の英語名を使う
   var _rep=String((co&&co.rep_name)||'').replace(/\s/g,''), _mgr=String(ss.supportManagerName||'').replace(/\s/g,'');
   set('es_coMgrNameEn', (_rep && _rep===_mgr) ? ((co&&co.rep_name_en)||'') : '');
-  var h = r.src==='anshis' ? '🤝 自社支援：支援責任者は案シスの「自社支援」タブの内容を使っています' : '📝 自社支援：支援責任者はヒアリングフォームの回答を使っています（案シスにはまだ取り込まれていません）';
+  var h = (window._p17SelfWhy ? '<b>自社支援として作成</b>（'+window._p17SelfWhy+'）<br>' : '') + (r.src==='anshis' ? '🤝 自社支援：支援責任者は案シスの「自社支援」タブの内容を使っています' : '📝 自社支援：支援責任者はヒアリングフォームの回答を使っています（案シスにはまだ取り込まれていません）');
   if(r.newer) h+='<br>⚠️ 案シスに取り込んでいない新しいフォーム回答があります。';
   if(!(_rep && _rep===_mgr)) h+='<br>支援責任者の氏名（英）は手で入れてください。';
+  /* ver.20261030.03: 自社支援の内容を Ⅱ-3・Ⅱ-4 と Ⅳ（対応時間・相談方法・実施予定など）へ入れる。
+     自社支援のデータは登録支援機関のヒアリングと同じ形なので、同じ流し込み処理を使う。 */
+  var T = window._p17Text = window._p17Text || {};
+  var num = function(x){ var m=String(x==null?'':x).match(/\d+/); return m?m[0]:''; };
+  if(num(ss.supporterCount))    T.f023n = num(ss.supporterCount);
+  if(num(ss.supportStaffCount)) T.f024  = num(ss.supportStaffCount);
+  if(ss.neutrality==='有' || ss.neutrality==='無'){ window._p17Radio = window._p17Radio || {}; window._p17Radio.f023 = ss.neutrality; }
+  var off = Array.isArray(ss.offices) && ss.offices[0];
+  if(off){
+    var zip = String(off.officeZip||off.zip||''), adr = off.officeAddress || ((off.officePref||'')+(off.officeCity||'')+(off.officeAddressDetail||''));
+    if(zip) T.f016 = zip.replace(/^(\d{3})(\d{4})$/,'$1-$2');
+    if(adr) T.f016a = adr;
+    var tp = String(off.officeTel||off.tel||'').split(/[-ー－\s]+/).filter(Boolean);
+    if(tp.length>=3){ T.f017=tp[0]; T.f018=tp[1]; T.f019=tp.slice(2).join('-'); } else if(tp.length){ T.f017=tp.join(''); }
+  }
+  try{ await _p17Hearing({id:null, extra:ss}, set); }catch(e){ console.warn('[1-17 自社支援の項目]', e); }
+  h += '<br>Ⅱ欄４（支援体制）と、対応時間・相談方法・実施予定なども自社支援の内容から入れました。Ⅲ欄（登録支援機関）は自社支援なので空欄です。';
   _p17SsNote(h, !!r.newer);
 }
 // DB保存（今は最小：将来 emp_set 等へ）
@@ -1971,7 +2028,9 @@ function _p17Collect(){
   document.querySelectorAll('#pageArea input.bl, #pageArea textarea.f').forEach(function(el){ if(el.id && el.value!=='') text[el.id]=el.value; });
   var chk = {};
   document.querySelectorAll('#pageArea input.cb[id]').forEach(function(el){ if(!el.disabled) chk[el.id]=!!el.checked; });
-  return { v:1, side:side, text:text, check:chk };
+  var radio = {};
+  document.querySelectorAll('#pageArea input[type=radio]:checked').forEach(function(el){ if(el.name) radio[el.name]=el.value; });
+  return { v:1, side:side, text:text, check:chk, radio:radio };
 }
 async function saveForm(){
   var cid = _p17CaseId();
@@ -2005,6 +2064,7 @@ async function _p17LoadSaved(){
   Object.keys(st.side||{}).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=st.side[id]; });
   window._p17Text  = Object.assign({}, st.text||{});
   window._p17Check = Object.assign(_p17DefaultChecks(), st.check||{});
+  window._p17Radio = Object.assign({}, st.radio||{});
   p();
   _p17SavedNote(r.saved_at, r.saved_by, true);
   return true;
@@ -2012,7 +2072,7 @@ async function _p17LoadSaved(){
 async function _p17Reload(){
   if(!confirm('保存した内容を使わず、案件データとヒアリング回答から作り直します。（保存した内容は消えません）')) return;
   document.querySelectorAll('input[id^="es_"],input[id^="f_"],textarea[id^="es_"],textarea[id^="f_"]').forEach(function(el){ el.value=''; });
-  window._p17Check=_p17DefaultChecks(); window._p17Text={};
+  window._p17Check=_p17DefaultChecks(); window._p17Text={}; window._p17Radio={};
   window._p17SkipSaved = true;
   try{ await loadFromDB(window._lastCaseInfo || {caseId:_p17CaseId()}); } finally { window._p17SkipSaved = false; }
   var el=document.getElementById('p17SavedNote'); if(el) el.innerHTML='案件データとヒアリング回答から作り直しました。必要なら「💾 DB保存」で保存してください。';
@@ -2095,6 +2155,7 @@ if(!window._selectCaseListenerAdded){
          残すと前の案件で外したチェックが次の案件に持ち越される。 */
       window._p17Check = _p17DefaultChecks();
       window._p17Text = {};   // ver.20261029.06: 前の案件の本文の文字も持ち越さない
+      window._p17Radio = {};
     }catch(_e){ console.warn('[1-17vi] 入力欄クリア失敗:', _e); }
     /* 書類内の案件セレクトも選択状態を合わせる（無ければ項目を足す）。 */
     var sel=document.getElementById('caseSelect');
