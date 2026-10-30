@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261030.04</div>
+    <div class="ver">ver.20261030.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -662,7 +662,8 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
      f076 … 出入国の送迎 ｂ「実施予定」の 有（契約終了後適宜実施）
      f082 … 出入国の送迎 ｂ「実施方法」の 出国予定空港等
      f084 … 出入国の送迎 ｂ「実施方法」の 送迎方法 */
-function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true }; }
+/* ver.20261030.05: f368 … 9-ｃ 労働法令違反の通報「有（認知次第実施）」（通報は義務なので常に有） */
+function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true }; }
 window._p17Check = window._p17Check || _p17DefaultChecks();
 document.addEventListener('change', function(e){
   var t=e.target;
@@ -1705,6 +1706,31 @@ async function loadFromDB(passedInfo){
         var _sp = _splitAddr(_oa);
         _s('es_officePref', _es.officePref||_sp.pref);
         _s('es_officeCity', _es.officeCity||_sp.city);
+        /* ver.20261030.05: 3-ｄ 住居の概要を雇用条件から入れる（チェック欄は描画で作り直されるので _p17Check／_p17Text に置く）。
+             確保の時期 … 変更申請は日本に住んでいるので「申請の時点で確保」、認定は「申請の後に確保」
+             居室の広さ … 住居ありなら法令の基準「1人当たり7.5㎡以上」
+             居住費     … 給与控除の居住費が1円以上なら「有」と金額、0円なら「無」
+             物件の種類 … housingOwnership の ■ が付いている方 */
+        (function(){
+          var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
+          var prov  = String(_es.housingProvided||'');
+          var own   = String(_es.housingOwnership||'');
+          var fee   = String(_es.deductHousing!=null ? _es.deductHousing : (_es.housingFee||'')).replace(/[,，円\s]/g,'');
+          var hasInfo = /有/.test(prov) || /■/.test(own) || fee!=='' || String(_es.cohabitants||'')!=='';
+          if(!hasInfo) return;
+          var nintei = /認定/.test((cas&&cas.app_type)||'');
+          C.f125 = !nintei; C.f126 = nintei;
+          C.f129 = true;
+          if(String(_es.cohabitants||'')!=='') T.f131 = String(_es.cohabitants);
+          if(/^\d+$/.test(fee)){
+            var yes = parseInt(fee,10) > 0;
+            C.f133 = yes; C.f134 = !yes; C.f135 = yes; C.f136 = !yes;
+            if(yes){ T.f138 = Number(fee).toLocaleString('ja-JP'); var _hf=document.getElementById('es_housingFee'); if(_hf) _hf.value = T.f138; }
+            else { var _hf0=document.getElementById('es_housingFee'); if(_hf0) _hf0.value=''; }   // 居住費「無」なら金額欄は空欄
+          }
+          if(/■\s*自己所有/.test(own)){ C.f139 = true; C.f140 = false; C.f141 = true; C.f142 = false; }
+          else if(/■\s*借/.test(own)){ C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; }
+        })();
         /* ver.20261029.06: 英語の都道府県・市区町村は読込処理が無く常に空だった。
            英語住所「475-2 Okubo-machi, Ota-shi, Gunma」の末尾＝都道府県、その前＝市区町村。 */
         var _ea = String(_es.officeAddrEn||'').split(',').map(function(x){return x.trim();}).filter(function(x){ return x && !/^japan$/i.test(x); });
