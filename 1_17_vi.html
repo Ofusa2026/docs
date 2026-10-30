@@ -523,7 +523,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261030.05</div>
+    <div class="ver">ver.20261030.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -552,7 +552,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
      認定＝これから入国するので 有（雇用開始日）、それ以外＝入国済み。
      案件読込で cases.app_type から自動セットするが、手で直せるようにしておく。 -->
 <div class="fg3">
-  <div class="fg"><label>申請種別<span class="fid">es.appType</span></label><input id="es_appType" oninput="p()" placeholder="認定 / 変更"></div>
+  <div class="fg"><label>申請種別<span class="fid">es.appType</span></label><input id="es_appType" oninput="_p17AppTypeChanged()" placeholder="認定 / 変更"></div>
   <div class="fg"><label>雇用開始日<span class="fid">es.contractStart</span></label><input id="es_contractStart" oninput="p()" placeholder="2026/09/01"></div>
   <div class="fg"><label>出迎え空港<span class="fid">es.arrivalAirport</span></label><input id="es_arrivalAirport" oninput="p()" placeholder="成田国際空港"></div>
 </div>
@@ -700,6 +700,19 @@ function _p17FitInput(el){
 }
 function _p17FitInputs(){ document.querySelectorAll('#pageArea input.bl').forEach(_p17FitInput); }
 document.addEventListener('input', function(e){ _p17FitInput(e.target); });
+/* ver.20261030.07: 左パネルの「申請種別」を手で変えたときも、認定／変更で変わる欄をまとめて切り替える。
+     1 事前ガイダンス 実施方法（認定＝テレビ電話／変更＝テレビ電話＋対面）
+     3-ｄ 住居の確保時期（認定＝申請の後／変更＝申請の時点。どちらかにチェックが入っているときだけ）
+     4 生活オリエンテーション 実施予定（決まり文句のときだけ。機関独自の書き方は触らない）
+     2-ａ 入国時の出迎えは本文側で申請種別を見て切り替わる */
+function _p17AppTypeChanged(){
+  var nin = /認定/.test((document.getElementById('es_appType')||{}).value||'');
+  var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
+  C.f051 = true; C.f050 = !nin;
+  if(C.f125 || C.f126){ C.f125 = !nin; C.f126 = nin; }
+  if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(String(T.f185||''))) T.f185 = nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
+  p();
+}
 function _p17RestoreChecks(){
   var st=window._p17Check||{};
   Object.keys(st).forEach(function(id){
@@ -1666,6 +1679,9 @@ async function loadFromDB(passedInfo){
        雇用開始日は人材側を優先し、無ければ案件側を使う（Word版 rv() と同じ順）。
        出迎え空港は案件データに無いため既定値を入れる。手で直せる。 */
     _s('es_appType', (cas&&cas.app_type)||'');
+    /* ver.20261030.06: 1 事前ガイダンスの実施方法。認定は本人が海外にいるので「テレビ電話」だけ、
+       変更は日本にいるので「テレビ電話」「対面」の両方（該当するもの全てにチェックする欄）。 */
+    (function(){ var C=window._p17Check=window._p17Check||{}; var nin=/認定/.test((cas&&cas.app_type)||''); C.f051=true; C.f050=!nin; })();
     var _cs = pd.contract_start || pd.contractStart || (cas&&cas.contract_start) || '';
     var _m  = String(_cs).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
     if(_m) _s('es_contractStart', _m[1]+'/'+('0'+_m[2]).slice(-2)+'/'+('0'+_m[3]).slice(-2));
@@ -1933,6 +1949,12 @@ async function _p17Hearing(so, _s){
   if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
   if(apply(IS.orientation, [['f184','f185','f186','f187']])) sch++;
+  /* ver.20261030.06: 4 生活オリエンテーションの実施予定。回答が「適宜実施」などの決まり文句（または空）のときだけ、
+     認定は「入国後遅滞なく」、変更は「変更許可後遅滞なく」にする。機関独自の書き方（例「入社後」）はそのまま。 */
+  if(C.f184 && /^(|有|適宜|適宜実施)$/.test(String(T.f185||'').trim())){
+    var _nin = /認定/.test((document.getElementById('es_appType')||{}).value||'');
+    T.f185 = _nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
+  }
   if(apply(IS.japanese,    [['f205','f206','f207','f208'],['f213','f214','f215','f216'],['f220','f221','f222','f223']])) sch++;
   // 相談・苦情は回答が「直接面談・電話…」など方法の列挙なので、有にチェックだけ入れる（欄には「適宜実施」が印字済み）
   if(String(IS.consultation||'').trim()){ C.f235 = true; C.f237 = false; sch++; }
