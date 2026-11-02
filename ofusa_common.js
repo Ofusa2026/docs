@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261102.01
+ * - fix: 直接編集版・呼び戻した書類で、業務区分２（分野２）が空なのに「建築・es.category2」と出ていた → 空なら区切りの「・」ごと出さない
  * ver.20261029.01
  * - feat(利用ログ): saysay_logs に案シスで選んだ担当者名(user_name)も記録（共有アカウント mail@ でも人を区別）
  * ver.20261028.01
@@ -1012,6 +1014,7 @@ function _currentUserId(){
    applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
    p()（全再描画）を使わずに変数スパンだけ更新する
    ============================================================ */
+const _OPT_SECOND_BINDS={es_category2:1,es_category2En:1,es_applicantField2:1,es_applicantField2En:1};
 function applyBindings(){
   const area=document.getElementById('pageArea');if(!area)return;
   // ver.20261027.01: 変数欄の中に直接打った文字を、流し直しで消さない
@@ -1038,6 +1041,25 @@ function applyBindings(){
     const id=span.getAttribute('data-bind');
     const raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';
     const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
+    // ver.20261102.01: 「2つ目がある場合のみ」の欄（業務区分２・分野２）は、空なら「・es.category2」を出さない
+    //   （直接編集版・呼び戻した書類に、空欄の目印と区切りの「・」が残っていた）
+    if(_OPT_SECOND_BINDS[id]){
+      var _prev=span.previousSibling;
+      if(!raw){
+        span.textContent=''; span.style.color='';span.style.fontSize='';span.style.fontFamily='';
+        span.style.display='none';
+        if(_prev && _prev.nodeType===3 && /・\s*$/.test(_prev.nodeValue)){
+          _prev.nodeValue=_prev.nodeValue.replace(/・(\s*)$/,'$1'); span.setAttribute('data-opt-sep','・');
+        }
+        return;
+      }
+      span.style.display='';
+      if(span.getAttribute('data-opt-sep')){
+        if(_prev && _prev.nodeType===3) _prev.nodeValue=_prev.nodeValue.replace(/\s*$/,'')+span.getAttribute('data-opt-sep');
+        else span.parentNode.insertBefore(document.createTextNode(span.getAttribute('data-opt-sep')), span);
+        span.removeAttribute('data-opt-sep');
+      }
+    }
     if(raw){
       span.style.color='';span.style.fontSize='';span.style.fontFamily='';
       const isMoney=span.getAttribute('data-bind-fmt')==='1';
