@@ -1024,8 +1024,35 @@ function applyBindings(){
       span.textContent=label;
     }
   });
+  // ver.20261102.01: 業務区分（1-6号 Ⅲ-2）は「1つ目・2つ目」を中点でつないだ形のまま直接編集版に保存されているため、
+  //   2つ目が空だと「建築・es.category2」と出ていた。2つ目が空（または1つ目と同じ）なら、2つ目と「・」を隠して
+  //   1つ目だけを（セルの中央に）出す。2つ目に値が入れば「・」ごと元に戻す。
+  try{ _bunyaPairTidy(area); }catch(_e){}
   try{ _snapBinds(); }catch(_e){} // ver.20261027.01: 流し込んだ後の中身を基準にする
   return spans.length; // data-bind スパン数を返す（0=旧形式）
+}
+function _bunyaPairTidy(area){
+  var _clean=function(x){ return String(x||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').trim(); };
+  [['es_category','es_category2'],['es_categoryEn','es_category2En']].forEach(function(pr){
+    area.querySelectorAll('span.f[data-bind="'+pr[1]+'"]').forEach(function(sp){
+      var v1=_clean((typeof v==='function'?v(pr[0]):'')||(window._fieldData&&window._fieldData[pr[0]])||'');
+      var v2=_clean((typeof v==='function'?v(pr[1]):'')||(window._fieldData&&window._fieldData[pr[1]])||'');
+      var empty2=!v2 || v2===v1;
+      var prev=sp.previousSibling;
+      var prevIsText=prev && prev.nodeType===3;
+      if(empty2){
+        sp.style.display='none';
+        if(prevIsText && /・\s*$/.test(prev.nodeValue)){ prev.nodeValue=prev.nodeValue.replace(/・\s*$/,''); sp.setAttribute('data-bunya-sep','1'); }
+      }else{
+        sp.style.display='';
+        if(sp.getAttribute('data-bunya-sep')==='1'){
+          if(prevIsText){ if(!/・\s*$/.test(prev.nodeValue)) prev.nodeValue=prev.nodeValue+'・'; }
+          else sp.parentNode.insertBefore(document.createTextNode('・'), sp);
+          sp.removeAttribute('data-bunya-sep');
+        }
+      }
+    });
+  });
 }
 /* data-bind スパンをプレースホルダー（変数名）に戻す */
 function resetBindings(){
@@ -4184,6 +4211,7 @@ function applyBlankMarks(){
   area.querySelectorAll('.f[data-bind]').forEach(function(sp){
     var isEmpty=(sp.getAttribute('style')||'').indexOf('color:#aaa')>=0;
     var target=isEmpty && (!reqSet || reqSet[sp.getAttribute('data-bind')]);
+    if(sp.style && sp.style.display==='none') target=false;   // ver.20261102.01: 業務区分の2つ目など、隠している欄は空欄扱いしない
     if(on&&target){ if(!sp.classList.contains('f-blank')) sp.classList.add('f-blank'); }
     else if(sp.classList.contains('f-blank')) sp.classList.remove('f-blank');
   });
