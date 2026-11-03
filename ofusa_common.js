@@ -147,10 +147,34 @@ function _sbToken(){
   if(lt) return lt;
   return wt || SB_KEY;                                // 最後の手段
 }
+// ver.20261103.01: ログインしていない（トークンが無い・切れた）ときは公開キーで読まず、ログインできるまで待つ（裏口対策）。
+//   Saysay（または案シス）でログインすると、そのまま続きを読み込む。
+function _sbUserTokOk(t){ return !!t && t!==SB_KEY && /^eyJ/.test(t) && _jwtExpMs(t) > Date.now() + 5000; }
+function _sbNeedLoginNotice(on){
+  try{
+    var id='_sbNeedLoginBar', el=document.getElementById(id);
+    if(!on){ if(el) el.remove(); return; }
+    if(el || !document.body) return;
+    el=document.createElement('div'); el.id=id;
+    el.style.cssText='position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:2147483000;background:#1e3a5f;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.25);';
+    el.textContent='🔑 ログインが切れています。Saysay（または案シス）でログインすると、続きを読み込みます';
+    document.body.appendChild(el);
+  }catch(e){}
+}
+function _sbWaitUserToken(){
+  return new Promise(function(res){
+    var t=_sbToken(); if(_sbUserTokOk(t)){ res(t); return; }
+    _sbNeedLoginNotice(true);
+    try{ if(window.parent && window.parent!==window) window.parent.postMessage({type:'OFUSA_NEED_LOGIN'}, '*'); }catch(e){}
+    var iv=setInterval(function(){ var t2=_sbTokenFromLS(); if(_sbUserTokOk(t2)){ clearInterval(iv); _sbNeedLoginNotice(false); res(t2); } }, 1500);
+  });
+}
 async function sb(path,opts={}){
+  let _tok = _sbToken();
+  if(!_sbUserTokOk(_tok)) _tok = await _sbWaitUserToken();
   const headers = {
     'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + _sbToken(),
+    'Authorization': 'Bearer ' + _tok,
     'Content-Type': 'application/json',
     ...(opts.headers || {})
   };
