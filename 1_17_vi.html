@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.05</div>
+    <div class="ver">ver.20261104.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -748,11 +748,19 @@ var P17_VI_DICT = {
   'a,bで実施':'Thực hiện bằng a, b', 'a、bで実施':'Thực hiện bằng a, b',
   '3か月に1回以上':'3 tháng 1 lần trở lên', '3か月に1回以上実施':'Thực hiện 3 tháng 1 lần trở lên', '3ヶ月':'3 tháng',
   '入社後':'Sau khi vào công ty', '入社日':'Ngày vào công ty', '入社時':'Khi vào công ty', '帰国時':'Khi về nước', '記載なし':'Không ghi',
+  // ver.20261104.06: 登録支援機関の回答によく出る言い回しを追加
+  'bで合意しない場合はaで実施':'Thực hiện a khi không đồng ý với b', 'bでの入居に合意しなかった場合に実施':'Được tiến hành khi bạn không đồng ý chuyển đến tại b',
+  '雇用後一週間以内に実施':'Thực hiện trong vòng một tuần sau khi bắt đầu làm việc', '雇用開始後一週間以内':'Trong vòng một tuần sau khi bắt đầu làm việc', '雇用後一週間以内':'Trong vòng một tuần sau khi bắt đầu làm việc',
+  '入国後一週間以内に実施':'Thực hiện trong vòng một tuần sau khi nhập cảnh', '入国後一週間以内':'Trong vòng một tuần sau khi nhập cảnh',
+  '在留資格変更許可申請の後に確保する予定':'Dự kiến bảo đảm sau khi nộp đơn xin phép thay đổi tư cách lưu trú',
+  '在留資格変更許可申請の時点で確保している':'Đã bảo đảm tại thời điểm nộp đơn xin phép thay đổi tư cách lưu trú',
+  '必要に応じて':'Khi cần thiết', 'aを実施するため未実施':'Không thực hiện vì đã thực hiện a', 'cで実施':'Thực hiện bằng c',
+  '自主学習教材・オンライン講座の情報提供':'Cung cấp thông tin về tài liệu tự học và khóa học trực tuyến',
   '直接面談':'Gặp trực tiếp', '電話':'Điện thoại', 'メール':'Email', '面談':'Phỏng vấn', '訪問':'Thăm hỏi', '必要に応じ訪問':'Thăm hỏi khi cần thiết',
   'ベトナム語通訳対応':'Có phiên dịch tiếng Việt', 'LINE等':'LINE, v.v.', 'SNS':'SNS', 'LINE':'LINE', 'Messenger':'Messenger', '市役所窓口':'Quầy tiếp nhận của tòa thị chính'
 };
 function _p17Vi(t){
-  t=String(t||'').trim(); if(!t) return '';
+  t=String(t||'').trim().replace(/1週間/g,'一週間'); if(!t) return '';   // 「1週間」「一週間」の書き方の違いをそろえる
   if(P17_VI_DICT[t]) return P17_VI_DICT[t];
   if(/^[\x20-\x7E]+$/.test(t)) return t;   // 電話番号・メールアドレスなどはそのまま
   return t.split(/／/).map(function(a){
@@ -2059,7 +2067,8 @@ async function _p17Hearing(so, _s){
     var m = v.match(/[（(]([^（）()]*)[）)][」』]?\s*$/) || v.match(/[（(]([^（）()]*)[）)]/);
     if(m) inner = m[1].trim();
     else if(!/^[有無]/.test(v) && v.length<=14) inner = v.replace(/冝/g,'宜');   // ver.20261030.03: 自社支援の「入社日」「適冝」など
-    if(inner.length > 12){
+    // ver.20261104.06: 長い回答も欄の中で折り返して全文を出せるようになったので、30字までは手を加えずそのまま入れる
+    if(inner.length > 30 || (inner.length > 12 && /／/.test(inner))){
       var seg = inner.split(/[／\/]/).map(function(x){return x.trim();}).filter(Boolean);
       if(/適宜実施/.test(inner)) inner='適宜実施';
       else if(seg.length>1 && seg.length<=3 && seg.every(function(x){ return x.length<=20; })) inner=seg.join('／');   // ver.20261104.01: 全部残す（欄の中で改行して表示）
