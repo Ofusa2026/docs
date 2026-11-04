@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.02</div>
+    <div class="ver">ver.20261104.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -682,7 +682,8 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
      f082 … 出入国の送迎 ｂ「実施方法」の 出国予定空港等
      f084 … 出入国の送迎 ｂ「実施方法」の 送迎方法 */
 /* ver.20261030.05: f368 … 9-ｃ 労働法令違反の通報「有（認知次第実施）」（通報は義務なので常に有） */
-function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true }; }
+/* ver.20261104.03: f380s … Ⅴ 住居地「同上」を既定でチェック */
+function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true, f380s:true }; }
 window._p17Check = window._p17Check || _p17DefaultChecks();
 document.addEventListener('change', function(e){
   var t=e.target;
