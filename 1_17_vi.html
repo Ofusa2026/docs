@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.04</div>
+    <div class="ver">ver.20261104.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -760,6 +760,21 @@ function _p17Vi(t){
     return a.split(/[・、,，]/).map(function(b){ b=b.trim(); return P17_VI_DICT[b]||b; }).join(', ');
   }).join(' / ');
 }
+/* ver.20261104.05: 入力値・チェックを HTML の属性にも書き込む。
+   直接編集の開始時、Saysay共通処理（_tplSig）が書類を一度作り直して innerHTML で元に戻すため、
+   画面で入れた値（属性ではない）が全部消えていた。属性に写しておけば innerHTML で戻しても残る。
+   編集版の保存（saysay_html_store）にも値が残るようになる。 */
+function _p17Bake(){
+  var area=document.getElementById('pageArea'); if(!area) return;
+  area.querySelectorAll('input').forEach(function(e){
+    var t=(e.type||'text').toLowerCase();
+    if(t==='checkbox'||t==='radio'){ if(e.checked) e.setAttribute('checked',''); else e.removeAttribute('checked'); }
+    else if(e.getAttribute('value')!==e.value) e.setAttribute('value', e.value);
+  });
+  area.querySelectorAll('textarea').forEach(function(e){ if(e.textContent!==e.value){ var v=e.value; e.textContent=v; e.value=v; } });
+}
+document.addEventListener('input',  function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')) _p17Bake(); }, true);
+document.addEventListener('change', function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')) _p17Bake(); }, true);
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
   // 対訳チェックの連動
@@ -813,6 +828,7 @@ function _p17Post(){
       else { ps[0].textContent=''; if(ps[1]) ps[1].textContent=''; }
     });
   });
+  _p17Bake();
 }
 document.addEventListener('change', function(e){
   var t=e.target;
@@ -2214,7 +2230,7 @@ function _p17Collect(){
   var side = {};
   document.querySelectorAll('.fp input[id^="es_"],.fp input[id^="f_"],.fp textarea[id^="es_"],.fp textarea[id^="f_"]').forEach(function(el){ if(el.value!=='') side[el.id]=el.value; });
   var text = {};
-  document.querySelectorAll('#pageArea input.bl, #pageArea textarea.f').forEach(function(el){ if(el.id && el.value!=='') text[el.id]=el.value; });
+  document.querySelectorAll('#pageArea input.bl, #pageArea textarea.f, #pageArea textarea.p17long').forEach(function(el){ if(el.id && el.value!=='') text[el.id]= el.classList.contains('p17long') ? el.value.split('\n').join('／') : el.value; });   // ver.20261104.05: 折り返し表示の欄も保存
   var chk = {};
   document.querySelectorAll('#pageArea input.cb[id]').forEach(function(el){ if(!el.disabled) chk[el.id]=!!el.checked; });
   var radio = {};
