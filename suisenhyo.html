@@ -47,6 +47,10 @@ table.sh-tbl td.col-job{width:20%;text-align:left}
 /* fp-case は共通CSSで display:none だが、ここでは表示する */
 .fp-case{display:block!important;padding:10px!important;background:#1e293b!important;color:#e2e8f0!important;border-bottom:1px solid #475569!important}
 .fp-case label{color:#cbd5e0!important;font-size:11px!important;font-weight:600!important;display:block;margin-bottom:4px;}
+/* ver.20261104.03: まとめて作成（案シスから ?ids=案件ID,… で開く）。会社・契約期間ごとに分け、1枚5名まで */
+.sui-batch-only{display:none;}
+.sui-batch .sui-batch-only{display:block;}
+.sui-batch .sui-single-only{display:none!important;}   /* 直接編集・スタイル編集・DB保存は1枚ずつのときだけ（まとめての紙を1つの案件に保存しないため） */
 
 /* === 交付申請書（P1）専用 === */
 .kf-receipt{text-align:right;font-size:10pt;margin-bottom:4mm}
@@ -136,20 +140,22 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20261029.01</div>
+    <div class="ver">ver.20261104.03</div>
   </div>
   <div class="bar-btns">
-    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
-    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
-    <button class="btn" onclick="saveFormGeneric('suisenhyo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
-    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
-    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn sui-single-only" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn sui-single-only" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn sui-single-only" onclick="saveFormGeneric('suisenhyo')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn sui-single-only" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn sui-single-only" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
   </div>
 </div>
 <div class="main">
 <div class="fp">
   <div class="fp-inner">
+
+    <div class="fs sui-batch-only" id="suiBatchList"></div>
 
     <div class="fs"><div class="fs-title">📄 交付申請書（P1）</div>
       <div class="fg"><label>受付番号</label><input id="f_receiptNo" placeholder="空のまま提出（ベトナム側で記入）" oninput="p()"></div>
@@ -166,7 +172,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>申請書作成年月日</label><input id="f_applyDate" placeholder="2026/05/19" oninput="p()"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">1. 登録支援機関に関する情報</div>
+    <div class="fs sui-single-only"><div class="fs-title">1. 登録支援機関に関する情報</div>
       <div class="fg"><label>名称</label><input id="f_supName" oninput="p()"></div>
       <div class="fg"><label>認可番号</label><input id="f_supLicense" oninput="p()"></div>
       <div class="fg"><label>代表者氏名</label><input id="f_supRep" oninput="p()"></div>
@@ -175,7 +181,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>Fax番号</label><input id="f_supFax" oninput="p()"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">2. 日本の受入機関に関する情報</div>
+    <div class="fs sui-single-only"><div class="fs-title">2. 日本の受入機関に関する情報</div>
       <div class="fg"><label>名称</label><input id="f_coName" oninput="p()"></div>
       <div class="fg"><label>法人番号</label><input id="f_coLicense" oninput="p()"></div>
       <div class="fg"><label>代表者氏名</label><input id="f_coRep" oninput="p()"></div>
@@ -184,12 +190,12 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>Fax番号</label><input id="f_coFax" oninput="p()"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">3. 契約期間</div>
+    <div class="fs sui-single-only"><div class="fs-title">3. 契約期間</div>
       <div class="fg"><label>契約開始日</label><input id="f_workFrom" placeholder="2026/04/01" oninput="p()"></div>
       <div class="fg"><label>契約終了日</label><input id="f_workTo" placeholder="2031/03/31" oninput="p()"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">4. 特定技能外国人</div>
+    <div class="fs sui-single-only"><div class="fs-title">4. 特定技能外国人</div>
       <div class="fg"><label>区分</label>
         <select id="f_visaType" onchange="p()">
           <option value="1">1号特定技能外国人</option>
@@ -199,7 +205,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div style="font-size:9px;color:#888;font-family:sans-serif;padding:4px 6px;">※各人材枠にcase IDを貼り付けて「投入」で人材情報を取得します。</div>
     </div>
 
-    <div class="fs" id="suiGroupBox"><div class="fs-title">👥 ヒアリングフォームから反映</div>
+    <div class="fs sui-single-only" id="suiGroupBox"><div class="fs-title">👥 ヒアリングフォームから反映</div>
       <div id="suiGroupBody" style="font-size:11px;color:#64748b;padding:6px 6px 2px;font-family:sans-serif;">案件を選ぶと、同じ案件名の人が表示されます。</div>
       <div id="suiGroupList" style="padding:0 6px;font-family:sans-serif;"></div>
       <div style="padding:6px;">
@@ -207,7 +213,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       </div>
     </div>
 
-    <div class="fs"><div class="fs-title">人材1</div>
+    <div class="fs sui-single-only"><div class="fs-title">人材1</div>
       <div class="cid-row">
         <input id="f_p1Cid" placeholder="case ID を貼り付け" oninput="onCidInput(1)" onkeydown="if(event.key==='Enter')importPerson(1)">
         <button class="cid-btn" id="p1Btn" onclick="importPerson(1)">投入</button>
@@ -225,7 +231,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p1VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">人材2</div>
+    <div class="fs sui-single-only"><div class="fs-title">人材2</div>
       <div class="cid-row">
         <input id="f_p2Cid" placeholder="case ID を貼り付け" oninput="onCidInput(2)" onkeydown="if(event.key==='Enter')importPerson(2)">
         <button class="cid-btn" id="p2Btn" onclick="importPerson(2)">投入</button>
@@ -243,7 +249,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p2VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">人材3</div>
+    <div class="fs sui-single-only"><div class="fs-title">人材3</div>
       <div class="cid-row">
         <input id="f_p3Cid" placeholder="case ID を貼り付け" oninput="onCidInput(3)" onkeydown="if(event.key==='Enter')importPerson(3)">
         <button class="cid-btn" id="p3Btn" onclick="importPerson(3)">投入</button>
@@ -261,7 +267,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p3VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">人材4</div>
+    <div class="fs sui-single-only"><div class="fs-title">人材4</div>
       <div class="cid-row">
         <input id="f_p4Cid" placeholder="case ID を貼り付け" oninput="onCidInput(4)" onkeydown="if(event.key==='Enter')importPerson(4)">
         <button class="cid-btn" id="p4Btn" onclick="importPerson(4)">投入</button>
@@ -279,7 +285,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
       <div class="fg"><label>母国親族住所/電話番号</label><input id="f_p4VnContact" oninput="p()" placeholder="母国住所・電話番号"></div>
     </div>
 
-    <div class="fs"><div class="fs-title">人材5</div>
+    <div class="fs sui-single-only"><div class="fs-title">人材5</div>
       <div class="cid-row">
         <input id="f_p5Cid" placeholder="case ID を貼り付け" oninput="onCidInput(5)" onkeydown="if(event.key==='Enter')importPerson(5)">
         <button class="cid-btn" id="p5Btn" onclick="importPerson(5)">投入</button>
@@ -309,8 +315,8 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="pp">
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
-    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
-    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <span id="suiPageBtns"><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button></span>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
@@ -361,6 +367,19 @@ function p(){
   try{ for(var _i=1;_i<=5;_i++){ var _o=document.getElementById('f_p'+_i+'Occ'), _j=document.getElementById('f_p'+_i+'Job'); if(_o&&_j&&String(_o.value).trim()==='会社員'&&String(_j.value).trim()) _o.value=String(_j.value).trim(); } }catch(_e){}
   if(_editMode) return;
   const w=document.getElementById('pageArea'); if(!w) return;
+  // ver.20261104.03: まとめて作成のときは1枚ずつ（P1＋P2）を並べる。書類の中身は _suiSheetHtml の1箇所
+  w.innerHTML=_suiBatch ? _suiBatchHtml() : _suiSheetHtml(0);
+  if(_suiBatch) suiNavSync();
+  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _applyFontSize();
+  _applySuisenhyoFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+// 推薦票1枚ぶん（P1 交付申請書＋P2 特定技能外国人表）。左の欄の値から作る。base＝前に並んでいるページ数
+function _suiSheetHtml(base){
+  base=base||0;
   const visa=document.getElementById('f_visaType');
   const v1=visa&&visa.value==='1'?'■':'□';
   const v2=visa&&visa.value==='2'?'■':'□';
@@ -368,9 +387,9 @@ function p(){
   const cb=id=>{const e=document.getElementById(id);return e&&e.checked?'■':'☐';};
   const rCo=cb('f_relCo'), rSup=cb('f_relSup'), rSelf=cb('f_relSelf'), rOther=cb('f_relOther');
   const rOtherText=f('f_relOtherText');
-  w.innerHTML=`
-<div class="doc">
-<div class="page-num-label">P1</div>
+  return `
+<div class="doc"${base?' style="margin-top:8mm;"':''}>
+<div class="page-num-label">P${base+1}</div>
 
 <div class="kf-receipt">Mã hồ sơ 受付番号: <span class="kf-receipt-line">${f('f_receiptNo')}</span></div>
 
@@ -476,7 +495,7 @@ function p(){
 </div>
 
 <div class="doc" style="margin-top:8mm;">
-<div class="page-num-label">P2</div>
+<div class="page-num-label">P${base+2}</div>
 <div class="sh-attach">添付2</div>
 <div class="sh-title">特定技能外国人表</div>
 
@@ -533,12 +552,6 @@ function p(){
   <div class="sh-foot-sign" style="margin-top:1mm;margin-right:5em;">（署名及び印）</div>
 </div>
 </div>`;
-  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
-  _applyFontSize();
-  _applySuisenhyoFontSize();
-  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
-  setupPageTracker();
-  fitDocToPreview();
 }
 function _applySuisenhyoFontSize(){
   const st=document.getElementById('_suisenhyoFontStyle')||document.createElement('style');
@@ -602,6 +615,37 @@ async function importMainCase(){
   if(st){ st.textContent='✅ 取得完了'; st.style.color='#16a34a'; }
 }
 
+/* ========== ver.20261104.03: 登録支援機関・受入機関の取り出し（1枚ずつ・まとめて作成で共用） ========== */
+// 登録支援機関：見つかれば found:true と各項目、見つからなければ名前だけ。読めなければ null
+async function _suiOrgVals(orgN){
+  if(!orgN) return null;
+  try{
+    // DB実カラム: name, address, support_manager, reg_no, tel, rep_name
+    // ver.20260715: 完全一致だけだと「株式会社KMT(82)」等で引けないため共通関数で3段照合
+    const org=await findSupportOrg(orgN,'name,address,support_manager,reg_no,tel,rep_name');
+    if(org) return { found:true, name:org.name||'', license:org.reg_no||'', rep:org.rep_name||org.support_manager||'', addr:org.address||'', tel:org.tel||'' };
+    return { found:false, name:orgN, license:'', rep:'', addr:'', tel:'' };   // 名前だけは入れておく
+  }catch(e){ console.warn('support_orgs取得スキップ:',e.message); return null; }
+}
+// 受入機関：companies を id → 無ければ名前で引く。見つからなければ null
+async function _suiCoVals(coId, coN){
+  let co=null;
+  if(coId){
+    try{
+      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&id=eq.${coId}`);
+      co=rows&&rows[0];
+    }catch(e){ console.warn('companies(id)取得スキップ:',e.message); }
+  }
+  if(!co && coN){
+    try{
+      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&name=eq.${encodeURIComponent(coN)}`);
+      co=rows&&rows[0];
+    }catch(e){ console.warn('companies(name)取得スキップ:',e.message); }
+  }
+  if(!co) return null;
+  return { name:co.name||'', license:co.corp_no||'', addr:((co.pref||'')+(co.city||'')+(co.address||''))||'', rep:co.rep_name||'', tel:co.tel||'' };
+}
+
 /* ========== 案件情報をDBから引いてフォームに反映 ========== */
 async function _loadCaseInfo(info){
   if(!info) return;
@@ -622,46 +666,25 @@ async function _loadCaseInfo(info){
   // 2. 登録支援機関：orgName(渡された値) または cas.org から名前検索
   const orgN=orgName||orgFromCase;
   if(orgN){
-    try{
-      // DB実カラム: name, address, support_manager, reg_no, tel, rep_name
-      // ver.20260715: 完全一致だけだと「株式会社KMT(82)」等で引けないため共通関数で3段照合
-      const org=await findSupportOrg(orgN,'name,address,support_manager,reg_no,tel,rep_name');
-      if(org){
-        s('f_supName',org.name||'');
-        s('f_supLicense',org.reg_no||'');
-        s('f_supRep',org.rep_name||org.support_manager||'');
-        s('f_supAddr',org.address||'');
-        s('f_supTel',org.tel||'');
-        // Fax は support_orgs に該当カラムなしのため未設定（手入力）
-      } else {
-        // 名前だけは入れておく
-        s('f_supName',orgN);
-      }
-    }catch(e){ console.warn('support_orgs取得スキップ:',e.message); }
+    // ver.20261104.03: 取り出しは _suiOrgVals の1箇所（まとめて作成と共用）
+    const sv=await _suiOrgVals(orgN);
+    if(sv){
+      s('f_supName',sv.name);
+      if(sv.found){ s('f_supLicense',sv.license); s('f_supRep',sv.rep); s('f_supAddr',sv.addr); s('f_supTel',sv.tel); }
+      // Fax は support_orgs に該当カラムなしのため未設定（手入力）
+    }
   }
 
-  // 3. 受入機関（companies）
+  // 3. 受入機関（companies）　ver.20261104.03: 取り出しは _suiCoVals の1箇所（まとめて作成と共用）
   const coId=companyId||(cas&&cas.company_id);
   const coN=(cas&&cas.company)||companyName||'';
-  let co=null;
-  if(coId){
-    try{
-      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&id=eq.${coId}`);
-      co=rows&&rows[0];
-    }catch(e){ console.warn('companies(id)取得スキップ:',e.message); }
-  }
-  if(!co && coN){
-    try{
-      const rows=await sb(`companies?select=name,pref,city,address,rep_name,rep_title,corp_no,tel&name=eq.${encodeURIComponent(coN)}`);
-      co=rows&&rows[0];
-    }catch(e){ console.warn('companies(name)取得スキップ:',e.message); }
-  }
-  if(co){
-    s('f_coName',co.name||'');
-    s('f_coLicense',co.corp_no||'');
-    s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
-    s('f_coRep',co.rep_name||'');
-    s('f_coTel',co.tel||'');
+  const cv=await _suiCoVals(coId, coN);
+  if(cv){
+    s('f_coName',cv.name);
+    s('f_coLicense',cv.license);
+    s('f_coAddr',cv.addr);
+    s('f_coRep',cv.rep);
+    s('f_coTel',cv.tel);
     // Fax: companies テーブルに該当カラムなしのため未設定（手入力）
   }
 
@@ -760,6 +783,47 @@ function onCidInput(slot){
     st.className='cid-status warn';
   }
 }
+/* ver.20261104.03: 人材1人ぶんの欄の値（cases ＋ persons）。set＝入れる欄だけ（入れない欄は今の値のまま） */
+const SUI_P_KEYS=['Name','Birth','Gender','Pass','Prev','Job','Occ','School','VnContact'];
+function _suiPersonVals(cas, rec){
+  const set={}; let filled=false;
+  if(cas){
+    if(cas.applicant){ set.Name=cas.applicant; filled=true; }
+    // 特定技能職業欄には案件の分野（cases.applicant_field）を分野名だけに整形して入れる
+    // 例:「外食業分野（特定技能１号）」→「外食業」、「介護分野」→「介護」
+    if(cas.applicant_field){
+      const _bunya=String(cas.applicant_field).replace(/[（(].*$/,'').replace(/分野$/,'').trim();
+      set.Job=_bunya;
+      // ver.20261029.01: 推薦状の「職業」も「会社員」ではなく分野名を入れる
+      set.Occ=_bunya;
+    }
+  }
+  if(rec){
+    const pd=(rec&&rec.data)||rec||{};
+    const pNm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
+    if(pNm) set.Name=pNm;
+    set.Birth=_ymd(pd.birthdate||'');
+    set.Gender=_gender(pd.gender||'');
+    set.Pass=pd.passport||'';
+    set.Prev=pd.residence_status||'';
+    // ※「特定技能職業」欄は分野(cases.applicant_field)を使うため、
+    //   persons.occupation(ほぼ「会社員」)では上書きしない
+    // extra JSONB から推薦状用カスタムフィールドを取得
+    // ankenの推薦状タブで追加された sendingOrgOrSchool / homeRelativeInfo は extra に保存される
+    let extra=pd.extra;
+    if(typeof extra==='string'){
+      try{ extra=JSON.parse(extra); }catch(e){ extra={}; }
+    }
+    extra=extra||{};
+    // ver.20261006.04: 案シスの申請人ヒアリング「大使館推薦票」の帯の欄（vnSendingOrg / vnFamilyAddress / vnFamilyTel）を優先。
+    //   空のときだけ旧「推薦状タブ」の欄（sendingOrgOrSchool / homeRelativeInfo）を使う
+    set.School=extra.vnSendingOrg||extra.sendingOrgOrSchool||'';
+    var _vnA=String(extra.vnFamilyAddress||'').trim(), _vnT=String(extra.vnFamilyTel||'').trim();
+    set.VnContact=(_vnA||_vnT) ? [_vnA,_vnT].filter(Boolean).join(' / ') : String(extra.homeRelativeInfo||'').replace(/\n+/g,' / ');
+    filled=true;
+  }
+  return { set:set, filled:filled };
+}
 async function importPerson(slot){
   const inp=document.getElementById('f_p'+slot+'Cid');
   const st=document.getElementById('p'+slot+'Status');
@@ -771,27 +835,15 @@ async function importPerson(slot){
   const s=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val||'';};
   const i=slot;
   let nm='', filled=false;
+  // ver.20261104.03: どの欄に何を入れるかは _suiPersonVals の1箇所（まとめて作成と共用）
+  const put=r=>{ Object.keys(r.set).forEach(k=>s('f_p'+i+k, r.set[k])); if(r.set.Name) nm=r.set.Name; if(r.filled) filled=true; };
 
   // 1. まずcasesから申請人名を取得（最低限の情報）
   let cas=null;
   try{
     const rows=await sb('cases?select=applicant,applicant_field&id=eq.'+encodeURIComponent(cid));
     cas=rows&&rows[0];
-    if(cas){
-      if(cas.applicant){
-        nm=cas.applicant;
-        s('f_p'+i+'Name',nm);
-        filled=true;
-      }
-      // 特定技能職業欄には案件の分野（cases.applicant_field）を分野名だけに整形して入れる
-      // 例:「外食業分野（特定技能１号）」→「外食業」、「介護分野」→「介護」
-      if(cas.applicant_field){
-        const _bunya=String(cas.applicant_field).replace(/[（(].*$/,'').replace(/分野$/,'').trim();
-        s('f_p'+i+'Job', _bunya);
-        // ver.20261029.01: 推薦状の「職業」も「会社員」ではなく分野名を入れる
-        s('f_p'+i+'Occ', _bunya);
-      }
-    }
+    if(cas) put(_suiPersonVals(cas, null));
   }catch(e){ console.warn('cases取得スキップ:',e.message); }
 
   // 2. personsから詳細情報を取得（あれば上書き）
@@ -801,28 +853,7 @@ async function importPerson(slot){
     const rec=persons&&persons[0];
     if(rec){
       foundPersons=true;
-      const pd=(rec&&rec.data)||rec||{};
-      const pNm=pd.applicant_name_en||pd.name_en||pd.romaji||pd.applicant_en||pd.applicant||pd.name||'';
-      if(pNm){ nm=pNm; s('f_p'+i+'Name',nm); }
-      s('f_p'+i+'Birth',_ymd(pd.birthdate||''));
-      s('f_p'+i+'Gender',_gender(pd.gender||''));
-      s('f_p'+i+'Pass',pd.passport||'');
-      s('f_p'+i+'Prev',pd.residence_status||'');
-      // ※「特定技能職業」欄は分野(cases.applicant_field)を使うため、
-      //   persons.occupation(ほぼ「会社員」)では上書きしない
-      // extra JSONB から推薦状用カスタムフィールドを取得
-      // ankenの推薦状タブで追加された sendingOrgOrSchool / homeRelativeInfo は extra に保存される
-      let extra=pd.extra;
-      if(typeof extra==='string'){
-        try{ extra=JSON.parse(extra); }catch(e){ extra={}; }
-      }
-      extra=extra||{};
-      // ver.20261006.04: 案シスの申請人ヒアリング「大使館推薦票」の帯の欄（vnSendingOrg / vnFamilyAddress / vnFamilyTel）を優先。
-      //   空のときだけ旧「推薦状タブ」の欄（sendingOrgOrSchool / homeRelativeInfo）を使う
-      s('f_p'+i+'School', extra.vnSendingOrg||extra.sendingOrgOrSchool||'');
-      var _vnA=String(extra.vnFamilyAddress||'').trim(), _vnT=String(extra.vnFamilyTel||'').trim();
-      s('f_p'+i+'VnContact', (_vnA||_vnT) ? [_vnA,_vnT].filter(Boolean).join(' / ') : String(extra.homeRelativeInfo||'').replace(/\n+/g,' / '));
-      filled=true;
+      put(_suiPersonVals(null, rec));
     }
   }catch(e){ console.warn('persons取得スキップ:',e.message); }
 
@@ -890,6 +921,109 @@ function clearPerson(slot){
 })();
 p();
 
+/* ========== ver.20261104.03: まとめて作成（案シスの推薦票の一覧から ?ids=案件ID,案件ID,… で開く） ==========
+   ・会社・登録支援機関・契約期間・1号/2号 が同じ人をまとめ、1枚5名ずつに分ける（推薦票の「労働期間」は1つしか書けないため）
+   ・1枚＝P1 交付申請書＋P2 特定技能外国人表。左の「交付申請書（P1）」の欄（受付番号・申請者・関係・作成年月日）は全部の紙に同じものが入る
+   ・紙ごとの中身は _suiBatch（[{sup, co, from, to, visa, people:[{id, vals, …}]}]）。描くときに左の欄へ入れてから _suiSheetHtml で作る */
+var _suiBatch=null, _suiBatchMiss=0;
+const SUI_BATCH_MAX=100, SUI_PER_SHEET=5;
+function _suiVisaNo(rs){ return /[2２]号/.test(String(rs||''))?'2':'1'; }
+function _suiApplySheet(sh){
+  const set=(id,val)=>{const e=document.getElementById(id); if(e) e.value=(val==null?'':String(val));};
+  const sp=sh.sup||{}, co=sh.co||{};
+  set('f_supName',sp.name); set('f_supLicense',sp.license); set('f_supRep',sp.rep); set('f_supAddr',sp.addr); set('f_supTel',sp.tel); set('f_supFax','');
+  set('f_coName',co.name); set('f_coLicense',co.license); set('f_coRep',co.rep); set('f_coAddr',co.addr); set('f_coTel',co.tel); set('f_coFax','');
+  set('f_workFrom',sh.from); set('f_workTo',sh.to); set('f_visaType',sh.visa||'1');
+  for(let i=1;i<=5;i++){
+    const pp=sh.people[i-1];
+    SUI_P_KEYS.forEach(k=>set('f_p'+i+k, pp?pp.vals[k]:''));
+    set('f_p'+i+'Cid', pp?pp.id:'');
+  }
+}
+function _suiBatchHtml(){
+  if(!_suiBatch.length) return '<div style="padding:40px;color:#fff;font-family:sans-serif;">対象の案件が見つかりませんでした。</div>';
+  return _suiBatch.map(function(sh,i){ _suiApplySheet(sh); return _suiSheetHtml(i*2); }).join('');
+}
+function suiNavSync(){
+  const box=document.getElementById('suiPageBtns'); if(!box) return;
+  const n=Math.max(1,(_suiBatch||[]).length)*2;
+  if(box.dataset.n===String(n)) return; box.dataset.n=String(n);
+  let h=''; for(let i=1;i<=Math.min(n,40);i++){ h+='<button class="pn-btn pn-btn-page'+(i===1?' active':'')+'" onclick="scrollToPage('+i+')">P'+i+'</button>'; }
+  if(n>40) h+='<span style="font-size:10px;color:#aaa;font-family:sans-serif;margin-left:6px;">…全'+n+'ページ</span>';
+  box.innerHTML=h;
+}
+function _suiBatchListHtml(){
+  const L=_suiBatch||[], ppl=[]; L.forEach(function(sh){ sh.people.forEach(function(x){ ppl.push(x); }); });
+  const e=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const nmOf=x=>x.vals.Name||x.applicant||'(名前なし)';
+  let h='<div class="fs-title">まとめて作成　'+ppl.length+'名・推薦票 '+L.length+'枚</div>'
+    +'<div style="font-size:10.5px;color:#475569;line-height:1.5;padding:2px 2px 6px;font-family:sans-serif;">会社・契約期間ごとに分けて、1枚5名までにしています（推薦票の「労働期間」は1つしか書けないため）。「🖨️ 印刷・PDF」で全部まとめて印刷できます。</div>';
+  const warn=(t,list)=>'<div style="font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:5px 8px;margin-bottom:6px;font-family:sans-serif;line-height:1.5;">⚠ '+t+(list&&list.length?('<br><span style="color:#92400e;">'+e(list.join('、'))+'</span>'):'')+'</div>';
+  if(_suiBatchMiss) h+=warn('見つからない案件が '+_suiBatchMiss+'件あります（紙には入れていません）');
+  const ng=ppl.filter(x=>x.noGender), na=ppl.filter(x=>!x.answered);
+  if(ng.length) h+=warn('性別が入っていない人が '+ng.length+'名います（案シスの人材情報で選んでから開き直してください）', ng.map(nmOf));
+  if(na.length) h+=warn('ヒアリングの回答（生年月日・旅券番号）がない人が '+na.length+'名います', na.map(nmOf));
+  h+=L.map(function(sh,i){
+    const per=(sh.from||sh.to)?(e(sh.from||'')+' ～ '+e(sh.to||'')):'<span style="color:#b45309;">契約期間なし</span>';
+    return '<div onclick="scrollToPage('+(i*2+1)+')" title="この紙を表示" style="cursor:pointer;font-size:11px;line-height:1.5;padding:5px 2px;border-top:1px solid #eef2f7;font-family:sans-serif;">'
+      +'<b>'+(i+1)+'枚目</b>　<span style="color:#64748b;">P'+(i*2+1)+'・P'+(i*2+2)+'</span>'+(sh.visa==='2'?'　<span style="color:#7c3aed;font-weight:700;">2号</span>':'')+'<br>'
+      +'<span style="font-weight:700;color:#0f172a;">'+e(sh.co.name||sh.coName||'(会社名なし)')+'</span>'+(sh.parts>1?('<span style="color:#64748b;">（'+sh.part+'/'+sh.parts+'）</span>'):'')+'<br>'
+      +'<span style="color:#64748b;">'+per+'</span><br>'
+      +sh.people.map(function(x){ return '<span style="color:'+((x.noGender||!x.answered)?'#b45309':'#334155')+';">・'+e(nmOf(x))+'</span>'; }).join('<br>')
+      +'</div>';
+  }).join('');
+  return h;
+}
+async function suiBatchInit(ids){
+  ids=ids.slice(0,SUI_BATCH_MAX);
+  document.body.classList.add('sui-batch');
+  _suiBatch=[];
+  const box=document.getElementById('suiBatchList');
+  if(box) box.innerHTML='<div class="fs-title">まとめて作成</div><div style="font-size:11px;color:#64748b;padding:4px 2px;font-family:sans-serif;">読み込み中…</div>';
+  const sheets=[];
+  try{
+    const inList=ids.map(function(id){ return '"'+String(id).replace(/["(),]/g,'')+'"'; }).join(',');
+    const rows=await sb('cases?select=id,name,applicant,applicant_field,org,company,company_id,residence_status,contract_start,contract_end&id=in.('+encodeURIComponent(inList)+')')||[];
+    const by={}; rows.forEach(function(r){ by[r.id]=r; });
+    const cs=ids.map(function(id){ return by[id]; }).filter(Boolean);
+    _suiBatchMiss=ids.length-cs.length;
+    let ps=[]; try{ ps=await sb('persons?select=*&case_id=in.('+encodeURIComponent(inList)+')')||[]; }catch(e){ console.warn('persons取得スキップ:',e.message); }
+    const pby={}; ps.forEach(function(x){ if(x && x.case_id && !pby[x.case_id]) pby[x.case_id]=x; });
+    // まとめる：会社・登録支援機関・1号/2号・契約期間が同じ人（並びは案シスから渡された順）
+    const groups=[], gby={};
+    cs.forEach(function(c){
+      const visa=_suiVisaNo(c.residence_status), from=_ymd(c.contract_start||''), to=_ymd(c.contract_end||'');
+      const key=[c.company_id||c.company||'', c.org||'', visa, from, to].join('|');
+      let g=gby[key]; if(!g){ g=gby[key]={ c0:c, visa:visa, from:from, to:to, list:[] }; groups.push(g); }
+      const rec=pby[c.id]||null;
+      const vals={}; SUI_P_KEYS.forEach(function(k){ vals[k]=''; });
+      Object.assign(vals, _suiPersonVals(c, null).set, rec?_suiPersonVals(null, rec).set:{});
+      g.list.push({ id:c.id, applicant:c.applicant||'', vals:vals, answered:!!(rec && (vals.Birth||vals.Pass)), noGender:!vals.Gender });
+    });
+    const orgCache={}, coCache={};
+    for(const g of groups){
+      const c=g.c0, on=String(c.org||''), ck=String(c.company_id||'')+'|'+String(c.company||'');
+      if(!(on in orgCache)) orgCache[on]=await _suiOrgVals(on);
+      if(!(ck in coCache)) coCache[ck]=await _suiCoVals(c.company_id, c.company||'');
+      const sv=orgCache[on]||{}, cv=coCache[ck]||{};
+      const sup={ name:sv.name||'', license:sv.license||'', rep:sv.rep||'', addr:sv.addr||'', tel:sv.tel||'' };
+      const co={ name:cv.name||'', license:cv.license||'', rep:cv.rep||'', addr:cv.addr||'', tel:cv.tel||'' };
+      const parts=Math.ceil(g.list.length/SUI_PER_SHEET);
+      for(let i=0;i<g.list.length;i+=SUI_PER_SHEET){
+        sheets.push({ sup:sup, co:co, coName:c.company||'', from:g.from, to:g.to, visa:g.visa, people:g.list.slice(i,i+SUI_PER_SHEET), part:i/SUI_PER_SHEET+1, parts:parts });
+      }
+    }
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
+  _suiBatch=sheets;
+  if(box) box.innerHTML=_suiBatchListHtml();
+  p();
+  if(sheets.length) showToast('✅ 推薦票を '+sheets.length+'枚 作りました。「🖨️ 印刷・PDF」でまとめて印刷できます');
+}
+(function(){
+  var ids=[]; try{ ids=(new URLSearchParams(location.search||'').get('ids')||'').split(',').map(function(x){ return x.trim(); }).filter(Boolean); }catch(e){}
+  if(ids.length) suiBatchInit(ids);
+})();
+
 function fitDocToPreview(){
   requestAnimationFrame(()=>{
     const pp = document.querySelector('.pp');
@@ -910,6 +1044,7 @@ window.addEventListener('resize', fitDocToPreview);
 // index.htmlからの案件選択を受信
 window.addEventListener('message', async function(e){
   if(!e.data||e.data.type!=='SELECT_CASE') return;
+  if(_suiBatch) return;   // ver.20261104.03: まとめて作成の画面では使わない
   const info=e.data.info;
   if(!info||!info.caseId) return;
   // 入力欄にも反映
