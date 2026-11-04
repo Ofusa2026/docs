@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.06</div>
+    <div class="ver">ver.20261104.07</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2128,6 +2128,19 @@ async function _p17Hearing(so, _s){
   if(apply(IS.jobchange,   [['f288','f289','f290','f291'],['f296','f297','f298','f299'],['f304','f305','f306','f307'],
                             ['f312','f313','f314','f315'],['f320','f321','f322','f323'],['f329','f330','f331','f332'],['f337','f338','f339','f340']])) sch++;
   if(sch) used.push('実施予定（'+sch+'項目）');
+  /* ver.20261104.07: 実施方法のチェック。ヒアリングに implMethods があればそれを使い、無ければ標準の方法にする。
+       3-イ 口座・携帯・ライフライン … 実施予定が「有」の行に ■手続に係る情報提供 ■必要に応じて手続に同行
+       4 生活オリエンテーション       … 実施予定が「有」なら ■対面 */
+  var IM = ex.implMethods || {};
+  var lc = IM.lifeContract || {}, lcHas = Object.keys(lc).length>0;
+  [['f143','f150','f151','f152'],['f154','f161','f162','f163'],['f165','f172','f173','f174']].forEach(function(x){
+    if(!C[x[0]]) return;
+    C[x[1]] = lcHas ? !!lc.info : true;
+    C[x[2]] = lcHas ? !!lc.accompany : true;
+    C[x[3]] = lcHas ? !!lc.other : false;
+  });
+  var om = IM.orientation || {}, omHas = Object.keys(om).length>0;
+  if(C.f184){ C.f190 = omHas ? !!om.face : true; C.f191 = omHas ? !!om.video : false; }
   if(review.length){
     window._p17Review = review;
   } else window._p17Review = [];
