@@ -534,14 +534,14 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #pageArea .p17sign-date{ margin:2.2em 0 0 34%; }
 #pageArea .p17sign-name{ margin:2.6em 0 0 34%; }
 #pageArea .p17sign-name .line{ display:inline-block; width:16em; border-bottom:1px solid #333; height:1.6em; vertical-align:bottom; margin-left:1em; }
-#pageArea textarea.p17long{ width:96%; resize:none; overflow:hidden; border:0; background:transparent; font:inherit; line-height:1.25; padding:0; vertical-align:top; }
+#pageArea textarea.p17long{ width:96%; resize:none; overflow:hidden; display:block; margin:0 auto; border:0; background:transparent; font:inherit; line-height:1.25; padding:0; vertical-align:top; }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.03</div>
+    <div class="ver">ver.20261104.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -766,11 +766,15 @@ function _p17Post(){
   area.querySelectorAll('input.vi-cb[data-mirror]').forEach(function(m){ var src=document.getElementById(m.getAttribute('data-mirror')); m.checked=!!(src&&src.checked); });
   // 長い回答（「／」区切り）は改行して全部表示
   area.querySelectorAll('input.bl').forEach(function(el){
-    if(/／/.test(el.value)){
+    // ver.20261104.04: 細い欄（実施予定の（　）など）で入りきらない長い回答も、折り返して全文を表示する
+    var _td=el.closest('td'), _narrow=_td && _td.clientWidth>0 && _td.clientWidth<260;
+    var _long=_narrow && el.value && el.scrollWidth>el.clientWidth+1;
+    if(/／/.test(el.value) || _long){
       var ta=document.createElement('textarea'); ta.className='p17long'; ta.id=el.id; ta.name=el.name;
       if(el.dataset.label) ta.dataset.label=el.dataset.label;
       ta.value=el.value.split('／').join('\n'); ta.rows=ta.value.split('\n').length;
       el.parentNode.replaceChild(ta, el);
+      ta.style.height='auto'; ta.style.height=(ta.scrollHeight+2)+'px';   // 折り返した行がすべて見えるよう高さを合わせる
     }
   });
   // ベトナム語の行の（　）に値を入れる
@@ -802,9 +806,11 @@ function _p17Post(){
       if((td.rowSpan||1)>1) return;
       var ps=td.querySelectorAll('p'); if(!ps.length) return;
       var t0=(ps[0].textContent||'').trim();
-      if(t0!=='別紙参照' && t0!=='記載なし') return;
+      // ver.20261104.04: 「有」でない行の担当者欄は空欄（一度見つけた欄には印を付けて、あとで「有」にしたとき戻せるようにする）
+      if(t0!=='別紙参照' && !td.dataset.p17staff) return;
+      td.dataset.p17staff='1';
       if(yesCb.checked){ ps[0].textContent='別紙参照'; if(ps[1]) ps[1].textContent='Xem tài liệu đính kèm.'; }
-      else { ps[0].textContent='記載なし'; if(ps[1]) ps[1].textContent='Không ghi'; }
+      else { ps[0].textContent=''; if(ps[1]) ps[1].textContent=''; }
     });
   });
 }
@@ -814,7 +820,7 @@ document.addEventListener('change', function(e){
   if(t && (t.id==='f380s'||t.id==='f380d') && t.checked){ var o=document.getElementById(t.id==='f380s'?'f380d':'f380s'); if(o){ o.checked=false; (window._p17Check=window._p17Check||{})[o.id]=false; } }
   if(t && t.closest && t.closest('#pageArea')) setTimeout(_p17Post,0); });
 document.addEventListener('input',  function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')){
-  var t=e.target; if(t.matches && t.matches('textarea.p17long')){ (window._p17Text=window._p17Text||{})[t.id]=t.value.split('\n').join('／'); t.rows=t.value.split('\n').length; }
+  var t=e.target; if(t.matches && t.matches('textarea.p17long')){ (window._p17Text=window._p17Text||{})[t.id]=t.value.split('\n').join('／'); t.style.height='auto'; t.style.height=(t.scrollHeight+2)+'px'; }
   setTimeout(_p17Post,0); } });
 /* ver.20261104.02: 「（　　都・道・府・県　　市・区・町・村）」の欄に入れる値は、末尾の「県」「市」などを外す（二重表示を防ぐ） */
 function _p17fStrip(id, re){ var raw=String(v(id)||'').trim(); if(!raw) return f(id); raw=raw.replace(re,''); return '<span class="f" data-bind="'+id+'">'+esc(raw)+'</span>'; }
@@ -2061,8 +2067,19 @@ async function _p17Hearing(so, _s){
   if(lo.housing_policy_c) HP.c = lo.housing_policy_c;
   var sch = 0;
   if(apply(IS.guidance,    [['f044',null,'f046','f047']])) sch++;
-  if(apply(HP.a || IS.housing, [['f094','f095','f096','f097']])) sch++;
-  if(apply(HP.b,           [['f102','f103','f104','f105']])) sch++;
+  /* ver.20261104.04: 住居の回答が「有（bで…合意しなかった場合に実施／雇用開始後一週間以内に実施）」のように
+     a（bで合意しないときの代わり）と b（本来の確保）をまとめて書いている場合は、
+     前半を a、後半を b に分けて、どちらも「有」にする。b に別の回答があるときは分けない。 */
+  var _ha = String(HP.a || IS.housing || ''), _hm = _ha.match(/^\s*有\s*[（(](.*)[）)]\s*$/);
+  var _hs = _hm ? _hm[1].split('／').map(function(x){ return x.trim(); }).filter(Boolean) : [];
+  if(_hs.length===2 && /^b/i.test(_hs[0]) && !String(HP.b||'').trim()){
+    C.f094=true; C.f096=false; T.f095=_hs[0];
+    C.f102=true; C.f104=false; T.f103=_hs[1];
+    sch++;
+  } else {
+    if(apply(HP.a || IS.housing, [['f094','f095','f096','f097']])) sch++;
+    if(apply(HP.b,           [['f102','f103','f104','f105']])) sch++;
+  }
   if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
   else if(Object.keys(IS).length){
