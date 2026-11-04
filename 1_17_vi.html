@@ -517,13 +517,31 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   #pageArea .doc.p17doc td.vert p.ja{ font-size:.78em !important; }
   #pageArea .doc.p17doc td.vert p.vi{ font-size:.62em !important; }
 }
+
+/* ver.20261104.01: 1ページ＝1枚に分けたので、表の中の改ページ（Wordの改ページ位置）は使わない。
+   Windows の印刷で空白ページや、1行だけ次のページに送られる原因になっていた。 */
+@media print{
+  #pageArea tr.pgrow{ break-before:auto !important; page-break-before:auto !important; }
+  #pageArea .tbl-wrap.pgstart{ break-before:auto !important; page-break-before:auto !important; }
+}
+/* ver.20261104.01: 署名ページ */
+#pageArea table.p17sign{ border-collapse:collapse; margin:2.2em 0 1.6em 34%; width:62%; }
+#pageArea table.p17sign td{ border:0 !important; padding:.5em .4em; vertical-align:bottom; }
+#pageArea table.p17sign td.lb{ width:42%; white-space:nowrap; }
+#pageArea table.p17sign p.ul, #pageArea .p17ul{ border-bottom:1px solid #333; padding:0 .4em; min-height:1.3em; }
+#pageArea table.p17sign p.vi.ul{ margin-top:.15em; }
+#pageArea .p17sign-gap{ margin-top:1.8em !important; }
+#pageArea .p17sign-date{ margin:2.2em 0 0 34%; }
+#pageArea .p17sign-name{ margin:2.6em 0 0 34%; }
+#pageArea .p17sign-name .line{ display:inline-block; width:16em; border-bottom:1px solid #333; height:1.6em; vertical-align:bottom; margin-left:1em; }
+#pageArea textarea.p17long{ width:96%; resize:none; overflow:hidden; border:0; background:transparent; font:inherit; line-height:1.25; padding:0; vertical-align:top; }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261030.07</div>
+    <div class="ver">ver.20261104.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -578,6 +596,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>支援責任者 役職<span class="fid">es.coMgrTitle</span></label><input id="es_coMgrTitle" oninput="p()"></div>
 <div class="fg"><label>支援責任者 役職(英)<span class="fid">es.coMgrTitleEn</span></label><input id="es_coMgrTitleEn" oninput="p()"></div>
 <div class="fg"><label>作成責任者 氏名<span class="fid">es.coAuthorName</span></label><input id="es_coAuthorName" oninput="p()"></div>
+<div class="fg"><label>作成責任者 氏名(英)<span class="fid">es.coAuthorNameEn</span></label><input id="es_coAuthorNameEn" oninput="p()"></div>
 </div>
 <input type="hidden" id="es_selfMode" value="">
 <div class="fs"><div class="fs-title">登録支援機関</div>
@@ -713,6 +732,85 @@ function _p17AppTypeChanged(){
   if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(String(T.f185||''))) T.f185 = nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
   p();
 }
+
+/* ===== ver.20261104.01: 描画後の仕上げ =====
+   ・実施予定が「有」でない行の担当者欄は「別紙参照」ではなく「記載なし」
+   ・日本語の行に入った値（有（　）の中、電話・メールなど）を、下のベトナム語の行の（　）にも入れる（決まった言い回しは訳す）
+   ・署名ページのベトナム語側のチェックを日本語側と連動
+   ・「／」で区切った長い回答は、欄の中で改行して全部表示する */
+var P17_VI_DICT = {
+  '適宜実施':'Thực hiện lúc thích hợp', '入国済み':'Đã vào nước', '契約終了後適宜実施':'Thực hiện lúc thích hợp sau khi kết thúc hợp đồng',
+  '認知次第実施':'Thực hiện khi đã nhận thức rõ', '非自発的離職時に実施':'Thực hiện khi nghỉ việc không tự nguyện',
+  'bでの入居に合意しなかった場合に実施':'Được tiến hành khi bạn không đồng ý chuyển đến tại b',
+  '雇用開始後一週間以内に実施':'Thực hiện trong vòng một tuần sau khi bắt đầu làm việc',
+  '入国後遅滞なく':'Thực hiện ngay sau khi nhập cảnh', '変更許可後遅滞なく':'Thực hiện ngay sau khi được cấp phép thay đổi tư cách lưu trú',
+  'a,bで実施':'Thực hiện bằng a, b', 'a、bで実施':'Thực hiện bằng a, b',
+  '3か月に1回以上':'3 tháng 1 lần trở lên', '3か月に1回以上実施':'Thực hiện 3 tháng 1 lần trở lên', '3ヶ月':'3 tháng',
+  '入社後':'Sau khi vào công ty', '入社日':'Ngày vào công ty', '入社時':'Khi vào công ty', '帰国時':'Khi về nước', '記載なし':'Không ghi',
+  '直接面談':'Gặp trực tiếp', '電話':'Điện thoại', 'メール':'Email', '面談':'Phỏng vấn', '訪問':'Thăm hỏi', '必要に応じ訪問':'Thăm hỏi khi cần thiết',
+  'ベトナム語通訳対応':'Có phiên dịch tiếng Việt', 'LINE等':'LINE, v.v.', 'SNS':'SNS', 'LINE':'LINE', 'Messenger':'Messenger', '市役所窓口':'Quầy tiếp nhận của tòa thị chính'
+};
+function _p17Vi(t){
+  t=String(t||'').trim(); if(!t) return '';
+  if(P17_VI_DICT[t]) return P17_VI_DICT[t];
+  if(/^[\x20-\x7E]+$/.test(t)) return t;   // 電話番号・メールアドレスなどはそのまま
+  return t.split(/／/).map(function(a){
+    a=a.trim(); if(P17_VI_DICT[a]) return P17_VI_DICT[a];
+    return a.split(/[・、,，]/).map(function(b){ b=b.trim(); return P17_VI_DICT[b]||b; }).join(', ');
+  }).join(' / ');
+}
+function _p17Post(){
+  var area=document.getElementById('pageArea'); if(!area) return;
+  // 対訳チェックの連動
+  area.querySelectorAll('input.vi-cb[data-mirror]').forEach(function(m){ var src=document.getElementById(m.getAttribute('data-mirror')); m.checked=!!(src&&src.checked); });
+  // 長い回答（「／」区切り）は改行して全部表示
+  area.querySelectorAll('input.bl').forEach(function(el){
+    if(/／/.test(el.value)){
+      var ta=document.createElement('textarea'); ta.className='p17long'; ta.id=el.id; ta.name=el.name;
+      if(el.dataset.label) ta.dataset.label=el.dataset.label;
+      ta.value=el.value.split('／').join('\n'); ta.rows=ta.value.split('\n').length;
+      el.parentNode.replaceChild(ta, el);
+    }
+  });
+  // ベトナム語の行の（　）に値を入れる
+  area.querySelectorAll('p.ja').forEach(function(ja){
+    var vi=ja.nextElementSibling; if(!vi || !vi.classList.contains('vi') || vi.children.length) return;
+    if(vi.dataset.viOrig==null) vi.dataset.viOrig=vi.textContent;
+    var orig=vi.dataset.viOrig;
+    var vals=[];
+    ja.querySelectorAll('input.bl, textarea.p17long').forEach(function(e){ var x=String(e.value||'').trim(); if(x) vals.push(x.replace(/\n/g,'／')); });
+    ja.querySelectorAll('span.f[data-bind]').forEach(function(e){ if(!e.style.color){ var x=e.textContent.trim(); if(x) vals.push(x); } });
+    // 対応時間「9時～18時」の下の「giờ - giờ」にも数字を入れる
+    if(/^\s*giờ\s*-\s*giờ\s*$/.test(orig) && vals.length===2){ vi.textContent=vals[0]+' giờ - '+vals[1]+' giờ'; return; }
+    var m=orig.match(/\(([\s\-－–]*)\)/);
+    if(!vals.length || !m){ vi.textContent=orig; return; }
+    var sep = /[-－–]/.test(m[1]) ? '-' : ' / ';   // 電話番号を分けて入れる欄は「-」でつなぐ
+    vi.textContent=orig.replace(m[0], '('+vals.map(_p17Vi).join(sep)+')');
+  });
+  // 担当者欄：実施予定が「有」でなければ「記載なし」
+  area.querySelectorAll('tr').forEach(function(tr){
+    var yesCb=null, cbTd=null;
+    tr.querySelectorAll(':scope > td').forEach(function(td){
+      if(yesCb) return;
+      var p=td.querySelector('p.ja input.cb'); if(!p) return;
+      var txt=(p.parentNode.textContent||'').trim();
+      if(/^有/.test(txt)){ yesCb=p; cbTd=td; }
+    });
+    if(!yesCb || (cbTd.rowSpan||1)>1) return;
+    tr.querySelectorAll(':scope > td').forEach(function(td){
+      if((td.rowSpan||1)>1) return;
+      var ps=td.querySelectorAll('p'); if(!ps.length) return;
+      var t0=(ps[0].textContent||'').trim();
+      if(t0!=='別紙参照' && t0!=='記載なし') return;
+      if(yesCb.checked){ ps[0].textContent='別紙参照'; if(ps[1]) ps[1].textContent='Xem tài liệu đính kèm.'; }
+      else { ps[0].textContent='記載なし'; if(ps[1]) ps[1].textContent='Không ghi'; }
+    });
+  });
+}
+document.addEventListener('change', function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')) setTimeout(_p17Post,0); });
+document.addEventListener('input',  function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')){
+  var t=e.target; if(t.matches && t.matches('textarea.p17long')){ (window._p17Text=window._p17Text||{})[t.id]=t.value.split('\n').join('／'); t.rows=t.value.split('\n').length; }
+  setTimeout(_p17Post,0); } });
 function _p17RestoreChecks(){
   var st=window._p17Check||{};
   Object.keys(st).forEach(function(id){
@@ -752,9 +850,11 @@ function p(){
   if(!area) return;
   area.innerHTML = P17_TEMPLATE();
   _p17RestoreChecks();
+  if(window._p17Text && !window._p17Text.f407) window._p17Text.f407='ベトナム';   // ver.20261104.01: ベトナム語版なので既定で「ベトナム」
   _p17RestoreTexts();
   _p17RestoreRadios();
   _p17BuildNav();
+  _p17Post();
   requestAnimationFrame(_p17FitInputs);
   p17Fit(); requestAnimationFrame(p17Fit);
 }
@@ -906,7 +1006,7 @@ Họ và tên</p></td>
 
 
 </div></div>
-<div class="p17page" style="--pz:.88"><div class="doc p17doc"><div class="tbl-wrap">
+<div class="p17page" style="--pz:.82"><div class="doc p17doc"><div class="tbl-wrap">
 <table class="grid" id="t3">
 <colgroup><col style="width:2.9722%"><col style="width:2.6334%"><col style="width:2.8380%"><col style="width:19.2969%"><col style="width:15.5769%"><col style="width:6.5197%"><col style="width:9.5813%"><col style="width:19.6037%"><col style="width:20.9779%"></colgroup>
 <tbody>
@@ -1325,28 +1425,23 @@ Ngày trong tuần</p></td>
 </tr>
 <tr style="height:2.18em">
 <td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hMonF')}時　～　${f('es_hMonT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt" colspan="3"><p class="ja a-center">${f('es_hTueF')}時　～　${f('es_hTueT')}時
-giờ -   giờ</p></td>
+<td class="b-tttt" colspan="3"><p class="ja a-center">${f('es_hTueF')}時　～　${f('es_hTueT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 <td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hWedF')}時　～　${f('es_hWedT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 <td class="b-tttt"><p class="ja a-center">${f('es_hThuF')}時　～　${f('es_hThuT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttk"><p class="ja a-center">${f('es_hFriF')}時　～　${f('es_hFriT')}時
-giờ -   giờ</p></td>
+<td class="b-tttk"><p class="ja a-center">${f('es_hFriF')}時　～　${f('es_hFriT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.53em">
 <td class="b-tttt"><p class="ja a-center">土曜</p><p class="vi a-center">Thứ Bảy</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSatF')}時～${f('es_hSatT')}時
-giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSatF')}時～${f('es_hSatT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.18em">
 <td class="b-tttt"><p class="ja a-center">日曜</p><p class="vi a-center">Chủ Nhật</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSunF')}時～${f('es_hSunT')}時
-giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSunF')}時～${f('es_hSunT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 </tr>
 <tr style="height:3.07em">
 <td class="b-tttt"><p class="ja a-center">祝日
 Ngày lễ</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hHolF')}時～${f('es_hHolT')}時
-giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hHolF')}時～${f('es_hHolT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
 </tr>
 <tr class="nosplit" style="height:7.76em">
 <td class="b-tttt vert"><p class="ja a-center" style="padding-left:0.63em">相談方法</p><p class="vi a-center" style="padding-left:0.63em">Phương pháp thảo luận</p></td>
@@ -1502,7 +1597,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tbody></table></div>
 
 </div></div>
-<div class="p17page" style="--pz:.88"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
+<div class="p17page" style="--pz:.82"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8c"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr style="height:8.36em" class="pgrow">
 <td class="b-nknt vert cont" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">Ⅳ　支援内容（続き）</p><p class="vi a-center" style="padding-left:0.63em">IV. Nội dung hỗ trợ (tiếp theo)</p></td>
 <td class="b-ttnt vert" rowspan="8"><p class="ja a-center" style="padding-left:0.63em">９　定期的な面談の実施・行政機関への通報</p><p class="vi a-center" style="padding-left:0.63em">9. Thực hiện phỏng vấn định kỳ, báo cáo cho cơ quan hành chính</p></td>
@@ -1543,7 +1638,7 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ｃ．労働基準法その他の労働に関する法令の規定に違反していることを知ったときは，労働基準監督署その他の関係行政機関へ通報する</p><p class="vi">Khi đã biết về việc đang vi phạm luật tiêu chuẩn lao động và các quy định luật pháp liên quan đến lao động khác, thông báo cho người quan sát tiêu chuẩn lao động và cơ quan hành chính có liên quan khác</p></td>
 <td class="b-tttt" rowspan="2"><p class="ja"><input type="checkbox" class="cb" id="f368" name="f368" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ">有（認知次第実施）</p><p class="vi"> Có (Thực hiện khi đã nhận thức rõ)</p><p class="ja"><input type="checkbox" class="cb" id="f369" name="f369" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ">無（<input type="text" class="bl" id="f370" name="f370" data-label="Ⅳ 支援内容（続き） ＞ ｃ．労働基準法その他の労働に関する法令の規定に違反しているこ｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-nttt cont" rowspan="2">&nbsp;</td>
-<td class="b-nttt cont" rowspan="2">&nbsp;</td>
+<td class="b-nttt cont" rowspan="2"><!-- ver.20261104.01: 通報の担当者 --><p class="ja a-center">別紙参照</p><p class="vi a-center">Xem tài liệu đính kèm.</p></td>
 <td class="b-nttt cont" rowspan="2">&nbsp;</td>
 <td class="b-nttk cont" rowspan="2">&nbsp;</td>
 </tr>
@@ -1610,18 +1705,21 @@ Người thuộc đối tượng phỏng vấn mong muốn phỏng vấn trực 
 <p class="ja" style="padding-left:3.00em;text-indent:-3.00em">また，本書面は支援対象者が十分に理解できる言語に翻訳し，支援対象者に交付するとともに，内容について十分に説明しました。</p>
 <p class="vi" style="padding-left:3.00em;text-indent:-3.00em">Việc hỗ trợ nêu trên sẽ được thực hiện một cách phù hợp dựa trên chính sách nhằm thực hiện xã hội cộng sinh do đoàn thể công cộng địa phương triển khai .</p>
 <p class="vi">Ngoài ra, văn bản này chúng tôi đã dịch sang ngôn ngữ mà đối tượng được hỗ trợ có thể hiểu được đầy đủ, cùng với việc giao cho đối tượng được hỗ trợ, chúng tôi đã giải thích đầy đủ về nội dung.</p>
-<p class="ja" style="padding-left:24.00em;text-indent:3.50em">特定技能所属機関の氏名又は名称　${f('es_coName')}</p>
-<p class="vi" style="padding-left:24.00em;text-indent:3.50em">Họ tên hoặc tên gọi cơ quan liên kết kỹ năng đặc định</p>
-<p class="ja" style="padding-left:24.00em;text-indent:1.75em">作成責任者の氏名　${f('es_coAuthorName')}</p>
-<p class="vi" style="padding-left:24.00em;text-indent:1.75em">    Họ tên người phụ trách soạn thảo</p>
-<p class="ja" style="padding-left:3.00em;text-indent:-3.00em">本書面について，<input type="text" class="bl" id="f407" name="f407" data-label="本文｜面について，＿語による翻訳" style="width:4.00em">語による翻訳文の交付を受け，その内容について説明を受け十分に理解しました。</p>
+<!-- ver.20261104.01: 署名欄を見やすく（行間を取り、名称・氏名は英語も下線つきで） -->
+<table class="p17sign"><tbody>
+<tr><td class="lb"><p class="ja">特定技能所属機関の氏名又は名称</p><p class="vi">Họ tên hoặc tên gọi cơ quan liên kết kỹ năng đặc định</p></td>
+<td class="vl"><p class="ja ul">${f('es_coName')}</p><p class="vi ul">${f('es_coNameEn')}</p></td></tr>
+<tr><td class="lb"><p class="ja">作成責任者の氏名</p><p class="vi">Họ tên người phụ trách soạn thảo</p></td>
+<td class="vl"><p class="ja ul">${f('es_coAuthorName')}</p><p class="vi ul">${f('es_coAuthorNameEn')}</p></td></tr>
+</tbody></table>
+<p class="ja p17sign-gap" style="padding-left:3.00em;text-indent:-3.00em">本書面について，<input type="text" class="bl" id="f407" name="f407" data-label="本文｜面について，＿語による翻訳" style="width:4.00em">語による翻訳文の交付を受け，その内容について説明を受け十分に理解しました。</p>
 <p class="ja">また、Ⅳ欄９アａの定期的な面談を実施する方法について説明を受け、その内容を十分理解し、　<input type="checkbox" class="cb" id="f408" name="f408" data-label="本文"> 対面とオンラインの併用　 <input type="checkbox" class="cb" id="f409" name="f409" data-label="本文"> 対面のみ　で実施することを希望します。</p>
-<p class="vi" style="padding-left:3.00em;text-indent:-3.00em">Về văn bản này, tôi đã được nhận bản dịch bằng tiếng           , tôi đã được giải thích về nội dung và đã hiểu đầy đủ.</p>
-<p class="vi">Ngoài ra, tôi đã được giải thích về cách thực hiện phỏng vấn định kỳ ở 9Aa mục IV và hiểu một cách đầy đủ về nội dung đó, và tôi mong muốn thực hiện phòng vấn  <input type="checkbox" class="cb vi-cb" disabled>Kết hợp trực tiếp và trực tuyến  <input type="checkbox" class="cb vi-cb" disabled>Chỉ phỏng vấn trực tiếp.</p>
-<p class="ja" style="padding-left:23.22em;text-indent:0.61em">署名日${f('es_createY')}年${f('es_createM')}月${f('es_createD')}日</p>
-<p class="vi" style="padding-left:23.22em;text-indent:0.61em">              Ngày ký tên                                        Ngày   tháng    năm</p>
-<p class="ja" style="text-indent:22.00em">１号特定技能外国人の署名</p>
-<p class="vi" style="text-indent:27.50em">  Chữ ký của người nước ngoài có kỹ năng đặc định số 1</p>
+<p class="vi" style="padding-left:3.00em;text-indent:-3.00em">Về văn bản này, tôi đã được nhận bản dịch bằng tiếng <span class="p17ul">Việt Nam</span>, tôi đã được giải thích về nội dung và đã hiểu đầy đủ.</p>
+<p class="vi">Ngoài ra, tôi đã được giải thích về cách thực hiện phỏng vấn định kỳ ở 9Aa mục IV và hiểu một cách đầy đủ về nội dung đó, và tôi mong muốn thực hiện phòng vấn  <input type="checkbox" class="cb vi-cb" data-mirror="f408" disabled>Kết hợp trực tiếp và trực tuyến  <input type="checkbox" class="cb vi-cb" data-mirror="f409" disabled>Chỉ phỏng vấn trực tiếp.</p>
+<p class="ja p17sign-date">署名日　${f('es_createY')}年${f('es_createM')}月${f('es_createD')}日</p>
+<p class="vi p17sign-date" style="margin-top:.1em">Ngày ký tên　Ngày ${v('es_createD')||'　'} tháng ${v('es_createM')||'　'} năm ${v('es_createY')||'　　'}</p>
+<p class="ja p17sign-name">１号特定技能外国人の署名<span class="line"></span></p>
+<p class="vi" style="margin-left:34%">Chữ ký của người nước ngoài có kỹ năng đặc định số 1</p>
   </div></div>
 </div></div>`; }
 
@@ -1703,6 +1801,7 @@ async function loadFromDB(passedInfo){
         _s('es_coMgrTitle',co.support_manager_title||co.rep_title); _s('es_coMgrTitleEn',co.support_manager_title_en||co.rep_title_en);
         _s('es_coMgrKana',co.support_manager_kana);
         _s('es_coAuthorName',co.author_name||co.rep_name);
+        _s('es_coAuthorNameEn',co.author_name_en||((co.rep_title_en?co.rep_title_en+' ':'')+(co.rep_name_en||'')).trim());   // ver.20261104.01
 
         /* ver.20261013.02: 雇用条件セット(companies.emp_sets[])由来の項目。
            どのセットを使うかは cases.emp_set_idx で決まるが未設定の案件が多いため、
@@ -1924,6 +2023,7 @@ async function _p17Hearing(so, _s){
     if(inner.length > 12){
       var seg = inner.split(/[／\/]/).map(function(x){return x.trim();}).filter(Boolean);
       if(/適宜実施/.test(inner)) inner='適宜実施';
+      else if(seg.length>1 && seg.length<=3 && seg.every(function(x){ return x.length<=20; })) inner=seg.join('／');   // ver.20261104.01: 全部残す（欄の中で改行して表示）
       else if(seg.length>1 && seg[seg.length-1].length<=14) inner=seg[seg.length-1];
       else { review.push(v); inner=''; }
     }
@@ -1948,6 +2048,10 @@ async function _p17Hearing(so, _s){
   if(apply(HP.b,           [['f102','f103','f104','f105']])) sch++;
   if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
+  else if(Object.keys(IS).length){
+    // ver.20261104.01: 3-イ（口座・携帯・ライフライン）は義務的支援。回答が無ければ「有（適宜実施）」
+    [['f143','f144','f145'],['f154','f155','f156'],['f165','f166','f167']].forEach(function(x){ C[x[0]]=true; C[x[2]]=false; T[x[1]]='適宜実施'; });
+  }
   if(apply(IS.orientation, [['f184','f185','f186','f187']])) sch++;
   /* ver.20261030.06: 4 生活オリエンテーションの実施予定。回答が「適宜実施」などの決まり文句（または空）のときだけ、
      認定は「入国後遅滞なく」、変更は「変更許可後遅滞なく」にする。機関独自の書き方（例「入社後」）はそのまま。 */
@@ -1956,6 +2060,9 @@ async function _p17Hearing(so, _s){
     T.f185 = _nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
   }
   if(apply(IS.japanese,    [['f205','f206','f207','f208'],['f213','f214','f215','f216'],['f220','f221','f222','f223']])) sch++;
+  // ver.20261104.01: 日本語学習の回答が教室案内・教材・オンライン講座だけ（日本語教師との契約・講習に触れていない）なら、ｃは「無（a,bで実施）」
+  var _jp = String(IS.japanese||'');
+  if(/教室|教材|オンライン/.test(_jp) && !/教師|講習/.test(_jp) && !/^無/.test(_jp)){ C.f220=false; C.f222=true; delete T.f221; T.f223='a,bで実施'; }
   // 相談・苦情は回答が「直接面談・電話…」など方法の列挙なので、有にチェックだけ入れる（欄には「適宜実施」が印字済み）
   if(String(IS.consultation||'').trim()){ C.f235 = true; C.f237 = false; sch++; }
   if(apply(IS.exchange,    [['f271','f272','f273','f274']])) sch++;
