@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261105.16</div>
+    <div class="ver">ver.20261105.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1166,9 +1166,21 @@ function _p17Bessi(){
     return pageOf('all', '別紙（支援責任者・支援担当者・通訳者）',
       section('支援責任者', L.mgr, mCols, mRows, 2) + gap + section('支援担当者', L.staff, sCols, sRows, 4) + gap + section('通訳者', L.interp, iCols, iRows, 4));
   }
-  return pageOf('mgr', '別紙（支援責任者）', section('支援責任者', L.mgr, mCols, mRows, 5))
-       + pageOf('staff', '別紙（支援担当者）', section('支援担当者', L.staff, sCols, sRows, 8))
-       + pageOf('interp', '別紙（通訳者）', section('通訳者', L.interp, iCols, iRows, 8));
+  /* ver.20261105.17: 人数が多い名簿は1枚15人ずつに分ける（アイデムのように数十人いても文字が小さくならないように） */
+  var PER = 15, out = '';
+  var paged = function(kind, titleJa, titleVi, cols, rows, minRows){
+    if(rows.length <= PER) return pageOf(kind, '別紙（'+titleJa+'）', section(titleJa, titleVi, cols, rows, minRows));
+    var n = Math.ceil(rows.length/PER), h = '';
+    for(var k=0;k<n;k++){
+      var part = rows.slice(k*PER, (k+1)*PER);
+      var sec = section(titleJa, titleVi, cols, part, 0).replace(/<td class="no">(\d+)<\/td>/g, function(_m, x){ return '<td class="no">'+(k*PER+Number(x))+'</td>'; });
+      h += pageOf(kind, '別紙（'+titleJa+'）　'+(k+1)+'／'+n, sec);
+    }
+    return h;
+  };
+  return paged('mgr', '支援責任者', L.mgr, mCols, mRows, 5)
+       + paged('staff', '支援担当者', L.staff, sCols, sRows, 8)
+       + paged('interp', '通訳者', L.interp, iCols, iRows, 8);
 }
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
