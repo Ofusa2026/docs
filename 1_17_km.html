@@ -561,7 +561,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（カンボジア語版・変更）</div>
-    <div class="ver">ver.20261105.17</div>
+    <div class="ver">ver.20261105.19</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -815,6 +815,8 @@ var P17_VI_DICT = {
   'Facebook等':'Facebook ជាដើម', '雇用契約締結日を記載':'សរសេរកាលបរិច្ឆេទចុះកិច្ចសន្យាការងារ', 'カンボジア':'កម្ពុជា'
 };
 
+/* ver.20261105.19: 都道府県名（住所欄の外国語側で使う。市区町村はAI翻訳） */
+Object.assign(P17_VI_DICT, {"北海道": "Hokkaido", "青森県": "Aomori", "岩手県": "Iwate", "宮城県": "Miyagi", "秋田県": "Akita", "山形県": "Yamagata", "福島県": "Fukushima", "茨城県": "Ibaraki", "栃木県": "Tochigi", "群馬県": "Gunma", "埼玉県": "Saitama", "千葉県": "Chiba", "東京都": "Tokyo", "神奈川県": "Kanagawa", "新潟県": "Niigata", "富山県": "Toyama", "石川県": "Ishikawa", "福井県": "Fukui", "山梨県": "Yamanashi", "長野県": "Nagano", "岐阜県": "Gifu", "静岡県": "Shizuoka", "愛知県": "Aichi", "三重県": "Mie", "滋賀県": "Shiga", "京都府": "Kyoto", "大阪府": "Osaka", "兵庫県": "Hyogo", "奈良県": "Nara", "和歌山県": "Wakayama", "鳥取県": "Tottori", "島根県": "Shimane", "岡山県": "Okayama", "広島県": "Hiroshima", "山口県": "Yamaguchi", "徳島県": "Tokushima", "香川県": "Kagawa", "愛媛県": "Ehime", "高知県": "Kochi", "福岡県": "Fukuoka", "佐賀県": "Saga", "長崎県": "Nagasaki", "熊本県": "Kumamoto", "大分県": "Oita", "宮崎県": "Miyazaki", "鹿児島県": "Kagoshima", "沖縄県": "Okinawa"});
 /* ver.20261105.01: 表記ゆれをそろえてから辞書を引く（全角→半角、3ヶ月/3カ月→3か月、1週間→一週間、一回/一度→1回、空白なし） */
 function _p17Nk(t){
   t=String(t||'');
@@ -975,7 +977,7 @@ function _p17Mirror(){
   // 異なる地方公共団体の都道府県・市区町村
   [['f401','f387'],['f402','f388']].forEach(function(p){ var t=$(p[0]); if(t) t.value=val(p[1]); });
 }
-document.addEventListener('input',  function(e){ if(e.target && /^f(38[4-9]|39[0-4])$/.test(e.target.id||'')){ _p17Mirror(); _p17Bake(); } }, true);
+document.addEventListener('input',  function(e){ if(e.target && /^f(38[4-9]|39[0-4])$/.test(e.target.id||'')){ _p17Mirror(); if(/^f38[78]$/.test(e.target.id) && typeof _p17Post==='function'){ clearTimeout(window._p17ResT); window._p17ResT=setTimeout(_p17Post, 600); } _p17Bake(); } }, true);
 document.addEventListener('change', function(e){ if(e.target && /^f(38[4-9]|39[0-4])$/.test(e.target.id||'')){ _p17Mirror(); _p17Bake(); } }, true);
 
 /* ver.20261105.11: 別紙（支援担当者名簿・通訳者名簿）。登録支援機関の詳細「別紙」に登録した名簿（support_orgs.attachments）から作る。
@@ -1081,6 +1083,22 @@ function _p17Bessi(){
        + paged('staff', '支援担当者', L.staff, sCols, sRows, 8)
        + paged('interp', '通訳者', L.interp, iCols, iRows, 8);
 }
+
+/* ver.20261105.19: 共生施策（Ⅴ）の所在地・住居地。値が入ったら「都・道・府・県」「市・区・町・村」などの選択肢の文言を消し、
+   「石川県　加賀市」「(Ishikawa, Kaga)」のように値だけを書く（重複をなくす）。値が無いときは原本どおりの書き方。 */
+function _p17Cap(x){ x=String(x||'').trim(); return x ? x.replace(/(^|\s)([a-z])/g, function(_m,a,b){ return a+b.toUpperCase(); }) : ''; }
+function _p17PlaceJa(){
+  var p=String(v('es_officePref')||'').trim(), c=String(v('es_officeCity')||'').trim();
+  if(!p && !c) return null;
+  return '<span class="f" data-bind="es_officePref">'+esc(p)+'</span>　<span class="f" data-bind="es_officeCity">'+esc(c)+'</span>';
+}
+function _p17PlaceFx(){
+  var pe=_p17Cap(v('es_officePrefEn')), ce=_p17Cap(v('es_officeCityEn'));
+  var pj=String(v('es_officePref')||'').trim(), cj=String(v('es_officeCity')||'').trim();
+  if(!pe && !ce && !pj && !cj) return null;
+  var a=[pe||(pj?_p17Vi(pj):''), ce||(cj?_p17Vi(cj):'')].filter(Boolean);
+  return '('+_p17EscMark(a.join(', '))+')';
+}
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
   window._p17Untr = {};   // ver.20261105.01: 訳せなかった語を毎回数え直す
@@ -1136,6 +1154,14 @@ function _p17Post(){
     });
   });
   _p17Mirror();       // ver.20261105.08
+  // ver.20261105.19: 値が入っている住所欄は、選択肢の文言を隠して値だけにする
+  area.querySelectorAll('span.p17lbl').forEach(function(sp){ var i=document.getElementById(sp.getAttribute('data-for')); sp.style.display = (i && String(i.value||'').trim()) ? 'none' : ''; });
+  (function(){
+    var p=String((document.getElementById('f387')||{}).value||'').trim(), c=String((document.getElementById('f388')||{}).value||'').trim();
+    var gen=area.querySelector('[data-gen="res"]'), val=area.querySelector('[data-val="res"]'); if(!gen||!val) return;
+    if(p||c){ val.innerHTML='('+_p17EscMark([p?_p17Vi(p):'', c?_p17Vi(c):''].filter(Boolean).join(', '))+')'; gen.style.display='none'; val.style.display=''; }
+    else { gen.style.display=''; val.style.display='none'; }
+  })();
   _p17ViBarUpdate();   // ver.20261105.01
   _p17Bake();
 }
@@ -2001,7 +2027,7 @@ B. ភាសាប្រើពេលអនុវត្ត</p></td>
 <div class="p17page"><div class="doc p17doc"><div class="tbl-wrap"><table class="grid" id="t8d"><colgroup><col style="width:2.9594%"><col style="width:2.6206%"><col style="width:2.8380%"><col style="width:19.2841%"><col style="width:15.5705%"><col style="width:4.6980%"><col style="width:11.3966%"><col style="width:20.1087%"><col style="width:20.5241%"></colgroup><tbody>
 <tr class="pgrow nosplit" style="height:6.30em">
 <td class="b-tktt vert" colspan="2"><p class="ja a-center" style="padding-left:0.63em">Ⅴ共生施策関係</p><p class="vi a-center" style="padding-left:0.63em">V. ទាក់ទងនឹងវិធានការរួមរស់ជាមួយគ្នា</p></td>
-<td class="b-tttk" colspan="7"><p class="ja" style="padding-left:2.52em">本計画の作成に当たり、地方公共団体が実施する共生社会の実現のための施策（共生施策）を確認しています。</p><p class="ja" style="padding-left:2.52em">共生施策を確認した地方公共団体（市区町村）名</p><p class="ja" style="padding-left:3.78em">・支援対象者が活動する事業所の所在地 （${_p17fStrip('es_officePref',/[都道府県]$/)}都・道・府・県${_p17fStrip('es_officeCity',/[市区町村]$/)}市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：${f('es_symY')}年${f('es_symM')}月${f('es_symD')}日　　確認方法：　<input type="checkbox" class="cb" id="f384" name="f384" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f385" name="f385" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f386" name="f386" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="ja" style="padding-left:3.78em">・支援対象者の住居地</p><p class="ja" style="padding-left:6.30em"><!-- ver.20261104.02: 原本どおり「同上」「異なる地方公共団体」にチェック欄 --><input type="checkbox" class="cb" id="f380s" name="f380s" data-label="Ⅴ共生施策関係 ＞ 住居地｜同上">同上</p><p class="ja" style="padding-left:6.30em"><input type="checkbox" class="cb" id="f380d" name="f380d" data-label="Ⅴ共生施策関係 ＞ 住居地｜異なる地方公共団体">異なる地方公共団体（<input type="text" class="bl" id="f387" name="f387" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜方公共団体（＿都・道・府・" style="width:5.00em">都・道・府・県<input type="text" class="bl" id="f388" name="f388" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜・道・府・県＿市・区・町・" style="width:5.00em">市・区・町・村　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f389" name="f389" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:3.50em">年<input type="text" class="bl" id="f390" name="f390" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f391" name="f391" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f392" name="f392" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f393" name="f393" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f394" name="f394" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="vi" style="padding-left:2.52em">ពេលធ្វើផែនការនេះ យើងខ្ញុំបានបញ្ជាក់មើលនូវវិធានការដើម្បីសម្រេចបាននូវសង្គមមួយដែលអាចរួមរស់ជាមួយគ្នាបាន (វិធានការរួមរស់ជាមួយគ្នា) ដែលអនុវត្តដោយរដ្ឋបាលមូលដ្ឋាន។</p><p class="vi" style="padding-left:2.52em">ឈ្មោះស្ថាប័នសាធារណៈ (ក្រុងឬស្រុក-ឃុំ-ភូមិ) ដែលបានធ្វើការបញ្ជាក់អំពីវិធានការរួមរស់ជាមួយគ្នា</p><p class="ja" style="padding-left:3.78em">・ទីតាំងនៃកន្លែងធ្វើការរបស់អ្នកត្រូវទទួលបានការគាំទ្រ (ខេត្ត ${f('es_officePrefEn')}/Tokyo/Osaka/Hokkaido, ក្រុង/ខ័ណ្ឌ/ឃុំ/ភូមិ ${f('es_officeCityEn')})</p><p class="ja" style="padding-left:6.30em">ថ្ងៃបញ្ជាក់៖ ថ្ងៃទី ${v('es_symD')||'　'} ខែ ${v('es_symM')||'　'} ឆ្នាំ ${v('es_symY')||'　　'}　<input type="hidden" class="bl" id="f397" name="f397" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿" style="width:2.75em">វិធីបញ្ជាក់៖　<input type="checkbox" class="cb" id="f398" name="f398" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> គេហទំព័រ　 <input type="checkbox" class="cb" id="f399" name="f399" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> វិធីក្រៅពីនេះ (<input type="text" class="bl" id="f400" name="f400" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">កំណត់ចំណាំ៖</p><p class="ja" style="padding-left:3.78em">・អាស័យដ្ឋានរបស់អ្នកត្រូវទទួលបានការគាំទ្រ</p><p class="vi" style="padding-left:6.30em"><input type="checkbox" class="cb vi-cb" data-mirror="f380s" disabled>ដូចខាងលើ</p><p class="ja" style="padding-left:6.30em"><input type="checkbox" class="cb vi-cb" data-mirror="f380d" disabled>ស្ថាប័នសាធារណៈខុសគ្នា (ខេត្ត<input type="text" class="bl" id="f401" name="f401" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜(＿/Tokyo" style="width:1.25em">/Tokyo/Osaka/Hokkaido, ក្រុង/ខ័ណ្ឌ/ឃុំ/ភូមិ<input type="text" class="bl" id="f402" name="f402" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:10.25em">)</p><p class="ja" style="padding-left:6.30em">ថ្ងៃបញ្ជាក់៖ ថ្ងៃទី <span data-p17d="d"></span> ខែ <span data-p17d="m"></span> ឆ្នាំ <span data-p17d="y"></span>　<input type="hidden" class="bl" id="f403" name="f403" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿" style="width:2.75em">វិធីបញ្ជាក់៖　<input type="checkbox" class="cb" id="f404" name="f404" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> គេហទំព័រ　 <input type="checkbox" class="cb" id="f405" name="f405" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> វិធីក្រៅពីនេះ (<input type="text" class="bl" id="f406" name="f406" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">កំណត់ចំណាំ៖</p></td>
+<td class="b-tttk" colspan="7"><p class="ja" style="padding-left:2.52em">本計画の作成に当たり、地方公共団体が実施する共生社会の実現のための施策（共生施策）を確認しています。</p><p class="ja" style="padding-left:2.52em">共生施策を確認した地方公共団体（市区町村）名</p><p class="ja" style="padding-left:3.78em">・支援対象者が活動する事業所の所在地 （${_p17PlaceJa() || `${_p17fStrip('es_officePref',/[都道府県]$/)}都・道・府・県${_p17fStrip('es_officeCity',/[市区町村]$/)}市・区・町・村`}　）</p><p class="ja" style="padding-left:6.30em">確認日：${f('es_symY')}年${f('es_symM')}月${f('es_symD')}日　　確認方法：　<input type="checkbox" class="cb" id="f384" name="f384" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f385" name="f385" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f386" name="f386" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="ja" style="padding-left:3.78em">・支援対象者の住居地</p><p class="ja" style="padding-left:6.30em"><!-- ver.20261104.02: 原本どおり「同上」「異なる地方公共団体」にチェック欄 --><input type="checkbox" class="cb" id="f380s" name="f380s" data-label="Ⅴ共生施策関係 ＞ 住居地｜同上">同上</p><p class="ja" style="padding-left:6.30em"><input type="checkbox" class="cb" id="f380d" name="f380d" data-label="Ⅴ共生施策関係 ＞ 住居地｜異なる地方公共団体">異なる地方公共団体（<input type="text" class="bl" id="f387" name="f387" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜方公共団体（＿都・道・府・" style="width:5.00em"><span class="p17lbl" data-for="f387">都・道・府・県</span><input type="text" class="bl" id="f388" name="f388" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜・道・府・県＿市・区・町・" style="width:5.00em"><span class="p17lbl" data-for="f388">市・区・町・村</span>　）</p><p class="ja" style="padding-left:6.30em">確認日：<input type="text" class="bl" id="f389" name="f389" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜確認日：＿年 月" style="width:3.50em">年<input type="text" class="bl" id="f390" name="f390" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年＿月 日" style="width:3.00em">月<input type="text" class="bl" id="f391" name="f391" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜年 月＿日 確認方" style="width:3.00em">日　　確認方法：　<input type="checkbox" class="cb" id="f392" name="f392" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> ホームページ　 <input type="checkbox" class="cb" id="f393" name="f393" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> その他の方法（<input type="text" class="bl" id="f394" name="f394" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜の他の方法（＿）" style="width:17.00em">）</p><p class="ja" style="padding-left:6.30em">備考：</p><p class="vi" style="padding-left:2.52em">ពេលធ្វើផែនការនេះ យើងខ្ញុំបានបញ្ជាក់មើលនូវវិធានការដើម្បីសម្រេចបាននូវសង្គមមួយដែលអាចរួមរស់ជាមួយគ្នាបាន (វិធានការរួមរស់ជាមួយគ្នា) ដែលអនុវត្តដោយរដ្ឋបាលមូលដ្ឋាន។</p><p class="vi" style="padding-left:2.52em">ឈ្មោះស្ថាប័នសាធារណៈ (ក្រុងឬស្រុក-ឃុំ-ភូមិ) ដែលបានធ្វើការបញ្ជាក់អំពីវិធានការរួមរស់ជាមួយគ្នា</p><p class="ja" style="padding-left:3.78em">・ទីតាំងនៃកន្លែងធ្វើការរបស់អ្នកត្រូវទទួលបានការគាំទ្រ ${_p17PlaceFx() || `(ខេត្ត ${f('es_officePrefEn')}/Tokyo/Osaka/Hokkaido, ក្រុង/ខ័ណ្ឌ/ឃុំ/ភូមិ ${f('es_officeCityEn')})`}</p><p class="ja" style="padding-left:6.30em">ថ្ងៃបញ្ជាក់៖ ថ្ងៃទី ${v('es_symD')||'　'} ខែ ${v('es_symM')||'　'} ឆ្នាំ ${v('es_symY')||'　　'}　<input type="hidden" class="bl" id="f397" name="f397" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿" style="width:2.75em">វិធីបញ្ជាក់៖　<input type="checkbox" class="cb" id="f398" name="f398" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> គេហទំព័រ　 <input type="checkbox" class="cb" id="f399" name="f399" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> វិធីក្រៅពីនេះ (<input type="text" class="bl" id="f400" name="f400" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">កំណត់ចំណាំ៖</p><p class="ja" style="padding-left:3.78em">・អាស័យដ្ឋានរបស់អ្នកត្រូវទទួលបានការគាំទ្រ</p><p class="vi" style="padding-left:6.30em"><input type="checkbox" class="cb vi-cb" data-mirror="f380s" disabled>ដូចខាងលើ</p><p class="ja" style="padding-left:6.30em"><input type="checkbox" class="cb vi-cb" data-mirror="f380d" disabled>ស្ថាប័នសាធារណៈខុសគ្នា <span class="p17gen" data-gen="res">(ខេត្ត<input type="text" class="bl" id="f401" name="f401" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜(＿/Tokyo" style="width:1.25em">/Tokyo/Osaka/Hokkaido, ក្រុង/ខ័ណ្ឌ/ឃុំ/ភូមិ<input type="text" class="bl" id="f402" name="f402" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:10.25em">)</span><span class="p17val" data-val="res" style="display:none"></span></p><p class="ja" style="padding-left:6.30em">ថ្ងៃបញ្ជាក់៖ ថ្ងៃទី <span data-p17d="d"></span> ខែ <span data-p17d="m"></span> ឆ្នាំ <span data-p17d="y"></span>　<input type="hidden" class="bl" id="f403" name="f403" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿" style="width:2.75em">វិធីបញ្ជាក់៖　<input type="checkbox" class="cb" id="f404" name="f404" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> គេហទំព័រ　 <input type="checkbox" class="cb" id="f405" name="f405" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係"> វិធីក្រៅពីនេះ (<input type="text" class="bl" id="f406" name="f406" data-label="Ⅴ共生施策関係 ＞ Ⅴ共生施策関係｜＿)" style="width:17.00em">)</p><p class="vi" style="padding-left:6.30em">កំណត់ចំណាំ៖</p></td>
 </tr>
 </tbody></table>
 </div>
@@ -2180,7 +2206,7 @@ async function loadFromDB(passedInfo){
           if(!ps.city || !oc) return;
           var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
           if(ps.city===oc && (!ps.pref || !op || ps.pref===op)){ C.f380s = true; C.f380d = false; }
-          else { C.f380s = false; C.f380d = true; T.f387 = ps.pref.replace(/[都道府県]$/,''); T.f388 = ps.city.replace(/[市区町村]$/,''); }
+          else { C.f380s = false; C.f380d = true; T.f387 = ps.pref; T.f388 = ps.city; }   /* ver.20261105.19: 選択肢の文言は隠すので値はそのまま */
         })();
         /* ver.20261030.05: 3-ｄ 住居の概要を雇用条件から入れる（チェック欄は描画で作り直されるので _p17Check／_p17Text に置く）。
              確保の時期 … 変更申請は日本に住んでいるので「申請の時点で確保」、認定は「申請の後に確保」
@@ -2784,7 +2810,7 @@ function _p17FitForPrint(){
       });
     });
   }catch(e){}
-  var MM=96/25.4, W=Math.floor(277*MM), H=Math.floor(190*MM*0.97);   // 3%は文字の高さの差のための余裕   // A4横・余白10mm
+  var MM=96/25.4, W=Math.floor(277*MM), H=Math.floor(190*MM*0.88);   // ver.20261105.19: 12%の余裕（Windowsの文字は画面の測り方より高く出ることがあり、1行はみ出して改ページが崩れていた）   // A4横・余白10mm
   var st=document.createElement('style'); st.id='_p17measure'; st.textContent=css+'\n#pageArea{ width:'+W+'px !important; max-width:none !important; }';
   pages.forEach(function(pg){ pg.style.setProperty('--pzfit','1'); });
   document.head.appendChild(st);
