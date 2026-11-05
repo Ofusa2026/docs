@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261102.01</div>
+    <div class="ver">ver.20261105.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -160,6 +160,8 @@
       <div class="fg"><label>分野（ID）<span class="fid">es.applicantFieldEn</span></label><input id="es_applicantFieldEn" oninput="p()"></div>
       <div class="fg"><label>業務区分（日）<span class="fid">es.category</span></label><input id="es_category" oninput="p()"></div>
       <div class="fg"><label>業務区分（ID）<span class="fid">es.categoryEn</span></label><input id="es_categoryEn" oninput="p()"></div>
+      <div class="fg"><label>業務区分２（日）<span class="fid">es.category2</span></label><input id="es_category2" oninput="p()" placeholder="複数ある場合のみ"></div>
+      <div class="fg"><label>業務区分２（ID）<span class="fid">es.category2En</span></label><input id="es_category2En" oninput="p()" placeholder="複数ある場合のみ"></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅳ 労働時間</div>
       <div class="fg2">
@@ -470,7 +472,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1793841872"></script>
+<script src="ofusa_common.js?v=1793855120"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){

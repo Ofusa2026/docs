@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20261102.01</div>
+    <div class="ver">ver.20261105.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -473,7 +473,7 @@
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1793841872"></script>
+<script src="ofusa_common.js?v=1793855120"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1349,7 +1349,7 @@ function setFormValues(esData){
       const el1=document.getElementById('es_'+fKey);
       const el2=document.getElementById('es_'+f2Key);
       if(el1) el1.value=parts[0]||'';
-      if(el2) el2.value=parts[1]||'';
+      if(el2 && parts[1]) el2.value=parts[1];   // ver.20261105.08: 1つだけのときは別の欄（category2）に入った2つ目を消さない
       p();return;
     }
 

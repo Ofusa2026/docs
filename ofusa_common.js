@@ -912,6 +912,7 @@ const fBunyaPair=(idA,idB)=>{
     return String(s||'')
       .replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'')
       .replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'')
+      .replace(/\s*\([^()]*\)\s*$/,'')   // ver.20261105.08: 訳の末尾の「(Lĩnh vực xây dựng - …)」等（分野・号の訳）も表示しない。2つ目は案シスの値を変えないよう入力欄では括弧を残すため
       .trim();
   };
   // 1つの欄に「土木、建築」のように複数入っていることがあるので読点/カンマで分解する。
@@ -1078,8 +1079,31 @@ function applyBindings(){
   return spans.length; // data-bind スパン数を返す（0=旧形式）
 }
 function _bunyaPairTidy(area){
-  var _clean=function(x){ return String(x||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').trim(); };
+  var _clean=function(x){ return String(x||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').replace(/\s*\([^()]*\)\s*$/,'').trim(); };
   [['es_category','es_category2'],['es_categoryEn','es_category2En']].forEach(function(pr){
+    // ver.20261105.08: 業務区分が1つのときに保存した直接編集版には2つ目の欄そのものが無く、
+    //   あとで案シスで2つ目を選んでも出なかった。2つ目に値があれば、1つ目のすぐ後ろに「・2つ目」の欄を足す。
+    try{
+      var _a=_clean((typeof v==='function'?v(pr[0]):'')||(window._fieldData&&window._fieldData[pr[0]])||'');
+      var _b=_clean((typeof v==='function'?v(pr[1]):'')||(window._fieldData&&window._fieldData[pr[1]])||'');
+      if(_b && _b!==_a){
+        area.querySelectorAll('span.f[data-bind="'+pr[0]+'"]').forEach(function(sp1){
+          var par=sp1.parentNode; if(!par || par.querySelector('span.f[data-bind="'+pr[1]+'"]')) return;
+          var sp2=document.createElement('span'); sp2.className='f'; sp2.setAttribute('data-bind',pr[1]);
+          sp2.innerHTML=(typeof esc==='function'?esc(_b):_b);
+          par.insertBefore(sp2, sp1.nextSibling);
+          par.insertBefore(document.createTextNode('・'), sp2);
+        });
+      }
+    }catch(_e){}
+    // 直接編集版の欄にも、分野・号の括弧書きを除いた値を出す（入力欄・案シスの値はそのまま）
+    try{
+      pr.forEach(function(id){
+        var _c=_clean((typeof v==='function'?v(id):'')||(window._fieldData&&window._fieldData[id])||'');
+        if(!_c) return;
+        area.querySelectorAll('span.f[data-bind="'+id+'"]').forEach(function(sp){ sp.innerHTML=(typeof esc==='function'?esc(_c):_c); });
+      });
+    }catch(_e){}
     area.querySelectorAll('span.f[data-bind="'+pr[1]+'"]').forEach(function(sp){
       var v1=_clean((typeof v==='function'?v(pr[0]):'')||(window._fieldData&&window._fieldData[pr[0]])||'');
       var v2=_clean((typeof v==='function'?v(pr[1]):'')||(window._fieldData&&window._fieldData[pr[1]])||'');
