@@ -524,6 +524,11 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   #pageArea tr.pgrow{ break-before:auto !important; page-break-before:auto !important; }
   #pageArea .tbl-wrap.pgstart{ break-before:auto !important; page-break-before:auto !important; }
 }
+/* ver.20261105.01: ベトナム語に訳せていない箇所（画面だけ赤、印刷では普通の文字） */
+#pageArea .p17-untr{ background:#fee2e2; color:#b91c1c; border-radius:2px; }
+@media print{ #pageArea .p17-untr{ background:none !important; color:inherit !important; } #p17ViBar{ display:none !important; } }
+#p17ViBar{ display:none; margin:0 0 8px; padding:7px 10px; border:1px solid #fca5a5; background:#fef2f2; color:#991b1b; border-radius:8px; font-size:12.5px; }
+#p17ViBar button{ margin-left:8px; padding:3px 10px; border:1px solid #b91c1c; background:#fff; color:#b91c1c; border-radius:6px; cursor:pointer; font-size:12px; }
 /* ver.20261104.01: 署名ページ */
 #pageArea table.p17sign{ border-collapse:collapse; margin:2.2em 0 1.6em 34%; width:62%; }
 #pageArea table.p17sign td{ border:0 !important; padding:.5em .4em; vertical-align:bottom; }
@@ -541,7 +546,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.09</div>
+    <div class="ver">ver.20261105.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -662,6 +667,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">9pt</button>
   <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
 </div>
+<div id="p17ViBar"></div>
 <div id="pageArea"></div>
 </div>
 </div>
@@ -759,15 +765,177 @@ var P17_VI_DICT = {
   '直接面談':'Gặp trực tiếp', '電話':'Điện thoại', 'メール':'Email', '面談':'Phỏng vấn', '訪問':'Thăm hỏi', '必要に応じ訪問':'Thăm hỏi khi cần thiết',
   'ベトナム語通訳対応':'Có phiên dịch tiếng Việt', 'LINE等':'LINE, v.v.', 'SNS':'SNS', 'LINE':'LINE', 'Messenger':'Messenger', '市役所窓口':'Quầy tiếp nhận của tòa thị chính'
 };
+/* ver.20261105.01: 登録支援機関の回答によく出る言い回しをさらに追加 */
+Object.assign(P17_VI_DICT, {
+  '有':'Có', '無':'Không', '同上':'Như trên', 'ベトナム':'Việt Nam', '適宜':'Khi thích hợp',
+  '1か月に1回':'1 tháng 1 lần', '3か月に1回':'3 tháng 1 lần', '3か月に1回以上':'3 tháng 1 lần trở lên', '3か月に1回程度':'Khoảng 3 tháng 1 lần',
+  '四半期に1回':'Mỗi quý 1 lần', '入社後3か月ごとに実施':'Thực hiện 3 tháng một lần sau khi vào công ty',
+  '情報提供':'Cung cấp thông tin', '同行':'Đi cùng', '補助':'Hỗ trợ', '契約を補助':'Hỗ trợ ký hợp đồng',
+  '書類作成の補助':'Hỗ trợ soạn thảo giấy tờ', '書類作成を補助':'Hỗ trợ soạn thảo giấy tờ', '書類作成等の補助を行う':'Hỗ trợ soạn thảo giấy tờ, v.v.',
+  '必要に応じて同行し':'Đi cùng khi cần thiết', '必要に応じ同行し':'Đi cùng khi cần thiết', '必要に応じて同行':'Đi cùng khi cần thiết',
+  '必要に応じて同行して契約等の補助を行う':'Đi cùng khi cần thiết và hỗ trợ ký hợp đồng, v.v.',
+  '必要に応じて同行し、書類作成の補助':'Đi cùng khi cần thiết và hỗ trợ soạn thảo giấy tờ',
+  '必要に応じて訪問する':'Thăm hỏi khi cần thiết', '必要に応じて訪問':'Thăm hỏi khi cần thiết',
+  '不動産仲介業者の紹介':'Giới thiệu công ty môi giới bất động sản', '不動産仲介事業者を紹介し':'Giới thiệu công ty môi giới bất động sản',
+  '自ら賃借し提供':'Tự thuê và cung cấp', '社宅':'Nhà ở của công ty', '寮':'Ký túc xá', '借上物件':'Nhà do công ty thuê', '借り上げ物件':'Nhà do công ty thuê',
+  '寮の準備または法人借り上げを前提とした物件':'Chuẩn bị ký túc xá hoặc nhà do công ty thuê',
+  '日本語教室案内':'Giới thiệu lớp học tiếng Nhật', '日本語教室の案内':'Giới thiệu lớp học tiếng Nhật', '自主学習教材':'Tài liệu tự học',
+  'オンライン講座の情報提供':'Cung cấp thông tin về khóa học trực tuyến', 'オンライン講座情報提供':'Cung cấp thông tin về khóa học trực tuyến',
+  '自主学習教材/オンライン講座情報提供':'Cung cấp thông tin về tài liệu tự học/khóa học trực tuyến', '自習学習アプリの提供':'Cung cấp ứng dụng tự học',
+  'ハローワーク案内':'Hướng dẫn đến Hello Work', 'ハローワーク同行':'Đi cùng đến Hello Work', 'ハローワーク案内・同行':'Hướng dẫn và đi cùng đến Hello Work',
+  '推薦状作成':'Viết thư giới thiệu', '推薦状':'Thư giới thiệu', '行政手続情報':'Thông tin về thủ tục hành chính',
+  '行政手続情報は口頭':'Thông tin thủ tục hành chính bằng lời nói', '書面':'Bằng văn bản', '口頭':'Bằng lời nói',
+  '有給付与':'Cấp ngày nghỉ có lương', '代替支援者確保':'Bảo đảm người hỗ trợ thay thế', '紹介あっせん':'Giới thiệu, môi giới việc làm',
+  '非自発的離職の場合':'Trường hợp nghỉ việc không tự nguyện',
+  'a〜gすべて「有(非自発的離職時に実施)」':'a〜g: tất cả "Có (thực hiện khi nghỉ việc không tự nguyện)"',
+  'a〜gすべて「有(適宜実施)」':'a〜g: tất cả "Có (thực hiện lúc thích hợp)"',
+  'いずれも適宜実施':'Tất cả đều thực hiện lúc thích hợp', 'いずれも雇用後一週間以内に実施':'Tất cả đều thực hiện trong vòng một tuần sau khi bắt đầu làm việc',
+  'いずれも入国後一週間以内に実施':'Tất cả đều thực hiện trong vòng một tuần sau khi nhập cảnh',
+  '許可後速やかに実施':'Thực hiện ngay sau khi được cấp phép', '配属日に実施':'Thực hiện vào ngày được phân công', '入国時':'Khi nhập cảnh',
+  '雇用開始後一週間以内':'Trong vòng một tuần sau khi bắt đầu làm việc',
+  '入社後10日以内':'Trong vòng 10 ngày sau khi vào công ty', '入社前から入社後2週間以内':'Từ trước khi vào công ty đến trong vòng 2 tuần sau khi vào công ty',
+  '在留資格変更申請前':'Trước khi nộp đơn xin thay đổi tư cách lưu trú', '事前に受入企業と調整し':'Điều chỉnh trước với công ty tiếp nhận',
+  'cは未実施=aを実施するため':'Không thực hiện c vì đã thực hiện a',
+  '通訳者対応':'Có phiên dịch viên hỗ trợ', 'ベトナム語通訳者対応':'Có phiên dịch viên tiếng Việt hỗ trợ', 'ベトナム語通訳':'Phiên dịch tiếng Việt',
+  'インドネシア語通訳者対応':'Có phiên dịch viên tiếng Indonesia hỗ trợ', 'ミャンマー語通訳対応':'Có phiên dịch tiếng Myanmar', 'ミャンマー語通訳者対応':'Có phiên dịch viên tiếng Myanmar hỗ trợ',
+  '対面面談':'Gặp mặt trực tiếp', '対面':'Trực tiếp', 'オンライン面談':'Phỏng vấn trực tuyến', 'オンライン':'Trực tuyến', 'WEB面談':'Phỏng vấn qua web', 'テレビ電話':'Gọi video',
+  'メッセンジャー':'Messenger', 'ライン':'LINE', 'Zoom等':'Zoom, v.v.', 'LINE/Messenger':'LINE/Messenger',
+  'LINE等でいつでも連絡可':'Có thể liên lạc bất cứ lúc nào qua LINE, v.v.', 'LINEなどでいつでも連絡を取れるようにする':'Bảo đảm có thể liên lạc bất cứ lúc nào qua LINE, v.v.',
+  'SNS各種メッセージアプリで連絡':'Liên lạc qua SNS và các ứng dụng nhắn tin', 'SNS(Facebook等)':'SNS (Facebook, v.v.)',
+  'ホームページ':'Trang chủ', 'メール(24時間対応)':'Email (hỗ trợ 24 giờ)', '24時間対応':'Hỗ trợ 24 giờ',
+  '通訳者対応、必要に応じて訪問する':'Có phiên dịch viên hỗ trợ, thăm hỏi khi cần thiết', '月1回':'1 lần mỗi tháng',
+  '入国時：入国予定日を記載':'Khi nhập cảnh: ghi ngày dự kiến nhập cảnh', '出国時：契約終了後適宜実施':'Khi xuất cảnh: thực hiện lúc thích hợp sau khi kết thúc hợp đồng',
+  '在留審査許可後入社前から入社後2週間':'Từ sau khi được cấp phép lưu trú, trước khi vào công ty đến 2 tuần sau khi vào công ty',
+  'a:希望あれば適宜':'a: thực hiện lúc thích hợp nếu có nguyện vọng', 'b:教材':'b: tài liệu học tập',
+  'オンライン講座情報＋c:日本語教師と契約し講習機会提供':'Thông tin khóa học trực tuyến + c: ký hợp đồng với giáo viên tiếng Nhật để tạo cơ hội học tập',
+  '全項目：非自発的離職時に実施。情報入手提供':'Tất cả hạng mục: thực hiện khi nghỉ việc không tự nguyện. Thu thập và cung cấp thông tin',
+  '支援メニューとしてオンライン日本語会話クラスを受講可能　特定技能外国人の支払なし':'Có thể tham gia lớp hội thoại tiếng Nhật trực tuyến trong chương trình hỗ trợ, người lao động không phải trả phí',
+  '有給付与等。担当:高橋範行':'Cấp ngày nghỉ có lương, v.v. Người phụ trách: Takahashi Noriyuki', '担当：長田建':'Người phụ trách: Osada Ken',
+  'その他':'Khác', 'インドネシア語通訳者ラマ対応':'Phiên dịch viên tiếng Indonesia Rama hỗ trợ', 'インドネシア語通訳者ラマが対応':'Phiên dịch viên tiếng Indonesia Rama hỗ trợ',
+  '対応不可時は山﨑 090-1460-7661が対応':'Khi không thể hỗ trợ, Yamazaki (090-1460-7661) sẽ hỗ trợ',
+  'ベトナム語通訳者ガ':'Phiên dịch viên tiếng Việt Nga', 'ロアン対応':'Loan hỗ trợ', 'ベトナム語通訳者ディエン対応':'Phiên dịch viên tiếng Việt Điền hỗ trợ',
+  'Facebook等':'Facebook, v.v.', '雇用契約締結日を記載':'Ghi ngày ký hợp đồng lao động'
+});
+/* ver.20261105.01: 表記ゆれをそろえてから辞書を引く（全角→半角、3ヶ月/3カ月→3か月、1週間→一週間、一回/一度→1回、空白なし） */
+function _p17Nk(t){
+  t=String(t||'');
+  try{ t=t.normalize('NFKC'); }catch(e){}
+  return t.replace(/[\s　]+/g,'').replace(/(\d)[ヶヵカケか]月/g,'$1か月').replace(/1週間/g,'一週間').replace(/一回|一度/g,'1回');
+}
+var _P17_JP = /[぀-ヿ㐀-鿿々〆〜「」]/;
+var _p17ViN = null;      // 正規化した辞書（静的）
+window._p17ViLearned = window._p17ViLearned || {};   // AIで訳して共有保存したもの（settings.p17_vi_dict）
+try{ var _ls=JSON.parse(localStorage.getItem('p17_vi_learned')||'{}'); if(_ls && typeof _ls==='object') Object.assign(window._p17ViLearned,_ls); }catch(e){}
+window._p17Untr = window._p17Untr || {};   // 今の画面で訳せなかった語（原文→true）
+function _p17Look(x){
+  if(!_p17ViN){ _p17ViN={}; Object.keys(P17_VI_DICT).forEach(function(k){ _p17ViN[_p17Nk(k)]=P17_VI_DICT[k]; }); }
+  var k=_p17Nk(x); if(!k) return '';
+  return _p17ViN[k] || window._p17ViLearned[k] || '';
+}
+/* 辞書の語を中に含むだけの文（例：電話 06-1234-5678）は、語を置き換えて日本語が残らなければそれを使う */
+function _p17Subst(x){
+  if(!_p17ViN) _p17Look('');
+  var t=String(x), keys=Object.keys(_p17ViN).filter(function(k){ return k.length>=2; }).sort(function(a,b){ return b.length-a.length; });
+  var out=String(t); try{ out=out.normalize('NFKC'); }catch(e){}
+  keys.forEach(function(k){ if(out.indexOf(k)>=0) out=out.split(k).join(' '+_p17ViN[k]+' '); });
+  out=out.replace(/\s+/g,' ').trim();
+  return _P17_JP.test(out) ? '' : out;
+}
 function _p17Vi(t){
-  t=String(t||'').trim().replace(/1週間/g,'一週間'); if(!t) return '';   // 「1週間」「一週間」の書き方の違いをそろえる
-  if(P17_VI_DICT[t]) return P17_VI_DICT[t];
-  if(/^[\x20-\x7E]+$/.test(t)) return t;   // 電話番号・メールアドレスなどはそのまま
+  t=String(t||'').trim(); if(!t) return '';
+  var hit=_p17Look(t); if(hit) return hit;
+  if(!_P17_JP.test(t)) return t;   // 電話番号・メールアドレスなどはそのまま
+  // 「有（適宜実施）」「直接面談(月1回)」のようなカッコ付きは、外と中を別々に訳す
+  var pm=t.match(/^([^（(]+)[（(](.+)[）)]$/);
+  if(pm && !/[（(]/.test(pm[2])) return _p17Vi(pm[1])+' ('+_p17Vi(pm[2])+')';
   return t.split(/／/).map(function(a){
-    a=a.trim(); if(P17_VI_DICT[a]) return P17_VI_DICT[a];
-    return a.split(/[・、,，]/).map(function(b){ b=b.trim(); return P17_VI_DICT[b]||b; }).join(', ');
+    a=a.trim(); var h=_p17Look(a); if(h) return h;
+    if(!_P17_JP.test(a)) return a;
+    return a.split(/[・、,，]/).map(function(b){
+      b=b.trim(); if(!b) return '';
+      if(/^(電話番号記載なし|記載チェック無し|記載文言多数|確認方法(欄)?未(チェック|記載))$/.test(_p17Nk(b))) return '';   // 読み取り時のメモは出さない
+      var h2=_p17Look(b) || _p17Subst(b); if(h2) return h2;
+      if(!_P17_JP.test(b)) return b;
+      window._p17Untr[b]=true; return b;
+    }).filter(Boolean).join(', ');
   }).join(' / ');
 }
+function _p17EscMark(s){
+  var e=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return e.replace(/[぀-ヿ㐀-鿿々〆〜「」（）：＝]+/g, function(m){ return '<span class="p17-untr">'+m+'</span>'; });
+}
+/* 訳せなかった語の知らせ・AI翻訳（案シスで登録したAPIキーを使う）。訳は全員共通の settings.p17_vi_dict に保存し、次からは誰が開いても訳が付く。 */
+var _p17AiTried = {}, _p17AiBusy = false;
+function _p17ApiKey(){ try{ return localStorage.getItem('ofusa_apiKey')||localStorage.getItem('claudeApiKey')||''; }catch(e){ return ''; } }
+function _p17ViBarUpdate(){
+  var bar=document.getElementById('p17ViBar'); if(!bar) return;
+  var list=Object.keys(window._p17Untr||{});
+  if(!list.length){ bar.style.display='none'; bar.innerHTML=''; return; }
+  bar.style.display='block';
+  bar.innerHTML='⚠ ベトナム語に訳せていない箇所が <b>'+list.length+'</b> 件あります（画面では赤色。印刷には色は出ません）'
+    + (_p17AiBusy ? '　<span>AIで翻訳中…</span>' : '<button type="button" onclick="_p17AiTranslate(true)">AIで翻訳</button>');
+  var fresh=list.filter(function(x){ return !_p17AiTried[_p17Nk(x)]; });
+  if(fresh.length && !_p17AiBusy && _p17ApiKey()) setTimeout(function(){ _p17AiTranslate(false); }, 300);
+}
+async function _p17SaveLearned(add){
+  try{ localStorage.setItem('p17_vi_learned', JSON.stringify(window._p17ViLearned)); }catch(e){}
+  try{
+    var cur={}; var r=await sb('settings?select=value&key=eq.p17_vi_dict');
+    if(r && r[0] && r[0].value){ try{ cur=JSON.parse(r[0].value)||{}; }catch(e){} }
+    Object.assign(cur, add);
+    await sb('settings?on_conflict=key', {method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body: JSON.stringify([{key:'p17_vi_dict', value: JSON.stringify(cur), updated_at: new Date().toISOString()}])});
+  }catch(e){ console.warn('[p17] 訳の共有保存に失敗', e); }
+}
+async function _p17AiTranslate(manual){
+  if(_p17AiBusy) return;
+  var key=_p17ApiKey();
+  if(!key){ var m='APIキーが未設定のためAI翻訳できません。案シスの設定画面でAPIキーを登録してください。'; if(typeof showToast==='function') showToast('⚠️ '+m); else alert(m); return; }
+  var list=Object.keys(window._p17Untr||{}).filter(function(x){ return manual || !_p17AiTried[_p17Nk(x)]; });
+  if(!list.length) return;
+  list.forEach(function(x){ _p17AiTried[_p17Nk(x)]=true; });
+  _p17AiBusy=true; _p17ViBarUpdate();
+  try{
+    var prompt='日本の特定技能「1号特定技能外国人支援計画書」（参考様式第1-17号）のベトナム語訳欄に印字する語句です。\n'
+      +'次の各項目を自然で簡潔なベトナム語に翻訳してください。\n'
+      +'・公的書類の文言として丁寧・簡潔に。説明や注釈は付けない\n'
+      +'・数字・日付・電話番号・メールアドレス・英字の固有名詞（LINE, Zoom など）はそのまま\n'
+      +'・日本の地名や会社名は、ローマ字表記（例：東京都渋谷区 → Shibuya-ku, Tokyo）\n'
+      +'・カッコや記号が片方だけでも、そのまま訳して記号は残してよい\n\n'
+      + list.map(function(x,i){ return (i+1)+'. '+x; }).join('\n')
+      +'\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]';
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    var j=await r.json(); if(j.error) throw new Error(j.error.message||'API error');
+    var text=((j.content&&j.content[0]&&j.content[0].text)||'').replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    var arr=JSON.parse(text.slice(text.indexOf('['), text.lastIndexOf(']')+1));
+    var add={};
+    list.forEach(function(x,i){ var v=String(arr[i]||'').trim(); if(v && !_P17_JP.test(v)){ add[_p17Nk(x)]=v; } });
+    Object.assign(window._p17ViLearned, add);
+    if(Object.keys(add).length){ await _p17SaveLearned(add); if(typeof showToast==='function') showToast('🌐 ベトナム語に訳しました（'+Object.keys(add).length+'件）。内容を確認してください'); }
+  }catch(e){
+    console.warn('[p17] AI翻訳エラー', e);
+    if(typeof showToast==='function') showToast('⚠️ AI翻訳に失敗しました：'+(e&&e.message||e));
+  }finally{
+    _p17AiBusy=false;
+    if(typeof p==='function') p(); else _p17ViBarUpdate();
+  }
+}
+/* 開いたとき、全員共通の訳（settings.p17_vi_dict）を読み込む */
+(function(){
+  var go=async function(){
+    try{
+      var r=await sb('settings?select=value&key=eq.p17_vi_dict');
+      if(r && r[0] && r[0].value){
+        var d=JSON.parse(r[0].value)||{}, n=0;
+        Object.keys(d).forEach(function(k){ if(window._p17ViLearned[k]!==d[k]){ window._p17ViLearned[k]=d[k]; n++; } });
+        try{ localStorage.setItem('p17_vi_learned', JSON.stringify(window._p17ViLearned)); }catch(e){}
+        if(n && Object.keys(window._p17Untr||{}).length && typeof p==='function') p();
+      }
+    }catch(e){ console.warn('[p17] 共有の訳を読めませんでした', e); }
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(go,0); }); else setTimeout(go,0);
+})();
 /* ver.20261104.05: 入力値・チェックを HTML の属性にも書き込む。
    直接編集の開始時、Saysay共通処理（_tplSig）が書類を一度作り直して innerHTML で元に戻すため、
    画面で入れた値（属性ではない）が全部消えていた。属性に写しておけば innerHTML で戻しても残る。
@@ -785,6 +953,7 @@ document.addEventListener('input',  function(e){ if(e.target && e.target.closest
 document.addEventListener('change', function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea')) _p17Bake(); }, true);
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
+  window._p17Untr = {};   // ver.20261105.01: 訳せなかった語を毎回数え直す
   // 対訳チェックの連動
   area.querySelectorAll('input.vi-cb[data-mirror]').forEach(function(m){ var src=document.getElementById(m.getAttribute('data-mirror')); m.checked=!!(src&&src.checked); });
   // 長い回答（「／」区切り）は改行して全部表示
@@ -813,7 +982,7 @@ function _p17Post(){
     var m=orig.match(/\(([\s\-－–]*)\)/);
     if(!vals.length || !m){ vi.textContent=orig; return; }
     var sep = /[-－–]/.test(m[1]) ? '-' : ' / ';   // 電話番号を分けて入れる欄は「-」でつなぐ
-    vi.textContent=orig.replace(m[0], '('+vals.map(_p17Vi).join(sep)+')');
+    vi.innerHTML=_p17EscMark(orig.replace(m[0], '('+vals.map(_p17Vi).join(sep)+')'));   // ver.20261105.01: 訳せなかった所は赤
   });
   // 担当者欄：実施予定が「有」でなければ「記載なし」
   area.querySelectorAll('tr').forEach(function(tr){
@@ -836,6 +1005,7 @@ function _p17Post(){
       else { ps[0].textContent=''; if(ps[1]) ps[1].textContent=''; }
     });
   });
+  _p17ViBarUpdate();   // ver.20261105.01
   _p17Bake();
 }
 document.addEventListener('change', function(e){
