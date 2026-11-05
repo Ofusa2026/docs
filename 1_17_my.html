@@ -539,7 +539,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 #pageArea .p17bessi .bs-title-vi{ text-align:center; margin:0 0 .9em; }
 #pageArea .p17bessi .bs-org{ margin:0 0 .6em; }
 #pageArea table.p17btbl{ width:100%; border-collapse:collapse; table-layout:fixed; }
-#pageArea table.p17btbl th, #pageArea table.p17btbl td{ border:1px solid #000; padding:.35em .5em; vertical-align:middle; font-size:.95em; height:2.6em; }
+#pageArea table.p17btbl th, #pageArea table.p17btbl td{ border:1px solid #000; padding:.35em .5em; vertical-align:middle; font-size:.95em; height:2.2em; }
 #pageArea table.p17btbl th{ background:#f3f4f6; font-weight:700; text-align:center; }
 #pageArea table.p17btbl th .vi, #pageArea table.p17btbl td .vi{ display:block; font-weight:normal; font-size:.85em; }
 #pageArea table.p17btbl td.no{ text-align:center; width:3em; }
@@ -561,7 +561,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ミャンマー語版・変更）</div>
-    <div class="ver">ver.20261105.13</div>
+    <div class="ver">ver.20261105.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -988,7 +988,7 @@ document.addEventListener('change', function(e){ if(e.target && /^f(38[4-9]|39[0
 /* ver.20261105.11: 別紙（支援担当者名簿・通訳者名簿）。登録支援機関の詳細「別紙」に登録した名簿（support_orgs.attachments）から作る。
    通訳者は、この書類の言語（P17_LANG）に対応する人だけを載せる。自社支援・未登録のときは手書き用の空欄の表にする。 */
 var P17_LANG = 'my';
-var P17_BESSI_L = {"staff": "ကူညီပံ့ပိုးရေးတာဝန်ခံများစာရင်း", "interp": "စကားပြန်များစာရင်း", "annex": "ပူးတွဲစာရွက်", "org": "ကူညီပံ့ပိုးရေးအဖွဲ့အစည်းအမည်", "name": "အမည်", "kana": "ဖူရီဂါနာ", "title": "ရာထူး", "tel": "ဖုန်းနံပါတ်", "aff": "ဆက်စပ်အဖွဲ့အစည်း", "nat": "နိုင်ငံသား", "lang": "ဘာသာစကား", "none": "မှတ်ပုံတင်ထားခြင်းမရှိ"};
+var P17_BESSI_L = {"staff": "ကူညီပံ့ပိုးရေးတာဝန်ခံများစာရင်း", "interp": "စကားပြန်များစာရင်း", "annex": "ပူးတွဲစာရွက်", "org": "ကူညီပံ့ပိုးရေးအဖွဲ့အစည်းအမည်", "name": "အမည်", "kana": "ဖူရီဂါနာ", "title": "ရာထူး", "tel": "ဖုန်းနံပါတ်", "aff": "ဆက်စပ်အဖွဲ့အစည်း", "nat": "နိုင်ငံသား", "lang": "ဘာသာစကား", "none": "မှတ်ပုံတင်ထားခြင်းမရှိ", "mgr": "ကူညီပံ့ပိုးရေးတာဝန်ခံချုပ်များစာရင်း"};
 function _p17BessiData(){
   /* ver.20261105.13: 別紙は必ず作る。名簿が無いときも、分かる人を1名でも載せる。
      支援担当者：①別紙の名簿 → ②支援責任者（担当者を兼ねる人として1名）
@@ -1002,16 +1002,14 @@ function _p17BessiData(){
     var c = Array.isArray(o.language_codes) ? o.language_codes : [];
     return c.indexOf(P17_LANG) >= 0;
   });
-  var fb = { staff:false, interp:false };
-  if(!staff.length){
-    var self = !!window._p17SelfWhy;
-    var nm = self ? g('es_coMgrName') : g('es_soMgr');
-    if(!bad(nm)){
-      staff = [{ name:nm, name_en: self ? g('es_coMgrNameEn') : '', title: self ? g('es_coMgrTitle') : g('es_soMgrTitle'),
-                 title_en: self ? g('es_coMgrTitleEn') : '', tel: self ? g('es_coTel') : (g('es_soOfficeTel') || g('es_soTel')) }];
-      if(bad(staff[0].title)) staff[0].title='';
-      fb.staff = true;
-    }
+  var fb = { mgr:false, staff:false, interp:false };
+  /* ver.20261105.14: 支援責任者も別紙。①別紙の支援責任者名簿 → ②案シスの支援責任者（本文は「別紙参照」にしたので、読み込んだ元の値を使う） */
+  var M0 = window._p17MgrReal || {};
+  var mgrs = (Array.isArray(att.support_managers) ? att.support_managers : []).filter(ok);
+  if(!mgrs.length && !bad(M0.name)){ mgrs = [{ name:M0.name, name_en:M0.name_en||'', title: bad(M0.title)?'':M0.title, title_en:M0.title_en||'' }]; fb.mgr = true; }
+  if(!staff.length && !bad(M0.name)){
+    staff = [{ name:M0.name, name_en:M0.name_en||'', title: bad(M0.title)?'':M0.title, title_en:M0.title_en||'', tel:M0.tel||'' }];
+    fb.staff = true;
   }
   if(!interp.length){
     var LANGJA = { vi:/ベトナム/, id:/インドネシア/, zh:/中国|台湾/, th:/タイ/, ne:/ネパール/, km:/クメール|カンボジア/, my:/ミャンマー|ビルマ/, en:/英語/ };
@@ -1022,6 +1020,7 @@ function _p17BessiData(){
       var m = raw.match(/^別紙参照\s*[（(](.*)[）)]\s*$/);
       if(/^別紙参照/.test(raw) && !m) return;
       var src = m ? m[1] : raw;
+      if(/支援担当者|支援責任者|名簿/.test(src)) return;   // 「別紙参照（支援担当者名簿：…）」のように別の名簿を指しているものは通訳者ではない
       src.split(/[／\/、,，・]/).forEach(function(t){
         t = String(t||'').replace(/\s*(他|ほか|等)\s*$/,'').replace(/^.*[：:]/,'').replace(/^(?:\S*語)?通訳者/,'').replace(/\s*[（(][^）)]*語[）)]\s*$/,'').trim();
         var aff = '';
@@ -1033,7 +1032,7 @@ function _p17BessiData(){
     });
     if(interp.length) fb.interp = true;
   }
-  return { staff: staff, interp: interp, fb: fb };
+  return { mgrs: mgrs, staff: staff, interp: interp, fb: fb };
 }
 function _p17Bessi(){
   var L = P17_BESSI_L, d = _p17BessiData();
@@ -1041,7 +1040,7 @@ function _p17Bessi(){
   var g = function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
   var org = window._p17SelfWhy ? g('es_coName') : (window._p17AttOrg || g('es_soName'));
   var orgEn = window._p17SelfWhy ? g('es_coNameEn') : g('es_soNameEn');
-  var head = function(ja, vi){ return '<th>'+ja+'<span class="vi">'+E(vi)+'</span></th>'; };
+  var head = function(ja, vi, w){ return '<th'+(w?' style="width:'+w+'"':'')+'>'+ja+'<span class="vi">'+E(vi)+'</span></th>'; };
   var cell = function(a, b){ return '<td>'+E(a)+(b ? '<span class="vi">'+E(b)+'</span>' : '')+'</td>'; };
   /* 名簿1つ分（見出し＋表）。minRows まで手書き用の空行を足す */
   var section = function(titleJa, titleVi, cols, rows, minRows){
@@ -1058,15 +1057,24 @@ function _p17Bessi(){
     return '<div class="p17page p17bessi" data-bessi="'+kind+'"><div class="doc p17doc">'
       + '<p class="ja bs-annex">'+annexJa+'</p><p class="vi bs-annex">'+E(L.annex)+'</p>' + orgLine + inner + '</div></div>';
   };
-  var sCols = [head('氏名', L.name), head('役職', L.title), head('電話番号', L.tel)];
-  var sRows = d.staff.map(function(o){ return cell(o.name, o.name_en) + cell(o.title, o.title_en) + cell(o.tel, ''); });
-  var iCols = [head('氏名', L.name), head('ふりがな', L.kana), head('所属', L.aff), head('国籍', L.nat)];
-  var iRows = d.interp.map(function(o){ return cell(o.name, '') + cell(o.kana, '') + cell(o.affiliation, '') + cell(o.nationality, ''); });
-  /* ver.20261105.12: 2つの名簿が1枚に収まる人数（各10人まで）なら1枚にまとめる。多いときはそれぞれ1枚 */
-  if(sRows.length<=10 && iRows.length<=10){
-    return pageOf('both', '別紙（支援担当者・通訳者）', section('支援担当者', L.staff, sCols, sRows, 5) + '<div style="height:1.2em"></div>' + section('通訳者', L.interp, iCols, iRows, 5));
+  var gap = '<div style="height:1em"></div>';
+  // 支援責任者：氏名・役職 ／ 支援担当者：氏名・役職・電話番号 ／ 通訳者：氏名・ふりがな
+  /* ver.20261105.15: 支援責任者・支援担当者は「氏名・役職」と、それぞれの英語表記（電話番号は載せない） */
+  var EN = "(အင်္ဂလိပ်)";
+  var pCols = [head('氏名', L.name), head('氏名（英語表記）', L.name+' '+EN), head('役職', L.title), head('役職（英語表記）', L.title+' '+EN)];
+  var pRow = function(o){ return cell(o.name,'') + cell(o.name_en,'') + cell(o.title,'') + cell(o.title_en,''); };
+  var mCols = pCols, mRows = d.mgrs.map(pRow);
+  var sCols = pCols, sRows = d.staff.map(pRow);
+  var iCols = [head('氏名', L.name), head('ふりがな', L.kana)];
+  var iRows = d.interp.map(function(o){ return cell(o.name, '') + cell(o.kana, ''); });
+  /* ver.20261105.14: 3つの名簿が1枚に収まる人数なら1枚にまとめる。多いときはそれぞれ1枚 */
+  if(mRows.length<=3 && sRows.length<=5 && iRows.length<=5){
+    return pageOf('all', '別紙（支援責任者・支援担当者・通訳者）',
+      section('支援責任者', L.mgr, mCols, mRows, 2) + gap + section('支援担当者', L.staff, sCols, sRows, 4) + gap + section('通訳者', L.interp, iCols, iRows, 4));
   }
-  return pageOf('staff', '別紙（支援担当者）', section('支援担当者', L.staff, sCols, sRows, 8)) + pageOf('interp', '別紙（通訳者）', section('通訳者', L.interp, iCols, iRows, 8));
+  return pageOf('mgr', '別紙（支援責任者）', section('支援責任者', L.mgr, mCols, mRows, 5))
+       + pageOf('staff', '別紙（支援担当者）', section('支援担当者', L.staff, sCols, sRows, 8))
+       + pageOf('interp', '別紙（通訳者）', section('通訳者', L.interp, iCols, iRows, 8));
 }
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
@@ -2053,7 +2061,7 @@ async function loadFromDB(passedInfo){
   var info=passedInfo;
   if(!info){ var sel=document.getElementById('caseSelect'); if(!sel||!sel.value) return; try{info=JSON.parse(sel.value);}catch(e){return;} }
   if(!info||!info.caseId) return;
-  window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = [];   // ver.20261105.11: 前の案件の名簿を持ち越さない
+  window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
   var caseId=info.caseId, companyId=info.companyId, companyName=info.companyName;
   var _s=function(id,val){var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val;};
   /* ver.20261013.02: 住所文字列を 都道府県／市区町村／以降 に分割（1_17.html Word版 splitAddress と同一仕様） */
@@ -2228,6 +2236,7 @@ async function loadFromDB(passedInfo){
       else _orgUnknown = true;
     }
     window._p17SelfWhy = _selfWhy;
+    if(_isSelf){ try{ var _gv=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }; window._p17MgrReal = { name:_gv('es_coMgrName'), name_en:_gv('es_coMgrNameEn'), title:_gv('es_coMgrTitle'), title_en:_gv('es_coMgrTitleEn'), tel:_gv('es_coTel') }; if(window._p17MgrReal.name && window._p17MgrReal.name!=='別紙参照'){ ['es_coMgrName','es_coMgrTitle'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value='別紙参照'; }); ['es_coMgrNameEn','es_coMgrTitleEn'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value='See attached'; }); } }catch(_e){} }   // ver.20261105.14
     if(_isSelf){ try{ var _ssx = (typeof co!=='undefined' && co && co.extra && co.extra.selfSupport) || {}; window._p17Att = (_ssx.attachments && typeof _ssx.attachments==='object') ? _ssx.attachments : {}; window._p17AttOrg = ''; }catch(_e){} }   // ver.20261105.13
     var _sm=document.getElementById('es_selfMode'); if(_sm) _sm.value = _isSelf ? '1' : '';
     if(_orgUnknown){
@@ -2255,9 +2264,11 @@ async function loadFromDB(passedInfo){
         // ４ 住所の電話番号（ver.20261013.10: 3分割をやめ案シスの値をそのまま1本で）
         _s('es_soTel', so.tel);
         // ７ 支援業務を行う体制の概要（支援責任者・人数）
-        _s('es_soMgrKana', so.support_manager_kana);
-        _s('es_soMgr', so.support_manager_name||so.support_manager);
-        _s('es_soMgrTitle', so.support_manager_title);
+        /* ver.20261105.14: 支援責任者は別紙に載せるので、本文は「別紙参照」。読み込んだ値は別紙用に覚えておく */
+        window._p17MgrReal = { name: so.support_manager_name||so.support_manager||'', title: so.support_manager_title||'', kana: so.support_manager_kana||'', tel: so.tel||'' };
+        _s('es_soMgrKana', '');
+        _s('es_soMgr', '別紙参照');
+        _s('es_soMgrTitle', '別紙参照');
         _s('es_soSupporterCount', so.supporter_count);
         _s('es_soSupportStaffCount', so.support_staff_count);
 
@@ -2731,7 +2742,7 @@ function _p17PrePrintList(){
   if(!window._p17SelfWhy) need.push(['es_soName','登録支援機関の名称'],['es_soRegNo','登録支援機関の登録番号']);
   var miss=need.filter(function(x){ var e=document.getElementById(x[0]); return e && !g(x[0]); }).map(function(x){ return x[1]; });
   if(miss.length) out.push('・空欄の欄：'+miss.join('、'));
-  try{ var _bd=_p17BessiData(); var _be=[]; if(!_bd.staff.length) _be.push('支援担当者'); if(!_bd.interp.length) _be.push('通訳者'); if(_be.length) out.push('・別紙の名簿が未登録：'+_be.join('、')+'（登録支援機関の詳細「別紙」で登録するか、手書きで記入）'); var _bf=[]; if(_bd.fb.staff) _bf.push('支援担当者は支援責任者を記載'); if(_bd.fb.interp) _bf.push('通訳者はO-Linkヒアリングの記入から記載'); if(_bf.length) out.push('・別紙の名簿が未登録のため代わりに入れました：'+_bf.join('、')); }catch(_e){}
+  try{ var _bd=_p17BessiData(); var _be=[]; if(!_bd.mgrs.length) _be.push('支援責任者'); if(!_bd.staff.length) _be.push('支援担当者'); if(!_bd.interp.length) _be.push('通訳者'); if(_be.length) out.push('・別紙の名簿が未登録：'+_be.join('、')+'（登録支援機関の詳細「別紙」で登録するか、手書きで記入）'); var _bf=[]; if(_bd.fb.mgr) _bf.push('支援責任者は案シスの支援責任者を記載'); if(_bd.fb.staff) _bf.push('支援担当者は支援責任者を記載'); if(_bd.fb.interp) _bf.push('通訳者はO-Linkヒアリングの記入から記載'); if(_bf.length) out.push('・別紙の名簿が未登録のため代わりに入れました：'+_bf.join('、')); }catch(_e){}
   return out;
 }
 (function(){
@@ -2768,7 +2779,7 @@ function _p17FitForPrint(){
       });
     });
   }catch(e){}
-  var MM=96/25.4, W=Math.floor(277*MM), H=Math.floor(190*MM)-4;   // A4横・余白10mm
+  var MM=96/25.4, W=Math.floor(277*MM), H=Math.floor(190*MM*0.97);   // 3%は文字の高さの差のための余裕   // A4横・余白10mm
   var st=document.createElement('style'); st.id='_p17measure'; st.textContent=css+'\n#pageArea{ width:'+W+'px !important; max-width:none !important; }';
   pages.forEach(function(pg){ pg.style.setProperty('--pzfit','1'); });
   document.head.appendChild(st);
