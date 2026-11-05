@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.07</div>
+    <div class="ver">ver.20261104.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2023,13 +2023,20 @@ async function _p17Hearing(so, _s){
     C[ids[3]] = !!(o.other && String(o.other).trim());
     return true;
   };
-  var CM = Object.assign({}, ex.consultMethods||{});
+  /* ver.20261104.08: ヒアリングの「記載なし」「なし」や、読み取り時のメモ（電話番号記載なし・要確認 など）は書類に出さない。 */
+  var _p17Clean = function(x){
+    var t = String(x==null?'':x).trim();
+    t = t.replace(/[（(][^）)]*(記載なし|要確認|未チェック|不鮮明|OCR)[^）)]*[）)]/g,'').trim();
+    return /^(記載なし|なし|無し|無|-|ー|－)$/.test(t) ? '' : t;
+  };
+  var _cleanGroup = function(o){ ['telNo','mailAddr','other'].forEach(function(k){ if(k in o) o[k] = _p17Clean(o[k]); }); return o; };
+  var CM = _cleanGroup(Object.assign({}, ex.consultMethods||{}));
   if(lo.consult_phone){ CM.telNo = lo.consult_phone; CM.tel = true; }
   if(lo.consult_email){ CM.mailAddr = lo.consult_email; CM.mail = true; }
   if(setGroup(CM, ['f253','f254','f258','f260'])){
     _s('es_cmTel', CM.telNo); _s('es_cmMail', CM.mailAddr); _s('es_cmOther', CM.other); used.push('相談方法');
   }
-  var EC = ex.emergencyContact || {};
+  var EC = _cleanGroup(Object.assign({}, ex.emergencyContact || {}));
   if(setGroup(EC, ['f262','f263','f267','f269'])){
     _s('es_emTel', EC.telNo); _s('es_emMail', EC.mailAddr); _s('es_emOther', EC.other); used.push('緊急時対応');
   }
