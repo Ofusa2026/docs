@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261024.02</div>
+    <div class="ver">ver.20261105.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -379,7 +379,7 @@ async function loadFromDB(passedInfo){
             const savedWho=v('f_t2WhoSel');
             if(savedWho && Array.from(sel2.options).some(o=>o.value===savedWho)) sel2.value=savedWho;
             if(!sel2.value && window._t2Form){
-              const norm=s=>String(s||'').replace(/[\s　・，、]/g,'');
+              const norm=s=>String(s||'').normalize('NFKC').toUpperCase().replace(/[\s　・，、,.]/g,''); // ver.20261105.01: 全角（ＴＲＩＮＨ）と半角（TRINH）を同じとみなす
               const cand=[v('f_applicant'), cas&&cas.applicant, pe&&pe.applicant_name_en].map(norm).filter(Boolean);
               let hit='';
               for(const k of window._t2Form.order){
