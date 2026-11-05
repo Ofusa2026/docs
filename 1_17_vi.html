@@ -541,7 +541,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261104.08</div>
+    <div class="ver">ver.20261104.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1889,6 +1889,10 @@ async function loadFromDB(passedInfo){
             C.f133 = yes; C.f134 = !yes; C.f135 = yes; C.f136 = !yes;
             if(yes){ T.f138 = Number(fee).toLocaleString('ja-JP'); var _hf=document.getElementById('es_housingFee'); if(_hf) _hf.value = T.f138; }
             else { var _hf0=document.getElementById('es_housingFee'); if(_hf0) _hf0.value=''; }   // 居住費「無」なら金額欄は空欄
+          } else if(fee===''){
+            /* ver.20261104.09: 住居の内容はあるのに居住費が空欄 → 給与控除が無いので「無」にする。 */
+            C.f133 = false; C.f134 = true; C.f135 = false; C.f136 = true;
+            var _hf1=document.getElementById('es_housingFee'); if(_hf1) _hf1.value='';
           }
           if(/■\s*自己所有/.test(own)){ C.f139 = true; C.f140 = false; C.f141 = true; C.f142 = false; }
           else if(/■\s*借/.test(own)){ C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; }
