@@ -546,7 +546,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261105.01</div>
+    <div class="ver">ver.20261105.05</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2254,7 +2254,7 @@ async function _p17Hearing(so, _s){
       if(/適宜実施/.test(inner)) inner='適宜実施';
       else if(seg.length>1 && seg.length<=3 && seg.every(function(x){ return x.length<=20; })) inner=seg.join('／');   // ver.20261104.01: 全部残す（欄の中で改行して表示）
       else if(seg.length>1 && seg[seg.length-1].length<=14) inner=seg[seg.length-1];
-      else { review.push(v); inner=''; }
+      else if(inner.length > 80){ review.push(v); inner=''; }   // ver.20261105.05: 80字までは全文を入れる（欄の中で折り返して表示・訳も付く）。それより長いものだけ空けて知らせる
     }
     return { no: no, text: inner };
   };
@@ -2330,7 +2330,7 @@ async function _p17Hearing(so, _s){
     ? ((so && so.id) ? '📝 登録支援機関のヒアリング回答から入れました：' : '🤝 所属機関の自社支援の内容から入れました：') + used.join('・') + (lo.support_org_id ? '<br>（ベトナム語の言語別設定を優先）' : '')
     : '⚠ この登録支援機関のヒアリング回答がまだありません。';
   if(note && window._p17Review && window._p17Review.length){
-    note.innerHTML += '<br><span style="color:#b45309">⚠ 次の回答は長いので（　）内を空けています。必要なら本文に書いてください：<br>・'
+    note.innerHTML += '<br><span style="color:#b45309">⚠ 次の回答はとても長い（80字超）ので（　）内を空けています。必要なら本文に書いてください：<br>・'
       + window._p17Review.map(function(x){ return String(x).replace(/</g,'&lt;'); }).join('<br>・') + '</span>';
   }
 }
