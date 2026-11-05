@@ -546,7 +546,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261105.05</div>
+    <div class="ver">ver.20261105.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2018,6 +2018,18 @@ async function loadFromDB(passedInfo){
           try{ _esIdx = await window.resolveEmpSetIdx(co, cas, info); }catch(_e){ _esIdx = -1; }
         }
         var _es = (Array.isArray(co.emp_sets) ? co.emp_sets : [])[_esIdx] || {};
+        /* ver.20261105.06: 作成日は雇用条件書（1-6号）と同じ順番で決める：案件の作成日 → 雇用条件セットの作成日 → 今日 */
+        (function(){
+          var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+          var put=function(id,val){ var e=document.getElementById(id); if(e) e.value=val; };
+          if(g('es_createY')) return;
+          if(_es.createY && _es.createM){
+            put('es_createY', String(_es.createY)); put('es_createM', String(parseInt(_es.createM,10)||_es.createM));
+            put('es_createD', _es.createD ? String(parseInt(_es.createD,10)||_es.createD) : '');
+          } else {
+            var d=new Date(); put('es_createY', String(d.getFullYear())); put('es_createM', String(d.getMonth()+1)); put('es_createD', String(d.getDate()));
+          }
+        })();
         _s('es_cohabitants',   _es.cohabitants);
         /* 居住費は emp_set 上は deductHousing（給与控除の居住費）に入っている。
            housingFee というキーは殆どの企業に存在しない。Word版 rv() と同じ扱い。 */
