@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261105.20</div>
+    <div class="ver">ver.20261105.21</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1149,7 +1149,7 @@ function _p17Bessi(){
       + '<table class="p17btbl"><thead><tr><th class="no" style="width:3em">No.</th>'+cols.join('')+'</tr></thead><tbody>'+body+'</tbody></table>'
       + (rows.length ? '' : '<p class="ja bs-note" style="margin-top:.4em;color:#b45309">※ 登録がありません。手書きで記入してください。（'+E(L.none)+'）</p>');
   };
-  var orgLine = '<p class="ja bs-org">登録支援機関名（'+E(L.org)+'）：'+E(org)+(orgEn ? '　/　'+E(orgEn) : '')+'</p>';
+  var orgLine = '<p class="ja bs-org">'+(window._p17SelfWhy ? '特定技能所属機関名' : '登録支援機関名（'+E(L.org)+'）')+'：'+E(org)+(orgEn ? '　/　'+E(orgEn) : '')+'</p>';
   var pageOf = function(kind, annexJa, inner){
     return '<div class="p17page p17bessi" data-bessi="'+kind+'"><div class="doc p17doc">'
       + '<p class="ja bs-annex">'+annexJa+'</p><p class="vi bs-annex">'+E(L.annex)+'</p>' + orgLine + inner + '</div></div>';
@@ -2388,7 +2388,6 @@ async function loadFromDB(passedInfo){
       else _orgUnknown = true;
     }
     window._p17SelfWhy = _selfWhy;
-    if(_isSelf){ try{ var _gv=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }; window._p17MgrReal = { name:_gv('es_coMgrName'), name_en:_gv('es_coMgrNameEn'), title:_gv('es_coMgrTitle'), title_en:_gv('es_coMgrTitleEn'), tel:_gv('es_coTel') }; if(window._p17MgrReal.name && window._p17MgrReal.name!=='別紙参照'){ (function(){ var S=function(id,x){ var e=document.getElementById(id); if(e) e.value=x; }; S('es_coMgrName','別紙参照'); S('es_coMgrTitle','\u3000'); S('es_coMgrNameEn','See attached'); S('es_coMgrTitleEn',''); })(); } }catch(_e){} }   // ver.20261105.14
     if(_isSelf){ try{ var _ssx = (typeof co!=='undefined' && co && co.extra && co.extra.selfSupport) || {}; window._p17Att = (_ssx.attachments && typeof _ssx.attachments==='object') ? _ssx.attachments : {}; window._p17AttOrg = ''; }catch(_e){} }   // ver.20261105.13
     var _sm=document.getElementById('es_selfMode'); if(_sm) _sm.value = _isSelf ? '1' : '';
     if(_orgUnknown){
@@ -2714,6 +2713,14 @@ async function _p17SelfSupport(cas, co, caseId){
   // 支援責任者の英語の氏名は自社支援のフォームで聞いていない。代表者と同じ人なら代表者の英語名を使う
   var _rep=String((co&&co.rep_name)||'').replace(/\s/g,''), _mgr=String(ss.supportManagerName||'').replace(/\s/g,'');
   set('es_coMgrNameEn', (_rep && _rep===_mgr) ? ((co&&co.rep_name_en)||'') : '');
+  /* ver.20261105.21: 支援責任者は別紙に載せる。自社支援の内容を入れ終わったここで覚え、本文は「別紙参照」にする */
+  (function(){
+    var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+    var off0 = Array.isArray(ss.offices) && ss.offices[0] || {};
+    window._p17MgrReal = { name:g('es_coMgrName'), name_en:g('es_coMgrNameEn'), title:g('es_coMgrTitle'), title_en:g('es_coMgrTitleEn'), tel:String(off0.officeTel||off0.tel||'') };
+    if(ss.attachments && typeof ss.attachments==='object') window._p17Att = ss.attachments;
+    if(window._p17MgrReal.name){ set('es_coMgrKana','\u3000'); set('es_coMgrName','別紙参照'); set('es_coMgrTitle','\u3000'); set('es_coMgrNameEn','See attached'); set('es_coMgrTitleEn',''); }
+  })();
   var h = (window._p17SelfWhy ? '<b>自社支援として作成</b>（'+window._p17SelfWhy+'）<br>' : '') + (r.src==='anshis' ? '🤝 自社支援：支援責任者は案シスの「自社支援」タブの内容を使っています' : '📝 自社支援：支援責任者はヒアリングフォームの回答を使っています（案シスにはまだ取り込まれていません）');
   if(r.newer) h+='<br>⚠️ 案シスに取り込んでいない新しいフォーム回答があります。';
   if(!(_rep && _rep===_mgr)) h+='<br>支援責任者の氏名（英）は手で入れてください。';
