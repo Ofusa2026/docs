@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261105.15</div>
+    <div class="ver">ver.20261105.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -847,33 +847,40 @@ function _p17Look(x){
 /* 辞書の語を中に含むだけの文（例：電話 06-1234-5678）は、語を置き換えて日本語が残らなければそれを使う */
 function _p17Subst(x){
   if(!_p17ViN) _p17Look('');
-  var t=String(x), keys=Object.keys(_p17ViN).filter(function(k){ return k.length>=2; }).sort(function(a,b){ return b.length-a.length; });
-  var out=String(t); try{ out=out.normalize('NFKC'); }catch(e){}
-  keys.forEach(function(k){ if(out.indexOf(k)>=0) out=out.split(k).join(' '+_p17ViN[k]+' '); });
-  out=out.replace(/\s+/g,' ').trim();
-  return _P17_JP.test(out) ? '' : out;
+  var keys=Object.keys(_p17ViN).filter(function(k){ return k.length>=2; }).sort(function(a,b){ return b.length-a.length; });
+  var out=String(x); try{ out=out.normalize('NFKC'); }catch(e){}
+  /* ver.20261105.16: 見つけた語は目印に置き換えてから、残りに日本語が無いかを見る（訳した文字を日本語と見間違えないように） */
+  var got=[];
+  keys.forEach(function(k){ if(out.indexOf(k)>=0){ out=out.split(k).join(' \u0003'+got.length+'\u0004 '); got.push(_p17ViN[k]); } });
+  if(!got.length) return '';
+  var rest=out.replace(/\u0003\d+\u0004/g,'');
+  if(_p17NeedTr(rest)) return '';
+  return out.replace(/\u0003(\d+)\u0004/g, function(_m,i){ return got[+i]; }).replace(/\s+/g,' ').replace(/\s+([)）,、])/g,'$1').replace(/([(（])\s+/g,'$1').trim();
 }
+/* ver.20261105.16: 訳す必要がある文字か（日本語のかな・漢字が残っている）。中国語版は漢字が共通なので、辞書に無い漢字も「訳せていない」とみなす */
+function _p17NeedTr(x){ x=String(x||''); return _P17_JP.test(x) || (typeof P17_LANG!=='undefined' && P17_LANG==='zh' && /[\u3400-\u9fff]/.test(x)); }
 function _p17Vi(t){
   t=String(t||'').trim(); if(!t) return '';
   var hit=_p17Look(t); if(hit) return hit;
-  if(!_P17_JP.test(t)) return t;   // 電話番号・メールアドレスなどはそのまま
+  if(!_p17NeedTr(t)) return t;   // 電話番号・メールアドレスなどはそのまま
   // 「有（適宜実施）」「直接面談(月1回)」のようなカッコ付きは、外と中を別々に訳す
   var pm=t.match(/^([^（(]+)[（(](.+)[）)]$/);
   if(pm && !/[（(]/.test(pm[2])) return _p17Vi(pm[1])+' ('+_p17Vi(pm[2])+')';
   return t.split(/／/).map(function(a){
     a=a.trim(); var h=_p17Look(a); if(h) return h;
-    if(!_P17_JP.test(a)) return a;
+    if(!_p17NeedTr(a)) return a;
     return a.split(/[・、,，]/).map(function(b){
       b=b.trim(); if(!b) return '';
       if(/^(電話番号記載なし|記載チェック無し|記載文言多数|確認方法(欄)?未(チェック|記載))$/.test(_p17Nk(b))) return '';   // 読み取り時のメモは出さない
       var h2=_p17Look(b) || _p17Subst(b); if(h2) return h2;
-      if(!_P17_JP.test(b)) return b;
-      window._p17Untr[b]=true; return b;
+      if(!_p17NeedTr(b)) return b;
+      window._p17Untr[b]=true; return '\u0001'+b+'\u0002';   // ver.20261105.16: 目印（赤表示用）
     }).filter(Boolean).join(', ');
   }).join(' / ');
 }
 function _p17EscMark(s){
   var e=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  e = e.replace(/\u0001([^\u0001\u0002]*)\u0002/g, function(_m, x){ return '<span class="p17-untr">'+x+'</span>'; });   // ver.20261105.16
   return e.replace(/[぀-ヿ㐀-鿿々〆〜「」（）：＝]+/g, function(m){ return '<span class="p17-untr">'+m+'</span>'; });
 }
 /* 訳せなかった語の知らせ・AI翻訳（案シスで登録したAPIキーを使う）。訳は全員共通の settings.p17_vi_dict に保存し、次からは誰が開いても訳が付く。 */
@@ -977,7 +984,7 @@ function _p17Mirror(){
   });
   // チェック（ホームページ／その他）と、その他の方法の中身
   [['f398','f384'],['f399','f385'],['f404','f392'],['f405','f393']].forEach(function(p){ var t=$(p[0]), s=$(p[1]); if(t&&s) t.checked=!!s.checked; });
-  [['f400','f386'],['f406','f394']].forEach(function(p){ var t=$(p[0]); if(t){ var x=val(p[1]); t.value = x ? _p17Vi(x) : ''; } });
+  [['f400','f386'],['f406','f394']].forEach(function(p){ var t=$(p[0]); if(t){ var x=val(p[1]); t.value = x ? _p17Vi(x).replace(/[\u0001\u0002]/g,'') : ''; } });
   // 異なる地方公共団体の都道府県・市区町村
   [['f401','f387'],['f402','f388']].forEach(function(p){ var t=$(p[0]); if(t) t.value=val(p[1]); });
 }
@@ -2798,6 +2805,48 @@ window.addEventListener('beforeprint', function(){ try{ _p17FitForPrint(); }catc
     w._p17fit=true; w._p17=orig._p17; window.doPrint=w;
   };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hook2,1600); }); else setTimeout(hook2,1600);
+})();
+
+/* ver.20261105.16: 古い版が画面に残らないようにする。
+   開いたとき、サーバーの最新版のバージョンと比べ、新しければ自動で読み込み直す（開いて10秒以内・未編集のとき）。
+   それ以外は画面上部に「新しい版があります」と出す。読み込み直す前に表示中の案件を覚えておき、読み込み後に同じ案件を開く。 */
+(function(){
+  var KEY='p17_reload_case_'+location.pathname;
+  var verNum=function(t){ var m=String(t||'').match(/ver\.(\d{8})\.(\d+)/); return m ? Number(m[1])*1000+Number(m[2]) : 0; };
+  var cur=function(){ var e=document.querySelector('.ver'); return e ? e.textContent.trim() : ''; };
+  var t0=Date.now(), touched=false;
+  document.addEventListener('input', function(){ touched=true; }, true);
+  document.addEventListener('mousedown', function(e){ if(e.target && e.target.closest && e.target.closest('#pageArea, .fp')) touched=true; }, true);
+  // 読み込み直した直後：案件が届かなければ覚えておいた案件を開く
+  try{
+    var saved=sessionStorage.getItem(KEY);
+    if(saved){
+      sessionStorage.removeItem(KEY);
+      var info=JSON.parse(saved);
+      setTimeout(function(){ try{ if(!window._lastCaseInfo && info && typeof loadFromDB==='function') loadFromDB(info); }catch(e){} }, 2500);
+    }
+  }catch(e){}
+  var reload=function(){
+    try{ if(window._lastCaseInfo) sessionStorage.setItem(KEY, JSON.stringify(window._lastCaseInfo)); }catch(e){}
+    var q=location.search.replace(/([?&])_r=\d+/,'$1').replace(/[?&]$/,'');
+    location.replace(location.pathname + (q ? q+'&' : '?') + '_r=' + Date.now() + location.hash);
+  };
+  window._p17ReloadLatest=reload;
+  var check=function(){
+    fetch(location.pathname+'?_vchk='+Date.now(), {cache:'no-store'}).then(function(r){ return r.ok ? r.text() : ''; }).then(function(html){
+      var m=String(html).match(/class="ver">(ver\.\d{8}\.\d+)</); if(!m) return;
+      var latest=m[1], now=cur();
+      if(verNum(latest) <= verNum(now)) return;
+      var guard='p17_vchk_'+latest;
+      var tried=false; try{ tried=sessionStorage.getItem(guard)==='1'; sessionStorage.setItem(guard,'1'); }catch(e){}
+      if(!tried && !touched && !window._editMode && Date.now()-t0 < 10000){ reload(); return; }
+      var bar=document.getElementById('p17UpdBar');
+      if(!bar){ bar=document.createElement('div'); bar.id='p17UpdBar'; bar.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:2147483000;background:#1e3a5f;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.25)'; document.body.appendChild(bar); }
+      bar.innerHTML='🔄 新しい版（'+latest+'）があります。いま表示しているのは '+now+' です。 <button type="button" style="margin-left:8px;padding:3px 10px;border:0;border-radius:6px;background:#fff;color:#1e3a5f;font-weight:700;cursor:pointer">最新版にする</button>';
+      bar.querySelector('button').onclick=reload;
+    }).catch(function(){});
+  };
+  if(document.readyState==='complete') setTimeout(check, 1500); else window.addEventListener('load', function(){ setTimeout(check, 1500); });
 })();
 </script>
 </body>
