@@ -503,7 +503,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   .p17page{ break-after:page; page-break-after:always; break-inside:avoid; page-break-inside:avoid; }
   .p17page:last-child{ break-after:auto; page-break-after:auto; }
   /* 紙に収まらないページだけ印刷時に縮める（値は各ページの style="--pz:…"） */
-  .p17page{ zoom:var(--pz,1); }
+  .p17page{ zoom:calc(var(--pz,1) * var(--pzfit,1)); }   /* ver.20261105.10: --pzfit は印刷直前に測って入れる */
   #pageArea .doc.p17doc{ min-height:0 !important; }
 }
 
@@ -546,7 +546,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261105.08</div>
+    <div class="ver">ver.20261105.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2620,6 +2620,74 @@ if(!window._selectCaseListenerAdded){
 (function(){
   var _orig = window.scrollToPage;
   window.scrollToPage = function(n){ if(window.p17Fit) p17Fit(); if(_orig) return _orig(n); };
+})();
+
+/* ver.20261105.09: 印刷・PDFの前に、訳せていない箇所と主な欄の空欄を知らせる（そのまま印刷することもできる） */
+function _p17PrePrintList(){
+  var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+  var out=[];
+  var untr=Object.keys(window._p17Untr||{});
+  if(untr.length) out.push('・訳せていない箇所が '+untr.length+' 件（書類の赤い所）：'+untr.slice(0,3).join('、')+(untr.length>3?' ほか':''));
+  var need=[['f_applicant','氏名'],['f_gender','性別'],['f_birthY','生年月日'],['es_createY','作成日'],['es_coName','所属機関の名称'],['es_coAddress','所属機関の住所']];
+  if(!window._p17SelfWhy) need.push(['es_soName','登録支援機関の名称'],['es_soRegNo','登録支援機関の登録番号']);
+  var miss=need.filter(function(x){ var e=document.getElementById(x[0]); return e && !g(x[0]); }).map(function(x){ return x[1]; });
+  if(miss.length) out.push('・空欄の欄：'+miss.join('、'));
+  return out;
+}
+(function(){
+  var hook=function(){
+    if(typeof window.doPrint!=='function' || window.doPrint._p17) return;
+    var orig=window.doPrint;
+    var wrapped=function(){
+      try{
+        var list=_p17PrePrintList();
+        if(list.length && !confirm('印刷・PDFの前に確認してください。\n\n'+list.join('\n')+'\n\nこのまま印刷しますか？（キャンセルで戻って直せます）')) return;
+      }catch(_e){}
+      return orig.apply(this, arguments);
+    };
+    wrapped._p17=true; window.doPrint=wrapped;
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', hook); else hook();
+  setTimeout(hook, 1500);
+})();
+
+/* ver.20261105.10: 印刷の直前に、各ページが紙1枚に収まるか測り、はみ出すページだけ縮める。
+   ヒアリングの回答が長い案件でも、同じ言語ならいつも同じ枚数（18枚）で印刷されるようにする。
+   測り方：印刷用のCSS（@media print の中身）を一時的に画面に当て、紙の幅で並べて高さを測る。 */
+function _p17FitForPrint(){
+  var A=document.getElementById('pageArea'); if(!A) return;
+  var pages=[].slice.call(A.querySelectorAll('.p17page')); if(!pages.length) return;
+  var css='';
+  try{
+    [].slice.call(document.styleSheets).forEach(function(ss){
+      var rules; try{ rules=ss.cssRules; }catch(e){ return; }
+      [].slice.call(rules||[]).forEach(function(r){
+        if(r.type===4 && r.media && /print/.test(r.media.mediaText) && !/screen/.test(r.media.mediaText)){
+          [].slice.call(r.cssRules).forEach(function(x){ css+=x.cssText+'\n'; });
+        }
+      });
+    });
+  }catch(e){}
+  var MM=96/25.4, W=Math.floor(277*MM), H=Math.floor(190*MM)-4;   // A4横・余白10mm
+  var st=document.createElement('style'); st.id='_p17measure'; st.textContent=css+'\n#pageArea{ width:'+W+'px !important; max-width:none !important; }';
+  pages.forEach(function(pg){ pg.style.setProperty('--pzfit','1'); });
+  document.head.appendChild(st);
+  try{
+    pages.forEach(function(pg){
+      var h=pg.getBoundingClientRect().height;
+      if(h>H){ pg.style.setProperty('--pzfit', String(Math.floor(H/h*1000)/1000)); }
+    });
+  }finally{ st.remove(); }
+}
+window.addEventListener('beforeprint', function(){ try{ _p17FitForPrint(); }catch(e){} });
+(function(){
+  var hook2=function(){
+    if(typeof window.doPrint!=='function' || window.doPrint._p17fit) return;
+    var orig=window.doPrint;
+    var w=function(){ try{ _p17FitForPrint(); }catch(e){} return orig.apply(this, arguments); };
+    w._p17fit=true; w._p17=orig._p17; window.doPrint=w;
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hook2,1600); }); else setTimeout(hook2,1600);
 })();
 </script>
 </body>
