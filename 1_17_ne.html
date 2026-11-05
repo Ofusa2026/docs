@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ネパール語版・変更）</div>
-    <div class="ver">ver.20261105.19</div>
+    <div class="ver">ver.20261105.20</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -969,9 +969,12 @@ function _p17Vi(t){
   }).join(' / ');
 }
 function _p17EscMark(s){
-  var e=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  e = e.replace(/\u0001([^\u0001\u0002]*)\u0002/g, function(_m, x){ return '<span class="p17-untr">'+x+'</span>'; });   // ver.20261105.16
-  return e.replace(/[぀-ヿ㐀-鿿々〆〜「」（）：＝]+/g, function(m){ return '<span class="p17-untr">'+m+'</span>'; });
+  var esc1=function(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  /* ver.20261105.20: 目印（\u0001…\u0002）の部分はそのまま赤、それ以外に残った日本語も赤。二重には囲まない */
+  return String(s).split(/(\u0001[^\u0001\u0002]*\u0002)/).map(function(seg){
+    if(/^\u0001[\s\S]*\u0002$/.test(seg)) return '<span class="p17-untr">'+esc1(seg.slice(1,-1))+'</span>';
+    return esc1(seg).replace(/[぀-ヿ㐀-鿿々〆〜「」（）：＝]+/g, function(m){ return '<span class="p17-untr">'+m+'</span>'; });
+  }).join('');
 }
 /* 訳せなかった語の知らせ・AI翻訳（案シスで登録したAPIキーを使う）。訳は全員共通の settings.p17_vi_dict に保存し、次からは誰が開いても訳が付く。 */
 var _p17AiTried = {}, _p17AiBusy = false;
@@ -1200,9 +1203,21 @@ function _p17PlaceFx(){
   var a=[pe||(pj?_p17Vi(pj):''), ce||(cj?_p17Vi(cj):'')].filter(Boolean);
   return '('+_p17EscMark(a.join(', '))+')';
 }
+
+/* ver.20261105.20: 性別の外国語行は、選んだ方だけを書く（「Laki-laki/Perempuan」→「Laki-laki」） */
+function _p17Gender(opts){
+  var g=String(v('f_gender')||'').trim(), parts=String(opts).split(/\s*[\/・]\s*/);
+  if(parts.length!==2 || !g) return opts;
+  return /^(男|M|male)/i.test(g) ? parts[0] : (/^(女|F|female)/i.test(g) ? parts[1] : opts);
+}
+/* ver.20261105.20: 自由記入の値（実費の説明など）に外国語の行を付ける。辞書・AIの訳を使い、訳せないときは赤で知らせる */
+function _p17FxLine(id){
+  var x=String(v(id)||'').trim(); if(!x) return '';
+  var h=_p17Look(x); var t = h ? h : (_p17NeedTr(x) ? (window._p17Untr[x]=true, '\u0001'+x+'\u0002') : x);   // 文ごと訳す
+  return '<p class="vi">'+_p17EscMark(t)+'</p>';
+}
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
-  window._p17Untr = {};   // ver.20261105.01: 訳せなかった語を毎回数え直す
   // 対訳チェックの連動
   area.querySelectorAll('input.vi-cb[data-mirror]').forEach(function(m){ var src=document.getElementById(m.getAttribute('data-mirror')); m.checked=!!(src&&src.checked); });
   // 長い回答（「／」区切り）は改行して全部表示
@@ -1232,6 +1247,12 @@ function _p17Post(){
     if(!vals.length || !m){ vi.textContent=orig; return; }
     var sep = /[-－–]/.test(m[1]) ? '-' : ' / ';   // 電話番号を分けて入れる欄は「-」でつなぐ
     vi.innerHTML=_p17EscMark(orig.replace(m[0], '('+vals.map(_p17Vi).join(sep)+')'));   // ver.20261105.01: 訳せなかった所は赤
+  });
+  // ver.20261105.20: 外国語行が日本語行とまったく同じ文字なら、重複になるので隠す（中国語版の性別「男」など）
+  area.querySelectorAll('p.ja').forEach(function(ja){
+    var vi=ja.nextElementSibling; if(!vi || !vi.classList.contains('vi')) return;
+    var a=ja.textContent.replace(/\s+/g,''), b=vi.textContent.replace(/\s+/g,'');
+    vi.style.display = (a && a===b && !vi.querySelector('input')) ? 'none' : '';
   });
   // 担当者欄：実施予定が「有」でなければ「記載なし」
   area.querySelectorAll('tr').forEach(function(tr){
@@ -1313,6 +1334,7 @@ function p(){
   if(window._editMode) return;
   var area=document.getElementById('pageArea');
   if(!area) return;
+  window._p17Untr = {};   // ver.20261105.20: 描画の前に数え直す（本文の描画中に見つけた未訳も数える）
   area.innerHTML = P17_TEMPLATE() + _p17Bessi();   // ver.20261105.11: 別紙（支援担当者・通訳者）
   _p17RestoreChecks();
   if(window._p17Text && !window._p17Text.f407) window._p17Text.f407='ネパール';   // ver.20261104.01: ベトナム語版なので既定で「ベトナム」
@@ -1354,7 +1376,7 @@ return `<div class="doc" id="docP1">
 <td class="b-kttt"><p class="ja">１　氏名</p><p class="vi a-center">नाम</p></td>
 <td class="b-kttt" colspan="3"><p class="ja">${f('f_applicant')}（ほか0名）</p><p class="vi a-right">(अरु 0 जना)</p></td>
 <td class="b-kttt" colspan="3"><p class="ja">２　性　別</p><p class="vi a-center">लिङ्ग</p></td>
-<td class="b-kttk" colspan="2"><p class="ja a-center">${f('f_gender')}</p><p class="vi a-center">पुरुष/महिला</p></td>
+<td class="b-kttk" colspan="2"><p class="ja a-center">${f('f_gender')}</p><p class="vi a-center">${_p17Gender('पुरुष/महिला')}</p></td>
 </tr>
 <tr class="nosplit" style="height:5.73em">
 <td class="b-ttkt"><p class="ja">３　生年月日</p><p class="vi">जन्म मिति</p></td>
@@ -1657,7 +1679,7 @@ B. कार्यान्वयन भाषा</p></td>
 प्रति महिना लगभग<input type="text" class="bl" id="f138" name="f138" data-label="居室の広さ（同居人数計 ｜＿" style="width:8.25em">येन</p><p class="ja" style="padding-left:1.04em;text-indent:-1.04em">提供する宿泊施設の具体的な内容
 प्रदान गरिने आवास सुविधाको विस्तृत विवरण</p><p class="ja" style="padding-left:1.04em">　<input type="checkbox" class="cb" id="f139" name="f139" data-label="居室の広さ（同居人数計">自己所有物件　<input type="checkbox" class="cb" id="f140" name="f140" data-label="居室の広さ（同居人数計">借上物件
 　<input type="checkbox" class="cb" id="f141" name="f141" data-label="居室の広さ（同居人数計">व्यक्तिगत स्वामित्वको भवन　<input type="checkbox" class="cb" id="f142" name="f142" data-label="居室の広さ（同居人数計">भाडामा लिइएको भवन</p><p class="ja" style="padding-left:1.04em;text-indent:-1.04em">費用が実費に相当する額その他の適正な額であることの説明
-खर्चको रकम वास्तविक लागत वा अन्य उपयुक्त रकमसँग समानुपातिक रहेको व्याख्या</p><p class="ja">${f('es_actualCostDesc')}</p></td>
+खर्चको रकम वास्तविक लागत वा अन्य उपयुक्त रकमसँग समानुपातिक रहेको व्याख्या</p><p class="ja">${f('es_actualCostDesc')}</p>${_p17FxLine('es_actualCostDesc')}</td>
 </tr>
 <tr style="height:1.66em">
 <td class="b-ttnt vert" rowspan="6"><p class="ja a-center" style="padding-left:0.63em">イ　生活に必要な契約に係る支援</p><p class="vi a-center" style="padding-left:0.63em"> B. जीवनको लागि आवश्यक सम्झौतासँग सम्बन्धित सहायता</p></td>
@@ -2368,7 +2390,7 @@ async function loadFromDB(passedInfo){
       else _orgUnknown = true;
     }
     window._p17SelfWhy = _selfWhy;
-    if(_isSelf){ try{ var _gv=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }; window._p17MgrReal = { name:_gv('es_coMgrName'), name_en:_gv('es_coMgrNameEn'), title:_gv('es_coMgrTitle'), title_en:_gv('es_coMgrTitleEn'), tel:_gv('es_coTel') }; if(window._p17MgrReal.name && window._p17MgrReal.name!=='別紙参照'){ ['es_coMgrName','es_coMgrTitle'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value='別紙参照'; }); ['es_coMgrNameEn','es_coMgrTitleEn'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value='See attached'; }); } }catch(_e){} }   // ver.20261105.14
+    if(_isSelf){ try{ var _gv=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }; window._p17MgrReal = { name:_gv('es_coMgrName'), name_en:_gv('es_coMgrNameEn'), title:_gv('es_coMgrTitle'), title_en:_gv('es_coMgrTitleEn'), tel:_gv('es_coTel') }; if(window._p17MgrReal.name && window._p17MgrReal.name!=='別紙参照'){ (function(){ var S=function(id,x){ var e=document.getElementById(id); if(e) e.value=x; }; S('es_coMgrName','別紙参照'); S('es_coMgrTitle','\u3000'); S('es_coMgrNameEn','See attached'); S('es_coMgrTitleEn',''); })(); } }catch(_e){} }   // ver.20261105.14
     if(_isSelf){ try{ var _ssx = (typeof co!=='undefined' && co && co.extra && co.extra.selfSupport) || {}; window._p17Att = (_ssx.attachments && typeof _ssx.attachments==='object') ? _ssx.attachments : {}; window._p17AttOrg = ''; }catch(_e){} }   // ver.20261105.13
     var _sm=document.getElementById('es_selfMode'); if(_sm) _sm.value = _isSelf ? '1' : '';
     if(_orgUnknown){
@@ -2398,9 +2420,9 @@ async function loadFromDB(passedInfo){
         // ７ 支援業務を行う体制の概要（支援責任者・人数）
         /* ver.20261105.14: 支援責任者は別紙に載せるので、本文は「別紙参照」。読み込んだ値は別紙用に覚えておく */
         window._p17MgrReal = { name: so.support_manager_name||so.support_manager||'', title: so.support_manager_title||'', kana: so.support_manager_kana||'', tel: so.tel||'' };
-        _s('es_soMgrKana', '');
+        _s('es_soMgrKana', '\u3000');
         _s('es_soMgr', '別紙参照');
-        _s('es_soMgrTitle', '別紙参照');
+        _s('es_soMgrTitle', '\u3000');   // ver.20261105.20: 「別紙参照」は氏名欄だけ（役職欄と重ねない）
         _s('es_soSupporterCount', so.supporter_count);
         _s('es_soSupportStaffCount', so.support_staff_count);
 
@@ -2479,13 +2501,30 @@ async function _p17Hearing(so, _s){
     return /^(記載なし|なし|無し|無|-|ー|－)$/.test(t) ? '' : t;
   };
   var _cleanGroup = function(o){ ['telNo','mailAddr','other'].forEach(function(k){ if(k in o) o[k] = _p17Clean(o[k]); }); return o; };
+  /* ver.20261105.20: 「その他」に、上でチェック済みの直接面談・電話・メールが重ねて書かれていたら取り除く（「■その他（直接面談・電話・メール）」の重複をなくす） */
+  var _dedupOther = function(o){
+    if(!o || !o.other) return o;
+    var dup = /^(直接面談|対面面談|対面|面談|電話|電 話|メール|Eメール|E-?mail)(\s*[（(][^）)]*[）)])?$/i;
+    var phone = /^(電話|TEL|tel)?[\s:：]*[0-9０-９][0-9０-９\-－()（）\s]*$/;
+    var rest = String(o.other).split(/[・、,，／\/]/).map(function(t){ return t.trim(); }).filter(function(t){
+      if(!t) return false;
+      if(dup.test(t)) return false;
+      if(phone.test(t) && o.tel) return false;
+      if(o.mailAddr && t.indexOf(o.mailAddr)>=0) return false;
+      return true;
+    });
+    o.other = rest.join('・');
+    return o;
+  };
   var CM = _cleanGroup(Object.assign({}, ex.consultMethods||{}));
   if(lo.consult_phone){ CM.telNo = lo.consult_phone; CM.tel = true; }
   if(lo.consult_email){ CM.mailAddr = lo.consult_email; CM.mail = true; }
+  _dedupOther(CM);
   if(setGroup(CM, ['f253','f254','f258','f260'])){
     _s('es_cmTel', CM.telNo); _s('es_cmMail', CM.mailAddr); _s('es_cmOther', CM.other); used.push('相談方法');
   }
   var EC = _cleanGroup(Object.assign({}, ex.emergencyContact || {}));
+  _dedupOther(EC);
   if(setGroup(EC, ['f262','f263','f267','f269'])){
     _s('es_emTel', EC.telNo); _s('es_emMail', EC.mailAddr); _s('es_emOther', EC.other); used.push('緊急時対応');
   }
