@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261106.02</div>
+    <div class="ver">ver.20261106.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -71,6 +71,8 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
+    <!-- ver.20261106.03: ヒアリングフォームの回答が書類に入ったかの一覧 -->
+    <div id="frPanel" style="display:none;margin:0 0 10px;border:1.5px solid #93c5fd;border-radius:10px;background:#eff6ff;font-size:11px;line-height:1.55;"></div>
     <div class="fs"><div class="fs-title">基本情報</div>
       <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
       <div class="fg"><label>２号特定技能外国人 氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
@@ -152,7 +154,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793937639"></script>
+<script src="ofusa_common.js?v=1793939529"></script>
 <script>
 // 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
 const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
@@ -323,6 +325,66 @@ function applyT2Targets(manual){
     showToast(who==='all' ? '指導対象者を全員分表示しました' : (nm?('「'+nm+'」の指導対象者（'+Math.min(list.length,5)+'名）を反映しました'):'指導対象者をクリアしました'));
   }
 }
+
+// ===== ver.20261106.03: ヒアリングフォームの回答が書類に入ったかの一覧（左パネル上部） =====
+//   フォームに答えがある項目ごとに「✅入った／✏️書き換え済み／⚠️入っていない（理由）」を出す。
+//   問い合わせの前に、その場で入っていない項目と理由が分かるようにするため。
+function _frNorm(x){ return String(x==null?'':x).normalize('NFKC').replace(/[\s　]/g,''); }
+function _frEsc(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function _frPanelRefresh(){
+  const box=document.getElementById('frPanel'); if(!box) return;
+  const F=window._t2FormResp;
+  if(!F || !F.resp){ box.style.display='none'; box.innerHTML=''; return; }
+  const fr=F.resp, rows=[];
+  const row=(icon,label,note,cls)=>rows.push('<div style="display:flex;gap:6px;padding:3px 0;border-top:1px dashed #bfdbfe;"><span style="flex:0 0 1.4em;">'+icon+'</span><span style="flex:1;"><b>'+_frEsc(label)+'</b>'+(note?('<br><span style="color:'+(cls||'#475569')+';">'+note+'</span>'):'')+'</span></div>');
+  const one=(label,id,ans,cond)=>{
+    if(cond===false) return;
+    const a=String(ans==null?'':ans).trim(); if(!a) return;
+    const cur=v(id);
+    if(_frNorm(cur)===_frNorm(a)) row('✅',label,'');
+    else if(String(cur||'').trim()) row('✏️',label,'書類は手で書き換えた内容です（フォームの回答：「'+_frEsc(a.length>40?a.slice(0,40)+'…':a)+'」）','#92400e');
+    else row('⚠️',label,'フォームに回答「'+_frEsc(a.length>40?a.slice(0,40)+'…':a)+'」がありますが、入力欄が空です','#b91c1c');
+  };
+  one('① 所属部署名','f_dept',fr.t2Dept);
+  one('② 役職又は地位','f_position',fr.t2Position);
+  one('③ 具体的な職務内容','f_jobDesc',fr.t2JobDetail);
+  one('④ 技能実習生等との職務内容の違い','f_jobDiff',fr.t2JobDiff);
+  one('留意事項３ 事業所・部署が違う理由','f_reason3',fr.t2Reason3,fr.t2SameOffice==='いいえ');
+  one('留意事項５ 一時的に人数が足りない理由','f_reason5',fr.t2Reason5,fr.t2Short5==='checked');
+  // 指導を受ける対象者
+  const tg=Array.isArray(fr.t2Targets)?fr.t2Targets.filter(t=>t&&String(t.name||'').trim()):[];
+  if(tg.length){
+    const tf=window._t2Form||{}; const sel=document.getElementById('f_t2Who'); const who=sel?sel.value:'';
+    let list=tg;
+    if(tf.grouped){
+      const m=String(who||'').match(/^(this|now)-(\d+)$/);
+      list=(who==='all')?tg:(m?tg.filter(t=>String(t.group)===m[1]&&String(t.person)===m[2]):[]);
+    }
+    const inDoc=[]; for(let n=1;n<=5;n++){ const x=v('f_t'+n+'Name'); if(String(x||'').trim()) inDoc.push(_frNorm(x)); }
+    const hit=list.filter(t=>inDoc.indexOf(_frNorm(t.name))>=0).length;
+    const notes=[];
+    if(tf.grouped && !who) notes.push('２号外国人が複数いるため、上の「この書類の２号特定技能外国人」から選んでください（フォーム全体で'+tg.length+'名）');
+    const noNames=tf.grouped && tf.names && Object.keys(tf.names).length && Object.keys(tf.names).every(k=>!tf.names[k]);
+    if(noNames) notes.push('フォームに２号外国人の名前の回答が無いため、「今回申請の何人目か」で判断しています');
+    if(list.length>5) notes.push('様式の枠は5名分のため、6人目以降（'+(list.length-5)+'名）は入っていません。別紙で追加してください');
+    const noDept=list.length && list.every(t=>!String(t.dept||'').trim());
+    if(noDept) notes.push('「事業所及び所属部署名」はフォームで回答されていません');
+    const icon=(list.length && hit>=Math.min(list.length,5))?'✅':(hit?'⚠️':(tf.grouped&&!who?'⚠️':'⚠️'));
+    row(icon,'２ 指導を受ける対象者（'+Math.min(hit,5)+' / '+list.length+'名 反映）',notes.map(_frEsc).join('<br>'),icon==='✅'?'#475569':'#b91c1c');
+  }
+  if(String(fr.t2DupReason||'').trim()) row('ℹ️','留意事項４ 他の２号にも指導を受ける人の理由','様式に欄が無いため、必要に応じて別紙で説明してください');
+  if(!rows.length){ box.style.display='none'; box.innerHTML=''; return; }
+  const ng=rows.filter(r=>r.indexOf('>⚠️<')>=0).length;
+  const when=F.at?new Date(F.at).toLocaleDateString('ja-JP'):'';
+  const open=box.getAttribute('data-open')!=='0';
+  box.style.display='';
+  box.innerHTML='<div style="display:flex;align-items:center;gap:6px;padding:6px 9px;cursor:pointer;font-weight:bold;color:#1e3a8a;" onclick="var b=document.getElementById(\'frPanel\');b.setAttribute(\'data-open\',b.getAttribute(\'data-open\')===\'0\'?\'1\':\'0\');_frPanelRefresh();">'
+    +'📋 ヒアリングフォームの反映状況'+(ng?('<span style="background:#dc2626;color:#fff;border-radius:9px;padding:0 7px;font-size:10px;">要確認 '+ng+'</span>'):'<span style="background:#16a34a;color:#fff;border-radius:9px;padding:0 7px;font-size:10px;">OK</span>')
+    +'<span style="margin-left:auto;font-weight:normal;color:#64748b;font-size:10px;">'+(when?('回答日 '+when+' '):'')+(open?'▲':'▼')+'</span></div>'
+    +(open?('<div style="padding:0 9px 6px;">'+rows.join('')+'</div>'):'');
+}
+document.addEventListener('input',function(e){ try{ if(e.target && /^f_/.test(e.target.id||'') && window._t2FormResp) { clearTimeout(window._frT); window._frT=setTimeout(_frPanelRefresh,300); } }catch(_e){} });
+document.addEventListener('change',function(e){ try{ if(e.target && e.target.id==='f_t2Who') setTimeout(_frPanelRefresh,100); }catch(_e){} });
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -366,6 +428,7 @@ async function loadFromDB(passedInfo){
         const _hasT2 = r => r && (r.t2Field || r.t2JobDetail || r.t2Dept || (Array.isArray(r.t2Targets) && r.t2Targets.length));
         const _hit = (frs||[]).find(x => _hasT2(x && x.response));
         const fr = _hit && _hit.response;
+        window._t2FormResp = fr ? {resp:fr, type:_hit.form_type, at:_hit.created_at} : null;   // ver.20261106.03: 反映チェック用
         if(fr){
           const sf=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
           sf('f_dept', fr.t2Dept);
@@ -408,6 +471,7 @@ async function loadFromDB(passedInfo){
       }
     }catch(_e){ console.warn('[1_32] tokutei2_pledge load:', _e); }
     p(); showToast('✅ データを読み込みました');
+    try{ _frPanelRefresh(); setTimeout(_frPanelRefresh,2500); setTimeout(_frPanelRefresh,6000); }catch(_fp){}   // 保存済みの値で上書きされた後も見直す
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);}
 }
 // ver.20261024.01: 作成年月日が自動で入らないことがあった（過去のDB保存で f_docDate が

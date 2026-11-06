@@ -3015,6 +3015,7 @@ async function loadCaseToForm(info, docKey, opts){
     // ver.20261026.04: 雇用条件に紐づく編集HTML（受け皿）を呼び戻す（案件ごとの編集版より新しければ採用）
     try{ await _htmlStoreRestore(info); }catch(_hs){ console.warn('[htmlStore restore]', _hs); }
     try{ _structNoticeHide(); window._tplSigBase=null; if(window._htmlFrozen) _structSetBase(); }catch(_sb){} // ver.20261028.01
+    try{ if(window._htmlFrozen) _staleEditedCheck(); }catch(_st){ console.warn('[staleEdited]', _st); } // ver.20261106.03
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
     console.error('[doc] loadCaseToForm error:', e);
@@ -4667,6 +4668,81 @@ window.addEventListener('load', function(){
   window.addEventListener('load', addBtn);
 })();
 
+/* ===== ver.20261106.03: 古い編集版のお知らせ =====
+   直接編集版（案件ごと／雇用条件ごと）を呼び戻したとき、「今の様式で作り直すと値が入る欄」のうち
+   編集版に欄そのものが無いもの（例：業務区分が1つのときに保存した版の「業務区分２」）を探し、
+   あれば書類の上に知らせる。値が入っていない欄・隠している欄は数えない。 */
+function _staleFieldLabel(id){
+  try{
+    var el=document.getElementById(id);
+    var fg=el && (el.closest('.fg')||el.parentNode);
+    var lb=fg && fg.querySelector('label');
+    var t=lb ? lb.cloneNode(true) : null;
+    if(t){ t.querySelectorAll('.fid,button').forEach(function(x){x.remove();}); t=(t.textContent||'').replace(/\s+/g,' ').trim(); }
+    return t || id.replace(/^(es|f)_/,'');
+  }catch(_e){ return id; }
+}
+function _staleEditedCheck(){
+  var area=document.getElementById('pageArea');
+  if(!area || !window._htmlFrozen || typeof window._origPRender!=='function') return;
+  var _pv=function(x){ return String(x==null?'':x).replace(/[\s　]/g,''); };
+  var have={};
+  area.querySelectorAll('[data-bind]').forEach(function(sp){ have[sp.getAttribute('data-bind')]=1; });
+  if(!Object.keys(have).length) return; // data-bind の無い古い形式は対象外（別の仕組みで作り直す）
+  var saved=area.innerHTML, sx=window.scrollX, sy=window.scrollY, at=area.scrollTop;
+  var em=(typeof _editMode!=='undefined')?_editMode:false, fr=window._htmlFrozen;
+  var missing=[], seen={};
+  window._tplSigRendering=true;
+  try{
+    try{ _editMode=false; }catch(_e){}
+    window._htmlFrozen=false;
+    window._origPRender();
+    area.querySelectorAll('[data-bind]').forEach(function(sp){
+      var id=sp.getAttribute('data-bind'); if(!id || have[id] || seen[id]) return;
+      if(sp.style && sp.style.display==='none') return;
+      var val=(typeof v==='function') ? v(id) : '';
+      var txt=_pv(sp.textContent);
+      if(!_pv(val) || !txt || txt===_pv(id.replace(/_/,'.'))) return;
+      seen[id]=1; missing.push(id);
+    });
+  }catch(e){ console.warn('[staleEdited render]', e); }
+  finally{
+    area.innerHTML=saved;
+    try{ _editMode=em; }catch(_e){}
+    window._htmlFrozen=fr;
+    window._tplSigRendering=false;
+    try{ window.scrollTo(sx,sy); area.scrollTop=at; }catch(_e){}
+    try{ if(typeof applyBindings==='function') applyBindings(); }catch(_e){}
+  }
+  window._staleEditedMissing=missing;
+  var old=document.getElementById('_staleNotice'); if(old && old.parentNode) old.parentNode.removeChild(old);
+  if(!missing.length) return;
+  // 「このまま」を選んだ同じ書類・同じ案件・同じ欄の組み合わせは、次から出さない（この端末だけ）
+  var _ci=(window._lastCaseInfo&&window._lastCaseInfo.caseId)||'';
+  var _kk='ofusa_staleKeep:'+((location.pathname.split('/').pop()||'').replace(/\.html.*$/,''))+':'+_ci+':'+missing.slice().sort().join(',');
+  try{ if(localStorage.getItem(_kk)) return; }catch(_ls){}
+  var labels=[]; missing.forEach(function(id){ var l=_staleFieldLabel(id); if(labels.indexOf(l)<0) labels.push(l); });
+  var w=document.createElement('div'); w.id='_staleNotice';
+  w.style.cssText='background:#fff7ed;border:2px solid #f97316;border-radius:10px;margin:8px 12px;padding:12px 16px;font-family:sans-serif;font-size:13px;line-height:1.6;color:#431407;box-sizing:border-box;';
+  var esc2=function(x){ return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  w.innerHTML=
+    '<div style="font-weight:bold;font-size:14px;margin-bottom:4px;">⚠️ この直接編集版は古い形のため、書類に出ていない内容があります</div>'+
+    '<div style="margin-bottom:6px;">今の様式で作り直すと入る次の欄が、保存した編集版にはありません：</div>'+
+    '<div style="margin:0 0 10px 8px;font-weight:bold;">'+labels.slice(0,8).map(function(l){return '・'+esc2(l);}).join('<br>')+(labels.length>8?('<br>ほか '+(labels.length-8)+' 件'):'')+'</div>'+
+    '<div style="margin-bottom:10px;">反映するには、編集版を破棄して作り直し、必要な直接編集をもう一度してください。</div>'+
+    '<button type="button" id="_stRebuild" style="padding:7px 14px;font-size:13px;font-weight:bold;border:1px solid #b91c1c;background:#dc2626;color:#fff;border-radius:6px;cursor:pointer;margin-right:8px;">♻️ 編集版を破棄して作り直す</button>'+
+    '<button type="button" id="_stKeep" style="padding:7px 14px;font-size:13px;border:1px solid #9a3412;background:#fff;color:#7c2d12;border-radius:6px;cursor:pointer;">このまま（編集版を使う）</button>';
+  area.parentNode.insertBefore(w, area);
+  w.querySelector('#_stRebuild').onclick=async function(){
+    try{
+      if(typeof window.discardEditedFromDB==='function') await window.discardEditedFromDB();
+      else if(typeof discardEditedGeneric==='function') await discardEditedGeneric();
+      else { window._htmlFrozen=false; if(typeof p==='function') p(); }
+    }catch(e){ console.warn('[staleRebuild]', e); }
+    if(!window._htmlFrozen && w.parentNode) w.parentNode.removeChild(w);
+  };
+  w.querySelector('#_stKeep').onclick=function(){ try{ localStorage.setItem(_kk, String(Date.now())); }catch(_ls){} if(w.parentNode) w.parentNode.removeChild(w); };
+}
 /* ===== 直接編集後の「書類の形が変わる変更」のお知らせ（ver.20261028.01） =====
    直接編集した書類（フリーズ中）は、サイドバーの値（灰色の欄）だけを差し替える。
    チェック欄・シフト行など、書類の形そのものが変わる変更は出ないので、
