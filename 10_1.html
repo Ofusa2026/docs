@@ -7,6 +7,8 @@
 <style>.fp-case{display:none!important;}</style>
 <link rel="stylesheet" href="ofusa_common.css?v=1784720412">
 <style>
+/* ver.20261106.08: 所属機関・外国人欄の項目名を同じ幅で均等割り付け（直接編集で毎回そろえていた） */
+.jlab{display:inline-block;width:6em;text-align:justify;text-align-last:justify;white-space:nowrap;vertical-align:top;}
 .doc{padding:15mm!important;line-height:1.35!important;min-height:auto!important}
 @media print{
   .app-bar,.fp{display:none!important}
@@ -15,13 +17,17 @@
   @page{margin:0}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
+/* ver.20261106.08: 1枚に収めるため、上下の余白・誓約事項の間・行間を少し詰める（文字の大きさは変えない） */
+html body .doc{padding-top:10mm!important;padding-bottom:9mm!important;line-height:1.22!important;}
+html body .doc div[style*="text-indent:-1.5em"]{margin-bottom:0.8mm!important;}
+@media print{html body .doc{padding-top:10mm!important;padding-bottom:9mm!important;line-height:1.22!important;} html body .doc div[style*="text-indent:-1.5em"]{margin-bottom:0.8mm!important;} }
 </style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１０－１号（宿泊）　受入れに関する誓約書</div>
-    <div class="ver">ver.20260810.01</div>
+    <div class="ver">ver.20261106.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -64,7 +70,7 @@
     <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
     <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
-    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
     <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
   </div>
   <div id="pageArea"></div>
@@ -88,12 +94,12 @@ function p(){
   </tr>
   <tr>
     <td></td>
-    <td style="width:24%;padding-left:2em;">氏名又は名称</td>
+    <td style="width:24%;padding-left:2em;"><span class="jlab">氏名又は名称</span></td>
     <td>${f('f_coName')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:2mm;padding-left:2em;">住　　　　所</td>
+    <td style="padding-top:2mm;padding-left:2em;"><span class="jlab">住所</span></td>
     <td style="padding-top:2mm;">${f('f_coAddr')}</td>
   </tr>
 </table>
@@ -104,22 +110,22 @@ function p(){
   </tr>
   <tr>
     <td></td>
-    <td style="width:24%;padding-left:2em;">氏　　　　名</td>
+    <td style="width:24%;padding-left:2em;"><span class="jlab">氏名</span></td>
     <td>${f('f_applicant')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:1.5mm;padding-left:2em;">性　　　　別</td>
+    <td style="padding-top:1.5mm;padding-left:2em;"><span class="jlab">性別</span></td>
     <td style="padding-top:1.5mm;">${f('f_gender')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:1.5mm;padding-left:2em;">国籍・地域</td>
+    <td style="padding-top:1.5mm;padding-left:2em;"><span class="jlab">国籍・地域</span></td>
     <td style="padding-top:1.5mm;">${f('f_nationality')}</td>
   </tr>
   <tr>
     <td></td>
-    <td style="padding-top:1.5mm;padding-left:2em;">生 年 月 日</td>
+    <td style="padding-top:1.5mm;padding-left:2em;"><span class="jlab">生年月日</span></td>
     <td style="padding-top:1.5mm;">${f('f_birthdate')}</td>
   </tr>
 </table>
@@ -141,7 +147,7 @@ function p(){
 <div style="font-size:10.5pt;margin-bottom:2mm;text-align:right;">作成年月日　${f('f_docDate')}</div>
 <div style="font-size:10.5pt;text-align:right;">作成責任者　${f('f_author')}</div>
 </div>`;
-  _fontSize = (_fontSize === 8.5) ? 10.5 : _fontSize;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;   // ver.20261106.08: 1枚に収めるため既定を10ptに（A+で10.5ptに戻せる）
   _applyFontSize();
   _apply10_1FontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
