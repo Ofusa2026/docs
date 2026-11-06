@@ -9,7 +9,7 @@
 .underline{text-decoration:underline;}
 .indent1{padding-left:2em;}
 .indent2{padding-left:4em;}
-.doc{padding:26mm 30mm!important;line-height:1.52!important}
+.doc{padding:26mm 30mm!important;line-height:1.52!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 @media print{
   .app-bar{display:none!important}
   .fp{display:none!important}
@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261106.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -61,6 +61,23 @@
           <option value="４">④EPA介護福祉士候補者</option>
         </select>
       </div>
+    </div>
+    <!-- ver.20261106.01: 「１ 申請できない事情」を文例から選べるように（入管提出実績のある文例を収録） -->
+    <div class="fs"><div class="fs-title">１ 申請できない事情</div>
+      <div class="fg"><label>文例を選ぶ</label>
+        <select id="f_reasonPreset" onchange="applyReasonPreset()">
+          <option value="std">① 標準（書類準備等・2ヶ月以上）</option>
+          <option value="kokko">② 国交省の認定待ち（建設）</option>
+          <option value="kyogikai">③ 協議会への加入待ち</option>
+          <option value="kigyo">④ 所属機関の企業書類の準備中</option>
+          <option value="short">⑤ 書類の準備等（短文・期間記載なし）</option>
+          <option value="expire">⑥ 在留期間満了日を明記</option>
+          <option value="shinsa">⑦ 審査期間・生活費の確保（詳細）</option>
+        </select>
+      </div>
+      <div class="fg"><label>在留期間満了日（⑥で使用）<span class="fid">{{在留期限}}</span></label><input id="f_expire" oninput="applyReasonPreset(true)" placeholder="令和〇年〇月〇日"></div>
+      <div class="fg"><label>事情（本文・直接修正可）<span class="fid">{{事情}}</span></label><textarea id="f_reason" oninput="p()" rows="9" style="width:100%;font-size:11px;line-height:1.5;"></textarea></div>
+      <div style="font-size:9px;color:#888;margin-top:-2px;">※ 本文中の〔分野〕〔在留期限〕は、書類では入力値に自動で置き換わります。文例を選び直すと本文は上書きされます。</div>
     </div>
     <div class="fs"><div class="fs-title">登録支援機関</div>
       <div class="fg"><label>機関名<span class="fid">{{登録支援機関名}}</span></label><input id="f_soName" oninput="p()"></div>
@@ -112,15 +129,7 @@ function p(){
 </div>
 <div style="margin-bottom:24px;">
   <div>１　在留期間の満了日までに「特定技能１号」への在留資格変更許可申請をすることができない事情</div>
-  <div style="border:1px solid #555;padding:0 12px;margin-top:6px;line-height:1.52em;">
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">この度弊社で特定技能 1 号として雇用契約を締結することに決定したが、弊社側の</div>
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">特定技能 1 号申請への準備(書類準備等)が整っておらず、許可が出るまで、</div>
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">2 ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得</div>
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考</div>
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">考えております。</div>
-    <div style="border-bottom:1px dashed #aaa;padding:2px 0;">また、弊社で${f('f_field')}に必要な指導、助言などを行うと共に、</div>
-    <div style="padding:2px 0;">在留中の日常生活に係る支援についても、適切に行っていきます。</div>
-  </div>
+  <div style="border:1px solid #555;padding:2px 12px;margin-top:6px;line-height:1.7em;min-height:10.2em;background-image:linear-gradient(to bottom,transparent calc(1.7em - 1px),#bbb calc(1.7em - 1px));background-size:100% 1.7em;background-position:0 2px;">${reasonHtml()}</div>
 </div>
 <div style="margin-bottom:24px;">
   <div>２　今次の受入れ機関において特定技能外国人として在留資格「特定技能１号」に該当する業務に従事するために同在留資格への在留資格変更許可申請を予定していること</div>
@@ -233,7 +242,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,org,nationality,emp_set_idx,doc_create_date&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,org,nationality,emp_set_idx,doc_create_date,expire&id=eq.'+caseId),
       sb('persons?select=applicant_name_en,nationality,skill_eval_type&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0];
@@ -299,6 +308,11 @@ async function loadFromDB(passedInfo){
         const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日');
       }
     }
+    // ver.20261106.01: 在留期間満了日（文例⑥で使用）。cases.expire を令和表記に
+    if(!v('f_expire') && cas && cas.expire){
+      const em=String(cas.expire).match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+      s('f_expire', em ? ('令和'+(parseInt(em[1],10)-2018)+'年'+parseInt(em[2],10)+'月'+parseInt(em[3],10)+'日') : String(cas.expire));
+    }
     // 技能区分
     const skillType=pd&&pd.skill_eval_type||'';
     if(skillType){
@@ -314,6 +328,38 @@ async function loadFromDB(passedInfo){
     showToast('✅ データを読み込みました');
   }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
 }
+
+// ver.20261106.01: 「１ 申請できない事情」の文例（入管へ提出した説明書の実例から収録）
+//   〔分野〕〔在留期限〕は描画時に入力値へ置き換える
+const IKO_REASON_PRESETS={
+  std:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（書類準備等）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  kokko:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（国土交通省の認定等）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  kyogikai:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（協議会への加入等）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  kigyo:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（所属機関の企業書類）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  short:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（書類の準備等）が整っておらず、許可が出るまでの間、申請人の生活確保のためにも特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  expire:'この度弊社で「特定技能１号」として雇用契約を締結することに決定したが、弊社側の特定技能１号申請への準備（書類の準備に時間がかかるため）が整っておらず、許可が出るまで、２ヶ月以上の時間がかかることが見込まれるため、現在の在留期間が満了する〔在留期限〕以降、特定技能での在留資格が取得できるまでの間、申請人の生活確保のためにも、特定活動で就労を可能にしたいと考えております。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。',
+  shinsa:'今次の受入れ機関において在留資格「特定技能１号」に該当する業務に従事することを希望しており、受入れ機関としても、申請人を特定技能外国人として受け入れる予定です。\nもっとも、特定技能１号への在留資格変更許可申請を行った場合、審査には１か月から２か月程度を要することが見込まれ、その間、申請人は予定している業務に従事することができません。申請人は、日本での就労を前提として生活を継続しているため、就労開始が遅れることにより、生活費の確保に支障が生じるおそれがあります。\nそのため、ご本人が日本での生活を安定させながら、円滑に特定技能１号へ移行できるよう、今次の受入れ機関において特定技能１号で従事する予定の業務と同様の業務に従事しつつ、特定技能１号への在留資格変更許可申請に向けた準備を進める必要があるため、本申請を行うものです。\nまた、弊社で〔分野〕に必要な指導、助言などを行うと共に、在留中の日常生活に係る支援についても、適切に行っていきます。'
+};
+function applyReasonPreset(fromExpire){
+  const sel=document.getElementById('f_reasonPreset');
+  const ta=document.getElementById('f_reason');
+  if(!sel||!ta) return;
+  if(fromExpire){ p(); return; }  // 期限の変更は描画だけ（本文は上書きしない）
+  ta.value=IKO_REASON_PRESETS[sel.value]||IKO_REASON_PRESETS.std;
+  p();
+}
+function reasonHtml(){
+  const ta=document.getElementById('f_reason');
+  let raw=(ta&&ta.value)||'';
+  if(!raw.trim()) raw=IKO_REASON_PRESETS.std;
+  const fld=v('f_field'), exp=v('f_expire');
+  const tok=(val,id,label)=>val?`<span class="f" data-bind="${id}">${esc(val)}</span>`:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${label}</span>`;
+  return raw.split('\n').map(line=>{
+    const parts=esc(line).split(/(〔分野〕|〔在留期限〕)/);
+    return '<div>'+(parts.map(pt=>pt==='〔分野〕'?tok(fld,'f_field','field'):pt==='〔在留期限〕'?tok(exp,'f_expire','expire'):pt).join('')||'&nbsp;')+'</div>';
+  }).join('');
+}
+(function(){ const ta=document.getElementById('f_reason'); if(ta&&!ta.value) ta.value=IKO_REASON_PRESETS.std; })();
 
 console.log('%c OFUSA 書類作成システム %c ver.20260415.36 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
