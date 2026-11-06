@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.06</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1716,6 +1716,15 @@ _docsAuthGateInit();
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
   {
+    version: 'ver.20261106.07',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '📄 左の一覧「特定活動」に「移行準備説明書（2号）」と「理由書（ミャンマー）」を追加しました。1号の移行準備説明書は「申請できない事情」を文例7種から選べます',
+      '🗂 特定活動の案件で書類をまとめて作るとき、上の一覧に「移行準備説明書（2号）」「理由書（ミャンマー）」も出るようにしました（必要なときだけチェックしてください）'
+    ]
+  },
+  {
     version: 'ver.20261106.06',
     date: '2026-11-06',
     notify: true,
@@ -2886,6 +2895,17 @@ async function printPriorityDocs(keepField){
     if(d==='1_11' && ukeire==='first') _pmState.note[d]='初回受入のため';
   });
   fieldList.forEach(function(x){ _pmState.sel[x.dk]=x.on; _pmState.note[x.dk]=x.note; });
+  // ver.20261106.07: 特定活動の案件では「移行準備説明書（2号）」「理由書（ミャンマー）」も上の一覧に出す（チェックは手動）
+  if(isTokkatsu){
+    var _isMm=/ミャンマー|Myanmar|MYANMAR|ビルマ/.test(String(info.nationality||''));
+    [['tk2go','特定技能２号へ移行する場合はこちら（その場合は1号の説明書を外す）'],
+     ['myanmar',_isMm?'ミャンマー国籍のため：緊急避難措置の特定活動なら必要':'ミャンマー国籍者等の場合のみ']].forEach(function(a){
+      if(!document.getElementById('nav-'+a[0])) return;
+      var oi=_pmState.others.indexOf(a[0]); if(oi>=0) _pmState.others.splice(oi,1);
+      if(_pmState.prio.indexOf(a[0])<0) _pmState.prio.push(a[0]);
+      _pmState.sel[a[0]]=false; _pmState.cond[a[0]]=true; _pmState.note[a[0]]=a[1];
+    });
+  }
   _pmRender();
 }
 function _pmNorm(t){
