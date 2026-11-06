@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261105.14</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.01</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1017,7 +1017,8 @@ var _ssSlots=[], _ssFrame=null;
 function ssMsg(t){ var e=document.getElementById('ssMsg'); if(e) e.textContent=t||''; }
 // ver.20260724.06: 書類プルダウンに、その言語で設定済みかどうかの✔を出す
 var _SS_DOCS=[{v:'1_5',t:'1-5 雇用契約書'},{v:'1_6',t:'1-6 雇用条件書'},{v:'1_3',t:'1-3 受診者の申告書別紙'},
-               {v:'1_16',t:'1-16 雇用経緯'},{v:'1_17',t:'1-17 支援計画書'},{v:'juuyou',t:'重要事項説明書'}];
+               {v:'1_16',t:'1-16 雇用経緯'},{v:'1_17',t:'1-17 支援計画書'},{v:'juuyou',t:'重要事項説明書'},
+               {v:'1_10',t:'1-10 技能移転に係る申告書'},{v:'1_32',t:'1-32 業務内容に関する誓約書'}];   // ver.20261106.01: 1-10・1-32 を追加
 async function ssBuildDocSelect(){
   var sel=document.getElementById('ssDoc'); if(!sel) return;
   var lang=(document.getElementById('ssLang')||{}).value||'id';
@@ -1048,6 +1049,9 @@ function ssClose(){
 // ver.20260724.06: インドネシア語版はファイル名に接尾辞が付かない（1_5.html が id 版）。
 //   旧値 'ja' も同じ扱いにして、移行前のデータでも開けるようにする。
 function _ssFile(doc, lang){
+  // ver.20261106.01: 1-16・1-17・重要事項はインドネシア語にも _id が付く。1-10・1-32 は日本語1種類（言語に関係なく同じファイル）
+  if(doc==='1_10' || doc==='1_32') return doc + '.html';
+  if(doc==='1_16' || doc==='1_17' || doc==='juuyou') return doc + '_' + ((!lang || lang==='ja') ? 'id' : lang) + '.html';
   var noSuffix = (!lang || lang==='id' || lang==='ja');
   return doc + (noSuffix ? '' : ('_'+lang)) + '.html';
 }
@@ -1057,6 +1061,8 @@ async function ssLoad(){
   await ssBuildDocSelect();
   var doc=document.getElementById('ssDoc').value, lang=document.getElementById('ssLang').value;
   var body=document.getElementById('ssBody');
+  // ver.20261106.01: 1-3号はPDFの書類なので、この画面では枠を置けない（署名位置はPDFから自動で設定済み）
+  if(doc==='1_3'){ body.innerHTML='<div style="padding:20px;color:#64748b;font-size:13px;line-height:1.7;">1-3号（受診者の申告書別紙）はPDFの書類のため、この画面では署名欄を調整できません。<br>署名位置は6言語ともPDFから自動で設定済みです。</div>'; ssMsg(''); return; }
   body.innerHTML='<div style="padding:20px;color:#64748b;font-size:13px;">読み込み中…</div>';
   ssMsg('');
   // スロット定義（無ければ ja を流用して表示だけする）
@@ -1095,8 +1101,10 @@ async function ssLoad(){
 //   消えて枠を置けなくなる不具合を修正。貼付を _ssMountOverlays に分離し、MutationObserver で
 //   「.ss-ov の無い .doc」を検知したら自動で貼り直す（自分の描画でループしないよう60msデバウンス）。
 var _ssObs=null, _ssRemountT=null;
+// ver.20261106.01: 用紙を内包する外枠の.doc（1-17号）は数えない。案件管理の電子署名と同じページ番号にそろえる
+function _ssLeafDocs(d){ return Array.prototype.filter.call(d.querySelectorAll('.doc'), function(x){ return !x.querySelector('.doc'); }); }
 function _ssMountOverlays(d){
-  var pages=d.querySelectorAll('.doc');
+  var pages=_ssLeafDocs(d);
   if(!pages.length){ ssMsg('用紙(.doc)が見つかりません'); return 0; }
   pages.forEach(function(pg,pi){
     if(getComputedStyle(pg).position==='static') pg.style.position='relative';
@@ -1133,7 +1141,7 @@ function _ssAttach(){
       var MO=(d.defaultView&&d.defaultView.MutationObserver)||window.MutationObserver;
       _ssObs=new MO(function(){
         var need=false;
-        Array.prototype.forEach.call(d.querySelectorAll('.doc'), function(pg){ if(!pg.querySelector('.ss-ov')) need=true; });
+        _ssLeafDocs(d).forEach(function(pg){ if(!pg.querySelector('.ss-ov')) need=true; });
         if(!need) return;
         clearTimeout(_ssRemountT);
         _ssRemountT=setTimeout(function(){ try{ _ssMountOverlays(d); }catch(e){} }, 60);
@@ -1674,6 +1682,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.01',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '🖊 署名欄設定：<b>1-10号・1-32号</b>を追加しました。1-16号・1-17号・重要事項説明書の<b>インドネシア語版</b>が開けなかったのを直し、1-17号はページ番号が案件管理の電子署名とそろうようにしました（1-3号はPDFの書類のため、署名位置は自動で設定済みです）。'
+    ]
+  },
   {
     version: 'ver.20261105.14',
     date: '2026-11-05',
