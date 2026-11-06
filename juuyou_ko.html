@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（韓国語）</div>
-    <div class="ver">ver.20261106.12</div>
+    <div class="ver">ver.20261106.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -181,7 +181,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793957526"></script>
+<script src="ofusa_common.js?v=1793959888"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -607,14 +607,16 @@ async function loadFromDB(passedInfo){
         // 「工事業の種類」に業務区分（建築（建設分野…）など）がそのまま入っていたら消す（工事業は人材の「従事させる工事業」から入れる）
         const _cats=new Set([_es.category,_es.category2,_es.categoryEn,_es.category2En].map(_nz).filter(Boolean));
         ['f_workCat','f_workCatEn'].forEach(id=>{ const e=document.getElementById(id); if(e && _cats.has(_nz(e.value))){ e.value=''; if(e.dataset) delete e.dataset.autofill; } });
-        { const e=document.getElementById('f_workCat'); if(e && !e.value && per && per.kokko_jyuji_koujigyo) e.value=String(per.kokko_jyuji_koujigyo).split(',').join('、'); }
+        { const e=document.getElementById('f_workCat'); if(e && !e.value && per && per.kokko_jyuji_koujigyo){ let _kj=String(per.kokko_jyuji_koujigyo).split(',').map(x=>x.trim()).filter(Boolean); if(typeof koujiFilterByCategory==='function') _kj=koujiFilterByCategory(_kj,[_es.category,_es.category2].filter(Boolean)); e.value=_kj.join('、'); } }
         // ver.20261106.09: 工事業の種類は、会社が国土交通省から受けている建設業許可の業種（companies.permit_types）を入れる。
         //   空欄・人材の「従事させる工事業」のまま・自動で入れた値 のときだけ入れ替え、手で直して保存した内容は残す。
         //   案シスに許可業種が無い会社は、国交省の建設業者検索で調べて入れる（案シスには書き込まない）。
+        window.__jyCats=[_es.category,_es.category2].filter(Boolean);
         { const _ldSeq=(window.__juuyouLoadSeq=(window.__juuyouLoadSeq||0)+1);
           const _applyPt=(_pt)=>{
             const e=document.getElementById('f_workCat');
             if(typeof koujiFilter==='function') _pt=koujiFilter(_pt);   // 土木工事業・建築工事業は入れない
+            if(typeof koujiFilterByCategory==='function') _pt=koujiFilterByCategory(_pt, window.__jyCats);   // 業務区分に合う工事業だけ（国交省の対応表）
             if(!e || !_pt || !_pt.length) return false;
             const _perKj=_nz(per&&per.kokko_jyuji_koujigyo?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
             const c=_nz(e.value);
@@ -743,6 +745,7 @@ function jyPrintCheck(){
     [['f_fixedOTHours','３．固定残業代の時間'],['f_fixedOTAmount','３．固定残業代の金額']].forEach(x=>{ if(has(x[0])&&!g(x[0])) miss.push(x[1]); });
   }
   ['1','2','3','4'].forEach((i,k)=>{ if(g('f_allowance'+i+'Name') && has('f_allowance'+i+'Amount') && !g('f_allowance'+i+'Amount')) miss.push('２．手当('+'abcd'[k]+')の金額'); });
+  if(typeof koujiOutOfCategory==='function' && g('f_workCat')){ const bad=koujiOutOfCategory(g('f_workCat').split(/[、,，]/).map(x=>x.trim()).filter(Boolean), window.__jyCats); if(bad.length) miss.push('７．工事業の種類に、業務区分（'+(window.__jyCats||[]).map(c=>String(c).replace(/[（(].*$/,'')).join('・')+'）に合わないものがあります：'+bad.join('、')); }
   const tr=JY_TR.filter(x=>g(x[0]) && has(x[0]+'En') && !g(x[0]+'En')).map(x=>x[1]);
   return {miss:miss, tr:tr};
 }
@@ -754,7 +757,7 @@ function jyPrintCheck(){
       const r=jyPrintCheck();
       if(r.miss.length || r.tr.length){
         let msg='';
-        if(r.miss.length) msg+='次の欄が空欄です：\n・'+r.miss.join('\n・')+'\n\n';
+        if(r.miss.length) msg+='次の欄を確認してください（空欄など）：\n・'+r.miss.join('\n・')+'\n\n';
         if(r.tr.length) msg+='次の欄は外国語の訳が入っていません：\n・'+r.tr.join('\n・')+'\n（左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます）\n\n';
         if(!confirm(msg+'このまま印刷しますか？')) return;
       }

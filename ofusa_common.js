@@ -4868,6 +4868,35 @@ function koujiFilter(list){
   return (list||[]).map(function(x){ return String(x||'').trim(); }).filter(function(x){ return x && !ex[x.normalize('NFKC').replace(/[\s　]/g,'')]; });
 }
 window.koujiFilter=koujiFilter;
+// ver.20261106.13: 特定技能 業務区分－建設業許可 対応表（国交省 2025/1/31 版 https://www.mlit.go.jp/tochi_fudousan_kensetsugyo/content/001499406.pdf）
+//   業務区分ごとに従事できる工事業。重要事項事前説明書の「工事業の種類」は、この表で業務区分に合うものだけを出す。
+var KOUJI_TAIOU={
+  '土木':['さく井','舗装','しゅんせつ','造園','大工','とび・土工','鋼構造物','鉄筋','塗装','防水','石','機械器具設置','板金','熱絶縁','管'],
+  '建築':['大工','とび・土工','鋼構造物','鉄筋','塗装','防水','石','機械器具設置','内装仕上','建具','左官','タイル・れんが・ブロック','清掃施設','屋根','ガラス','解体','板金','熱絶縁','管'],
+  'ライフライン・設備':['板金','熱絶縁','管','電気','電気通信','水道施設','消防施設']
+};
+function _koujiKey(x){
+  var t=String(x||'').normalize('NFKC').replace(/[\s　]/g,'').replace(/工事業$|工事$/,'').replace(/･/g,'・');
+  if(t==='とび土工') t='とび・土工'; if(/^タイル|^れんが|^ブロック/.test(t)) t='タイル・れんが・ブロック';
+  if(t==='機械器具') t='機械器具設置'; if(t==='内装') t='内装仕上';
+  return t;
+}
+// cats: 業務区分の値の配列（例 ['土木（建設分野・特定技能１号）','建築…']）。区分が判定できないときは絞らない。
+function koujiAllowedFor(cats){
+  var keys=(cats||[]).map(function(c){ return typeof _juuyouCatKey==='function'?_juuyouCatKey(c):''; }).filter(Boolean);
+  if(!keys.length) return null;
+  var ok={}; keys.forEach(function(k){ (KOUJI_TAIOU[k]||[]).forEach(function(x){ ok[x]=1; }); });
+  return ok;
+}
+function koujiFilterByCategory(list, cats){
+  var ok=koujiAllowedFor(cats); if(!ok) return (list||[]).slice();
+  return (list||[]).filter(function(x){ return ok[_koujiKey(x)]; });
+}
+function koujiOutOfCategory(list, cats){
+  var ok=koujiAllowedFor(cats); if(!ok) return [];
+  return (list||[]).filter(function(x){ var k=_koujiKey(x); return k && !ok[k]; });
+}
+window.koujiFilterByCategory=koujiFilterByCategory; window.koujiOutOfCategory=koujiOutOfCategory;
 // 国交省で見つかった許可情報を、案シスの会社情報に入れる（許可業種が空の会社の、空欄の項目だけ。入っている値は変えない）
 async function mlitSaveToCompany(co, r){
   try{
