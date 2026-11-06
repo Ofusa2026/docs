@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能２号）</div>
-    <div class="ver">ver.20261106.02</div>
+    <div class="ver">ver.20261106.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('tokkatsu_2gou')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -228,6 +228,9 @@ async function loadFromDB(passedInfo){
     const fieldsU=_collect(es,'applicantField',normField);
     const fieldVal=(cas&&cas.applicant_field)?normField(cas.applicant_field):fieldsU.join('・');
     if(fieldVal) s('f_field',fieldVal);
+    // ver.20261106.03: 建設なら事情の文例を「国交省の認定待ち」に（本文を書き換えていないときだけ）
+    { const ta=document.getElementById('f_reason'), ps=document.getElementById('f_reasonPreset');
+      if(ta&&ps&&/建設/.test(fieldVal||'')&&(!ta.value.trim()||ta.value===TK2_REASON_PRESETS.std)){ ps.value='kokko'; ta.value=TK2_REASON_PRESETS.kokko; } }
     // 業務区分: emp_setsから取得（土木・建築、ライフライン・設備 など複数も連結）
     const cats=_collect(es,'category',stripParens);
     const catVal=cats.length?cats.join('・'):stripParens(es.applicantCategory||es.categoryName||'');
@@ -297,6 +300,25 @@ function reasonHtml(){
   return linedHtml(raw,{'〔分野〕':['f_field','field'],'〔在留期限〕':['f_expire','expire']});
 }
 (function(){ const ta=document.getElementById('f_reason'); if(ta&&!ta.value) ta.value=TK2_REASON_PRESETS.std; })();
+
+// ver.20261106.03: 印刷・PDFの前に、必須欄が空欄なら知らせる
+const REQUIRED_FIELDS=[['f_nationality','国籍・地域'],['f_name','氏名'],['f_field','特定産業分野'],['f_category','業務区分'],['f_skill','５ 該当する番号'],['f_date','作成日'],['f_orgName','受入れ機関名']];
+(function(){
+  const _orig=window.doPrint;
+  if(typeof _orig!=='function') return;
+  window.doPrint=function(){
+    if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
+      const miss=REQUIRED_FIELDS.filter(x=>!String(v(x[0])||'').trim()).map(x=>x[1]);
+      if(typeof extraPrintCheck==='function'){ const ex=extraPrintCheck(); if(ex) miss.push(ex); }
+      if(miss.length && !confirm('次の欄が空欄です：\n・'+miss.join('\n・')+'\n\nこのまま印刷しますか？')) return;
+    }
+    return _orig.apply(this,arguments);
+  };
+})();
+function extraPrintCheck(){
+  if(/〔在留期限〕/.test(v('f_reason')||'') && !v('f_expire')) return '在留期間満了日（事情の文中）';
+  return '';
+}
 
 console.log('%c OFUSA 書類作成システム %c ver.20260415.36 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();

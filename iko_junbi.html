@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20261106.01</div>
+    <div class="ver">ver.20261106.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -79,6 +79,30 @@
       <div class="fg"><label>事情（本文・直接修正可）<span class="fid">{{事情}}</span></label><textarea id="f_reason" oninput="p()" rows="9" style="width:100%;font-size:11px;line-height:1.5;"></textarea></div>
       <div style="font-size:9px;color:#888;margin-top:-2px;">※ 本文中の〔分野〕〔在留期限〕は、書類では入力値に自動で置き換わります。文例を選び直すと本文は上書きされます。</div>
     </div>
+    <!-- ver.20261106.03: ６ 支援体制（案件の登録支援機関から自動判定。自社支援なら(1)(2)を選ぶ） -->
+    <div class="fs"><div class="fs-title">６ 支援体制</div>
+      <div class="fg"><label>該当する項目</label>
+        <select id="f_support" onchange="p()">
+          <option value="3">(3) 登録支援機関に委託</option>
+          <option value="1">(1) 過去2年の外国人受入れ実績あり</option>
+          <option value="2">(2) 生活相談経験者を責任者・担当者に選任</option>
+        </select>
+      </div>
+      <div id="supWrap1">
+        <div style="font-size:9px;color:#888;">(1) 雇用した在留外国人（1名で可）</div>
+        <div class="fg"><label>氏名</label><input id="f_s1Name" oninput="p()"></div>
+        <div class="fg"><label>国籍・地域</label><input id="f_s1Nat" oninput="p()"></div>
+        <div class="fg"><label>性別</label><input id="f_s1Sex" oninput="p()"></div>
+        <div class="fg"><label>生年月日</label><input id="f_s1Birth" oninput="p()"></div>
+        <div class="fg"><label>在留資格</label><input id="f_s1Status" oninput="p()"></div>
+        <div class="fg"><label>雇用期間（から）</label><input id="f_s1From" oninput="p()"></div>
+        <div class="fg"><label>雇用期間（まで）</label><input id="f_s1To" oninput="p()"></div>
+      </div>
+      <div id="supWrap2">
+        <div class="fg"><label>(2) 責任者氏名</label><input id="f_s2Chief" oninput="p()"></div>
+        <div class="fg"><label>(2) 担当者氏名</label><input id="f_s2Staff" oninput="p()"></div>
+      </div>
+    </div>
     <div class="fs"><div class="fs-title">登録支援機関</div>
       <div class="fg"><label>機関名<span class="fid">{{登録支援機関名}}</span></label><input id="f_soName" oninput="p()"></div>
       <div class="fg"><label>登録番号<span class="fid">{{登録支援機関番号}}</span></label><input id="f_soNo" oninput="p()"></div>
@@ -116,6 +140,11 @@ function p(){
   if(!w) return;
   const skillVal=v('f_skill');
   const ul=s=>`<span class="underline">${s}</span>`;
+  // ver.20261106.03: ６ 支援体制
+  const sup=v('f_support')||'3';
+  const s1=(id,blank)=>(sup==='1'&&v(id))?f(id):blank;
+  const s2=id=>(sup==='2'&&v(id))?f(id):'　　　　　　　　';
+  try{ const w1=document.getElementById('supWrap1'),w2=document.getElementById('supWrap2'); if(w1)w1.style.display=sup==='1'?'':'none'; if(w2)w2.style.display=sup==='2'?'':'none'; }catch(_e){}
 
   w.innerHTML=`
 <div class="doc">
@@ -167,24 +196,24 @@ function p(){
   <div>６　今次の受入れ機関又は支援委託予定先が申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を適切に行うことが見込まれること（次の（１）から（３）までのいずれかに該当していること）</div>
   <div style="font-size:9pt;margin-top:4px;">
     <div style="margin-bottom:6px;">（１）過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の受入れ又は管理を適正に行った実績があること</div>
-    <div class="indent1" style="margin-bottom:24px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">${sup==='1'?'■':'□'}　該当　□　非該当</div>
     <div class="indent1" style="margin-bottom:24px;">
       ※　雇用した在留外国人の身分事項等（１名で可）<br>
-      氏名：${ul('　　　　　　　　　　')}　国籍・地域：${ul('　　　　　　')}　性別：${ul('　　　')}<br>
-      生年月日：${ul('　　　　　　　　')}　在留資格：${ul('　　　　　　　　')}<br>
-      雇用期間：${ul('　　　　　　から　　　　　　　まで')}
+      氏名：${ul(s1('f_s1Name','　　　　　　　　　　'))}　国籍・地域：${ul(s1('f_s1Nat','　　　　　　'))}　性別：${ul(s1('f_s1Sex','　　　'))}<br>
+      生年月日：${ul(s1('f_s1Birth','　　　　　　　　'))}　在留資格：${ul(s1('f_s1Status','　　　　　　　　'))}<br>
+      雇用期間：${ul(s1('f_s1From','　　　　　　')+'から'+s1('f_s1To','　　　　　　　')+'まで')}
     </div>
     <div style="margin-bottom:6px;">（２）今次の受入れ機関の役職員の中から，過去２年間に入管法別表第１の１の表，２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る。）（例：「技能実習」，「特定技能」，「技術・人文知識・国際業務」など）の外国人の生活相談に従事した経験がある者を申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行う責任者及び担当者として選任していること。</div>
-    <div class="indent1" style="margin-bottom:24px;">□　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">${sup==='2'?'■':'□'}　該当　□　非該当</div>
     <div class="indent1" style="margin-bottom:24px;">
-      ※　責任者氏名：${ul('　　　　　　　　')}<br>
-      担当者氏名：${ul('　　　　　　　　')}
+      ※　責任者氏名：${ul(s2('f_s2Chief'))}<br>
+      担当者氏名：${ul(s2('f_s2Staff'))}
     </div>
     <div style="margin-bottom:6px;">（３）申請人の在留中の日常生活等に係る支援（関係行政機関の相談先を案内及び必要に応じて当該機関に同行することを含む。）を行うことについて，登録支援機関に委託していること</div>
-    <div class="indent1" style="margin-bottom:24px;">■　該当　□　非該当</div>
+    <div class="indent1" style="margin-bottom:24px;">${sup==='3'?'■':'□'}　該当　□　非該当</div>
     <div class="indent1">
       登録支援機関<br>
-      　名称：${ul('　'+f('f_soName')+'　')}　登録番号：${ul(f('f_soNo')+'　')}
+      　名称：${ul('　'+(sup==='3'?f('f_soName'):'　　　　　　　　')+'　')}　登録番号：${ul((sup==='3'?f('f_soNo'):'　　　　　')+'　')}
     </div>
   </div>
 </div>
@@ -283,13 +312,18 @@ async function loadFromDB(passedInfo){
     const fieldsU=_collect(es,'applicantField',normField);
     const fieldVal=(cas&&cas.applicant_field)?normField(cas.applicant_field):fieldsU.join('・');
     if(fieldVal) s('f_field',fieldVal);
+    // ver.20261106.03: 建設なら事情の文例を「国交省の認定待ち」に（本文を書き換えていないときだけ）
+    { const ta=document.getElementById('f_reason'), ps=document.getElementById('f_reasonPreset');
+      if(ta&&ps&&/建設/.test(fieldVal||'')&&(!ta.value.trim()||ta.value===IKO_REASON_PRESETS.std)){ ps.value='kokko'; ta.value=IKO_REASON_PRESETS.kokko; } }
     // 業務区分: emp_setsから取得（土木・建築、ライフライン・設備 など複数も連結）
     const cats=_collect(es,'category',stripParens);
     const catVal=cats.length?cats.join('・'):stripParens(es.applicantCategory||es.categoryName||'');
     if(catVal) s('f_category',catVal);
     s('f_orgName',coName);
-    s('f_soName',orgName);
-    if(soNo) s('f_soNo',soNo);
+    // ver.20261106.03: 登録支援機関が空欄・自社などなら(3)にしない
+    const _itaku=!!orgName.trim() && !/単独|自社|なし|無し/.test(orgName);
+    { const se=document.getElementById('f_support'); if(se){ if(_itaku) se.value='3'; else if(se.value==='3') se.value='1'; } }
+    if(_itaku){ s('f_soName',orgName); if(soNo) s('f_soNo',soNo); }
     if(!v('f_date')){
       // ver.20260811.02: DBの doc_create_date を優先。無ければ今日の日付を自動セット
       const dbDate = cas && cas.doc_create_date;
@@ -360,6 +394,29 @@ function reasonHtml(){
   }).join('');
 }
 (function(){ const ta=document.getElementById('f_reason'); if(ta&&!ta.value) ta.value=IKO_REASON_PRESETS.std; })();
+
+// ver.20261106.03: 印刷・PDFの前に、必須欄が空欄なら知らせる
+const REQUIRED_FIELDS=[['f_nationality','国籍・地域'],['f_name','氏名'],['f_field','特定産業分野'],['f_category','業務区分'],['f_skill','５ 該当する番号'],['f_date','作成日'],['f_orgName','受入れ機関名']];
+(function(){
+  const _orig=window.doPrint;
+  if(typeof _orig!=='function') return;
+  window.doPrint=function(){
+    if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
+      const miss=REQUIRED_FIELDS.filter(x=>!String(v(x[0])||'').trim()).map(x=>x[1]);
+      if(typeof extraPrintCheck==='function'){ const ex=extraPrintCheck(); if(ex) miss.push(ex); }
+      if(miss.length && !confirm('次の欄が空欄です：\n・'+miss.join('\n・')+'\n\nこのまま印刷しますか？')) return;
+    }
+    return _orig.apply(this,arguments);
+  };
+})();
+function extraPrintCheck(){
+  const sup=v('f_support')||'3';
+  if(sup==='3' && (!v('f_soName')||!v('f_soNo'))) return '６(3) 登録支援機関の名称・登録番号';
+  if(sup==='2' && (!v('f_s2Chief')||!v('f_s2Staff'))) return '６(2) 責任者・担当者氏名';
+  if(sup==='1' && !v('f_s1Name')) return '６(1) 雇用した在留外国人の氏名';
+  if(/〔在留期限〕/.test(v('f_reason')||'') && !v('f_expire')) return '在留期間満了日（事情の文中）';
+  return '';
+}
 
 console.log('%c OFUSA 書類作成システム %c ver.20260415.36 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();

@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 理由書（ミャンマー国籍者等）</div>
-    <div class="ver">ver.20261106.02</div>
+    <div class="ver">ver.20261106.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('myanmar_riyusho')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -57,7 +57,7 @@
     <div class="fs"><div class="fs-title">１〜３ チェック項目</div>
       <div class="fg"><label>１ 申請人</label><select id="f_q1" onchange="p()"><option value="">（未選択）</option><option value="1">ミャンマー国籍者</option><option value="2">ミャンマーに生活の本拠があるミャンマー以外の国籍者</option><option value="3">その他</option></select></div>
       <div class="fg"><label>　その他の内容</label><input id="f_q1other" oninput="p()"></div>
-      <div class="fg"><label>２ 就労希望の有無</label><select id="f_q2" onchange="p()"><option value="">（未選択）</option><option value="1">就労を希望する</option><option value="2">就労を希望しない</option></select></div>
+      <div class="fg"><label>２ 就労希望の有無</label><select id="f_q2" onchange="p()"><option value="">（未選択）</option><option value="1" selected>就労を希望する</option><option value="2">就労を希望しない</option></select></div>
       <div class="fg"><label>３ 現在の在留資格に基づく活動</label><select id="f_q3" onchange="p()"><option value="">（未選択）</option><option value="1">予定どおり満了した</option><option value="2">予定どおり満了していない（途中終了を含む）</option></select></div>
     </div>
     <div class="fs"><div class="fs-title">４ 詳細</div>
@@ -197,6 +197,25 @@ const MY_SAMPLES={
   f_henkou:'現在の在留資格に基づく活動を終えた後も、本邦で安定した生活を続けるために就労を希望しており、在留資格の変更を申請するものです。'
 };
 function insertSample(id){ const e=document.getElementById(id); if(!e) return; if(e.value.trim() && !confirm('入力済みの文を文例で置き換えますか？')) return; e.value=MY_SAMPLES[id]; p(); }
+
+// ver.20261106.03: 印刷・PDFの前に、必須欄が空欄なら知らせる
+const REQUIRED_FIELDS=[['f_date','作成日'],['f_name','氏名'],['f_nationality','国籍・地域'],['f_q1','１ 申請人'],['f_q2','２ 就労希望の有無'],['f_q3','３ 在留資格に基づく活動'],['f_kikoku','４-１ 帰国できない理由']];
+(function(){
+  const _orig=window.doPrint;
+  if(typeof _orig!=='function') return;
+  window.doPrint=function(){
+    if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
+      const miss=REQUIRED_FIELDS.filter(x=>!String(v(x[0])||'').trim()).map(x=>x[1]);
+      if(typeof extraPrintCheck==='function'){ const ex=extraPrintCheck(); if(ex) miss.push(ex); }
+      if(miss.length && !confirm('次の欄が空欄です：\n・'+miss.join('\n・')+'\n\nこのまま印刷しますか？')) return;
+    }
+    return _orig.apply(this,arguments);
+  };
+})();
+function extraPrintCheck(){
+  if(v('f_q1')==='3' && !v('f_q1other')) return '１ その他の内容';
+  return '';
+}
 
 console.log('%c OFUSA 書類作成システム %c ver.20260415.36 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
 initCaseSelect();
