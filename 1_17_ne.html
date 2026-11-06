@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ネパール語版・変更）</div>
-    <div class="ver">ver.20261105.22</div>
+    <div class="ver">ver.20261105.23</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2216,7 +2216,7 @@ async function loadFromDB(passedInfo){
   var info=passedInfo;
   if(!info){ var sel=document.getElementById('caseSelect'); if(!sel||!sel.value) return; try{info=JSON.parse(sel.value);}catch(e){return;} }
   if(!info||!info.caseId) return;
-  window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
+  window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null; window._p17OfficeNote = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
   var caseId=info.caseId, companyId=info.companyId, companyName=info.companyName;
   var _s=function(id,val){var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val;};
   /* ver.20261013.02: 住所文字列を 都道府県／市区町村／以降 に分割（1_17.html Word版 splitAddress と同一仕様） */
@@ -2432,6 +2432,13 @@ async function loadFromDB(passedInfo){
            事業所側に値が無い場合は本部(so.zip/address/tel)にフォールバックする。 */
         var _oIdx = parseInt((cas&&cas.so_office_idx)||0, 10) || 0;
         var _offs = Array.isArray(so.offices) ? so.offices : [];
+        /* ver.20261105.23: 支援を行う事業所は、案シスの案件で選んだ事業所で作る。
+           事業所が複数ある登録支援機関（アイデムなど）で未選択のときは、1つ目の事業所で作り、確認欄に出す。 */
+        window._p17OfficeNote = null;
+        var _oRaw = cas ? cas.so_office_idx : null;
+        if((_oRaw===null || _oRaw===undefined || _oRaw==='') && _offs.length >= 2){
+          window._p17OfficeNote = { guessed:false, name:String((_offs[0]||{}).officeName||'') };
+        }
         var _off  = _offs[_oIdx] || _offs[0] || {};
         var _offAddr = _off.officeAddress
           || ((_off.officePref||'')+(_off.officeCity||'')+(_off.officeAddressDetail||''))
@@ -3052,6 +3059,8 @@ function _p17TodoItems(){
   var need=[['f_applicant','氏名'],['f_gender','性別'],['f_birthY','生年月日'],['es_createY','作成日'],['es_coName','所属機関の名称'],['es_coAddress','所属機関の住所']];
   if(!window._p17SelfWhy) need.push(['es_soName','登録支援機関の名称'],['es_soRegNo','登録支援機関の登録番号']);
   need.forEach(function(x){ var e=document.getElementById(x[0]); if(e && !g(x[0])) items.push({t:x[1]+'が空欄', go:"_p17GoField('"+x[0]+"')"}); });
+  var ON=window._p17OfficeNote;
+  if(ON && !ON.guessed) items.push({t:'支援を行う事業所は「'+ON.name+'」で作成（案シスの案件情報「使用する支援事業所」が未選択のため1つ目。別の事業所なら案シスで選んで開き直してください）', go:"_p17GoField('es_soOfficeAddress')", info:1});
   try{
     var d=_p17BessiData();
     [['mgrs','支援責任者'],['staff','支援担当者'],['interp','通訳者']].forEach(function(k){ if(!d[k[0]].length) items.push({t:'別紙の'+k[1]+'名簿が未登録（手書き）', go:'_p17GoBessi()'}); });
