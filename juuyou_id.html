@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20261030.09</div>
+    <div class="ver">ver.20261106.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -181,7 +181,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793949923"></script>
+<script src="ofusa_common.js?v=1793956376"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -541,7 +541,7 @@ function _koujiSync(){
 }
 function _koujiTr(s){
   if(!s) return '';
-  return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||t):'';})
+  return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||_KOUJI_TR[t+'工事業']||_KOUJI_TR[t.replace(/一式/,'')+'工事業']||t):'';   /* ver.20261106.07: 「土木」「建築一式」のような書き方も訳す */})
          .filter(Boolean).join('、');
 }
 const _J_REV={f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_allowance4Calc:'allowance4Cond',f_allowance4Amount:'allowance4Amount',f_allowance4Name:'allowance4Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
@@ -564,9 +564,9 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cas0,cos,per0]=await Promise.all([
-      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en,residence_status&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('persons?select=kokko_jyuji_koujigyo&case_id=eq.'+caseId):Promise.resolve([])
     ]);
     const co=cos&&cos[0]; const cas=cas0&&cas0[0]; const per=per0&&per0[0];
@@ -593,6 +593,52 @@ async function loadFromDB(passedInfo){
     if(per&&per.kokko_jyuji_koujigyo){ var _e=document.getElementById('f_workCatEn');
       if(_e && !_e.value) setAutoDefault('f_workCatEn', _koujiTr(per.kokko_jyuji_koujigyo)); }
     S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
+    // ver.20261106.07: 「７．業務内容」を自動で作る（業務区分「土木・建築」、作業内容は国交省の業務区分の定型文＋この言語の訳）。
+    //   雇用条件の値そのまま（未加工）や空欄のときだけ入れ替え、手で直して保存した内容はそのまま残す。自動で入れた値は案シスに書き戻さない。
+    try{
+      const _is2=/2号|２号/.test((cas&&cas.residence_status)||'');
+      const _A=(typeof juuyouWorkAuto==='function')?juuyouWorkAuto(_es,'id',_is2):null;
+      if(_A && _A.keys.length){
+        const _nz=x=>String(x==null?'':x).normalize('NFKC').replace(/[\s　]/g,'');
+        const _raw=new Set([_es.category,_es.category2,_es.categoryEn,_es.category2En,_es.foreignerJobDesc,_es.foreignerJobDescEn,cas&&cas.job_category,cas&&cas.job_category_en].map(_nz).filter(Boolean));
+        const _put=(id,val)=>{ if(!val) return; const e=document.getElementById(id); if(!e) return; const c=_nz(e.value); if(!c || _raw.has(c) || (e.dataset&&e.dataset.autofill==='1')) setAutoDefault(id,val); };
+        _put('f_workType',_A.type); _put('f_workTypeEn',_A.typeEn); _put('f_workDetail',_A.detail); _put('f_workDetailEn',_A.detailEn);
+        // 「工事業の種類」に業務区分（建築（建設分野…）など）がそのまま入っていたら消す（工事業は人材の「従事させる工事業」から入れる）
+        const _cats=new Set([_es.category,_es.category2,_es.categoryEn,_es.category2En].map(_nz).filter(Boolean));
+        ['f_workCat','f_workCatEn'].forEach(id=>{ const e=document.getElementById(id); if(e && _cats.has(_nz(e.value))){ e.value=''; if(e.dataset) delete e.dataset.autofill; } });
+        { const e=document.getElementById('f_workCat'); if(e && !e.value && per && per.kokko_jyuji_koujigyo) e.value=String(per.kokko_jyuji_koujigyo).split(',').join('、'); }
+        // ver.20261106.09: 工事業の種類は、会社が国土交通省から受けている建設業許可の業種（companies.permit_types）を入れる。
+        //   空欄・人材の「従事させる工事業」のまま・自動で入れた値 のときだけ入れ替え、手で直して保存した内容は残す。
+        //   案シスに許可業種が無い会社は、国交省の建設業者検索で調べて入れる（案シスには書き込まない）。
+        { const _ldSeq=(window.__juuyouLoadSeq=(window.__juuyouLoadSeq||0)+1);
+          const _applyPt=(_pt)=>{
+            const e=document.getElementById('f_workCat');
+            if(!e || !_pt || !_pt.length) return false;
+            const _perKj=_nz(per&&per.kokko_jyuji_koujigyo?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
+            const c=_nz(e.value);
+            if(!c || c===_perKj || (e.dataset&&e.dataset.autofill==='1')){
+              setAutoDefault('f_workCat', _pt.join('、'));
+              const en=document.getElementById('f_workCatEn'); if(en){ en.value=''; en.dataset.autofill='1'; }   // 訳は日本語に合わせて作り直す
+              return true;
+            }
+            return false;
+          };
+          const _pt=String((co&&co.permit_types)||'').split(/[,、，]/).map(x=>x.trim()).filter(Boolean);
+          if(_pt.length){ _applyPt(_pt); }
+          else if(co && co.name && typeof mlitPermitLookup==='function'){
+            mlitPermitLookup(co).then(function(r){
+              if(_ldSeq!==window.__juuyouLoadSeq) return;            // 別の案件に切り替わっていたら何もしない
+              if(r && !r.city_mismatch && typeof mlitSaveToCompany==='function') mlitSaveToCompany(co, r);   // 案シスの会社情報（空欄のところだけ）にも入れる
+              if(r && r.permit_types && r.permit_types.length && _applyPt(r.permit_types)){
+                if(typeof _koujiSync==='function'){ try{ _koujiSync(); }catch(_ks2){} }
+                if(typeof showToast==='function') showToast('工事業の種類を、国土交通省の建設業許可（'+(r.lic||'')+'）から入れました'+(r.city_mismatch?'。国交省に登録の所在地（'+(r.mlit_addr||'')+'）が案シスと違います。同じ会社か確認してください':'')+(r.expired?'。許可の有効期限（'+r.expiry+'）が過ぎています。更新されているか確認してください':''), (r.expired||r.city_mismatch)?9000:4000);
+              }
+            }).catch(function(){});
+          }
+        }
+        if(typeof _koujiSync==='function'){ try{ _koujiSync(); }catch(_ks){} }
+      }
+    }catch(_wa){ console.warn('[juuyou workAuto]',_wa); }
     S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
     if(co){
       s('f_orgName',co.name||'');

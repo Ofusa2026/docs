@@ -2856,7 +2856,8 @@ async function loadCaseToForm(info, docKey, opts){
          従来はこれらが未マッピングで、案件を開くたびに空欄になり、
          毎回手入力が必要だった不具合の修正。 */
       category:'workType', categoryEn:'workTypeEn',
-      category2:'workCat', category2En:'workCatEn',
+      /* ver.20261106.07: category2（業務区分の2つ目）を「工事業の種類」(workCat) に入れていたのは誤り（工事業は人材の「従事させる工事業」）。
+         入れると、手で入れた工事業が雇用条件の更新時に空や業務区分で上書きされていたため外す。 */
       foreignerJobDesc:'workDetail', foreignerJobDescEn:'workDetailEn',
       payCutoffDay:'payCutoff', payCutoffDayEn:'payCutoffEn',
       otherHoliday:'otherHolidays',
@@ -4770,6 +4771,113 @@ window.addEventListener('load', function(){
   window.addEventListener('load', addBtn);
 })();
 
+/* ===== ver.20261106.07: 重要事項事前説明書（建設）「７．業務内容」の自動作成 =====
+   雇用条件の業務区分（category / category2）から、
+   ・従事させる業務区分 … 「土木・建築」（分野・号の括弧書きを外し、2つあれば「・」でつなぐ）
+   ・具体的職種及び作業内容 … 国交省の業務区分の定型文（1号）を「、」でつなぐ
+   を作り、各言語の訳も決まった文で入れる。2号は定型文が違うため作業内容は雇用条件のまま。 */
+var JUUYOU_WORK_STD={
+  '土木':{
+    ja:'指導者の指示・監督を受けながら、土木施設の新設、改築、維持、修繕に係る作業等に従事',
+    name:{vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
+    tr:{
+      vi:'Tham gia thực hiện các công việc liên quan đến xây dựng mới, cải tạo, duy trì và sửa chữa các công trình kỹ thuật dân dụng dưới sự chỉ đạo và giám sát của người hướng dẫn',
+      id:'Melaksanakan pekerjaan yang berkaitan dengan pembangunan baru, rekonstruksi, pemeliharaan, dan perbaikan fasilitas teknik sipil di bawah arahan dan pengawasan pembimbing',
+      my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် အရပ်ဘက်အင်ဂျင်နီယာ အဆောက်အအုံများ အသစ်တည်ဆောက်ခြင်း၊ ပြန်လည်ပြုပြင်ခြင်း၊ ထိန်းသိမ်းခြင်းနှင့် ပြုပြင်ခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
+      km:'ចូលរួមក្នុងការងារពាក់ព័ន្ធនឹងការសាងសង់ថ្មី ការកែលម្អ ការថែទាំ និងការជួសជុលសំណង់វិស្វកម្មស៊ីវិល ក្រោមការណែនាំ និងការត្រួតពិនិត្យរបស់អ្នកណែនាំ',
+      ne:'पर्यवेक्षकको निर्देशन र पर्यवेक्षणमा, सिभिल इन्जिनियरिङ संरचनाहरूको नयाँ निर्माण, पुनर्निर्माण, संरक्षण र मर्मतसँग सम्बन्धित काममा संलग्न हुने',
+      ko:'지도자의 지시·감독을 받으면서, 토목 시설의 신설, 개축, 유지, 수선에 관련된 작업 등에 종사'}
+  },
+  '建築':{
+    ja:'指導者の指示・監督を受けながら、建築物の新築、増築、改築若しくは移転又は修繕若しくは模様替に係る作業等に従事',
+    name:{vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
+    tr:{
+      vi:'Tham gia thực hiện các công việc liên quan đến xây dựng mới, mở rộng, cải tạo, di dời, sửa chữa hoặc thay đổi diện mạo các công trình kiến trúc dưới sự chỉ đạo và giám sát của người hướng dẫn',
+      id:'Melaksanakan pekerjaan yang berkaitan dengan pembangunan baru, perluasan, renovasi, pemindahan, perbaikan, atau perubahan tampilan bangunan di bawah arahan dan pengawasan pembimbing',
+      my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် အဆောက်အအုံများ အသစ်ဆောက်လုပ်ခြင်း၊ တိုးချဲ့ခြင်း၊ ပြန်လည်ပြုပြင်ခြင်း၊ ရွှေ့ပြောင်းခြင်း၊ ပြုပြင်ခြင်း သို့မဟုတ် ပုံစံပြောင်းလဲခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
+      km:'ចូលរួមក្នុងការងារពាក់ព័ន្ធនឹងការសាងសង់ថ្មី ការពង្រីក ការកែលម្អ ការផ្លាស់ទីតាំង ការជួសជុល ឬការកែប្រែរូបរាងអគារ ក្រោមការណែនាំ និងការត្រួតពិនិត្យរបស់អ្នកណែនាំ',
+      ne:'पर्यवेक्षकको निर्देशन र पर्यवेक्षणमा, भवनहरूको नयाँ निर्माण, विस्तार, पुनर्निर्माण, स्थानान्तरण, मर्मत वा स्वरूप परिवर्तनसँग सम्बन्धित काममा संलग्न हुने',
+      ko:'지도자의 지시·감독을 받으면서, 건축물의 신축, 증축, 개축 혹은 이전 또는 수선 혹은 모양 변경에 관련된 작업 등에 종사'}
+  },
+  'ライフライン・設備':{
+    ja:'指導者の指示・監督を受けながら、電気通信、ガス、水道、電気その他のライフライン・設備の整備・設置、変更又は修理に係る作業等に従事',
+    name:{vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
+    tr:{
+      vi:'Tham gia thực hiện các công việc liên quan đến bảo trì, lắp đặt, thay đổi hoặc sửa chữa viễn thông, khí đốt, cấp nước, điện và các cơ sở hạ tầng, thiết bị khác dưới sự chỉ đạo và giám sát của người hướng dẫn',
+      id:'Melaksanakan pekerjaan yang berkaitan dengan pemeliharaan, pemasangan, perubahan, atau perbaikan telekomunikasi, gas, air, listrik, serta infrastruktur dan fasilitas lainnya di bawah arahan dan pengawasan pembimbing',
+      my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် ဆက်သွယ်ရေး၊ ဓာတ်ငွေ့၊ ရေပေးဝေရေး၊ လျှပ်စစ်နှင့် အခြားအခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်းများကို ပြုပြင်ထိန်းသိမ်းခြင်း၊ တပ်ဆင်ခြင်း၊ ပြောင်းလဲခြင်း သို့မဟုတ် ပြင်ဆင်ခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
+      km:'ចូលរួមក្នុងការងារពាក់ព័ន្ធនឹងការថែទាំ ការដំឡើង ការផ្លាស់ប្តូរ ឬការជួសជុលទូរគមនាគមន៍ ឧស្ម័ន ទឹក អគ្គិសនី និងហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារផ្សេងទៀត ក្រោមការណែនាំ និងការត្រួតពិនិត្យរបស់អ្នកណែនាំ',
+      ne:'पर्यवेक्षकको निर्देशन र पर्यवेक्षणमा, दूरसञ्चार, ग्यास, खानेपानी, बिजुली तथा अन्य पूर्वाधार र उपकरणहरूको मर्मत, जडान, परिवर्तन वा सुधारसँग सम्बन्धित काममा संलग्न हुने',
+      ko:'지도자의 지시·감독을 받으면서, 통신, 가스, 수도, 전기 그 외의 라이프 라인·설비의 정비·설치, 변경 또는 수리에 관련된 작업 등에 종사'}
+  }
+};
+function _juuyouCatKey(x){
+  var t=String(x||'').normalize('NFKC').replace(/[（(][^）)]*[）)]/g,'').replace(/[\s　]/g,'');
+  if(!t) return '';
+  if(/ライフライン|設備/.test(t)) return 'ライフライン・設備';
+  if(/^土木/.test(t)) return '土木';
+  if(/^建築/.test(t)) return '建築';
+  return '';
+}
+// 戻り値 {type,typeEn,detail,detailEn,keys} … 判定できない項目は空文字
+function juuyouWorkAuto(es, lang, is2go){
+  es=es||{};
+  var keys=[]; [es.category, es.category2].forEach(function(c){ var k=_juuyouCatKey(c); if(k && keys.indexOf(k)<0) keys.push(k); });
+  var out={type:'',typeEn:'',detail:'',detailEn:'',keys:keys};
+  if(!keys.length) return out;
+  out.type=keys.join('・');
+  var nm=keys.map(function(k){ return (JUUYOU_WORK_STD[k].name||{})[lang]||''; });
+  if(nm.every(Boolean)) out.typeEn=nm.join(lang==='ko'||lang==='km'?'・':' / ');
+  if(!is2go){
+    out.detail=keys.map(function(k){ return JUUYOU_WORK_STD[k].ja; }).join('、');
+    var tr=keys.map(function(k){ return (JUUYOU_WORK_STD[k].tr||{})[lang]||''; });
+    if(tr.every(Boolean)) out.detailEn=tr.join(lang==='ko'?', ':'; ');
+  }
+  return out;
+}
+window.juuyouWorkAuto=juuyouWorkAuto;
+
+// ver.20261106.09: 国土交通省「建設業者検索」で会社の建設業許可（業種・許可番号・有効期間）を調べる。
+//   Supabase の mlit-kensetsu-lookup（読み取りのみ・DBには書き込まない）を呼ぶ。見つかった結果は7日、見つからない結果は1日この端末に覚えておく。
+//   戻り値: 見つかったとき {status:'found', lic, permit_types:[...], kinds:[{name,kubun}], expiry, expired, ...}、それ以外は null
+async function mlitPermitLookup(co){
+  try{
+    if(!co || !co.name) return null;
+    var ck='ofusa_mlit:'+co.name+'|'+(co.pref||'')+(co.city||'');
+    try{ var c=JSON.parse(localStorage.getItem(ck)||'null'); if(c && c.until>Date.now()) return c.r && c.r.status==='found' ? c.r : null; }catch(_c){}
+    var tok=_sbToken(); if(!_sbUserTokOk(tok)) return null;
+    var ac=(typeof AbortController!=='undefined')?new AbortController():null; var tm=ac?setTimeout(function(){ac.abort();},30000):null;
+    var res=await fetch(SB_URL+'/functions/v1/mlit-kensetsu-lookup',{method:'POST',signal:ac?ac.signal:undefined,
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+tok,'Content-Type':'application/json'},
+      body:JSON.stringify({name:co.name,pref:co.pref||'',city:co.city||'',address:co.address||''})});
+    if(tm) clearTimeout(tm);
+    if(!res.ok) return null;
+    var j=await res.json();
+    if(j && /^(found|notfound|multiple|mismatch)$/.test(j.status||'')){
+      try{ localStorage.setItem(ck, JSON.stringify({until:Date.now()+(j.status==='found'?7:1)*86400000, r:j.status==='found'?j:{status:j.status}})); }catch(_s){}
+    }
+    return j && j.status==='found' ? j : null;
+  }catch(e){ console.warn('[mlitPermitLookup]',e); return null; }
+}
+window.mlitPermitLookup=mlitPermitLookup;
+// 国交省で見つかった許可情報を、案シスの会社情報に入れる（許可業種が空の会社の、空欄の項目だけ。入っている値は変えない）
+async function mlitSaveToCompany(co, r){
+  try{
+    if(!co || !co.id || !r || r.status!=='found' || !(r.permit_types||[]).length) return false;
+    if(String(co.permit_types||'').trim()) return false;
+    var m=String(r.lic||'').match(/^(.+?)(?:知事)?許可\s*第0*(\d+)号/);
+    var kb=(r.kinds||[]).map(function(k){return k.kubun;}); var allT=kb.length&&kb.every(function(x){return x==='特定';}), allG=kb.length&&kb.every(function(x){return x==='一般';});
+    var p={ permit_types:r.permit_types.join(',') };
+    if(m && !String(co.permit_pref_code||'').trim()) p.permit_pref_code=m[1];
+    if(m && !String(co.permit_number||'').trim()) p.permit_number=m[2];
+    if((allT||allG) && !String(co.permit_general_type||'').trim()) p.permit_general_type=allT?'特':'般';
+    if(r.expiry && !co.construction_license_expiry) p.construction_license_expiry=r.expiry;
+    await sb('companies?id=eq.'+encodeURIComponent(co.id)+'&or=(permit_types.is.null,permit_types.eq.)',{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(p)});
+    co.permit_types=p.permit_types;
+    return true;
+  }catch(e){ console.warn('[mlitSaveToCompany]',e); return false; }
+}
+window.mlitSaveToCompany=mlitSaveToCompany;
 /* ===== ver.20261106.04: 印刷・PDFの前のページはみ出しチェック =====
    印刷用の見た目（@media print の指定）を画面外の枠で再現し、各ページ（.doc。中の強制改ページで区切った区間）の
    高さが用紙の印刷範囲を超えていないかを調べる。超えていれば何ページ目が何mmはみ出すかを返す。 */
