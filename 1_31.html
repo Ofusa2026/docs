@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３１号　通算在留期間を超える在留に関する申立書</div>
-    <div class="ver">ver.20260714.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -77,7 +77,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -130,7 +130,7 @@ function _apply1_31FontSize(){
   const s=_fontSize/11;
   st.textContent=`.doc [style*="font-size:18pt"]{font-size:${(18*s).toFixed(2)}pt!important}`;
 }
-function _wareki(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+function _wareki(d){ if(!d) return ''; if(typeof ofusaToISO==='function') d=ofusaToISO(d); const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){

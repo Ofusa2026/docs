@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（インドネシア語版・変更）</div>
-    <div class="ver">ver.20261105.23</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -683,7 +683,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -2178,7 +2178,7 @@ async function loadFromDB(passedInfo){
        変更は日本にいるので「テレビ電話」「対面」の両方（該当するもの全てにチェックする欄）。 */
     (function(){ var C=window._p17Check=window._p17Check||{}; var nin=/認定/.test((cas&&cas.app_type)||''); C.f051=true; C.f050=!nin; })();
     var _cs = pd.contract_start || pd.contractStart || (cas&&cas.contract_start) || '';
-    var _m  = String(_cs).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    var _m  = String((typeof ofusaToISO==='function'?ofusaToISO(_cs):_cs)).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);   // ver.20261106.04: 和暦も読む
     if(_m) _s('es_contractStart', _m[1]+'/'+('0'+_m[2]).slice(-2)+'/'+('0'+_m[3]).slice(-2));
     var _ap=document.getElementById('es_arrivalAirport');
     if(_ap && !_ap.value) _ap.value='成田国際空港';

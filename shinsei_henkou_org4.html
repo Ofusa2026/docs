@@ -28,7 +28,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用4）　特定技能</div>
-    <div class="ver">ver.20260715.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -93,7 +93,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 // (38)〜(41)  [キー, 設問, 訳, 内容欄のラベル（''なら無し）]
 const G38=[
@@ -275,10 +275,10 @@ function resetForm(){
   SP.forEach(([k])=>ids.push('f_'+k));
   ids.forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
 }
-function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+function _ymd(s){ const m=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').match(/^(\d{4})-(\d{2})-(\d{2})/); /* ver.20261106.04: 和暦・「2026/1/5」も読む */ return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
 // 登録年月日は「20190530」「2019-05-30」「2019/5/30」が混在するので全部受ける
 function _regYmd(s){
-  const t=String(s||'').trim();
+  const t=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').trim();   // ver.20261106.04: 「2021年05月21日」「令和3年…」も読む
   let m=t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
   if(m) return [m[1],String(+m[2]),String(+m[3])];
   m=t.match(/^(\d{4})(\d{2})(\d{2})$/);

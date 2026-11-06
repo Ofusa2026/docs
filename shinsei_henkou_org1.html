@@ -29,7 +29,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用1）　特定技能</div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -118,7 +118,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 function v_(id){ const e=document.getElementById(id); return e?String(e.value||'').trim():''; }
 function setPick(id, val){
@@ -291,7 +291,7 @@ function resetForm(){
    'f_jaName','f_jaCorp','f_jaEi','f_jaAddr','f_jaTel','f_jaNo','f_jaY','f_jaM','f_jaD']
    .forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
 }
-function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+function _ymd(s){ const m=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').match(/^(\d{4})-(\d{2})-(\d{2})/); /* ver.20261106.04: 和暦・「2026/1/5」も読む */ return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){

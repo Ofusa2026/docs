@@ -41,7 +41,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第６－３号（建設・２号）　２号特定技能外国人に求められる実務経験に係る申告書＋別紙 経歴証明書</div>
-    <div class="ver">ver.20261029.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -116,7 +116,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 function _term(n){
   // 見本どおり1行: 「2023年　4月　1日～ 2025年 3月 25日」
@@ -272,7 +272,7 @@ function _apply63FromForm(r, sf){
     const d2=document.getElementById('f_days2'); if(d2) d2.value='';
   }
 }
-function _ymd63(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+function _ymd63(d){ if(!d) return ''; if(typeof ofusaToISO==='function') d=ofusaToISO(d); const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){

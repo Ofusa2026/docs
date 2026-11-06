@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261106.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -154,7 +154,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 // 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
 const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
@@ -176,7 +176,7 @@ function _tRow(n){
     `<tr>${cells}</tr>`;
 }
 function _ymd32(){
-  const s=String(v('f_docDate')||'').normalize('NFKC'); const m=s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  const s=String((typeof ofusaToISO==='function'?ofusaToISO(v('f_docDate')):v('f_docDate'))||'').normalize('NFKC'); const m=s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);   // ver.20261106.04: 共通の日付読み取りを使う
   if(m) return `${m[1]}年　${+m[2]}月　${+m[3]}日`;
   // ver.20261106.02: 「令和8年10月6日」のような和暦の作成日を読めず、今日の日付になっていた
   const w=s.match(/(令和|R)\s*(元|\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?/i);
@@ -272,7 +272,7 @@ function _apply132FontSize(){
   const s=_fontSize/10.5;
   st.textContent=[`.doc{font-size:10.5pt!important}`,`.doc td.v{font-size:${(10*s).toFixed(2)}pt!important}`].join('');
 }
-function _wareki32(d){ if(!d) return ''; const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
+function _wareki32(d){ if(!d) return ''; if(typeof ofusaToISO==='function') d=ofusaToISO(d); const x=new Date(d); if(isNaN(x)) return d; return `${x.getFullYear()}年${x.getMonth()+1}月${x.getDate()}日`; }
 // ver.20261007.01: 指導対象者を「どの２号外国人の対象か」で絞り込む。
 //   フォーム回答の t2Targets[].group/person（this=今回申請・now=既存２号、person=各リストの番号）と
 //   t2NamesThis / t2NamesNow を使って紐づけし、f_t2Who セレクタで選んだ人の対象者のみ①〜⑤へ反映する。

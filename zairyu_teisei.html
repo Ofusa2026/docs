@@ -24,7 +24,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 在留カード記載事項訂正願出書（参考様式５）</div>
-    <div class="ver">ver.20261007.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -76,7 +76,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 var BUREAU_MAP={ '東':['東京','TOKYO'],'阪':['大阪','OSAKA'],'名':['名古屋','NAGOYA'],'福':['福岡','FUKUOKA'],
   '横':['横浜','YOKOHAMA'],'神':['神戸','KOBE'],'広':['広島','HIROSHIMA'],'仙':['仙台','SENDAI'],
@@ -91,7 +91,7 @@ function bureauEn(jp){
   return '';
 }
 function _bp5(){
-  var m=String(v('f_birthdate')||'').match(/(\d{4})[-\/年]\s*(\d{1,2})[-\/月]\s*(\d{1,2})/);
+  var m=String((typeof ofusaToISO==='function'?ofusaToISO(v('f_birthdate')):v('f_birthdate'))||'').match(/(\d{4})[-\/年]\s*(\d{1,2})[-\/月]\s*(\d{1,2})/);   // ver.20261106.04: 和暦の生年月日も読む
   return m?{y:m[1],m:String(parseInt(m[2])),d:String(parseInt(m[3]))}:null;
 }
 function p(){

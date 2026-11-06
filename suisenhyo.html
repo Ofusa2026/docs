@@ -140,7 +140,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 特定技能外国人表 交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</div>
-    <div class="ver">ver.20261104.03</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn sui-single-only" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -326,7 +326,7 @@ table.kf-tbl td.kf-period{font-size:6.5pt!important}
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 function _row(i){
   // 行に1つでも入力があれば f()（プレースホルダー付き）、無ければ完全空白でセル表示
@@ -567,6 +567,7 @@ function _applySuisenhyoFontSize(){
 
 function _ymd(d){
   if(!d) return '';
+  if(typeof ofusaToISO==='function') d=ofusaToISO(d);   // ver.20261106.04: 和暦・「2026年1月5日」も読む
   // 2025-04-01 → 2025/04/01
   const m=String(d).match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
   if(m) return `${m[1]}/${String(m[2]).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;

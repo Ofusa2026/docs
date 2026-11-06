@@ -53,7 +53,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２２号　支援担当者の履歴書</div>
-    <div class="ver">ver.20261020.02</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -113,7 +113,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 // ============================================================
 // 参考様式第１－２２号　支援担当者の履歴書
@@ -123,7 +123,7 @@
 const RS_ROWS = 8;    // 学歴・職歴の行数（記載が多い時は自動で増える）
 let _hist = [];
 function _rsEsc(s){ return (typeof esc==='function') ? esc(String(s==null?'':s)) : String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function hrSync(){ const t=document.getElementById('f_histJson'); if(t) t.value=JSON.stringify(_hist); }
+function hrSync(){ const t=document.getElementById('f_histJson'); if(t) t.value=JSON.stringify(_hist); try{ if(typeof _rsRenderFormInfo==='function') setTimeout(_rsRenderFormInfo,0); }catch(_e){} }
 function hrLoadFromField(){ const t=document.getElementById('f_histJson'); try{ const a=JSON.parse(t&&t.value||'[]'); _hist=Array.isArray(a)?a:[]; }catch(e){ _hist=[]; } }
 function hrAdd(text){ _hist.push({y:'',m:'',t:text||''}); hrSync(); hrRender(); p();
   setTimeout(()=>{ const l=document.querySelectorAll('#hrList .hr-y'); if(l.length && !text) l[l.length-1].focus(); },30); }
@@ -234,6 +234,7 @@ function rsLoadFromForm(force, quiet){
   if(force && !quiet) showToast('✅ 自社支援の回答を入れました');
   return true;
 }
+document.addEventListener('input',function(e){ try{ if(e.target&&/^f_/.test(e.target.id||'')&&typeof _rsRenderFormInfo==='function'){ clearTimeout(window._rsRT); window._rsRT=setTimeout(_rsRenderFormInfo,300); } }catch(_e){} });   // ver.20261106.04
 function _rsRenderFormInfo(){
   const el=document.getElementById('rsFormInfo'), bw=document.getElementById('rsFormBtnWrap'); if(!el) return;
   const ss=_rsSS;
@@ -244,6 +245,27 @@ function _rsRenderFormInfo(){
   if(b==='1') h+='<br><span style="color:#b45309;font-weight:700;">⚠️ ①を選んでいるため、通常この履歴書は使いません（フォームでも履歴書の項目は聞いていません）。</span>';
   const per=_rsFormPerson(v('f_name'));
   if(per && per.rk) h+='<br>この人の履歴書の回答：あり';
+  // ver.20261106.04: フォームの回答が書類に入ったかの一覧（✅入った／✏️書き換え／⚠️入っていない）
+  try{
+    const names=_rsFormNames();
+    if(!per && names.length && v('f_name')){
+      h+=`<br><span style="color:#b91c1c;font-weight:700;">⚠️ 画面の氏名「${_rsEsc(v('f_name'))}」は自社支援の回答（${names.slice(0,4).map(_rsEsc).join('、')}）にありません</span>`;
+    }else if(per){
+      const nz=x=>String(x==null?'':x).normalize('NFKC').replace(/[\s　]/g,'');
+      const rk=per.rk||{}; const items=[];
+      const chk=(label,form,cur)=>{ const a=String(form==null?'':form).trim(); if(!a) return;
+        if(nz(a)===nz(cur)) items.push('✅ '+label);
+        else if(String(cur||'').trim()) items.push('✏️ '+label+'（手で書き換え。フォーム：'+_rsEsc(a.length>20?a.slice(0,20)+'…':a)+'）');
+        else items.push('<span style="color:#b91c1c;">⚠️ '+label+'（フォームに回答あり・入力欄が空）</span>'); };
+      chk('氏名',per.name,v('f_name')); chk('ふりがな',per.kana,v('f_kana')); chk('性別',rk.gender,v('f_gender'));
+      const b=String(rk.birth||'').match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+      if(b) chk('生年月日',(+b[1])+'/'+(+b[2])+'/'+(+b[3]),(v('f_bYear')&&(+v('f_bYear'))+'/'+(+v('f_bMonth'))+'/'+(+v('f_bDay')))||'');
+      chk('免許・資格',rk.licenses,v('f_license'));
+      const fh=(rk.hist||[]).filter(x=>x&&(x.y||x.m||x.text)).length, ch=(_hist||[]).filter(r=>r.y||r.m||r.t).length;
+      if(fh) items.push(ch>=fh?('✅ 学歴・職歴（フォーム'+fh+'行 → 書類'+ch+'行）'):('<span style="color:#b91c1c;">⚠️ 学歴・職歴（フォーム'+fh+'行のうち書類は'+ch+'行）</span>'));
+      if(items.length) h+='<div style="margin-top:4px;padding-top:4px;border-top:1px dashed #cbd5e1;"><b>📋 フォームの反映状況</b><br>'+items.join('<br>')+'</div>';
+    }
+  }catch(_e){ console.warn('[rsReflect]',_e); }
   el.innerHTML=h; el.style.display='';
   if(bw) bw.style.display = (_rsFormNames().length) ? '' : 'none';
 }

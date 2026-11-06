@@ -187,7 +187,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -785,7 +785,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 // 業種番号: 入管省令様式「別紙 業種一覧」(2024年版) に基づく
 // 1=農林業, 2=漁業, 4=建設業, 5=食料品(製造), 11=輸送用機械器具,
@@ -991,10 +991,10 @@ function digits(id, n){
   for(let i=0;i<n;i++) h+=`<span class="digit">${s[i]||''}</span>`;
   return `<span data-bind="${id}">${h}</span>`;
 }
-function _ymd(s){ const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/); return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
+function _ymd(s){ const m=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').match(/^(\d{4})-(\d{2})-(\d{2})/); /* ver.20261106.04: 和暦・「2026/1/5」も読む */ return m?[m[1],String(+m[2]),String(+m[3])]:['','','']; }
 // 登録年月日は「20190530」「2019-05-30」「2019/5/30」が混在するので全部受ける
 function _regYmd(s){
-  const t=String(s||'').trim();
+  const t=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').trim();   // ver.20261106.04: 「2021年05月21日」「令和3年…」も読む
   // 2024年2月15日 / 2024年02月15日（和暦漢字）
   let m=t.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
   if(m) return [m[1],String(+m[2]),String(+m[3])];

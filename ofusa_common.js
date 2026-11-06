@@ -1405,6 +1405,14 @@ function doPrint(){
       if(!confirm('サイドバーで変えた内容のうち、直接編集した書類に出ていないものがあります。\n（画面上部の黄色いお知らせを確認してください）\n\nこのまま印刷しますか？')) return;
     }
   }catch(_pw){}
+  // ver.20261106.04: 印刷・PDFの前に、ページからはみ出していないか確かめる（はみ出していれば選んでもらう）
+  try{
+    if(!window._skipOverflowCheck && typeof checkPrintOverflow==='function' && !((typeof _editMode!=='undefined') && _editMode)){
+      var _ov=checkPrintOverflow();
+      if(_ov && _ov.length){ _showOverflowDialog(_ov); return; }
+    }
+  }catch(_oc){ console.warn('[overflowCheck]', _oc); }
+  window._skipOverflowCheck=false;
   try{ slog('print'); }catch(_sl){} // ver.20261026.01: 利用ログ（PDF印刷）
   var orig = document.title;
   // ver.20260820.08: 親フレーム(index.html)のtitleも書き換える。
@@ -4668,6 +4676,146 @@ window.addEventListener('load', function(){
   window.addEventListener('load', addBtn);
 })();
 
+/* ===== ver.20261106.04: 印刷・PDFの前のページはみ出しチェック =====
+   印刷用の見た目（@media print の指定）を画面外の枠で再現し、各ページ（.doc。中の強制改ページで区切った区間）の
+   高さが用紙の印刷範囲を超えていないかを調べる。超えていれば何ページ目が何mmはみ出すかを返す。 */
+function _pxFromCss(x){
+  x=String(x||'').trim(); if(!x) return 0; var n=parseFloat(x); if(isNaN(n)) return 0;
+  if(/mm$/.test(x)) return n*96/25.4; if(/cm$/.test(x)) return n*96/2.54; if(/in$/.test(x)) return n*96; if(/pt$/.test(x)) return n*96/72; return n;
+}
+function _printCssText(){
+  var out='', pages={};
+  var walk=function(rules, inPrint){
+    for(var i=0;i<rules.length;i++){
+      var r=rules[i];
+      try{
+        if(r.type===1){ out+=r.cssText+'\n'; }
+        else if(r.type===4){
+          var c=String(r.conditionText||(r.media&&r.media.mediaText)||'');
+          if(/print/i.test(c) && !/not\s+print/i.test(c)) walk(r.cssRules, true);
+          else if(/screen/i.test(c) && !/print/i.test(c)) { /* 画面だけの指定は使わない */ }
+          else walk(r.cssRules, inPrint);
+        }
+        else if(r.type===6){
+          var st=r.style, name=String(r.selectorText||'').replace(/^@page\s*/,'').trim()||'_';
+          var t=_pxFromCss(st.getPropertyValue('margin-top')), b=_pxFromCss(st.getPropertyValue('margin-bottom'));
+          var sz=st.getPropertyValue('size')||'';
+          pages[name]={t:t,b:b,land:/landscape/i.test(sz)};
+        }
+        else if(r.type===5){ out+=r.cssText+'\n'; }
+        else if(r.cssRules){ walk(r.cssRules, inPrint); }
+      }catch(e){}
+    }
+  };
+  for(var k=0;k<document.styleSheets.length;k++){
+    var ss=document.styleSheets[k], rules=null; try{ rules=ss.cssRules; }catch(e){ continue; }
+    if(rules) walk(rules, false);
+  }
+  return {css:out, pages:pages};
+}
+function checkPrintOverflow(){
+  var area=document.getElementById('pageArea'); if(!area) return [];
+  var pc=_printCssText();
+  var ifr=document.createElement('iframe');
+  var _defLand=!!(pc.pages['_'] && pc.pages['_'].land);
+  // 用紙の幅（A4 縦 210mm＝794px／横 297mm＝1123px）で並べないと、文字の折り返しが印刷と変わる
+  ifr.style.cssText='position:fixed;left:-20000px;top:0;width:'+(_defLand?1123:794)+'px;height:1200px;border:0;visibility:hidden;';
+  document.body.appendChild(ifr);
+  var res=[], pageNo=0;
+  try{
+    var d=ifr.contentDocument;
+    d.open(); d.write('<!doctype html><html><head><meta charset="utf-8"><style>'+pc.css.replace(/<\/style/gi,'<\\/style')+'</style><style>html,body{margin:0;padding:0;}</style></head><body><div id="pageArea">'+area.innerHTML+'</div></body></html>'); d.close();
+    var docs=[].slice.call(d.querySelectorAll('#pageArea .doc'));
+    var def=pc.pages['_']||{t:0,b:0,land:false};
+    docs.forEach(function(doc){
+      if(doc.querySelector('.doc')) return;            // 中に別のページを持つ外枠（1-17号など）は数えない
+      try{ doc.style.zoom=''; }catch(_z){}
+      var cs=ifr.contentWindow.getComputedStyle(doc);
+      if(cs.display==='none') return;
+      var pn=(cs.page && cs.page!=='auto') ? cs.page : '_';
+      var P=pc.pages[pn]||def;
+      var H=(P.land?793.7:1122.5)-P.t-P.b;
+      var top=doc.getBoundingClientRect().top, bottom=doc.getBoundingClientRect().bottom;
+      // 中の強制改ページで区切る
+      var cuts=[top];
+      [].slice.call(doc.querySelectorAll('*')).forEach(function(el){
+        var c2=ifr.contentWindow.getComputedStyle(el);
+        var bb=c2.breakBefore||c2.pageBreakBefore, ba=c2.breakAfter||c2.pageBreakAfter;
+        var r=el.getBoundingClientRect();
+        if(/page|always|left|right/.test(bb||'')) cuts.push(r.top);
+        if(/page|always|left|right/.test(ba||'')) cuts.push(r.bottom);
+      });
+      cuts.push(bottom);
+      cuts=cuts.filter(function(x){ return x>=top-1 && x<=bottom+1; }).sort(function(a,b){return a-b;});
+      for(var i=0;i<cuts.length-1;i++){
+        var h=cuts[i+1]-cuts[i]; if(h<2) continue;
+        pageNo++;
+        // 数行だけはみ出す場合だけ知らせる（ページの4分の1を超える長さは、もともと複数ページになる書類とみなす）
+        if(h>H+0.5 && (h-H)<=H*0.25) res.push({page:pageNo, overMm:Math.round((h-H)*25.4/96), overPx:Math.round(h-H)});
+      }
+    });
+  }catch(e){ console.warn('[printOverflow]', e); }
+  finally{ try{ document.body.removeChild(ifr); }catch(_r){} }
+  window._printSegCount=pageNo;
+  return res;
+}
+window.checkPrintOverflow=checkPrintOverflow;
+function _showOverflowDialog(ov, note){
+  var old=document.getElementById('_ovDlg'); if(old && old.parentNode) old.parentNode.removeChild(old);
+  var lines=ov.map(function(o){ return '・'+o.page+'ページ目が 約'+Math.max(1,o.overMm)+'mm（'+Math.max(1,Math.round(o.overPx/16))+'行ほど）はみ出しています'; }).join('<br>');
+  var canShrink=(typeof changeFontSize==='function') && (typeof _fontSize!=='undefined') && _fontSize>5;
+  var w=document.createElement('div'); w.id='_ovDlg';
+  w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2147483000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+  w.innerHTML='<div style="background:#fff;border-radius:12px;max-width:440px;width:92%;padding:18px 20px;box-shadow:0 10px 40px rgba(0,0,0,.3);font-size:13px;line-height:1.7;color:#1f2937;">'
+    +'<div style="font-weight:bold;font-size:15px;margin-bottom:6px;">📄 印刷するとページからはみ出します</div>'
+    +'<div style="margin-bottom:8px;">'+lines+'</div>'
+    +'<div style="color:#64748b;font-size:12px;margin-bottom:12px;">このまま印刷すると、はみ出した分が次のページに送られ、ページ数が増えます。'+(note?('<br><b style="color:#b91c1c;">'+note+'</b>'):'')+'</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+    +(canShrink?'<button type="button" id="_ovShrink" style="padding:8px 12px;font-weight:bold;border:0;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;">🔍 文字を小さくして収める</button>':'')
+    +'<button type="button" id="_ovGo" style="padding:8px 12px;border:1px solid #94a3b8;border-radius:8px;background:#fff;color:#334155;cursor:pointer;">このまま印刷</button>'
+    +'<button type="button" id="_ovBack" style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#475569;cursor:pointer;">戻って直す</button>'
+    +'</div></div>';
+  document.body.appendChild(w);
+  var close=function(){ if(w.parentNode) w.parentNode.removeChild(w); };
+  w.querySelector('#_ovBack').onclick=close;
+  w.querySelector('#_ovGo').onclick=function(){ close(); window._skipOverflowCheck=true; doPrint(); };
+  var sb=w.querySelector('#_ovShrink');
+  if(sb) sb.onclick=function(){
+    var start=_fontSize, steps=0, left=ov;
+    while(left.length && steps<6 && _fontSize>5){ changeFontSize(-0.5); steps++; left=checkPrintOverflow(); }
+    close();
+    if(!left.length){
+      if(typeof showToast==='function') showToast('🔍 文字を '+start+'pt → '+_fontSize+'pt にして1ページに収めました');
+      window._skipOverflowCheck=true; doPrint();
+    }else{
+      var tried=_fontSize;
+      try{ if(_fontSize!==start) changeFontSize(start-_fontSize); }catch(_r){}   // 収まらなければ文字の大きさは元に戻す
+      _showOverflowDialog(left, '文字を '+tried+'pt まで小さくしても収まらなかったため、文字の大きさは元（'+start+'pt）に戻しました。文章を短くするか、「このまま印刷」してください。');
+    }
+  };
+}
+/* ===== ver.20261106.04: 日付の読み方を共通化 =====
+   令和／平成／昭和（R・H・S、元年）・西暦（2026年10月6日、2026/10/6、2026.10.6）・8桁（20261006）・全角数字を
+   すべて「2026-10-06」に直す。読めないものはそのまま返す（「不明」など）。
+   すでに「YYYY-MM-DD」で始まるものは一切変えない（時刻つきもそのまま）。 */
+function ofusaToISO(x){
+  if(x===null || x===undefined) return x;
+  var raw=String(x); if(!raw.trim()) return raw;
+  if(/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw;
+  var t=raw.normalize('NFKC').replace(/\s+/g,'');
+  var y=null,m=null,d=null,r;
+  var ERA={'令和':2018,'R':2018,'r':2018,'平成':1988,'H':1988,'h':1988,'昭和':1925,'S':1925,'s':1925};
+  if((r=t.match(/^(令和|平成|昭和|R|H|S)(元|\d{1,2})[年.\/-](\d{1,2})[月.\/-](\d{1,2})日?$/i))){
+    y=ERA[r[1]]+(r[2]==='元'?1:+r[2]); m=+r[3]; d=+r[4];
+  }else if((r=t.match(/^(\d{4})[年.\/-](\d{1,2})[月.\/-](\d{1,2})日?$/))){
+    y=+r[1]; m=+r[2]; d=+r[3];
+  }else if((r=t.match(/^(\d{4})(\d{2})(\d{2})$/))){
+    y=+r[1]; m=+r[2]; d=+r[3];
+  }
+  if(y===null || m<1 || m>12 || d<1 || d>31) return raw;
+  return y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2);
+}
+window.ofusaToISO=ofusaToISO;
 /* ===== ver.20261106.03: 古い編集版のお知らせ =====
    直接編集版（案件ごと／雇用条件ごと）を呼び戻したとき、「今の様式で作り直すと値が入る欄」のうち
    編集版に欄そのものが無いもの（例：業務区分が1つのときに保存した版の「業務区分２」）を探し、

@@ -70,7 +70,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📋 参考様式第１－１１－３号　生活相談業務を行った中長期在留者リスト</div>
-    <div class="ver">ver.20261020.02</div>
+    <div class="ver">ver.20261106.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -127,7 +127,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793939529"></script>
+<script src="ofusa_common.js?v=1793947273"></script>
 <script>
 // ============================================================
 // 参考様式第１－１１－３号　生活相談業務を行った中長期在留者リスト
@@ -150,7 +150,7 @@ function _lrJP(d){
 function _lrISO(d){ const s=String(d||'').trim(); const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${m[1]}-${m[2]}-${m[3]}`:s; }
 function _lrToday(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; }
 
-function lrSync(){ const t=document.getElementById('f_rowsJson'); if(t) t.value=JSON.stringify(_lrRows); }
+function lrSync(){try{ if(typeof _lrRenderFormInfo==='function') setTimeout(_lrRenderFormInfo,0); }catch(_e){} /* ver.20261106.04: 一覧が変わったら反映状況も見直す */  const t=document.getElementById('f_rowsJson'); if(t) t.value=JSON.stringify(_lrRows); }
 function lrLoadFromField(){
   const t=document.getElementById('f_rowsJson');
   try{ const a=JSON.parse(t&&t.value||'[]'); _lrRows=Array.isArray(a)?a:[]; }catch(e){ _lrRows=[]; }
@@ -446,6 +446,14 @@ function _lrRenderFormInfo(){
   if(b && b!==need) h+=`<br><span style="color:#b45309;font-weight:700;">⚠️ この会社は${b==='1'?'①':'②'}を選んでいるため、通常この書類（${LR_MODE==='ukeire'?'1-11-2号':'1-11-3号'}）は使いません。</span>`;
   if(LR_MODE==='ukeire' && ss.accept && ss.accept.exempt) h+='<br>（フォームでは「受入れた中長期在留者リストの提出を省略」と回答）';
   if(rows.length) h+=`<br>フォームの一覧：${rows.length}名`;
+  // ver.20261106.04: フォームの一覧のうち、書類の一覧に入っていない人を出す（反映状況）
+  if(rows.length){
+    const nz=x=>String(x||'').normalize('NFKC').toUpperCase().replace(/[\s　・,，.]/g,'');
+    const inList=new Set((_lrRows||[]).filter(r=>r&&r.on!==false).map(r=>nz(r.name)));
+    const miss=rows.filter(r=>!inList.has(nz(r.name)));
+    if(!miss.length) h+=`<br><span style="color:#15803d;font-weight:700;">✅ フォームの${rows.length}名は全員、書類の一覧に入っています</span>`;
+    else h+=`<br><span style="color:#b91c1c;font-weight:700;">⚠️ フォームの${rows.length}名のうち${miss.length}名が書類の一覧に入っていません：${miss.slice(0,5).map(r=>esc(r.name)).join('、')}${miss.length>5?' ほか':''}</span><br><span style="color:#64748b;">（「📝 自社支援の回答から読み込み」で入れるか、一覧に✔を付けてください）</span>`;
+  }
   el.innerHTML=h; el.style.display='';
 }
 function lrLoadFromForm(){
