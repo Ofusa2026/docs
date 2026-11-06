@@ -561,7 +561,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ミャンマー語版・変更）</div>
-    <div class="ver">ver.20261106.04</div>
+    <div class="ver">ver.20261106.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2165,7 +2165,7 @@ async function loadFromDB(passedInfo){
        ただしベトナム以外の申請人でこのファイルを開くと書類に誤った国籍が載るため、
        取得した国籍が一致しない場合だけ警告を出す（言語別ファイルの取り違え防止）。 */
     var _nat=String(pd.nationality||pd.nationality_ja||'').trim();
-    if(_nat && !/ミャンマー|Myanmar|ビルマ|Burma/i.test(_nat)){
+    if(_nat && !/ミ[ャヤ]ンマ|Myanmar|ビルマ|Burma/i.test(_nat)){
       console.warn('[1-17my] 申請人の国籍が「'+_nat+'」ですが、この書類はミャンマー語版です。');
       if(typeof showToast==='function') showToast('⚠ 申請人の国籍は「'+_nat+'」です。ミャンマー語版ではなく該当言語の1-17をお使いください。');
     }

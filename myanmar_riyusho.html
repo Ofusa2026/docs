@@ -23,7 +23,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 理由書（ミャンマー国籍者等）</div>
-    <div class="ver">ver.20261106.03</div>
+    <div class="ver">ver.20261106.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('myanmar_riyusho')" style="background:#16a34a;color:white;">🛢 DB保存</button>
@@ -173,7 +173,7 @@ async function loadFromDB(passedInfo){
     s('f_name',personName);
     s('f_nationality',nationality);
     // 国籍がミャンマーなら１の「ミャンマー国籍者」に自動でチェック
-    if(/ミャンマー|Myanmar|MYANMAR|ビルマ/.test(nationality) && !v('f_q1')) s('f_q1','1');
+    if(/ミ[ャヤ]ンマ|Myanmar|MYANMAR|ビルマ/.test(nationality) && !v('f_q1')) s('f_q1','1');
     if(!v('f_date')){
       const dbDate=cas&&cas.doc_create_date;
       const m=dbDate&&String(dbDate).match(/^(\d{4})-(\d{2})-(\d{2})/);

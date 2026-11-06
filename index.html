@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.11</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.12</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -478,8 +478,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1793957526';
-window.__DOCS_CACHE_BUSTER__ = '1793957526';
+window.__DOCS_CACHE_BUSTER__ = '1793959723';
+window.__DOCS_CACHE_BUSTER__ = '1793959723';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -492,7 +492,7 @@ const docs={
   '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793953273'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793953273'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1793953273'},
-  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793953273'},
+  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793959723'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793953273'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793953273'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793953273'},
@@ -562,7 +562,7 @@ const docs={
   '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793953273'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793953273'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1793953273'},
-  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793953273'},
+  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793959723'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793953273'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793953273'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793953273'},
@@ -684,11 +684,12 @@ function setGlobalLang(lang){
 
 // ver.20260731: 国籍 → 書類言語コード。対応版が無い国籍は英語。空/確認中/その他は変更しない（null）
 function idxLangFromNationality(nat){
-  var n=String(nat||'').replace(/[Ａ-Ｚａ-ｚ０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).toUpperCase().replace(/\s/g,'');
+  // ver.20261106.11: 全角英数・半角カナもそろえる（NFKC）。案シスの入力ゆれ「ミヤンマー」「ミャンマ―」なども拾う
+  var n=String(nat||'').normalize('NFKC').toUpperCase().replace(/\s/g,'');
   if(!n||/確認中|その他/.test(n)) return null;
   if(/ベトナム|VIETNAM|VIET/.test(n)) return 'vi';
   if(/インドネシア|INDONESIA/.test(n)) return 'id';
-  if(/ミャンマ|MYANMAR|BURMA/.test(n)) return 'my';
+  if(/ミ[ャヤ]ンマ|ミャンー|ビルマ|MYANMAR|BURMA/.test(n)) return 'my';
   if(/ネパール|NEPAL/.test(n)) return 'ne';
   if(/カンボジア|CAMBODIA|KHMER/.test(n)) return 'km';
   if(/中国|台湾|CHINA|CHINESE|TAIWAN/.test(n)) return 'zh';
@@ -772,7 +773,7 @@ const LANG_FILES_1_17={
   'th':'1_17_th.html?v=1793953273',
   'ne':'1_17_ne.html?v=1793953273',
   'km':'1_17_km.html?v=1793953273',
-  'my':'1_17_my.html?v=1793953273',
+  'my':'1_17_my.html?v=1793959723',
   'en':'1_17_en.html?v=1793953273',
 };
 const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語']];
@@ -1795,6 +1796,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.12',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '🌐 案件を選んだときの言語：国籍が「ミヤンマー」「ミャンマ―」など書き方がゆれていても、ミャンマー語版で開くようにしました（1-5・1-6・1-16・1-17・重要事項事前説明書）',
+      '🖨 重要事項事前説明書：印刷・PDFの前に、空欄の必須欄（作成日・会社情報・金額・業務内容・昇給など）と、訳が入っていない欄を知らせるようにしました'
+    ]
+  },
   {
     version: 'ver.20261106.11',
     date: '2026-11-06',
@@ -3012,7 +3022,7 @@ async function printPriorityDocs(keepField){
   fieldList.forEach(function(x){ _pmState.sel[x.dk]=x.on; _pmState.note[x.dk]=x.note; });
   // ver.20261106.07: 特定活動の案件では「移行準備説明書（2号）」「理由書（ミャンマー）」も上の一覧に出す（チェックは手動）
   if(isTokkatsu){
-    var _isMm=/ミャンマー|Myanmar|MYANMAR|ビルマ/.test(String(info.nationality||''));
+    var _isMm=/ミ[ャヤ]ンマ|ビルマ|Myanmar|MYANMAR/.test(String(info.nationality||''));
     [['tk2go','特定技能２号へ移行する場合はこちら（その場合は1号の説明書を外す）'],
      ['myanmar',_isMm?'ミャンマー国籍のため：緊急避難措置の特定活動なら必要':'ミャンマー国籍者等の場合のみ']].forEach(function(a){
       if(!document.getElementById('nav-'+a[0])) return;

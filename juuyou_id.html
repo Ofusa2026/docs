@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（インドネシア語）</div>
-    <div class="ver">ver.20261106.10</div>
+    <div class="ver">ver.20261106.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -724,6 +724,44 @@ window.addEventListener('message', async function(e){
   // 書類固有の追加処理があれば loadFromDB で補完
   if(typeof loadFromDB==='function') loadFromDB(info);
 });
+
+// ver.20261106.11: 印刷・PDFの前に、必須欄の空欄と、訳が入っていない欄を知らせる
+const JY_REQUIRED=[['f_createY','作成日（年）'],['f_createM','作成日（月）'],['f_createD','作成日（日）'],['f_orgName','特定技能所属機関名'],['f_orgAddress','所在地'],['f_orgTel','電話番号'],['f_repName','代表者 氏名'],
+  ['f_salaryMonthly','１．基本賃金（月額）'],['f_salaryTotal','４．１か月当たりの支払概算額'],['f_netPay','６．手取り支給額'],
+  ['f_workType','７．従事させる業務区分'],['f_workCat','７．従事させる工事業の種類'],['f_workDetail','７．具体的職種及び作業内容'],
+  ['f_raiseAmount','８．昇給額'],['f_raiseCond','８．昇給条件'],['f_raiseTime','８．昇給時期']];
+const JY_TR=[['f_orgName','機関名'],['f_orgAddress','所在地'],['f_repTitle','代表者 役職'],['f_repName','代表者 氏名'],
+  ['f_allowance1Name','２．手当(a)の名前'],['f_allowance1Calc','２．手当(a)の計算方法'],['f_allowance2Name','２．手当(b)の名前'],['f_allowance2Calc','２．手当(b)の計算方法'],
+  ['f_allowance3Name','２．手当(c)の名前'],['f_allowance3Calc','２．手当(c)の計算方法'],['f_allowance4Name','２．手当(d)の名前'],['f_allowance4Calc','２．手当(d)の計算方法'],
+  ['f_fixedOTCalc','３．固定残業代の計算方法'],['f_workType','７．業務区分'],['f_workCat','７．工事業の種類'],['f_workDetail','７．作業内容'],
+  ['f_raiseAmount','８．昇給額'],['f_raiseCond','８．昇給条件'],['f_raiseTime','８．昇給時期']];
+function jyPrintCheck(){
+  const has=id=>!!document.getElementById(id);
+  const g=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+  const miss=JY_REQUIRED.filter(x=>has(x[0])&&!g(x[0])).map(x=>x[1]);
+  if((typeof _fixedOTState!=='undefined'&&_fixedOTState)==='有'){
+    [['f_fixedOTHours','３．固定残業代の時間'],['f_fixedOTAmount','３．固定残業代の金額']].forEach(x=>{ if(has(x[0])&&!g(x[0])) miss.push(x[1]); });
+  }
+  ['1','2','3','4'].forEach((i,k)=>{ if(g('f_allowance'+i+'Name') && has('f_allowance'+i+'Amount') && !g('f_allowance'+i+'Amount')) miss.push('２．手当('+'abcd'[k]+')の金額'); });
+  const tr=JY_TR.filter(x=>g(x[0]) && has(x[0]+'En') && !g(x[0]+'En')).map(x=>x[1]);
+  return {miss:miss, tr:tr};
+}
+(function(){
+  const _orig=window.doPrint;
+  if(typeof _orig!=='function') return;
+  window.doPrint=function(){
+    if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
+      const r=jyPrintCheck();
+      if(r.miss.length || r.tr.length){
+        let msg='';
+        if(r.miss.length) msg+='次の欄が空欄です：\n・'+r.miss.join('\n・')+'\n\n';
+        if(r.tr.length) msg+='次の欄は外国語の訳が入っていません：\n・'+r.tr.join('\n・')+'\n（左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます）\n\n';
+        if(!confirm(msg+'このまま印刷しますか？')) return;
+      }
+    }
+    return _orig.apply(this,arguments);
+  };
+})();
 </script>
 <div id="jKensetsuModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;max-width:540px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-family:sans-serif;box-sizing:border-box;">
