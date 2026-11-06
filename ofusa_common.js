@@ -3050,6 +3050,8 @@ const MONEY_FIELD_PATTERNS = [
   /fixedOT?Amount(En)?$/i,
   // 日本人比較報酬
   /jpCompSalary(En)?$/i,
+  // ver.20261106.06: 1-25号 委託料（１名当たりの月額）
+  /^(f_)?supportFee$/i,
   /jpCompAllow\d+Amt(En)?$/i,
   /jpSalary$/i,
   // 1_4系

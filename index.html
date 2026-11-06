@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.05</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.06</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -316,38 +316,52 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定を自動判別</span></div>
     </div>
     <div class="divider"></div>
-    <div class="section">分野別誓約書</div>
+    <!-- ver.20261106.06: 受入れ誓約書と登録支援機関の誓約書を分けず、分野ごとに並べる -->
+    <div class="section">分野別誓約書（受入れ・登録支援機関）</div>
     <div class="item" id="nav-1_1" onclick="open_doc('1_1')"><span class="item-icon">📄</span><div>介護<span class="item-sub">1-1号 受入れ誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-2_1" onclick="open_doc('2_1')"><span class="item-icon">📄</span><div>ビルクリーニング<span class="item-sub">2-1号 受入れ誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-3_1" onclick="open_doc('3_1')"><span class="item-icon">📄</span><div>工業製品製造業<span class="item-sub">3-1号 受入れ誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-6_1" onclick="open_doc('6_1')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-6_2" onclick="open_doc('6_2')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-2号 2号機関 基準誓約書</span></div></div>
     <div class="item" id="nav-6_3" onclick="open_doc('6_3')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-3号 2号 実務経験申告書＋別紙 経歴証明書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-7_1" onclick="open_doc('7_1')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">7-1号 受入れ誓約書</span></div></div>
+    <div class="item" id="nav-7_2" onclick="open_doc('7_2')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">7-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-8_1" onclick="open_doc('8_1')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">8-1号 受入れ誓約書</span></div></div>
+    <div class="item" id="nav-8_2" onclick="open_doc('8_2')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">8-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-9_1" onclick="open_doc('9_1')"><span class="item-icon">📄</span><div>航空<span class="item-sub">9-1号 受入れ誓約書</span></div></div>
+    <div class="item" id="nav-9_2" onclick="open_doc('9_2')"><span class="item-icon">📄</span><div>航空<span class="item-sub">9-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-10_1" onclick="open_doc('10_1')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">10-1号 受入れ誓約書</span></div></div>
+    <div class="item" id="nav-10_2" onclick="open_doc('10_2')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">10-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
     <div class="item" id="nav-11_1" onclick="open_doc('11_1')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-1号 受入れ誓約書（直接雇用）</span></div></div>
     <div class="item" id="nav-11_3" onclick="open_doc('11_3')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-3号 受入れ誓約書（派遣形態）</span></div></div>
-    <div class="item" id="nav-12_1" onclick="open_doc('12_1')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">12-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-13_1" onclick="open_doc('13_1')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">13-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-14_1" onclick="open_doc('14_1')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">14-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-15_1" onclick="open_doc('15_1')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-16_1" onclick="open_doc('16_1')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-17_1" onclick="open_doc('17_1')"><span class="item-icon">📄</span><div>林業<span class="item-sub">17-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-18_1" onclick="open_doc('18_1')"><span class="item-icon">📄</span><div>木材産業<span class="item-sub">18-1号 受入れ誓約書</span></div></div>
-    <div class="divider"></div>
-    <div class="section">分野別誓約書（登録支援機関）</div>
-    <div class="item" id="nav-7_2" onclick="open_doc('7_2')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">7-2号 登録支援機関 誓約書</span></div></div>
-    <div class="item" id="nav-8_2" onclick="open_doc('8_2')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">8-2号 登録支援機関 誓約書</span></div></div>
-    <div class="item" id="nav-9_2" onclick="open_doc('9_2')"><span class="item-icon">📄</span><div>航空<span class="item-sub">9-2号 登録支援機関 誓約書</span></div></div>
-    <div class="item" id="nav-10_2" onclick="open_doc('10_2')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">10-2号 登録支援機関 誓約書</span></div></div>
     <div class="item" id="nav-11_4" onclick="open_doc('11_4')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-4号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-12_1" onclick="open_doc('12_1')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">12-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-12_2" onclick="open_doc('12_2')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">12-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-13_1" onclick="open_doc('13_1')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">13-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-13_2" onclick="open_doc('13_2')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">13-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-14_1" onclick="open_doc('14_1')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">14-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-14_2" onclick="open_doc('14_2')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">14-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-15_1" onclick="open_doc('15_1')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-15_2" onclick="open_doc('15_2')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-16_1" onclick="open_doc('16_1')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-1号 受入れ誓約書</span></div></div>
     <div class="item" id="nav-16_2" onclick="open_doc('16_2')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-2号 登録支援機関 誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-17_1" onclick="open_doc('17_1')"><span class="item-icon">📄</span><div>林業<span class="item-sub">17-1号 受入れ誓約書</span></div></div>
+    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
+    <div class="item" id="nav-18_1" onclick="open_doc('18_1')"><span class="item-icon">📄</span><div>木材産業<span class="item-sub">18-1号 受入れ誓約書</span></div></div>
     <div class="divider"></div>
     <div class="section">設定</div>
     <div class="item" id="nav-signslot" onclick="openSignSlotEditor()"><span class="item-icon">🖊</span><div>署名欄設定<span class="item-sub">電子署名の位置を書類ごとに決める</span></div></div>
@@ -454,8 +468,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1793949111';
-window.__DOCS_CACHE_BUSTER__ = '1793949111';
+window.__DOCS_CACHE_BUSTER__ = '1793949923';
+window.__DOCS_CACHE_BUSTER__ = '1793949923';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -463,140 +477,140 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949111'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949111'},
-  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949111'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794000101'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949111'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949111'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949111'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949111'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949111'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949111'},
-  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949111'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949111'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949111'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949111'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949111'},
-  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949111'},
-  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949111'},
-  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949111'},
-  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949111'},
-  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949111'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949111'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949111'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949111'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949111'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949111'},
-  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949111'},
-  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949111'},
-  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949111'},
-  'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1793949111'},   // ver.20261006.05
-  'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1793949111'},   // ver.20261007.01
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949111'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949111'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949111'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949111'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949111'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949111'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949111'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949111'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949111'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949111'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949111'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949111'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949111'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949111'},
-  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949111'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949111'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949111'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949111'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949111'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949111'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949111'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949111'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949111'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949111'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949111'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949111'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949111'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949111'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949111'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949111'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949111'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949111'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949111'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949111'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949111'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949111'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949111'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949111'},
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949111'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949111'},
-  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949111'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794000101'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949111'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949111'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949111'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949111'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949111'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949111'},
-  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949111'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949111'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949111'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949111'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949111'},
-  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949111'},
-  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949111'},
-  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949111'},
-  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949111'},
-  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949111'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949111'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949111'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949111'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949111'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949111'},
-  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949111'},
-  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949111'},
-  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949111'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949111'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949111'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949111'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949111'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949111'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949111'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949111'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949111'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949111'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949111'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949111'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949111'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949111'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949111'},
-  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949111'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949111'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949111'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949111'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949111'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949111'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949111'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949111'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949111'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949111'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949111'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949111'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949111'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949111'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949111'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949111'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949111'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949111'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949111'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949111'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949111'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949111'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949111'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949111'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949923'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949923'},
+  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949923'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949923'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949923'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949923'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949923'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949923'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949923'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949923'},
+  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949923'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949923'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949923'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949923'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949923'},
+  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949923'},
+  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949923'},
+  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949923'},
+  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949923'},
+  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949923'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949923'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949923'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949923'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949923'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949923'},
+  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949923'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949923'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949923'},
+  'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1793949923'},   // ver.20261006.05
+  'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1793949923'},   // ver.20261007.01
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949923'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949923'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949923'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949923'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949923'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949923'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949923'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949923'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949923'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949923'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949923'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949923'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949923'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949923'},
+  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949923'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949923'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949923'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949923'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949923'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949923'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949923'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949923'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949923'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949923'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949923'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949923'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949923'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949923'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949923'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949923'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949923'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949923'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949923'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949923'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949923'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949923'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949923'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949923'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949923'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949923'},
+  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949923'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949923'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949923'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949923'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949923'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949923'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949923'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949923'},
+  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949923'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949923'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949923'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949923'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949923'},
+  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949923'},
+  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949923'},
+  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949923'},
+  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949923'},
+  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949923'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949923'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949923'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949923'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949923'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949923'},
+  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949923'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949923'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949923'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949923'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949923'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949923'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949923'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949923'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949923'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949923'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949923'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949923'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949923'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949923'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949923'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949923'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949923'},
+  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949923'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949923'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949923'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949923'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949923'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949923'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949923'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949923'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949923'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949923'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949923'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949923'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949923'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949923'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949923'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949923'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949923'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949923'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949923'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949923'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949923'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949923'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949923'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949923'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -671,24 +685,24 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1793949111',
-  'vi':'1_5_vi.html?v=1793949111',
-  'th':'1_5_th.html?v=1793949111',
-  'ne':'1_5_ne.html?v=1793949111',
-  'my':'1_5_my.html?v=1793949111',
-  'km':'1_5_km.html?v=1793949111',
-  'en':'1_5_en.html?v=1793949111',
-  'ko':'1_5_ko.html?v=1793949111',
-  'zh':'1_5_zh.html?v=1793949111',
-  'id':'1_5.html?v=1793949111',
-  'vi':'1_5_vi.html?v=1793949111',
-  'th':'1_5_th.html?v=1793949111',
-  'ne':'1_5_ne.html?v=1793949111',
-  'my':'1_5_my.html?v=1793949111',
-  'km':'1_5_km.html?v=1793949111',
-  'en':'1_5_en.html?v=1793949111',
-  'ko':'1_5_ko.html?v=1793949111',
-  'zh':'1_5_zh.html?v=1793949111',
+  'id':'1_5.html?v=1793949923',
+  'vi':'1_5_vi.html?v=1793949923',
+  'th':'1_5_th.html?v=1793949923',
+  'ne':'1_5_ne.html?v=1793949923',
+  'my':'1_5_my.html?v=1793949923',
+  'km':'1_5_km.html?v=1793949923',
+  'en':'1_5_en.html?v=1793949923',
+  'ko':'1_5_ko.html?v=1793949923',
+  'zh':'1_5_zh.html?v=1793949923',
+  'id':'1_5.html?v=1793949923',
+  'vi':'1_5_vi.html?v=1793949923',
+  'th':'1_5_th.html?v=1793949923',
+  'ne':'1_5_ne.html?v=1793949923',
+  'my':'1_5_my.html?v=1793949923',
+  'km':'1_5_km.html?v=1793949923',
+  'en':'1_5_en.html?v=1793949923',
+  'ko':'1_5_ko.html?v=1793949923',
+  'zh':'1_5_zh.html?v=1793949923',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -738,14 +752,14 @@ function open_1_5(lang){
 //   ・画面上部の言語選択（#p17LangBar）は frame-1_17_vi が見えているあいだだけ出す（p17WatchFrame）
 let p17ManualLang=null;
 const LANG_FILES_1_17={
-  'vi':'1_17_vi.html?v=1793949111',
-  'id':'1_17_id.html?v=1793949111',
-  'zh':'1_17_zh.html?v=1793949111',
-  'th':'1_17_th.html?v=1793949111',
-  'ne':'1_17_ne.html?v=1793949111',
-  'km':'1_17_km.html?v=1793949111',
-  'my':'1_17_my.html?v=1793949111',
-  'en':'1_17_en.html?v=1793949111',
+  'vi':'1_17_vi.html?v=1793949923',
+  'id':'1_17_id.html?v=1793949923',
+  'zh':'1_17_zh.html?v=1793949923',
+  'th':'1_17_th.html?v=1793949923',
+  'ne':'1_17_ne.html?v=1793949923',
+  'km':'1_17_km.html?v=1793949923',
+  'my':'1_17_my.html?v=1793949923',
+  'en':'1_17_en.html?v=1793949923',
 };
 const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語']];
 // 国籍から決まる言語（決まらないときは null）
@@ -810,24 +824,24 @@ function p17WatchFrame(){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1793949111',
-  'vi':'1_6_vi.html?v=1793949111',
-  'th':'1_6_th.html?v=1793949111',
-  'ne':'1_6_ne.html?v=1793949111',
-  'my':'1_6_my.html?v=1793949111',
-  'km':'1_6_km.html?v=1793949111',
-  'en':'1_6_en.html?v=1793949111',
-  'ko':'1_6_ko.html?v=1793949111',
-  'zh':'1_6_zh.html?v=1793949111',
-  'id':'1_6.html?v=1793949111',
-  'vi':'1_6_vi.html?v=1793949111',
-  'th':'1_6_th.html?v=1793949111',
-  'ne':'1_6_ne.html?v=1793949111',
-  'my':'1_6_my.html?v=1793949111',
-  'km':'1_6_km.html?v=1793949111',
-  'en':'1_6_en.html?v=1793949111',
-  'ko':'1_6_ko.html?v=1793949111',
-  'zh':'1_6_zh.html?v=1793949111',
+  'id':'1_6.html?v=1793949923',
+  'vi':'1_6_vi.html?v=1793949923',
+  'th':'1_6_th.html?v=1793949923',
+  'ne':'1_6_ne.html?v=1793949923',
+  'my':'1_6_my.html?v=1793949923',
+  'km':'1_6_km.html?v=1793949923',
+  'en':'1_6_en.html?v=1793949923',
+  'ko':'1_6_ko.html?v=1793949923',
+  'zh':'1_6_zh.html?v=1793949923',
+  'id':'1_6.html?v=1793949923',
+  'vi':'1_6_vi.html?v=1793949923',
+  'th':'1_6_th.html?v=1793949923',
+  'ne':'1_6_ne.html?v=1793949923',
+  'my':'1_6_my.html?v=1793949923',
+  'km':'1_6_km.html?v=1793949923',
+  'en':'1_6_en.html?v=1793949923',
+  'ko':'1_6_ko.html?v=1793949923',
+  'zh':'1_6_zh.html?v=1793949923',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -871,24 +885,24 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1793949111',
-  'vi':'1_16_vi.html?v=1793949111',
-  'th':'1_16_th.html?v=1793949111',
-  'ne':'1_16_ne.html?v=1793949111',
-  'my':'1_16_my.html?v=1793949111',
-  'km':'1_16_km.html?v=1793949111',
-  'en':'1_16_en.html?v=1793949111',
-  'ko':'1_16_ko.html?v=1793949111',
-  'zh':'1_16_zh.html?v=1793949111',
-  'id':'1_16_id.html?v=1793949111',
-  'vi':'1_16_vi.html?v=1793949111',
-  'th':'1_16_th.html?v=1793949111',
-  'ne':'1_16_ne.html?v=1793949111',
-  'my':'1_16_my.html?v=1793949111',
-  'km':'1_16_km.html?v=1793949111',
-  'en':'1_16_en.html?v=1793949111',
-  'ko':'1_16_ko.html?v=1793949111',
-  'zh':'1_16_zh.html?v=1793949111',
+  'id':'1_16_id.html?v=1793949923',
+  'vi':'1_16_vi.html?v=1793949923',
+  'th':'1_16_th.html?v=1793949923',
+  'ne':'1_16_ne.html?v=1793949923',
+  'my':'1_16_my.html?v=1793949923',
+  'km':'1_16_km.html?v=1793949923',
+  'en':'1_16_en.html?v=1793949923',
+  'ko':'1_16_ko.html?v=1793949923',
+  'zh':'1_16_zh.html?v=1793949923',
+  'id':'1_16_id.html?v=1793949923',
+  'vi':'1_16_vi.html?v=1793949923',
+  'th':'1_16_th.html?v=1793949923',
+  'ne':'1_16_ne.html?v=1793949923',
+  'my':'1_16_my.html?v=1793949923',
+  'km':'1_16_km.html?v=1793949923',
+  'en':'1_16_en.html?v=1793949923',
+  'ko':'1_16_ko.html?v=1793949923',
+  'zh':'1_16_zh.html?v=1793949923',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1687,6 +1701,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.06',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '☑ 1-25号：項番４「委託する支援業務」は最初から「該当」に☑が付くようにしました（左の入力欄で変更できます）。委託料は 20,000 のように自動でカンマが付きます',
+      '📂 左の一覧の「分野別誓約書」と「分野別誓約書（登録支援機関）」を1つにまとめ、分野ごとに並べました（例：10-1号 受入れ誓約書 の下に 10-2号 登録支援機関 誓約書）'
+    ]
+  },
   {
     version: 'ver.20261106.05',
     date: '2026-11-06',
