@@ -140,7 +140,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20261103.01</span>
+  <span class="ver">ver.20261106.01</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -2623,6 +2623,8 @@ function resolveMappingWriteTarget(field){
   // 計算フィールド（分割系・自動算出など）は編集不可
   var COMPUTED = /^(auto$|case\.docYear$|case\.docMonth$|case\.docDay$|case\.docCreateDate$|case\.entryDate$|p\.birthY$|p\.birthM$|p\.birthD$|p\.expireY$|p\.expireM$|p\.expireD$|p\.passExpY$|p\.passExpM$|p\.passExpD$|es\.createY$|es\.createM$|es\.createD$|es\.entryY$|es\.entryM$|es\.entryD$|es\.contractStartY$|es\.contractStartM$|es\.contractStartD$|es\.contractEndY$|es\.contractEndM$|es\.contractEndD$|es\.officePref$|es\.officeCity$|es\.housingFeeType$|co\.fullAddress$|co\.authorTitleName$|co\.repTitleName$)/;
   if(COMPUTED.test(field)) return {table:'', column:'', editable:false};
+  // ver.20261106.01: 申請人の氏名は案件管理システムを正とし、Saysayからは書き戻さない
+  if(/^(p\.|case\.)?(applicantNameEn|applicantName|applicant|nameEn|nameJp|name)$/.test(field)) return {table:'', column:'', editable:false};
 
   // プレフィックスごとに判定
   if(field.indexOf('co.') === 0) return { table:'companies', column: camelToSnake(field.substring(3)), editable:true };

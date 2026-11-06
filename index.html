@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.11</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1289,6 +1289,84 @@ async function idxSb(path, allPages=false){
   return all;
 }
 
+// ===== ver.20261106.11: 申請人名チェック =====
+//   案件管理システム（persons.applicant_name_en、なければ cases.applicant から末尾の(2)等を除いたもの）を正とし、
+//   ヒアリングフォーム（form_responses）で違う名前が来ていたら、どちらを使うか選んでもらう。
+//   選んだ結果は persons.extra.nameCheck に残し、同じフォームの名前では二度と聞かない。
+function _idxNameNorm(s){
+  return String(s||'').normalize('NFKD').replace(/[̀-ͯ]/g,'')
+    .replace(/\s*[\(（][^)）]*[\)）]\s*$/,'').normalize('NFKC')
+    .replace(/[\s　,.'’`\-]/g,'').toUpperCase();
+}
+function _idxNameStrip(s){ return String(s||'').replace(/\s*[\(（][^)）]*[\)）]\s*$/,'').trim(); }
+async function idxNameCheck(info){
+  try{
+    if(!info||!info.caseId) return;
+    var cid=encodeURIComponent(info.caseId);
+    var ps=await idxSb('persons?select=case_id,applicant_name_en,extra&case_id=eq.'+cid);
+    var fr=await idxSb('form_responses?select=id,form_type,response,submitted_at&case_id=eq.'+cid+'&deleted_at=is.null&order=submitted_at.desc.nullslast&limit=20');
+    var p=(ps&&ps[0])||null;
+    var formName='';
+    (fr||[]).some(function(r){ var x=r&&r.response||{}; var n=String(x.applicantNameEn||x.kzNameEn||'').trim(); if(n){ formName=n; return true; } return false; });
+    if(!formName) return;
+    var ankenName=(p&&String(p.applicant_name_en||'').trim()) || _idxNameStrip(info.applicant);
+    if(!ankenName) return;
+    if(_idxNameNorm(ankenName)===_idxNameNorm(formName)) return;
+    var extra=(p&&p.extra&&typeof p.extra==='object')?p.extra:{};
+    var done=extra.nameCheck||{};
+    if(done.formName && _idxNameNorm(done.formName)===_idxNameNorm(formName)) return;   // 同じ名前で一度選んでいる
+    if(window._idxNameCheckSkip && window._idxNameCheckSkip[info.caseId+'|'+_idxNameNorm(formName)]) return;   // 「あとで」はこの画面を開いている間だけ
+    if(!idxSelectedCase || idxSelectedCase.caseId!==info.caseId) return;   // 待っている間に別の案件へ移った
+    _idxNameCheckShow(info, p, ankenName, formName, extra);
+  }catch(e){ console.warn('nameCheck err:',e); }
+}
+function _idxNameCheckShow(info, p, ankenName, formName, extra){
+  var old=document.getElementById('idxNameCheckModal'); if(old) old.remove();
+  var esc=function(s){ return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var m=document.createElement('div'); m.id='idxNameCheckModal';
+  m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;';
+  m.innerHTML='<div style="background:#fff;color:#0f172a;border-radius:12px;max-width:460px;width:100%;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:14px;line-height:1.6;">'
+    +'<div style="font-size:16px;font-weight:700;margin-bottom:6px;">⚠️ 申請人の名前がちがいます</div>'
+    +'<div style="color:#475569;margin-bottom:12px;">ヒアリングフォームで、案件管理システムと違う名前が届いています。今後どちらを使いますか？</div>'
+    +'<div style="border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;margin-bottom:8px;"><div style="font-size:12px;color:#64748b;">案件管理システム（いまの名前）</div><div style="font-weight:700;font-size:15px;">'+esc(ankenName)+'</div></div>'
+    +'<div style="border:1px solid #fcd34d;background:#fffbeb;border-radius:8px;padding:10px 12px;margin-bottom:14px;"><div style="font-size:12px;color:#92400e;">ヒアリングフォーム</div><div style="font-weight:700;font-size:15px;">'+esc(formName)+'</div></div>'
+    +'<div style="display:flex;flex-direction:column;gap:8px;">'
+    +'<button id="idxNcAnken" style="padding:10px;border-radius:8px;border:none;background:#0f2040;color:#fff;font-weight:700;cursor:pointer;">案件管理システムの名前を使う（おすすめ）</button>'
+    +'<button id="idxNcForm" style="padding:10px;border-radius:8px;border:1px solid #f59e0b;background:#fff;color:#92400e;font-weight:700;cursor:pointer;">フォームの名前に直す（案件管理システムも書き換わります）</button>'
+    +'<button id="idxNcLater" style="padding:8px;border-radius:8px;border:none;background:transparent;color:#64748b;cursor:pointer;">あとで決める</button>'
+    +'</div><div id="idxNcMsg" style="font-size:12px;color:#b91c1c;margin-top:8px;"></div></div>';
+  document.body.appendChild(m);
+  var close=function(){ m.remove(); };
+  document.getElementById('idxNcLater').onclick=function(){
+    window._idxNameCheckSkip=window._idxNameCheckSkip||{}; window._idxNameCheckSkip[info.caseId+'|'+_idxNameNorm(formName)]=1; close();
+  };
+  var save=async function(useForm){
+    var msg=document.getElementById('idxNcMsg'); msg.textContent='保存中…';
+    try{
+      var who=''; try{ var s=await _sbDocs.auth.getSession(); who=(s&&s.data&&s.data.session&&s.data.session.user&&s.data.session.user.email)||''; }catch(_e){}
+      var ex=Object.assign({}, extra, { nameCheck:{ formName:formName, ankenName:ankenName, choice:useForm?'form':'anken', at:new Date().toISOString(), by:who } });
+      var body={ case_id:info.caseId, extra:ex, updated_at:new Date().toISOString() };
+      if(useForm) body.applicant_name_en=formName;
+      else if(!(p&&p.applicant_name_en)) body.applicant_name_en=ankenName;   // 空なら今の名前で埋めておく（書類に出るように）
+      await _idxFreshToken();
+      var r=await fetch(IDX_URL+'persons?on_conflict=case_id',{ method:'POST',
+        headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify(body) });
+      if(!r.ok){ msg.textContent='保存できませんでした（'+r.status+'）。もう一度お試しください。'; return; }
+      close();
+      if(useForm){
+        try{ if(typeof showToast==='function') showToast('✅ フォームの名前に直しました'); }catch(_e){}
+        try{ idxSendToVisible(idxSelectedCase||info); }catch(_e){}   // 開いている書類を新しい名前で読み直す
+      }else{
+        try{ if(typeof showToast==='function') showToast('✅ 案件管理システムの名前を使います'); }catch(_e){}
+      }
+    }catch(e){ msg.textContent='保存できませんでした：'+e.message; }
+  };
+  document.getElementById('idxNcAnken').onclick=function(){ save(false); };
+  document.getElementById('idxNcForm').onclick=function(){ save(true); };
+}
+// ===== /申請人名チェック =====
+
 // idxAllCases / idxSelectedCase は冒頭で var 宣言済み
 
 async function idxInit(){
@@ -1395,6 +1473,8 @@ async function idxJumpByPaste(){
       nationality:row.nationality||''
     };
     idxSelectedCase=info;
+    // ver.20261106.11: ヒアリングフォームの名前が案件管理システムと違えば、どちらを使うか聞く（待たずに進める）
+    try{ idxNameCheck(info); }catch(_e){ console.warn('nameCheck err:',_e); }
     // ver.20261105.01: 1-17号を開いていれば、国籍に合った言語版へ入れ替える（手で選んだ言語はここで解除）
     try{ p17OnCaseChanged(); }catch(_e){ console.warn('p17 lang err:',_e); }
     // ver.20260820.16: 優先書類マップに従ってナビを並び替え
@@ -1715,6 +1795,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.11',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '👤 案件を選んだとき、ヒアリングフォームの申請人名が案件管理システムと違っていたら、今後どちらの名前を使うか選べるお知らせが出るようにしました（おすすめは案件管理システムの名前。一度選べば同じ名前では聞きません）'
+    ]
+  },
   {
     version: 'ver.20261106.10',
     date: '2026-11-06',
