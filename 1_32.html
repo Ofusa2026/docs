@@ -50,7 +50,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３２号　２号特定技能外国人の業務内容に関する誓約書</div>
-    <div class="ver">ver.20261105.01</div>
+    <div class="ver">ver.20261106.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -152,7 +152,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793855120"></script>
+<script src="ofusa_common.js?v=1793937639"></script>
 <script>
 // 指導対象者の行：氏名の行＋在留カード番号の12マス（原本どおり①〜⑤を常に表示）
 const _CARD_RE=/^(.*?)[\s　]+([A-Za-z]{2}\d{8}[A-Za-z]{2})$/;
@@ -174,8 +174,11 @@ function _tRow(n){
     `<tr>${cells}</tr>`;
 }
 function _ymd32(){
-  const s=v('f_docDate'); const m=String(s||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  const s=String(v('f_docDate')||'').normalize('NFKC'); const m=s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
   if(m) return `${m[1]}年　${+m[2]}月　${+m[3]}日`;
+  // ver.20261106.02: 「令和8年10月6日」のような和暦の作成日を読めず、今日の日付になっていた
+  const w=s.match(/(令和|R)\s*(元|\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?/i);
+  if(w) return `${2018+(w[2]==='元'?1:+w[2])}年　${+w[3]}月　${+w[4]}日`;
   // ver.20261024.01: 空欄でも「２０　年　月　日」の空テンプレは出さず、作成した日（今日）を表示する
   const n=new Date(); return `${n.getFullYear()}年　${n.getMonth()+1}月　${n.getDate()}日`;
 }
@@ -209,10 +212,10 @@ function p(){
   <tr style="height:45mm;"><td class="lb" style="vertical-align:middle;padding-left:13pt;text-indent:-10pt;">④　技能実習生又は１号特定技能外国人が従事する場合、それら外国人と当該２号特定技能外国人の職務内容の違い（各特定産業分野における分野別方針で定めている２号特定技能外国人の従事する業務内容に相違のないよう記載すること）</td><td class="v">${f('f_jobDiff')}</td></tr>
 </table>
 <div class="g"></div>
-<div class="h12">２　当該２号特定技能外国人に指導を受ける対象者一覧</div>
 </div>
 <div class="doc">
 <div class="page-num-label">P2</div>
+<div class="h12">２　当該２号特定技能外国人に指導を受ける対象者一覧</div>
 <table class="t2" style="width:177mm;">
   <colgroup>${C2.map(x=>`<col style="width:${x}mm">`).join('')}</colgroup>
   <tr style="height:9mm;"><th></th><th colspan="12" style="font-size:10.5pt;">対象者の氏名<br><span style="font-size:6pt;">※外国人の場合は在留カード番号も記載</span></th><th style="font-size:6.5pt;">事業所及び<br>所属部署名</th><th style="font-size:8pt;">役職又は地位</th><th style="font-size:10.5pt;">指導を受ける職務内容</th></tr>
@@ -280,13 +283,19 @@ function _t2BuildOptions(fr){
   nNow.forEach((nm,i)=>{const k='now-'+(i+1); names[k]=String(nm||'').trim(); order.push(k);});
   const targets=Array.isArray(fr.t2Targets)?fr.t2Targets:[];
   const grouped=targets.some(t=>t && t.group && t.person);
+  // ver.20261106.02: フォームで２号外国人の名前（t2NamesThis/t2NamesNow）が空のまま対象者だけ回答されていると、
+  //   選択肢が作れず対象者が1人も反映されなかった。対象者に付いている「今回申請／既存２号の何人目か」から選択肢を作る。
+  if(grouped){
+    targets.forEach(t=>{ if(!t||!t.group||!t.person) return; const k=String(t.group)+'-'+String(t.person);
+      if(!(k in names)){ names[k]=''; order.push(k); } });
+  }
   window._t2Form={targets, names, order, grouped};
   const sel=document.getElementById('f_t2Who'), wrap=document.getElementById('t2WhoWrap');
   if(!sel) return;
   sel.innerHTML='';
   const add=(vv,txt)=>{const o=document.createElement('option');o.value=vv;o.textContent=txt;sel.appendChild(o);};
   add('','── 選択してください ──');
-  order.forEach(k=>{ if(names[k]) add(k,(k.indexOf('this')===0?'今回申請：':'既存２号：')+names[k]); });
+  order.forEach(k=>{ add(k,(k.indexOf('this')===0?'今回申請：':'既存２号：')+(names[k]||(k.split('-')[1]+'人目（フォームに名前の回答なし）'))); });
   add('all','（全員まとめて表示）');
   if(wrap) wrap.style.display=(grouped && order.length)?'':'none';
 }
