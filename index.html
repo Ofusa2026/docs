@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.13</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.14</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -478,8 +478,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1793959888';
-window.__DOCS_CACHE_BUSTER__ = '1793959888';
+window.__DOCS_CACHE_BUSTER__ = '1793962988';
+window.__DOCS_CACHE_BUSTER__ = '1793962988';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -680,6 +680,44 @@ function setGlobalLang(lang){
   if(fr1_3 && fr1_3.style.display!=='none'){
     try{fr1_3.contentWindow.postMessage({type:'SET_LANG',lang:resolveLangForDoc('1_3',lang)},'*');}catch(e){}
   }
+}
+
+// ver.20261106.14: 案件を選んだときに、Saysay が判定できなかったことを画面下に知らせる
+//   ・国籍から言語を判定できず英語版になる（書き方のゆれ・未知の国名）／国籍が空・確認中で言語を切り替えない
+//   ・特定技能の案件で、分野が空・選ばれている雇用条件セットの業務区分が空
+var _IDX_EN_OK=/フィリピン|スリランカ|インド|バングラ|パキスタン|モンゴル|ウズベキスタン|キルギス|カザフ|タジキスタン|ラオス|マレーシア|シンガポール|東ティモール|ブータン|モルディブ|ブラジル|ペルー|ボリビア|アメリカ|米国|カナダ|イギリス|英国|オーストラリア|ニュージーランド|フランス|ドイツ|イタリア|スペイン|ロシア|ウクライナ|トルコ|イラン|エジプト|ナイジェリア|ケニア|ガーナ|ウガンダ|PHILIPPINES|SRILANKA|INDIA|BANGLADESH|PAKISTAN|MONGOLIA|UZBEKISTAN|LAOS|MALAYSIA|USA|UNITEDSTATES|UK|BRAZIL|PERU/;
+function idxNotice(lines){
+  if(!lines||!lines.length) return;
+  var old=document.getElementById('idxCaseNotice'); if(old) old.remove();
+  var el=document.createElement('div'); el.id='idxCaseNotice';
+  el.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);max-width:640px;background:#7c2d12;color:#fff;padding:10px 34px 10px 16px;border-radius:10px;font-size:12.5px;font-weight:600;line-height:1.6;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);white-space:pre-line;font-family:sans-serif;';
+  el.textContent=lines.map(function(x){return '⚠ '+x;}).join('\n');
+  var x=document.createElement('span'); x.textContent='×'; x.style.cssText='position:absolute;top:6px;right:12px;cursor:pointer;font-size:16px;opacity:.8;';
+  x.onclick=function(){ el.remove(); }; el.appendChild(x);
+  document.body.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) el.remove(); }, 12000);
+}
+async function idxCaseNotices(row, lang){
+  var L=[], nat=String(row.nationality||'').trim();
+  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語'};
+  var natN=nat.normalize('NFKC').toUpperCase().replace(/\s/g,'');
+  if(!nat || /確認中|その他/.test(nat)) L.push('国籍が「'+(nat||'空欄')+'」のため、言語は今のまま（'+(LN[currentLang]||currentLang)+'）です。案シスの国籍を確認してください');
+  else if(lang==='en' && !_IDX_EN_OK.test(natN)) L.push('国籍「'+nat+'」から言語を判定できないため、英語版で開きます。案シスの国籍の書き方を確認してください');
+  var rs=String(row.residence_status||'');
+  if(/特定技能/.test(rs)){
+    var idx=String(row.emp_set_idx==null?'':row.emp_set_idx).trim(), es=null;
+    if(row.company_id && idx!=='' && !isNaN(parseInt(idx,10))){
+      try{
+        var cos=await idxSb('companies?select=emp_sets&id=eq.'+encodeURIComponent(row.company_id));
+        es=cos&&cos[0]&&Array.isArray(cos[0].emp_sets)?cos[0].emp_sets[parseInt(idx,10)]:null;
+        if(es && !String(es.category||'').trim()) L.push('雇用条件セット「'+(es.setName||es.name||('#'+(parseInt(idx,10)+1)))+'」の業務区分が空です（1-6号・重要事項事前説明書の業務区分が空になります）');
+      }catch(_e){}
+    }
+    // 分野は、案件にも雇用条件セットにも無いときだけ知らせる（雇用条件セットから補えるため）
+    if(!String(row.applicant_field||'').trim() && es && !String(es.applicantField||'').trim()) L.push('分野が案件にも雇用条件セットにも入っていません（書類の分野・分野別の様式が決まりません）');
+  }
+  if(idxSelectedCase && idxSelectedCase.caseId!==row.id) return;   // 別の案件に切り替わっていたら出さない
+  idxNotice(L);
 }
 
 // ver.20260731: 国籍 → 書類言語コード。対応版が無い国籍は英語。空/確認中/その他は変更しない（null）
@@ -1488,6 +1526,8 @@ async function idxJumpByPaste(){
     } else {
       idxSendToVisible(info);
     }
+    // ver.20261106.14: 判定できなかったこと（国籍から言語・業務区分など）があれば、画面下に知らせる（待たずに進める）
+    try{ idxCaseNotices(row,_lang); }catch(_e){ console.warn('caseNotices err:',_e); }
     if(st){ st.textContent='✅ ジャンプしました'; st.style.color='#86efac'; }
     if(info_el){
       info_el.style.display='block';
@@ -1796,6 +1836,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.14',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '⚠ 案件を選んだとき、Saysayが判定できなかったことを画面下に知らせるようにしました（国籍から言語が決まらず英語版になる・国籍が空/確認中・雇用条件セットの業務区分が空・分野が空）',
+      '🖨 重要事項事前説明書：印刷前に、金額（基本給・手当・固定残業代・控除・手取りなど）が案シスの雇用条件（1-6号の元）と合っているかも確かめるようにしました'
+    ]
+  },
   {
     version: 'ver.20261106.13',
     date: '2026-11-06',

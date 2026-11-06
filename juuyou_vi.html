@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（ベトナム語）</div>
-    <div class="ver">ver.20261106.13</div>
+    <div class="ver">ver.20261106.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -573,6 +573,7 @@ async function loadFromDB(passedInfo){
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     let _es={};
     if(co && Array.isArray(co.emp_sets)){ const _i=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1; _es=(_i>=0?co.emp_sets[_i]:null)||{}; }   // ver.20261023.04: 未選択なら1番目を使わず、選んでもらう
+    window.__jyEs=_es;   // ver.20261106.14: 印刷前に金額を雇用条件と比べるため
     const S=(id,val)=>{const e=document.getElementById(id); if(e && val!=null && val!=='' && !e.value) e.value=val;};
     S('f_deductSocialIns', _es.deductSocial);
     S('f_deductEmpIns', _es.deductEmployment);
@@ -745,7 +746,25 @@ function jyPrintCheck(){
   ['1','2','3','4'].forEach((i,k)=>{ if(g('f_allowance'+i+'Name') && has('f_allowance'+i+'Amount') && !g('f_allowance'+i+'Amount')) miss.push('２．手当('+'abcd'[k]+')の金額'); });
   if(typeof koujiOutOfCategory==='function' && g('f_workCat')){ const bad=koujiOutOfCategory(g('f_workCat').split(/[、,，]/).map(x=>x.trim()).filter(Boolean), window.__jyCats); if(bad.length) miss.push('７．工事業の種類に、業務区分（'+(window.__jyCats||[]).map(c=>String(c).replace(/[（(].*$/,'')).join('・')+'）に合わないものがあります：'+bad.join('、')); }
   const tr=JY_TR.filter(x=>g(x[0]) && has(x[0]+'En') && !g(x[0]+'En')).map(x=>x[1]);
-  return {miss:miss, tr:tr};
+  // ver.20261106.14: 金額が雇用条件（案シスの雇用条件＝1-6号の元）と合っているか
+  const diff=[];
+  const es=window.__jyEs||{};
+  const num=x=>{const t=String(x==null?'':x).normalize('NFKC').replace(/[,，\s円]/g,''); return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null;};
+  const fmt=n=>n==null?'空欄':n.toLocaleString('ja-JP')+'円';
+  const CMPF=[['f_salaryMonthly',['salaryMonthly'],'１．基本賃金（月額）'],['f_allowance1Amount',['allowance1Amount','allowance1Amt'],'２．手当(a)'],['f_allowance2Amount',['allowance2Amount','allowance2Amt'],'２．手当(b)'],
+    ['f_allowance3Amount',['allowance3Amount','allowance3Amt'],'２．手当(c)'],['f_allowance4Amount',['allowance4Amount','allowance4Amt'],'２．手当(d)'],['f_fixedOTAmount',['fixedOTAmount','fixedOTAmt'],'３．固定残業代'],
+    ['f_salaryTotal',['totalMonthly'],'４．１か月当たりの支払概算額'],['f_deductTax',['deductTax'],'５．(a)税金'],['f_deductSocialIns',['deductSocial'],'５．(b)社会保険料'],['f_deductEmpIns',['deductEmployment'],'５．(c)雇用保険料'],
+    ['f_deductFood',['deductFood'],'５．(d)食費'],['f_deductHousing',['deductHousing'],'５．(e)居住費'],['f_deductUtility',['deductUtility'],'５．(f)水道光熱費'],['f_deductOther1Amount',['deductOther1Amount'],'５．(g)その他'],
+    ['f_deductTotal',['deductTotal'],'５．控除する金額（合計）'],['f_netPay',['netPay'],'６．手取り支給額']];
+  CMPF.forEach(x=>{
+    if(!has(x[0])) return;
+    if(x[0]==='f_fixedOTAmount' && (typeof _fixedOTState!=='undefined'&&_fixedOTState)!=='有') return;
+    let ev=null; for(const k of x[1]){ const n=num(es[k]); if(n!=null){ ev=n; break; } }
+    if(ev==null) return;                         // 雇用条件に数字が無い項目は比べない
+    const jv=num(g(x[0]));
+    if(jv!==ev && !(jv==null && ev===0)) diff.push(x[2]+'：この書類 '+fmt(jv)+' ／ 雇用条件 '+fmt(ev));
+  });
+  return {miss:miss, tr:tr, diff:diff};
 }
 (function(){
   const _orig=window.doPrint;
@@ -753,8 +772,9 @@ function jyPrintCheck(){
   window.doPrint=function(){
     if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
       const r=jyPrintCheck();
-      if(r.miss.length || r.tr.length){
+      if(r.miss.length || r.tr.length || r.diff.length){
         let msg='';
+        if(r.diff.length) msg+='金額が雇用条件（案シスの雇用条件・1-6号）と違います：\n・'+r.diff.join('\n・')+'\n\n';
         if(r.miss.length) msg+='次の欄を確認してください（空欄など）：\n・'+r.miss.join('\n・')+'\n\n';
         if(r.tr.length) msg+='次の欄は外国語の訳が入っていません：\n・'+r.tr.join('\n・')+'\n（左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます）\n\n';
         if(!confirm(msg+'このまま印刷しますか？')) return;
