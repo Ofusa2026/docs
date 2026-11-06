@@ -4860,6 +4860,14 @@ async function mlitPermitLookup(co){
   }catch(e){ console.warn('[mlitPermitLookup]',e); return null; }
 }
 window.mlitPermitLookup=mlitPermitLookup;
+// ver.20261106.10: 土木一式・建築一式（土木工事業・建築工事業）は特定技能の外国人を従事させる工事業にならないため、
+//   重要事項事前説明書の「工事業の種類」には出さず、国交省から案シスに入れるときも入れない。
+var KOUJI_EXCLUDE=['土木工事業','建築工事業','土木一式工事業','建築一式工事業','土木一式工事','建築一式工事','土木','建築'];
+function koujiFilter(list){
+  var ex={}; KOUJI_EXCLUDE.forEach(function(x){ ex[x]=1; });
+  return (list||[]).map(function(x){ return String(x||'').trim(); }).filter(function(x){ return x && !ex[x.normalize('NFKC').replace(/[\s　]/g,'')]; });
+}
+window.koujiFilter=koujiFilter;
 // 国交省で見つかった許可情報を、案シスの会社情報に入れる（許可業種が空の会社の、空欄の項目だけ。入っている値は変えない）
 async function mlitSaveToCompany(co, r){
   try{
@@ -4867,7 +4875,8 @@ async function mlitSaveToCompany(co, r){
     if(String(co.permit_types||'').trim()) return false;
     var m=String(r.lic||'').match(/^(.+?)(?:知事)?許可\s*第0*(\d+)号/);
     var kb=(r.kinds||[]).map(function(k){return k.kubun;}); var allT=kb.length&&kb.every(function(x){return x==='特定';}), allG=kb.length&&kb.every(function(x){return x==='一般';});
-    var p={ permit_types:r.permit_types.join(',') };
+    var _pt=koujiFilter(r.permit_types); if(!_pt.length) return false;
+    var p={ permit_types:_pt.join(',') };
     if(m && !String(co.permit_pref_code||'').trim()) p.permit_pref_code=m[1];
     if(m && !String(co.permit_number||'').trim()) p.permit_number=m[2];
     if((allT||allG) && !String(co.permit_general_type||'').trim()) p.permit_general_type=allT?'特':'般';

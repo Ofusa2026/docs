@@ -33,7 +33,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 .under{display:inline;padding:0 2px;background-image:linear-gradient(transparent 95%,#000 95%,#000 100%);background-repeat:repeat-x;}
 .under:empty::before{content:"\3000\3000\3000\3000";color:transparent;}
 @media print{
-  .app-bar,.fp{display:none!important}
+  .app-bar,.fp,#jKensetsuModal{display:none!important}
   .main{display:block!important}
   .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
   .f[style*="color:#aaa"]{visibility:hidden}
@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（カンボジア語）</div>
-    <div class="ver">ver.20261106.09</div>
+    <div class="ver">ver.20261106.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -181,7 +181,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793956376"></script>
+<script src="ofusa_common.js?v=1793957526"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -376,10 +376,6 @@ function p(){
     <div class="row vi">នៅពេលចូលធ្វើការ ពេលផ្លាស់ប្តូរខ្លឹមសារការងារ ពេលដែលត្រូវបំពេញការងារដែលមានគ្រោះថ្នាក់ឬការងារដែលមានគ្រោះថ្នាក់ដូចដែលបានកំណត់ក្នុងច្បាប់ស្តីពីសុវត្ថិភាពនិងសុខភាពការងារ ពេលដែលត្រូវបំពេញមុខដំណែងជាអ្នកចាត់ចែង ពេលដែលច្បាប់ទាមទារឲ្យអនុវត្តការអប់រំអំពីសុវត្ថិភាពនិងសុខភាព នឹងអនុវត្តការអប់រំអំពីសុវត្ថិភាពនិងសុខភាព។ ក្នុងរយៈពេល 1 ឆ្នាំបន្ទាប់ពីការទទួលយក នឹងផ្តល់ការអប់រំជំនាញដែលស្មើនឹងកម្រិត 2 នៃប្រព័ន្ធអភិវឌ្ឍអាជីពសំណង់។ លើសពីនេះ ដើម្បីសំដៅទទួលបានជំនាញកម្រិត 1 ក្នុងរយៈពេល 3 ឆ្នាំបន្ទាប់ពីការទទួលយក នឹងរៀបចំកិច្ចប្រជុំសិក្សាក្នុងក្រុមហ៊ុនជាដើម។</div>
   </div>
 </div>
-</div>
-
-<div class="doc">
-<div class="page-num-label">P4</div>
 
 <div class="sec">
   <div class="sec-h">10．個人情報の提供に係る同意について</div>
@@ -388,6 +384,11 @@ function p(){
   <div class="row ja">　　<input type="checkbox" class="chk-box" checked>同意している。　　　<input type="checkbox" class="chk-box">同意していない。</div>
   <div class="row vi">　　☑ យល់ព្រម　　　☐ មិនយល់ព្រម</div>
 </div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+<!-- ver.20261106.10: 10．個人情報の提供に係る同意はP3へ。P4は説明・署名欄だけ -->
 
 <div class="sec" style="margin-top:6mm;">
   <div class="row ja">(西暦) <span class="under">${f('f_createY')}</span>年 <span class="under">${f('f_createM')}</span>月 <span class="under">${f('f_createD')}</span>日、前記１から10の内容について以下の者が十分に理解することができる言語（カンボジア語）にて説明し、内容を理解していることを確認した。</div>
@@ -612,6 +613,7 @@ async function loadFromDB(passedInfo){
         { const _ldSeq=(window.__juuyouLoadSeq=(window.__juuyouLoadSeq||0)+1);
           const _applyPt=(_pt)=>{
             const e=document.getElementById('f_workCat');
+            if(typeof koujiFilter==='function') _pt=koujiFilter(_pt);   // 土木工事業・建築工事業は入れない
             if(!e || !_pt || !_pt.length) return false;
             const _perKj=_nz(per&&per.kokko_jyuji_koujigyo?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
             const c=_nz(e.value);
@@ -635,6 +637,11 @@ async function loadFromDB(passedInfo){
             }).catch(function(){});
           }
         }
+        { const e=document.getElementById('f_workCat');   // ver.20261106.10: 土木工事業・建築工事業は重要事項事前説明書に出さない
+          if(e && e.value && typeof koujiFilter==='function'){
+            const _tk=String(e.value).split(/[、,，]/).map(x=>x.trim()).filter(Boolean), _kp=koujiFilter(_tk);
+            if(_kp.length!==_tk.length){ e.value=_kp.join('、'); e.dataset.autofill='1'; const en=document.getElementById('f_workCatEn'); if(en){ en.value=''; en.dataset.autofill='1'; } }
+          } }
         if(typeof _koujiSync==='function'){ try{ _koujiSync(); }catch(_ks){} }
       }
     }catch(_wa){ console.warn('[juuyou workAuto]',_wa); }
