@@ -253,6 +253,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>移行準備説明書<span class="item-sub">特定活動→特定技能１号</span></div>
     </div>
+    <div class="item" id="nav-tk2go" onclick="open_doc('tk2go')">
+      <span class="item-icon">📄</span>
+      <div>移行準備説明書（2号）<span class="item-sub">特定活動→特定技能２号</span></div>
+    </div>
+    <div class="item" id="nav-myanmar" onclick="open_doc('myanmar')">
+      <span class="item-icon">📄</span>
+      <div>理由書（ミャンマー）<span class="item-sub">ミャンマー国籍者等の特定活動</span></div>
+    </div>
     <div class="divider"></div>
     <div class="section">国交省</div>
     <div class="item" id="nav-juuyou" onclick="open_juuyou()">
@@ -383,6 +391,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-1_17_vi"></iframe>
     <iframe id="frame-juuyou"></iframe>
     <iframe id="frame-iko"></iframe>
+    <iframe id="frame-tk2go"></iframe>
+    <iframe id="frame-myanmar"></iframe>
     <iframe id="frame-1_23"></iframe>
     <iframe id="frame-1_25"></iframe>
     <iframe id="frame-1_27"></iframe>
@@ -481,6 +491,8 @@ const docs={
   '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949923'},
   '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949923'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949923'},
+  'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1793949923'},
+  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793949923'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949923'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949923'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949923'},
@@ -549,6 +561,8 @@ const docs={
   '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949923'},
   '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949923'},
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949923'},
+  'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1793949923'},
+  'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1793949923'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949923'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949923'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949923'},
@@ -1444,7 +1458,7 @@ var DGJ_DOC_LABELS = {
   '6_3':'6-3号 2号実務経験申告書＋別紙',
   '1_11':'1-11号','1_16':'1-16号 雇用の経緯に係る説明書',
   '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号','1_32':'1-32号',
-  '1_1':'1-1号','iko':'移行準備説明書','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
+  '1_1':'1-1号','iko':'移行準備説明書','tk2go':'移行準備説明書(2号)','myanmar':'理由書(ミャンマー)','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
   'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状','shashin_teishutsu':'写真提出用紙','zairyu_teisei':'在留カード記載事項訂正願出書（参考様式５）',
   'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
   'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',

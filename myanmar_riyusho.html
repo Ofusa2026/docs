@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>理由書（ミャンマー）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.underline{text-decoration:underline;}
+.indent1{padding-left:2em;}
+.indent2{padding-left:4em;}
+.doc{padding:25mm 30mm 15mm!important;line-height:1.52!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media print{
+  .app-bar{display:none!important}
+  .fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:25mm 30mm 15mm!important;line-height:1.52!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 理由書（ミャンマー国籍者等）</div>
+    <div class="ver">ver.20261106.02</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" onclick="saveFormGeneric('myanmar_riyusho')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+
+<!-- 左パネル -->
+<div class="fp">
+  <div class="fp-case">
+    <label>🔍 登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()" style="margin-bottom:5px;"></select>
+    <label>🏢 所属機関</label>
+    <select id="filterCompany" onchange="filterCases()" style="margin-bottom:5px;"></select>
+    <label>🔤 検索（名前）</label>
+    <input id="filterText" placeholder="名前で絞り込み" oninput="filterCases()" style="margin-bottom:5px;">
+    <label>👤 案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>作成日<span class="fid">{{書類作成日}}</span></label><input id="f_date" oninput="p()" placeholder="令和〇年〇月〇日"></div>
+      <div class="fg"><label>氏名（申請人）<span class="fid">{{申請人氏名}}</span></label><input id="f_name" oninput="p()"></div>
+      <div class="fg"><label>国籍・地域（申請人）<span class="fid">{{申請人国籍}}</span></label><input id="f_nationality" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">１〜３ チェック項目</div>
+      <div class="fg"><label>１ 申請人</label><select id="f_q1" onchange="p()"><option value="">（未選択）</option><option value="1">ミャンマー国籍者</option><option value="2">ミャンマーに生活の本拠があるミャンマー以外の国籍者</option><option value="3">その他</option></select></div>
+      <div class="fg"><label>　その他の内容</label><input id="f_q1other" oninput="p()"></div>
+      <div class="fg"><label>２ 就労希望の有無</label><select id="f_q2" onchange="p()"><option value="">（未選択）</option><option value="1">就労を希望する</option><option value="2">就労を希望しない</option></select></div>
+      <div class="fg"><label>３ 現在の在留資格に基づく活動</label><select id="f_q3" onchange="p()"><option value="">（未選択）</option><option value="1">予定どおり満了した</option><option value="2">予定どおり満了していない（途中終了を含む）</option></select></div>
+    </div>
+    <div class="fs"><div class="fs-title">４ 詳細</div>
+      <div class="fg"><label>１ ミャンマーへ帰国できない理由 <button type="button" onclick="insertSample('f_kikoku')" style="font-size:9px;padding:0 5px;margin-left:4px;">文例を入れる</button></label><textarea id="f_kikoku" oninput="p()" rows="6" style="width:100%;font-size:11px;line-height:1.5;"></textarea></div>
+      <div class="fg"><label>２ 現在の在留資格から変更する理由（変更申請の場合） <button type="button" onclick="insertSample('f_henkou')" style="font-size:9px;padding:0 5px;margin-left:4px;">文例を入れる</button></label><textarea id="f_henkou" oninput="p()" rows="6" style="width:100%;font-size:11px;line-height:1.5;"></textarea></div>
+      <div style="font-size:9px;color:#888;">※ 文例は一般的な書き方の例です。本人の事情に合わせて必ず書き直してください。</div>
+    </div>
+  </div>
+</div>
+
+<!-- プレビューエリア -->
+<div class="pp" id="ppOuter">
+  <div class="page-nav" id="pageNav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn" id="editModeBtn" onclick="toggleEditMode()" style="margin-left:8px;background:#7c3aed;color:white;border-color:#7c3aed;">✏️ 直接編集</button>
+    <button class="pn-btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;border-color:#0f766e;">🎨 スタイル編集</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">8.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+
+<script src="ofusa_common.js?v=1793949923"></script>
+<script>
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea');
+  if(!w) return;
+  const ck=(id,val)=>v(id)===val?'■':'□';
+  const LN='border-bottom:0;line-height:1.9em;background-image:linear-gradient(to bottom,transparent calc(1.9em - 1px),#999 calc(1.9em - 1px));background-size:100% 1.9em;';
+  w.innerHTML=`
+<div class="doc">
+<div style="text-align:center;font-size:18pt;letter-spacing:12px;margin:4px 0 8px;">理　由　書</div>
+<div style="text-align:right;margin-bottom:28px;">${v('f_date')?f('f_date'):'年　　　月　　　日'}</div>
+<div style="margin-left:42%;margin-bottom:22px;">
+  <div>氏　　名（申請人）</div>
+  <div style="border-bottom:1px dashed #333;min-height:1.8em;padding-left:1em;font-size:12pt;">${f('f_name')}</div>
+</div>
+<div style="margin-left:42%;margin-bottom:40px;">
+  <div style="font-size:9.5pt;">国籍・地域（申請人）</div>
+  <div style="border-bottom:1px dashed #333;min-height:1.8em;padding-left:1em;font-size:12pt;">${f('f_nationality')}</div>
+</div>
+<div style="line-height:2.3;">
+<div>１　申請人</div>
+<div class="indent2">${ck('f_q1','1')}　ミャンマー国籍者</div>
+<div class="indent2">${ck('f_q1','2')}　ミャンマーに生活の本拠があるミャンマー以外の国籍者</div>
+<div class="indent2">${ck('f_q1','3')}　その他（${v('f_q1other')?f('f_q1other'):'　　　　　　　　　　　　　　　　　　　　'}）</div>
+<div style="margin-top:14px;">２　就労希望の有無</div>
+<div class="indent2">${ck('f_q2','1')}　就労を希望する</div>
+<div class="indent2">${ck('f_q2','2')}　就労を希望しない</div>
+<div style="margin-top:14px;">３　現在有している在留資格に基づく活動</div>
+<div class="indent2">${ck('f_q3','1')}　予定どおり満了した</div>
+<div style="padding-left:6em;line-height:1.6;">（例：契約期間満了，実習修了，卒業・修了など）</div>
+<div class="indent2">${ck('f_q3','2')}　予定どおり満了していない（途中終了を含む。）</div>
+<div style="padding-left:6em;line-height:1.6;">（例：在職・在学中，解雇・倒産，自主退職，失踪・除籍・退学による途中終了など）</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="margin-bottom:12px;">４　以下の項目について詳細に記載してください。</div>
+<div style="border:1px solid #333;padding:6px 10px;">
+  <div style="${LN}">１　ミャンマーへ帰国できない理由</div>
+  <div style="${LN}min-height:9.5em;">${linedHtml(v('f_kikoku'),'f_kikoku')}</div>
+  <div style="${LN}">２　現在の在留資格から変更する理由（在留資格変更許可申請の場合）</div>
+  <div style="${LN}min-height:9.5em;">${linedHtml(v('f_henkou'),'f_henkou')}</div>
+</div>
+</div>`;
+
+  _fontSize = (_fontSize === 8.5) ? 9.5 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  _applyIkoFontSize();
+  setupPageTracker();
+  fitDocToPreview();
+}
+
+function _applyIkoFontSize(){
+  const st = document.getElementById('_ikoFontStyle') || document.createElement('style');
+  st.id = '_ikoFontStyle';
+  document.head.appendChild(st);
+  const s = _fontSize / 8.5;
+  st.textContent = [
+    `.doc [style*="font-size:18pt"]{font-size:${(18*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:12pt"]{font-size:${(12*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  }
+  if(!info || !info.caseId) return;
+  const caseId=info.caseId;
+  try{
+    const [cases,persons]=await Promise.all([
+      sb('cases?select=id,applicant,nationality,residence_status,doc_create_date&id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality&case_id=eq.'+caseId)
+    ]);
+    const cas=cases&&cases[0];
+    const pd=persons&&persons[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    const personName=(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'';
+    const nationality=(pd&&pd.nationality)||(cas&&cas.nationality)||'';
+    s('f_name',personName);
+    s('f_nationality',nationality);
+    // 国籍がミャンマーなら１の「ミャンマー国籍者」に自動でチェック
+    if(/ミャンマー|Myanmar|MYANMAR|ビルマ/.test(nationality) && !v('f_q1')) s('f_q1','1');
+    if(!v('f_date')){
+      const dbDate=cas&&cas.doc_create_date;
+      const m=dbDate&&String(dbDate).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if(m) s('f_date','令和'+(parseInt(m[1],10)-2018)+'年'+parseInt(m[2],10)+'月'+parseInt(m[3],10)+'日');
+      else { const now=new Date(); s('f_date','令和'+(now.getFullYear()-2018)+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日'); }
+    }
+    p();
+    showToast('✅ データを読み込みました');
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
+}
+
+
+// ver.20261106.02: ミャンマー理由書 用ヘルパー
+function linedHtml(raw,id){
+  const t=String(raw||'');
+  if(!t.trim()) return '<div>&nbsp;</div>';
+  return t.split('\n').map(line=>'<div><span class="f" data-bind="'+id+'">'+(esc(line)||'&nbsp;')+'</span></div>').join('');
+}
+const MY_SAMPLES={
+  f_kikoku:'ミャンマー国内の情勢が不安定な状態が続いており、本国へ帰国した場合に安全に生活できる見通しが立たないため、帰国することが困難です。',
+  f_henkou:'現在の在留資格に基づく活動を終えた後も、本邦で安定した生活を続けるために就労を希望しており、在留資格の変更を申請するものです。'
+};
+function insertSample(id){ const e=document.getElementById(id); if(!e) return; if(e.value.trim() && !confirm('入力済みの文を文例で置き換えますか？')) return; e.value=MY_SAMPLES[id]; p(); }
+
+console.log('%c OFUSA 書類作成システム %c ver.20260415.36 ', 'background:#1a2e4a;color:white;font-weight:bold;padding:2px 6px;', 'background:#475569;color:white;padding:2px 6px;');
+initCaseSelect();
+p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{
+        d.style.zoom = scale;
+      });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  // caseSelectに値をセットしてloadFromDB()を呼ぶ
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    // 既存のoptionを探すかなければ追加
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  // まず共通関数で全入力欄を埋める
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'myanmar_riyusho'); }
+  // 書類固有の追加処理があれば loadFromDB で補完
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
