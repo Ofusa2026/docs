@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261106.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -155,6 +155,9 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <div style="padding:6px 10px;background:#faf5ff;border-bottom:1px solid #f3e8ff;">
         <button onclick="printPriorityDocs()" style="width:100%;padding:7px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">🖨️ スキャン必要書類を<wbr>まとめてPDF</button>
         <div style="font-size:9px;color:#a78bfa;margin-top:3px;line-height:1.4;">必要書類を国籍に合った言語で1つのPDFにまとめます。書類の追加・検索もできます。</div>
+        <!-- ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF -->
+        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:6px;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 同じ会社の複数人を<wbr>まとめてPDF</button>
+        <div style="font-size:9px;color:#5eead4;margin-top:3px;line-height:1.4;">この会社の人を選び、1-5号・1-6号などを人数分まとめて1つのPDFにします（言語は人ごとに国籍から自動）。</div>
       </div>
       <div id="priorityDocsList"></div>
     </div>
@@ -451,8 +454,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1793947273';
-window.__DOCS_CACHE_BUSTER__ = '1793947273';
+window.__DOCS_CACHE_BUSTER__ = '1793949111';
+window.__DOCS_CACHE_BUSTER__ = '1793949111';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -460,140 +463,140 @@ var idxAllCases = [];
 var idxSelectedCase = null;
 
 const docs={
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793947273'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793947273'},
-  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793947273'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793947273'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793947273'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793947273'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793947273'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793947273'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793947273'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793947273'},
-  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793947273'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793947273'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793947273'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793947273'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793947273'},
-  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793947273'},
-  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793947273'},
-  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793947273'},
-  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793947273'},
-  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793947273'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793947273'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793947273'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793947273'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793947273'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793947273'},
-  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793947273'},
-  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793947273'},
-  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793947273'},
-  'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1793947273'},   // ver.20261006.05
-  'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1793947273'},   // ver.20261007.01
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793947273'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793947273'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793947273'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793947273'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793947273'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793947273'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793947273'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793947273'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793947273'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793947273'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793947273'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793947273'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793947273'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793947273'},
-  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793947273'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793947273'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793947273'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793947273'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793947273'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793947273'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793947273'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793947273'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793947273'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793947273'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793947273'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793947273'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793947273'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793947273'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793947273'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793947273'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793947273'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793947273'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793947273'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793947273'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793947273'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793947273'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793947273'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793947273'},
-  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793947273'},
-  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793947273'},
-  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793947273'},
-  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793947273'},
-  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793947273'},
-  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793947273'},
-  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793947273'},
-  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793947273'},
-  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793947273'},
-  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793947273'},
-  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793947273'},
-  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793947273'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793947273'},
-  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793947273'},
-  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793947273'},
-  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793947273'},
-  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793947273'},
-  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793947273'},
-  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793947273'},
-  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793947273'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793947273'},
-  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793947273'},
-  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793947273'},
-  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793947273'},
-  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793947273'},
-  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793947273'},
-  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793947273'},
-  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793947273'},
-  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793947273'},
-  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793947273'},
-  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793947273'},
-  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793947273'},
-  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793947273'},
-  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793947273'},
-  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793947273'},
-  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793947273'},
-  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793947273'},
-  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793947273'},
-  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793947273'},
-  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793947273'},
-  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793947273'},
-  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793947273'},
-  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793947273'},
-  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793947273'},
-  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793947273'},
-  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793947273'},
-  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793947273'},
-  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793947273'},
-  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793947273'},
-  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793947273'},
-  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793947273'},
-  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793947273'},
-  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793947273'},
-  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793947273'},
-  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793947273'},
-  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793947273'},
-  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793947273'},
-  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793947273'},
-  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793947273'},
-  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793947273'},
-  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793947273'},
-  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793947273'},
-  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793947273'},
-  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793947273'},
-  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793947273'},
-  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793947273'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949111'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949111'},
+  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949111'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949111'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949111'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949111'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949111'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949111'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949111'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949111'},
+  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949111'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949111'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949111'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949111'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949111'},
+  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949111'},
+  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949111'},
+  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949111'},
+  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949111'},
+  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949111'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949111'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949111'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949111'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949111'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949111'},
+  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949111'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949111'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949111'},
+  'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1793949111'},   // ver.20261006.05
+  'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1793949111'},   // ver.20261007.01
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949111'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949111'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949111'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949111'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949111'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949111'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949111'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949111'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949111'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949111'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949111'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949111'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949111'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949111'},
+  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949111'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949111'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949111'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949111'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949111'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949111'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949111'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949111'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949111'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949111'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949111'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949111'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949111'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949111'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949111'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949111'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949111'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949111'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949111'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949111'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949111'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949111'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949111'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949111'},
+  '1_6':{navId:'nav-1_6',frameId:'frame-1_6',file:'1_6.html?v=1793949111'},
+  '1_17':{navId:'nav-1_17',frameId:'frame-1_17',file:'1_17.html?v=1793949111'},
+  '1_17_vi':{navId:'nav-1_17_vi',frameId:'frame-1_17_vi',file:'1_17_vi.html?v=1793949111'},
+  'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1793949111'},
+  '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1793949111'},
+  '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1793949111'},
+  '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1793949111'},
+  '1_29':{navId:'nav-1_29',frameId:'frame-1_29',file:'1_29.html?v=1793949111'},
+  '1_30':{navId:'nav-1_30',frameId:'frame-1_30',file:'1_30.html?v=1793949111'},
+  '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1793949111'},
+  '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1793949111'},
+  'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1793949111'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1793949111'},
+  '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1793949111'},
+  'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1793949111'},
+  '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1793949111'},
+  '1_11_2':{navId:'nav-1_11_2',frameId:'frame-1_11_2',file:'1_11_2.html?v=1793949111'},
+  '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1793949111'},
+  '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1793949111'},
+  '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1793949111'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1793949111'},
+  'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1793949111'},
+  'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1793949111'},
+  'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1793949111'},
+  'tesuryo':{navId:'nav-tesuryo',frameId:'frame-tesuryo',file:'tesuryo.html?v=1793949111'},
+  'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1793949111'},
+  'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1793949111'},
+  'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1793949111'},
+  'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1793949111'},
+  'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1793949111'},
+  'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1793949111'},
+  'shinsei_henkou2':{navId:'nav-shinsei_henkou2',frameId:'frame-shinsei_henkou2',file:'shinsei_henkou2.html?v=1793949111'},
+  'shinsei_henkou3':{navId:'nav-shinsei_henkou3',frameId:'frame-shinsei_henkou3',file:'shinsei_henkou3.html?v=1793949111'},
+  'shinsei_henkou_org1':{navId:'nav-shinsei_henkou_org1',frameId:'frame-shinsei_henkou_org1',file:'shinsei_henkou_org1.html?v=1793949111'},
+  'shinsei_henkou_org2':{navId:'nav-shinsei_henkou_org2',frameId:'frame-shinsei_henkou_org2',file:'shinsei_henkou_org2.html?v=1793949111'},
+  'shinsei_henkou_org3':{navId:'nav-shinsei_henkou_org3',frameId:'frame-shinsei_henkou_org3',file:'shinsei_henkou_org3.html?v=1793949111'},
+  'shinsei_henkou_org4':{navId:'nav-shinsei_henkou_org4',frameId:'frame-shinsei_henkou_org4',file:'shinsei_henkou_org4.html?v=1793949111'},
+  '1_1':{navId:'nav-1_1',frameId:'frame-1_1',file:'1_1.html?v=1793949111'},
+  '2_1':{navId:'nav-2_1',frameId:'frame-2_1',file:'2_1.html?v=1793949111'},
+  '3_1':{navId:'nav-3_1',frameId:'frame-3_1',file:'3_1.html?v=1793949111'},
+  '6_1':{navId:'nav-6_1',frameId:'frame-6_1',file:'6_1.html?v=1793949111'},
+  '6_2':{navId:'nav-6_2',frameId:'frame-6_2',file:'6_2.html?v=1793949111'},
+  '6_3':{navId:'nav-6_3',frameId:'frame-6_3',file:'6_3.html?v=1793949111'},
+  '7_1':{navId:'nav-7_1',frameId:'frame-7_1',file:'7_1.html?v=1793949111'},
+  '8_1':{navId:'nav-8_1',frameId:'frame-8_1',file:'8_1.html?v=1793949111'},
+  '9_1':{navId:'nav-9_1',frameId:'frame-9_1',file:'9_1.html?v=1793949111'},
+  '10_1':{navId:'nav-10_1',frameId:'frame-10_1',file:'10_1.html?v=1793949111'},
+  '11_1':{navId:'nav-11_1',frameId:'frame-11_1',file:'11_1.html?v=1793949111'},
+  '11_3':{navId:'nav-11_3',frameId:'frame-11_3',file:'11_3.html?v=1793949111'},
+  '12_1':{navId:'nav-12_1',frameId:'frame-12_1',file:'12_1.html?v=1793949111'},
+  '13_1':{navId:'nav-13_1',frameId:'frame-13_1',file:'13_1.html?v=1793949111'},
+  '14_1':{navId:'nav-14_1',frameId:'frame-14_1',file:'14_1.html?v=1793949111'},
+  '15_1':{navId:'nav-15_1',frameId:'frame-15_1',file:'15_1.html?v=1793949111'},
+  '16_1':{navId:'nav-16_1',frameId:'frame-16_1',file:'16_1.html?v=1793949111'},
+  '17_1':{navId:'nav-17_1',frameId:'frame-17_1',file:'17_1.html?v=1793949111'},
+  '18_1':{navId:'nav-18_1',frameId:'frame-18_1',file:'18_1.html?v=1793949111'},
+  '7_2':{navId:'nav-7_2',frameId:'frame-7_2',file:'7_2.html?v=1793949111'},
+  '8_2':{navId:'nav-8_2',frameId:'frame-8_2',file:'8_2.html?v=1793949111'},
+  '9_2':{navId:'nav-9_2',frameId:'frame-9_2',file:'9_2.html?v=1793949111'},
+  '10_2':{navId:'nav-10_2',frameId:'frame-10_2',file:'10_2.html?v=1793949111'},
+  '11_4':{navId:'nav-11_4',frameId:'frame-11_4',file:'11_4.html?v=1793949111'},
+  '12_2':{navId:'nav-12_2',frameId:'frame-12_2',file:'12_2.html?v=1793949111'},
+  '13_2':{navId:'nav-13_2',frameId:'frame-13_2',file:'13_2.html?v=1793949111'},
+  '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1793949111'},
+  '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1793949111'},
+  '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1793949111'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -668,24 +671,24 @@ function idxLangFromNationality(nat){
 
 let cur1_5Lang='id';
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1793947273',
-  'vi':'1_5_vi.html?v=1793947273',
-  'th':'1_5_th.html?v=1793947273',
-  'ne':'1_5_ne.html?v=1793947273',
-  'my':'1_5_my.html?v=1793947273',
-  'km':'1_5_km.html?v=1793947273',
-  'en':'1_5_en.html?v=1793947273',
-  'ko':'1_5_ko.html?v=1793947273',
-  'zh':'1_5_zh.html?v=1793947273',
-  'id':'1_5.html?v=1793947273',
-  'vi':'1_5_vi.html?v=1793947273',
-  'th':'1_5_th.html?v=1793947273',
-  'ne':'1_5_ne.html?v=1793947273',
-  'my':'1_5_my.html?v=1793947273',
-  'km':'1_5_km.html?v=1793947273',
-  'en':'1_5_en.html?v=1793947273',
-  'ko':'1_5_ko.html?v=1793947273',
-  'zh':'1_5_zh.html?v=1793947273',
+  'id':'1_5.html?v=1793949111',
+  'vi':'1_5_vi.html?v=1793949111',
+  'th':'1_5_th.html?v=1793949111',
+  'ne':'1_5_ne.html?v=1793949111',
+  'my':'1_5_my.html?v=1793949111',
+  'km':'1_5_km.html?v=1793949111',
+  'en':'1_5_en.html?v=1793949111',
+  'ko':'1_5_ko.html?v=1793949111',
+  'zh':'1_5_zh.html?v=1793949111',
+  'id':'1_5.html?v=1793949111',
+  'vi':'1_5_vi.html?v=1793949111',
+  'th':'1_5_th.html?v=1793949111',
+  'ne':'1_5_ne.html?v=1793949111',
+  'my':'1_5_my.html?v=1793949111',
+  'km':'1_5_km.html?v=1793949111',
+  'en':'1_5_en.html?v=1793949111',
+  'ko':'1_5_ko.html?v=1793949111',
+  'zh':'1_5_zh.html?v=1793949111',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -735,14 +738,14 @@ function open_1_5(lang){
 //   ・画面上部の言語選択（#p17LangBar）は frame-1_17_vi が見えているあいだだけ出す（p17WatchFrame）
 let p17ManualLang=null;
 const LANG_FILES_1_17={
-  'vi':'1_17_vi.html?v=1793947273',
-  'id':'1_17_id.html?v=1793947273',
-  'zh':'1_17_zh.html?v=1793947273',
-  'th':'1_17_th.html?v=1793947273',
-  'ne':'1_17_ne.html?v=1793947273',
-  'km':'1_17_km.html?v=1793947273',
-  'my':'1_17_my.html?v=1793947273',
-  'en':'1_17_en.html?v=1793947273',
+  'vi':'1_17_vi.html?v=1793949111',
+  'id':'1_17_id.html?v=1793949111',
+  'zh':'1_17_zh.html?v=1793949111',
+  'th':'1_17_th.html?v=1793949111',
+  'ne':'1_17_ne.html?v=1793949111',
+  'km':'1_17_km.html?v=1793949111',
+  'my':'1_17_my.html?v=1793949111',
+  'en':'1_17_en.html?v=1793949111',
 };
 const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語']];
 // 国籍から決まる言語（決まらないときは null）
@@ -807,24 +810,24 @@ function p17WatchFrame(){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1793947273',
-  'vi':'1_6_vi.html?v=1793947273',
-  'th':'1_6_th.html?v=1793947273',
-  'ne':'1_6_ne.html?v=1793947273',
-  'my':'1_6_my.html?v=1793947273',
-  'km':'1_6_km.html?v=1793947273',
-  'en':'1_6_en.html?v=1793947273',
-  'ko':'1_6_ko.html?v=1793947273',
-  'zh':'1_6_zh.html?v=1793947273',
-  'id':'1_6.html?v=1793947273',
-  'vi':'1_6_vi.html?v=1793947273',
-  'th':'1_6_th.html?v=1793947273',
-  'ne':'1_6_ne.html?v=1793947273',
-  'my':'1_6_my.html?v=1793947273',
-  'km':'1_6_km.html?v=1793947273',
-  'en':'1_6_en.html?v=1793947273',
-  'ko':'1_6_ko.html?v=1793947273',
-  'zh':'1_6_zh.html?v=1793947273',
+  'id':'1_6.html?v=1793949111',
+  'vi':'1_6_vi.html?v=1793949111',
+  'th':'1_6_th.html?v=1793949111',
+  'ne':'1_6_ne.html?v=1793949111',
+  'my':'1_6_my.html?v=1793949111',
+  'km':'1_6_km.html?v=1793949111',
+  'en':'1_6_en.html?v=1793949111',
+  'ko':'1_6_ko.html?v=1793949111',
+  'zh':'1_6_zh.html?v=1793949111',
+  'id':'1_6.html?v=1793949111',
+  'vi':'1_6_vi.html?v=1793949111',
+  'th':'1_6_th.html?v=1793949111',
+  'ne':'1_6_ne.html?v=1793949111',
+  'my':'1_6_my.html?v=1793949111',
+  'km':'1_6_km.html?v=1793949111',
+  'en':'1_6_en.html?v=1793949111',
+  'ko':'1_6_ko.html?v=1793949111',
+  'zh':'1_6_zh.html?v=1793949111',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -868,24 +871,24 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1793947273',
-  'vi':'1_16_vi.html?v=1793947273',
-  'th':'1_16_th.html?v=1793947273',
-  'ne':'1_16_ne.html?v=1793947273',
-  'my':'1_16_my.html?v=1793947273',
-  'km':'1_16_km.html?v=1793947273',
-  'en':'1_16_en.html?v=1793947273',
-  'ko':'1_16_ko.html?v=1793947273',
-  'zh':'1_16_zh.html?v=1793947273',
-  'id':'1_16_id.html?v=1793947273',
-  'vi':'1_16_vi.html?v=1793947273',
-  'th':'1_16_th.html?v=1793947273',
-  'ne':'1_16_ne.html?v=1793947273',
-  'my':'1_16_my.html?v=1793947273',
-  'km':'1_16_km.html?v=1793947273',
-  'en':'1_16_en.html?v=1793947273',
-  'ko':'1_16_ko.html?v=1793947273',
-  'zh':'1_16_zh.html?v=1793947273',
+  'id':'1_16_id.html?v=1793949111',
+  'vi':'1_16_vi.html?v=1793949111',
+  'th':'1_16_th.html?v=1793949111',
+  'ne':'1_16_ne.html?v=1793949111',
+  'my':'1_16_my.html?v=1793949111',
+  'km':'1_16_km.html?v=1793949111',
+  'en':'1_16_en.html?v=1793949111',
+  'ko':'1_16_ko.html?v=1793949111',
+  'zh':'1_16_zh.html?v=1793949111',
+  'id':'1_16_id.html?v=1793949111',
+  'vi':'1_16_vi.html?v=1793949111',
+  'th':'1_16_th.html?v=1793949111',
+  'ne':'1_16_ne.html?v=1793949111',
+  'my':'1_16_my.html?v=1793949111',
+  'km':'1_16_km.html?v=1793949111',
+  'en':'1_16_en.html?v=1793949111',
+  'ko':'1_16_ko.html?v=1793949111',
+  'zh':'1_16_zh.html?v=1793949111',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1597,6 +1600,8 @@ window.addEventListener('message', function(e){
       const allIframes = document.querySelectorAll('iframe');
       for(const fr of allIframes){
         if(fr.contentWindow === e.source){
+          // ver.20261106.05: まとめPDF用の見えない画面（案件を指定して開いたもの）には、選択中の案件を送り直さない（別の人の内容で上書きされるため）
+          if(fr.getAttribute('data-pm-fixed')==='1'){ try{ if(fr._pmInfo) fr.contentWindow.postMessage({type:'SELECT_CASE', info: fr._pmInfo}, '*'); }catch(_pe){} break; }
           if(fr.style.display !== 'none' && fr.src && fr.src !== location.href){
             fr.contentWindow.postMessage({type:'SELECT_CASE', info: idxSelectedCase}, '*');
           }
@@ -1682,6 +1687,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261106.05',
+    date: '2026-11-06',
+    notify: true,
+    items: [
+      '👥 「同じ会社の複数人をまとめてPDF」を追加しました（会社の人と書類を選ぶと、人数分を1つのPDFにまとめます。言語は人ごとに国籍から自動）',
+      '🌐 「訳が空いている欄をまとめて翻訳」を追加しました（日本語があって訳が空の欄だけを訳し、確認画面で直してから入れます。訳が入っている欄は変えません）'
+    ]
+  },
   {
     version: 'ver.20261106.04',
     date: '2026-11-06',
@@ -3046,6 +3060,8 @@ function _loadDocForPrint(src, info){
   return new Promise(function(resolve){
     var ifr=document.createElement('iframe');
     ifr.style.cssText='position:fixed;left:-10000px;top:0;width:1400px;height:1200px;border:0;';
+    ifr.setAttribute('data-pm-fixed','1');   // ver.20261106.05: 選択中の案件で上書きされないように
+    ifr._pmInfo={caseId:info.caseId,companyId:info.companyId,companyName:info.companyName};   // 準備完了の合図には、この案件を送り直す
     var done=false;
     var finish=function(res){ if(done) return; done=true; try{document.body.removeChild(ifr);}catch(e){} resolve(res); };
     ifr.onload=function(){
@@ -3094,10 +3110,143 @@ function _loadDocForPrint(src, info){
     document.body.appendChild(ifr);
   });
 }
+// ===== ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF =====
+//   一括登録した会社（同じ会社で何人も）で、1人ずつ案件を開いて作る手間をなくす。
+//   人（案件）×書類 を見えない画面で順に開いて回収し、1つの印刷画面にまとめる（スキャン必要書類のまとめPDFと同じ仕組み）。
+var _mpState=null;
+var _MP_DEFAULT_DOCS=['1_5','1_6'];
+async function openMultiPersonPdf(){
+  if(!idxSelectedCase){ alert('先に、この会社のどれか1件の案件を選んでください。'); return; }
+  var c=idxSelectedCase;
+  var coId=c.companyId;
+  try{
+    if(!coId){ var r0=await idxSb('cases?select=company_id&id=eq.'+encodeURIComponent(c.caseId)); coId=r0&&r0[0]&&r0[0].company_id; }
+  }catch(e){}
+  if(!coId){ alert('この案件の所属機関が分かりませんでした。'); return; }
+  var wait=document.createElement('div'); wait.id='mpWait';
+  wait.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font:700 14px sans-serif;';
+  wait.textContent='👥 この会社の人を読み込んでいます…'; document.body.appendChild(wait);
+  var rows=[], sets=[], coName=c.companyName||'';
+  try{
+    var cs=await idxSb('cases?select=id,name,applicant,nationality,status,app_type,residence_status,applicant_field,emp_set_idx,created_at,org,company&company_id=eq.'+encodeURIComponent(coId)+'&order=created_at.desc&limit=200');
+    var co=await idxSb('companies?select=name,emp_sets&id=eq.'+encodeURIComponent(coId));
+    if(co&&co[0]){ coName=co[0].name||coName; sets=co[0].emp_sets||[]; if(typeof sets==='string'){ try{ sets=JSON.parse(sets); }catch(e){ sets=[]; } } }
+    rows=(cs||[]).filter(function(x){ return x && x.applicant; });
+  }catch(e){ alert('読み込みエラー: '+e.message); }
+  finally{ var w=document.getElementById('mpWait'); if(w) w.remove(); }
+  if(!rows.length){ alert('この会社の案件が見つかりませんでした。'); return; }
+  var cur=rows.find(function(x){return x.id===c.caseId;})||{};
+  var sel={};
+  rows.forEach(function(x){
+    var setOk=!(Array.isArray(sets)&&sets.length) || (x.emp_set_idx!=null && String(x.emp_set_idx)!=='' && sets[parseInt(x.emp_set_idx,10)]);
+    x._setOk=!!setOk;
+    x._lang=idxLangFromNationality(x.nationality)||'en';
+    // 既定：今の案件と同じ案件名（一括登録の「【第1弾】…」など）の人にチェック
+    sel[x.id]=setOk && (x.id===c.caseId || (cur.name && x.name===cur.name));
+  });
+  var docSel={}; _MP_DEFAULT_DOCS.forEach(function(d){ docSel[d]=true; });
+  _mpState={coId:coId, coName:coName, rows:rows, sel:sel, docSel:docSel, order:'person', q:''};
+  _mpRender();
+}
+function _mpRender(){
+  var st=_mpState; if(!st) return;
+  var old=document.getElementById('mpModal'); if(old) old.remove();
+  var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語'};
+  var q=String(st.q||'').trim();
+  var ppl=st.rows.filter(function(x){ return !q || (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)>=0; });
+  var pr=ppl.map(function(x){
+    var dis=!x._setOk;
+    return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #f1f5f9;'+(dis?'opacity:.55;':'cursor:pointer;')+'">'
+      +'<input type="checkbox" '+(st.sel[x.id]?'checked':'')+(dis?' disabled':'')+' onchange="_mpState.sel[\''+x.id+'\']=this.checked;_mpCount();">'
+      +'<span style="flex:1;min-width:0;"><b>'+esc(x.applicant)+'</b> <span style="color:#64748b;font-size:11px;">'+esc(x.nationality||'')+'→'+(LN[x._lang]||x._lang)+'／'+esc(x.app_type||'')+'／'+esc(x.status||'')+'</span>'
+      +'<br><span style="color:#94a3b8;font-size:10.5px;">'+esc(x.name||'')+'</span>'
+      +(dis?'<br><span style="color:#b91c1c;font-size:10.5px;">雇用条件セットが選ばれていないため対象外（1-6号などを開いて選んでください）</span>':'')+'</span></label>';
+  }).join('');
+  var allDocs=_getAllDocKeys().filter(function(d){ return _PM_EXCLUDE.indexOf(d.key)<0 && d.key!=='signslot'; });
+  var dr=allDocs.map(function(d){
+    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 10px 3px 0;font-size:12px;cursor:pointer;"><input type="checkbox" '+(st.docSel[d.key]?'checked':'')+' onchange="_mpState.docSel[\''+d.key+'\']=this.checked;_mpCount();">'+esc(d.label)+'</label>';
+  }).join('');
+  var html='<div id="mpModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;" onclick="if(event.target.id===\'mpModal\')this.remove();">'
+    +'<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(760px,94vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">👥 同じ会社の複数人をまとめてPDF</div>'
+    +'<div style="font-size:12px;color:#475569;margin-top:2px;">'+esc(st.coName)+'（'+st.rows.length+'件）／言語は人ごとに国籍から自動で選びます</div></div>'
+    +'<div style="padding:10px 18px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;font-size:12.5px;margin-bottom:4px;">① 書類を選ぶ</div><div style="max-height:110px;overflow:auto;">'+dr+'</div></div>'
+    +'<div style="padding:8px 18px 0;display:flex;gap:8px;align-items:center;"><div style="font-weight:700;font-size:12.5px;">② 人を選ぶ</div>'
+    +'<input id="mpQ" placeholder="名前・案件名で絞り込み" value="'+esc(st.q)+'" oninput="_mpState.q=this.value;_mpRender();var e=document.getElementById(\'mpQ\');e.focus();e.setSelectionRange(e.value.length,e.value.length);" style="flex:1;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;">'
+    +'<button onclick="_mpAll(true)" style="font-size:11px;padding:4px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">表示中を全部</button>'
+    +'<button onclick="_mpAll(false)" style="font-size:11px;padding:4px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">外す</button></div>'
+    +'<div style="flex:1;overflow:auto;margin:6px 18px;border:1px solid #e2e8f0;border-radius:8px;">'+pr+'</div>'
+    +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+    +'<span style="font-size:12px;">並び順：</span><label style="font-size:12px;"><input type="radio" name="mpOrder" '+(st.order==='person'?'checked':'')+' onchange="_mpState.order=\'person\'"> 人ごと</label>'
+    +'<label style="font-size:12px;"><input type="radio" name="mpOrder" '+(st.order==='doc'?'checked':'')+' onchange="_mpState.order=\'doc\'"> 書類ごと</label>'
+    +'<span id="mpCount" style="flex:1;font-size:12.5px;color:#0f766e;font-weight:700;text-align:right;"></span>'
+    +'<button onclick="document.getElementById(\'mpModal\').remove()" style="padding:8px 14px;background:#f1f5f9;border:none;border-radius:8px;cursor:pointer;">キャンセル</button>'
+    +'<button id="mpGo" onclick="_mpExecute()" style="padding:9px 18px;background:#0f766e;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">PDFを作る</button>'
+    +'</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  _mpCount();
+}
+function _mpAll(on){
+  var st=_mpState; var q=String(st.q||'').trim();
+  st.rows.forEach(function(x){ if(!x._setOk) return; if(q && (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)<0) return; st.sel[x.id]=!!on; });
+  _mpRender();
+}
+function _mpCount(){
+  var st=_mpState; var el=document.getElementById('mpCount'); if(!st||!el) return;
+  var np=st.rows.filter(function(x){return st.sel[x.id];}).length;
+  var nd=Object.keys(st.docSel).filter(function(k){return st.docSel[k];}).length;
+  el.textContent=np+'名 × '+nd+'書類 ＝ '+(np*nd)+'件（約'+Math.max(1,Math.round(np*nd*6/60))+'分）';
+  var go=document.getElementById('mpGo'); if(go){ go.disabled=!(np&&nd); go.style.opacity=(np&&nd)?'1':'.5'; }
+}
+async function _mpExecute(){
+  var st=_mpState; if(!st) return;
+  var ppl=st.rows.filter(function(x){return st.sel[x.id];});
+  var allDocs=_getAllDocKeys().map(function(d){return d.key;});
+  var dks=allDocs.filter(function(k){return st.docSel[k];});
+  if(!ppl.length||!dks.length) return;
+  var jobs=[];
+  if(st.order==='doc'){ dks.forEach(function(dk){ ppl.forEach(function(x){ jobs.push({x:x,dk:dk}); }); }); }
+  else { ppl.forEach(function(x){ dks.forEach(function(dk){ jobs.push({x:x,dk:dk}); }); }); }
+  var m=document.getElementById('mpModal'); if(m) m.remove();
+  var overlay=document.createElement('div'); overlay.id='mpOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
+  overlay.innerHTML='<div style="text-align:center;min-width:300px;"><div style="font-size:15px;font-weight:700;margin-bottom:10px;">👥 '+ppl.length+'名分の書類をまとめています…</div>'
+    +'<div style="height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;"><div id="mpBar" style="height:100%;width:0;background:#5eead4;transition:width .3s;"></div></div>'
+    +'<div id="mpProg" style="font-size:12px;margin-top:8px;opacity:.85;"></div><div id="mpFail" style="font-size:11px;margin-top:6px;color:#fca5a5;"></div></div>';
+  document.body.appendChild(overlay);
+  var busterV=window.__DOCS_CACHE_BUSTER__||Date.now();
+  var collected=[], failed=[], warned=[];
+  try{
+    for(var i=0;i<jobs.length;i++){
+      var j=jobs[i], x=j.x;
+      var f=_docFileForPrint(j.dk, x._lang); var lb=_pmDocLabel(j.dk);
+      document.getElementById('mpProg').textContent='('+(i+1)+'/'+jobs.length+') '+x.applicant+' ・ '+(lb&&lb.name||j.dk)+' を読み込み中…';
+      document.getElementById('mpBar').style.width=Math.round(i/jobs.length*100)+'%';
+      if(!f){ failed.push(x.applicant+'：'+j.dk); continue; }
+      var info={caseId:x.id, companyId:st.coId, companyName:st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
+      var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), info);
+      if(res){
+        // 開いた書類に別の人の名前が出ていないか（取り違え防止）：申請人名が書類に無ければ失敗扱い
+        var nm=String(x.applicant||'').normalize('NFKC').replace(/[\s　]/g,'').toUpperCase();
+        var txt=String(res.html||'').replace(/<[^>]+>/g,'').normalize('NFKC').replace(/[\s　]/g,'').toUpperCase();
+        if(nm && txt.indexOf(nm)<0 && /^(1_5|1_6|juuyou|1_16)$/.test(j.dk)) warned.push(x.applicant+'：'+(lb&&lb.name||j.dk));
+        collected.push({dk:j.dk, html:res});
+      } else failed.push(x.applicant+'：'+(lb&&lb.name||j.dk));
+      document.getElementById('mpFail').textContent=failed.length?('⚠️ 作れなかったもの '+failed.length+'件'):'';
+    }
+    document.getElementById('mpBar').style.width='100%';
+    if(!collected.length) throw new Error('書類の内容を取得できませんでした');
+    if(failed.length) alert('次の書類は作れなかったため、PDFに入っていません：\n\n'+failed.slice(0,15).join('\n')+(failed.length>15?('\nほか '+(failed.length-15)+'件'):''));
+    if(warned.length) alert('次の書類は、書類の中に申請人の名前が見つかりませんでした。PDFには入れましたが、別の人の内容になっていないか確認してください：\n\n'+warned.slice(0,15).join('\n')+(warned.length>15?('\nほか '+(warned.length-15)+'件'):''));
+    _openMergedPrintWindow(collected, {applicant:st.coName+'_'+ppl.length+'名分', _title:st.coName+'_'+ppl.length+'名分'});
+  }catch(e){ alert('まとめPDFの作成でエラーが発生しました: '+e.message); console.error(e); }
+  finally{ var ov=document.getElementById('mpOverlay'); if(ov) ov.remove(); }
+}
 function _openMergedPrintWindow(collected, info){
   var w=window.open('', '_blank');
   if(!w){ alert('ポップアップがブロックされました。ポップアップを許可してから再度お試しください。'); return; }
-  var title=(info.applicant?info.applicant+'様_':'')+'スキャン必要書類';
+  var title=info._title ? (info._title+'_書類') : ((info.applicant?info.applicant+'様_':'')+'スキャン必要書類');   // ver.20261106.05: 複数人まとめは「会社名_◯名分_書類」
   var links=[]; collected.forEach(function(c){ (c.html.links||[]).forEach(function(h){ if(links.indexOf(h)<0) links.push(h); }); });
   var head='<meta charset="UTF-8"><title>'+title+'</title>'
     + links.map(function(h){return '<link rel="stylesheet" href="'+h+'">';}).join('')

@@ -4111,6 +4111,38 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     });
     return out;
   }
+  // ver.20261106.05: 翻訳APIの呼び出し（1欄ずつの🌐と、まとめて翻訳の両方で使う）
+  async function _callTranslate(pairs, lang, key, gl){
+      var hasAddr=false;
+    var payload = pairs.map(function(p,i){
+      var isA=_isAddr(p.ja)||_isAddr(p.en); if(isA) hasAddr=true;
+      return (i+1)+'. '+(isA?'[ADDRESS] ':'')+String(p.ja.value).replace(/\n/g,' ').slice(0,500);
+    }).join('\n');
+    var prompt = '日本の特定技能（雇用条件書などの公的様式）の記載内容を翻訳します。\n'
+      + '次の各項目を '+LANG_EN[lang]+' に翻訳してください。\n'
+      + '・様式に印字される文言として簡潔・丁寧に\n・数字、単位（円・時間・日・月）、固有名詞はそのまま保持\n・説明や注釈は加えない\n'
+      + (hasAddr ? ('・[ADDRESS] が付いた項目は日本の住所です。欧米式の語順（小さい単位→大きい単位）に並べ替えて'+LANG_EN[lang]+'表記にしてください。\n'
+        + '  例: 愛知県北名古屋市沖村山ノ神54番地 → 54 Okimura-Yamanokami, Kitanagoya-shi, Aichi\n'
+        + '  例: 東京都港区南青山二丁目5-17 ポーラ青山ビル3F → 3F Pola Aoyama Bldg., 2-5-17 Minami-Aoyama, Minato-ku, Tokyo\n'
+        + '  丁目・番地・号は 2-5-17 のようにハイフンでまとめ、都=Tokyo、道府県=そのままローマ字、市区町村は -shi/-ku/-cho/-mura を付ける。郵便番号は入力にあるときだけ残す。\n'
+        + '  出力に [ADDRESS] の文字は含めないこと。\n') : '')
+      + (gl.length ? ('・次の用語が含まれる場合は、必ずこの対訳を使うこと：\n'
+        + gl.map(function(g){ return '  「'+g[0]+'」 → '+g[1]; }).join('\n') + '\n') : '')
+      + '\n' + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
+    var r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+    var j = await r.json();
+    if(j.error) throw new Error(j.error.message||'API error');
+    var text=(j.content&&j.content[0]&&j.content[0].text)||'';
+    var cleaned=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    var arr;
+    try{ arr=JSON.parse(cleaned); }catch(e){ var m=cleaned.match(/\[[\s\S]*\]/); arr=m?JSON.parse(m[0]):[]; }
+    if(!Array.isArray(arr)) arr=[];
+    return arr;
+  }
   window.translateEmptyFields = async function(onlyKey){
     var lang=_docLang(), key=_apiKey();
     if(!key){
@@ -4145,34 +4177,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     var mini = el0 && el0.nextElementSibling && el0.nextElementSibling.classList.contains('tr-mini') ? el0.nextElementSibling : null;
     if(mini){ mini.disabled=true; mini.textContent='…'; }
     try{
-      var hasAddr=false;
-      var payload = pairs.map(function(p,i){
-        var isA=_isAddr(p.ja)||_isAddr(p.en); if(isA) hasAddr=true;
-        return (i+1)+'. '+(isA?'[ADDRESS] ':'')+String(p.ja.value).replace(/\n/g,' ').slice(0,500);
-      }).join('\n');
-      var prompt = '日本の特定技能（雇用条件書などの公的様式）の記載内容を翻訳します。\n'
-        + '次の各項目を '+LANG_EN[lang]+' に翻訳してください。\n'
-        + '・様式に印字される文言として簡潔・丁寧に\n・数字、単位（円・時間・日・月）、固有名詞はそのまま保持\n・説明や注釈は加えない\n'
-        + (hasAddr ? ('・[ADDRESS] が付いた項目は日本の住所です。欧米式の語順（小さい単位→大きい単位）に並べ替えて'+LANG_EN[lang]+'表記にしてください。\n'
-          + '  例: 愛知県北名古屋市沖村山ノ神54番地 → 54 Okimura-Yamanokami, Kitanagoya-shi, Aichi\n'
-          + '  例: 東京都港区南青山二丁目5-17 ポーラ青山ビル3F → 3F Pola Aoyama Bldg., 2-5-17 Minami-Aoyama, Minato-ku, Tokyo\n'
-          + '  丁目・番地・号は 2-5-17 のようにハイフンでまとめ、都=Tokyo、道府県=そのままローマ字、市区町村は -shi/-ku/-cho/-mura を付ける。郵便番号は入力にあるときだけ残す。\n'
-          + '  出力に [ADDRESS] の文字は含めないこと。\n') : '')
-        + (gl.length ? ('・次の用語が含まれる場合は、必ずこの対訳を使うこと：\n'
-          + gl.map(function(g){ return '  「'+g[0]+'」 → '+g[1]; }).join('\n') + '\n') : '')
-        + '\n' + payload + '\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]  JSON以外のテキストは含めないでください。';
-      var r = await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:prompt}]})
-      });
-      var j = await r.json();
-      if(j.error) throw new Error(j.error.message||'API error');
-      var text=(j.content&&j.content[0]&&j.content[0].text)||'';
-      var cleaned=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-      var arr;
-      try{ arr=JSON.parse(cleaned); }catch(e){ var m=cleaned.match(/\[[\s\S]*\]/); arr=m?JSON.parse(m[0]):[]; }
-      if(!Array.isArray(arr)) arr=[];
+      var arr = await _callTranslate(pairs, lang, key, gl);
       var n=0;
       pairs.forEach(function(p,i){
         var t=String(arr[i]||'').trim();
@@ -4186,6 +4191,91 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       if(mini){ mini.disabled=false; mini.textContent='🌐'; }
     }
   };
+  // ===== ver.20261106.05: 訳が空いている欄をまとめて翻訳（確認してから入れる） =====
+  //   日本語があって訳が空の欄だけを集めて訳し、一覧で確認・手直ししてから、チェックした欄だけに入れる。
+  //   すでに訳が入っている欄は対象外（上書きしない）。勝手には入れない。
+  function _fieldLabel(el){
+    try{ var fg=el.closest('.fg'), lb=fg&&fg.querySelector('label'); if(lb){ var c=lb.cloneNode(true); c.querySelectorAll('.fid,button').forEach(function(x){x.remove();}); var t=(c.textContent||'').replace(/\s+/g,' ').trim(); if(t) return t; } }catch(e){}
+    return el.id;
+  }
+  function _emptyPairs(){
+    return _pairs().filter(function(p){ return String(p.ja.value||'').trim()!=='' && String(p.en.value||'').trim()===''; });
+  }
+  window.translateEmptyBulk = async function(){
+    var lang=_docLang(), key=_apiKey();
+    var pairs=_emptyPairs();
+    if(!pairs.length){ if(typeof showToast==='function') showToast('✅ 訳が空いている欄はありません'); return; }
+    if(!key){ if(typeof showToast==='function') showToast('⚠️ APIキーが未設定です。案シスの設定画面でAPIキーを登録してください'); return; }
+    if(!confirm('日本語が入っていて訳が空いている欄が '+pairs.length+' か所あります。\n'+(LANG_JA[lang]||lang)+'に訳して、確認画面を出します（まだ入力欄には入れません）。よろしいですか？')) return;
+    var t=(typeof showToast==='function')?showToast('🌐 '+pairs.length+'か所を翻訳しています…',0):null;
+    var gl=GLOSS[lang]||[], out=new Array(pairs.length).fill('');
+    try{
+      var need=[];
+      pairs.forEach(function(pr,i){
+        var jv=String(pr.ja.value||'').replace(/[\s　]/g,''); var hit='';
+        for(var gi=0;gi<gl.length;gi++){ if(gl[gi][0]===jv){ hit=gl[gi][1]; break; } }
+        if(hit) out[i]=hit; else need.push(i);
+      });
+      for(var k=0;k<need.length;k+=15){
+        var idx=need.slice(k,k+15);
+        var arr=await _callTranslate(idx.map(function(i){return pairs[i];}), lang, key, gl);
+        idx.forEach(function(i,n){ out[i]=String(arr[n]||'').trim(); });
+      }
+    }catch(e){
+      if(t&&t.remove) t.remove();
+      if(typeof showToast==='function') showToast('⚠️ 翻訳エラー: '+e.message); return;
+    }
+    if(t&&t.remove) t.remove();
+    _bulkReview(pairs, out, lang);
+  };
+  function _bulkReview(pairs, out, lang){
+    var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var old=document.getElementById('_trBulk'); if(old) old.remove();
+    var w=document.createElement('div'); w.id='_trBulk';
+    w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:2147483000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+    var rows=pairs.map(function(pr,i){
+      return '<tr style="border-top:1px solid #e2e8f0;vertical-align:top;">'
+        +'<td style="padding:6px;"><input type="checkbox" class="_trChk" data-i="'+i+'" '+(out[i]?'checked':'')+'></td>'
+        +'<td style="padding:6px;font-size:11px;color:#475569;width:22%;">'+esc(_fieldLabel(pr.ja))+'<br><span style="color:#1f2937;font-size:12px;">'+esc(pr.ja.value)+'</span></td>'
+        +'<td style="padding:6px;"><textarea class="_trOut" data-i="'+i+'" rows="2" style="width:100%;box-sizing:border-box;font-size:12px;padding:4px;border:1px solid #cbd5e1;border-radius:6px;">'+esc(out[i])+'</textarea>'
+        +(out[i]?'':'<div style="color:#b91c1c;font-size:11px;">訳を取得できませんでした（手で入力できます）</div>')+'</td></tr>';
+    }).join('');
+    w.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:12px;width:min(820px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
+      +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">🌐 訳の確認（'+esc(LANG_JA[lang]||lang)+'）</div>'
+      +'<div style="font-size:12px;color:#475569;">訳を確認し、必要なら直してください。チェックした欄だけに入れます（訳が入っていた欄は対象外です）。</div></div>'
+      +'<div style="overflow:auto;flex:1;padding:0 12px;"><table style="width:100%;border-collapse:collapse;">'+rows+'</table></div>'
+      +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end;">'
+      +'<button type="button" id="_trCancel" style="padding:8px 14px;border:none;background:#f1f5f9;border-radius:8px;cursor:pointer;">やめる</button>'
+      +'<button type="button" id="_trApply" style="padding:8px 16px;border:none;background:#2563eb;color:#fff;font-weight:700;border-radius:8px;cursor:pointer;">チェックした欄に入れる</button></div></div>';
+    document.body.appendChild(w);
+    w.querySelector('#_trCancel').onclick=function(){ w.remove(); };
+    w.querySelector('#_trApply').onclick=function(){
+      var n=0;
+      w.querySelectorAll('._trChk').forEach(function(cb){
+        if(!cb.checked) return; var i=+cb.getAttribute('data-i');
+        var v=String(w.querySelector('._trOut[data-i="'+i+'"]').value||'').trim(); if(!v) return;
+        var en=pairs[i].en; en.value=v; n++;
+        en.style.background='#fef9c3'; (function(e){ setTimeout(function(){ e.style.background=''; },2500); })(en);
+        try{ en.dispatchEvent(new Event('input',{bubbles:true})); }catch(_e){}
+      });
+      w.remove();
+      if(typeof p==='function'){ try{ p(); }catch(e){} }
+      if(typeof showToast==='function') showToast('🌐 '+n+'か所に訳を入れました（内容を確認してDB保存してください）');
+    };
+  }
+  function _injectBulkBtn(){
+    try{
+      if(document.getElementById('_trBulkBtn')) return;
+      if(!_pairs().length) return;
+      var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host) return;
+      var b=document.createElement('button'); b.type='button'; b.id='_trBulkBtn';
+      b.textContent='🌐 訳が空いている欄をまとめて翻訳';
+      b.title='日本語が入っていて訳が空の欄だけを訳し、確認してから入れます（訳が入っている欄は変えません）';
+      b.style.cssText='display:block;width:100%;margin:0 0 8px;padding:6px;border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;';
+      b.onclick=function(ev){ ev.preventDefault(); window.translateEmptyBulk(); };
+      host.insertBefore(b, host.firstChild);
+    }catch(e){}
+  }
   function _inject(){
     _pairs().forEach(function(pr){
       if(pr.en.nextElementSibling && pr.en.nextElementSibling.classList && pr.en.nextElementSibling.classList.contains('tr-mini')) return;
@@ -4196,8 +4286,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       pr.en.insertAdjacentElement('afterend', s);
     });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(_inject,300); });
-  else setTimeout(_inject,300);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(_inject,300); setTimeout(_injectBulkBtn,350); });
+  else { setTimeout(_inject,300); setTimeout(_injectBulkBtn,350); }
 })();
 
 /* ===== ver.20261006.01: 赤字モード（書類の値クリックで文字色を赤⇔黒） =====
