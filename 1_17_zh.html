@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261105.21</div>
+    <div class="ver">ver.20261105.22</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1283,6 +1283,7 @@ function _p17Post(){
     else { gen.style.display=''; val.style.display='none'; }
   })();
   _p17ViBarUpdate();   // ver.20261105.01
+  try{ _p17TodoRender(); }catch(e){}   // ver.20261105.22
   _p17Bake();
 }
 document.addEventListener('change', function(e){
@@ -3017,6 +3018,94 @@ window.addEventListener('beforeprint', function(){ try{ _p17FitForPrint(); }catc
     }).catch(function(){});
   };
   if(document.readyState==='complete') setTimeout(check, 1500); else window.addEventListener('load', function(){ setTimeout(check, 1500); });
+})();
+
+/* ver.20261105.22: ① 確認が必要な項目を左パネルの一番上にいつも出し、押すとその場所へ移動する
+                    ② PDF保存のファイル名を「1-17_支援計画書_氏名_言語」に自動でする */
+var P17_LANG_JA = {vi:'ベトナム語',id:'インドネシア語',zh:'中国語',th:'タイ語',ne:'ネパール語',km:'カンボジア語',my:'ミャンマー語',en:'英語'};
+function _p17Flash(el){
+  if(!el) return;
+  try{ el.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){ el.scrollIntoView(); }
+  var o=el.style.outline, b=el.style.background;
+  el.style.outline='3px solid #f59e0b'; el.style.background='#fef3c7';
+  setTimeout(function(){ el.style.outline=o; el.style.background=b; }, 1800);
+}
+function _p17GoField(id){
+  var side=document.getElementById(id);
+  var onPage=document.querySelector('#pageArea span.f[data-bind="'+id+'"]');
+  if(onPage) _p17Flash(onPage.closest('td')||onPage);
+  if(side){ _p17Flash(side); setTimeout(function(){ try{ side.focus({preventScroll:true}); }catch(e){} }, 400); }
+}
+function _p17GoUntr(){
+  var els=[].slice.call(document.querySelectorAll('#pageArea .p17-untr')).filter(function(e){ return e.offsetParent!==null; });
+  if(els.length){ _p17Flash(els[0]); return; }
+  var bar=document.getElementById('p17ViBar'); if(bar) _p17Flash(bar);
+}
+function _p17GoBessi(){ _p17Flash(document.querySelector('#pageArea .p17bessi')); }
+function _p17TodoItems(){
+  var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+  var items=[];
+  var untr=Object.keys(window._p17Untr||{});
+  if(untr.length) items.push({t:'訳せていない箇所 '+untr.length+' 件（書類の赤い所）', go:'_p17GoUntr()'});
+  var need=[['f_applicant','氏名'],['f_gender','性別'],['f_birthY','生年月日'],['es_createY','作成日'],['es_coName','所属機関の名称'],['es_coAddress','所属機関の住所']];
+  if(!window._p17SelfWhy) need.push(['es_soName','登録支援機関の名称'],['es_soRegNo','登録支援機関の登録番号']);
+  need.forEach(function(x){ var e=document.getElementById(x[0]); if(e && !g(x[0])) items.push({t:x[1]+'が空欄', go:"_p17GoField('"+x[0]+"')"}); });
+  try{
+    var d=_p17BessiData();
+    [['mgrs','支援責任者'],['staff','支援担当者'],['interp','通訳者']].forEach(function(k){ if(!d[k[0]].length) items.push({t:'別紙の'+k[1]+'名簿が未登録（手書き）', go:'_p17GoBessi()'}); });
+    if(d.fb.mgr)    items.push({t:'別紙の支援責任者は案シスの支援責任者で代わりに記載', go:'_p17GoBessi()', info:1});
+    if(d.fb.staff)  items.push({t:'別紙の支援担当者は支援責任者で代わりに記載', go:'_p17GoBessi()', info:1});
+    if(d.fb.interp) items.push({t:'別紙の通訳者はO-Linkヒアリングから記載', go:'_p17GoBessi()', info:1});
+  }catch(e){}
+  return items;
+}
+function _p17TodoRender(){
+  var box=document.getElementById('p17TodoBox');
+  if(!box){
+    var host=document.querySelector('.fp-inner'); if(!host) return;
+    box=document.createElement('div'); box.id='p17TodoBox';
+    host.insertBefore(box, host.firstChild);
+  }
+  if(!_p17CaseId()){ box.style.display='none'; return; }
+  var items=_p17TodoItems(), warn=items.filter(function(x){ return !x.info; }).length;
+  box.style.cssText='display:block;margin:0 0 10px;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.55;'
+    +(warn ? 'background:#fffbeb;border:1px solid #fcd34d;color:#78350f;' : 'background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;');
+  if(!items.length){ box.innerHTML='✅ 確認が必要な項目はありません'; return; }
+  box.innerHTML='<div style="font-weight:700;margin-bottom:3px">'+(warn?'⚠ 確認が必要な項目（'+warn+'）':'ℹ️ お知らせ')+'</div>'
+    + items.map(function(x){ return '<div><a href="#" onclick="'+x.go+';return false;" style="color:'+(x.info?'#475569':'#b45309')+';text-decoration:underline">'+(x.info?'ℹ️ ':'・')+x.t+'</a></div>'; }).join('')
+    + '<div style="margin-top:3px;color:#92400e;opacity:.8;font-size:11px">押すとその場所へ移動します</div>';
+}
+function _p17PdfTitle(){
+  var nm=(function(){ var e=document.getElementById('f_applicant'); return e ? String(e.value||'').trim() : ''; })() || '案件';
+  return ('1-17_支援計画書_'+nm+'_'+(P17_LANG_JA[P17_LANG]||P17_LANG)).replace(/[\\\/:*?"<>|]+/g,'_');
+}
+(function(){
+  var saved=null;
+  var setT=function(){
+    var t=_p17PdfTitle();
+    if(!saved){
+      saved={self:document.title, top:null};
+      try{ if(window.top && window.top!==window) saved.top=window.top.document.title; }catch(e){}
+      setTimeout(restore, 120000);
+    }
+    document.title=t;   // 共通の印刷処理が付ける題名より、こちら（氏名・言語入り）を優先する
+    try{ if(window.top && window.top!==window) window.top.document.title=t; }catch(e){}
+  };
+  var restore=function(){
+    if(!saved) return;
+    document.title=saved.self;
+    try{ if(saved.top!=null) window.top.document.title=saved.top; }catch(e){}
+    saved=null;
+  };
+  window.addEventListener('beforeprint', setT);
+  window.addEventListener('afterprint', function(){ setTimeout(restore, 300); });
+  var hook3=function(){
+    if(typeof window.doPrint!=='function' || window.doPrint._p17title) return;
+    var orig=window.doPrint;
+    var w=function(){ setT(); return orig.apply(this, arguments); };
+    w._p17title=true; w._p17=orig._p17; w._p17fit=orig._p17fit; window.doPrint=w;
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hook3,1700); }); else setTimeout(hook3,1700);
 })();
 </script>
 </body>
