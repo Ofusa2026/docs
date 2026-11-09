@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ネパール語版）</div>
-    <div class="ver">ver.20261109.03</div>
+    <div class="ver">ver.20261109.08</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794202845"></script>
+<script src="ofusa_common.js?v=1794208902"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -2081,9 +2081,10 @@ if(!window._selectCaseListenerAdded){
   }
   function calc(){
     var pay=0; PAY.forEach(function(id){pay+=val([id]);});
+    if(!val(['es_salaryMonthly'])) pay+=val(['es_calcMonthly']);   // ver.20261109.08: 時給・日給のときは換算月給を基本給として足す
     var ded=0; DED.forEach(function(g){ded+=val(g);});
     var net=pay-ded;
-    var hasPayInput = PAY.some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
+    var hasPayInput = PAY.concat(['es_calcMonthly']).some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
     if(!hasPayInput) return;
     set('es_salaryTotal',pay); set('es_deductTotal',ded); set('es_netPay',net);
   }

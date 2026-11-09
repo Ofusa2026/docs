@@ -51,7 +51,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20260901.T01</div>
+    <div class="ver">ver.20261109.08T01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -402,7 +402,7 @@
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794202845"></script>
+<script src="ofusa_common.js?v=1794208902"></script>
 <script>
 // ver.20260716: f() は未入力でもプレースホルダの<span>を返すため常に truthy。
 // そのため f(A)||f(B) は必ず A を返し、フォールバックが機能していなかった。
@@ -2081,9 +2081,10 @@ function _dtAfterRender(){ dtRenderBg(); dtApplyAll(); }
   }
   function calc(){
     var pay=0; PAY.forEach(function(id){pay+=val([id]);});
+    if(!val(['es_salaryMonthly'])) pay+=val(['es_calcMonthly']);   // ver.20261109.08: 時給・日給のときは換算月給を基本給として足す
     var ded=0; DED.forEach(function(g){ded+=val(g);});
     var net=pay-ded;
-    var hasPayInput = PAY.some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
+    var hasPayInput = PAY.concat(['es_calcMonthly']).some(function(id){ var e=el(id); return e && String(e.value).trim()!==''; });
     if(!hasPayInput) return;
     set('es_salaryTotal',pay); set('es_deductTotal',ded); set('es_netPay',net);
   }

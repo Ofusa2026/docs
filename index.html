@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261109.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261109.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -156,8 +156,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         <button onclick="printPriorityDocs()" style="width:100%;padding:7px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">🖨️ スキャン必要書類を<wbr>まとめてPDF</button>
         <div style="font-size:9px;color:#a78bfa;margin-top:3px;line-height:1.4;">必要書類を国籍に合った言語で1つのPDFにまとめます。書類の追加・検索もできます。</div>
         <!-- ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF -->
-        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:6px;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 同じ会社の複数人を<wbr>まとめてPDF</button>
-        <div style="font-size:9px;color:#5eead4;margin-top:3px;line-height:1.4;">この会社の人を選び、1-5号・1-6号などを人数分まとめて1つのPDFにします（言語は人ごとに国籍から自動）。</div>
+        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:6px;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 会社・グループの複数人を<wbr>まとめてPDF</button>
+        <div style="font-size:9px;color:#5eead4;margin-top:3px;line-height:1.4;">この会社の人や、案シスでグループにした案件の人を選び、1-5号・1-6号などを人数分まとめて1つのPDFにします（言語は人ごとに国籍から自動）。</div>
       </div>
       <div id="priorityDocsList"></div>
     </div>
@@ -478,8 +478,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794202845';
-window.__DOCS_CACHE_BUSTER__ = '1794202845';
+window.__DOCS_CACHE_BUSTER__ = '1794208902';
+window.__DOCS_CACHE_BUSTER__ = '1794208902';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1427,6 +1427,9 @@ async function idxAutoSelectFromUrl(){
   try{
     var q=new URLSearchParams(location.search||'');
     var cid=(q.get('caseId')||'').trim();
+    // ver.20261109.08: ?group=<案シスのグループID> で開かれたら、そのグループの「まとめてPDF」を開く
+    var _gq=(q.get('group')||'').trim();
+    if(_gq){ setTimeout(function(){ try{ openMultiPersonPdf({groupId:_gq}); }catch(e){ console.error('mp group',e); } }, 600); if(!cid) return; }
     if(!cid){
       if((q.get('mode')||'')==='slot'){
         setTimeout(function(){ try{ openSignSlotEditor((q.get('doc')||'1_5').trim()); }catch(e){} }, 400);
@@ -1836,6 +1839,17 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261109.08',
+    date: '2026-11-09',
+    notify: true,
+    items: [
+      '👥 「会社・グループの複数人をまとめてPDF」：案シスでグループにした案件を選べるようにしました（グループの人が最初から選ばれます。外す・ほかの人を足すこともできます。別の会社の人がいても作れます）',
+      '🖨 PDFの分け方を「人ごと書類ごと／人ごと／書類ごと／まとめて」から選べるようにしました（ファイル名は自動）',
+      '🔎 まとめてPDFにする前に、人・書類ごとの確認（最低賃金・建設の報酬基準・空欄・案シスで埋める欄など）を1つの画面で出すようにしました（スキャン必要書類のまとめPDFも）',
+      '⏱ 雇用条件書（1-6号）：時給・日給の人は、換算月給（時給×月の所定労働時間）を自動で入れ、支払概算総額・手取りも計算するようにしました。印刷前に換算月給の違い・手取りのマイナスも確認します'
+    ]
+  },
   {
     version: 'ver.20261109.07',
     date: '2026-11-09',
@@ -3324,12 +3338,15 @@ async function _pmExecute(){
       document.getElementById('pmProg').textContent='('+(i+1)+'/'+targets.length+') '+lb.name+' を読み込み中…';
       document.getElementById('pmBar').style.width=Math.round(i/targets.length*100)+'%';
       if(!f) continue;
-      var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), info);
+      var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), Object.assign({_batch:'scan'}, info));
       if(res) collected.push({dk:dk, html:res});
     }
     document.getElementById('pmBar').style.width='100%';
     if(!collected.length) throw new Error('書類の内容を取得できませんでした');
+    var _ov0=document.getElementById('printMergeOverlay'); if(_ov0) _ov0.style.display='none';
+    if(!(await _bpReview(_bpGroups(collected, function(){ return info.applicant||''; }), [], []))) return;   // ver.20261109.08
     _openMergedPrintWindow(collected, info);
+    _bpPostLogs(collected);
   }catch(e){ alert('まとめPDFの作成でエラーが発生しました: '+e.message); console.error(e); }
   finally{ var ov=document.getElementById('printMergeOverlay'); if(ov) ov.remove(); }
 }
@@ -3383,6 +3400,10 @@ function _loadDocForPrint(src, info){
               if((reflected && tries>=5) || tries>=22){
                 clearInterval(timer);
                 var id='pm'+(++_pmSeq);
+                // ver.20261109.08: 印刷前チェックと同じ内容・印刷の記録の材料を、この書類からもらっておく
+                var _chk=[], _lb=null;
+                try{ if(typeof win._batchCheck==='function') _chk=win._batchCheck()||[]; }catch(_c){}
+                try{ if(typeof win._slogBody==='function') _lb=win._slogBody('print',{meta:{batch:info._batch||'pdf'}}); }catch(_l){}
                 // ページ要素に印（入れ子を除いた最外のもの）
                 var cands=Array.prototype.slice.call(area.querySelectorAll('.doc,.docabs,[id^="docP"]'));
                 cands.forEach(function(el){
@@ -3401,7 +3422,7 @@ function _loadDocForPrint(src, info){
                   try{ css+=_pmScopeRules(sh.cssRules, '#'+id); }
                   catch(e){ if(sh.href) links.push(sh.href); }
                 });
-                finish({id:id, html:clone.outerHTML, css:css, links:links});
+                finish({id:id, html:clone.outerHTML, css:css, links:links, check:_chk, logBody:_lb});
                 return;
               }
             }
@@ -3414,42 +3435,163 @@ function _loadDocForPrint(src, info){
     document.body.appendChild(ifr);
   });
 }
+// ===== ver.20261109.08: まとめPDFの前に、人・書類ごとの確認事項を1つの画面で見せる／印刷を記録する =====
+function _bpReview(groups, failed, warned){
+  // groups: [{who, doc, list:[...]}]
+  return new Promise(function(resolve){
+    if(!groups.length && !failed.length && !warned.length){ resolve(true); return; }
+    var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var nOut=0; groups.forEach(function(g){ g.list.forEach(function(x){ if(/^⛔/.test(x)) nOut++; }); });
+    var body='';
+    if(failed.length) body+='<div style="margin:8px 0;padding:8px 10px;background:#fef2f2;border-radius:8px;color:#991b1b;font-size:12px;"><b>作れなかった書類（PDFに入りません）</b><br>'+failed.map(esc).join('<br>')+'</div>';
+    if(warned.length) body+='<div style="margin:8px 0;padding:8px 10px;background:#fff7ed;border-radius:8px;color:#9a3412;font-size:12px;"><b>書類の中に申請人の名前が見つかりません（別の人の内容でないか確認）</b><br>'+warned.map(esc).join('<br>')+'</div>';
+    body+=groups.map(function(g){
+      return '<div style="padding:7px 4px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;font-size:12.5px;">'+esc(g.who)+' <span style="color:#64748b;font-weight:400;">・'+esc(g.doc)+'</span></div>'
+        +g.list.map(function(x){ return '<div style="font-size:11.5px;line-height:1.5;margin-left:8px;color:'+(/^⛔/.test(x)?'#b91c1c':'#334155')+';">・'+esc(x)+'</div>'; }).join('')+'</div>';
+    }).join('');
+    var w=document.createElement('div'); w.id='bpReview';
+    w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100001;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+    w.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
+      +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">🔎 印刷前の確認（'+groups.length+'件'+(nOut?'・<span style="color:#b91c1c;">⛔ '+nOut+'</span>':'')+'）</div>'
+      +'<div style="font-size:12px;color:#475569;margin-top:2px;">1人ずつ印刷するときと同じチェックです。直す場合は「やめる」を押し、その人の書類を開いて直してください。</div></div>'
+      +'<div style="overflow:auto;flex:1;padding:4px 18px;">'+body+'</div>'
+      +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end;">'
+      +'<button type="button" id="bpNo" style="padding:8px 14px;border:none;background:#f1f5f9;border-radius:8px;cursor:pointer;">やめる</button>'
+      +'<button type="button" id="bpYes" style="padding:8px 16px;border:none;background:#0f766e;color:#fff;font-weight:700;border-radius:8px;cursor:pointer;">このままPDFにする</button></div></div>';
+    document.body.appendChild(w);
+    w.querySelector('#bpNo').onclick=function(){ w.remove(); resolve(false); };
+    w.querySelector('#bpYes').onclick=function(){ w.remove(); resolve(true); };
+  });
+}
+function _bpPostLogs(collected){
+  try{
+    var rows=collected.map(function(c){ return c.html&&c.html.logBody; }).filter(Boolean);
+    if(!rows.length) return;
+    fetch(IDX_URL+'saysay_logs',{method:'POST',keepalive:true,headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(rows)}).catch(function(){});
+  }catch(e){}
+}
+// ver.20261109.08: 人ごと・書類ごとに別々のPDFにするときの一覧（ブラウザの「PDFに保存」は自動で押せないので、1つずつ押してもらう）
+function _bpShortDoc(dk){
+  var lb=_pmDocLabel(dk), n=String((lb&&lb.name)||dk).normalize('NFKC');
+  var m=n.match(/参考様式第?\s*(\d+)\s*[-－ー−]\s*(\d+)(?:\s*[-－ー−]\s*(\d+))?\s*号/);
+  return m ? (m[1]+'-'+m[2]+(m[3]?'-'+m[3]:'')+'号') : n.replace(/\s+/g,'').slice(0,24);
+}
+function _bpSplitHub(collected, mode, ppl, grpTitle){
+  var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var clean=function(t){ return String(t||'').replace(/[\\/:*?"<>|]/g,'').trim(); };
+  var units=[];
+  if(mode==='person'){
+    var order=[]; collected.forEach(function(c){ if(order.indexOf(c.who)<0) order.push(c.who); });
+    order.forEach(function(w){ var it=collected.filter(function(c){ return c.who===w; }); units.push({label:w, sub:it.map(function(c){ return _bpShortDoc(c.dk); }).join('・'), title:clean(w)+'様_'+(it.length<=3?it.map(function(c){ return _bpShortDoc(c.dk); }).join('・'):'書類'), items:it}); });
+  } else if(mode==='bydoc'){
+    var dko=[]; collected.forEach(function(c){ if(dko.indexOf(c.dk)<0) dko.push(c.dk); });
+    dko.forEach(function(dk){ var it=collected.filter(function(c){ return c.dk===dk; }), d=_bpShortDoc(dk); units.push({label:d, sub:it.map(function(c){ return c.who; }).join('・'), title:clean(grpTitle||'')+'_'+d+'_'+it.length+'名分', items:it}); });
+  } else {
+    collected.forEach(function(c){ var d=_bpShortDoc(c.dk); units.push({label:c.who, sub:d, title:clean(c.who)+'様_'+d, items:[c]}); });
+  }
+  window._bpUnits=units;
+  var old=document.getElementById('bpHub'); if(old) old.remove();
+  var w=document.createElement('div'); w.id='bpHub';
+  w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100001;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+  w.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(640px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">🖨 '+({person:'人ごと',bydoc:'書類ごと',doc:'人ごと書類ごと'}[mode]||'')+'にPDFを作る（'+units.length+'ファイル）</div>'
+    +'<div style="font-size:12px;color:#475569;margin-top:2px;">「PDF」を押すと、その分だけの印刷画面が開きます。「PDFに保存」で保存してください（ファイル名は自動で入ります）。</div></div>'
+    +'<div style="overflow:auto;flex:1;padding:4px 18px;">'+units.map(function(u,i){
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f1f5f9;"><span id="bpDone'+i+'" style="width:18px;"></span>'
+        +'<span style="flex:1;min-width:0;"><b>'+esc(u.label)+'</b><br><span style="font-size:11px;color:#64748b;">'+esc(u.sub)+'　→ '+esc(u.title)+'.pdf</span></span>'
+        +'<button type="button" onclick="_bpOpenUnit('+i+')" style="padding:6px 14px;border:none;background:#0f766e;color:#fff;font-weight:700;border-radius:8px;cursor:pointer;">PDF</button></div>';
+    }).join('')+'</div>'
+    +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:8px;"><span id="bpHubCnt" style="flex:1;font-size:12px;color:#0f766e;font-weight:700;">0 / '+units.length+' 作成済み</span>'
+    +'<button type="button" onclick="var h=document.getElementById(\'bpHub\');if(h&&(!window._bpLeft()||confirm(\'まだPDFにしていない分があります。閉じますか？\')))h.remove();" style="padding:8px 14px;border:none;background:#f1f5f9;border-radius:8px;cursor:pointer;">閉じる</button></div></div>';
+  document.body.appendChild(w);
+}
+window._bpLeft=function(){ return (window._bpUnits||[]).filter(function(u){ return !u.done; }).length; };
+function _bpOpenUnit(i){
+  var u=(window._bpUnits||[])[i]; if(!u) return;
+  _openMergedPrintWindow(u.items, {applicant:u.label, _fullTitle:u.title});
+  if(!u.done){ u.done=true; _bpPostLogs(u.items); }
+  var d=document.getElementById('bpDone'+i); if(d) d.textContent='✅';
+  var c=document.getElementById('bpHubCnt'); if(c){ var n=window._bpUnits.filter(function(x){ return x.done; }).length; c.textContent=n+' / '+window._bpUnits.length+' 作成済み'+(n===window._bpUnits.length?'（全部できました）':''); }
+}
+function _bpGroups(collected, whoOf){
+  var g=[]; collected.forEach(function(c){ var l=(c.html&&c.html.check)||[]; if(l.length){ var lb=_pmDocLabel(c.dk); g.push({who:whoOf(c), doc:(lb&&lb.name)||c.dk, list:l}); } }); return g;
+}
+
 // ===== ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF =====
 //   一括登録した会社（同じ会社で何人も）で、1人ずつ案件を開いて作る手間をなくす。
 //   人（案件）×書類 を見えない画面で順に開いて回収し、1つの印刷画面にまとめる（スキャン必要書類のまとめPDFと同じ仕組み）。
 var _mpState=null;
 var _MP_DEFAULT_DOCS=['1_5','1_6'];
-async function openMultiPersonPdf(){
-  if(!idxSelectedCase){ alert('先に、この会社のどれか1件の案件を選んでください。'); return; }
-  var c=idxSelectedCase;
-  var coId=c.companyId;
-  try{
-    if(!coId){ var r0=await idxSb('cases?select=company_id&id=eq.'+encodeURIComponent(c.caseId)); coId=r0&&r0[0]&&r0[0].company_id; }
-  }catch(e){}
-  if(!coId){ alert('この案件の所属機関が分かりませんでした。'); return; }
+// ver.20261109.08: 案シスでグループにまとめた案件（settings.caseGroups）も選べるように。
+//   グループに入っている案件があれば、そのグループの人を最初から選んだ状態で開く（チェックを外して選んで作ることもできる）。
+//   グループが別の会社の案件をまたぐ場合も、人ごとに会社・雇用条件セットを見て作る。
+async function _mpLoadGroups(){
+  try{ var r=await idxSb('settings?select=value&key=eq.caseGroups'); var v=r&&r[0]&&r[0].value; var a=(typeof v==='string')?JSON.parse(v):v; return Array.isArray(a)?a.filter(function(g){ return g&&g.id&&Array.isArray(g.caseIds)&&g.caseIds.length; }):[]; }catch(e){ return []; }
+}
+async function openMultiPersonPdf(opt){
+  opt=opt||{};
+  var c=idxSelectedCase||{};
   var wait=document.createElement('div'); wait.id='mpWait';
   wait.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font:700 14px sans-serif;';
-  wait.textContent='👥 この会社の人を読み込んでいます…'; document.body.appendChild(wait);
-  var rows=[], sets=[], coName=c.companyName||'';
+  wait.textContent='👥 この会社・グループの人を読み込んでいます…'; document.body.appendChild(wait);
+  var CF='id,name,applicant,nationality,status,app_type,residence_status,applicant_field,emp_set_idx,created_at,org,company,company_id';
+  var rows=[], coSets={}, coNames={}, coId=c.companyId||'', coName=c.companyName||'', groups=[], grp=null;
   try{
-    var cs=await idxSb('cases?select=id,name,applicant,nationality,status,app_type,residence_status,applicant_field,emp_set_idx,created_at,org,company&company_id=eq.'+encodeURIComponent(coId)+'&order=created_at.desc&limit=200');
-    var co=await idxSb('companies?select=name,emp_sets&id=eq.'+encodeURIComponent(coId));
-    if(co&&co[0]){ coName=co[0].name||coName; sets=co[0].emp_sets||[]; if(typeof sets==='string'){ try{ sets=JSON.parse(sets); }catch(e){ sets=[]; } } }
-    rows=(cs||[]).filter(function(x){ return x && x.applicant; });
+    groups=await _mpLoadGroups();
+    if(opt.groupId) grp=groups.find(function(g){ return g.id===opt.groupId; })||null;
+    if(!grp && c.caseId) grp=groups.find(function(g){ return g.caseIds.indexOf(c.caseId)>=0; })||null;
+    if(!c.caseId && !grp){ alert('先に、案件を1件選んでください。'); return; }
+    if(!coId && c.caseId){ var r0=await idxSb('cases?select=company_id&id=eq.'+encodeURIComponent(c.caseId)); coId=r0&&r0[0]&&r0[0].company_id; }
+    var byId={};
+    if(grp){
+      var ids=grp.caseIds.slice(0,100).map(function(x){ return '"'+String(x).replace(/"/g,'')+'"'; }).join(',');
+      (await idxSb('cases?select='+CF+'&id=in.('+encodeURIComponent(ids)+')')||[]).forEach(function(x){ byId[x.id]=x; });
+      if(!coId){ var g0=grp.caseIds.map(function(id){ return byId[id]; }).filter(Boolean)[0]; if(g0) coId=g0.company_id; }
+    }
+    if(coId){ (await idxSb('cases?select='+CF+'&company_id=eq.'+encodeURIComponent(coId)+'&order=created_at.desc&limit=200')||[]).forEach(function(x){ if(!byId[x.id]) byId[x.id]=x; }); }
+    // この会社の人が入っているほかのグループも、別の会社の人を含めて読み込む
+    var _need=[]; groups.forEach(function(g){ if(g.caseIds.some(function(id){ return byId[id]; })) g.caseIds.forEach(function(id){ if(!byId[id] && _need.indexOf(id)<0) _need.push(id); }); });
+    for(var _k=0; _k<_need.length && _k<300; _k+=60){
+      var _ids=_need.slice(_k,_k+60).map(function(x){ return '"'+String(x).replace(/"/g,'')+'"'; }).join(',');
+      (await idxSb('cases?select='+CF+'&id=in.('+encodeURIComponent(_ids)+')')||[]).forEach(function(x){ if(!byId[x.id]) byId[x.id]=x; });
+    }
+    rows=Object.keys(byId).map(function(k){ return byId[k]; }).filter(function(x){ return x && x.applicant; });
+    var coIds=[]; rows.forEach(function(x){ if(x.company_id && coIds.indexOf(x.company_id)<0) coIds.push(x.company_id); });
+    if(coIds.length){
+      var cos=await idxSb('companies?select=id,name,emp_sets&id=in.('+encodeURIComponent(coIds.map(function(x){ return '"'+x+'"'; }).join(','))+')');
+      (cos||[]).forEach(function(o){ var ss=o.emp_sets||[]; if(typeof ss==='string'){ try{ ss=JSON.parse(ss); }catch(e){ ss=[]; } } coSets[o.id]=ss; coNames[o.id]=o.name||''; });
+    }
+    if(coId && coNames[coId]) coName=coNames[coId];
   }catch(e){ alert('読み込みエラー: '+e.message); }
   finally{ var w=document.getElementById('mpWait'); if(w) w.remove(); }
-  if(!rows.length){ alert('この会社の案件が見つかりませんでした。'); return; }
+  if(!rows.length){ alert('この会社・グループの案件が見つかりませんでした。'); return; }
   var cur=rows.find(function(x){return x.id===c.caseId;})||{};
-  var sel={};
   rows.forEach(function(x){
-    var setOk=!(Array.isArray(sets)&&sets.length) || (x.emp_set_idx!=null && String(x.emp_set_idx)!=='' && sets[parseInt(x.emp_set_idx,10)]);
-    x._setOk=!!setOk;
+    var sets=coSets[x.company_id]||[];
+    x._setOk=!(Array.isArray(sets)&&sets.length) || (x.emp_set_idx!=null && String(x.emp_set_idx)!=='' && !!sets[parseInt(x.emp_set_idx,10)]);
     x._lang=idxLangFromNationality(x.nationality)||'en';
-    // 既定：今の案件と同じ案件名（一括登録の「【第1弾】…」など）の人にチェック
-    sel[x.id]=setOk && (x.id===c.caseId || (cur.name && x.name===cur.name));
+    x._coName=coNames[x.company_id]||x.company||x.org||'';
   });
-  var docSel={}; _MP_DEFAULT_DOCS.forEach(function(d){ docSel[d]=true; });
-  _mpState={coId:coId, coName:coName, rows:rows, sel:sel, docSel:docSel, order:'person', q:''};
+  // この画面で選べるグループ：今の人たちのどれかが入っているグループ
+  var rid={}; rows.forEach(function(x){ rid[x.id]=1; });
+  var vg=groups.filter(function(g){ return g.caseIds.some(function(id){ return rid[id]; }); }).map(function(g){ return {id:g.id, name:g.name||'(名前なし)', ids:g.caseIds.filter(function(id){ return rid[id]; })}; });
+  var st={coId:coId, coName:coName, rows:rows, sel:{}, docSel:{}, order:'person', q:'', groups:vg, view:grp?('g:'+grp.id):'co'};
+  var docSel={}, _last=null; try{ _last=JSON.parse(localStorage.getItem('mp_docs')||'null'); }catch(e){}   // 前回選んだ書類を覚えておく
+  ((Array.isArray(_last)&&_last.length)?_last:_MP_DEFAULT_DOCS).forEach(function(d){ docSel[d]=true; });
+  st.docSel=docSel;
+  try{ st.split=localStorage.getItem('mp_split')||'one'; }catch(e){ st.split='one'; }   // PDFの分け方も前回のものを使う
+  _mpState=st;
+  if(grp) _mpSetView('g:'+grp.id, true);
+  else { rows.forEach(function(x){ st.sel[x.id]=x._setOk && x.company_id===coId && (x.id===c.caseId || (cur.name && x.name===cur.name)); }); _mpRender(); }
+}
+function _mpViewRows(){
+  var st=_mpState; if(!st) return [];
+  if(String(st.view).indexOf('g:')===0){ var g=st.groups.find(function(x){ return 'g:'+x.id===st.view; }); if(g){ var m={}; g.ids.forEach(function(id){ m[id]=1; }); return st.rows.filter(function(x){ return m[x.id]; }); } }
+  return st.rows.filter(function(x){ return !st.coId || x.company_id===st.coId; });
+}
+function _mpSetView(v, noRender){
+  var st=_mpState; if(!st) return; st.view=v; st.q='';
+  if(String(v).indexOf('g:')===0){ st.sel={}; _mpViewRows().forEach(function(x){ st.sel[x.id]=!!x._setOk; }); }   // グループを選んだら、そのグループの人を全員選ぶ
   _mpRender();
 }
 function _mpRender(){
@@ -3458,12 +3600,17 @@ function _mpRender(){
   var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
   var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語'};
   var q=String(st.q||'').trim();
-  var ppl=st.rows.filter(function(x){ return !q || (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)>=0; });
+  var ppl=_mpViewRows().filter(function(x){ return !q || (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)>=0; });
+  var _multiCo=ppl.some(function(x){ return x.company_id!==st.coId; });
+  var _chip=function(v,label,n){ var on=st.view===v; return '<button type="button" onclick="_mpSetView(\''+v+'\')" style="font-size:11.5px;padding:4px 10px;margin:2px 6px 2px 0;border-radius:14px;cursor:pointer;border:1px solid '+(on?'#0f766e':'#cbd5e1')+';background:'+(on?'#0f766e':'#fff')+';color:'+(on?'#fff':'#334155')+';">'+esc(label)+'（'+n+'名）</button>'; };
+  var nCo=st.rows.filter(function(x){ return !st.coId || x.company_id===st.coId; }).length;
+  var gbar=(st.groups.length?'<div style="padding:8px 18px 0;"><span style="font-weight:700;font-size:12.5px;margin-right:6px;">案シスのグループ：</span>'
+    +st.groups.map(function(g){ return _chip('g:'+g.id,'🗂 '+g.name,g.ids.length); }).join('')+(st.coId?_chip('co','🏢 '+(st.coName||'この会社')+'の全員',nCo):'')+'</div>':'');
   var pr=ppl.map(function(x){
     var dis=!x._setOk;
     return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #f1f5f9;'+(dis?'opacity:.55;':'cursor:pointer;')+'">'
       +'<input type="checkbox" '+(st.sel[x.id]?'checked':'')+(dis?' disabled':'')+' onchange="_mpState.sel[\''+x.id+'\']=this.checked;_mpCount();">'
-      +'<span style="flex:1;min-width:0;"><b>'+esc(x.applicant)+'</b> <span style="color:#64748b;font-size:11px;">'+esc(x.nationality||'')+'→'+(LN[x._lang]||x._lang)+'／'+esc(x.app_type||'')+'／'+esc(x.status||'')+'</span>'
+      +'<span style="flex:1;min-width:0;"><b>'+esc(x.applicant)+'</b> <span style="color:#64748b;font-size:11px;">'+(_multiCo?esc(x._coName)+'／':'')+esc(x.nationality||'')+'→'+(LN[x._lang]||x._lang)+'／'+esc(x.app_type||'')+'／'+esc(x.status||'')+'</span>'
       +'<br><span style="color:#94a3b8;font-size:10.5px;">'+esc(x.name||'')+'</span>'
       +(dis?'<br><span style="color:#b91c1c;font-size:10.5px;">雇用条件セットが選ばれていないため対象外（1-6号などを開いて選んでください）</span>':'')+'</span></label>';
   }).join('');
@@ -3473,17 +3620,21 @@ function _mpRender(){
   }).join('');
   var html='<div id="mpModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;" onclick="if(event.target.id===\'mpModal\')this.remove();">'
     +'<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(760px,94vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
-    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">👥 同じ会社の複数人をまとめてPDF</div>'
-    +'<div style="font-size:12px;color:#475569;margin-top:2px;">'+esc(st.coName)+'（'+st.rows.length+'件）／言語は人ごとに国籍から自動で選びます</div></div>'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">👥 複数人の書類をまとめてPDF（会社・案シスのグループ）</div>'
+    +'<div style="font-size:12px;color:#475569;margin-top:2px;">'+esc(_mpTitle())+'／言語は人ごとに国籍から自動で選びます</div></div>'
     +'<div style="padding:10px 18px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;font-size:12.5px;margin-bottom:4px;">① 書類を選ぶ</div><div style="max-height:110px;overflow:auto;">'+dr+'</div></div>'
+    +gbar
     +'<div style="padding:8px 18px 0;display:flex;gap:8px;align-items:center;"><div style="font-weight:700;font-size:12.5px;">② 人を選ぶ</div>'
     +'<input id="mpQ" placeholder="名前・案件名で絞り込み" value="'+esc(st.q)+'" oninput="_mpState.q=this.value;_mpRender();var e=document.getElementById(\'mpQ\');e.focus();e.setSelectionRange(e.value.length,e.value.length);" style="flex:1;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;">'
     +'<button onclick="_mpAll(true)" style="font-size:11px;padding:4px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">表示中を全部</button>'
     +'<button onclick="_mpAll(false)" style="font-size:11px;padding:4px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">外す</button></div>'
     +'<div style="flex:1;overflow:auto;margin:6px 18px;border:1px solid #e2e8f0;border-radius:8px;">'+pr+'</div>'
     +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
-    +'<span style="font-size:12px;">並び順：</span><label style="font-size:12px;"><input type="radio" name="mpOrder" '+(st.order==='person'?'checked':'')+' onchange="_mpState.order=\'person\'"> 人ごと</label>'
-    +'<label style="font-size:12px;"><input type="radio" name="mpOrder" '+(st.order==='doc'?'checked':'')+' onchange="_mpState.order=\'doc\'"> 書類ごと</label>'
+    +'<span style="font-size:12px;font-weight:700;">PDF：</span>'
+    +[['doc','人ごと書類ごと','1人の書類1つずつ、別々のPDF'],['person','人ごと','1人分の書類を1つのPDF'],['bydoc','書類ごと','同じ書類の全員分を1つのPDF'],['one','まとめて','全員の全書類を1つのPDF']].map(function(o){
+      return '<label title="'+o[2]+'" style="font-size:12px;cursor:pointer;"><input type="radio" name="mpSplit" '+((st.split||'one')===o[0]?'checked':'')+' onchange="_mpState.split=\''+o[0]+'\';try{localStorage.setItem(\'mp_split\',\''+o[0]+'\');}catch(e){}_mpRender();"> '+o[1]+'</label>'; }).join('')
+    +((st.split||'one')==='one'?'<span style="font-size:11px;color:#64748b;margin-left:4px;">並び：</span><label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='person'?'checked':'')+' onchange="_mpState.order=\'person\'"> 人順</label>'
+      +'<label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='doc'?'checked':'')+' onchange="_mpState.order=\'doc\'"> 書類順</label>':'')
     +'<span id="mpCount" style="flex:1;font-size:12.5px;color:#0f766e;font-weight:700;text-align:right;"></span>'
     +'<button onclick="document.getElementById(\'mpModal\').remove()" style="padding:8px 14px;background:#f1f5f9;border:none;border-radius:8px;cursor:pointer;">キャンセル</button>'
     +'<button id="mpGo" onclick="_mpExecute()" style="padding:9px 18px;background:#0f766e;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">PDFを作る</button>'
@@ -3491,24 +3642,31 @@ function _mpRender(){
   document.body.insertAdjacentHTML('beforeend', html);
   _mpCount();
 }
+function _mpTitle(short){
+  var st=_mpState; if(!st) return '';
+  if(String(st.view).indexOf('g:')===0){ var g=st.groups.find(function(x){ return 'g:'+x.id===st.view; }); if(g) return short?String(g.name).replace(/[\\/:*?"<>|]/g,'').slice(0,60):('🗂 '+g.name+'（'+g.ids.length+'件）'); }
+  return short?st.coName:(st.coName+'（'+_mpViewRows().length+'件）');
+}
 function _mpAll(on){
   var st=_mpState; var q=String(st.q||'').trim();
-  st.rows.forEach(function(x){ if(!x._setOk) return; if(q && (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)<0) return; st.sel[x.id]=!!on; });
+  _mpViewRows().forEach(function(x){ if(!x._setOk) return; if(q && (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)<0) return; st.sel[x.id]=!!on; });
   _mpRender();
 }
 function _mpCount(){
   var st=_mpState; var el=document.getElementById('mpCount'); if(!st||!el) return;
   var np=st.rows.filter(function(x){return st.sel[x.id];}).length;
+  var _vis={}; _mpViewRows().forEach(function(x){ _vis[x.id]=1; }); var _hid=st.rows.filter(function(x){ return st.sel[x.id] && !_vis[x.id]; }).length;
   var nd=Object.keys(st.docSel).filter(function(k){return st.docSel[k];}).length;
-  el.textContent=np+'名 × '+nd+'書類 ＝ '+(np*nd)+'件（約'+Math.max(1,Math.round(np*nd*6/60))+'分）';
+  el.textContent=np+'名'+(_hid?'（ほかの表示で選んだ'+_hid+'名を含む）':'')+' × '+nd+'書類 ＝ '+(np*nd)+'件（約'+Math.max(1,Math.round(np*nd*6/60))+'分）';
   var go=document.getElementById('mpGo'); if(go){ go.disabled=!(np&&nd); go.style.opacity=(np&&nd)?'1':'.5'; }
 }
 async function _mpExecute(){
   var st=_mpState; if(!st) return;
-  var ppl=st.rows.filter(function(x){return st.sel[x.id];});
+  var ppl=st.rows.filter(function(x){return st.sel[x.id];});   // 表示を切り替えて選んだ人もまとめて作る
   var allDocs=_getAllDocKeys().map(function(d){return d.key;});
   var dks=allDocs.filter(function(k){return st.docSel[k];});
   if(!ppl.length||!dks.length) return;
+  try{ localStorage.setItem('mp_docs', JSON.stringify(dks)); }catch(e){}
   var jobs=[];
   if(st.order==='doc'){ dks.forEach(function(dk){ ppl.forEach(function(x){ jobs.push({x:x,dk:dk}); }); }); }
   else { ppl.forEach(function(x){ dks.forEach(function(dk){ jobs.push({x:x,dk:dk}); }); }); }
@@ -3528,29 +3686,33 @@ async function _mpExecute(){
       document.getElementById('mpProg').textContent='('+(i+1)+'/'+jobs.length+') '+x.applicant+' ・ '+(lb&&lb.name||j.dk)+' を読み込み中…';
       document.getElementById('mpBar').style.width=Math.round(i/jobs.length*100)+'%';
       if(!f){ failed.push(x.applicant+'：'+j.dk); continue; }
-      var info={caseId:x.id, companyId:st.coId, companyName:st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
+      var info={_batch:'multi', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
       var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), info);
       if(res){
         // 開いた書類に別の人の名前が出ていないか（取り違え防止）：申請人名が書類に無ければ失敗扱い
         var nm=String(x.applicant||'').normalize('NFKC').replace(/[\s　]/g,'').toUpperCase();
         var txt=String(res.html||'').replace(/<[^>]+>/g,'').normalize('NFKC').replace(/[\s　]/g,'').toUpperCase();
         if(nm && txt.indexOf(nm)<0 && /^(1_5|1_6|juuyou|1_16)$/.test(j.dk)) warned.push(x.applicant+'：'+(lb&&lb.name||j.dk));
-        collected.push({dk:j.dk, html:res});
+        collected.push({dk:j.dk, html:res, who:x.applicant});
       } else failed.push(x.applicant+'：'+(lb&&lb.name||j.dk));
       document.getElementById('mpFail').textContent=failed.length?('⚠️ 作れなかったもの '+failed.length+'件'):'';
     }
     document.getElementById('mpBar').style.width='100%';
     if(!collected.length) throw new Error('書類の内容を取得できませんでした');
-    if(failed.length) alert('次の書類は作れなかったため、PDFに入っていません：\n\n'+failed.slice(0,15).join('\n')+(failed.length>15?('\nほか '+(failed.length-15)+'件'):''));
-    if(warned.length) alert('次の書類は、書類の中に申請人の名前が見つかりませんでした。PDFには入れましたが、別の人の内容になっていないか確認してください：\n\n'+warned.slice(0,15).join('\n')+(warned.length>15?('\nほか '+(warned.length-15)+'件'):''));
-    _openMergedPrintWindow(collected, {applicant:st.coName+'_'+ppl.length+'名分', _title:st.coName+'_'+ppl.length+'名分'});
+    // ver.20261109.08: 作れなかったもの・名前が見つからないもの・印刷前チェックを1つの画面で確認
+    var _ov1=document.getElementById('mpOverlay'); if(_ov1) _ov1.style.display='none';
+    if(!(await _bpReview(_bpGroups(collected, function(c){ return c.who||''; }), failed, warned))) return;
+    if(st.split==='person' || st.split==='doc' || st.split==='bydoc'){ _bpSplitHub(collected, st.split, ppl, _mpTitle(true)); return; }
+    var _tt=_mpTitle(true)+'_'+ppl.length+'名分';
+    _openMergedPrintWindow(collected, {applicant:_tt, _title:_tt});
+    _bpPostLogs(collected);
   }catch(e){ alert('まとめPDFの作成でエラーが発生しました: '+e.message); console.error(e); }
   finally{ var ov=document.getElementById('mpOverlay'); if(ov) ov.remove(); }
 }
 function _openMergedPrintWindow(collected, info){
   var w=window.open('', '_blank');
   if(!w){ alert('ポップアップがブロックされました。ポップアップを許可してから再度お試しください。'); return; }
-  var title=info._title ? (info._title+'_書類') : ((info.applicant?info.applicant+'様_':'')+'スキャン必要書類');   // ver.20261106.05: 複数人まとめは「会社名_◯名分_書類」
+  var title=info._fullTitle ? info._fullTitle : (info._title ? (info._title+'_書類') : ((info.applicant?info.applicant+'様_':'')+'スキャン必要書類'));   // ver.20261109.08: 人ごと・書類ごとに分けるときは名前をそのまま   // ver.20261106.05: 複数人まとめは「会社名_◯名分_書類」
   var links=[]; collected.forEach(function(c){ (c.html.links||[]).forEach(function(h){ if(links.indexOf(h)<0) links.push(h); }); });
   var head='<meta charset="UTF-8"><title>'+title+'</title>'
     + links.map(function(h){return '<link rel="stylesheet" href="'+h+'">';}).join('')

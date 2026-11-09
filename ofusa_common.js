@@ -262,10 +262,12 @@ function _aiCheck16Local(rules){
     if(isKensetsu){
       // ver.20261109.07: 建設は「所定内賃金÷月所定労働時間」が、地域別最低賃金×1.1 と 全国加重平均×1.1 のどちらも下回らないこと（国交省 受入計画の認定基準）
       var stn=_mw16_shoteinai(), avg=window.OFUSA_MIN_WAGE_AVG||0;
-      var hk=(_mw16_num('es_salaryHourly') && !monthly) ? _mw16_num('es_salaryHourly') : (th>0 ? Math.floor(stn.sum/th) : hourly);
+      var _hr=(!monthly)?_mw16_num('es_salaryHourly'):0, hk;
+      if(_hr){ var _al=stn.sum; hk=th>0 ? Math.floor(_hr+_al/th) : _hr; stn.detail='時給'+_hr+(_al?'＋手当（'+stn.detail+'）÷月'+th.toFixed(1)+'h':''); }   // ver.20261109.08: 時給は 時給＋手当÷月時間
+      else hk=(th>0 ? Math.floor(stn.sum/th) : hourly);
       var needR=Math.ceil(mw*1.1), needA=Math.ceil(avg*1.1), need=Math.max(needR,needA);
       var basis=(needA>needR?'全国加重平均'+avg+'円×1.1＝'+needA+'円':pref+'最賃'+mw+'円×1.1＝'+needR+'円')+'（地域別×1.1＝'+needR+'円／全国加重平均×1.1＝'+needA+'円の高い方）';
-      if(hk<need) add('out','建設報酬基準','建設の報酬基準を下回っています','時給換算 '+hk+'円 < '+need+'円。'+basis+'。所定内賃金 '+stn.detail+' ÷ 月'+th.toFixed(1)+'h で計算。','P5');
+      if(hk<need) add('out','建設報酬基準','建設の報酬基準を下回っています','時給換算 '+hk+'円 < '+need+'円。'+basis+'。'+(_hr?stn.detail+' で計算。':'所定内賃金 '+stn.detail+' ÷ 月'+th.toFixed(1)+'h で計算。'),'P5');
       else add('ok','建設報酬基準','建設の報酬基準クリア','時給換算 '+hk+'円 ≥ '+need+'円。'+basis+'。','P5');
     }
   } else if(!pref){
@@ -4528,8 +4530,7 @@ function _slogUserName(){
   try{ return String(localStorage.getItem('ofusa_currentUser')||''); }catch(_l){}
   return '';
 }
-function slog(event, extra){
-  try{
+function _slogBuild(event, extra){
     var key=''; try{ key=(typeof _dgjInferDocKey==='function')?(_dgjInferDocKey()||''):''; }catch(_k){}
     var who=''; try{ who=(typeof _printApplicantName==='function')?(_printApplicantName()||''):''; }catch(_w){}
     var body={ event:String(event||''), user_email:_slogUser(), user_name:_slogUserName(), doc_key:key,
@@ -4539,6 +4540,12 @@ function slog(event, extra){
       ms_since_load:(_SLOG_LOADED_AT?(Date.now()-_SLOG_LOADED_AT):null) };
     if(extra){ for(var k in extra){ if(Object.prototype.hasOwnProperty.call(extra,k)) body[k]=extra[k]; } }
     if(body.event==='save' && !body.meta){ try{ var _mi=_miCollect(); if(_mi) body.meta=_mi; }catch(_m){} }   // ver.20261109.03: 手入力の記録
+    return body;
+}
+window._slogBody=function(event, extra){ try{ return _slogBuild(event, extra); }catch(e){ return null; } };   // ver.20261109.08: まとめPDFの記録用
+function slog(event, extra){
+  try{
+    var body=_slogBuild(event, extra);
     fetch(SB_URL+'/rest/v1/saysay_logs',{method:'POST',keepalive:true,
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify(body)}).catch(function(){});
@@ -4564,6 +4571,23 @@ function _srcEmpSet(){
 /* ===== ver.20261109.07: 1-6号 雇用条件書の印刷前チェック =====
    印刷・PDFの前に、必須欄の空欄・計算の検算（支払概算総額／控除合計／手取り）・最低賃金・建設の報酬基準などを確かめ、
    問題があれば一覧で知らせる（そのまま印刷するか選べる）。計算の判定は AI判定と同じ _aiCheck16Local を使う。 */
+function _p16MonthHours(){
+  var h=_mw16_num('es_monthlyH'), m=_mw16_num('es_monthlyMin');
+  return h ? Math.round((h+(m||0)/60)*100)/100 : 0;
+}
+// ver.20261109.08: 時給・日給のとき、換算月給が空なら 時給×月の所定労働時間（日給×月の日数）で入れる（月給のときは何もしない）
+function _p16AutoCalcMonthly(){
+  try{
+    var e=document.getElementById('es_calcMonthly'); if(!e) return;
+    if(_mw16_num('es_salaryMonthly')) return;
+    if(String(e.value||'').trim() && e.dataset.autofill!=='1') return;   // 入っている値（案シス・手入力）は変えない
+    var hr=_mw16_num('es_salaryHourly'), dy=_mw16_num('es_salaryDaily'), mh=_p16MonthHours();
+    var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
+    var v=hr&&mh ? Math.round(hr*mh) : (dy&&md ? Math.round(dy*md) : 0); if(!v) return;
+    var s=v.toLocaleString('ja-JP'); if(e.value===s) return;
+    e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
+  }catch(err){}
+}
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
@@ -4575,11 +4599,21 @@ function _p16PrintCheck(){
   try{
     (_aiCheck16Local(window._check16RulesCache||null)||[]).forEach(function(c){ if(c.severity==='out'||c.severity==='warn') probs.push((c.severity==='out'?'⛔ ':'⚠ ')+c.title+'：'+c.detail); });
   }catch(e){ console.warn('[1-6 印刷前チェック]', e); }
-  // 支払概算総額 ＝ 基本給＋手当＋固定残業代（月給のとき）
+  // ver.20261109.08: 時給・日給のとき、換算月給が 時給×月の所定労働時間 と合っているか／手取りがマイナスでないか
   try{
-    var base=_mw16_num('es_salaryMonthly'), st=_mw16_num('es_salaryTotal');
+    var hr=_mw16_num('es_salaryHourly'), cm=_mw16_num('es_calcMonthly'), mh=_p16MonthHours();
+    if(!_mw16_num('es_salaryMonthly') && hr && mh){
+      var want=Math.round(hr*mh);
+      if(!cm) probs.push('⚠ 換算月給が空欄です（時給'+hr+'円×月'+mh+'時間＝'+want.toLocaleString('ja-JP')+'円）');
+      else if(Math.abs(cm-want)>Math.max(10, want*0.01)) probs.push('⚠ 換算月給が 時給×月の所定労働時間 と違います：時給'+hr+'円×月'+mh+'時間＝'+want.toLocaleString('ja-JP')+'円 ／ 換算月給 '+cm.toLocaleString('ja-JP')+'円');
+    }
+    var np=g('es_netPay'); if(np && /^-/.test(np.normalize('NFKC').replace(/[,\s円]/g,''))) probs.push('⛔ 手取り支給額がマイナスです（'+np+'円）。支払概算総額を確認してください');
+  }catch(e){}
+  // 支払概算総額 ＝ 基本給（時給・日給は換算月給）＋手当＋固定残業代
+  try{
+    var _bm=_mw16_num('es_salaryMonthly'), base=_bm||_mw16_num('es_calcMonthly'), st=_mw16_num('es_salaryTotal');
     if(base && st){
-      var sum=base, d=['基本給'+base];
+      var sum=base, d=[(_bm?'基本給':'換算月給')+base];
       for(var i=1;i<=6;i++){ var am=_mw16_num('es_a'+i+'Amt'); if(am){ sum+=am; d.push((g('es_a'+i+'Name')||('手当'+i))+am); } }
       var fo=_mw16_num('es_fixedOTAmount'); if(fo){ sum+=fo; d.push('固定残業代'+fo); }
       if(Math.abs(sum-st)>1) probs.push('⚠ 支払概算総額が内訳の合計と違います：'+d.join('＋')+'＝'+sum.toLocaleString('ja-JP')+'円 ／ 支払概算総額 '+st.toLocaleString('ja-JP')+'円（差 '+(st-sum).toLocaleString('ja-JP')+'円）');
@@ -4607,6 +4641,8 @@ function _p16PrintCheck(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
+  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); }, true);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
 /* ===== ver.20261109.05: 🔍 空欄の参照先（案シスのどこが空か） =====
@@ -4706,23 +4742,51 @@ function srcToggle(){
 }
 window.srcToggle=srcToggle;
 // ver.20261109.07: 案件を読み込んだあと、案シス側が空のために空欄になっている欄があれば、左上に要約だけ自動で出す（押すと詳しく）
+// 案シス側が空のために空欄になっている欄（任意・訳の欄を除く）の一覧
+function _srcHourlyOrDaily(){ var v=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }; return !!(v('es_salaryHourly')||v('es_salaryDaily')||v('f_salaryHourly')||v('f_salaryDaily')); }
+function _srcRedItems(){
+  var todo={}, n=0;
+  try{
+    _srcMapCache=null;
+    document.querySelectorAll('.fp input[id], .fp select[id], .fp textarea[id]').forEach(function(el){
+      if(el.type==='hidden'||el.type==='checkbox'||el.type==='radio'||el.id==='caseSelect'||/Select$/.test(el.id)||/^sp_/.test(el.id)||el.offsetParent===null) return;
+      if(!_srcIsEmpty(el.value) || /(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/.test(el.id)) return;
+      var info=_srcEmptyInfo(el); if(!info) return;
+      var _hd=_srcHourlyOrDaily();
+      var emp=info.filter(function(x){ return x.state==='empty' && !_SRC_OPT.test(x.k) && !(_hd && /^(salaryMonthly|calcHourly)$/.test(x.k)); }); if(!emp.length) return;   // 時給・日給の人は月給が空でふつう
+      var gg=_SRC_GRP[emp[0].g], key=gg.icon+gg.name; (todo[key]=todo[key]||{}); emp.filter(function(e){ return e.g===emp[0].g; }).slice(0,3).forEach(function(e){ todo[key][e.label]=1; }); n++;
+    });
+  }catch(e){ console.warn('[空欄の一覧]', e); }
+  var items=[]; Object.keys(todo).forEach(function(k){ Object.keys(todo[k]).forEach(function(l){ items.push(k+' '+l); }); });
+  return {n:n, items:items};
+}
+window._srcRedItems=_srcRedItems;
+// ver.20261109.08: まとめてPDFのとき、見えない画面で開いた書類ごとに、印刷前チェックと同じ内容を集める
+window._batchCheck=function(){
+  var out=[];
+  try{
+    if(typeof _p16AutoCalcMonthly==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) _p16AutoCalcMonthly();
+    if(typeof _p16PrintCheck==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){
+      var r=_p16PrintCheck(); r.probs.forEach(function(x){ out.push(x); }); if(r.miss.length) out.push('空欄：'+r.miss.join('、'));
+    }
+    if(typeof jyPrintCheck==='function'){
+      var j=jyPrintCheck(); (j.diff||[]).forEach(function(x){ out.push('⚠ 雇用条件と違う：'+x); });
+      if((j.miss||[]).length) out.push('空欄：'+j.miss.join('、'));
+      if((j.tr||[]).length) out.push('🌐 訳がない欄 '+j.tr.length+'か所');
+    }
+    if(!/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)){
+      var R=_srcRedItems(); if(R.n) out.push('⬜ 案シスで埋めてください（'+R.n+'欄）：'+R.items.slice(0,4).join('、')+(R.items.length>4?' ほか':''));
+    }
+  }catch(e){ console.warn('[まとめPDFのチェック]', e); }
+  return out;
+};
 function _srcAutoSummary(){
   try{
     if(/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)) return;
     var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host || !document.getElementById('pageArea')) return;
     var old=document.getElementById('srcAuto'); if(old) old.remove();
     if(document.querySelector('.src-badge')) return;   // 詳しい表示中は出さない
-    _srcMapCache=null;
-    var todo={}, n=0;
-    document.querySelectorAll('.fp input[id], .fp select[id], .fp textarea[id]').forEach(function(el){
-      if(el.type==='hidden'||el.type==='checkbox'||el.type==='radio'||el.id==='caseSelect'||/Select$/.test(el.id)||/^sp_/.test(el.id)||el.offsetParent===null) return;
-      if(!_srcIsEmpty(el.value) || /(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/.test(el.id)) return;
-      var info=_srcEmptyInfo(el); if(!info) return;
-      var emp=info.filter(function(x){ return x.state==='empty' && !_SRC_OPT.test(x.k); }); if(!emp.length) return;
-      var gg=_SRC_GRP[emp[0].g], key=gg.icon+gg.name; (todo[key]=todo[key]||{}); emp.filter(function(e){ return e.g===emp[0].g; }).slice(0,3).forEach(function(e){ todo[key][e.label]=1; }); n++;
-    });
-    var keys=Object.keys(todo); if(!keys.length) return;
-    var items=[]; keys.forEach(function(k){ Object.keys(todo[k]).forEach(function(l){ items.push(k+' '+l); }); });
+    var R=_srcRedItems(); var items=R.items, n=R.n; if(!n) return;
     var box=document.createElement('div'); box.id='srcAuto';
     box.style.cssText='margin:0 0 8px;padding:6px 9px;border:1px solid #fecaca;border-radius:8px;background:#fff7f7;color:#991b1b;font-size:11px;line-height:1.55;cursor:pointer';
     box.title='押すと、空欄ごとに案シスのどこが空かを表示します';
