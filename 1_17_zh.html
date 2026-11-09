@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261106.04</div>
+    <div class="ver">ver.20261109.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2287,7 +2287,7 @@ async function loadFromDB(passedInfo){
         _s('es_coMgrName',co.support_manager_name||co.rep_name); _s('es_coMgrNameEn',co.support_manager_name_en||co.rep_name_en);
         _s('es_coMgrTitle',co.support_manager_title||co.rep_title); _s('es_coMgrTitleEn',co.support_manager_title_en||co.rep_title_en);
         _s('es_coMgrKana',co.support_manager_kana);
-        _s('es_coAuthorName',co.author_name||co.rep_name);
+        _s('es_coAuthorName',_p17StripTitle(co.author_name||co.rep_name, co.author_title||co.rep_title));   // ver.20261109.01: 役職が名前に混ざっていたら外す
         _s('es_coAuthorNameEn',co.author_name_en||((co.rep_title_en?co.rep_title_en+' ':'')+(co.rep_name_en||'')).trim());   // ver.20261104.01
 
         /* ver.20261013.02: 雇用条件セット(companies.emp_sets[])由来の項目。
@@ -2327,6 +2327,11 @@ async function loadFromDB(passedInfo){
           var ps = _splitAddr(adr), oc = String(_es.officeCity||_sp.city||''), op = String(_es.officePref||_sp.pref||'');
           if(!ps.city || !oc) return;
           var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
+          /* ver.20261109.01: 変更申請で、今の住所が事業所と別の都道府県なら、入社後は事業所の近くに住むので「同上」。
+             （実際の作成で「異なる地方公共団体」→「同上」への手直しが続いたため）。同じ都道府県で市区町村が違うときは従来どおり。 */
+          var _chg = /変更/.test((cas&&cas.app_type)||'');
+          window._p17ResNote = null;
+          if(_chg && ps.pref && op && ps.pref!==op){ C.f380s = true; C.f380d = false; window._p17ResNote = ps.pref+(ps.city||''); return; }
           if(ps.city===oc && (!ps.pref || !op || ps.pref===op)){ C.f380s = true; C.f380d = false; }
           else { C.f380s = false; C.f380d = true; T.f387 = ps.pref; T.f388 = ps.city; }   /* ver.20261105.19: 選択肢の文言は隠すので値はそのまま */
         })();
@@ -2754,6 +2759,14 @@ async function _p17SelfSupport(cas, co, caseId){
 // DB保存（今は最小：将来 emp_set 等へ）
 /* ver.20261030.01: DB保存。左パネルの全欄・本文の文字・チェックを案件ごとに saysay_form_state へ追記保存する。
    案件を開くと、最新の保存があれば案件データ・ヒアリングより優先して戻す。 */
+/* ver.20261109.01: 「理事長　小野 裕司」のように名前の前に役職が入っていたら外す（役職は別の欄に出るため） */
+function _p17StripTitle(name, title){
+  var n=String(name||'').replace(/\u3000/g,' ').trim(); if(!n) return name||'';
+  var t=String(title||'').replace(/\u3000/g,' ').trim();
+  if(t && n.indexOf(t)===0 && n.length>t.length) return n.slice(t.length).trim();
+  var m=n.match(/^(代表取締役社長|代表取締役会長|代表取締役|取締役社長|代表理事長|代表理事|理事長|代表社員|業務執行社員|組合長|代表者|社長|会長|所長|院長|園長|施設長)\s+(.+)$/);
+  return m ? m[2].trim() : n;
+}
 var P17_DOC = '1_17_zh.html';
 function _p17CaseId(){ var i = window._lastCaseInfo || {}; return i.caseId || new URLSearchParams(location.search).get('case') || ''; }
 function _p17Collect(){
@@ -3056,6 +3069,15 @@ function _p17TodoItems(){
   if(untr.length) items.push({t:'訳せていない箇所 '+untr.length+' 件（書類の赤い所）', go:'_p17GoUntr()'});
   var need=[['f_applicant','氏名'],['f_gender','性別'],['f_birthY','生年月日'],['es_createY','作成日'],['es_coName','所属機関の名称'],['es_coAddress','所属機関の住所']];
   if(!window._p17SelfWhy) need.push(['es_soName','登録支援機関の名称'],['es_soRegNo','登録支援機関の登録番号']);
+  // ver.20261109.01: 実際の作成で手直しが多かった所を知らせる
+  if(window._p17ResNote) items.push({t:'Ⅴ 住居地は「同上」にしました（今の住所「'+window._p17ResNote+'」は事業所と別の都道府県のため）。入社後の住居地が違うときは直してください', go:"_p17Flash(document.getElementById('f380s'))", info:1});
+  (function(){ var y=parseInt(g('es_symY'),10), m=parseInt(g('es_symM'),10), d=parseInt(g('es_symD'),10); if(!y||!m||!d) return;
+    var cy=parseInt(g('es_createY'),10), cm=parseInt(g('es_createM'),10), cd=parseInt(g('es_createD'),10);
+    if(y<1000) y+=2018; if(cy&&cy<1000) cy+=2018;   // 令和で入っていても比べられるように
+    var base=(cy&&cm&&cd)?new Date(cy,cm-1,cd):new Date(); var days=Math.round((base-new Date(y,m-1,d))/86400000);
+    if(days>90) items.push({t:'Ⅴ 共生施策の確認日が '+y+'/'+m+'/'+d+'（作成日の約'+Math.round(days/30)+'か月前）。最近確認した日か見直してください', go:"_p17GoField('es_symM')"});
+  })();
+  if(window._p17Check && window._p17Check.f129){ var _f131=document.getElementById('f131'); if(_f131 && !String(_f131.value||'').trim()) items.push({t:'住居の同居人数が空欄（雇用条件に人数が無いため）', go:"_p17Flash(document.getElementById('f131'))"}); }
   need.forEach(function(x){ var e=document.getElementById(x[0]); if(e && !g(x[0])) items.push({t:x[1]+'が空欄', go:"_p17GoField('"+x[0]+"')"}); });
   var ON=window._p17OfficeNote;
   if(ON && !ON.guessed) items.push({t:'支援を行う事業所は「'+ON.name+'」で作成（案シスの案件情報「使用する支援事業所」が未選択のため1つ目。別の事業所なら案シスで選んで開き直してください）', go:"_p17GoField('es_soOfficeAddress')", info:1});
