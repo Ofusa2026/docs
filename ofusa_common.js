@@ -191,7 +191,7 @@ async function sb(path,opts={}){
   const t = await r.text();
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
   const _res = t ? JSON.parse(t) : null;
-  // ver.20261109.05: 「🔍 出どころ」表示のため、1件ずつ読んだ行（案件・会社・人材・登録支援機関など）を覚えておく
+  // ver.20261109.09: 「🔍 出どころ」表示のため、1件ずつ読んだ行（案件・会社・人材・登録支援機関など）を覚えておく
   try{ if(_method==='GET' && Array.isArray(_res) && _res.length && _res.length<=3){ const _tb=String(path).split('?')[0]; (window._srcRows=window._srcRows||{})[_tb]=_res[0]; } }catch(_sr){}
   return _res;
 }
@@ -253,11 +253,14 @@ function _aiCheck16Local(rules){
   var th=_mw16_num('es_monthlyH')+_mw16_num('es_monthlyMin')/60;
   var hourly=_mw16_num('es_salaryHourly');
   var monthly=_mw16_num('es_salaryMonthly');
-  if(!hourly && monthly && th>0) hourly=Math.round(monthly/th);
+  // ver.20261109.09: 最低賃金は基本給だけでなく、算入される手当も足して判定（精皆勤・通勤・家族・固定残業や夜勤などの割増・臨時・賞与は除く＝最低賃金法の除外賃金）
+  var _mwAllow=0, _mwAllowNames=[];
+  for(var _mi=1; _mi<=6; _mi++){ var _mn=_mw16_val('es_a'+_mi+'Name'), _ma=_mw16_num('es_a'+_mi+'Amt'); if(_ma && !/固定残業|みなし|残業|時間外|深夜|夜勤|休日出勤|通勤|家族|扶養|精勤|皆勤|臨時|賞与/.test(_mn)){ _mwAllow+=_ma; _mwAllowNames.push(_mn||('手当'+_mi)); } }
+  if(!hourly && monthly && th>0) hourly=Math.round((monthly+_mwAllow)/th);
   var isKensetsu=/建設/.test(_mw16_val('es_applicantField')+_mw16_val('es_applicantFieldEn'));
   if(pref && hourly){
     var mw=OFUSA_MIN_WAGE[pref];
-    if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（令和7年度）。基本給ベース（月給÷月所定労働時間）で判定。','P5');
+    if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（令和7年度）。（月給'+(_mwAllow?'＋算入手当［'+_mwAllowNames.join('・')+'］':'')+'）÷月所定労働時間で判定。','P5');
     else add('ok','最低賃金','最低賃金クリア（'+pref+'）','時給換算 '+hourly+'円 ≥ '+mw+'円。','P5');
     if(isKensetsu){
       // ver.20261109.07: 建設は「所定内賃金÷月所定労働時間」が、地域別最低賃金×1.1 と 全国加重平均×1.1 のどちらも下回らないこと（国交省 受入計画の認定基準）
@@ -345,8 +348,105 @@ function _aiCheck16Local(rules){
     var rc=_mw16_val('es_raiseCondition');
     if(rc && !/1[,，]?000円/.test(rc)) add('warn','昇給','建設の昇給要件（月1,000円以上）が文言から読めません','昇給条件:「'+rc.substring(0,60)+'…」。年1回・1,000円/月以上の明記を推奨。','P5');
   }
+  // ver.20261109.09: 差戻しの多い項目を計算チェックに追加（時給換算・固定残業代・契約期間・変形労働）
+  //   手当のうち、割増賃金の計算に入れないもの（固定残業・通勤・家族・住宅・別居・子女教育・精皆勤・臨時）は時給換算から除く
+  var _exAllow=/固定残業|みなし|残業|時間外|深夜|夜勤|休日出勤|通勤|家族|扶養|住宅|別居|子女|精勤|皆勤|臨時|賞与/;
+  var allowIn=0, allowInNames=[], fixedInAllow=[];
+  for(var ai=1; ai<=6; ai++){
+    var an=_mw16_val('es_a'+ai+'Name'), aa=_mw16_num('es_a'+ai+'Amt');
+    if(!an && !aa) continue;
+    if(/固定残業|みなし/.test(an)) fixedInAllow.push(an||('手当'+ai));
+    if(aa && !_exAllow.test(an)){ allowIn+=aa; allowInNames.push((an||('手当'+ai))+aa); }
+  }
+  var ch=_mw16_num('es_calcHourly');
+  if(ch && monthly && th>0){
+    var expH=(monthly+allowIn)/th;
+    if(Math.abs(expH-ch)>1) add('warn','時給換算','換算時給が計算と合いません','（月給 '+monthly+(allowIn?' ＋ 手当 '+allowIn+'［'+allowInNames.join('・')+'］':'')+'）÷ 月所定 '+th.toFixed(1)+'h ＝ '+expH.toFixed(1)+'円 に対し、換算時給欄は '+ch+'円。入れる手当の範囲を確認してください（固定残業・夜勤など割増の手当、通勤・家族・住宅・精皆勤などは除いて計算）。','P5');
+    else add('ok','時給換算','換算時給は（月給＋手当）÷月所定と一致','換算時給 '+ch+'円。','P5');
+  }
+  var foA=_mw16_num('es_fixedOTAmount'), foH=_mw16_num('es_fixedOTHours');
+  if(foA && fixedInAllow.length) add('out','固定残業代','固定残業代が手当欄にも入っています','手当欄の「'+fixedInAllow.join('・')+'」と固定残業代欄（'+foA+'円）の両方にあります。固定残業代欄だけに書き、手当からは外してください。','P5');
+  var baseH=ch||((monthly&&th>0)?monthly/th:0);
+  if(foA && foH && baseH){
+    var expFo=foH*baseH*1.25;
+    if(foA+1<Math.floor(expFo)) add('warn','固定残業代','固定残業代が割増（1.25倍）の計算より少ない','固定残業 '+foH+'h × 時給 '+baseH.toFixed(1)+'円 × 1.25 ＝ '+Math.floor(expFo)+'円 に対し、固定残業代は '+foA+'円。','P5');
+    else add('ok','固定残業代','固定残業代は時間×時給×1.25以上','固定残業 '+foH+'h／'+foA+'円。','P5');
+  }
+  // 契約期間：作成日 ≦ 開始日 ＜ 終了日（年が空なら判定しない）
+  var _d=function(p){ var y=_mw16_num('es_'+p+'Y'), m=_mw16_num('es_'+p+'M'), d=_mw16_num('es_'+p+'D'); if(!y||!m||!d) return null; if(y<1900) y+=2018; return new Date(y, m-1, d); };   // 令和の年数は西暦に直す
+  var _fmt=function(t){ return t.getFullYear()+'/'+(t.getMonth()+1)+'/'+t.getDate(); };
+  var dCr=_d('create'), dSt=_d('contractStart'), dEn=_d('contractEnd'), dEt=_d('entry');
+  if(dSt && dEn && dEn<=dSt) add('out','契約期間','契約の終わりが始まりより前です','開始 '+_fmt(dSt)+' ／ 終了 '+_fmt(dEn)+'。','P1');
+  if(dCr && dSt && dCr>dSt) add('warn','契約期間','作成日が契約の開始日より後です','作成日 '+_fmt(dCr)+' ／ 開始 '+_fmt(dSt)+'。','P1');
+  if(dEt && dSt && dSt<dEt) add('warn','契約期間','契約の開始日が入国予定日より前です','入国予定 '+_fmt(dEt)+' ／ 開始 '+_fmt(dSt)+'。','P1');
+  if(dSt && dEn && dEn>dSt && !(dCr && dCr>dSt)) add('ok','契約期間','契約期間の前後関係は正しい',_fmt(dSt)+'〜'+_fmt(dEn)+'。','P1');
+  // 変形労働：適用ありなら単位が必要
+  var flx=_mw16_val('es_flexFlg');
+  if(/適用あり|有/.test(flx) && !_mw16_val('es_flexUnit')) add('out','変形労働','変形労働「適用あり」なのに単位が空です','「1ヶ月」「1年」などの単位を入れてください。','P3');
   return checks;
 }
+
+// ver.20261109.09: 1-6号を保存したら自動チェックし、結果をタスクのコメント（案シスの💬）に追記する。
+//   ・補助用。止めたりはしない。依頼者のコメントは消さず、末尾の「🤖自動チェック」欄だけを毎回書き換える
+//   ・修正タスク（11）が依頼中／作業中／確認待ちならそちら、なければ1-6作成タスク（1）に書く
+//   ・AIは使わない（APIキー不要・全員に効く）。代表者名は会社情報（companies）の最新と照合する
+window.C16_MARK_START='━━ 🤖自動チェック';
+window.C16_MARK_END='━━ 自動チェックここまで ━━';
+async function autoCheck16ToComment(caseId, companyId){
+  if(!caseId) return;
+  var rules=null; try{ rules=await _check16LoadRules(); }catch(e){}
+  var checks=_aiCheck16Local(rules);
+  // 代表者（会社情報の最新と照合。代表者は3人まで登録できるので、どれかと一致すればOK）
+  if(companyId){
+    try{
+      var co=await sb('companies?select=rep_name,rep_title,rep2_name,rep2_title,rep3_name,rep3_title&id=eq.'+encodeURIComponent(companyId));
+      co=co&&co[0];
+      var nz=function(s){ return String(s||'').replace(/[\s　]/g,''); };
+      var fn=nz(_mw16_val('es_repName')), ft=nz(_mw16_val('es_repTitle'));
+      if(co && fn){
+        var reps=[[co.rep_name,co.rep_title],[co.rep2_name,co.rep2_title],[co.rep3_name,co.rep3_title]].filter(function(r){return nz(r[0]);});
+        if(reps.length){
+          var hit=reps.filter(function(r){ return nz(r[0])===fn; })[0];
+          if(!hit) checks.push({severity:'warn',category:'代表者',title:'代表者名が会社情報と違います',detail:'書類：'+_mw16_val('es_repName')+' ／ 会社情報：'+reps.map(function(r){return r[0];}).join('・')+'。代表者が変わっていないか確認してください。',src:'計算',page:'P1'});
+          else if(nz(hit[1]) && ft && nz(hit[1])!==ft) checks.push({severity:'warn',category:'代表者',title:'代表者の役職が会社情報と違います',detail:'書類：'+_mw16_val('es_repTitle')+' ／ 会社情報：'+hit[1]+'。',src:'計算',page:'P1'});
+          else checks.push({severity:'ok',category:'代表者',title:'代表者は会社情報と一致',detail:'',src:'計算',page:'P1'});
+        }
+      }
+    }catch(e){ console.warn('[autoCheck16] 会社情報の読込失敗', e); }
+  }
+  var outs=checks.filter(function(c){return c.severity==='out';});
+  var warns=checks.filter(function(c){return c.severity==='warn';});
+  var oks=checks.filter(function(c){return c.severity==='ok';});
+  var now=new Date(); var jst=new Date(now.getTime()+(9*60+now.getTimezoneOffset())*60000);
+  var stamp=(jst.getMonth()+1)+'/'+jst.getDate()+' '+('0'+jst.getHours()).slice(-2)+':'+('0'+jst.getMinutes()).slice(-2);
+  var lines=[C16_MARK_START+' '+stamp+'（1-6保存時・参考） ━━'];
+  lines.push('⛔ 要修正 '+outs.length+'件 ／ ⚡ 要確認 '+warns.length+'件 ／ ✅ OK '+oks.length+'件');
+  outs.concat(warns).slice(0,8).forEach(function(c){
+    var d=String(c.detail||'').replace(/\s+/g,' ');
+    if(d.length>110) d=d.substring(0,110)+'…';
+    lines.push((c.severity==='out'?'⛔ ':'⚡ ')+c.title+(d?'：'+d:''));
+  });
+  if(outs.length+warns.length>8) lines.push('…ほか '+(outs.length+warns.length-8)+'件（Saysayの「🧬 AI判定」で全件見られます）');
+  if(!outs.length && !warns.length) lines.push('自動で見られる項目に問題は見つかりませんでした。');
+  lines.push(C16_MARK_END);
+  var block=lines.join('\n');
+  // 書き込むタスクを決める（書く直前に読み直して、ほかの人のコメントを消さない）
+  var rows=await sb('doc_tasks?select=task_index,status,assignee_comment&case_id=eq.'+encodeURIComponent(caseId)+'&task_index=in.(1,11)');
+  rows=rows||[];
+  var t11=rows.filter(function(r){return r.task_index===11 && [1,2,3].indexOf(Number(r.status))>=0;})[0];
+  var t1=rows.filter(function(r){return r.task_index===1;})[0];
+  var target=t11||t1;
+  if(!target) return;   // タスクが無い案件には作らない
+  var cur=String(target.assignee_comment||'');
+  var si=cur.indexOf(C16_MARK_START), ei=cur.indexOf(C16_MARK_END);
+  var base=(si>=0 && ei>si) ? (cur.substring(0,si)+cur.substring(ei+C16_MARK_END.length)) : cur;
+  base=base.replace(/\s+$/,'');
+  var next=(base?base+'\n\n':'')+block;
+  if(next===cur) return;
+  await sb('doc_tasks?case_id=eq.'+encodeURIComponent(caseId)+'&task_index=eq.'+target.task_index,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({assignee_comment:next})});
+  return {taskIndex:target.task_index, outs:outs.length, warns:warns.length};
+}
+window.autoCheck16ToComment=autoCheck16ToComment;
 window._check16RulesCache = null;
 async function _check16LoadRules(){
   if(window._check16RulesCache) return window._check16RulesCache;
@@ -4645,7 +4745,7 @@ function _p16PrintCheck(){
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
-/* ===== ver.20261109.05: 🔍 空欄の参照先（案シスのどこが空か） =====
+/* ===== ver.20261109.09: 🔍 空欄の参照先（案シスのどこが空か） =====
    左の欄のうち空欄のものに、「本来どこ（案シスの雇用条件・会社・案件・人材・登録支援機関・ヒアリング）から入る欄か」と
    「案シス側が空なのか、案シスには入っているのに入らなかったのか」を札で出す。上に、案シスで入れるべき項目の一覧も出す。
    ・参照先は、書類の読み込み処理の書き方（s('f_x', co.author_name) など）を読み取って調べる＋雇用条件セットの同名項目

@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20261109.08</div>
+    <div class="ver">ver.20261109.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794208902"></script>
+<script src="ofusa_common.js?v=1794209099"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1774,6 +1774,8 @@ async function saveForm(){
     }
     try{ if(typeof snapshotEmpBaseline==='function') snapshotEmpBaseline(); }catch(_e){}
     showToast(_editedSaved ? _msg+'（直接編集版も保存）' : _msg);
+    // ver.20261109.09: 保存したら自動チェックして、結果をタスクのコメントに追記（補助用・止めない）
+    try{ if(typeof autoCheck16ToComment==='function'){ autoCheck16ToComment(info.caseId, companyId).then(function(r){ if(r) setTimeout(function(){ showToast('🤖 自動チェック：要修正 '+r.outs+'件・要確認 '+r.warns+'件をタスクのコメントに記録しました'); }, 3200); }).catch(function(e){ console.warn('[autoCheck16]', e); }); } }catch(_e){}
   }catch(e){
     console.error('DB保存エラー:',e);
     alert('保存エラー: '+e.message);
