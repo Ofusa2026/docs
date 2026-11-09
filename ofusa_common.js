@@ -4606,6 +4606,7 @@ window.srcToggle=srcToggle;
   function inj(){
     try{
       if(document.getElementById('_srcBtn')) return;
+      if(/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)) return;   // 1-17号は独自の「確認が必要な項目」があるので出さない
       var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host || !document.getElementById('pageArea')) return;
       var b=document.createElement('button'); b.type='button'; b.id='_srcBtn'; b.textContent='🔍 空欄チェック（案シスのどこが空か）';
       b.title='空欄の欄ごとに、案シスのどこ（雇用条件・会社・案件・人材など）が空なのかを表示します';
