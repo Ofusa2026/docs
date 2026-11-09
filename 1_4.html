@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20261109.03</div>
+    <div class="ver">ver.20261109.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -65,7 +65,7 @@
       <div class="fg"><label>報酬月額（円）</label><input id="f_jpSalary" oninput="p()"></div>
       <div class="fg"><label>賃金規程の有無</label><input id="f_wageReg" oninput="p()"></div>
       <div class="fg"><label>規程に基づく報酬（円）</label><input id="f_salaryRule" oninput="p()"></div>
-      <div class="fg"><label>同等以上と考える理由</label><textarea id="f_jpReason" oninput="p()"></textarea></div>
+      <div class="fg"><label>同等以上と考える理由 <button type="button" onclick="_jpReasonAuto()" style="margin-left:6px;font-size:11px;padding:1px 8px;border:1px solid #93c5fd;background:#eff6ff;color:#1d4ed8;border-radius:5px;cursor:pointer">💡 文例を作る</button></label><textarea id="f_jpReason" oninput="p()"></textarea><div id="jpReasonNote" style="font-size:11px;color:#92400e;margin-top:2px;display:none"></div></div>
       <div class="fg"><label>⑥その他（諸手当等）</label><textarea id="f_other2" oninput="p()"></textarea></div>
     </div>
     <div class="fs"><div class="fs-title">比較日本人（いない場合）</div>
@@ -282,6 +282,45 @@ async function loadFromDB(passedInfo){
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+/* ver.20261109.04: ２⑤「同等以上と考える理由」の文例を、報酬と経験年数から作って提案する（自動では入れない）。
+   「💡 文例を作る」を押すと下に文例を出し、「この文を使う」を押したときだけ理由の欄に入れる。
+   ・申請人の報酬 ≧ 日本人の報酬 → 同等以上である旨
+   ・申請人の報酬 ＜ 日本人の報酬 で、日本人の経験年数の方が長い → 経験年数の差による旨（これまで一番多く使われていた書き方）
+   ・それ以外は文例を作らず、手で書くよう知らせる */
+function _jpNum(x){ var t=String(x||'').normalize('NFKC').replace(/[,，\s円]/g,''); var m=t.match(/(\d+(?:\.\d+)?)/); return m?Number(m[1]):null; }
+function _jpYears(x){ var t=String(x||'').normalize('NFKC'); var y=t.match(/(\d+(?:\.\d+)?)\s*年/), mo=t.match(/(\d+)\s*(?:ヶ|か|カ|ケ|箇)?月/);
+  if(y||mo) return (y?Number(y[1]):0)+(mo?Number(mo[1])/12:0); var n=_jpNum(t); return n; }
+function _jpYen(n){ return Number(n).toLocaleString('ja-JP'); }
+function _jpReasonText(){
+  var S=_jpNum(v('f_salaryM')), J=_jpNum(v('f_jpSalary'));
+  if(S==null && _jpNum(v('f_salaryH'))!=null) return {msg:'申請人が時間給のため、文例は作れません（月給に換算して比べてください）'};
+  if(S==null || J==null) return {msg:'申請人と比較対象の日本人の月額報酬が入っていないため、文例を作れません'};
+  var Ea=_jpYears(v('f_exp')), Ej=_jpYears(v('f_jpExp'));
+  if(S>=J) return {txt:'申請人に対する報酬（月額'+_jpYen(S)+'円）は、申請人と同等の業務に従事する比較対象の日本人労働者の報酬（月額'+_jpYen(J)+'円）と同等以上であり、国籍を理由とした報酬の差は設けていないため。'};
+  if(Ej!=null && Ea!=null && Ej>Ea){
+    var r=function(n){ return (Math.round(n*10)/10).toString(); };
+    return {txt:'比較対象の日本人は、経験年数が'+r(Ej)+'年（申請人は'+r(Ea)+'年）であり、経験年数の差により任されている業務の範囲において広く高い技術を習得しており、責任の程度も大きい。\n上記の観点から、特定技能外国人と日本人従業員との報酬の差（月額'+_jpYen(J-S)+'円）は経験年数の差によるものであり、妥当なものであると考える。'};
+  }
+  return {msg:'申請人の報酬が比較対象の日本人より低く、経験年数の差でも説明できないため、文例は作れません。理由は手で書いてください（申請人 '+_jpYen(S)+'円／日本人 '+_jpYen(J)+'円）'};
+}
+function _jpReasonAuto(){
+  var note=document.getElementById('jpReasonNote'); if(!note) return;
+  var r=_jpReasonText(); note.style.display='block';
+  if(!r.txt){ note.style.cssText='font-size:11px;color:#92400e;margin-top:4px;display:block'; note.textContent=r.msg; return; }
+  note.style.cssText='font-size:11.5px;color:#1e3a8a;margin-top:4px;display:block;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 8px;line-height:1.55';
+  note.innerHTML='<div style="font-weight:700;margin-bottom:2px">💡 文例（報酬と経験年数から作成）</div><div id="jpReasonSug" style="white-space:pre-wrap"></div>'
+    +'<div style="margin-top:5px"><button type="button" onclick="_jpReasonUse()" style="font-size:11px;padding:2px 10px;border:none;background:#2563eb;color:#fff;border-radius:5px;cursor:pointer">この文を使う</button> '
+    +'<button type="button" onclick="document.getElementById(\'jpReasonNote\').style.display=\'none\'" style="font-size:11px;padding:2px 10px;border:1px solid #cbd5e1;background:#fff;border-radius:5px;cursor:pointer">閉じる</button></div>';
+  document.getElementById('jpReasonSug').textContent=r.txt;
+  window._jpReasonSug=r.txt;
+}
+function _jpReasonUse(){
+  var el=document.getElementById('f_jpReason'); if(!el || !window._jpReasonSug) return;
+  if(String(el.value||'').trim() && !confirm('今の理由を、この文例に置き換えますか？')) return;
+  el.value=window._jpReasonSug; el.dispatchEvent(new Event('input',{bubbles:true}));
+  document.getElementById('jpReasonNote').style.display='none';
+  if(typeof p==='function') p();
 }
 initCaseSelect(); p();
 
