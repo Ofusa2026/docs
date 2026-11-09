@@ -1057,6 +1057,10 @@ const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/
 window.cbState=window.cbState||{};
 let _cbSeq=0;
 function resetCbSeq(){_cbSeq=0;}
+// ver.20261109.12: 1-6号の「賃金支払方法」を、案シスの雇用条件（支払方法）から付ける（前は口座振込に固定だった）
+function _payMethodText(){ try{ return String((window._empLoadedSet||{}).payMethod||'').normalize('NFKC'); }catch(e){ return ''; } }
+function _payCash(){ return /現金|通貨|手渡|cash/i.test(_payMethodText()); }
+function _payBank(){ var m=_payMethodText(); return !m || /口座|振込|振り込|銀行|bank/i.test(m) || !_payCash(); }
 const cb=(on,id)=>{const state=id&&window.cbState[id]!==undefined?window.cbState[id]:on;return`<span class="cb-click" onclick="toggleCb('${id||''}')" data-cbid="${id||''}">${state?'■':'□'}</span>`;};
 function toggleCb(id){if(!id)return;window.cbState[id]=!window.cbState[id];document.querySelectorAll(`[data-cbid="${id}"]`).forEach(el=>{el.textContent=window.cbState[id]?'■':'□';});}
 // 保険の加入判定：読込済みemp_set(window._empLoadedSet)の値を見て、未加入系のみ false。
@@ -4790,7 +4794,15 @@ function _p16PrintCheck(){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
   document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); }, true);
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); } }catch(_e){} });
+  // ver.20261109.12: 支払方法（口座振込／通貨払）は雇用条件セットを読んだあとに決まるので、表示が合っていなければ描き直す
+  function _payRefresh(){
+    try{
+      var e=document.querySelector('[data-cbid="pay_cash"]'), b=document.querySelector('[data-cbid="pay_bank"]'); if(!e||!b) return;
+      var cs=window.cbState||{}; if(cs.pay_cash!==undefined || cs.pay_bank!==undefined) return;   // 手で切り替えたものはそのまま
+      if(e.textContent!==(_payCash()?'■':'□') || b.textContent!==(_payBank()?'■':'□')){ if(typeof p==='function') p(); }
+    }catch(err){}
+  }
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
 /* ===== ver.20261109.09: 🔍 空欄の参照先（案シスのどこが空か） =====

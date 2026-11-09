@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（中国語版）</div>
-    <div class="ver">ver.20261109.10</div>
+    <div class="ver">ver.20261109.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794210857"></script>
+<script src="ofusa_common.js?v=1794224309"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1019,13 +1019,13 @@ function p(){
         </tr>
         <tr>
           <td style="vertical-align:top;">６．賃金支払方法</td>
-          <td>${cb(true,"pay_bank")}&nbsp;口座振込</td>
-          <td>${cb(false,"pay_cash")}&nbsp;通貨払</td>
+          <td>${cb(_payBank(),"pay_bank")}&nbsp;口座振込</td>
+          <td>${cb(_payCash(),"pay_cash")}&nbsp;通貨払</td>
         </tr>
         <tr>
           <td class="id" style="font-size:7pt;" data-key="85">6. 工资支付方法</td>
-          <td class="id" style="font-size:7pt;" data-key="86">${cb(true,"pay_bank_id")} 汇入银行账户</td>
-          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(false,"pay_cash_id")} 法定货币支付</td>
+          <td class="id" style="font-size:7pt;" data-key="86">${cb(_payBank(),"pay_bank_id")} 汇入银行账户</td>
+          <td class="id" style="font-size:7pt;padding-bottom:2px;" data-key="87">${cb(_payCash(),"pay_cash_id")} 法定货币支付</td>
         </tr>
         <tr>
           <td colspan="2" style="vertical-align:top;">７．労使協定に基づく賃金支払時の控除<br><span class="id" style="font-size:7pt;" data-key="88">7. 根据劳资合同在支付工资时的扣除</span></td>
