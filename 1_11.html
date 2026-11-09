@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20261020.03</div>
+    <div class="ver">ver.20261109.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -179,7 +179,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793959888"></script>
+<script src="ofusa_common.js?v=1794191643"></script>
 <script>
 const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
 const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
@@ -562,7 +562,7 @@ async function loadFromDB(passedInfo){
     }
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!==undefined&&val!==null)e.value=val;};
     s('f_company',co.name||'');
-    s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+    s('f_author',(typeof _authorJoin==='function')?_authorJoin(co.author_title,co.author_name):[co.author_title,co.author_name].filter(Boolean).join('　'));   // ver.20261109.03: 役職の二重を防ぐ
     s('f_salesY1',co.sales_y1||'');s('f_salesY2',co.sales_y2||'');s('f_salesY3',co.sales_y3||'');
     s('f_plY1',co.ordinary_pl_y1||'');s('f_plY2',co.ordinary_pl_y2||'');s('f_plY3',co.ordinary_pl_y3||'');
     s('f_netY1',co.net_pl_y1||'');s('f_netY2',co.net_pl_y2||'');s('f_netY3',co.net_pl_y3||'');

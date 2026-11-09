@@ -39,7 +39,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261028.04</div>
+    <div class="ver">ver.20261109.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -149,7 +149,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793959888"></script>
+<script src="ofusa_common.js?v=1794191643"></script>
 <script>
 // 手数料として有効な値か判定する。
 // 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
@@ -515,6 +515,24 @@ async function loadFromDB(passedInfo){
       if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
       const _am=AGENCY_MASTER[ir.agency_name];
       if(_am){ s('f_ag_addr',_am.addr); s('f_ag_tel',_am.tel); s('f_ag_license',_am.license); const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value)_t.value=_am.type; }
+      // ver.20261109.03: 一覧（AGENCY_MASTER）に無い職業紹介事業者は、案シスの登録支援機関（職業紹介の許可番号つき）から入れる
+      else if(typeof findSupportOrg==='function'){
+        try{
+          const _so=await findSupportOrg(ir.agency_name,'name,zip,pref,city,address_detail,address,tel,job_permit_no');
+          const _pn=String((_so&&_so.job_permit_no)||'').normalize('NFKC').replace(/[\s]/g,'').replace(/[ー－‐―−]/g,'-');
+          if(_so && /\d/.test(_pn) && !/不明|未定/.test(_pn)){
+            const _m=_pn.match(/^(\d{2})-?(ユ|特)-?(\d{6})/);
+            const _lic=_m?(_m[1]+'-'+_m[2]+'-'+_m[3]):_pn;
+            const _zip=String(_so.zip||'').normalize('NFKC').replace(/[^0-9-]/g,'');
+            const _ad=(_so.address_detail?(String(_so.pref||'')+String(_so.city||'')+String(_so.address_detail)):String(_so.address||'')).trim();
+            const E=id=>{ const e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+            if(!E('f_ag_license')) s('f_ag_license',_lic);
+            if(_ad && !/[都道府県市区町村郡]/.test(E('f_ag_addr'))) s('f_ag_addr',(_zip?'〒'+_zip+'　':'')+_ad);   // 空、または郵便番号だけのとき
+            if(!E('f_ag_tel') && _so.tel) s('f_ag_tel',String(_so.tel).normalize('NFKC').trim());
+            const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value&&_m&&_m[2]==='ユ') _t.value='有料';
+          }
+        }catch(_e){ console.warn('[1-16 職業紹介事業者]', _e); }
+      }
       // ver.20260717: 以前は agency_name があれば無条件で「有」にしていたが、
       // agency_name は intake_requests 2,388件すべてに入っており（＝登録支援機関名がそのまま入る）、
       // 斡旋の有無を表す項目ではなかった。そのため手で「無」にしても読込のたびに「有」へ戻っていた。

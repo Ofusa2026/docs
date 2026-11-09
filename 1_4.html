@@ -21,7 +21,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－４号　特定技能外国人の報酬に関する説明書</div>
-    <div class="ver">ver.20261023.04</div>
+    <div class="ver">ver.20261109.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -96,7 +96,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793959888"></script>
+<script src="ofusa_common.js?v=1794191643"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -237,27 +237,34 @@ async function loadFromDB(passedInfo){
     if(cas) s('f_applicant',cas.applicant||'');
     if(co){
       s('f_company',co.name||'');
-      s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+      s('f_author',(typeof _authorJoin==='function')?_authorJoin(co.author_title,co.author_name):[co.author_title,co.author_name].filter(Boolean).join('　'));   // ver.20261109.03: 役職の二重を防ぐ
       // ver.20261023.04: 雇用条件セットが未選択なら1番目を使わず、選んでもらう（共通 resolveEmpSetIdx）
       const idx=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
       const es=(idx>=0?(co.emp_sets||[])[idx]:null)||{};
+      // ver.20261109.03: このセットに比較対象の日本人が無ければ、同じ会社・同じ業務区分の別のセットにある比較対象の日本人を使う（お知らせ付き）
+      let esJ=es;
+      if(!es.jpCompSalary && !es.jpCompAge && !es.jpCompJobDesc && Array.isArray(co.emp_sets)){
+        const _cat=String(es.category||'').replace(/[（(].*$/,'');
+        const _alt=co.emp_sets.find((x,i)=>i!==idx && x && (x.jpCompSalary||x.jpCompAge||x.jpCompJobDesc) && (!_cat || String(x.category||'').replace(/[（(].*$/,'')===_cat));
+        if(_alt){ esJ=_alt; setTimeout(()=>{ if(typeof showToast==='function') showToast('比較対象の日本人は、同じ会社の雇用条件セット「'+(_alt.setName||_alt.name||'別のセット')+'」のものを入れました（このセットには未登録）',7000); },600); }
+      }
       s('f_jobDesc',es.foreignerJobDesc||'');
       s('f_salaryM',es.salaryMonthly||'');
       s('f_salaryH',es.salaryHourly||'');
-      s('f_jpJobDesc',es.jpCompJobDesc||'');
-      s('f_jpAge',es.jpCompAge||'');
-      s('f_jpGender',es.jpCompGender||'');
-      s('f_jpExp',es.jpCompExp||'');
-      s('f_jpSalary',es.jpCompSalary||'');
+      s('f_jpJobDesc',esJ.jpCompJobDesc||'');
+      s('f_jpAge',esJ.jpCompAge||'');
+      s('f_jpGender',esJ.jpCompGender||'');
+      s('f_jpExp',esJ.jpCompExp||'');
+      s('f_jpSalary',esJ.jpCompSalary||'');
       s('f_wageReg',es.wageRegulation||'');
       s('f_salaryRule',es.salaryRuleApply||'');
-      s('f_jpReason',es.jpCompReason||'');
+      s('f_jpReason',esJ.jpCompReason||'');
       // ver.20260731: 手当名に「手当」が無ければ補う（例:「住宅」→「住宅手当」。既に「〜手当」なら据え置き）
       var _teate=function(n){ n=String(n||'').trim(); if(!n) return ''; return n.indexOf('手当')>=0 ? n : n+'手当'; };
       // 比較対象日本人の手当（jpCompAllow1〜3）を⑥その他へ。手当名のみ（金額なし）
       var _allowParts=[];
       for(var _i=1;_i<=3;_i++){
-        var _nm=_teate(es['jpCompAllow'+_i+'Name']);
+        var _nm=_teate(esJ['jpCompAllow'+_i+'Name']);
         if(_nm) _allowParts.push(_nm);
       }
       s('f_other2', _allowParts.join('、'));

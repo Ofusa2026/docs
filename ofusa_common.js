@@ -2761,7 +2761,9 @@ async function loadCaseToForm(info, docKey, opts){
     // 作成責任者（ver.20260729: 書類別の個別設定(extra.docAuthors)があればそちらを優先。空欄は既定author_*）
     var _docKey = window.OFUSA_DOC_KEY || docKey || '';
     var _au = getDocAuthor(co, _docKey);
-    setValMulti(['f_author'], [_au.title, _au.name].filter(Boolean).join('　'));
+    // ver.20261109.03: 案シスの作成者名に役職まで入っている会社（例「代表取締役　中川清彦」）で
+    //   「代表取締役　代表取締役　中川清彦」と役職が二重になっていたため、名前の頭に役職があれば役職欄は付けない
+    setValMulti(['f_author'], _authorJoin(_au.title, _au.name));
     setValMulti(['es_authorName','f_authorName'], _au.name);
     setValMulti(['es_authorTitle','f_authorTitle'], _au.title);
     setValMulti(['es_authorNameEn','f_authorNameEn'], _au.nameEn);
@@ -4478,11 +4480,86 @@ function slog(event, extra){
       applicant:who, session_id:_SLOG_SESSION,
       ms_since_load:(_SLOG_LOADED_AT?(Date.now()-_SLOG_LOADED_AT):null) };
     if(extra){ for(var k in extra){ if(Object.prototype.hasOwnProperty.call(extra,k)) body[k]=extra[k]; } }
+    if(body.event==='save' && !body.meta){ try{ var _mi=_miCollect(); if(_mi) body.meta=_mi; }catch(_m){} }   // ver.20261109.03: 手入力の記録
     fetch(SB_URL+'/rest/v1/saysay_logs',{method:'POST',keepalive:true,
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify(body)}).catch(function(){});
   }catch(_e){}
 }
+/* ver.20261109.03: 役職＋氏名をつなぐ（氏名の頭に役職が入っていれば二重にしない） */
+var _AUTHOR_TITLE_RE=/^(代表取締役社長|代表取締役会長|代表取締役副社長|代表取締役|取締役社長|取締役|代表理事長|代表理事|理事長|専務理事|常務理事|理事|代表社員|業務執行社員|代表者|代表|社長|会長|副社長|専務|常務|組合長|事務局長|施設長|院長|園長|所長|工場長|支配人|部長|課長)/;
+function _authorJoin(title, name){
+  var t=String(title||'').replace(/\s+$/,'').trim(), n=String(name||'').trim();
+  if(!n) return t;
+  if(!t) return n;
+  var nn=n.replace(/[\s　]/g,''), tt=t.replace(/[\s　]/g,'');
+  if(nn.indexOf(tt)===0 || _AUTHOR_TITLE_RE.test(nn)) return n;   // 氏名の側に役職が入っている
+  return t+'　'+n;
+}
+window._authorJoin=_authorJoin;
+/* ===== ver.20261109.03: 手入力の記録 =====
+   「手入力0」に向けて、どの欄を手で入れた・直したかを保存のときに利用ログ（saysay_logs.meta）へ残す。
+   ・左の入力欄：最初に触った時点の値（＝自動で入った値）と保存時の値を比べ、変わった欄を記録
+   ・書類の直接編集：最初に本文を触った時点の文と保存時の文を比べ、増えた行（最大8行）を記録
+   ・案件を選び直したら記録を空にする。保存後は保存した値を基準にする（同じ直しを二重に数えない）
+   画面の動きは変えない。 */
+window._miV0 = window._miV0 || {};
+window._miTxt0 = null;
+function _miVal(el){ if(!el) return ''; if(el.type==='checkbox'||el.type==='radio') return el.checked?'☑':'☐'; return String(el.value==null?'':el.value); }
+function _miLabel(el){
+  try{
+    var dl=el.getAttribute('data-label'); if(dl) return dl.slice(0,60);
+    var fg=el.closest('.fg'); var lb=fg&&fg.querySelector('label');
+    if(lb){ var t=''; lb.childNodes.forEach(function(n){ if(n.nodeType===3) t+=n.textContent; }); t=t.trim(); if(t) return t.slice(0,60); }
+    if(el.placeholder) return String(el.placeholder).slice(0,60);
+  }catch(_e){}
+  return '';
+}
+function _miPageLines(){
+  var a=document.getElementById('pageArea'); if(!a) return [];
+  return String(a.innerText||'').split('\n').map(function(s){ return s.replace(/\s+/g,' ').trim(); }).filter(function(s){ return s.length>1; });
+}
+document.addEventListener('focusin', function(e){
+  try{
+    var t=e.target; if(!t) return;
+    if(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) && t.id && t.id!=='caseSelect' && !/^sp_/.test(t.id)){
+      if(!(t.id in window._miV0)) window._miV0[t.id]=_miVal(t);
+    } else if(window._miTxt0===null && t.closest && t.closest('#pageArea') && (t.isContentEditable || (typeof _editMode!=='undefined' && _editMode))){
+      window._miTxt0=_miPageLines();
+    }
+  }catch(_e){}
+}, true);
+window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ window._miV0={}; window._miTxt0=null; } }catch(_e){} });
+function _miCollect(){
+  var out=[], cut=function(s){ s=String(s||''); return s.length>40 ? s.slice(0,40)+'…' : s; };
+  Object.keys(window._miV0||{}).forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    var v=_miVal(el), v0=window._miV0[id];
+    if(v!==v0){ out.push({id:id, label:_miLabel(el), from:cut(v0), to:cut(v)}); window._miV0[id]=v; }
+  });
+  var lines=[];
+  if(window._miTxt0){
+    var before={}; window._miTxt0.forEach(function(s){ before[s]=(before[s]||0)+1; });
+    var now=_miPageLines();
+    now.forEach(function(s){ if(before[s]) before[s]--; else if(lines.length<8) lines.push(cut(s.length>80?s.slice(0,80):s)); });
+    window._miTxt0=now;
+  }
+  if(!out.length && !lines.length) return null;
+  return { manual: out.slice(0,40), n_manual: out.length, edited_lines: lines };
+}
+/* ver.20261109.03: 手で打った日付「2026年  9月    1日」「令和 8年10月 1日」の余分な空白を、欄から出たときに詰める
+   （年・月・日が全部数字で入っているときだけ。「令和　年　月　日」のような空欄の枠は触らない） */
+document.addEventListener('focusout', function(e){
+  try{
+    var t=e.target; if(!t || !/^(INPUT|TEXTAREA)$/.test(t.tagName) || t.type==='checkbox') return;
+    var v=String(t.value||''); if(!/年/.test(v) || !/日/.test(v)) return;
+    var m=v.normalize('NFKC').match(/^\s*(令和|平成|昭和)?\s*(\d{1,4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日\s*$/);
+    if(!m) return;
+    var n=(m[1]||'')+parseInt(m[2],10)+'年'+parseInt(m[3],10)+'月'+parseInt(m[4],10)+'日';
+    if(n!==v){ t.value=n; if(typeof p==='function'){ try{ p(); }catch(_p){} } }
+  }catch(_e){}
+}, true);
+/* ===== /手入力の記録 ===== */
 /* ===== /利用ログ ===== */
 
 /* ===== ver.20261026.04: 編集HTMLの受け皿（saysay_html_store） =====

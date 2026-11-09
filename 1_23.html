@@ -20,7 +20,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２３号　特定技能所属機関の役員に関する誓約書</div>
-    <div class="ver">ver.20260805.01</div>
+    <div class="ver">ver.20261109.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -66,7 +66,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1793959888"></script>
+<script src="ofusa_common.js?v=1794191643"></script>
 <script>
 const MAX_OFF=20;
 const _offMark=function(i){ return '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳'[i] || ('('+(i+1)+')'); };
@@ -206,7 +206,7 @@ async function loadFromDB(passedInfo){
     const cos=await sb(q); const co=cos&&cos[0]; if(!co) return;
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     s('f_company',co.name||'');
-    s('f_author',[co.author_title,co.author_name].filter(Boolean).join('　'));
+    s('f_author',(typeof _authorJoin==='function')?_authorJoin(co.author_title,co.author_name):[co.author_title,co.author_name].filter(Boolean).join('　'));   // ver.20261109.03: 役職の二重を防ぐ
     if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
     const officers=(co.officers||[]).filter(o=>!(o.title&&o.title.includes('代表')));
     officers.forEach((o,i)=>{if(i>=MAX_OFF)return;s(`off${i+1}Kana`,o.kana||o.name_kana||'');s(`off${i+1}Name`,o.name||'');});
