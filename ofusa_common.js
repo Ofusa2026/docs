@@ -190,7 +190,10 @@ async function sb(path,opts={}){
   const r = await fetch(SB_URL + '/rest/v1/' + path, { ...restOpts, headers });
   const t = await r.text();
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
-  return t ? JSON.parse(t) : null;
+  const _res = t ? JSON.parse(t) : null;
+  // ver.20261109.05: 「🔍 出どころ」表示のため、1件ずつ読んだ行（案件・会社・人材・登録支援機関など）を覚えておく
+  try{ if(_method==='GET' && Array.isArray(_res) && _res.length && _res.length<=3){ const _tb=String(path).split('?')[0]; (window._srcRows=window._srcRows||{})[_tb]=_res[0]; } }catch(_sr){}
+  return _res;
 }
 
 // ver.20260901.01: 雇用条件セット(emp_sets)のインデックス自動解決。
@@ -4497,6 +4500,124 @@ function _authorJoin(title, name){
   return t+'　'+n;
 }
 window._authorJoin=_authorJoin;
+function _srcEmpSet(){
+  if(window._empLoadedSet && Object.keys(window._empLoadedSet).length) return window._empLoadedSet;
+  var R=window._srcRows||{}, co=R.companies, ca=R.cases;
+  if(co && Array.isArray(co.emp_sets)){ var i=parseInt((ca&&ca.emp_set_idx)||((window._lastCaseInfo||{}).empSetIdx)||'',10); if(!isNaN(i) && co.emp_sets[i]) return co.emp_sets[i]; }
+  return null;
+}
+/* ===== ver.20261109.05: 🔍 空欄の参照先（案シスのどこが空か） =====
+   左の欄のうち空欄のものに、「本来どこ（案シスの雇用条件・会社・案件・人材・登録支援機関・ヒアリング）から入る欄か」と
+   「案シス側が空なのか、案シスには入っているのに入らなかったのか」を札で出す。上に、案シスで入れるべき項目の一覧も出す。
+   ・参照先は、書類の読み込み処理の書き方（s('f_x', co.author_name) など）を読み取って調べる＋雇用条件セットの同名項目
+   ・案シス側の値は、書類が読み込んだ行（sb() で1件ずつ読んだもの）を見る
+   ・項目名は案シスの差し込み項目一覧の名前を使う。各書類の読み込み処理は変えない。 */
+var _SRC_LBL={"es":{"createY":"作成日（年）","createM":"作成日（月）","createD":"作成日（日）","createYEn":"作成日（年）翻訳","createMEn":"作成日（月）翻訳","createDEn":"作成日（日）翻訳","applicantName":"申請人の名前","applicantNameEn":"申請人の名前（翻訳）","orgName":"所属機関名","orgNameEn":"所属機関名（翻訳）","orgAddress":"所在地","orgAddressEn":"所在地（翻訳）","orgTel":"電話番号","orgTelEn":"電話番号（翻訳）","repName":"代表者名","repTitle":"代表者役職","repNameEn":"代表者名（翻訳）","repTitleEn":"代表者役職（翻訳）","contractStartY":"契約開始（年）","contractStartM":"契約開始（月）","contractStartD":"契約開始（日）","contractEndY":"契約終了（年）","contractEndM":"契約終了（月）","contractEndD":"契約終了（日）","contractStartYEn":"契約開始（年）翻訳","contractStartMEn":"契約開始（月）翻訳","contractStartDEn":"契約開始（日）翻訳","contractEndYEn":"契約終了（年）翻訳","contractEndMEn":"契約終了（月）翻訳","contractEndDEn":"契約終了（日）翻訳","entryY":"入国予定（年）","entryM":"入国予定（月）","entryD":"入国予定（日）","entryYEn":"入国予定（年）翻訳","entryMEn":"入国予定（月）翻訳","entryDEn":"入国予定（日）翻訳","entryYEn2":"入国予定（年）翻訳2","entryMEn2":"入国予定（月）翻訳2","entryDEn2":"入国予定（日）翻訳2","officeName":"事業所名","officeNameEn":"事業所名（翻訳）","officeAddress":"事業所住所","officeAddressEn":"事業所住所（翻訳）","officeTel":"事業所連絡先","officeTelEn":"事業所連絡先（翻訳）","subOfficeName":"事業所名②（直接雇用②）","subOfficeNameEn":"事業所名②（翻訳）","subOfficeAddress":"事業所住所②","subOfficeAddressEn":"事業所住所②（翻訳）","subOfficeTel":"事業所連絡先②","officePref":"事業所 都道府県（自動）","officeCity":"事業所 市区町村（自動）","officePrefEn":"事業所 都道府県（英語）","officeCityEn":"事業所 市区町村（英語）","cohabitants":"同居人数","housingOwnership":"自己所有/借上","actualCostDesc":"実費相当説明","housingFeeType":"居住費徴収有無（自動）","housingFee":"居住費徴収費用（=居住費控除）","foreignerJobDesc":"外国人の職務内容","foreignerJobDescEn":"外国人の職務内容（翻訳）","applicantField":"分野","applicantFieldEn":"分野（翻訳）","category":"業務区分","categoryEn":"業務区分（翻訳）","startTime":"始業時刻","startTimeEn":"始業時刻（翻訳）","endTime":"終業時刻","endTimeEn":"終業時刻（翻訳）","dailyHours":"1日所定労働時間","dailyHoursEn":"1日所定労働時間（翻訳）","dailyMins":"1日所定労働時間（分）","breakTime":"休憩時間","breakTimeEn":"休憩時間（翻訳）","flexCheck1":"変形労働チェック1","flexCheck2":"変形労働チェック2","flexUnit":"変形労働制単位","flexUnitEn":"変形労働制単位（翻訳）","overtimeCheck1":"時間外労働有無","overtimeCheck2":"時間外労働有無2","weeklyH":"週(時)","weeklyMin":"週(分)","monthlyH":"月(時)","monthlyMin":"月(分)","yearlyH":"年(時)","yearlyMin":"年(分)","weeklyHEn":"週(時)翻訳","weeklyMinEn":"週(分)翻訳","monthlyHEn":"月(時)翻訳","monthlyMinEn":"月(分)翻訳","yearlyHEn":"年(時)翻訳","yearlyMinEn":"年(分)翻訳","weeklyDays":"週日数","monthlyDays":"月日数","yearlyDays":"年日数","weeklyDaysEn":"週日数翻訳","monthlyDaysEn":"月日数翻訳","yearlyDaysEn":"年日数翻訳","fixedDay1":"定休日①","fixedDay2":"定休日②","otherHolidays":"その他休日","fixedDay1En":"定休日①翻訳","fixedDay2En":"定休日②翻訳","otherHolidaysEn":"その他休日翻訳","annualHolidays":"年間休日数","irregDays":"不定期休日日数","irregHolidays":"不定期休日詳細","irregDaysEn":"不定期休日日数翻訳","irregHolidaysEn":"不定期休日詳細翻訳","paidLeave":"有給休暇","otherPaid":"その他有給","unpaidLeave":"無給休暇","paidLeaveEn":"有給休暇（翻訳）","otherPaidEn":"その他有給（翻訳）","unpaidLeaveEn":"無給休暇（翻訳）","salaryMonthly":"月額基本給（賃金計算）","salaryHourly":"時間給（賃金計算）","monthlyWage":"月給","monthlyWageEn":"月給（翻訳）","dailyWage":"日給","dailyWageEn":"日給（翻訳）","hourlyWage":"時給","hourlyWageEn":"時給（翻訳）","monthlyCheck":"月給チェック","dailyCheck":"日給チェック","hourlyCheck":"時給チェック","monthlyCheckEn":"月給チェック翻訳","dailyCheckEn":"日給チェック翻訳","hourlyCheckEn":"時給チェック翻訳","calcHourly":"換算時給","calcHourlyEn":"換算時給（翻訳）","calcMonthly":"換算月給","calcMonthlyEn":"換算月給（翻訳）","hourlyCheck2":"時給チェック（明細）","dailyCheck2":"日給チェック（明細）","monthlyCheck2":"月給チェック（明細）","monthlyCheck2En":"月給チェック（明細翻訳）","dailyCheck2En":"日給チェック（明細翻訳）","allowance1Name":"手当①名","allowance1Amt":"手当①金額","allowance1Cond":"手当①条件","allowance1NameEn":"手当①名翻訳","allowance1AmtEn":"手当①金額翻訳","allowance1CondEn":"手当①条件翻訳","allowance2Name":"手当②名","allowance2Amt":"手当②金額","allowance2Cond":"手当②条件","allowance2NameEn":"手当②名翻訳","allowance2AmtEn":"手当②金額翻訳","allowance2CondEn":"手当②条件翻訳","allowance3Name":"手当③名","allowance3Amt":"手当③金額","allowance3Cond":"手当③条件","allowance3NameEn":"手当③名翻訳","allowance3AmtEn":"手当③金額翻訳","allowance3CondEn":"手当③条件翻訳","allowance4Name":"手当④名","allowance4Amt":"手当④金額","allowance4Cond":"手当④条件","allowance4NameEn":"手当④名翻訳","allowance4AmtEn":"手当④金額翻訳","allowance4CondEn":"手当④条件翻訳","fixedOTName":"固定残業名","fixedOTAmt":"固定残業金額","fixedOTHours":"固定残業時間","fixedOTNameEn":"固定残業名翻訳","fixedOTAmtEn":"固定残業金額翻訳","fixedOTHoursEn":"固定残業時間翻訳","fixedOTHours2":"固定残業時間2","fixedOTHours2En":"固定残業時間2翻訳","ot60under":"法定超60h以内%","ot60underEn":"法定超60h以内%翻訳","ot60over":"法定超60h超%","ot60overEn":"法定超60h超%翻訳","otPrescribed":"所定超%","otPrescribedEn":"所定超%翻訳","holidayLegal":"法定休日%","holidayLegalEn":"法定休日%翻訳","holidayNonLegal":"法定外休日%","holidayNonLegalEn":"法定外休日%翻訳","nightPremium":"深夜割増%","nightPremiumEn":"深夜割増%翻訳","cutoffCheck1":"締め日チェック1","cutoffCheck1En":"締め日チェック1翻訳","payCutoff":"締め日","payCutoffEn":"締め日（翻訳）","cutoffCheck2":"支払日チェック","payDayCheckEn":"支払日チェック翻訳","payDay":"支払日","payDayEn":"支払日（翻訳）","payMethodCheck1":"支払方法チェック1","payMethodCheck2":"支払方法チェック2","totalPay":"月額支給合計","totalPayEn":"月額支給合計翻訳","netPay":"手取り","netPayEn":"手取り翻訳","raiseCheck":"昇給チェック","raiseCondition":"昇給条件","raiseConditionEn":"昇給条件翻訳","bonusCheck":"賞与チェック","bonusCondition":"賞与条件","bonusConditionEn":"賞与条件翻訳","severanceCheck":"退職金チェック","severanceCondition":"退職金条件","severanceConditionEn":"退職金条件翻訳","leaveCheck":"休業手当チェック","leaveAllowance":"休業手当条件","leaveAllowanceEn":"休業手当条件翻訳","resignDays":"退職予告日数","resignDaysEn":"退職予告日数翻訳","taxAmount":"税金","taxAmountEn":"税金翻訳","socialIns":"社会保険料","socialInsEn":"社会保険料翻訳","empIns":"雇用保険料","empInsEn":"雇用保険料翻訳","deductFood":"食費控除","deductFoodEn":"食費控除翻訳","deductFoodType":"食費 実費フラグ(true=控除除外)","deductHousing":"居住費控除","deductHousingEn":"居住費控除翻訳","deductHousingType":"居住費 実費フラグ(true=控除除外)","deductUtility":"水道光熱費控除","deductUtilityEn":"水道光熱費控除翻訳","deductUtilityType":"水道光熱費 実費フラグ(true=控除除外)","deductOther1Name":"その他控除①名","deductOther1Amt":"その他控除①額","deductOther1NameEn":"その他控除①名翻訳","deductOther1AmtEn":"その他控除①額翻訳","deductOther1Type":"その他控除① 実費フラグ(true=控除除外)","deductOther2Name":"その他控除②名","deductOther2Amt":"その他控除②額","deductOther2NameEn":"その他控除②名翻訳","deductOther2AmtEn":"その他控除②額翻訳","deductOther2Type":"その他控除② 実費フラグ(true=控除除外)","totalDeduct":"控除合計","totalDeductEn":"控除合計翻訳","insCheck1":"保険チェック1","insCheck2":"保険チェック2","insCheck3":"保険チェック3","insCheck4":"保険チェック4","insCheck5":"保険チェック5","insCheck6":"保険チェック6","otherInsurance":"その他保険","otherInsuranceEn":"その他保険翻訳","healthCheckY":"健診年","healthCheckM":"健診月","healthCheckYEn":"健診年翻訳","healthCheckMEn":"健診月翻訳","consultantTitle":"相談窓口役職","consultantName":"相談窓口名前","consultantTel":"相談窓口連絡先","consultantTitleEn":"相談窓口役職翻訳","consultantNameEn":"相談窓口名前翻訳","consultantTelEn":"相談窓口連絡先翻訳","workRulesAccess":"就業規則確認方法","workRulesAccessEn":"就業規則確認方法翻訳","supportFee":"支援委託費"},"co":{"name":"所属機関名","nameKana":"所属機関名（かな）","name_kana":"所属機関名（かな）","nameEn":"会社名（英語）","name_en":"会社名（英語）","zip":"郵便番号","pref":"所在地（都道府県）","city":"所在地（市区町村）","address":"所在地（番地以降）","fullAddress":"所在地（都道府県+市区町村+番地 結合）","full_address":"所在地（都道府県+市区町村+番地 結合）","addressEn":"所在地（翻訳）","address_en":"所在地（翻訳）","tel":"電話番号","telEn":"電話番号（翻訳）","tel_en":"電話番号（翻訳）","repName":"代表者名","rep_name":"代表者名","repTitle":"代表者役職","rep_title":"代表者役職","repNameEn":"代表者名（翻訳）","rep_name_en":"代表者名（翻訳）","repTitleEn":"代表者役職（翻訳）","rep_title_en":"代表者役職（翻訳）","authorName":"作成責任者 氏名","author_name":"作成責任者 氏名","authorTitle":"作成責任者 役職","author_title":"作成責任者 役職","authorTitleName":"作成責任者 役職+氏名","author_title_name":"作成責任者 役職+氏名","authorNameEn":"作成責任者（英語）","author_name_en":"作成責任者（英語）","supportStaff":"支援担当者","support_staff":"支援担当者","jpCompJobDesc":"比較対象日本人 職務内容","jp_comp_job_desc":"比較対象日本人 職務内容","jpCompAge":"比較対象日本人 年齢","jp_comp_age":"比較対象日本人 年齢","jpCompGender":"比較対象日本人 性別","jp_comp_gender":"比較対象日本人 性別","jpCompExp":"比較対象日本人 経験年数","jp_comp_exp":"比較対象日本人 経験年数","jpCompSalary":"比較対象日本人 賃金","jp_comp_salary":"比較対象日本人 賃金","jpCompReason":"比較対象日本人 同等理由","jp_comp_reason":"比較対象日本人 同等理由","wageRegulation":"賃金規定有無","wage_regulation":"賃金規定有無","repTitleName":"代表者 役職+氏名","rep_title_name":"代表者 役職+氏名","jpVoluntaryQuit":"(日本人)自発的離職者","jp_voluntary_quit":"(日本人)自発的離職者","jpInvoluntaryQuit":"(日本人)非自発的離職者","jp_involuntary_quit":"(日本人)非自発的離職者","fnVoluntaryQuit":"(外国人)自発的離職者","fn_voluntary_quit":"(外国人)自発的離職者","fnInvoluntaryQuit":"(外国人)非自発的離職者","fn_involuntary_quit":"(外国人)非自発的離職者","salesY1":"前年度売上高","sales_y1":"前年度売上高","salesY2":"前々年度売上高","sales_y2":"前々年度売上高","salesY3":"前々々年度売上高","sales_y3":"前々々年度売上高","ordinaryPLY1":"前年度経常損益","ordinary_p_l_y1":"前年度経常損益","ordinaryPLY2":"前々年度経常損益","ordinary_p_l_y2":"前々年度経常損益","ordinaryPLY3":"前々々年度経常損益","ordinary_p_l_y3":"前々々年度経常損益","netPLY1":"前年度純損益","net_p_l_y1":"前年度純損益","netPLY2":"前々年度純損益","net_p_l_y2":"前々年度純損益","netPLY3":"前々々年度純損益","net_p_l_y3":"前々々年度純損益","netAssetsY1":"前年度純資産","net_assets_y1":"前年度純資産","netAssetsY2":"前々年度純資産","net_assets_y2":"前々年度純資産","netAssetsY3":"前々々年度純資産","net_assets_y3":"前々々年度純資産","officer1Kana":"①役員ふりがな","officer1_kana":"①役員ふりがな","officer1Name":"①役員氏名","officer1_name":"①役員氏名","officer1Title":"①役員役職","officer1_title":"①役員役職","officer2Kana":"②役員ふりがな","officer2_kana":"②役員ふりがな","officer2Name":"②役員氏名","officer2_name":"②役員氏名","officer2Title":"②役員役職","officer2_title":"②役員役職","officer3Kana":"③役員ふりがな","officer3_kana":"③役員ふりがな","officer3Name":"③役員氏名","officer3_name":"③役員氏名","officer3Title":"③役員役職","officer3_title":"③役員役職","officer4Kana":"④役員ふりがな","officer4_kana":"④役員ふりがな","officer4Name":"④役員氏名","officer4_name":"④役員氏名","officer4Title":"④役員役職","officer4_title":"④役員役職","officer5Kana":"⑤役員ふりがな","officer5_kana":"⑤役員ふりがな","officer5Name":"⑤役員氏名","officer5_name":"⑤役員氏名","officer5Title":"⑤役員役職","officer5_title":"⑤役員役職","officer6Kana":"⑥役員ふりがな","officer6_kana":"⑥役員ふりがな","officer6Name":"⑥役員氏名","officer6_name":"⑥役員氏名","officer6Title":"⑥役員役職","officer6_title":"⑥役員役職","officer7Kana":"⑦役員ふりがな","officer7_kana":"⑦役員ふりがな","officer7Name":"⑦役員氏名","officer7_name":"⑦役員氏名","officer7Title":"⑦役員役職","officer7_title":"⑦役員役職","officer8Kana":"⑧役員ふりがな","officer8_kana":"⑧役員ふりがな","officer8Name":"⑧役員氏名","officer8_name":"⑧役員氏名","officer8Title":"⑧役員役職","officer8_title":"⑧役員役職","officer9Kana":"⑨役員ふりがな","officer9_kana":"⑨役員ふりがな","officer9Name":"⑨役員氏名","officer9_name":"⑨役員氏名","officer9Title":"⑨役員役職","officer9_title":"⑨役員役職","officer10Kana":"⑩役員ふりがな","officer10_kana":"⑩役員ふりがな","officer10Name":"⑩役員氏名","officer10_name":"⑩役員氏名","officer10Title":"⑩役員役職","officer10_title":"⑩役員役職","prevSales1":"前年度売上高","prev_sales1":"前年度売上高","prevSales2":"前々年度売上高","prev_sales2":"前々年度売上高","prevSales3":"前々々年度売上高","prev_sales3":"前々々年度売上高","prevOrdinary1":"前年度経常損益","prev_ordinary1":"前年度経常損益","prevOrdinary2":"前々年度経常損益","prev_ordinary2":"前々年度経常損益","prevOrdinary3":"前々々年度経常損益","prev_ordinary3":"前々々年度経常損益","prevNet1":"前年度純損益","prev_net1":"前年度純損益","prevNet2":"前々年度純損益","prev_net2":"前々年度純損益","prevNet3":"前々々年度純損益","prev_net3":"前々々年度純損益","prevAsset1":"前年度純資産","prev_asset1":"前年度純資産","prevAsset2":"前々年度純資産","prev_asset2":"前々年度純資産","prevAsset3":"前々々年度純資産","prev_asset3":"前々々年度純資産","fgnVoluntaryQuit":"(外国人)自発的離職者","fgn_voluntary_quit":"(外国人)自発的離職者","fgnInvoluntaryQuit":"(外国人)非自発的離職者","fgn_involuntary_quit":"(外国人)非自発的離職者","missing1y":"行方不明者(直近1年)","missing2y":"行方不明者(直近2年)","missing3y":"行方不明者(直近3年)","supportOrgName":"登録支援機関名","support_org_name":"登録支援機関名","supportOrgNumber":"登録支援機関番号","support_org_number":"登録支援機関番号"},"p":{"contractStartY":"契約開始年","contract_start_y":"契約開始年","contractStartM":"契約開始月","contract_start_m":"契約開始月","contractStartD":"契約開始日","contract_start_d":"契約開始日","contractEndY":"契約終了年","contract_end_y":"契約終了年","contractEndM":"契約終了月","contract_end_m":"契約終了月","contractEndD":"契約終了日","contract_end_d":"契約終了日","entryY":"入国予定年","entry_y":"入国予定年","entryM":"入国予定月","entry_m":"入国予定月","entryD":"入国予定日","entry_d":"入国予定日","age":"年齢","gender":"性別","experience":"経験年数","nationality":"国籍（カナ）","birthdate":"生年月日（そのまま）","birthY":"生年月日（年）自動","birth_y":"生年月日（年）自動","birthM":"生年月日（月）自動","birth_m":"生年月日（月）自動","birthD":"生年月日（日）自動","birth_d":"生年月日（日）自動","expireY":"在留期限(年)自動","expire_y":"在留期限(年)自動","expireM":"在留期限(月)自動","expire_m":"在留期限(月)自動","expireD":"在留期限(日)自動","expire_d":"在留期限(日)自動","passExpY":"旅券有効期限(年)","pass_exp_y":"旅券有効期限(年)","passExpM":"旅券有効期限(月)","pass_exp_m":"旅券有効期限(月)","passExpD":"旅券有効期限(日)","pass_exp_d":"旅券有効期限(日)","homeAddress":"本国における居住地","home_address":"本国における居住地","desiredStatus":"希望する在留資格","desired_status":"希望する在留資格","address":"住所（人材データ）","passport":"旅券番号","residenceCard":"在留カード番号","residence_card":"在留カード番号","residenceStatus":"現在の在留資格","residence_status":"現在の在留資格","stayPeriod":"在留期間","stay_period":"在留期間","totalStayYear":"特定技能通算在留期間（年）","total_stay_year":"特定技能通算在留期間（年）","totalStayMonth":"特定技能通算在留期間（月）","total_stay_month":"特定技能通算在留期間（月）"},"so":{"name":"登録支援機関名","address":"登録支援機関住所","tel":"登録支援機関電話番号","staff":"支援責任者氏名","repName":"支援機関代表者名","rep_name":"支援機関代表者名","regNo":"登録番号","reg_no":"登録番号","pref":"支援機関都道府県","city":"支援機関市区町村","officeName":"支援事業所名","office_name":"支援事業所名","officeAddress":"支援事業所住所","office_address":"支援事業所住所","language":"対応言語","regY":"登録年月日(年)","reg_y":"登録年月日(年)","regM":"登録年月日(月)","reg_m":"登録年月日(月)","regD":"登録年月日(日)","reg_d":"登録年月日(日)"},"case":{"docCreateDate":"書類作成日","company":"所属機関名（案件）","entryDate":"入国予定日（/区切り）","contractEndDate":"契約終了日"}};
+(function(){ var E=_SRC_LBL.es, C=_SRC_LBL.co||{};
+  ['JobDesc','Age','Gender','Exp','Salary','Reason'].forEach(function(x){ var k='jpComp'+x; if(!E[k]) E[k]=C[k]||C['jp_comp_'+x.toLowerCase()]||('比較対象日本人 '+x); });
+  for(var n=1;n<=6;n++){ if(!E['allowance'+n+'Amount']) E['allowance'+n+'Amount']=E['allowance'+n+'Amt']||('手当'+'①②③④⑤⑥'[n-1]+'金額'); }
+  var add={salaryRaiseCond:'昇給条件',salaryRaiseTime:'昇給時期',salaryRaiseAmount:'昇給額',wageRegulation:'賃金規程の有無',salaryRuleApply:'賃金規程に基づく報酬',foreignerJobDesc:'外国人の職務内容',category:'業務区分',category2:'業務区分（2つ目）',cohabitants:'同居人数',actualCostDesc:'実費の説明',housingOwnership:'住居（自己所有・借上）'};
+  Object.keys(add).forEach(function(k){ if(!E[k]) E[k]=add[k]; });
+})();
+_SRC_LBL.cases={applicant:'申請人氏名',doc_create_date:'書類作成日',contract_start:'契約開始日',contract_end:'契約終了日',app_type:'申請種別',residence_status:'在留資格',nationality:'国籍',org:'登録支援機関（案件）',company:'所属機関名（案件）',emp_set_idx:'使用する雇用条件セット',applicant_field:'分野',senddashi_org:'送出し機関',senddashi_payment:'送出し機関への支払い',receipt_no:'申請受付番号',job_category:'業務区分（案件）'};
+var _SRC_GRP={emp:{icon:'📋',name:'雇用条件セット',tb:null,lbl:'es'},co:{icon:'🏢',name:'会社情報',tb:'companies',lbl:'co'},cas:{icon:'🗂',name:'案件情報',tb:'cases',lbl:'cases'},
+  per:{icon:'👤',name:'人材情報',tb:'persons',lbl:'p'},so:{icon:'🤝',name:'登録支援機関',tb:'support_orgs',lbl:'so'},ir:{icon:'📝',name:'ヒアリング',tb:'intake_requests',lbl:null}};
+var _SRC_VAR={co:'co',company:'co',_co:'co',cas:'cas',cs:'cas',cas0:'cas',ca:'cas',pd:'per',per:'per',person:'per',psn:'per',es:'emp',_es:'emp',esJ:'emp',es0:'emp',_es0:'emp',emp:'emp',ir:'ir',so:'so',_so:'so',soRow:'so'};
+// 使う会社だけが入れる項目（空でもふつう）。赤い一覧には出さない
+var _SRC_OPT=/^(shift\d|shiftDetail|deductOther\d|allowance\d|a\d(Name|Amt|Calc)|category2|nonReg|other|unpaid|salaryDaily|salaryHourly|calcMonthly|calcHourly|fixedOT|retire|bonus|entry[YMD]|dispatch|jpCompAllow|flex|holidayOther)/i;
+var _srcMapCache=null;
+function _srcBuildMap(){
+  if(_srcMapCache) return _srcMapCache;
+  var map={}, add=function(id,g,k){ (map[id]=map[id]||[]); if(!map[id].some(function(x){ return x.g===g&&x.k===k; })) map[id].push({g:g,k:k}); };
+  var txt=''; document.querySelectorAll('script:not([src])').forEach(function(sc){ txt+=sc.textContent+'\n'; });
+  var re=/\b(?:s|S|_s|set|put|sv|setVal|setAutoDefault|setValMulti)\(\s*(\[[^\]]*\]|'[^']+'|"[^"]+")\s*,\s*([^;\n]{0,240})/g, m;
+  while((m=re.exec(txt))){
+    var ids=(m[1].match(/(?:es|f)_[A-Za-z0-9_]+/g)||[]); if(!ids.length) continue;
+    var rr=/\b([A-Za-z_][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)/g, r2;
+    while((r2=rr.exec(m[2]))){ var g=_SRC_VAR[r2[1]]; if(!g) continue; if(/^(length|trim|replace|split|join|indexOf|map|filter|toString|slice)$/.test(r2[2])) continue; ids.forEach(function(id){ add(id,g,r2[2]); }); }
+  }
+  _srcMapCache=map; return map;
+}
+function _srcIsEmpty(v){ return v==null || String(v).trim()===''; }
+function _srcLabel(g,k){ var L=_SRC_GRP[g]&&_SRC_GRP[g].lbl&&_SRC_LBL[_SRC_GRP[g].lbl]; return (L&&L[k])||k; }
+function _srcEmptyInfo(el){
+  var map=_srcBuildMap(), list=(map[el.id]||[]).slice();
+  var es=_srcEmpSet(), R=window._srcRows||{}, base=el.id.replace(/^(es_|f_)/,'');
+  if(!list.some(function(x){ return x.g==='emp'; })){   // 雇用条件セットの同名項目（共通の読み込み）
+    var cand=[base, base.replace(/Amount$/,'Amt'), base.replace(/Amt$/,'Amount')];
+    for(var ci=0;ci<cand.length;ci++){ if(_SRC_LBL.es[cand[ci]] || (es && es[cand[ci]]!==undefined)){ list.push({g:'emp',k:cand[ci]}); break; } }
+  }
+  if(!list.length) return null;
+  var out=list.map(function(x){
+    var row = x.g==='emp' ? es : (R[_SRC_GRP[x.g].tb]||null);
+    var v = row ? row[x.k] : undefined;
+    return {g:x.g, k:x.k, label:_srcLabel(x.g,x.k), state: !row ? 'unknown' : (_srcIsEmpty(v) ? 'empty' : 'filled'), val:v};
+  });
+  return out;
+}
+function srcToggle(){
+  var on=!document.querySelector('.src-badge');
+  document.querySelectorAll('.src-badge,#srcLegend').forEach(function(e){ e.remove(); });
+  var btn=document.getElementById('_srcBtn'); if(btn) btn.textContent=on?'🔍 空欄チェックを消す':'🔍 空欄チェック（案シスのどこが空か）';
+  if(!on) return;
+  _srcMapCache=null;
+  var todo={}, nEmpty=0, nOther=0, nUnk=0, nOpt=0;
+  document.querySelectorAll('.fp input[id], .fp select[id], .fp textarea[id]').forEach(function(el){
+    if(el.type==='hidden' || el.type==='checkbox' || el.type==='radio' || el.id==='caseSelect' || /Select$/.test(el.id) || /^sp_/.test(el.id) || el.offsetParent===null) return;
+    if(!_srcIsEmpty(el.value)) return;
+    var info=_srcEmptyInfo(el), b=document.createElement('span'); b.className='src-badge';
+    var txt, color, bg, tip;
+    var isTr=/(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/.test(el.id) && document.getElementById(el.id.replace(/(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/,''));
+    if(isTr){ var ja=document.getElementById(el.id.replace(/(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/,''));
+      if(ja && _srcIsEmpty(ja.value)) return;   // 日本語も空なら、日本語の欄の札だけ出す
+      txt='🌐 訳が空（上の「🌐 訳が空いている欄をまとめて翻訳」で入ります）'; color='#1d4ed8'; bg='#eff6ff'; tip='日本語は入っていて訳だけが空です。翻訳ボタンで入れられます（案シスの雇用条件に訳を入れておけば次から自動で入ります）'; nOther++; }
+    else if(!info){ txt='✍ この書類で入力（案シスの対応項目なし）'; color='#64748b'; bg='#f8fafc'; tip='案シスから読み込む欄ではありません。必要ならこの書類で入力してください'; nOther++; }
+    else{
+      var emp=info.filter(function(x){ return x.state==='empty'; }), fil=info.filter(function(x){ return x.state==='filled'; });
+      var _opt=emp.length && emp.every(function(e){ return _SRC_OPT.test(e.k); });
+      if(emp.length && _opt){ var o=emp[0], go=_SRC_GRP[o.g]; txt='▫ 案シス'+go.name+'「'+o.label+'」が空（使う場合だけ）'; color='#64748b'; bg='#f8fafc';
+        tip='使う会社だけが入れる項目です（交代制の2つ目以降・その他控除・手当など）。必要なら案シスの'+go.name+'で入れてください'; nOpt++; }
+      else if(emp.length){ var x=emp.filter(function(e){ return !_SRC_OPT.test(e.k); })[0]||emp[0], gg=_SRC_GRP[x.g];
+        var labs=emp.filter(function(e){ return e.g===x.g; }).slice(0,3).map(function(e){ return e.label; });
+        txt='⬜ 案シス '+gg.icon+gg.name+'「'+labs.join('・')+'」が空'; color='#b91c1c'; bg='#fef2f2';
+        tip='案シスの'+gg.name+'の「'+labs.join('」「')+'」が空のため、この欄も空です。案シスで入れると次から自動で入ります'; nEmpty++;
+        var key=gg.icon+' '+gg.name; (todo[key]=todo[key]||{}); labs.forEach(function(l){ todo[key][l]=1; }); }
+      else if(fil.length){ var y=fil[0], g2=_SRC_GRP[y.g]; txt='⚠ 案シス'+g2.name+'「'+y.label+'」には入っています'; color='#b45309'; bg='#fffbeb';
+        tip='案シスには「'+String(y.val).slice(0,40)+'」と入っていますが、この欄には入っていません（書類の作り方で使わない値か、読み込みの不具合）。必要ならこの値を入れてください'; nOther++; }
+      else { var z=info[0], g3=_SRC_GRP[z.g]; txt='… 参照先：'+g3.icon+g3.name+'「'+z.label+'」'; color='#475569'; bg='#f1f5f9'; tip='この欄は案シスの'+g3.name+'「'+z.label+'」から入ります（今は読み込めていないため空か判定できません）'; nUnk++; }
+    }
+    b.textContent=txt; b.title=tip;
+    b.style.cssText='display:inline-block;margin:2px 0 0;padding:0 6px;border-radius:9px;font-size:10px;line-height:16px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;color:'+color+';background:'+bg+';border:1px solid '+color+'33;';
+    el.insertAdjacentElement('afterend', b);
+  });
+  var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host) return;
+  var lg=document.createElement('div'); lg.id='srcLegend';
+  lg.style.cssText='margin:0 0 8px;padding:7px 9px;border:1px solid #fecaca;border-radius:8px;background:#fff;font-size:11px;line-height:1.6;color:#334155';
+  var keys=Object.keys(todo);
+  lg.innerHTML = keys.length
+    ? '<b style="color:#b91c1c">案シスで入れると自動で入る項目（'+nEmpty+'欄）</b>'+keys.map(function(k){ return '<div style="margin-top:3px"><b>'+k+'</b>：'+Object.keys(todo[k]).map(function(t){ return t.replace(/[<>&]/g,''); }).join('、')+'</div>'; }).join('')
+      +(nOpt?'<div style="margin-top:3px;color:#64748b">▫ 使う場合だけ入れる項目の空欄：'+nOpt+'欄（交代制の2つ目以降・その他控除・手当など）</div>':'')
+      +'<div style="margin-top:4px;color:#64748b;font-size:10.5px">空欄の下の札にマウスを乗せると説明が出ます。'+(nOther?'「✍ この書類で入力」「⚠」の欄は案シスでは埋まりません。':'')+'</div>'
+    : '<b style="color:#15803d">✅ 案シス側が空のために空欄になっている欄はありません</b>'+(nOther||nUnk?'<div style="color:#64748b;font-size:10.5px">残りの空欄は、この書類で入力する欄です。</div>':'');
+  var bt=document.getElementById('_srcBtn'); if(bt && bt.parentNode===host) bt.insertAdjacentElement('afterend', lg); else host.insertBefore(lg, host.firstChild);
+}
+window.srcToggle=srcToggle;
+(function(){
+  function inj(){
+    try{
+      if(document.getElementById('_srcBtn')) return;
+      var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host || !document.getElementById('pageArea')) return;
+      var b=document.createElement('button'); b.type='button'; b.id='_srcBtn'; b.textContent='🔍 空欄チェック（案シスのどこが空か）';
+      b.title='空欄の欄ごとに、案シスのどこ（雇用条件・会社・案件・人材など）が空なのかを表示します';
+      b.style.cssText='display:block;width:100%;margin:0 0 8px;padding:6px;border:1px solid #fca5a5;background:#fff7f7;color:#b91c1c;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;';
+      b.onclick=function(ev){ ev.preventDefault(); srcToggle(); };
+      host.insertBefore(b, host.firstChild);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(inj,400); }); else setTimeout(inj,400);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ window._srcRows={}; if(document.querySelector('.src-badge')) srcToggle(); } }catch(_e){} });
+})();
+/* ===== /空欄の参照先 ===== */
 /* ===== ver.20261109.03: 手入力の記録 =====
    「手入力0」に向けて、どの欄を手で入れた・直したかを保存のときに利用ログ（saysay_logs.meta）へ残す。
    ・左の入力欄：最初に触った時点の値（＝自動で入った値）と保存時の値を比べ、変わった欄を記録
