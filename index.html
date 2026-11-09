@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261109.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261109.11</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -153,10 +153,9 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div id="priorityDocsSection" style="display:none;">
       <div class="section" style="color:#a855f7;background:linear-gradient(180deg,#faf5ff,#f3e8ff);border-left:3px solid #a855f7;">📌 この案件の必要書類</div>
       <div style="padding:6px 10px;background:#faf5ff;border-bottom:1px solid #f3e8ff;">
-        <button onclick="printPriorityDocs()" style="width:100%;padding:7px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">🖨️ スキャン必要書類を<wbr>まとめてPDF</button>
-        <div style="font-size:9px;color:#a78bfa;margin-top:3px;line-height:1.4;">必要書類を国籍に合った言語で1つのPDFにまとめます。書類の追加・検索もできます。</div>
+        <!-- ver.20261109.11: 「スキャン必要書類をまとめてPDF」ボタンは、下の「まとめてPDF」と重なるため削除（必要書類の自動選択は、まとめてPDFの「📌 スキャン必要書類を選ぶ」に移した） -->
         <!-- ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF -->
-        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:6px;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 会社・グループの複数人を<wbr>まとめてPDF</button>
+        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:0;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 会社・グループの複数人を<wbr>まとめてPDF</button>
         <div style="font-size:9px;color:#5eead4;margin-top:3px;line-height:1.4;">この会社の人や、案シスでグループにした案件の人を選び、1-5号・1-6号などを人数分まとめて1つのPDFにします（言語は人ごとに国籍から自動）。</div>
       </div>
       <div id="priorityDocsList"></div>
@@ -478,8 +477,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794210857';
-window.__DOCS_CACHE_BUSTER__ = '1794210857';
+window.__DOCS_CACHE_BUSTER__ = '1794212523';
+window.__DOCS_CACHE_BUSTER__ = '1794212523';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1840,6 +1839,15 @@ _docsAuthGateInit();
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
   {
+    version: 'ver.20261109.11',
+    date: '2026-11-09',
+    notify: true,
+    items: [
+      '✍📌 「会社・グループの複数人をまとめてPDF」の書類選びに、カテゴリ「サイン書類」「スキャン書類」を追加しました（押すと、人ごとに必要な書類だけを選びます。ほかの書類は1つずつチェックで足す・外すことができます）',
+      '🧹 左の「スキャン必要書類をまとめてPDF」ボタンはなくしました（同じことは「まとめてPDF」で人を1人選び、「📌 スキャン書類」を押せばできます）'
+    ]
+  },
+  {
     version: 'ver.20261109.10',
     date: '2026-11-09',
     notify: true,
@@ -3092,9 +3100,9 @@ function _pmChangeField(v){
   _pmState._fieldOverride=v||'';
   printPriorityDocs(true);
 }
-async function printPriorityDocs(keepField){
-  if(!idxSelectedCase){ alert('先に案件を選択してください。'); return; }
-  var c=idxSelectedCase;
+async function printPriorityDocs(keepField, silentInfo){
+  if(!idxSelectedCase && !silentInfo){ alert('先に案件を選択してください。'); return; }
+  var c=silentInfo||idxSelectedCase;
   // ver.20261023.04: 雇用条件セットが選ばれていないときは、まとめ印刷をしない
   //   （まとめ印刷は見えない画面で書類を開くので、そこでは選ぶ画面を出せない＝雇用条件が空の書類になる）
   try{
@@ -3104,7 +3112,7 @@ async function printPriorityDocs(keepField){
       var _co=await idxSb('companies?select=emp_sets&id=eq.'+encodeURIComponent(_coid));
       var _sets=(_co&&_co[0]&&_co[0].emp_sets)||[]; if(typeof _sets==='string'){ try{ _sets=JSON.parse(_sets); }catch(e){ _sets=[]; } }
       var _ok=(_ix!=null && String(_ix)!=='' && Array.isArray(_sets) && _sets[parseInt(_ix,10)]);
-      if(Array.isArray(_sets) && _sets.length && !_ok){
+      if(Array.isArray(_sets) && _sets.length && !_ok && !silentInfo){
         alert('この案件は、雇用条件セットが選ばれていません。\n\n先に「1-6号」などの書類を開くと、雇用条件セットを選ぶ画面が出ます。\nこの人のセットを選んでから、もう一度まとめ印刷をしてください。\n（選ばないまま印刷すると、雇用条件が空の書類になります）');
         return;
       }
@@ -3175,6 +3183,7 @@ async function printPriorityDocs(keepField){
       _pmState.sel[a[0]]=false; _pmState.cond[a[0]]=true; _pmState.note[a[0]]=a[1];
     });
   }
+  if(silentInfo) return Object.keys(_pmState.sel).filter(function(d){ return _pmState.sel[d]; });   // ver.20261109.11: まとめてPDFの「スキャン必要書類を選ぶ」用
   _pmRender();
 }
 function _pmNorm(t){
@@ -3480,6 +3489,8 @@ function _bpPostLogs(collected){
 }
 // ver.20261109.08: 人ごと・書類ごとに別々のPDFにするときの一覧（ブラウザの「PDFに保存」は自動で押せないので、1つずつ押してもらう）
 function _bpShortDoc(dk){
+  if(/^\d+_\d+(_\d+)?$/.test(String(dk))) return String(dk).replace(/_/g,'-')+'号';
+  var _nm={juuyou:'重要事項説明書',madoguchi:'窓口申請書',iko:'移行準備説明書',tk2go:'移行準備説明書(2号)',ininjou:'委任状',tesuryo:'手数料納付書'}; if(_nm[dk]) return _nm[dk];
   var lb=_pmDocLabel(dk), n=String((lb&&lb.name)||dk).normalize('NFKC');
   var m=n.match(/参考様式第?\s*(\d+)\s*[-－ー−]\s*(\d+)(?:\s*[-－ー−]\s*(\d+))?\s*号/);
   return m ? (m[1]+'-'+m[2]+(m[3]?'-'+m[3]:'')+'号') : n.replace(/\s+/g,'').slice(0,24);
@@ -3542,8 +3553,8 @@ async function openMultiPersonPdf(opt){
   var wait=document.createElement('div'); wait.id='mpWait';
   wait.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font:700 14px sans-serif;';
   wait.textContent='👥 この会社・グループの人を読み込んでいます…'; document.body.appendChild(wait);
-  var CF='id,name,applicant,nationality,status,app_type,residence_status,applicant_field,emp_set_idx,created_at,org,company,company_id';
-  var rows=[], coSets={}, coNames={}, coId=c.companyId||'', coName=c.companyName||'', groups=[], grp=null;
+  var CF='id,name,applicant,nationality,status,app_type,residence_status,applicant_field,emp_set_idx,created_at,org,company,company_id,other_support_note,madoguchi_date';
+  var rows=[], coSets={}, coNames={}, coAcc={}, coId=c.companyId||'', coName=c.companyName||'', groups=[], grp=null;
   try{
     groups=await _mpLoadGroups();
     if(opt.groupId) grp=groups.find(function(g){ return g.id===opt.groupId; })||null;
@@ -3566,8 +3577,8 @@ async function openMultiPersonPdf(opt){
     rows=Object.keys(byId).map(function(k){ return byId[k]; }).filter(function(x){ return x && x.applicant; });
     var coIds=[]; rows.forEach(function(x){ if(x.company_id && coIds.indexOf(x.company_id)<0) coIds.push(x.company_id); });
     if(coIds.length){
-      var cos=await idxSb('companies?select=id,name,emp_sets&id=in.('+encodeURIComponent(coIds.map(function(x){ return '"'+x+'"'; }).join(','))+')');
-      (cos||[]).forEach(function(o){ var ss=o.emp_sets||[]; if(typeof ss==='string'){ try{ ss=JSON.parse(ss); }catch(e){ ss=[]; } } coSets[o.id]=ss; coNames[o.id]=o.name||''; });
+      var cos=await idxSb('companies?select=id,name,emp_sets,foreigner_accept_exp&id=in.('+encodeURIComponent(coIds.map(function(x){ return '"'+x+'"'; }).join(','))+')');
+      (cos||[]).forEach(function(o){ var ss=o.emp_sets||[]; if(typeof ss==='string'){ try{ ss=JSON.parse(ss); }catch(e){ ss=[]; } } coSets[o.id]=ss; coNames[o.id]=o.name||''; coAcc[o.id]=o.foreigner_accept_exp||''; });
     }
     if(coId && coNames[coId]) coName=coNames[coId];
   }catch(e){ alert('読み込みエラー: '+e.message); }
@@ -3579,11 +3590,12 @@ async function openMultiPersonPdf(opt){
     x._setOk=!(Array.isArray(sets)&&sets.length) || (x.emp_set_idx!=null && String(x.emp_set_idx)!=='' && !!sets[parseInt(x.emp_set_idx,10)]);
     x._lang=idxLangFromNationality(x.nationality)||'en';
     x._coName=coNames[x.company_id]||x.company||x.org||'';
+    x._acc=coAcc[x.company_id]||'';
   });
   // この画面で選べるグループ：今の人たちのどれかが入っているグループ
   var rid={}; rows.forEach(function(x){ rid[x.id]=1; });
   var vg=groups.filter(function(g){ return g.caseIds.some(function(id){ return rid[id]; }); }).map(function(g){ return {id:g.id, name:g.name||'(名前なし)', ids:g.caseIds.filter(function(id){ return rid[id]; })}; });
-  var st={coId:coId, coName:coName, rows:rows, sel:{}, docSel:{}, order:'person', q:'', groups:vg, view:grp?('g:'+grp.id):'co'};
+  var st={coId:coId, coName:coName, rows:rows, sel:{}, docSel:{}, order:'person', q:'', groups:vg, view:grp?('g:'+grp.id):'co', cats:{sign:false,scan:false}, per:{}, extraOn:{}, extraOff:{}};
   var docSel={}, _last=null; try{ _last=JSON.parse(localStorage.getItem('mp_docs')||'null'); }catch(e){}   // 前回選んだ書類を覚えておく
   ((Array.isArray(_last)&&_last.length)?_last:_MP_DEFAULT_DOCS).forEach(function(d){ docSel[d]=true; });
   st.docSel=docSel;
@@ -3601,6 +3613,7 @@ function _mpSetView(v, noRender){
   var st=_mpState; if(!st) return; st.view=v; st.q='';
   if(String(v).indexOf('g:')===0){ st.sel={}; _mpViewRows().forEach(function(x){ st.sel[x.id]=!!x._setOk; }); }   // グループを選んだら、そのグループの人を全員選ぶ
   _mpRender();
+  if(_mpCatOn()) _mpEnsurePer(st.rows.filter(function(x){ return st.sel[x.id]; })).then(_mpCount);
 }
 function _mpRender(){
   var st=_mpState; if(!st) return;
@@ -3617,20 +3630,21 @@ function _mpRender(){
   var pr=ppl.map(function(x){
     var dis=!x._setOk;
     return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #f1f5f9;'+(dis?'opacity:.55;':'cursor:pointer;')+'">'
-      +'<input type="checkbox" '+(st.sel[x.id]?'checked':'')+(dis?' disabled':'')+' onchange="_mpState.sel[\''+x.id+'\']=this.checked;_mpCount();">'
+      +'<input type="checkbox" '+(st.sel[x.id]?'checked':'')+(dis?' disabled':'')+' onchange="_mpState.sel[\''+x.id+'\']=this.checked;_mpPersonChanged(\''+x.id+'\');">'
       +'<span style="flex:1;min-width:0;"><b>'+esc(x.applicant)+'</b> <span style="color:#64748b;font-size:11px;">'+(_multiCo?esc(x._coName)+'／':'')+esc(x.nationality||'')+'→'+(LN[x._lang]||x._lang)+'／'+esc(x.app_type||'')+'／'+esc(x.status||'')+'</span>'
       +'<br><span style="color:#94a3b8;font-size:10.5px;">'+esc(x.name||'')+'</span>'
+      +'<span id="mpChip_'+x.id+'" style="display:block;font-size:10.5px;color:#6d28d9;"></span>'
       +(dis?'<br><span style="color:#b91c1c;font-size:10.5px;">雇用条件セットが選ばれていないため対象外（1-6号などを開いて選んでください）</span>':'')+'</span></label>';
   }).join('');
   var allDocs=_getAllDocKeys().filter(function(d){ return _PM_EXCLUDE.indexOf(d.key)<0 && d.key!=='signslot'; });
   var dr=allDocs.map(function(d){
-    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 10px 3px 0;font-size:12px;cursor:pointer;"><input type="checkbox" '+(st.docSel[d.key]?'checked':'')+' onchange="_mpState.docSel[\''+d.key+'\']=this.checked;_mpCount();">'+esc(d.label)+'</label>';
+    return '<label style="display:inline-flex;align-items:center;gap:4px;margin:3px 10px 3px 0;font-size:12px;cursor:pointer;"><input type="checkbox" id="mpDoc_'+d.key+'" '+(st.docSel[d.key]?'checked':'')+' onchange="_mpDocToggle(\''+d.key+'\',this.checked);">'+esc(d.label)+'<span id="mpDocN_'+d.key+'" style="font-size:10.5px;color:#6d28d9;"></span></label>';
   }).join('');
   var html='<div id="mpModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;" onclick="if(event.target.id===\'mpModal\')this.remove();">'
     +'<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(760px,94vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
     +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">👥 複数人の書類をまとめてPDF（会社・案シスのグループ）</div>'
     +'<div style="font-size:12px;color:#475569;margin-top:2px;">'+esc(_mpTitle())+'／言語は人ごとに国籍から自動で選びます</div></div>'
-    +'<div style="padding:10px 18px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;font-size:12.5px;margin-bottom:4px;">① 書類を選ぶ</div><div style="max-height:110px;overflow:auto;">'+dr+'</div></div>'
+    +'<div style="padding:10px 18px;border-bottom:1px solid #f1f5f9;"><div style="font-weight:700;font-size:12.5px;margin-bottom:4px;">① 書類を選ぶ <span style="font-weight:400;font-size:11px;color:#64748b;">（カテゴリを押すと人ごとに必要な書類を選びます。ほかは書類ごとにチェック）</span></div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:11.5px;color:#64748b;">カテゴリ：</span>'+_mpCatBtn('sign','✍ サイン書類','申請の種類・在留資格・分野などから、署名してもらう書類（1-5号・1-6号・重要事項説明書など）を人ごとに選びます')+_mpCatBtn('scan','📌 スキャン書類','申請の種類・在留資格・分野・初回受入などから、スキャンして出す書類を人ごとに選びます（署名済みをスキャンする1-5号・1-6号などは除く）')+'<span id="mpPickNote" style="font-size:11px;font-weight:400;color:#6d28d9;">'+esc(st._pickNote||'')+'</span></div><div style="max-height:110px;overflow:auto;">'+dr+'</div></div>'
     +gbar
     +'<div style="padding:8px 18px 0;display:flex;gap:8px;align-items:center;"><div style="font-weight:700;font-size:12.5px;">② 人を選ぶ</div>'
     +'<input id="mpQ" placeholder="名前・案件名で絞り込み" value="'+esc(st.q)+'" oninput="_mpState.q=this.value;_mpRender();var e=document.getElementById(\'mpQ\');e.focus();e.setSelectionRange(e.value.length,e.value.length);" style="flex:1;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;">'
@@ -3643,12 +3657,104 @@ function _mpRender(){
       return '<label title="'+o[2]+'" style="font-size:12px;cursor:pointer;"><input type="radio" name="mpSplit" '+((st.split||'one')===o[0]?'checked':'')+' onchange="_mpState.split=\''+o[0]+'\';try{localStorage.setItem(\'mp_split\',\''+o[0]+'\');}catch(e){}_mpRender();"> '+o[1]+'</label>'; }).join('')
     +((st.split||'one')==='one'?'<span style="font-size:11px;color:#64748b;margin-left:4px;">並び：</span><label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='person'?'checked':'')+' onchange="_mpState.order=\'person\'"> 人順</label>'
       +'<label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='doc'?'checked':'')+' onchange="_mpState.order=\'doc\'"> 書類順</label>':'')
+    +'<div style="flex-basis:100%;height:0;"></div>'
     +'<span id="mpCount" style="flex:1;font-size:12.5px;color:#0f766e;font-weight:700;text-align:right;"></span>'
     +'<button onclick="document.getElementById(\'mpModal\').remove()" style="padding:8px 14px;background:#f1f5f9;border:none;border-radius:8px;cursor:pointer;">キャンセル</button>'
     +'<button id="mpGo" onclick="_mpExecute()" style="padding:9px 18px;background:#0f766e;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">PDFを作る</button>'
     +'</div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
   _mpCount();
+}
+// ===== ver.20261109.11: 書類のカテゴリ（サイン書類／スキャン書類）。人ごとに必要な書類を判定し、ほかは書類ごとに足す・外す =====
+var _MP_SIGN_SKIP={'1_3':'1-3号（受診者の申告書）','1_17':'1-17号（支援計画書）'};
+function _mpCatOn(){ var st=_mpState; return !!(st && (st.cats.sign || st.cats.scan)); }
+function _mpCatBtn(cat, label, title){
+  var on=_mpState && _mpState.cats[cat];
+  return '<button type="button" title="'+title+'" onclick="_mpToggleCat(\''+cat+'\')" style="white-space:nowrap;font-size:11.5px;font-weight:700;padding:3px 10px;margin-right:4px;border-radius:12px;cursor:pointer;border:1px solid '+(on?'#6d28d9':'#c4b5fd')+';background:'+(on?'#6d28d9':'#faf5ff')+';color:'+(on?'#fff':'#6d28d9')+';">'+(on?'✓ ':'')+label+'</button>';
+}
+// 案シスの「サイン書類作成」の⭐おすすめと同じ判定
+function _mpSignDocs(x){
+  var at=String(x.app_type||''), rs=String(x.residence_status||'');
+  var is2go=/特定技能[2２]号/.test(rs), isNinHen=/認定|変更/.test(at);
+  var d=['1_5','1_6'], skip=[];
+  if(isNinHen){ skip.push('1_3'); if(!is2go) skip.push('1_17'); }
+  if(is2go){ d.push('1_10','1_32'); }
+  if(String(x._acc||'')==='なし') d.push('1_16');
+  if(String(x.applicant_field||'').indexOf('建設')>=0 || String(x.other_support_note||'').indexOf('【分野：建設')>=0) d.push('juuyou');
+  if(String(x.madoguchi_date||'').trim()) d.push('madoguchi');
+  return {docs:d, skip:skip};
+}
+async function _mpEnsurePer(list){
+  var st=_mpState; if(!st) return;
+  for(var i=0;i<list.length;i++){
+    var x=list[i]; var p=st.per[x.id]||(st.per[x.id]={});
+    if(st.cats.sign && !p.sign){ var sg=_mpSignDocs(x); p.sign=sg.docs; p.skip=sg.skip; }
+    if(st.cats.scan && !p.scan){
+      try{ p.scan=(await printPriorityDocs(false, {caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', appType:x.app_type||'', nationality:x.nationality||'', orgName:x.org||'', empSetIdx:x.emp_set_idx}))||[]; }
+      catch(e){ p.scan=[]; console.warn('[mp scan]', e); }
+    }
+  }
+}
+function _mpPersonDocs(x){
+  var st=_mpState, all=_getAllDocKeys().filter(function(d){ return _PM_EXCLUDE.indexOf(d.key)<0; }).map(function(d){ return d.key; });
+  if(!_mpCatOn()) return all.filter(function(k){ return st.docSel[k]; });
+  var p=st.per[x.id]||{}, set={};
+  if(st.cats.sign) (p.sign||[]).forEach(function(k){ set[k]=1; });
+  if(st.cats.scan) (p.scan||[]).forEach(function(k){ set[k]=1; });
+  Object.keys(st.extraOn).forEach(function(k){ set[k]=1; });
+  Object.keys(st.extraOff).forEach(function(k){ delete set[k]; });
+  return all.filter(function(k){ return set[k]; });
+}
+async function _mpToggleCat(cat){
+  var st=_mpState; if(!st) return;
+  st.cats[cat]=!st.cats[cat];
+  if(!_mpCatOn()){ st.extraOn={}; st.extraOff={}; st._pickNote=''; _mpRender(); return; }
+  st._pickNote='判定中…'; _mpRender();
+  await _mpEnsurePer(st.rows.filter(function(x){ return st.sel[x.id]; }));
+  var sk={}; st.rows.forEach(function(x){ if(st.sel[x.id] && st.cats.sign) ((st.per[x.id]||{}).skip||[]).forEach(function(k){ sk[k]=1; }); });
+  st._pickNote='人ごとに必要な書類だけ作ります'+(Object.keys(sk).length?'（'+Object.keys(sk).map(function(k){ return _MP_SIGN_SKIP[k]||k; }).join('・')+'は、ここでは作れないので別に作成）':'');
+  _mpRender();
+}
+function _mpPersonChanged(id){
+  var st=_mpState; if(!st) return;
+  if(_mpCatOn() && st.sel[id] && !(st.per[id] && (!st.cats.sign||st.per[id].sign) && (!st.cats.scan||st.per[id].scan))){
+    var x=st.rows.find(function(r){ return r.id===id; }); if(x){ _mpEnsurePer([x]).then(_mpCount); return; }
+  }
+  _mpCount();
+}
+function _mpDocToggle(k, on){
+  var st=_mpState; if(!st) return;
+  if(!_mpCatOn()){ st.docSel[k]=on; _mpCount(); return; }
+  if(on){ st.extraOn[k]=1; delete st.extraOff[k]; } else { st.extraOff[k]=1; delete st.extraOn[k]; }   // カテゴリ選択中に手で選んだ書類は、全員に足す／全員から外す
+  _mpCount();
+}
+// 書類のチェック表示（カテゴリ選択中は「何人分か」も出す）と、人ごとの書類
+function _mpRefreshDocs(){
+  var st=_mpState; if(!st) return;
+  var cat=_mpCatOn(), ppl=st.rows.filter(function(x){ return st.sel[x.id]; }), cnt={};
+  if(cat) ppl.forEach(function(x){ _mpPersonDocs(x).forEach(function(k){ cnt[k]=(cnt[k]||0)+1; }); });
+  _getAllDocKeys().forEach(function(d){
+    var cb=document.getElementById('mpDoc_'+d.key), sp=document.getElementById('mpDocN_'+d.key); if(!cb) return;
+    if(cat){ cb.checked=!!cnt[d.key]; if(sp) sp.textContent=(cnt[d.key] && cnt[d.key]<ppl.length)?'（'+cnt[d.key]+'名）':''; }
+    else { cb.checked=!!st.docSel[d.key]; if(sp) sp.textContent=''; }
+  });
+  st.rows.forEach(function(x){
+    var ch=document.getElementById('mpChip_'+x.id); if(!ch) return;
+    ch.textContent=(cat && st.sel[x.id]) ? ('→ '+_mpPersonDocs(x).map(_bpShortDoc).join('・')) : '';
+  });
+}
+// ver.20261109.11: 選んだ人（最初の1人）の案件から、スキャン必要書類を選ぶ（以前の「スキャン必要書類をまとめてPDF」と同じ判定）
+async function _mpPickScanDocs(){
+  var st=_mpState; if(!st) return;
+  var x=st.rows.filter(function(r){ return st.sel[r.id]; })[0] || _mpViewRows()[0]; if(!x) return;
+  var nt=document.getElementById('mpPickNote'); if(nt) nt.textContent='判定中…';
+  try{
+    var keys=await printPriorityDocs(false, {caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', appType:x.app_type||'', nationality:x.nationality||'', orgName:x.org||'', empSetIdx:x.emp_set_idx});
+    var all=_getAllDocKeys().map(function(d){ return d.key; });
+    st.docSel={}; (keys||[]).forEach(function(k){ if(all.indexOf(k)>=0) st.docSel[k]=true; });
+    st._pickNote=x.applicant+'さんの案件（'+(x.app_type||'')+'）で'+Object.keys(st.docSel).length+'件選びました';
+  }catch(e){ st._pickNote='判定できませんでした'; console.warn('[mp pick]', e); }
+  _mpRender(); var nt2=document.getElementById('mpPickNote'); if(nt2) nt2.textContent=st._pickNote||'';
 }
 function _mpTitle(short){
   var st=_mpState; if(!st) return '';
@@ -3659,12 +3765,20 @@ function _mpAll(on){
   var st=_mpState; var q=String(st.q||'').trim();
   _mpViewRows().forEach(function(x){ if(!x._setOk) return; if(q && (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)<0) return; st.sel[x.id]=!!on; });
   _mpRender();
+  if(_mpCatOn()) _mpEnsurePer(st.rows.filter(function(x){ return st.sel[x.id]; })).then(_mpCount);
 }
 function _mpCount(){
   var st=_mpState; var el=document.getElementById('mpCount'); if(!st||!el) return;
   var np=st.rows.filter(function(x){return st.sel[x.id];}).length;
   var _vis={}; _mpViewRows().forEach(function(x){ _vis[x.id]=1; }); var _hid=st.rows.filter(function(x){ return st.sel[x.id] && !_vis[x.id]; }).length;
+  _mpRefreshDocs();
   var nd=Object.keys(st.docSel).filter(function(k){return st.docSel[k];}).length;
+  if(_mpCatOn()){
+    var tot=0; st.rows.forEach(function(x){ if(st.sel[x.id]) tot+=_mpPersonDocs(x).length; });
+    el.textContent=np+'名'+(_hid?'（ほかの表示で選んだ'+_hid+'名を含む）':'')+'・人ごとに必要な書類 計'+tot+'件（約'+Math.max(1,Math.round(tot*6/60))+'分）';
+    var go0=document.getElementById('mpGo'); if(go0){ go0.disabled=!(np&&tot); go0.style.opacity=(np&&tot)?'1':'.5'; }
+    return;
+  }
   el.textContent=np+'名'+(_hid?'（ほかの表示で選んだ'+_hid+'名を含む）':'')+' × '+nd+'書類 ＝ '+(np*nd)+'件（約'+Math.max(1,Math.round(np*nd*6/60))+'分）';
   var go=document.getElementById('mpGo'); if(go){ go.disabled=!(np&&nd); go.style.opacity=(np&&nd)?'1':'.5'; }
 }
@@ -3672,12 +3786,14 @@ async function _mpExecute(){
   var st=_mpState; if(!st) return;
   var ppl=st.rows.filter(function(x){return st.sel[x.id];});   // 表示を切り替えて選んだ人もまとめて作る
   var allDocs=_getAllDocKeys().map(function(d){return d.key;});
-  var dks=allDocs.filter(function(k){return st.docSel[k];});
+  if(_mpCatOn()) await _mpEnsurePer(ppl);
+  var pd={}; ppl.forEach(function(x){ pd[x.id]=_mpPersonDocs(x); });   // ver.20261109.11: カテゴリ選択中は人ごとに必要な書類だけ
+  var dks=allDocs.filter(function(k){ return ppl.some(function(x){ return pd[x.id].indexOf(k)>=0; }); });
   if(!ppl.length||!dks.length) return;
-  try{ localStorage.setItem('mp_docs', JSON.stringify(dks)); }catch(e){}
+  if(!_mpCatOn()){ try{ localStorage.setItem('mp_docs', JSON.stringify(dks)); }catch(e){} }
   var jobs=[];
-  if(st.order==='doc'){ dks.forEach(function(dk){ ppl.forEach(function(x){ jobs.push({x:x,dk:dk}); }); }); }
-  else { ppl.forEach(function(x){ dks.forEach(function(dk){ jobs.push({x:x,dk:dk}); }); }); }
+  if(st.order==='doc'){ dks.forEach(function(dk){ ppl.forEach(function(x){ if(pd[x.id].indexOf(dk)>=0) jobs.push({x:x,dk:dk}); }); }); }
+  else { ppl.forEach(function(x){ dks.forEach(function(dk){ if(pd[x.id].indexOf(dk)>=0) jobs.push({x:x,dk:dk}); }); }); }
   var m=document.getElementById('mpModal'); if(m) m.remove();
   var overlay=document.createElement('div'); overlay.id='mpOverlay';
   overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
