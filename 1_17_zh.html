@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261109.01</div>
+    <div class="ver">ver.20261109.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2366,7 +2366,11 @@ async function loadFromDB(passedInfo){
         })();
         /* ver.20261029.06: 英語の都道府県・市区町村は読込処理が無く常に空だった。
            英語住所「475-2 Okubo-machi, Ota-shi, Gunma」の末尾＝都道府県、その前＝市区町村。 */
-        var _ea = String(_es.officeAddrEn||'').split(',').map(function(x){return x.trim();}).filter(function(x){ return x && !/^japan$/i.test(x); });
+        /* ver.20261109.02: 雇用条件に英語の事業所住所が無いときは、事業所が会社と同じ市区町村なら会社の英語住所（案シス）を使う。
+           （英語の都道府県・市区町村が空で、手で入れる時に逆に入れてしまう例があったため） */
+        var _offP=String(_es.officePref||_sp.pref||''), _offC=String(_es.officeCity||_sp.city||'');
+        var _coEn=(co && co.address_en && _offP && _offP===String(co.pref||'') && _offC===String(co.city||'')) ? String(co.address_en) : '';
+        var _ea = String(_es.officeAddrEn||_coEn||'').split(',').map(function(x){return x.trim();}).filter(function(x){ return x && !/^japan$/i.test(x); });
         if(_ea.length>=2){ _s('es_officePrefEn', _es.officePrefEn||_ea[_ea.length-1]); _s('es_officeCityEn', _es.officeCityEn||_ea[_ea.length-2]); }
       }
     }
