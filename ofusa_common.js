@@ -4688,6 +4688,48 @@ function _p16AutoCalcMonthly(){
     e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
   }catch(err){}
 }
+// ver.20261109.09: 読み込んだあと、人が手で直した雇用条件の欄（案シスの値と違うもの）
+function _p16ChangedFields(){
+  var out=[], base=window._empBaseline, touched=window._miV0||{};
+  if(!base || ((typeof _editMode!=='undefined')&&_editMode)) return out;
+  document.querySelectorAll('[id^="es_"]').forEach(function(el){
+    if(!Object.prototype.hasOwnProperty.call(touched, el.id)) return;          // 触っていない欄（自動で入ったもの）は除く
+    if(/En$/.test(el.id)) return;                                               // 訳の欄は一覧に出さない（保存はされる）
+    var b=String(base[el.id]==null?'':base[el.id]), v=String(el.value==null?'':el.value);
+    if(b===v) return;
+    var lb=''; try{ lb=(typeof _miLabel==='function')?_miLabel(el):el.id; }catch(e){ lb=el.id; }
+    out.push({id:el.id, label:lb, from:b, to:v});
+  });
+  if(window._p16SkipSig && window._p16SkipSig===JSON.stringify(out)) return [];   // 「保存しないで印刷」を選んだあと、さらに直していなければ聞かない
+  return out;
+}
+function _p16SavePrompt(){
+  return new Promise(function(resolve){
+    var ch=_p16ChangedFields(), sig=JSON.stringify(ch);
+    var esc=function(x){ x=String(x==null?'':x); if(x.length>36) x=x.slice(0,36)+'…'; return x.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var w=document.createElement('div'); w.id='p16SavePrompt';
+    w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+    w.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:12px;width:min(560px,94vw);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.3);">'
+      +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">💾 直した雇用条件を案シスにも保存しますか？</div>'
+      +'<div style="font-size:12px;color:#475569;margin-top:3px;line-height:1.55;">保存すると、同じ雇用条件を使うほかの人の1-6号や、重要事項説明書・1-5号などにも正しい値が入ります。<br>保存しないと、次に開いたときはまた元の値に戻ります。</div></div>'
+      +'<div style="overflow:auto;flex:1;padding:8px 18px;font-size:12px;">'+ch.slice(0,12).map(function(c){ return '<div style="padding:4px 0;border-bottom:1px solid #f1f5f9;"><b>'+esc(c.label)+'</b>：<span style="color:#94a3b8;text-decoration:line-through;">'+(esc(c.from)||'（空欄）')+'</span> → <span style="color:#0f766e;font-weight:700;">'+(esc(c.to)||'（空欄）')+'</span></div>'; }).join('')+(ch.length>12?'<div style="color:#64748b;padding-top:4px;">ほか '+(ch.length-12)+' か所</div>':'')+'</div>'
+      +'<div style="padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">'
+      +'<button type="button" id="p16Cancel" style="padding:8px 12px;border:none;background:#f1f5f9;border-radius:8px;cursor:pointer;">やめる</button>'
+      +'<button type="button" id="p16NoSave" style="padding:8px 12px;border:1px solid #cbd5e1;background:#fff;border-radius:8px;cursor:pointer;">この人だけ（保存しないで印刷）</button>'
+      +'<button type="button" id="p16Save" style="padding:8px 16px;border:none;background:#0f766e;color:#fff;font-weight:700;border-radius:8px;cursor:pointer;">💾 保存して印刷</button></div></div>';
+    document.body.appendChild(w);
+    var done=function(v){ try{ w.remove(); }catch(e){} resolve(v); };
+    w.querySelector('#p16Cancel').onclick=function(){ done(false); };
+    w.querySelector('#p16NoSave').onclick=function(){ window._p16SkipSig=sig; try{ if(typeof slog==='function') slog('p16_nosave',{meta:{n:ch.length}}); }catch(e){} done(true); };
+    w.querySelector('#p16Save').onclick=async function(){
+      try{ w.remove(); }catch(e){}
+      try{ if(typeof saveForm==='function') await saveForm(); }catch(e){ console.warn('[1-6 保存]', e); }
+      // 保存できたら基準値が取り直されて「直した欄」がなくなる。キャンセルされたときは印刷しない
+      if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){ if(typeof showToast==='function') showToast('保存しなかったので、印刷はやめました'); resolve(false); return; }
+      resolve(true);
+    };
+  });
+}
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
@@ -4733,6 +4775,12 @@ function _p16PrintCheck(){
           if(r.probs.length) msg+='次の点を確認してください：\n'+r.probs.map(function(x){ return '・'+x; }).join('\n')+'\n\n';
           if(r.miss.length) msg+='次の欄が空欄です：\n・'+r.miss.join('\n・')+'\n\n';
           if(!confirm(msg+'このまま印刷しますか？')) return;
+        }
+        // ver.20261109.09: 書類で直した雇用条件を、印刷の前に案シスへ保存するか聞く（保存しないで印刷すると、次の人・ほかの書類でまた同じ直しが必要になるため）
+        var _self=this, _args=arguments;
+        if(_p16ChangedFields().length){
+          _p16SavePrompt().then(function(go){ if(go) _orig.apply(_self,_args); });
+          return;
         }
       }
       return _orig.apply(this, arguments);
