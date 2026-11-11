@@ -3911,6 +3911,47 @@ document.addEventListener('click', function(e){
       wrap.onclick=function(e){ if(e.target===wrap) done(null); };
     });
   };
+  // ===== ver.20261111.04: 訳は言語ごとにも保存する（_tr_<言語>）。別の言語の訳が入っている共通の訳の欄は上書きしない =====
+  //   雇用条件セットの「〇〇En」は全言語で同じ欄のため、ベトナム語版で保存すると、インドネシア語版などにもベトナム語が出ていた。
+  function _trDocLang(){ var m=(location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id)\.html$/i); return m?m[1].toLowerCase():'id'; }
+  function _trSplit(values, existing){
+    try{
+      var L=_trDocLang(), sc=window._scriptOf||function(){ return ''; }, latin=(L==='en'||L==='id');
+      var out=Object.assign({}, values), tr=Object.assign({}, (existing&&existing['_tr_'+L])||{}), n=0;
+      Object.keys(values).forEach(function(k){
+        if(!/En$/.test(k) || k.charAt(0)==='_') return;
+        var v=values[k]; if(v==null || String(v).trim()==='') return;
+        tr[k]=v; n++;
+        var old=existing ? existing[k] : '';
+        if(old==null || String(old).trim()==='' || String(old)===String(v)) return;   // 空なら共通の欄にも入れる
+        var os=sc(old), ns=sc(v);
+        var oldIsMine = latin ? (os==='') : (os===L);
+        if(!oldIsMine){ out[k]=old; }   // 共通の欄に別の言語の訳が入っているときは残す（この言語の訳は _tr_ に入る）
+        else if(!latin && ns!==L && ns!==''){ out[k]=old; }
+      });
+      if(n) out['_tr_'+L]=tr;
+      return out;
+    }catch(e){ console.warn('[訳の言語ごとの保存]', e); return values; }
+  }
+  window._trSplit=_trSplit;
+  // 読み込んだあと、この言語の訳（_tr_<言語>）があれば、共通の訳の代わりに入れる（手で直した欄はそのまま）
+  function _trOverlay(){
+    try{
+      var es=window._empLoadedSet; if(!es) return; var L=_trDocLang(), tr=es['_tr_'+L]; if(!tr || typeof tr!=='object') return;
+      var n=0;
+      Object.keys(tr).forEach(function(k){
+        var fk=k; try{ if(typeof dbKeyToForm==='function') fk=dbKeyToForm(k)||k; }catch(_e){}
+        var el=document.getElementById('es_'+fk)||document.getElementById('es_'+k)||document.getElementById('f_'+k); if(!el) return;
+        var cur=String(el.value==null?'':el.value), base=String(es[k]==null?'':es[k]), v=String(tr[k]==null?'':tr[k]);
+        if(!v || cur===v) return;
+        if(cur!=='' && cur!==base) return;   // 手で直した欄は変えない
+        el.value=v; n++;
+      });
+      if(n){ if(typeof p==='function'){ try{ p(); }catch(e){} } try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){} }
+    }catch(e){ console.warn('[言語ごとの訳]', e); }
+  }
+  window._trOverlay=_trOverlay;
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_trOverlay, 2200); setTimeout(_trOverlay, 4500); } }catch(_e){} });
   window.saveEmpSetWithMode=async function(companyId,caseId,values,mode,curIdx,force){
     if(!companyId) throw new Error('会社IDが未解決です');
     var cos=await sb('companies?select=id,emp_sets&id=eq.'+companyId);
@@ -3927,7 +3968,7 @@ document.addEventListener('click', function(e){
       var defName='条件セット'+(empSets.length+1);
       var nm=window.prompt('新しい雇用条件セットの名前を入力してください',defName);
       if(nm===null) return {saved:false};
-      var newSet=Object.assign({},values,{setName:(nm||defName),_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
+      var newSet=Object.assign({},_trSplit(values, (curIdx!=null&&empSets[parseInt(curIdx,10)])||null),{setName:(nm||defName),_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       empSets.push(newSet);
       var newIdx=empSets.length-1;
       var _rn=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
@@ -3950,7 +3991,7 @@ document.addEventListener('click', function(e){
       }
       while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
       var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
-      Object.assign(empSets[idx],values,{setName:keepName,_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
+      Object.assign(empSets[idx],_trSplit(values, empSets[idx]),{setName:keepName,_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       var _r2=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
       // ②: 読み戻し確認（0行更新やサイレント失敗・内容不一致を検知）
       if(!_r2||!_r2.length) throw new Error('保存に失敗しました（対象の会社が見つからないか、権限がありません）');
@@ -4349,6 +4390,145 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   function _emptyPairs(){
     return _pairs().filter(function(p){ return String(p.ja.value||'').trim()!=='' && String(p.en.value||'').trim()===''; });
   }
+  // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
+  //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
+  var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語'};
+  function _scriptOf(t){
+    t=String(t||''); if(!t.trim()) return '';
+    if(/[\u1780-\u17FF]/.test(t)) return 'km';
+    if(/[\u1000-\u109F]/.test(t)) return 'my';
+    if(/[\u0E00-\u0E7F]/.test(t)) return 'th';
+    if(/[\u0900-\u097F]/.test(t)) return 'ne';
+    if(/[\uAC00-\uD7AF]/.test(t)) return 'ko';
+    if(/[\u3040-\u30FF]/.test(t)) return 'ja';
+    var vi=(t.match(/[ăâđêôơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹĂÂĐÊÔƠƯẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ]/g)||[]).length;
+    if(vi>=2) return 'vi';
+    return '';
+  }
+  function _wrongLangPairs(){
+    var lang=_docLang(), out=[];
+    if(/(^|\/)(shinsei_|tsuika_)/.test(location.pathname)) return out;   // 申請書・追加資料は対象外
+    _pairs().forEach(function(p){
+      var v=String(p.en.value||''); if(!v.trim()) return;
+      if(/(applicant|Applicant|rep|Rep|Mgr|mgr|Author|author|interp|Interp|staff|Staff|person|Person|resp|Resp|manager|Manager|contact|Contact|family|Family|kin|Kin)[A-Za-z0-9]*Name\d*En$|(Addr|addr|Address|address|Kana|kana|Mail|mail|Tel|tel)\d*En$/.test(p.en.id)) return;   // 人の名前・住所などは本国の書き方のことがあるので見ない
+      var sc=_scriptOf(v); if(!sc || sc===lang) return;
+      if(sc==='ja' && lang==='zh') return;
+      out.push({p:p, sc:sc});
+    });
+    return out;
+  }
+  window._wrongLangPairs=_wrongLangPairs;
+  window._scriptOf=_scriptOf;
+  function _wlSummary(list){ var c={}; list.forEach(function(x){ c[x.sc]=(c[x.sc]||0)+1; }); return Object.keys(c).map(function(k){ return (_WL_NAME[k]||k)+' '+c[k]+'か所'; }).join('・'); }
+  window._wlSummary=function(){ var l=_wrongLangPairs(); return l.length?_wlSummary(l):''; };
+  function _wlShow(){
+    try{
+      var old=document.getElementById('trWrong'); if(old) old.remove();
+      var list=_wrongLangPairs();
+      document.querySelectorAll('.wl-mark').forEach(function(e){ e.classList.remove('wl-mark'); e.style.outline=''; });
+      if(!list.length) return;
+      list.forEach(function(x){ x.p.en.classList.add('wl-mark'); x.p.en.style.outline='2px solid #f97316'; });
+      var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host) return;
+      var box=document.createElement('div'); box.id='trWrong';
+      box.style.cssText='margin:0 0 8px;padding:7px 9px;border:1px solid #fdba74;border-radius:8px;background:#fff7ed;color:#9a3412;font-size:11px;line-height:1.55;';
+      box.innerHTML='<b>🌐 訳が別の言語になっています（'+_wlSummary(list)+'）</b><br>この書類は'+(LANG_JA[_docLang()]||'')+'版です。オレンジの枠の欄を確認してください。'
+        +'<br><button type="button" id="trWrongFix" style="margin-top:4px;padding:3px 10px;border:none;background:#ea580c;color:#fff;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">消して入れ直す</button>';
+      var anchor=document.getElementById('srcAuto')||document.getElementById('_srcBtn');
+      if(anchor && anchor.parentNode===host) anchor.insertAdjacentElement('afterend', box); else host.insertBefore(box, host.firstChild);
+      box.querySelector('#trWrongFix').onclick=async function(){
+        var l=_wrongLangPairs(); l.forEach(function(x){ x.p.en.value=''; delete x.p.en.dataset.autofill; x.p.en.style.outline=''; x.p.en.classList.remove('wl-mark'); });
+        try{ if(typeof window._trdApplyOnLoad==='function') await window._trdApplyOnLoad(); }catch(e){}
+        if(typeof p==='function'){ try{ p(); }catch(e){} }
+        var left=l.filter(function(x){ return !String(x.p.en.value||'').trim(); }).length;
+        box.innerHTML='<b>🌐 別の言語の訳を '+l.length+' か所消しました</b>'+(l.length-left?'（うち '+(l.length-left)+' か所は前に確認した訳を入れました）':'')
+          +(left?'<br>残り '+left+' か所は空欄です。<button type="button" id="trWrongBulk" style="margin-left:4px;padding:2px 8px;border:none;background:#0f766e;color:#fff;border-radius:6px;font-size:11px;cursor:pointer;">まとめて翻訳</button>':'');
+        var bb=box.querySelector('#trWrongBulk'); if(bb) bb.onclick=function(){ if(typeof window.translateEmptyBulk==='function') window.translateEmptyBulk(); };
+      };
+    }catch(e){ console.warn('[訳の言語チェック]', e); }
+  }
+  window._wlShow=_wlShow;
+  // ver.20261111.05: 開いたときに自動で直す。別の言語の欄を消し、前に確認した訳 → 用語集 → AI翻訳 の順で入れ直す。
+  //   入れ直した訳は、その雇用条件セットの「この言語用の訳」（_tr_<言語>）に自動で保存する（共通の訳の欄と、ほかの言語の訳は変えない）。
+  function _wlDbKey(el){ var k=String(el.id||'').replace(/^(es_|f_)/,''); try{ if(typeof formKeyToDb==='function') k=formKeyToDb(k)||k; }catch(e){} return k; }
+  async function _wlSaveTr(lang, fixes){
+    try{
+      if(!Object.keys(fixes).length) return false;
+      var ctx=window._empCtx||{}, coId=ctx.companyId, idx=parseInt(window._empLoadedIdx,10);
+      if(!coId || isNaN(idx) || idx<0) return false;
+      var r=await sb('companies?select=id,emp_sets&id=eq.'+encodeURIComponent(coId)); var co=r&&r[0]; if(!co) return false;
+      var sets=Array.isArray(co.emp_sets)?co.emp_sets:[]; if(!sets[idx]) return false;
+      var key='_tr_'+lang; sets[idx][key]=Object.assign({}, sets[idx][key]||{}, fixes);
+      var w=await sb('companies?id=eq.'+encodeURIComponent(coId)+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:sets})});
+      if(!w||!w.length) return false;
+      var ns=(w[0].emp_sets||[])[idx]||sets[idx];
+      try{ window._empLoadedSet=JSON.parse(JSON.stringify(ns)); }catch(e){}   // 保存のときの「ほかの人が変えた」判定に引っかからないように
+      if(window._empCtx) window._empCtx.empSets=w[0].emp_sets||sets;
+      return true;
+    }catch(e){ console.warn('[言語ごとの訳の自動保存]', e); return false; }
+  }
+  async function _wlAutoFix(){
+    if(window._wlBusy) return; window._wlBusy=true;
+    try{
+      if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen){ _wlShow(); return; }
+      var list=_wrongLangPairs(); if(!list.length){ _wlShow(); return; }
+      var lang=_docLang(), key=_apiKey(), gl=GLOSS[lang]||[], undo=[], mem=0, ai=0;
+      list.forEach(function(x){ undo.push({el:x.p.en, v:x.p.en.value}); x.p.en.value=''; delete x.p.en.dataset.autofill; x.p.en.style.outline=''; x.p.en.classList.remove('wl-mark'); });
+      var prs=list.map(function(x){ return x.p; }).filter(function(pr){ return String(pr.ja.value||'').trim(); });
+      try{ await _trdLoad(lang); }catch(_t){}
+      var need=[];
+      prs.forEach(function(pr){
+        var jv=String(pr.ja.value||'').replace(/[\s　]/g,''), hit='';
+        for(var gi=0;gi<gl.length;gi++){ if(gl[gi][0]===jv){ hit=gl[gi][1]; break; } }
+        if(!hit && _TRD[lang]) hit=_TRD[lang][_trdKey(pr.ja.value)]||'';
+        if(hit){ pr.en.value=hit; mem++; } else need.push(pr);
+      });
+      if(need.length && key){
+        for(var k=0;k<need.length;k+=15){
+          var part=need.slice(k,k+15);
+          try{ var arr=await _callTranslate(part, lang, key, gl); part.forEach(function(pr,i){ var t=String(arr[i]||'').trim(); if(t){ pr.en.value=t; ai++; } }); }catch(e){ console.warn('[自動翻訳]', e); }
+        }
+      }
+      var fixes={};
+      prs.forEach(function(pr){ if(String(pr.en.value||'').trim()){ pr.en.dataset.autofill='1'; pr.en.style.background='#ecfdf5'; fixes[_wlDbKey(pr.en)]=pr.en.value; } });
+      if(typeof p==='function'){ try{ p(); }catch(e){} }
+      try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+      var saved=await _wlSaveTr(lang, fixes);
+      try{ if(typeof slog==='function') slog('wl_autofix',{meta:{n:list.length, mem:mem, ai:ai, saved:saved, lang:lang}}); }catch(e){}
+      // 結果を出す
+      var old=document.getElementById('trWrong'); if(old) old.remove();
+      var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host) return;
+      var left=prs.filter(function(pr){ return !String(pr.en.value||'').trim(); }).length;
+      var box=document.createElement('div'); box.id='trWrong';
+      box.style.cssText='margin:0 0 8px;padding:7px 9px;border:1px solid #86efac;border-radius:8px;background:#f0fdf4;color:#166534;font-size:11px;line-height:1.55;';
+      box.innerHTML='<b>🌐 別の言語だった訳を '+list.length+' か所、自動で'+(LANG_JA[lang]||'')+'に入れ直しました</b>'
+        +'<br>（前に確認した訳 '+mem+' か所'+(ai?'・AI翻訳 '+ai+' か所':'')+(left?'・<span style="color:#b91c1c;">訳せなかった '+left+' か所</span>':'')+'）緑の欄を確認してください。'
+        +(saved?'<br>次からはこの訳が自動で入ります。':'')
+        +(ai?'<br><span style="color:#92400e;">AIの訳は念のため内容を確認してください。</span>':'')
+        +(left&&!key?'<br><span style="color:#b91c1c;">APIキーが未設定のため、AI翻訳はしていません。</span>':'')
+        +'<br><button type="button" id="trWrongUndo" style="margin-top:4px;padding:2px 8px;border:1px solid #86efac;background:#fff;color:#166534;border-radius:6px;font-size:11px;cursor:pointer;">元に戻す</button>';
+      var anchor=document.getElementById('srcAuto')||document.getElementById('_srcBtn');
+      if(anchor && anchor.parentNode===host) anchor.insertAdjacentElement('afterend', box); else host.insertBefore(box, host.firstChild);
+      box.querySelector('#trWrongUndo').onclick=function(){ undo.forEach(function(u){ u.el.value=u.v; u.el.style.background=''; delete u.el.dataset.autofill; }); if(typeof p==='function'){ try{ p(); }catch(e){} } box.remove(); _wlShow(); };
+    }catch(e){ console.warn('[訳の自動修正]', e); }
+    finally{ window._wlBusy=false; }
+  }
+  window._wlAutoFix=_wlAutoFix;
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var o=document.getElementById('trWrong'); if(o) o.remove(); setTimeout(_wlAutoFix, 5500); setTimeout(function(){ if(!document.getElementById('trWrong') && !window._wlBusy) _wlShow(); }, 12000); } }catch(_e){} });
+  // 印刷の前にも確認（1-6号は印刷前チェックの中で出すので除く）
+  setTimeout(function(){
+    try{
+      if(typeof window.doPrint!=='function' || window.doPrint.__wl || /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
+      var _o=window.doPrint;
+      var w=function(){
+        if(!window._skipOverflowCheck){
+          var l=_wrongLangPairs();
+          if(l.length && !confirm('🌐 訳が別の言語になっている欄があります（'+_wlSummary(l)+'）。\nこの書類は'+(LANG_JA[_docLang()]||'')+'版です。\n\nこのまま印刷しますか？（直す場合は「キャンセル」→ 左の「消して入れ直す」）')) return;
+        }
+        return _o.apply(this, arguments);
+      };
+      w.__wl=true; w.__p16=_o.__p16; window.doPrint=w;
+    }catch(e){}
+  }, 800);
   // ver.20261109.07: 確認して入れた訳を、言語ごとに全員で共有して覚える（settings.tr_dict_<言語>：日本語→訳）。
   //   次からは同じ日本語の欄に、開いたときに自動で入る（訳が空の欄だけ）。まとめて翻訳でも、覚えている訳はAIを使わずに出す。
   var _TRD={};
@@ -4751,6 +4931,7 @@ function _p16SavePrompt(){
     };
   });
 }
+function _p16WrongLang(probs){ try{ if(typeof window._wlSummary==='function'){ var s=window._wlSummary(); if(s) probs.push('⛔ 訳が別の言語になっています（'+s+'）。左の「消して入れ直す」で直してください'); } }catch(e){} }
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
@@ -4782,6 +4963,7 @@ function _p16PrintCheck(){
       if(Math.abs(sum-st)>1) probs.push('⚠ 支払概算総額が内訳の合計と違います：'+d.join('＋')+'＝'+sum.toLocaleString('ja-JP')+'円 ／ 支払概算総額 '+st.toLocaleString('ja-JP')+'円（差 '+(st-sum).toLocaleString('ja-JP')+'円）');
     }
   }catch(e){}
+  _p16WrongLang(probs);   // ver.20261111.04
   return {miss:miss, probs:probs};
 }
 (function(){
@@ -4946,6 +5128,7 @@ window._batchCheck=function(){
     if(typeof _p16PrintCheck==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){
       var r=_p16PrintCheck(); r.probs.forEach(function(x){ out.push(x); }); if(r.miss.length) out.push('空欄：'+r.miss.join('、'));
     }
+    if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname) && typeof window._wlSummary==='function'){ var _wls=window._wlSummary(); if(_wls) out.push('⛔ 訳が別の言語になっています（'+_wls+'）'); }
     if(typeof jyPrintCheck==='function'){
       var j=jyPrintCheck(); (j.diff||[]).forEach(function(x){ out.push('⚠ 雇用条件と違う：'+x); });
       if((j.miss||[]).length) out.push('空欄：'+j.miss.join('、'));

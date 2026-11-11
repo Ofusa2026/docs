@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -477,8 +477,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794382563';
-window.__DOCS_CACHE_BUSTER__ = '1794382563';
+window.__DOCS_CACHE_BUSTER__ = '1794385659';
+window.__DOCS_CACHE_BUSTER__ = '1794385659';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1838,6 +1838,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261111.05',
+    date: '2026-11-11',
+    notify: true,
+    items: [
+      '🌐 訳の欄に、書類と別の言語の訳（例：インドネシア語版にベトナム語）が入っていたら、開いたときに自動でその書類の言語に入れ直すようにしました（前に確認した訳 → AI翻訳の順。緑の欄を確認してください。「元に戻す」もできます）',
+      '🌐 入れ直した訳は、雇用条件セットに言語ごとに保存されます。ほかの言語の訳を上書きしなくなりました（いろいろな国籍の人が同じ雇用条件を使う会社でも、言語ごとに正しい訳が出ます）',
+      '🌐 印刷前の確認・まとめてPDFの確認にも「訳が別の言語になっています」が出ます'
+    ]
+  },
   {
     version: 'ver.20261111.03',
     date: '2026-11-11',
