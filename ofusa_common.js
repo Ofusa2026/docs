@@ -2806,7 +2806,7 @@ async function loadCaseToForm(info, docKey, opts){
   window._lastCaseInfo = info;
   window._fieldData = {}; // ver.20260612: 案件読込ごとにDBフォールバック値をリセット
   // ver.20261026.01: 利用ログ（案件読込）
-  try{ _SLOG_LOADED_AT=Date.now(); _slogCtxFromInfo(info); slog('load'); }catch(_sl){}
+  try{ if(window._slogFb===String(info.caseId)){ window._slogFb=''; } else { _SLOG_LOADED_AT=Date.now(); _slogCtxFromInfo(info); slog('load'); } }catch(_sl){}   // ver.20261111.12: 下の予備の記録が先に済んでいれば二重に記録しない
   // ver.20260819.06: 入力欄クリアは各書類の SELECT_CASE ハンドラ側で loadFromDB
   //   より先に実行するため、ここでは行わない（ここでクリアするとloadFromDBで
   //   セットされた値まで消えてしまう）。
@@ -4823,6 +4823,20 @@ var _SLOG_SESSION=(Math.random().toString(36).slice(2,10)+Date.now().toString(36
 var _SLOG_LOADED_AT=null;
 var _SLOG_CTX={caseId:'',companyId:''};
 function _slogCtxFromInfo(info){ try{ _SLOG_CTX={caseId:String((info&&info.caseId)||''), companyId:String((info&&info.companyId)||'')}; }catch(_e){} }
+// ver.20261111.12: 書類が自分で案件を読む場合（1-17号・推薦表など loadCaseToForm を使わない書類）でも、どの案件か・開いてからの時間を記録する
+window.addEventListener('message', function(e){
+  try{
+    if(!e.data || e.data.type!=='SELECT_CASE') return;
+    var info=e.data.info||{}; if(!info.caseId) return;
+    var t0=Date.now();
+    setTimeout(function(){
+      try{
+        if(_SLOG_CTX.caseId===String(info.caseId)) return;   // ふつうの書類は loadCaseToForm が記録済み
+        _SLOG_LOADED_AT=t0; _slogCtxFromInfo(info); window._prLast=null; window._slogFb=String(info.caseId); slog('load');
+      }catch(_e){}
+    }, 3000);
+  }catch(_e){}
+});
 function _slogUser(){
   // ①Saysayのログイン情報（supabase-js が localStorage に保存。同一ドメインなので書類ページからも読める）
   try{
@@ -4863,6 +4877,7 @@ function _slogBuild(event, extra){
       applicant:who, session_id:_SLOG_SESSION,
       ms_since_load:(_SLOG_LOADED_AT?(Date.now()-_SLOG_LOADED_AT):null) };
     if(extra){ for(var k in extra){ if(Object.prototype.hasOwnProperty.call(extra,k)) body[k]=extra[k]; } }
+    if(body.event==='print' && !(extra&&extra.meta)){ try{ var _pd=_prDiff(); if(_pd) body.meta=_pd; }catch(_p){} }   // ver.20261111.12: 印刷し直しの理由
     if(body.event==='save' && !body.meta){ try{ var _mi=_miCollect(); if(_mi) body.meta=_mi; }catch(_m){} }   // ver.20261109.03: 手入力の記録
     return body;
 }
@@ -5261,6 +5276,32 @@ document.addEventListener('focusin', function(e){
   }catch(_e){}
 }, true);
 window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ window._miV0={}; window._miTxt0=null; } }catch(_e){} });
+/* ver.20261111.12: 印刷し直しの記録
+   印刷のたびに左の入力欄・チェック・書類の本文を覚えておき、同じ案件でもう一度印刷したら、前の印刷から変わったところを
+   利用ログ（print の meta）へ残す。印刷してすぐ直して刷り直す原因を調べ、印刷前チェックや自動入力に足すため。画面の動きは変えない。 */
+window._prLast=null;
+function _prSnap(){
+  var v={};
+  document.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){
+    if(el.closest && el.closest('#pageArea')) return;
+    if(/^(caseSelect|caseIdPaste)$/.test(el.id) || /^sp_|^mp/.test(el.id) || el.type==='file' || el.type==='password') return;
+    v[el.id]=_miVal(el);
+  });
+  var cb={}; try{ var cs=window.cbState||{}; Object.keys(cs).forEach(function(k){ cb[k]=String(cs[k]); }); }catch(_c){}
+  return { at:Date.now(), caseId:_SLOG_CTX.caseId, v:v, cb:cb, lines:_miPageLines() };
+}
+function _prDiff(){
+  var now=_prSnap(), L=window._prLast; window._prLast=now;
+  if(!L || L.caseId!==now.caseId) return null;
+  var cut=function(x){ x=String(x==null?'':x); return x.length>40?x.slice(0,40)+'…':x; };
+  var ch=[];
+  Object.keys(now.v).forEach(function(id){ if(id in L.v && L.v[id]!==now.v[id]){ var el=document.getElementById(id); ch.push({id:id, label:el?_miLabel(el):'', from:cut(L.v[id]), to:cut(now.v[id])}); } });
+  var cbc=[]; Object.keys(Object.assign({},L.cb,now.cb)).forEach(function(k){ if(L.cb[k]!==now.cb[k]) cbc.push(k); });
+  var before={}, lines=[]; L.lines.forEach(function(x){ before[x]=(before[x]||0)+1; });
+  now.lines.forEach(function(x){ if(before[x]) before[x]--; else if(lines.length<8) lines.push(cut(x.length>80?x.slice(0,80):x)); });
+  return { reprint:true, since_prev_ms:now.at-L.at, changed:ch.slice(0,40), n_changed:ch.length, cb_changed:cbc.slice(0,20), page_lines_new:lines, same:(!ch.length && !cbc.length && !lines.length) };
+}
+window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') window._prLast=null; }catch(_e){} });
 function _miCollect(){
   var out=[], cut=function(s){ s=String(s||''); return s.length>40 ? s.slice(0,40)+'…' : s; };
   Object.keys(window._miV0||{}).forEach(function(id){
