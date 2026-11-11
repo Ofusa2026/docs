@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用1）　特定技能</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261111.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -340,7 +340,7 @@ async function loadFromDB(passedInfo){
     s('f_payJp',es.jpCompSalary||'');                 // 同等の業務に従事する日本人の月額報酬(2,121件)
     // (5)報酬の支払方法：payMethod(2,280件) から通貨払/口座振込みを判定
     if(es.payMethod) s('f_payWay', /口座|振込|bank/i.test(es.payMethod) ? 'bank' : 'cash');
-    const ce=_ymd((pd&&pd.contract_end)||(cas&&cas.contract_end));
+    const ce=_ymd((cas&&cas.contract_end)||(pd&&pd.contract_end));   // ver.20261111.11: 契約期間は案件（案シスの契約開始日・終了日）を先に見て、無ければ人材側（1-6号・1-25号・推薦表とそろえる）
     if(ce[0]){ s('f_ceY',ce[0]); s('f_ceM',ce[1]); s('f_ceD',ce[2]); }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
