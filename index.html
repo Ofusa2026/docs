@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.09</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.10</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -477,8 +477,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794393342';
-window.__DOCS_CACHE_BUSTER__ = '1794393342';
+window.__DOCS_CACHE_BUSTER__ = '1794393569';
+window.__DOCS_CACHE_BUSTER__ = '1794393569';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1839,6 +1839,16 @@ _docsAuthGateInit();
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
   {
+    version: 'ver.20261111.10',
+    date: '2026-11-11',
+    notify: true,
+    items: [
+      '🧮 雇用条件書（1-6号）：月給・日給の人の「換算時給」を自動で入れるようにしました（（月給＋手当）÷月の所定労働時間、1円未満切り捨て）。空欄のときと、画面で月給・時間・手当を直したときに入ります。手で入れた値は変えません。',
+      '📚 まとめてPDF：1-3号と1-17号も作れるようにしました。1-17号はA4横なので、1人ずつ別のPDFとして作成画面に出ます（「PDF」を押すと、その人の1-17号の印刷画面が開きます）。',
+      '🛠 1-17号：印刷前の確認が2回出ていたのを1回にしました。'
+    ]
+  },
+  {
     version: 'ver.20261111.09',
     date: '2026-11-11',
     notify: true,
@@ -3073,7 +3083,7 @@ async function reorderNavByPriority(info){
 
 // ver.20260925.02: 必要書類（優先書類）をまとめて1つのPDFに
 var _PM_LANG_LABEL={id:'🇮🇩 インドネシア語',vi:'🇻🇳 ベトナム語',th:'🇹🇭 タイ語',ne:'🇳🇵 ネパール語',my:'🇲🇲 ミャンマー語',km:'🇰🇭 クメール語',en:'🇬🇧 英語',ko:'🇰🇷 韓国語',zh:'🇨🇳 中国語',ja:'🇯🇵 日本語'};
-var _PM_EXCLUDE=['1_17','1_17_vi','1_3'];
+var _PM_EXCLUDE=['1_17'];   // ver.20261111.10: 1-17号（言語版 1_17_vi）と1-3号もまとめてPDFで作れるように。Word版の1_17だけ除く
 // docKey → 実ファイルパス（指定言語の版）
 function _docFileForPrint(docKey, lang){
   var langMap = {
@@ -3082,6 +3092,10 @@ function _docFileForPrint(docKey, lang){
     '1_16': (typeof LANG_FILES_1_16!=='undefined')?LANG_FILES_1_16:null,
     'juuyou': (typeof LANG_FILES_JUUYOU!=='undefined')?LANG_FILES_JUUYOU:null
   };
+  if(docKey==='1_17_vi' && typeof LANG_FILES_1_17!=='undefined'){   // ver.20261111.10: 1-17号は人ごとの言語版（韓国語などは英語）
+    var l17=(lang && LANG_FILES_1_17[lang]) ? lang : 'en';
+    return {file:String(LANG_FILES_1_17[l17]).split('?')[0], lang:l17};
+  }
   if(langMap[docKey]){
     var rl = resolveLangForDoc(docKey, lang||currentLang);
     var f = langMap[docKey][rl];
@@ -3494,13 +3508,14 @@ function _loadDocForPrint(src, info){
             var d=win.document; var area=d.getElementById('pageArea');
             if(area && area.querySelector('.doc,.docabs,[id^="docP"]')){
               var reflected = wantName ? ((area.innerText||'').replace(/\s/g,'').indexOf(wantName)>=0) : true;
-              if((reflected && tries>=5) || tries>=22){
+              if((reflected && tries>=(info._minTries||5)) || tries>=Math.max(22,(info._minTries||0)+8)){
                 clearInterval(timer);
                 var id='pm'+(++_pmSeq);
                 // ver.20261109.08: 印刷前チェックと同じ内容・印刷の記録の材料を、この書類からもらっておく
                 var _chk=[], _lb=null;
                 try{ if(typeof win._batchCheck==='function') _chk=win._batchCheck()||[]; }catch(_c){}
                 try{ if(typeof win._slogBody==='function') _lb=win._slogBody('print',{meta:{batch:info._batch||'pdf'}}); }catch(_l){}
+                try{ if(typeof win._p17FitForPrint==='function') win._p17FitForPrint(); }catch(_f){}   // ver.20261111.10: 1-17号は印刷の直前と同じく、紙に収まらないページを縮める
                 // ページ要素に印（入れ子を除いた最外のもの）
                 var cands=Array.prototype.slice.call(area.querySelectorAll('.doc,.docabs,[id^="docP"]'));
                 cands.forEach(function(el){
@@ -3524,7 +3539,7 @@ function _loadDocForPrint(src, info){
               }
             }
           }catch(e){}
-          if(tries>30){ clearInterval(timer); finish(null); }
+          if(tries>Math.max(30,(info._minTries||0)+16)){ clearInterval(timer); finish(null); }
         }, 300);
       }catch(e){ finish(null); }
     };
@@ -3570,12 +3585,12 @@ function _bpPostLogs(collected){
 // ver.20261109.08: 人ごと・書類ごとに別々のPDFにするときの一覧（ブラウザの「PDFに保存」は自動で押せないので、1つずつ押してもらう）
 function _bpShortDoc(dk){
   if(/^\d+_\d+(_\d+)?$/.test(String(dk))) return String(dk).replace(/_/g,'-')+'号';
-  var _nm={juuyou:'重要事項説明書',madoguchi:'窓口申請書',iko:'移行準備説明書',tk2go:'移行準備説明書(2号)',ininjou:'委任状',tesuryo:'手数料納付書'}; if(_nm[dk]) return _nm[dk];
+  var _nm={'1_17_vi':'1-17号','1_3':'1-3号',juuyou:'重要事項説明書',madoguchi:'窓口申請書',iko:'移行準備説明書',tk2go:'移行準備説明書(2号)',ininjou:'委任状',tesuryo:'手数料納付書'}; if(_nm[dk]) return _nm[dk];
   var lb=_pmDocLabel(dk), n=String((lb&&lb.name)||dk).normalize('NFKC');
   var m=n.match(/参考様式第?\s*(\d+)\s*[-－ー−]\s*(\d+)(?:\s*[-－ー−]\s*(\d+))?\s*号/);
   return m ? (m[1]+'-'+m[2]+(m[3]?'-'+m[3]:'')+'号') : n.replace(/\s+/g,'').slice(0,24);
 }
-function _bpSplitHub(collected, mode, ppl, grpTitle){
+function _bpSplitHub(collected, mode, ppl, grpTitle, p17Units){
   var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
   var clean=function(t){ return String(t||'').replace(/[\\/:*?"<>|]/g,'').trim(); };
   var units=[];
@@ -3588,12 +3603,14 @@ function _bpSplitHub(collected, mode, ppl, grpTitle){
   } else {
     collected.forEach(function(c){ var d=_bpShortDoc(c.dk); units.push({label:c.who, sub:d, title:clean(c.who)+'様_'+d, items:[c]}); });
   }
+  if(mode==='one' && collected.length){ units=[{label:'まとめ（1-17号以外）', sub:collected.length+'件', title:clean(grpTitle||'')+'_'+ppl.length+'名分_書類', items:collected}]; }
+  (p17Units||[]).forEach(function(u){ units.push({label:u.x.applicant, sub:'1-17号（A4横・'+u.lang+'）', title:clean(u.x.applicant)+'様_1-17号', p17:u}); });
   window._bpUnits=units;
   var old=document.getElementById('bpHub'); if(old) old.remove();
   var w=document.createElement('div'); w.id='bpHub';
   w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100001;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
   w.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:14px;width:min(640px,94vw);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.35);">'
-    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">🖨 '+({person:'人ごと',bydoc:'書類ごと',doc:'人ごと書類ごと'}[mode]||'')+'にPDFを作る（'+units.length+'ファイル）</div>'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;"><div style="font-weight:800;font-size:15px;">🖨 '+({person:'人ごと',bydoc:'書類ごと',doc:'人ごと書類ごと',one:'まとめて'}[mode]||'')+'PDFを作る（'+units.length+'ファイル）</div>'
     +'<div style="font-size:12px;color:#475569;margin-top:2px;">「PDF」を押すと、その分だけの印刷画面が開きます。「PDFに保存」で保存してください（ファイル名は自動で入ります）。</div></div>'
     +'<div style="overflow:auto;flex:1;padding:4px 18px;">'+units.map(function(u,i){
       return '<div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f1f5f9;"><span id="bpDone'+i+'" style="width:18px;"></span>'
@@ -3605,10 +3622,31 @@ function _bpSplitHub(collected, mode, ppl, grpTitle){
   document.body.appendChild(w);
 }
 window._bpLeft=function(){ return (window._bpUnits||[]).filter(function(u){ return !u.done; }).length; };
+// 1-17号は、その人の1-17号の画面を別のウィンドウで開いて、いつもの印刷（紙に収める調整つき）をする
+function _bpOpenP17(u){
+  var x=u.p17.x, src=u.p17.file+(u.p17.file.indexOf('?')<0?('?v='+(window.__DOCS_CACHE_BUSTER__||Date.now())):'');
+  var w=window.open(src, '_blank'); if(!w){ alert('ポップアップがブロックされました。ポップアップを許可してから再度お試しください。'); return; }
+  var info={caseId:x.id, companyId:x.company_id||'', companyName:x._coName||''};
+  var want=String(info.companyName||'').replace(/\s/g,'').slice(0,4), tries=0, sent=false;
+  var t=setInterval(function(){
+    tries++;
+    try{
+      if(!sent && w.document && w.document.readyState==='complete'){ w.postMessage({type:'SELECT_CASE', info:info}, '*'); sent=true; return; }
+      if(!sent) return;
+      var a=w.document.getElementById('pageArea'); var ok=a && (!want || (a.innerText||'').replace(/\s/g,'').indexOf(want)>=0);
+      if((ok && tries>=18) || tries>=45){
+        clearInterval(t);
+        try{ w.document.title=u.title; }catch(e){}
+        // 利用ログは1-17号の画面の印刷（doPrint）が自分で記録する
+        try{ w.doPrint(); }catch(e){ try{ w.print(); }catch(_e){} }
+      }
+    }catch(e){ if(tries>45) clearInterval(t); }
+  }, 400);
+}
 function _bpOpenUnit(i){
   var u=(window._bpUnits||[])[i]; if(!u) return;
-  _openMergedPrintWindow(u.items, {applicant:u.label, _fullTitle:u.title});
-  if(!u.done){ u.done=true; _bpPostLogs(u.items); }
+  if(u.p17) _bpOpenP17(u); else _openMergedPrintWindow(u.items, {applicant:u.label, _fullTitle:u.title});
+  if(!u.done){ u.done=true; if(u.items) _bpPostLogs(u.items); }
   var d=document.getElementById('bpDone'+i); if(d) d.textContent='✅';
   var c=document.getElementById('bpHubCnt'); if(c){ var n=window._bpUnits.filter(function(x){ return x.done; }).length; c.textContent=n+' / '+window._bpUnits.length+' 作成済み'+(n===window._bpUnits.length?'（全部できました）':''); }
 }
@@ -3746,7 +3784,7 @@ function _mpRender(){
   _mpCount();
 }
 // ===== ver.20261109.11: 書類のカテゴリ（サイン書類／スキャン書類）。人ごとに必要な書類を判定し、ほかは書類ごとに足す・外す =====
-var _MP_SIGN_SKIP={'1_3':'1-3号（受診者の申告書）','1_17':'1-17号（支援計画書）'};
+var _MP_SIGN_SKIP={};
 function _mpCatOn(){ var st=_mpState; return !!(st && (st.cats.sign || st.cats.scan)); }
 function _mpCatBtn(cat, label, title){
   var on=_mpState && _mpState.cats[cat];
@@ -3757,7 +3795,7 @@ function _mpSignDocs(x){
   var at=String(x.app_type||''), rs=String(x.residence_status||'');
   var is2go=/特定技能[2２]号/.test(rs), isNinHen=/認定|変更/.test(at);
   var d=['1_5','1_6'], skip=[];
-  if(isNinHen){ skip.push('1_3'); if(!is2go) skip.push('1_17'); }
+  if(isNinHen){ d.push('1_3'); if(!is2go) d.push('1_17_vi'); }   // ver.20261111.10: まとめてPDFでも作れるようになった
   if(is2go){ d.push('1_10','1_32'); }
   if(String(x._acc||'')==='なし') d.push('1_16');
   if(String(x.applicant_field||'').indexOf('建設')>=0 || String(x.other_support_note||'').indexOf('【分野：建設')>=0) d.push('juuyou');
@@ -3770,7 +3808,7 @@ async function _mpEnsurePer(list){
     var x=list[i]; var p=st.per[x.id]||(st.per[x.id]={});
     if(st.cats.sign && !p.sign){ var sg=_mpSignDocs(x); p.sign=sg.docs; p.skip=sg.skip; }
     if(st.cats.scan && !p.scan){
-      try{ p.scan=(await printPriorityDocs(false, {caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', appType:x.app_type||'', nationality:x.nationality||'', orgName:x.org||'', empSetIdx:x.emp_set_idx}))||[]; }
+      try{ p.scan=((await printPriorityDocs(false, {caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', appType:x.app_type||'', nationality:x.nationality||'', orgName:x.org||'', empSetIdx:x.emp_set_idx}))||[]).map(function(k){ return k==='1_17'?'1_17_vi':k; }); }
       catch(e){ p.scan=[]; console.warn('[mp scan]', e); }
     }
   }
@@ -3882,15 +3920,21 @@ async function _mpExecute(){
     +'<div id="mpProg" style="font-size:12px;margin-top:8px;opacity:.85;"></div><div id="mpFail" style="font-size:11px;margin-top:6px;color:#fca5a5;"></div></div>';
   document.body.appendChild(overlay);
   var busterV=window.__DOCS_CACHE_BUSTER__||Date.now();
-  var collected=[], failed=[], warned=[];
+  var collected=[], failed=[], warned=[], p17Units=[];
   try{
     for(var i=0;i<jobs.length;i++){
       var j=jobs[i], x=j.x;
       var f=_docFileForPrint(j.dk, x._lang); var lb=_pmDocLabel(j.dk);
       document.getElementById('mpProg').textContent='('+(i+1)+'/'+jobs.length+') '+x.applicant+' ・ '+(lb&&lb.name||j.dk)+' を読み込み中…';
       document.getElementById('mpBar').style.width=Math.round(i/jobs.length*100)+'%';
+      if(j.dk==='1_3'){   // ver.20261111.10: 1-3号は入管のPDF様式そのもの（記入欄なし）。言語のPDFをページの絵にして入れる
+        var r13=await _pm13Pages(x._lang);
+        if(r13) collected.push({dk:j.dk, html:r13, who:x.applicant}); else failed.push(x.applicant+'：1-3号（PDFを読み込めませんでした）');
+        continue;
+      }
       if(!f){ failed.push(x.applicant+'：'+j.dk); continue; }
       var info={_batch:'multi', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
+      if(j.dk==='1_17_vi'){ p17Units.push({x:x, file:f.file, lang:f.lang}); continue; }   // ver.20261111.10: 1-17号はA4横で組み方が違うので、まとめには入れず1-17号の画面で印刷する
       var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), info);
       if(res){
         // 開いた書類に別の人の名前が出ていないか（取り違え防止）：申請人名が書類に無ければ失敗扱い
@@ -3902,16 +3946,45 @@ async function _mpExecute(){
       document.getElementById('mpFail').textContent=failed.length?('⚠️ 作れなかったもの '+failed.length+'件'):'';
     }
     document.getElementById('mpBar').style.width='100%';
-    if(!collected.length) throw new Error('書類の内容を取得できませんでした');
+    if(!collected.length && !p17Units.length) throw new Error('書類の内容を取得できませんでした');
     // ver.20261109.08: 作れなかったもの・名前が見つからないもの・印刷前チェックを1つの画面で確認
     var _ov1=document.getElementById('mpOverlay'); if(_ov1) _ov1.style.display='none';
     if(!(await _bpReview(_bpGroups(collected, function(c){ return c.who||''; }), failed, warned))) return;
-    if(st.split==='person' || st.split==='doc' || st.split==='bydoc'){ _bpSplitHub(collected, st.split, ppl, _mpTitle(true)); return; }
+    if(p17Units.length || st.split==='person' || st.split==='doc' || st.split==='bydoc'){ _bpSplitHub(collected, st.split, ppl, _mpTitle(true), p17Units); return; }
     var _tt=_mpTitle(true)+'_'+ppl.length+'名分';
     _openMergedPrintWindow(collected, {applicant:_tt, _title:_tt});
     _bpPostLogs(collected);
   }catch(e){ alert('まとめPDFの作成でエラーが発生しました: '+e.message); console.error(e); }
   finally{ var ov=document.getElementById('mpOverlay'); if(ov) ov.remove(); }
+}
+// ver.20261111.10: 1-3号（受診者の申告書）の言語のPDFを、ページごとの絵にする（pdf.js）。同じ言語は2回目から使い回す
+var _pm13Cache={};
+function _pmLoadPdfJs(){
+  return new Promise(function(res, rej){
+    if(window.pdfjsLib) return res(window.pdfjsLib);
+    var sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    sc.onload=function(){ try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); }catch(e){ rej(e); } };
+    sc.onerror=function(){ rej(new Error('pdf.js を読み込めませんでした')); };
+    document.head.appendChild(sc);
+  });
+}
+async function _pm13Pages(lang){
+  try{
+    var L=['id','vi','th','km','my','en'].indexOf(lang)>=0 ? lang : 'en';
+    if(_pm13Cache[L]) return Object.assign({}, _pm13Cache[L], {id:'pm'+(++_pmSeq)});
+    var lib=await _pmLoadPdfJs();
+    var pdf=await lib.getDocument('pdf/1_3_'+L+'.pdf').promise;
+    var imgs=[];
+    for(var i=1;i<=pdf.numPages;i++){
+      var pg=await pdf.getPage(i), vp=pg.getViewport({scale:2.2});
+      var cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
+      await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+      imgs.push(cv.toDataURL('image/png'));
+    }
+    var html='<div id="pageArea">'+imgs.map(function(u){ return '<div class="docabs pmpage pm13"><img src="'+u+'"></div>'; }).join('')+'</div>';
+    _pm13Cache[L]={html:html, css:'', links:[], check:[], logBody:null};
+    return Object.assign({}, _pm13Cache[L], {id:'pm'+(++_pmSeq)});
+  }catch(e){ console.warn('[1-3号]', e); return null; }
 }
 function _openMergedPrintWindow(collected, info){
   var w=window.open('', '_blank');
@@ -3927,11 +4000,14 @@ function _openMergedPrintWindow(collected, info){
     + '.pmdoc .pmpage{zoom:1!important;transform:none!important;box-shadow:none!important;margin:0 auto!important;break-after:page;page-break-after:always;}'
     + '.pmdoc .pmpage.pmlast{break-after:auto;page-break-after:auto;}'
     + collected.map(function(c){ var i='#'+c.html.id;
-        return i+' #pageArea{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:0!important;margin:0!important;}'
+        return i+' #pageArea{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:0!important;margin:0!important;background:#fff!important;}'
           + i+' .pmpage.pmpage{zoom:1!important;transform:none!important;break-after:page!important;page-break-after:always!important;break-before:auto!important;page-break-before:auto!important;}'
           + i+' .pmpage.pmpage.pmlast{break-after:auto!important;page-break-after:auto!important;}'; }).join('')
-    + '@page{size:A4;margin:0;}'
+    + (collected.length && collected.every(function(c){ return /^1_17/.test(c.dk||''); }) ? '@page{size:A4 landscape;margin:10mm;}' : '@page{size:A4;margin:0;}')   // ver.20261111.10: 1-17号だけのPDFはA4横
     + '@page ofusaLand{size:A4 landscape;margin:0;}'  // 1-11-2/1-11-3（A4横）は .doc{page:ofusaLand} で横向きページにする
+    + '@page p17Land{size:A4 landscape;margin:10mm;}'
+    + collected.filter(function(c){ return /^1_17/.test(c.dk||''); }).map(function(c){ var i='#'+c.html.id; return i+' .pmpage{page:p17Land!important;}'; }).join('')   // ver.20261111.10: 1-17号はA4横（横の幅で組む）
+    + '.pm13 img{display:block;width:210mm;height:297mm;object-fit:contain;}'
     + '@media screen{body{background:#e5e7eb;} .pmdoc .pmpage{margin:12px auto!important;box-shadow:0 1px 6px rgba(0,0,0,.25)!important;}}'
     + '</style>';
   var body=collected.map(function(c){ return '<div class="pmdoc" id="'+c.html.id+'">'+c.html.html+'</div>'; }).join('');

@@ -4548,6 +4548,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         }
         return _o.apply(this, arguments);
       };
+      try{ Object.keys(_o).forEach(function(k){ w[k]=_o[k]; }); }catch(_k){}   // ver.20261111.10: 前の包みの印（_p17など）を引き継ぐ（無いと1-17号の確認が2回出ていた）
       w.__wl=true; w.__p16=_o.__p16; window.doPrint=w;
     }catch(e){}
   }, 800);
@@ -4912,6 +4913,33 @@ function _p16AutoCalcMonthly(){
     if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc();   // 税金・社会保険料・雇用保険料も計算し直す（自動の欄だけ）
   }catch(err){}
 }
+// ver.20261111.10: 月給・日給の人の「換算時給」を自動で入れる
+//   月給：（月給＋割増の計算に入れる手当）÷ 月の所定労働時間　／　日給：（日給×月の日数＋手当）÷ 月の所定労働時間
+//   1円未満は切り捨て（最低賃金と比べるとき、上に丸めて超えたように見せないため）。
+//   入れるのは ① 空欄のとき ② この画面で月給・時間・手当を直したとき。案シスに入っている値は、読み込んだだけでは変えない（印刷前チェックで食い違いを知らせる）。
+//   換算時給をこの画面で手で入れたら、それ以降は変えない。
+var _P16_EXALLOW=/固定残業|みなし|残業|時間外|深夜|夜勤|休日出勤|通勤|家族|扶養|住宅|別居|子女|精勤|皆勤|臨時|賞与/;
+function _p16CalcHourlyValue(){
+  var mh=_p16MonthHours(); if(!mh) return 0;
+  var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
+  var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
+  var base=mo || (dy&&md ? dy*md : 0); if(!base) return 0;
+  var al=0;
+  for(var i=1;i<=6;i++){ var an=_mw16_val('es_a'+i+'Name'), aa=_mw16_num('es_a'+i+'Amt'); if(aa && !_P16_EXALLOW.test(an||'')) al+=aa; }
+  return Math.floor((base+al)/mh);
+}
+function _p16AutoCalcHourly(force){
+  try{
+    var e=document.getElementById('es_calcHourly'); if(!e) return;
+    if(e.dataset.manualCalc==='1') return;
+    if(!_mw16_num('es_salaryMonthly') && !_mw16_num('es_salaryDaily')) return;   // 時給の人は何もしない（欄は「月給・日給の場合」）
+    if(!force && String(e.value||'').trim()!=='') return;
+    var v=_p16CalcHourlyValue(); if(!v) return;
+    var s=v.toLocaleString('ja-JP'); if(e.value===s) return;
+    e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
+  }catch(err){}
+}
+window._p16AutoCalcHourly=_p16AutoCalcHourly;
 // ver.20261109.09: 読み込んだあと、人が手で直した雇用条件の欄（案シスの値と違うもの）
 function _p16ChangedFields(){
   var out=[], base=window._empBaseline, touched=window._miV0||{};
@@ -5017,8 +5045,8 @@ function _p16PrintCheck(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
-  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; } }catch(_e){} });
+  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; var c2=document.getElementById('es_calcHourly'); if(c2) delete c2.dataset.manualCalc; } }catch(_e){} });
   // ver.20261109.12: 支払方法（口座振込／通貨払）は雇用条件セットを読んだあとに決まるので、表示が合っていなければ描き直す
   function _payRefresh(){
     try{
@@ -5027,7 +5055,7 @@ function _p16PrintCheck(){
       if(e.textContent!==(_payCash()?'■':'□') || b.textContent!==(_payBank()?'■':'□')){ if(typeof p==='function') p(); }
     }catch(err){}
   }
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(function(){ _p16AutoCalcHourly(false); }, 3200); setTimeout(function(){ _p16AutoCalcHourly(false); }, 6200); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
 /* ===== ver.20261109.09: 🔍 空欄の参照先（案シスのどこが空か） =====
@@ -6347,8 +6375,8 @@ function _structNoticeShow(){
 
   // --- 1-6号 → 案シス ---
   if(/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)){
-    var KEYS=['calcMonthly','totalMonthly','deductTax','deductSocial','deductEmployment','deductTotal','netPay'];
-    var LABEL={calcMonthly:'換算月給',totalMonthly:'支払概算総額',deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料',deductTotal:'控除合計',netPay:'手取り'};
+    var KEYS=['calcMonthly','calcHourly','totalMonthly','deductTax','deductSocial','deductEmployment','deductTotal','netPay'];
+    var LABEL={calcMonthly:'換算月給',calcHourly:'換算時給',totalMonthly:'支払概算総額',deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料',deductTotal:'控除合計',netPay:'手取り'};
     var busy=false;
     async function sync(){
       if(busy) return; busy=true;
