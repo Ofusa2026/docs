@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261111.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -477,8 +477,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794390238';
-window.__DOCS_CACHE_BUSTER__ = '1794390238';
+window.__DOCS_CACHE_BUSTER__ = '1794391644';
+window.__DOCS_CACHE_BUSTER__ = '1794391644';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1838,6 +1838,17 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261111.08',
+    date: '2026-11-11',
+    notify: true,
+    items: [
+      '🔗 雇用条件書（1-6号）：開いて計算した金額（換算月給・支払概算総額・税金・社会保険料・雇用保険料・控除合計・手取り）が案シスの雇用条件と違えば、案シスに自動で合わせるようにしました（雇用条件セットが選ばれている案件だけ）',
+      '🧮 重要事項説明書（全言語）：支払概算額・控除合計・手取りを、案シスの合計ではなく書類の内訳から計算するようにしました（手で入れた合計はそのまま。合わないときは印刷前にお知らせ）',
+      '🛠 重要事項説明書：固定残業代の金額が入っているのに「無」になっていたのを「有」にするようにしました',
+      '⚠ 雇用条件書（1-6号）：月給と時給の両方が入っているときに、印刷前にお知らせするようにしました'
+    ]
+  },
   {
     version: 'ver.20261111.07',
     date: '2026-11-11',

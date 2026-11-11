@@ -4474,6 +4474,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       if(!Object.keys(fixes).length) return false;
       var ctx=window._empCtx||{}, coId=ctx.companyId, idx=parseInt(window._empLoadedIdx,10);
       if(!coId || isNaN(idx) || idx<0) return false;
+      try{ var cid=ctx.caseId||(window._lastCaseInfo&&window._lastCaseInfo.caseId); if(!cid) return false; var cr=await sb('cases?select=emp_set_idx&id=eq.'+encodeURIComponent(cid)); if(!cr||!cr[0]||String(cr[0].emp_set_idx)!==String(idx)) return false; }catch(e){ return false; }   // ver.20261111.08: 選ばれたセットのときだけ
       var r=await sb('companies?select=id,emp_sets&id=eq.'+encodeURIComponent(coId)); var co=r&&r[0]; if(!co) return false;
       var sets=Array.isArray(co.emp_sets)?co.emp_sets:[]; if(!sets[idx]) return false;
       var key='_tr_'+lang; sets[idx][key]=Object.assign({}, sets[idx][key]||{}, fixes);
@@ -4542,6 +4543,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         if(!window._skipOverflowCheck){
           var l=_wrongLangPairs();
           if(l.length && !confirm('🌐 訳が別の言語になっている欄があります（'+_wlSummary(l)+'）。\nこの書類は'+(LANG_JA[_docLang()]||'')+'版です。\n\nこのまま印刷しますか？（直す場合は「キャンセル」→ 左の「消して入れ直す」）')) return;
+          var ti=(typeof window._jyTotalsIssue==='function')?window._jyTotalsIssue():[];   // ver.20261111.08: 重説の合計
+          if(ti.length && !confirm(ti.join('\n')+'\n\n（左の「合計」「控除合計」「手取り」を空にすると、内訳から自動で計算します）\nこのまま印刷しますか？')) return;
         }
         return _o.apply(this, arguments);
       };
@@ -4951,6 +4954,7 @@ function _p16SavePrompt(){
     };
   });
 }
+function _p16BothPay(probs){ try{ var m=_mw16_num('es_salaryMonthly'), h=_mw16_num('es_salaryHourly'), d=_mw16_num('es_salaryDaily'); if(m && (h||d)) probs.push('⚠ 月給と'+(h?'時給':'日給')+'の両方が入っています（月給 '+m.toLocaleString('ja-JP')+'円／'+(h?'時給 '+h.toLocaleString('ja-JP'):'日給 '+d.toLocaleString('ja-JP'))+'円）。書類は月給になります。違う方を消してください'); }catch(e){} }
 function _p16WrongLang(probs){ try{ if(typeof window._wlSummary==='function'){ var s=window._wlSummary(); if(s) probs.push('⛔ 訳が別の言語になっています（'+s+'）。左の「消して入れ直す」で直してください'); } }catch(e){} }
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
@@ -4984,6 +4988,7 @@ function _p16PrintCheck(){
     }
   }catch(e){}
   _p16WrongLang(probs);   // ver.20261111.04
+  _p16BothPay(probs);     // ver.20261111.08
   return {miss:miss, probs:probs};
 }
 (function(){
@@ -5150,6 +5155,7 @@ window._batchCheck=function(){
       var r=_p16PrintCheck(); r.probs.forEach(function(x){ out.push(x); }); if(r.miss.length) out.push('空欄：'+r.miss.join('、'));
     }
     if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname) && typeof window._wlSummary==='function'){ var _wls=window._wlSummary(); if(_wls) out.push('⛔ 訳が別の言語になっています（'+_wls+'）'); }
+    if(typeof window._jyTotalsIssue==='function'){ window._jyTotalsIssue().forEach(function(x){ out.push(x); }); }
     if(typeof jyPrintCheck==='function'){
       var j=jyPrintCheck(); (j.diff||[]).forEach(function(x){ out.push('⚠ 雇用条件と違う：'+x); });
       if((j.miss||[]).length) out.push('空欄：'+j.miss.join('、'));
@@ -6273,3 +6279,112 @@ function _structNoticeShow(){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ wrapSave(); init(); });
   else init();
 })();
+
+/* ===== ver.20261111.08: 金額の「合計・控除合計・手取り」を内訳から計算し、書類どうし・案シスと合わせる =====
+   ・重要事項説明書（全言語）：支払概算額・控除合計・手取りを、書類の内訳から計算し直す（手で入れた欄はそのまま）。
+   ・1-6号：開いて計算し終わった金額（換算月給・支払概算総額・税金・社会保険料・雇用保険料・控除合計・手取り）が
+     案シスの雇用条件セットと違えば、案シスに自動で保存する（この金額だけ。ほかの欄は変えない）。 */
+(function(){
+  if(typeof window==='undefined') return;
+  var path=String(location.pathname||'');
+  function el(id){ return document.getElementById(id); }
+  function num(x){ var t=String(x==null?'':x).normalize('NFKC').replace(/[,，\s円¥]/g,''); return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null; }
+  function fmt(n){ return n==null?'':Math.round(n).toLocaleString('ja-JP'); }
+
+  // --- 重要事項説明書 ---
+  if(/(^|\/)juuyou(_[a-z]+)?\.html$/.test(path)){
+    var BASE=['f_salaryMonthly'], ALLOW=['f_allowance1Amount','f_allowance2Amount','f_allowance3Amount','f_allowance4Amount'];
+    var DED=['f_deductTax','f_deductSocialIns','f_deductEmpIns','f_deductFood','f_deductHousing','f_deductUtility','f_deductOther1Amount'];
+    var OUT={f_salaryTotal:'totalMonthly', f_deductTotal:'deductTotal', f_netPay:'netPay'};
+    function otOn(){ try{ return (typeof _fixedOTState!=='undefined' && _fixedOTState)==='有'; }catch(e){ return !!num((el('f_fixedOTAmount')||{}).value); } }
+    function calc(){
+      var b=num((el('f_salaryMonthly')||{}).value); if(!b) return null;
+      var tot=b; ALLOW.forEach(function(id){ var n=num((el(id)||{}).value); if(n) tot+=n; });
+      if(otOn()){ var o=num((el('f_fixedOTAmount')||{}).value); if(o) tot+=o; }
+      var ded=0, ok=true;
+      DED.forEach(function(id){ var e=el(id); if(!e) return; var t=String(e.value||'').trim(); if(!t) return; var n=num(t); if(n==null){ ok=false; } else ded+=n; });   // 「実費」など文字があるときは控除合計は計算しない
+      return {total:tot, ded:ok?ded:null, net:ok?tot-ded:null};
+    }
+    window._jyTotals=calc;
+    // 固定残業代の金額が入っているのに「無」になっていたら「有」にする（雇用条件セットに有・無の欄がなく、金額だけ入っている場合があるため）
+    var _otUser=false;
+    document.addEventListener('change', function(ev){ if(ev.target && ev.target.id==='f_fixedOT' && ev.isTrusted) _otUser=true; }, true);
+    document.addEventListener('click', function(ev){ var t=ev.target; if(ev.isTrusted && t && t.closest && t.closest('[onclick*="toggleFixedOT"]')) _otUser=true; }, true);
+    function fixOT(){
+      try{
+        if(_otUser) return;
+        var a=num((el('f_fixedOTAmount')||{}).value), es=window.__jyEs||{};
+        if(!a || String(es.fixedOT||'').trim()==='無') return;
+        if((typeof _fixedOTState!=='undefined') && _fixedOTState!=='有' && typeof toggleFixedOT==='function') toggleFixedOT('有');
+      }catch(e){}
+    }
+    function apply(){
+      try{
+        fixOT();
+        var r=calc(); if(!r) return;
+        var ch=0, put=function(id,val){ var e=el(id); if(!e || val==null || e.dataset.manualTot==='1') return; var s=fmt(val); if(num(e.value)!==Math.round(val)){ e.value=s; ch++; } };
+        put('f_salaryTotal', r.total); put('f_deductTotal', r.ded); put('f_netPay', r.net);
+        // 印刷前の「雇用条件と比べる」は、計算し直した合計で比べる（案シスの合計がずれていても誤って出さない）
+        if(window.__jyEs){ window.__jyEs=Object.assign({}, window.__jyEs, {totalMonthly:r.total}, r.ded!=null?{deductTotal:r.ded, netPay:r.net}:{}); }
+        if(ch && typeof p==='function'){ try{ p(); }catch(e){} }
+      }catch(e){ console.warn('[重説の合計]', e); }
+    }
+    document.addEventListener('input', function(ev){
+      var id=ev.target&&ev.target.id||'';
+      if(OUT[id] && ev.isTrusted){ if(String(ev.target.value||'').trim()==='') delete ev.target.dataset.manualTot; else ev.target.dataset.manualTot='1'; return; }
+      if(BASE.concat(ALLOW,DED,['f_fixedOTAmount']).indexOf(id)>=0) apply();
+    }, true);
+    window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ _otUser=false; Object.keys(OUT).forEach(function(id){ var x=el(id); if(x) delete x.dataset.manualTot; }); setTimeout(apply, 2500); setTimeout(apply, 5000); } }catch(_e){} });
+    // 手で入れた合計が内訳と合わないときの印刷前のお知らせ
+    window._jyTotalsIssue=function(){
+      var r=calc(), out=[]; if(!r) return out;
+      [['f_salaryTotal',r.total,'４．１か月当たりの支払概算額'],['f_deductTotal',r.ded,'５．控除する金額（合計）'],['f_netPay',r.net,'６．手取り支給額']].forEach(function(x){
+        var e=el(x[0]); if(!e || x[1]==null) return; var v=num(e.value); if(v!=null && Math.abs(v-x[1])>1) out.push('⚠ '+x[2]+'が内訳の計算と合いません（書類 '+fmt(v)+'円／計算 '+fmt(x[1])+'円）');
+      });
+      return out;
+    };
+  }
+
+  // --- 1-6号 → 案シス ---
+  if(/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)){
+    var KEYS=['calcMonthly','totalMonthly','deductTax','deductSocial','deductEmployment','deductTotal','netPay'];
+    var LABEL={calcMonthly:'換算月給',totalMonthly:'支払概算総額',deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料',deductTotal:'控除合計',netPay:'手取り'};
+    var busy=false;
+    async function sync(){
+      if(busy) return; busy=true;
+      try{
+        if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return;
+        if(typeof collectFormValues!=='function') return;
+        var L=window._empLoadedSet, ctx=window._empCtx||{}, idx=parseInt(window._empLoadedIdx,10);
+        if(!L || !ctx.companyId || isNaN(idx) || idx<0) return;
+        // 案件に雇用条件セットがはっきり選ばれているときだけ（推測で選んだセットに書き込むと、別の人のセットを変えてしまうため）
+        try{ var cid=ctx.caseId||(window._lastCaseInfo&&window._lastCaseInfo.caseId); if(!cid) return; var cr=await sb('cases?select=emp_set_idx&id=eq.'+encodeURIComponent(cid)); if(!cr||!cr[0]||String(cr[0].emp_set_idx)!==String(idx)) return; }catch(e){ return; }
+        var cur=collectFormValues()||{}, diff={}, msg=[];
+        KEYS.forEach(function(k){
+          var nv=num(cur[k]), ov=num(L[k]);
+          if(nv==null) return;                      // 書類の側が空・文字なら書かない
+          if(ov!=null && Math.abs(nv-ov)<=1) return;
+          diff[k]=String(Math.round(nv)); msg.push(LABEL[k]+' '+(ov==null?'空欄':fmt(ov))+'→'+fmt(nv));
+        });
+        if(!Object.keys(diff).length) return;
+        var r=await sb('companies?select=id,emp_sets&id=eq.'+encodeURIComponent(ctx.companyId)); var co=r&&r[0]; if(!co) return;
+        var sets=Array.isArray(co.emp_sets)?co.emp_sets:[]; if(!sets[idx]) return;
+        Object.assign(sets[idx], diff);
+        // 税金・保険料を自動で入れた値として記録（次に開いたときも自動の欄として扱う）
+        try{ var av=Object.assign({}, sets[idx].deductAutoVals||{}); ['deductTax','deductSocial','deductEmployment'].forEach(function(k){ if(diff[k]!=null){ var map={deductTax:'es_deductTax',deductSocial:'es_deductSocialIns',deductEmployment:'es_deductEmpIns'}; var e=el(map[k]); if(e && e.dataset.taxAuto==='1') av[k]=diff[k]; } }); if(diff.netPay!=null) av.netPay=diff.netPay; sets[idx].deductAutoVals=av; }catch(e){}
+        var w=await sb('companies?id=eq.'+encodeURIComponent(ctx.companyId)+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:sets})});
+        if(!w||!w.length) return;
+        var ns=(w[0].emp_sets||[])[idx]||sets[idx];
+        try{ window._empLoadedSet=JSON.parse(JSON.stringify(ns)); }catch(e){}
+        if(window._empCtx) window._empCtx.empSets=w[0].emp_sets||sets;
+        try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+        try{ if(typeof slog==='function') slog('p16_sync',{meta:{keys:Object.keys(diff)}}); }catch(e){}
+        if(typeof showToast==='function') showToast('🔗 案シスの雇用条件の金額を、この1-6号の計算に合わせました（'+msg.slice(0,3).join('、')+(msg.length>3?' ほか':'')+'）');
+      }catch(e){ console.warn('[1-6→案シス 金額]', e); }
+      finally{ busy=false; }
+    }
+    window._p16SyncToAnshis=sync;
+    window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(sync, 8500); } }catch(_e){} });
+  }
+})();
+
