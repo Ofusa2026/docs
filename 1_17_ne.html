@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ネパール語版・変更）</div>
-    <div class="ver">ver.20261109.02</div>
+    <div class="ver">ver.20261111.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2562,12 +2562,29 @@ async function _p17Hearing(so, _s){
   // 共生施策（確認日・ホームページで確認）
   var SC = ex.symbiosisCheck || {};
   var dm = String(SC.date || SC.other || '').match(/(\d{4})\s*[-\/年.]\s*(\d{1,2})\s*[-\/月.]\s*(\d{1,2})/);
-  if(dm){ _s('es_symY', dm[1]); _s('es_symM', String(parseInt(dm[2],10))); _s('es_symD', String(parseInt(dm[3],10))); }
+  /* ver.20261111.01: 共生施策の確認日は案件（計画）ごとに決まるもの。支援機関のヒアリングに書かれた日付（別の事業所で確認した古い日付）は使わず、
+     作成日（1-6号と同じ日）を初期値にする。左の欄で直した日付は、その案件の1-17号として保存される。作成日を変えたら、手で直していない限りついて動く。 */
+  (function(){
+    var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+    if(g('es_symY')||g('es_symM')||g('es_symD')) return;
+    var y=g('es_createY'), m=g('es_createM'), d=g('es_createD'); if(!y) return;
+    ['Y','M','D'].forEach(function(k,i){ var e=document.getElementById('es_sym'+k); if(e){ e.value=[y,m,d][i]; e.dataset.symAuto='1'; } });
+  })();
+  if(!window._p17SymSync){ window._p17SymSync=true;
+    document.addEventListener('input', function(ev){
+      var id=ev.target&&ev.target.id||'';
+      if(/^es_sym[YMD]$/.test(id)){ ['Y','M','D'].forEach(function(k){ var e=document.getElementById('es_sym'+k); if(e) delete e.dataset.symAuto; }); return; }   // 手で直したら、もうついて動かない
+      if(/^es_create[YMD]$/.test(id)){
+        var k=id.slice(-1), s=document.getElementById('es_sym'+k);
+        if(s && s.dataset.symAuto==='1'){ s.value=ev.target.value; if(typeof p==='function') p(); }
+      }
+    }, true);
+  }
   if(SC.hp) C.f384 = true;
   // ver.20261030.03: 日付の無い「その他」（例：市役所窓口）は、確認方法の「その他の方法（　）」へ
   var _scOther = String(SC.other||'').trim();
   if(!dm && _scOther && _scOther.length<=20){ C.f385 = true; (window._p17Text = window._p17Text || {}).f386 = _scOther; }
-  if(dm || SC.hp) used.push('共生施策');
+  if(SC.hp || (!dm && _scOther)) used.push('共生施策');
   // ver.20261030.01: 各支援の実施予定（extra.implSchedules）と住居確保の方針（extra.housingPolicy／言語別設定）
   var T = window._p17Text = window._p17Text || {};
   var review = [];

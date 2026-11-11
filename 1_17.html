@@ -1566,7 +1566,7 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         if(k==='housingNote') return HP.note||'';
         // 共生社会
         if(k==='symbiosisHp') return _cb(SC.hp);
-        if(k==='symbiosisOther') return SC.other||'';
+        if(k==='symbiosisOther') return /\d{4}\s*[-\/年.]\s*\d{1,2}/.test(String(SC.other||'')) ? '' : (SC.other||'');   // ver.20261111.01: 日付入りのメモ（別の事業所で確認した日）は確認方法に出さない
         return '';
       }
       // 登録年月日の分割
