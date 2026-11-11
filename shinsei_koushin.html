@@ -192,7 +192,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20261111.03</div>
+    <div class="ver">ver.20261111.04</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1745,96 +1745,92 @@ ${v('f_ins2')==='無'?'<div class="cir" style="left:120.64mm;top:115.87mm"></div
 </div>
 <div class="doc docabs" id="docP6">
 <div class="page-num-label">P6</div>
+<!-- ver.20261111.03: 6ページの有・無の丸を作り直し。固定で出ていた丸（二重の原因）を削除し、丸の大きさ・位置を「有」「無」の文字に合わせた。クリック範囲も有と無で重ならないようにした -->
+${v('f_q23')==='有'?'<div class="cir" style="left:162.05mm;top:23.21mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q23')==='無'?'<div class="cir" style="left:165.20mm;top:23.21mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:23.21mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q23','有')" title="f_q23=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:23.21mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q23','無')" title="f_q23=無"></div>
+${v('f_q26')==='有'?'<div class="cir" style="left:162.05mm;top:54.12mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q26')==='無'?'<div class="cir" style="left:165.20mm;top:54.12mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:54.12mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q26','有')" title="f_q26=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:54.12mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q26','無')" title="f_q26=無"></div>
+${v('f_q27')==='有'?'<div class="cir" style="left:162.05mm;top:65.64mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q27')==='無'?'<div class="cir" style="left:165.20mm;top:65.64mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:65.64mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q27','有')" title="f_q27=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:65.64mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q27','無')" title="f_q27=無"></div>
+${v('f_q30')==='有'?'<div class="cir" style="left:162.05mm;top:130.08mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q30')==='無'?'<div class="cir" style="left:165.20mm;top:130.08mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:130.08mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q30','有')" title="f_q30=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:130.08mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q30','無')" title="f_q30=無"></div>
+${v('f_q31')==='有'?'<div class="cir" style="left:162.05mm;top:141.00mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q31')==='無'?'<div class="cir" style="left:165.20mm;top:141.00mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:141.00mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q31','有')" title="f_q31=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:141.00mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q31','無')" title="f_q31=無"></div>
+${v('f_q32')==='有'?'<div class="cir" style="left:162.05mm;top:152.35mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q32')==='無'?'<div class="cir" style="left:165.20mm;top:152.35mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:152.35mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q32','有')" title="f_q32=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:152.35mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q32','無')" title="f_q32=無"></div>
+${v('f_coop1')==='有'?'<div class="cir" style="left:162.05mm;top:160.98mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_coop1')==='無'?'<div class="cir" style="left:165.20mm;top:160.98mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:160.98mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_coop1','有')" title="f_coop1=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:160.98mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_coop1','無')" title="f_coop1=無"></div>
+${v('f_coop2')==='有'?'<div class="cir" style="left:162.05mm;top:172.92mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_coop2')==='無'?'<div class="cir" style="left:165.20mm;top:172.92mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:172.92mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_coop2','有')" title="f_coop2=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:172.92mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_coop2','無')" title="f_coop2=無"></div>
+${v('f_q33')==='有'?'<div class="cir" style="left:162.05mm;top:188.42mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q33')==='無'?'<div class="cir" style="left:165.20mm;top:188.42mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:188.42mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q33','有')" title="f_q33=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:188.42mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q33','無')" title="f_q33=無"></div>
+${v('f_smYN')==='有'?'<div class="cir" style="left:162.05mm;top:211.71mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_smYN')==='無'?'<div class="cir" style="left:165.20mm;top:211.71mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:211.71mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_smYN','有')" title="f_smYN=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:211.71mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_smYN','無')" title="f_smYN=無"></div>
+${v('f_ssYN')==='有'?'<div class="cir" style="left:162.05mm;top:224.58mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_ssYN')==='無'?'<div class="cir" style="left:165.20mm;top:224.58mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:224.58mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_ssYN','有')" title="f_ssYN=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:224.58mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_ssYN','無')" title="f_ssYN=無"></div>
+${v('f_q35')==='有'?'<div class="cir" style="left:162.05mm;top:232.28mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q35')==='無'?'<div class="cir" style="left:165.20mm;top:232.28mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:232.28mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q35','有')" title="f_q35=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:232.28mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q35','無')" title="f_q35=無"></div>
+${v('f_q36')==='有'?'<div class="cir" style="left:162.05mm;top:276.15mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q36')==='無'?'<div class="cir" style="left:165.20mm;top:276.15mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:276.15mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q36','有')" title="f_q36=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:276.15mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q36','無')" title="f_q36=無"></div>
+${v('f_q37')==='有'?'<div class="cir" style="left:162.05mm;top:286.48mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q37')==='無'?'<div class="cir" style="left:165.20mm;top:286.48mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:162.25mm;top:286.48mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q37','有')" title="f_q37=有"></div>
+<div class="pickhot cb-click" style="left:165.40mm;top:286.48mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q37','無')" title="f_q37=無"></div>
+${v('f_q22')==='有'?'<div class="cir" style="left:35.40mm;top:15.25mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q22')==='無'?'<div class="cir" style="left:161.52mm;top:15.25mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:35.60mm;top:15.25mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q22','有')" title="f_q22=有"></div>
+<div class="pickhot cb-click" style="left:161.72mm;top:15.25mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q22','無')" title="f_q22=無"></div>
+${v('f_q24')==='有'?'<div class="cir" style="left:35.40mm;top:36.08mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q24')==='無'?'<div class="cir" style="left:161.52mm;top:36.08mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:35.60mm;top:36.08mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q24','有')" title="f_q24=有"></div>
+<div class="pickhot cb-click" style="left:161.72mm;top:36.08mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q24','無')" title="f_q24=無"></div>
+${v('f_q25')==='有'?'<div class="cir" style="left:35.40mm;top:46.42mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q25')==='無'?'<div class="cir" style="left:161.52mm;top:46.42mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:35.60mm;top:46.42mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q25','有')" title="f_q25=有"></div>
+<div class="pickhot cb-click" style="left:161.72mm;top:46.42mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q25','無')" title="f_q25=無"></div>
+${v('f_q28')==='有'?'<div class="cir" style="left:35.40mm;top:117.21mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q28')==='無'?'<div class="cir" style="left:161.52mm;top:117.21mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:35.60mm;top:117.21mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q28','有')" title="f_q28=有"></div>
+<div class="pickhot cb-click" style="left:161.72mm;top:117.21mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q28','無')" title="f_q28=無"></div>
+${v('f_q29')==='有'?'<div class="cir" style="left:35.40mm;top:124.91mm;width:3.8mm;height:3.4mm"></div>':''}
+${v('f_q29')==='無'?'<div class="cir" style="left:161.52mm;top:124.91mm;width:3.8mm;height:3.4mm"></div>':''}
+<div class="pickhot cb-click" style="left:35.60mm;top:124.91mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q29','有')" title="f_q29=有"></div>
+<div class="pickhot cb-click" style="left:161.72mm;top:124.91mm;width:3.4mm;height:3.4mm;" onclick="setPick('f_q29','無')" title="f_q29=無"></div>
 <!-- ver.20261111.03: (32)住居地の行に機関の作成年月日・届出先が二重に出ていたのと、市に固定で付いていた丸を削除（(32)の欄はページ下の f_submit* で出す） -->
 <div class="av avg" style="left:49.21mm;top:126.14mm;font-size:6.7pt;">${f('f_q29d')}</div>
-${v('f_q22')==='有'?'<div class="cir" style="left:162.16mm;top:23.17mm"></div>':''}
-${v('f_q22')==='無'?'<div class="cir" style="left:164.14mm;top:23.17mm"></div>':''}
-${v('f_q23')==='有'?'<div class="cir" style="left:162.16mm;top:23.17mm"></div>':''}
-${v('f_q23')==='無'?'<div class="cir" style="left:164.14mm;top:23.17mm"></div>':''}
-${v('f_q24')==='有'?'<div class="cir" style="left:162.16mm;top:54.13mm"></div>':''}
-${v('f_q24')==='無'?'<div class="cir" style="left:164.14mm;top:54.13mm"></div>':''}
-${v('f_q25')==='有'?'<div class="cir" style="left:162.16mm;top:54.13mm"></div>':''}
-${v('f_q25')==='無'?'<div class="cir" style="left:164.14mm;top:54.13mm"></div>':''}
-${v('f_q26')==='有'?'<div class="cir" style="left:162.16mm;top:54.13mm"></div>':''}
-${v('f_q26')==='無'?'<div class="cir" style="left:164.14mm;top:54.13mm"></div>':''}
-${v('f_q27')==='有'?'<div class="cir" style="left:162.16mm;top:65.57mm"></div>':''}
-${v('f_q27')==='無'?'<div class="cir" style="left:164.14mm;top:65.57mm"></div>':''}
-${v('f_q30')==='有'?'<div class="cir" style="left:162.16mm;top:130.08mm"></div>':''}
-${v('f_q30')==='無'?'<div class="cir" style="left:164.14mm;top:130.08mm"></div>':''}
-${v('f_q31')==='有'?'<div class="cir" style="left:162.16mm;top:141.04mm"></div>':''}
-${v('f_q31')==='無'?'<div class="cir" style="left:164.14mm;top:141.04mm"></div>':''}
-${v('f_q32')==='有'?'<div class="cir" style="left:162.17mm;top:152.32mm"></div>':''}
-${v('f_q32')==='無'?'<div class="cir" style="left:164.15mm;top:152.32mm"></div>':''}
-${v('f_q33')==='有'?'<div class="cir" style="left:162.16mm;top:188.45mm"></div>':''}
-${v('f_q33')==='無'?'<div class="cir" style="left:164.14mm;top:188.45mm"></div>':''}
-${v('f_smYN')==='有'?'<div class="cir" style="left:162.16mm;top:211.67mm"></div>':''}
-${v('f_smYN')==='無'?'<div class="cir" style="left:164.14mm;top:211.67mm"></div>':''}
-${v('f_ssYN')==='有'?'<div class="cir" style="left:162.16mm;top:224.57mm"></div>':''}
-${v('f_ssYN')==='無'?'<div class="cir" style="left:164.14mm;top:224.57mm"></div>':''}
-${v('f_q35')==='有'?'<div class="cir" style="left:162.16mm;top:232.31mm"></div>':''}
-${v('f_q35')==='無'?'<div class="cir" style="left:164.14mm;top:232.31mm"></div>':''}
-${v('f_q36')==='有'?'<div class="cir" style="left:162.16mm;top:276.18mm"></div>':''}
-${v('f_q36')==='無'?'<div class="cir" style="left:164.14mm;top:276.18mm"></div>':''}
-${v('f_q37')==='有'?'<div class="cir" style="left:162.16mm;top:286.50mm"></div>':''}
-${v('f_q37')==='無'?'<div class="cir" style="left:164.14mm;top:286.50mm"></div>':''}
-${v('f_q28')==='有'?'<div class="cir" style="left:35.45mm;top:117.28mm"></div>':''}
 <div class="av avg" style="left:49.16mm;top:117.58mm;font-size:8.5pt;">${f('f_q28d')}</div>
-${v('f_q29')==='有'?'<div class="cir" style="left:50.37mm;top:125.53mm"></div>':''}
 <div class="av avg avfit" data-w="38.1" style="left:74.05mm;top:205.43mm;font-size:8pt;transform:translateX(-50%);max-width:38.1mm;">${f('f_smName')}</div>
 <div class="av avg avfit" data-w="45.4" style="left:140.10mm;top:205.13mm;font-size:8.5pt;transform:translateX(-50%);max-width:45.4mm;">${f('f_smTitle')}</div>
 <div class="av avg avfit" data-w="38.1" style="left:73.75mm;top:217.83mm;font-size:8.5pt;transform:translateX(-50%);max-width:38.1mm;">${f('f_ssName')}</div>
 <div class="av avg avfit" data-w="45.4" style="left:140.10mm;top:217.83mm;font-size:8.5pt;transform:translateX(-50%);max-width:45.4mm;">${f('f_ssTitle')}</div>
-<div class="cir" style="left:162.28mm;top:15.73mm;width:4.00mm;height:4.24mm;"></div>
-<div class="cir" style="left:162.06mm;top:23.27mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:162.49mm;top:36.27mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:161.74mm;top:46.72mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:165.41mm;top:54.47mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:162.06mm;top:130.81mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:162.06mm;top:141.25mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:161.95mm;top:152.22mm;width:4.00mm;height:4.18mm;"></div>
-<div class="cir" style="left:162.17mm;top:189.12mm;width:4.00mm;height:4.18mm;"></div>
 
-<div class="pickhot cb-click" style="left:161.36mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','有')" title="f_q22=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q22','無')" title="f_q22=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q23','有')" title="f_q23=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:22.37mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q23','無')" title="f_q23=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q24','有')" title="f_q24=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q24','無')" title="f_q24=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q25','有')" title="f_q25=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q25','無')" title="f_q25=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q26','有')" title="f_q26=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:53.33mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q26','無')" title="f_q26=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:64.77mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q27','有')" title="f_q27=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:64.77mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q27','無')" title="f_q27=無"></div>
-<div class="pickhot cb-click" style="left:34.65mm;top:116.48mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q28','有')" title="f_q28=有"></div>
-<div class="pickhot cb-click" style="left:49.57mm;top:124.73mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q29','有')" title="f_q29=有"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:129.28mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q30','有')" title="f_q30=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:129.28mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q30','無')" title="f_q30=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:140.24mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q31','有')" title="f_q31=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:140.24mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q31','無')" title="f_q31=無"></div>
-<div class="pickhot cb-click" style="left:161.37mm;top:151.52mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q32','有')" title="f_q32=有"></div>
-<div class="pickhot cb-click" style="left:163.35mm;top:151.52mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q32','無')" title="f_q32=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:187.65mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q33','有')" title="f_q33=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:187.65mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q33','無')" title="f_q33=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:231.51mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q35','有')" title="f_q35=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:231.51mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q35','無')" title="f_q35=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:275.38mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q36','有')" title="f_q36=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:275.38mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q36','無')" title="f_q36=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:285.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q37','有')" title="f_q37=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:285.70mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_q37','無')" title="f_q37=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:210.87mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_smYN','有')" title="f_smYN=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:210.87mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_smYN','無')" title="f_smYN=無"></div>
-<div class="pickhot cb-click" style="left:161.36mm;top:223.77mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','有')" title="f_ssYN=有"></div>
-<div class="pickhot cb-click" style="left:163.34mm;top:223.77mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_ssYN','無')" title="f_ssYN=無"></div>
 
-${v('f_coop1')==='有'?'<div class="cir" style="left:162.20mm;top:161.00mm"></div>':''}
-${v('f_coop1')==='無'?'<div class="cir" style="left:164.10mm;top:161.00mm"></div>':''}
-<div class="pickhot cb-click" style="left:161.40mm;top:160.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','有')" title="f_coop1=有"></div>
-<div class="pickhot cb-click" style="left:163.30mm;top:160.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop1','無')" title="f_coop1=無"></div>
-${v('f_coop2')==='有'?'<div class="cir" style="left:162.20mm;top:173.00mm"></div>':''}
-${v('f_coop2')==='無'?'<div class="cir" style="left:164.10mm;top:173.00mm"></div>':''}
-<div class="pickhot cb-click" style="left:161.40mm;top:172.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop2','有')" title="f_coop2=有"></div>
-<div class="pickhot cb-click" style="left:163.30mm;top:172.20mm;width:7.4mm;height:6.4mm;" onclick="setPick('f_coop2','無')" title="f_coop2=無"></div>
 <!-- ver.20261111.03: (32) 協力確認書の提出年月日・提出先名（更新様式の位置に合わせて配置） -->
 <div class="av avg" style="left:119.60mm;top:167.70mm;font-size:6.8pt;transform:translateX(-50%);">${f('f_submit1Name')}</div>
 <div class="av avg" style="left:68.00mm;top:167.50mm;font-size:6.8pt;">${f('f_submit1Y')}</div>
@@ -1945,6 +1941,7 @@ function resetForm(){
   const d_o3=(id,v)=>{const e=document.getElementById(id); if(e) e.value=v;};
   // 既定値（欠格事由系は無、労災は「雇用開始後、すぐに労災保険へ加入」が定型）
   d_o3('f_q22','無'); d_o3('f_q24','無'); d_o3('f_q25','無'); d_o3('f_q28','無');
+  d_o3('f_q23','有'); d_o3('f_q26','有'); d_o3('f_q30','有'); d_o3('f_q31','有'); d_o3('f_q32','有'); d_o3('f_q33','有');   // ver.20261111.03: 固定で出していた丸の代わりに既定値で有
   d_o3('f_q29d','雇用開始後、すぐに労災保険へ加入');
   }
   // --- shinsei_henkou_org4 ---
