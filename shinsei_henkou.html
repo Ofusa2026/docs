@@ -192,7 +192,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261111.03</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1794,7 +1794,7 @@ ${v('f_smYN')==='無'?'<div class="cir" style="left:168.91mm;top:208.63mm"></div
 <div class="av avg avfit" data-w="41.2" style="left:71.63mm;top:214.92mm;font-size:9.3pt;transform:translateX(-50%);max-width:41.2mm;">${f('f_ssName')}</div>
 ${v('f_ssYN')==='有'?'<div class="cir" style="left:165.74mm;top:221.54mm"></div>':''}
 ${v('f_ssYN')==='無'?'<div class="cir" style="left:168.91mm;top:221.54mm"></div>':''}
-<div class="cir" style="left:164.64mm;top:185.89mm;width:5.91mm;height:4.63mm"></div>
+<!-- ver.20261111.03: (33)の丸が2つ出ていたので固定の丸を削除（f_q33 の丸だけ） -->
 
 
 
@@ -2062,6 +2062,71 @@ function updateSubmitCircles(){
   });
 }
 
+/* ver.20261111.03: (32) 協力確認書の提出年月日・提出先名を、1-17号（支援計画書 Ⅴ 共生施策）と同じ考え方で入れる。
+   上段 … 事業所の所在地：案件の雇用条件セットの事業所住所（無ければ会社の住所）の市区町村
+   下段 … 申請人の住居地：今の住所の市区町村。ただし変更申請で、今の住所が事業所と別の都道府県なら、入社後は事業所の近くに住むので事業所と同じ（1-17号の「同上」）
+   提出年月日 … 案シス 所属機関の「📝 協力確認書」タブに登録した、その市区町村の提出日。無ければ作成日（案件の作成日 → 雇用条件セットの作成日 → 今日）
+   政令市の区は市単位にする（協力確認書は市に出す。案シスの協力確認書タブと同じ切り出し方）。 */
+function _kyo32City(addr){
+  if(!addr) return {pref:'', city:''};
+  var a=String(addr).replace(/^[\s　]*〒?[\s　]*[0-9０-９]{3}[-－‐ー]?[0-9０-９]{4}[\s　]*/,'').trim();
+  var pm=a.match(/^(東京都|北海道|京都府|大阪府|.{2,3}県)/), pref=pm?pm[1]:'';
+  a=a.slice(pref.length);
+  var m=a.match(/^(.+?(?:郡.+?[町村]|市.+?区|[市区町村]))/);
+  var raw=m?m[1]:'';
+  raw=raw.replace(/^(.+?市).+区$/,'$1');
+  // 名前の途中に「市・町・村」がある市町村は、上の切り出しだと途中で切れるので先に見る（例：四日市市・東村山市・大町市）
+  var ex=['四日市市','廿日市市','野々市市','大町市','十日町市','東村山市','武蔵村山市','羽村市','大村市','上市町','下市町','余市町','大町町','市貝町','町田市','市川市','市原市'];
+  var a2=a.replace(/^.+?郡/,function(g){ return /[町村]/.test(a.slice(g.length)) ? '' : g; });
+  var hit=ex.find(function(x){ return a.indexOf(x)===0 || a2.indexOf(x)===0; });
+  var city=hit ? (a.indexOf(hit)===0 ? hit : a.slice(0,a.length-a2.length)+hit) : raw;
+  return {pref:pref, city:city, raw:raw};
+}
+async function _fillKyoryoku32(caseId, companyId, companyName, info){
+  var put=function(id,v){ var e=document.getElementById(id); if(e) e.value=(v==null?'':String(v)); };
+  ['submit1','submit2'].forEach(function(p){ ['Name','Y','M','D','City'].forEach(function(k){ put('f_'+p+k,''); }); });
+  var cs=await sb('cases?select=id,applicant,company,company_id,emp_set_idx,app_type,doc_create_date&id=eq.'+caseId);
+  var cas=cs&&cs[0]; if(!cas) return;
+  var ps=await sb('persons?select=address,jp_address,jp_detail_address&case_id=eq.'+caseId);
+  var pd=ps&&ps[0];
+  var sel='name,pref,city,address,emp_sets,extra', co=null;
+  var cid=companyId||cas.company_id;
+  if(cid){ var r=await sb('companies?select='+sel+'&id=eq.'+cid); co=r&&r[0]; }
+  if(!co){ var nm=companyName||cas.company; if(nm){ var r2=await sb('companies?select='+sel+'&name=eq.'+encodeURIComponent(nm)); co=r2&&r2[0]; } }
+  var es={};
+  try{ var ix=(co&&typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1; if(co&&Array.isArray(co.emp_sets)&&ix>=0) es=co.emp_sets[ix]||{}; }catch(_e){}
+  // 上段: 事業所の所在地
+  var off=_kyo32City(es.officeAddr||es.officeAddress||es.orgAddress||'');
+  if(!off.city && (es.officePref||es.officeCity)) off=_kyo32City((es.officePref||'')+(es.officeCity||''));
+  if(!off.city && co) off=_kyo32City((co.pref||'')+(co.city||'')+(co.address||''));
+  // 下段: 申請人の住居地
+  var res=_kyo32City(pd ? (pd.address||((pd.jp_address||'')+(pd.jp_detail_address||''))) : '');
+  if(/変更/.test(cas.app_type||'') && res.pref && off.pref && res.pref!==off.pref) res=off;   // 1-17号と同じ：別の都道府県からの変更は事業所と同じ
+  // 作成日（提出日が未登録のときの既定）
+  var cd=['','',''];
+  var dm=String(cas.doc_create_date||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  if(dm) cd=[dm[1],String(+dm[2]),String(+dm[3])];
+  else if(es.createY && es.createM) cd=[String(es.createY),String(parseInt(es.createM,10)||es.createM),es.createD?String(parseInt(es.createD,10)||es.createD):''];
+  else { var n=new Date(); cd=[String(n.getFullYear()),String(n.getMonth()+1),String(n.getDate())]; }
+  // 案シス 協力確認書タブの提出日（co.extra.kyoryoku.dates = {市区町村: 'YYYY-MM-DD'}）
+  var kd=(co&&co.extra&&co.extra.kyoryoku&&co.extra.kyoryoku.dates&&typeof co.extra.kyoryoku.dates==='object')?co.extra.kyoryoku.dates:{};
+  var dateOf=function(city){
+    if(!city) return null;
+    var v=kd[city];
+    if(!v){ var k=Object.keys(kd).find(function(x){ if(!x) return false; var xc=_kyo32City(x); return xc.city===city || xc.raw===city || _kyo32City(city).raw===x || x.replace(/^(東京都|北海道|京都府|大阪府|.{2,3}県)/,'')===city; }); if(k) v=kd[k]; }
+    var m=String(v||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    return m?[m[1],String(+m[2]),String(+m[3])]:null;
+  };
+  [['submit1',off],['submit2',res]].forEach(function(row){
+    var p=row[0], c=row[1].city; if(!c) return;
+    var mt=c.match(/^(.*?)(市|区|町|村)$/);
+    put('f_'+p+'Name', mt?mt[1]:c);
+    put('f_'+p+'City', mt?mt[2]:'');
+    var d=dateOf(c)||cd;
+    put('f_'+p+'Y', d[0]); put('f_'+p+'M', d[1]); put('f_'+p+'D', d[2]);
+  });
+}
+
 async function loadFromDB(passedInfo){
   let info = passedInfo;
   if(!info){
@@ -2116,35 +2181,7 @@ async function loadFromDB(passedInfo){
       if(pd.total_stay_year!=null && pd.total_stay_year!=='') s('f_totalY',String(pd.total_stay_year));
       if(pd.total_stay_month!=null && pd.total_stay_month!=='') s('f_totalM',String(pd.total_stay_month));
     }
-    // 32番 協力確認書(上段=事業所所在地の市区町村/下段=住居地の市区町村)
-    (function(){
-      // 市区町村名を「大田区」→ 名前「大田」+種別「区」に分解し、種別文字に丸(◯)を付ける
-      function splitCity(full){
-        var t=String(full||'').trim();
-        var m=t.match(/^(.*?)(市|区|町|村)$/);
-        if(m) return {name:m[1], type:m[2]};
-        return {name:t, type:''};
-      }
-      // 種別に応じて「市・区・町・村」のうち該当を◯で囲んだ文字列
-      function circledType(type){
-        var arr=['市','区','町','村'];
-        return arr.map(function(x){ return x===type ? '◯'+x : x; }).join('・');
-      }
-      // 上段: 事業所所在地の市区町村（emp_sets.officeAddr or 会社city）
-      var offCity='';
-      try{ if(typeof es!=='undefined' && es && es.officeAddr){ var mm=String(es.officeAddr).match(/(..+?[都道府県])?(.+?[市区町村])/); if(mm) offCity=mm[2]; } }catch(_e){}
-      if(!offCity && typeof co!=='undefined' && co && co.city) offCity=co.city;
-      var s1=splitCity(offCity);
-      var _s=function(id,val){ var el=document.getElementById(id); if(el && val!=null) el.value=val; };
-      _s('f_submit1Name', s1.name);
-      _s('f_submit1City', s1.type);
-      // 下段: 申請人の住居地の市区町村（pd.address等から）
-      var homeCity='';
-      try{ var addr=(typeof pd!=='undefined'&&pd)?(pd.jp_detail_address||pd.address||''):''; var mh=String(addr).match(/(.+?[市区町村])/); if(mh) homeCity=mh[1].replace(/^.*?[都道府県]/,''); }catch(_e){}
-      var s2=splitCity(homeCity);
-      _s('f_submit2Name', s2.name);
-      _s('f_submit2City', s2.type);
-    })();
+    // ver.20261111.03: 32番 協力確認書は読み込みの最後（_fillKyoryoku32）でまとめて入れる
     // 6ページ 有無項目のデフォルト設定（支援体制まわりは有、保証金・違約金・不正は無）
     (function(){ var _sd=function(id,v){ var e=document.getElementById(id); if(e && !e.value) e.value=v; };
       _sd('f_q24','有');_sd('f_q25','有');_sd('f_q26','有');_sd('f_q27','有');_sd('f_q28','有');_sd('f_q29','有');_sd('f_q30','有');_sd('f_q31','有');_sd('f_q32','有');_sd('f_q33','有');_sd('f_q36','有');_sd('f_q37','有');_sd('f_coop1','有');_sd('f_coop2','有');_sd('f_smYN','有');_sd('f_ssYN','有');
@@ -2260,9 +2297,7 @@ async function loadFromDB(passedInfo){
         }
       }
     }
-    // 作成年月日は今日を既定
-    const n=new Date();
-    s('f_aSigY',String(n.getFullYear())); s('f_aSigM',String(n.getMonth()+1)); s('f_aSigD',String(n.getDate()));
+    // ver.20261111.03: 申請人の署名／作成年月日は本人が自署するので空欄が既定（今日の日付は入れない）
     }
     // ===== 機関1 =====
     {
@@ -2447,11 +2482,10 @@ async function loadFromDB(passedInfo){
     const _p=_dcd?_dcd.split(/[-\/]/):[];
     if(_p.length>=3){
       s('f_oSigY',_p[0]); s('f_oSigM',String(parseInt(_p[1],10))); s('f_oSigD',String(parseInt(_p[2],10)));
-      var _sd=function(id,v){var e=document.getElementById(id);if(e&&v)e.value=v;};
-      ['submit1','submit2'].forEach(function(pfx){ _sd('f_'+pfx+'Y',_p[0]); _sd('f_'+pfx+'M',String(parseInt(_p[1],10))); _sd('f_'+pfx+'D',String(parseInt(_p[2],10))); });
     }
     else { const n=new Date(); s('f_oSigY',String(n.getFullYear())); s('f_oSigM',String(n.getMonth()+1)); s('f_oSigD',String(n.getDate())); }
     }
+    try{ await _fillKyoryoku32(caseId, companyId, companyName, info); }catch(_e){ console.warn('[32 協力確認書]', _e); }
     // ver.20260917.02: (23)は既定「有」（案件読込後も空なら有をセット。手動変更は可能）
     (function(){ var e=document.getElementById('f_a23'); if(e && !e.value){ e.value='有'; } })();
     p(); showToast('✅ 全7ページにデータを読み込みました');

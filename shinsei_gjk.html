@@ -187,7 +187,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　技術・人文知識・国際業務　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜2・所属機関1〜2）</span></div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261111.03</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -2000,9 +2000,7 @@ async function loadFromDB(passedInfo){
     s('f_agentOrg',  OFUSA_AGENT.org);
     s('f_agentTel',  OFUSA_AGENT.tel);
     // 氏名(f_agentName)はユーザーがサイドバーで中林/田中を選択する
-    // 作成年月日は今日を既定
-    const n=new Date();
-    s('f_aSigY',String(n.getFullYear())); s('f_aSigM',String(n.getMonth()+1)); s('f_aSigD',String(n.getDate()));
+    // ver.20261111.03: 申請人の署名／作成年月日は本人が自署するので空欄が既定（今日の日付は入れない）
     }
     // ===== 機関1 =====
     {
