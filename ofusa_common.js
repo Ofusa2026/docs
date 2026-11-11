@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261111.02
+ * - feat(1-6号): 税金（所得税＋住民税）・社会保険料・雇用保険料を自動計算（案シスと同じ OFUSA_TAXCALC。手で直した欄は上書きしない）
  * ver.20261102.01
  * - fix: 直接編集版・呼び戻した書類で、業務区分２（分野２）が空なのに「建築・es.category2」と出ていた → 空なら区切りの「・」ごと出さない
  * ver.20261029.01
@@ -5754,3 +5756,300 @@ function _structNoticeShow(){
   w.querySelector('#_snKeep').onclick=function(){ _structSetBase(); _structNoticeHide(); };
   try{ w.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(_e){}
 }
+
+// ===== 税・社保の自動計算エンジン（OFUSA_TAXCALC） ver.20261111.01 =====
+//   ⚠️ 同じコードが 案シス(anken/index.html) と Saysay(docs/ofusa_common.js) の2か所にある。直すときは必ず両方。
+//   料率は年度ごとに RATES だけ直す（毎年3〜4月）。
+(function(root){
+  if(root.OFUSA_TAXCALC) return;
+  var RATES = {
+    label: '令和8年度',
+    // 協会けんぽ 健康保険料率（%・労使合計）令和8年3月分から
+    kenpo: {'北海道':10.28,'青森県':9.85,'岩手県':9.51,'宮城県':10.10,'秋田県':10.01,'山形県':9.75,'福島県':9.50,'茨城県':9.52,'栃木県':9.82,'群馬県':9.68,'埼玉県':9.67,'千葉県':9.73,'東京都':9.85,'神奈川県':9.92,'新潟県':9.21,'富山県':9.59,'石川県':9.70,'福井県':9.71,'山梨県':9.55,'長野県':9.63,'岐阜県':9.80,'静岡県':9.61,'愛知県':9.93,'三重県':9.77,'滋賀県':9.88,'京都府':9.89,'大阪府':10.13,'兵庫県':10.12,'奈良県':9.91,'和歌山県':10.06,'鳥取県':9.86,'島根県':9.94,'岡山県':10.05,'広島県':9.78,'山口県':10.15,'徳島県':10.24,'香川県':10.02,'愛媛県':9.98,'高知県':10.05,'福岡県':10.11,'佐賀県':10.55,'長崎県':10.06,'熊本県':10.08,'大分県':10.08,'宮崎県':9.77,'鹿児島県':10.13,'沖縄県':9.44},
+    kaigo: 1.62,   // 介護保険（%・労使合計／40〜64歳）
+    kodomo: 0.23,  // 子ども・子育て支援金（%・労使合計）令和8年4月分から
+    nenkin: 18.3,  // 厚生年金（%・労使合計）
+    koyo: {ippan:5, norin:6, kensetsu:6}, // 雇用保険 本人負担（/1000）令和8年4月〜
+    // 住民税：都道府県民税の均等割（超過課税込み）。市町村民税3,000円＋森林環境税1,000円は別に足す
+    juminPrefKintou: {'北海道':1000,'青森県':1000,'岩手県':2000,'宮城県':2200,'秋田県':1800,'山形県':2000,'福島県':2000,'茨城県':2000,'栃木県':1700,'群馬県':1700,'埼玉県':1000,'千葉県':1000,'東京都':1000,'神奈川県':1300,'新潟県':1000,'富山県':1500,'石川県':1500,'福井県':1000,'山梨県':1500,'長野県':1500,'岐阜県':2000,'静岡県':1400,'愛知県':1500,'三重県':2000,'滋賀県':1800,'京都府':1600,'大阪府':1300,'兵庫県':1800,'奈良県':1500,'和歌山県':1500,'鳥取県':1500,'島根県':1500,'岡山県':1500,'広島県':1500,'山口県':1500,'徳島県':1000,'香川県':1000,'愛媛県':1700,'高知県':1500,'福岡県':1500,'佐賀県':1500,'長崎県':1500,'熊本県':1500,'大分県':1500,'宮崎県':1500,'鹿児島県':1500,'沖縄県':1000},
+    juminPrefRateAdj: {'神奈川県':0.00025},   // 県民税の所得割 上乗せ
+    juminCity: [  // 市町村の独自税率（ここにない市町村は 市民税均等割3,000円・所得割は標準）
+      {name:'横浜市', pref:'神奈川県', kintou:3900},
+      {name:'名古屋市', pref:'愛知県', kintou:2800, rateAdj:-0.003},
+      {name:'神戸市', pref:'兵庫県', kintou:3400},
+      {name:'豊岡市', pref:'兵庫県', rateAdj:0.001}
+    ],
+    juminCityKintou: 3000, shinrin: 1000, juminRate: 0.10,
+    juminKiso: 430000, choseiKojo: 2500, kyuyoMin: 740000,
+    hikazeiShotoku: 380000, hikazeiShotokuWari: 450000
+  };
+  // 健康保険 標準報酬月額（50等級）：[報酬月額がこの額未満, 標準報酬月額]
+  var HYOJUN = [[63000,58000],[73000,68000],[83000,78000],[93000,88000],[101000,98000],[107000,104000],[114000,110000],[122000,118000],[130000,126000],[138000,134000],[146000,142000],[155000,150000],[165000,160000],[175000,170000],[185000,180000],[195000,190000],[210000,200000],[230000,220000],[250000,240000],[270000,260000],[290000,280000],[310000,300000],[330000,320000],[350000,340000],[370000,360000],[395000,380000],[425000,410000],[455000,440000],[485000,470000],[515000,500000],[545000,530000],[575000,560000],[605000,590000],[635000,620000],[665000,650000],[695000,680000],[730000,710000],[770000,750000],[810000,790000],[855000,830000],[905000,880000],[955000,930000],[1005000,980000],[1055000,1030000],[1115000,1090000],[1175000,1150000],[1235000,1210000],[1295000,1270000],[1355000,1330000],[Infinity,1390000]];
+  var PREFS = Object.keys(RATES.kenpo);
+
+  function num(v){
+    if(v==null) return 0;
+    v=String(v).replace(/[０-９．－]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[^0-9.\-]/g,'');
+    var n=parseFloat(v); return isFinite(n)?n:0;
+  }
+  function hyojun(pay){ for(var i=0;i<HYOJUN.length;i++){ if(pay<HYOJUN[i][0]) return HYOJUN[i][1]; } return 1390000; }
+  function hyojunNenkin(pay){ return Math.min(Math.max(hyojun(pay),88000),650000); }
+  function half(x){ var f=Math.floor(x); return (x-f>0.5)?f+1:f; } // 本人負担：50銭以下切捨て・50銭超切上げ
+
+  // 住所 → {pref, city}（都道府県が無い住所は pref='' ）
+  function parseAddr(s){
+    s=String(s||'').replace(/^[\s　]*〒?[\s　]*\d{3}[-－ー]?\d{4}[\s　]*/,'').replace(/^[\s　]+/,'');
+    var pref='';
+    for(var i=0;i<PREFS.length;i++){ if(s.indexOf(PREFS[i])===0){ pref=PREFS[i]; break; } }
+    if(!pref){ for(var j=0;j<PREFS.length;j++){ var b=PREFS[j].replace(/[都道府県]$/,''); if(b.length>=2 && s.indexOf(b)===0){ pref=PREFS[j]; break; } } }
+    var city=null;
+    for(var k=0;k<RATES.juminCity.length;k++){
+      var c=RATES.juminCity[k];
+      if(s.indexOf(c.name)>=0 && (!pref || pref===c.pref)){ city=c; if(!pref) pref=c.pref; break; }
+    }
+    return {pref:pref, city:city};
+  }
+  // 就業先住所 → だめなら本社住所
+  function pickAddr(officeAddr, hqAddr){
+    var a=parseAddr(officeAddr);
+    if(a.pref) return {pref:a.pref, city:a.city, from:'就業先'};
+    var b=parseAddr(hqAddr);
+    if(b.pref) return {pref:b.pref, city:b.city, from:'本社'};
+    return {pref:'', city:null, from:''};
+  }
+  function koyoKind(field){
+    field=String(field||'');
+    if(field.indexOf('建設')>=0) return 'kensetsu';
+    if(/農業|漁業|林業/.test(field)) return 'norin';
+    return 'ippan';
+  }
+  // 源泉所得税（令和8年分 月額表甲欄・電子計算機特例・扶養0人）
+  function incomeTax(A){
+    if(!(A>0)) return 0;
+    var k;
+    if(A<=158333) k=54167;
+    else if(A<=299999) k=Math.ceil(A*0.30+6667);
+    else if(A<=549999) k=Math.ceil(A*0.20+36667);
+    else if(A<=708330) k=Math.ceil(A*0.10+91667);
+    else k=162500;
+    var kiso = A<=2120833?48334 : A<=2162499?40000 : A<=2204166?26667 : A<=2245833?13334 : 0;
+    var B=Math.floor(A-k-kiso); if(B<=0) return 0;
+    var t;
+    if(B<=162500) t=B*0.05105;
+    else if(B<=275000) t=B*0.10210-8296;
+    else if(B<=579166) t=B*0.20420-36374;
+    else if(B<=750000) t=B*0.23483-54113;
+    else if(B<=1500000) t=B*0.33693-130688;
+    else if(B<=3333333) t=B*0.40840-237893;
+    else t=B*0.45945-408061;
+    return Math.max(0, Math.round(t/10)*10);
+  }
+  // 住民税（年額）：年収・年間の社保・都道府県・市町村
+  function juminAnnual(annualPay, annualSocial, pref, city){
+    var J=RATES;
+    var kojo;
+    if(annualPay<=3600000) kojo=annualPay*0.30+80000;
+    else if(annualPay<=6600000) kojo=annualPay*0.20+440000;
+    else if(annualPay<=8500000) kojo=annualPay*0.10+1100000;
+    else kojo=1950000;
+    kojo=Math.max(kojo, J.kyuyoMin);
+    var shotoku=Math.max(0, Math.floor(annualPay-kojo));
+    if(shotoku<=J.hikazeiShotoku) return 0;
+    var kintou=(J.juminPrefKintou[pref]||1000) + ((city&&city.kintou)||J.juminCityKintou) + J.shinrin;
+    if(shotoku<=J.hikazeiShotokuWari) return kintou;
+    var rate=J.juminRate + (J.juminPrefRateAdj[pref]||0) + ((city&&city.rateAdj)||0);
+    var kazei=Math.floor(Math.max(0, shotoku-annualSocial-J.juminKiso)/1000)*1000;
+    var wari=Math.max(0, kazei*rate - Math.min(J.choseiKojo, kazei*0.05));
+    wari=Math.floor(wari/100)*100;
+    return wari + kintou;
+  }
+  // 雇用条件セット(es) から月の総支給・通勤手当を出す
+  function grossOf(es){
+    es=es||{};
+    var base=num(es.salaryMonthly)||num(es.calcMonthly);
+    var g=base, commute=0;
+    for(var i=1;i<=6;i++){
+      var nm=String(es['allowance'+i+'Name']||'');
+      var amt=num(es['allowance'+i+'Amount']!=null&&es['allowance'+i+'Amount']!==''?es['allowance'+i+'Amount']:es['allowance'+i+'Amt']);
+      if(!amt) continue;
+      g+=amt; if(nm.indexOf('通勤')>=0) commute+=amt;
+    }
+    g+=num(es.fixedOTAmount||es.fixedOTAmt);
+    return {gross:g, commute:commute, base:base};
+  }
+  // 健康保険・厚生年金・雇用保険の加入状況
+  function insFlags(es){
+    es=es||{};
+    var k=String(es.insKenpo||''), ko=String(es.insKenpoOther||'');
+    return {
+      noKenpo: k==='未加入',
+      kumiai: /組合/.test(k) || (k==='その他' && /組合/.test(ko)),
+      noNenkin: String(es.insPension||'')==='未加入',
+      noKoyo: String(es.insEmp||'')==='未加入'
+    };
+  }
+  // 本体
+  //  opt = {gross, commute, officeAddr, hqAddr, field, kaigo, noKenpo, kumiai, noNenkin, noKoyo}
+  function calc(opt){
+    var R=RATES;
+    var gross=Math.max(0, num(opt.gross));
+    var commute=Math.min(Math.max(0,num(opt.commute)), 150000, gross);
+    var ad=pickAddr(opt.officeAddr, opt.hqAddr);
+    var r={ok:false, pref:ad.pref, city:ad.city?ad.city.name:'', addrFrom:ad.from, gross:gross, commute:commute,
+           hyojun:0, kenpo:0, nenkin:0, koyo:0, social:null, incomeTax:0, jumin:0, tax:null, employment:null, notes:[]};
+    if(!gross) return r;
+    var hyo=hyojun(gross); r.hyojun=hyo;
+    var kenpoKnown=true;
+    if(opt.noKenpo){ r.kenpo=0; }
+    else if(!ad.pref){ kenpoKnown=false; r.notes.push('就業先・本社の住所から都道府県が分からないため、社会保険料・住民税を計算できません'); }
+    else {
+      r.kenpo=half(hyo*(R.kenpo[ad.pref]+(opt.kaigo?R.kaigo:0))/100/2) + half(hyo*R.kodomo/100/2);
+      if(opt.kumiai){ r.notes.push('健保組合のため、社会保険料は手入力してください（税金は協会けんぽの料率で概算）'); }
+    }
+    r.nenkin = opt.noNenkin ? 0 : half(hyojunNenkin(gross)*R.nenkin/100/2);
+    r.koyo = opt.noKoyo ? 0 : half(gross*R.koyo[koyoKind(opt.field)]/1000);
+    r.employment = r.koyo;
+    if(kenpoKnown && !opt.kumiai) r.social = r.kenpo + r.nenkin;
+    var A=gross-commute-r.kenpo-r.nenkin-r.koyo;
+    r.incomeTax=incomeTax(A);
+    if(ad.pref){
+      r.jumin=Math.floor(juminAnnual((gross-commute)*12, (r.kenpo+r.nenkin+r.koyo)*12, ad.pref, ad.city)/12);
+      r.tax=r.incomeTax+r.jumin;
+    }
+    r.ok=true;
+    return r;
+  }
+  // 年齢（今日時点）
+  function age(birth){
+    var m=String(birth||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/); if(!m) return null;
+    var y=+m[1], mo=+m[2], d=+m[3]; var t=new Date();
+    var a=t.getFullYear()-y; if((t.getMonth()+1)<mo || ((t.getMonth()+1)===mo && t.getDate()<d)) a--;
+    return (a>=0&&a<120)?a:null;
+  }
+  function isKaigoAge(a){ return a!=null && a>=40 && a<65; }
+  root.OFUSA_TAXCALC={RATES:RATES, calc:calc, grossOf:grossOf, insFlags:insFlags, parseAddr:parseAddr, pickAddr:pickAddr,
+    incomeTax:incomeTax, juminAnnual:juminAnnual, hyojun:hyojun, koyoKind:koyoKind, age:age, isKaigoAge:isKaigoAge, num:num,
+    KEYS:['deductTax','deductSocial','deductEmployment']};
+})(typeof window!=='undefined'?window:globalThis);
+
+/* ver.20261111.02: 1-6号（全言語）の 税金・社会保険料・雇用保険料 を自動計算（案シスと同じ OFUSA_TAXCALC）
+   ・自動の欄 ＝ 空欄／前回自動で入れた値（es.deductAutoVals）のまま／今の計算結果と同じ。手で書き換えた欄は上書きしない（空にすると自動に戻る）
+   ・給与・手当・固定残業代・就業先住所・本社住所・分野を手で変えると、その場で計算し直す
+   ・読み込み直後に空欄の欄を埋める（このときは「編集した」扱いにしない）
+   ・保存時に es.deductAutoVals を記録（案シスが同じ判定に使う）
+   ・1_6_test.html（デザイン検証用）は対象外 */
+(function(){
+  if(typeof window==='undefined' || !window.OFUSA_TAXCALC) return;
+  var path=String(location.pathname||'');
+  if(!/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)) return;
+  var T=window.OFUSA_TAXCALC;
+  var MAP={deductTax:'es_deductTax', deductSocial:'es_deductSocialIns', deductEmployment:'es_deductEmpIns'};
+  var KEYS=Object.keys(MAP);
+  var SRC=/^es_(salaryMonthly|calcMonthly|a[1-6](Name|Amt)|fixedOTAmount|officeAddress|orgAddress|applicantField)$/;
+  function el(id){ return document.getElementById(id); }
+  function v(id){ var e=el(id); return e?String(e.value||''):''; }
+  function loaded(){ var s=window._empLoadedSet; return (s && typeof s==='object') ? s : {}; }
+  function formEs(){
+    var L=loaded(), o={};
+    o.salaryMonthly=v('es_salaryMonthly'); o.calcMonthly=v('es_calcMonthly'); o.fixedOTAmount=v('es_fixedOTAmount');
+    for(var i=1;i<=6;i++){ o['allowance'+i+'Name']=v('es_a'+i+'Name'); o['allowance'+i+'Amount']=v('es_a'+i+'Amt'); }
+    ['insKenpo','insKenpoOther','insPension','insEmp'].forEach(function(k){ var e=el('es_'+k); o[k]= e ? e.value : (L[k]||''); });
+    return o;
+  }
+  var _kaigo=false;
+  function compute(kaigo){
+    var es=formEs(), g=T.grossOf(es), ins=T.insFlags(es);
+    var r=T.calc({gross:g.gross, commute:g.commute, officeAddr:v('es_officeAddress'), hqAddr:v('es_orgAddress'),
+      field:v('es_applicantField'), kaigo:(kaigo==null?_kaigo:kaigo), noKenpo:ins.noKenpo, kumiai:ins.kumiai, noNenkin:ins.noNenkin, noKoyo:ins.noKoyo});
+    r.values={deductTax:r.tax, deductSocial:r.social, deductEmployment:r.employment};
+    return r;
+  }
+  function setVal(e, s){
+    if(e.value===s || same(e.value, s)) return false;
+    e.value=s; e.dispatchEvent(new Event('input',{bubbles:true}));   // 合計・手取りの計算（ページ側）を動かす
+    return true;
+  }
+  function recalc(){
+    var r=compute(); if(!r.ok || !r.gross) return [];
+    var changed=[];
+    KEYS.forEach(function(k){
+      var e=el(MAP[k]); if(!e || e.dataset.taxAuto!=='1') return;
+      if(r.values[k]==null) return;
+      if(setVal(e, String(r.values[k]))) changed.push(MAP[k]);
+    });
+    return changed;
+  }
+  function same(a,b){   // 金額として同じか（「14,126」と「14126」は同じ）
+    a=(a==null?'':String(a)).trim(); b=(b==null?'':String(b)).trim();
+    if(a===''||b==='') return false;
+    return a===b || (/\d/.test(a) && /\d/.test(b) && T.num(a)===T.num(b));
+  }
+  // 読み込み直後
+  function onLoaded(){
+    var L=loaded(), av=(L.deductAutoVals && typeof L.deductAutoVals==='object') ? L.deductAutoVals : {};
+    // 介護保険：案シスが入れた社会保険料が「介護あり」の計算と同じなら介護あり
+    var withK=compute(true), soc=v('es_deductSocialIns');
+    _kaigo = !!(withK.values.deductSocial!=null && same(soc, withK.values.deductSocial) && !same(soc, compute(false).values.deductSocial));
+    var r=compute();
+    KEYS.forEach(function(k){
+      var e=el(MAP[k]); if(!e) return;
+      var cur=String(e.value||'').trim();
+      e.dataset.taxAuto = (cur==='' || same(cur, av[k]) || same(cur, r.values[k])) ? '1' : '';
+      if(!e._taxBound){
+        e._taxBound=true;
+        e.title='自動計算されます（手入力で上書き可・空にすると自動計算に戻ります）';
+        e.addEventListener('input', function(ev){
+          if(!ev.isTrusted) return;
+          if(String(this.value).trim()===''){ this.dataset.taxAuto='1'; recalc(); } else { this.dataset.taxAuto=''; }
+        });
+      }
+    });
+    var changed=recalc();
+    // 読み込み直後に埋めた分は「編集した」扱いにしない
+    try{
+      var snap=window._empBaseline;
+      if(snap && changed.length){
+        changed.concat(['es_deductTotal','es_netPay','es_salaryTotal']).forEach(function(id){ var e=el(id); if(e) snap[id]=e.value||''; });
+      }
+    }catch(e){}
+  }
+  function init(){
+    if(!el('es_deductTax') || !el('es_deductSocialIns') || !el('es_deductEmpIns')) return;
+    document.addEventListener('input', function(ev){
+      if(!ev.isTrusted) return;
+      var id=ev.target && ev.target.id;
+      if(id && SRC.test(id)){ try{ recalc(); }catch(e){ console.warn('[taxcalc]', e); } }
+    }, true);
+    // 読み込み（_empLoadedSet が入れ替わる）を見張る
+    var last=null;
+    setInterval(function(){
+      var s=window._empLoadedSet;
+      if(s && s!==last){ last=s; setTimeout(function(){ try{ onLoaded(); }catch(e){ console.warn('[taxcalc] load', e); } }, 400); }
+    }, 400);
+  }
+  // 保存：自動/手入力の状態を es.deductAutoVals に記録
+  function wrapSave(){
+    var orig=window.saveEmpSetWithMode;
+    if(typeof orig!=='function' || orig._taxWrapped) return;
+    var w=function(companyId, caseId, values, mode, curIdx, force){
+      try{
+        if(values && typeof values==='object'){
+          var L=loaded(), av=Object.assign({}, (L.deductAutoVals && typeof L.deductAutoVals==='object') ? L.deductAutoVals : {});
+          KEYS.forEach(function(k){
+            var e=el(MAP[k]); if(!e) return;
+            if(e.dataset.taxAuto==='1') av[k]=String(e.value||''); else delete av[k];
+          });
+          var n=el('es_netPay');
+          if(n){ if(n.dataset.manual!=='1') av.netPay=String(n.value||''); else delete av.netPay; }
+          values.deductAutoVals=av;
+        }
+      }catch(e){ console.warn('[taxcalc] save', e); }
+      return orig.apply(this, arguments);
+    };
+    w._taxWrapped=true;
+    window.saveEmpSetWithMode=w;
+  }
+  wrapSave();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ wrapSave(); init(); });
+  else init();
+})();
