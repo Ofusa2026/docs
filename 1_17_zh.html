@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261111.01</div>
+    <div class="ver">ver.20261111.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -590,6 +590,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
   <div class="fg"><label>申請種別<span class="fid">es.appType</span></label><input id="es_appType" oninput="_p17AppTypeChanged()" placeholder="認定 / 変更"></div>
   <div class="fg"><label>雇用開始日<span class="fid">es.contractStart</span></label><input id="es_contractStart" oninput="p()" placeholder="2026/09/01"></div>
   <div class="fg"><label>出迎え空港<span class="fid">es.arrivalAirport</span></label><input id="es_arrivalAirport" oninput="p()" placeholder="成田国際空港"></div>
+  <div class="fg"><label>出迎え空港（翻訳）<span class="fid">es.arrivalAirportEn</span></label><input id="es_arrivalAirportEn" oninput="p()" placeholder="空港名を入れると自動で入ります"></div>
 </div>
 <div class="fg3"><div class="fg"><label>年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div><div class="fg"><label>月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div><div class="fg"><label>日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div></div>
 <div class="fg"><label>申請人 氏名(ローマ字)<span class="fid">applicant</span></label><input id="f_applicant" oninput="p()"></div>
@@ -683,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794374611"></script>
+<script src="ofusa_common.js?v=1794382563"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -1355,7 +1356,7 @@ var _mukaeA = _nintei
   ? `<p class="ja a-center"><input type="checkbox" class="cb" id="f065" name="f065" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（有）">有（${f('es_contractStart')}）</p><p class="vi"> 有(${f('es_contractStart')})</p><p class="ja a-center"><input type="checkbox" class="cb" id="f067" name="f067" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（無）">無（　　　　　　）</p><p class="vi">无(                 )</p>`
   : `<p class="ja a-center"><input type="checkbox" class="cb" id="f065" name="f065" data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（有）">有（　　　　　　）</p><p class="vi"> 有(                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f067" name="f067" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．到着空港等での出迎え｜実施予定（無）">無（入国済み）</p><p class="vi">无(已入境)</p>`;
 var _houhouA = _nintei
-  ? `<p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜出迎え空港等">　出迎え空港等  接机机场等</p><p class="ja">（${f('es_arrivalAirport')}）</p><p class="vi"> (${f('es_arrivalAirport')} 机场)</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法">　送迎方法（公共交通機関）</p><p class="vi">  接机方法(公共交通工具)</p>`
+  ? `<p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜出迎え空港等">　出迎え空港等  接机机场等</p><p class="ja">（${f('es_arrivalAirport')}）</p><p class="vi"> (${f('es_arrivalAirportEn')})</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" checked data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法">　送迎方法（公共交通機関）</p><p class="vi">  接机方法(公共交通工具)</p>`
   : `<p class="ja"><input type="checkbox" class="cb" id="f072" name="f072" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜出迎え空港等">　出迎え空港等  接机机场等</p><p class="ja">（<input type="text" class="bl" id="f073" name="f073" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜（＿空港）" style="width:9.00em">空港）</p><p class="vi"> (                机场)</p><p class="ja"><input type="checkbox" class="cb" id="f074" name="f074" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法">　送迎方法（<input type="text" class="bl" id="f075" name="f075" data-label="Ⅳ 支援内容（続き） ＞ ａ．実施方法｜送迎方法（＿）" style="width:8.00em">）</p><p class="vi">  接机方法(             )</p>`;
 return `<div class="doc" id="docP1">
 <div class="sheet" id="p17sheet" lang="ja"><div class="p17page"><div class="doc p17doc">
@@ -1373,7 +1374,7 @@ return `<div class="doc" id="docP1">
 <tr class="nosplit" style="height:4.23em">
 <td class="b-kkkt vert" rowspan="2"><p class="ja a-center">Ⅰ　支援対象者</p><p class="vi a-center">I. 支援对象</p></td>
 <td class="b-kttt"><p class="ja">１　氏名</p><p class="vi a-center">姓名</p></td>
-<td class="b-kttt" colspan="3"><p class="ja">${f('f_applicant')}（ほか0名）</p><p class="vi a-right">(另0人)</p></td>
+<td class="b-kttt" colspan="3"><p class="ja">${f('f_applicant')}（ほか0名）</p><p class="vi">${f('f_applicant')} (另0人)</p></td>
 <td class="b-kttt" colspan="3"><p class="ja">２　性　別</p><p class="vi a-center">性别</p></td>
 <td class="b-kttk" colspan="2"><p class="ja a-center">${f('f_gender')}</p><p class="vi a-center">${_p17Gender('男/女')}</p></td>
 </tr>
@@ -2272,6 +2273,15 @@ async function loadFromDB(passedInfo){
     if(_m) _s('es_contractStart', _m[1]+'/'+('0'+_m[2]).slice(-2)+'/'+('0'+_m[3]).slice(-2));
     var _ap=document.getElementById('es_arrivalAirport');
     if(_ap && !_ap.value) _ap.value='成田国際空港';
+    /* ver.20261111.02: 空港名の訳を自動で入れる（入っていない・自動で入れた値のときだけ）。空港名を変えたらついて動く */
+    (function(L){
+      var fill=function(){ var j=document.getElementById('es_arrivalAirport'), e=document.getElementById('es_arrivalAirportEn'); if(!j||!e) return;
+        if(String(e.value||'').trim() && e.dataset.autofill!=='1') return;
+        var t=(typeof _airportTr==='function')?_airportTr(j.value, L):''; if(t && e.value!==t){ e.value=t; e.dataset.autofill='1'; } };
+      fill(); setTimeout(function(){ fill(); if(typeof p==='function') p(); }, 3000);   // 保存した内容を読み込んだあとにも
+      if(!window._apTrBound){ window._apTrBound=true; document.addEventListener('input', function(ev){ if(ev.target&&ev.target.id==='es_arrivalAirport'){ fill(); } }, true); }
+      document.getElementById('es_arrivalAirportEn') && document.getElementById('es_arrivalAirportEn').addEventListener('input', function(){ delete this.dataset.autofill; });
+    })('zh');
     // 作成日
     var dc=(cas&&cas.doc_create_date||'').toString().replace(/[年月]/g,'-').replace(/日/,'').split(/[-\/.]/);
     if(dc.length>=3){_s('es_createY',dc[0]);_s('es_createM',String(parseInt(dc[1],10)||dc[1]));_s('es_createD',String(parseInt(dc[2],10)||dc[2]));}

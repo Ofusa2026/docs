@@ -1059,6 +1059,21 @@ const ff=id=>{const raw=v(id);const label=id.replace(/^es_/,'es.').replace(/^f_/
 window.cbState=window.cbState||{};
 let _cbSeq=0;
 function resetCbSeq(){_cbSeq=0;}
+// ver.20261111.02: 1-17号「出迎え空港等」の空港名の訳（よく使う空港）。ない空港は空欄にして「訳がない欄」で知らせる
+var _AIRPORT_TR={
+  narita:{en:'Narita International Airport',id:'Bandara Internasional Narita',km:'ព្រលានយន្តហោះអន្តរជាតិណារីតា',my:'နာရီတာ အပြည်ပြည်ဆိုင်ရာ လေဆိပ်',ne:'नारिता अन्तर्राष्ट्रिय विमानस्थल',th:'ท่าอากาศยานนานาชาตินาริตะ',vi:'Sân bay quốc tế Narita',zh:'成田国际机场'},
+  haneda:{en:'Haneda Airport (Tokyo International Airport)',id:'Bandara Haneda (Bandara Internasional Tokyo)',km:'ព្រលានយន្តហោះហាណេដា',my:'ဟာနဲဒါ လေဆိပ်',ne:'हानेदा विमानस्थल',th:'ท่าอากาศยานฮาเนดะ',vi:'Sân bay Haneda',zh:'羽田机场（东京国际机场）'},
+  kansai:{en:'Kansai International Airport',id:'Bandara Internasional Kansai',km:'ព្រលានយន្តហោះអន្តរជាតិកានសៃ',my:'ခန်ဆိုင်း အပြည်ပြည်ဆိုင်ရာ လေဆိပ်',ne:'कान्साई अन्तर्राष्ट्रिय विमानस्थल',th:'ท่าอากาศยานนานาชาติคันไซ',vi:'Sân bay quốc tế Kansai',zh:'关西国际机场'},
+  chubu:{en:'Chubu Centrair International Airport',id:'Bandara Internasional Chubu Centrair',km:'ព្រលានយន្តហោះអន្តរជាតិឈូប៊ូ',my:'ချူးဘူး အပြည်ပြည်ဆိုင်ရာ လေဆိပ်',ne:'चुबु अन्तर्राष्ट्रिय विमानस्थल',th:'ท่าอากาศยานนานาชาติชูบุ',vi:'Sân bay quốc tế Chubu',zh:'中部国际机场'},
+  fukuoka:{en:'Fukuoka Airport',id:'Bandara Fukuoka',km:'ព្រលានយន្តហោះហ្វូគូអូកា',my:'ဖူကူအိုကာ လေဆိပ်',ne:'फुकुओका विमानस्थल',th:'ท่าอากาศยานฟุกุโอกะ',vi:'Sân bay Fukuoka',zh:'福冈机场'},
+  chitose:{en:'New Chitose Airport',id:'Bandara New Chitose',km:'ព្រលានយន្តហោះស៊ីនឈីតូសេ',my:'ချီတိုဆေး လေဆိပ်သစ်',ne:'नयाँ चितोसे विमानस्थल',th:'ท่าอากาศยานนิวชิโตเสะ',vi:'Sân bay Shin-Chitose',zh:'新千岁机场'},
+  naha:{en:'Naha Airport',id:'Bandara Naha',km:'ព្រលានយន្តហោះណាហា',my:'နာဟာ လေဆိပ်',ne:'नाहा विमानस्थल',th:'ท่าอากาศยานนาฮะ',vi:'Sân bay Naha',zh:'那霸机场'}
+};
+window._airportTr=function(ja, lang){
+  var t=String(ja||'').normalize('NFKC').replace(/\s/g,'');
+  var k=/成田/.test(t)?'narita':/羽田|東京国際/.test(t)?'haneda':/関西|関空/.test(t)?'kansai':/中部|セントレア/.test(t)?'chubu':/福岡/.test(t)?'fukuoka':/千歳/.test(t)?'chitose':/那覇/.test(t)?'naha':'';
+  return k ? (_AIRPORT_TR[k][lang]||'') : '';
+};
 // ver.20261109.12: 1-6号の「賃金支払方法」を、案シスの雇用条件（支払方法）から付ける（前は口座振込に固定だった）
 function _payMethodText(){ try{ return String((window._empLoadedSet||{}).payMethod||'').normalize('NFKC'); }catch(e){ return ''; } }
 function _payCash(){ return /現金|通貨|手渡|cash/i.test(_payMethodText()); }
