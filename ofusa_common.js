@@ -4388,8 +4388,27 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     return el.id;
   }
   function _emptyPairs(){
-    return _pairs().filter(function(p){ return String(p.ja.value||'').trim()!=='' && String(p.en.value||'').trim()===''; });
+    return _pairs().filter(function(p){ var j=String(p.ja.value||'').trim(); return j!=='' && String(p.en.value||'').trim()==='' && !/^[\d,.\s円¥％%]+$/.test(j.normalize('NFKC')); });   // ver.20261111.06: 数字だけの欄は訳がいらない
   }
+  // ver.20261111.06: 1-6号の手当の金額が「実費」などの文字のとき、訳を自動で入れる
+  var _AMT_WORD={
+    '実費':{id:'Biaya aktual',en:'Actual cost',vi:'Chi phí thực tế',km:'ថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်',ne:'वास्तविक खर्च',th:'ตามที่จ่ายจริง',zh:'实际费用',ko:'실비'},
+    '実費支給':{id:'Dibayar sesuai biaya aktual',en:'Paid at actual cost',vi:'Chi trả theo chi phí thực tế',km:'ផ្តល់ជូនតាមថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်အတိုင်း ပေးသည်',ne:'वास्तविक खर्च अनुसार भुक्तानी',th:'จ่ายตามที่จ่ายจริง',zh:'按实际费用支付',ko:'실비 지급'},
+    '全額支給':{id:'Dibayar penuh',en:'Paid in full',vi:'Chi trả toàn bộ',km:'ផ្តល់ជូនទាំងស្រុង',my:'အပြည့်အဝ ပေးသည်',ne:'पूरा भुक्तानी',th:'จ่ายเต็มจำนวน',zh:'全额支付',ko:'전액 지급'}
+  };
+  function _amtWordFill(){
+    try{
+      var L=_docLang();
+      for(var i=1;i<=6;i++){
+        var j=document.getElementById('es_a'+i+'Amt'), e=document.getElementById('es_a'+i+'AmtEn'); if(!j||!e) continue;
+        if(String(e.value||'').trim() && e.dataset.autofill!=='1') continue;
+        var w=_AMT_WORD[String(j.value||'').normalize('NFKC').replace(/\s/g,'')], t=w&&w[L];
+        if(t && e.value!==t){ e.value=t; e.dataset.autofill='1'; if(typeof p==='function'){ try{ p(); }catch(_e){} } }
+      }
+    }catch(e){}
+  }
+  document.addEventListener('input', function(ev){ if(ev.target && /^es_a\dAmt$/.test(ev.target.id||'')) _amtWordFill(); if(ev.target && /^es_a\dAmtEn$/.test(ev.target.id||'')) delete ev.target.dataset.autofill; }, true);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_amtWordFill, 3500); } }catch(_e){} });
   // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
   //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
   var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語'};
