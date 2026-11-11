@@ -17,12 +17,17 @@
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
+<style>
+/* ver.20261111.02: 画面の幅がせまいと fitDocToPreview() が .doc を縮めて表示する（zoom）。その大きさのまま印刷され、
+   人によって書類が小さく刷られていた（幅1000pxで84%）。印刷のときは画面の幅に関係なく元の大きさに戻す */
+@media print{ .doc{zoom:1!important} }
+</style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１４－２号（外食業 登録支援機関）　受入れに関する誓約書</div>
-    <div class="ver">ver.20261106.08</div>
+    <div class="ver">ver.20261111.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>

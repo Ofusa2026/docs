@@ -18,12 +18,17 @@
   .f[style*="color:#aaa"]{visibility:hidden}
 }
 </style>
+<style>
+/* ver.20261111.02: 画面の幅がせまいと fitDocToPreview() が .doc を縮めて表示する（zoom）。その大きさのまま印刷され、
+   人によって書類が小さく刷られていた（幅1000pxで84%）。印刷のときは画面の幅に関係なく元の大きさに戻す */
+@media print{ .doc{zoom:1!important} }
+</style>
 </head>
 <body>
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 移行準備説明書（特定活動→特定技能１号）</div>
-    <div class="ver">ver.20261106.03</div>
+    <div class="ver">ver.20261111.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="saveFormGeneric('iko_junbi')" style="background:#16a34a;color:white;">🛢 DB保存</button>
