@@ -4900,12 +4900,13 @@ function _p16AutoCalcMonthly(){
   try{
     var e=document.getElementById('es_calcMonthly'); if(!e) return;
     if(_mw16_num('es_salaryMonthly')) return;
-    if(String(e.value||'').trim() && e.dataset.autofill!=='1') return;   // 入っている値（案シス・手入力）は変えない
+    if(e.dataset.manualCalc==='1') return;   // ver.20261111.07: この画面で換算月給を手で入れたときだけ変えない（案シスに古い値が残っていても、時給×時間で入れ直す）
     var hr=_mw16_num('es_salaryHourly'), dy=_mw16_num('es_salaryDaily'), mh=_p16MonthHours();
     var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
     var v=hr&&mh ? Math.round(hr*mh) : (dy&&md ? Math.round(dy*md) : 0); if(!v) return;
     var s=v.toLocaleString('ja-JP'); if(e.value===s) return;
     e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
+    if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc();   // 税金・社会保険料・雇用保険料も計算し直す（自動の欄だけ）
   }catch(err){}
 }
 // ver.20261109.09: 読み込んだあと、人が手で直した雇用条件の欄（案シスの値と違うもの）
@@ -5011,7 +5012,8 @@ function _p16PrintCheck(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
-  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); }, true);
+  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; } }catch(_e){} });
   // ver.20261109.12: 支払方法（口座振込／通貨払）は雇用条件セットを読んだあとに決まるので、表示が合っていなければ描き直す
   function _payRefresh(){
     try{
@@ -6196,6 +6198,7 @@ function _structNoticeShow(){
     });
     return changed;
   }
+  window._p16TaxRecalc=function(){ try{ return recalc(); }catch(e){ return []; } };   // ver.20261111.07: 時給から換算月給を入れ直したときにも呼ぶ
   function same(a,b){   // 金額として同じか（「14,126」と「14126」は同じ）
     a=(a==null?'':String(a)).trim(); b=(b==null?'':String(b)).trim();
     if(a===''||b==='') return false;
