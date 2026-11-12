@@ -1293,7 +1293,9 @@ function applyBindings(){
   const spans=area.querySelectorAll('[data-bind]');
   spans.forEach(span=>{
     const id=span.getAttribute('data-bind');
-    const raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';
+    let raw=(typeof v==='function'?v(id):'')|| (window._fieldData&&window._fieldData[id])||'';
+    // ver.20261112.16: 変形労働時間制の単位は書類に「（　）単位の変形労働時間制」と印字済み。案シスの「1ヶ月単位」をそのまま入れると「単位」が二重になる
+    if((id==='es_flexUnit'||id==='es_flexType') && raw) raw=String(raw).replace(/単位/g,'').trim();
     const label=id.replace(/^es_/,'es.').replace(/^f_/,'');
     // ver.20261102.01: 「2つ目がある場合のみ」の欄（業務区分２・分野２）は、空なら「・es.category2」を出さない
     //   （直接編集版・呼び戻した書類に、空欄の目印と区切りの「・」が残っていた）
