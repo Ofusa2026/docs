@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261111.11</div>
+    <div class="ver">ver.20261112.09</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -684,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794451861"></script>
+<script src="ofusa_common.js?v=1794459578"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -1123,6 +1123,11 @@ function _p17Gender(opts){
   if(parts.length!==2 || !g) return opts;
   return /^(男|M|male)/i.test(g) ? parts[0] : (/^(女|F|female)/i.test(g) ? parts[1] : opts);
 }
+/* ver.20261112.09: 訳の行にも値を出す（登録番号・支援の人数・時間・電話・メール・その他・定期面談など）
+   数字・番号・電話・メールはそのまま、日本語の文は辞書・AIの訳（訳せないときは赤）。空欄なら原本どおりの空き */
+function _p17Num(id){ var x=String(v(id)||'').replace(/\s*(名|人|時間|時)\s*$/,'').trim(); return x ? '<span class="f" data-bind="'+id+'">'+esc(x)+'</span>' : '&emsp;&emsp;'; }
+function _p17TrOr(id, blank){ var x=String(v(id)||'').trim(); if(!x) return blank; return '<span class="f" data-bind="'+id+'">'+_p17EscMark(_p17Vi(x))+'</span>'; }
+function _p17RegNo(){ var x=String(v('es_soRegNo')||'').trim(); if(!x) return ''; return '<span class="f" data-bind="es_soRegNo">'+esc(/登/.test(x)?x:'登'+x)+'</span>'; }
 /* ver.20261105.20: 自由記入の値（実費の説明など）に外国語の行を付ける。辞書・AIの訳を使い、訳せないときは赤で知らせる */
 function _p17FxLine(id){
   var x=String(v(id)||'').trim(); if(!x) return '';
@@ -1352,7 +1357,7 @@ Họ và tên</p></td>
 <tr class="nosplit" style="height:5.36em">
 <td class="b-kknt vert" rowspan="11"><p class="ja a-center">　登録支援機関</p><p class="vi a-center">III. Cơ quan hỗ trợ có đăng ký</p></td>
 <td class="b-kttt" colspan="2"><p class="ja">１　登録番号</p><p class="vi a-center">Mã số đăng ký</p></td>
-<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">${/登/.test(v('es_soRegNo')||'') ? f('es_soRegNo') : '登'+f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">Đăng</p></td>
+<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">${/登/.test(v('es_soRegNo')||'') ? f('es_soRegNo') : '登'+f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">${_p17RegNo() || 'Đăng'}</p></td>
 <td class="b-kttt" colspan="3"><p class="ja a-center">２　登録年月日</p><p class="vi a-center" style="padding-left:1.89em;text-indent:-1.00em">Ngày tháng năm đăng ký</p></td>
 <td class="b-kttk" colspan="3"><p class="ja a-right">${f('es_soRegY')}年${f('es_soRegM')}月${f('es_soRegD')}日</p><p class="vi a-right">Ngày ${f('es_soRegD')} tháng ${f('es_soRegM')} năm ${f('es_soRegY')}</p></td>
 </tr>
@@ -1395,12 +1400,12 @@ Họ và tên</p></td>
 </tr>
 <tr class="nosplit" style="height:5.80em">
 <td class="b-tttt"><p class="ja a-center">支援を行っている</p><p class="ja a-center">１号特定技能外国人数</p><p class="vi a-center">Số người nước ngoài có kỹ năng đặc định số 1 đang hỗ trợ</p></td>
-<td class="b-tttt" colspan="3"><p class="ja a-right">${f('es_soSupporterCount')}${/名\s*$/.test(v('es_soSupporterCount')||'') ? '' : '名'}</p><p class="vi a-right">người</p></td>
+<td class="b-tttt" colspan="3"><p class="ja a-right">${f('es_soSupporterCount')}${/名\s*$/.test(v('es_soSupporterCount')||'') ? '' : '名'}</p><p class="vi a-right">${_p17Num('es_soSupporterCount')} người</p></td>
 <td class="b-ttkk" colspan="4" rowspan="2"><p class="ja a-center">支援の適正性を確保していることの有無</p><p class="ja">・支援責任者が特定技能所属機関の役員の配偶者、２親等以内の親族、特定技能所属機関の役員と社会生活において密接な関係にある者、過去５年以内に特定技能所属機関の役員又は職員であった者ではないこと</p><p class="ja" style="padding-left:0.90em">・支援責任者及び支援担当者が登録支援機関の登録拒否事由に該当しないこと</p><p class="vi a-center" style="padding-left:0.90em">Tính phù hợp của việc hỗ trợ có được đảm bảo hay không</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không được là vợ hặc chồng hay họ hàng trong vòng 2 đời của viên chức cơ quan trực thuộc kỹ năng đặc định, hoặc người có mối quan hệ thân thiết với viên chức của cơ quan trực thuộc kỹ năng đặc định, hay từng là viên chức hoặc nhân viên của cơ quan trực thuộc kỹ năng đặc định trong vòng 5 năm trở lại.</p><p class="vi" style="padding-left:0.90em">- Người chịu trách nhiệm hỗ trợ và người đảm trách việc hỗ trợ không liên quan đến lý do từ chối đăng ký của tổ chức hỗ trợ đăng ký.</p><p class="ja a-center"><span class="chc"><span class="fixed">有</span>　　　　　　<span>無</span></span></p><p class="vi a-center">Có          Không</p></td>
 </tr>
 <tr class="nosplit" style="height:5.07em">
 <td class="b-ttkt"><p class="ja a-center">支援担当者数</p><p class="vi a-center">Số người phụ trách hỗ trợ</p></td>
-<td class="b-ttkt" colspan="3"><p class="ja a-right">${f('es_soSupportStaffCount')}${/名\s*$/.test(v('es_soSupportStaffCount')||'') ? '' : '名'}</p><p class="vi a-right">người</p></td>
+<td class="b-ttkt" colspan="3"><p class="ja a-right">${f('es_soSupportStaffCount')}${/名\s*$/.test(v('es_soSupportStaffCount')||'') ? '' : '名'}</p><p class="vi a-right">${_p17Num('es_soSupportStaffCount')} người</p></td>
 </tr>
 </tbody></table>
 </div>
@@ -1715,7 +1720,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr style="height:2.61em">
 <td class="b-tttt" colspan="2"><p class="ja">ウ　実施予定時間</p><p class="vi">C. Thời gian dự kiến thực hiện</p></td>
-<td class="b-tttk" colspan="6"><p class="ja">合計${f('es_orientHours')}時間</p><p class="vi">Tổng cộng       tiếng</p></td>
+<td class="b-tttk" colspan="6"><p class="ja">合計${f('es_orientHours')}時間</p><p class="vi">Tổng cộng ${_p17Num('es_orientHours')} tiếng</p></td>
 </tr>
 </tbody></table></div>
 
@@ -1825,33 +1830,33 @@ Ngày trong tuần</p></td>
 <td class="b-tttk"><p class="ja a-center">金 Thứ Sáu</p></td>
 </tr>
 <tr style="height:2.18em">
-<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hMonF')}時　～　${f('es_hMonT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt" colspan="3"><p class="ja a-center">${f('es_hTueF')}時　～　${f('es_hTueT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hWedF')}時　～　${f('es_hWedT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttt"><p class="ja a-center">${f('es_hThuF')}時　～　${f('es_hThuT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
-<td class="b-tttk"><p class="ja a-center">${f('es_hFriF')}時　～　${f('es_hFriT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hMonF')}時　～　${f('es_hMonT')}時</p><p class="vi a-center">${_p17Num('es_hMonF')} giờ - ${_p17Num('es_hMonT')} giờ</p></td>
+<td class="b-tttt" colspan="3"><p class="ja a-center">${f('es_hTueF')}時　～　${f('es_hTueT')}時</p><p class="vi a-center">${_p17Num('es_hTueF')} giờ - ${_p17Num('es_hTueT')} giờ</p></td>
+<td class="b-tttt" colspan="2"><p class="ja a-center">${f('es_hWedF')}時　～　${f('es_hWedT')}時</p><p class="vi a-center">${_p17Num('es_hWedF')} giờ - ${_p17Num('es_hWedT')} giờ</p></td>
+<td class="b-tttt"><p class="ja a-center">${f('es_hThuF')}時　～　${f('es_hThuT')}時</p><p class="vi a-center">${_p17Num('es_hThuF')} giờ - ${_p17Num('es_hThuT')} giờ</p></td>
+<td class="b-tttk"><p class="ja a-center">${f('es_hFriF')}時　～　${f('es_hFriT')}時</p><p class="vi a-center">${_p17Num('es_hFriF')} giờ - ${_p17Num('es_hFriT')} giờ</p></td>
 </tr>
 <tr style="height:3.53em">
 <td class="b-tttt"><p class="ja a-center">土曜</p><p class="vi a-center">Thứ Bảy</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSatF')}時～${f('es_hSatT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSatF')}時～${f('es_hSatT')}時</p><p class="vi a-center">${_p17Num('es_hSatF')} giờ - ${_p17Num('es_hSatT')} giờ</p></td>
 </tr>
 <tr style="height:3.18em">
 <td class="b-tttt"><p class="ja a-center">日曜</p><p class="vi a-center">Chủ Nhật</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSunF')}時～${f('es_hSunT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hSunF')}時～${f('es_hSunT')}時</p><p class="vi a-center">${_p17Num('es_hSunF')} giờ - ${_p17Num('es_hSunT')} giờ</p></td>
 </tr>
 <tr style="height:3.07em">
 <td class="b-tttt"><p class="ja a-center">祝日
 Ngày lễ</p></td>
-<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hHolF')}時～${f('es_hHolT')}時</p><p class="vi a-center">giờ -   giờ</p></td>
+<td class="b-tttk" colspan="9"><p class="ja a-center">${f('es_hHolF')}時～${f('es_hHolT')}時</p><p class="vi a-center">${_p17Num('es_hHolF')} giờ - ${_p17Num('es_hHolT')} giờ</p></td>
 </tr>
 <tr class="nosplit" style="height:7.76em">
 <td class="b-tttt vert"><p class="ja a-center" style="padding-left:0.63em">相談方法</p><p class="vi a-center" style="padding-left:0.63em">Phương pháp thảo luận</p></td>
 <td class="b-tttk" colspan="10"><p class="ja">以下の方法により実施（該当するものを全てチェックすること。）
-Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f253" name="f253" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f254" name="f254" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　電　　話（${f('es_cmTel')}）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f258" name="f258" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　メ ー ル（${f('es_cmMail')}）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f260" name="f260" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　そ の 他（${f('es_cmOther')}）</p><p class="vi">   Khác (                                             )</p></td>
+Thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f253" name="f253" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f254" name="f254" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　電　　話（${f('es_cmTel')}）</p><p class="vi">   Điện thoại (${_p17TrOr('es_cmTel','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p><p class="ja"><input type="checkbox" class="cb" id="f258" name="f258" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　メ ー ル（${f('es_cmMail')}）</p><p class="vi">   Email (${_p17TrOr('es_cmMail','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p><p class="ja"><input type="checkbox" class="cb" id="f260" name="f260" data-label="Ⅳ 支援内容（続き） ＞ 相談方法">　そ の 他（${f('es_cmOther')}）</p><p class="vi">   Khác (${_p17TrOr('es_cmOther','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p></td>
 </tr>
 <tr class="nosplit" style="height:7.81em">
 <td class="b-tttt vert"><p class="ja a-center" style="padding-left:0.63em">緊急時対応</p><p class="vi a-center" style="padding-left:0.63em">Giải quyết lúc khẩn cấp</p></td>
-<td class="b-tttk" colspan="10"><p class="ja">緊急時は，以下の方法により実施（該当するものを全てチェックすること。）</p><p class="vi">Khi khẩn cấp, thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f262" name="f262" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f263" name="f263" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　電　　話（${f('es_emTel')}）</p><p class="vi">   Điện thoại (         -         -           )</p><p class="ja"><input type="checkbox" class="cb" id="f267" name="f267" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　メ ー ル（${f('es_emMail')}）</p><p class="vi">   Email (                                            )</p><p class="ja"><input type="checkbox" class="cb" id="f269" name="f269" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　そ の 他（${f('es_emOther')}）</p><p class="vi">   Khác (                                             )</p></td>
+<td class="b-tttk" colspan="10"><p class="ja">緊急時は，以下の方法により実施（該当するものを全てチェックすること。）</p><p class="vi">Khi khẩn cấp, thực hiện bằng phương pháp sau (Đánh dấu vào toàn bộ nội dung tương ứng.)</p><p class="ja"><input type="checkbox" class="cb" id="f262" name="f262" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　直接面談  Nói chuyện trực tiếp</p><p class="ja"><input type="checkbox" class="cb" id="f263" name="f263" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　電　　話（${f('es_emTel')}）</p><p class="vi">   Điện thoại (${_p17TrOr('es_emTel','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p><p class="ja"><input type="checkbox" class="cb" id="f267" name="f267" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　メ ー ル（${f('es_emMail')}）</p><p class="vi">   Email (${_p17TrOr('es_emMail','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p><p class="ja"><input type="checkbox" class="cb" id="f269" name="f269" data-label="Ⅳ 支援内容（続き） ＞ 緊急時対応">　そ の 他（${f('es_emOther')}）</p><p class="vi">   Khác (${_p17TrOr('es_emOther','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p></td>
 </tr>
 <tr style="height:3.42em">
 <td class="b-tttt" colspan="4"><p class="ja">ウ　実施言語</p><p class="vi">B.  Ngôn ngữ thực hiện</p></td>
@@ -2017,7 +2022,7 @@ Họ và tên</p><p class="vi a-center">(Chức vụ)</p></td>
 </tr>
 <tr style="height:6.97em">
 <td class="b-tttt"><p class="ja" style="padding-left:2.00em;text-indent:-1.00em">ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当該外国人及びその監督をする立場にある者それぞれと定期的な面談（3か月に1回以上）を実施する</p><p class="vi">Để kiểm tra tình trạng lao động và tình trạng sinh hoạt của người nước ngoài có kỹ năng đặc định số 1, định kỳ phỏng vấn người nước ngoài đó và người đang ở vị trí quan sát (ít nhất 3 tháng một lần)</p></td>
-<td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f353" name="f353" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">有（${f('es_meetSchedule')}）</p><p class="vi"> Có (                   )</p><p class="ja a-center"><input type="checkbox" class="cb" id="f355" name="f355" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">無（<input type="text" class="bl" id="f356" name="f356" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
+<td class="b-tttt"><p class="ja a-center"><input type="checkbox" class="cb" id="f353" name="f353" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">有（${f('es_meetSchedule')}）</p><p class="vi"> Có (${_p17TrOr('es_meetSchedule','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')})</p><p class="ja a-center"><input type="checkbox" class="cb" id="f355" name="f355" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当">無（<input type="text" class="bl" id="f356" name="f356" data-label="Ⅳ 支援内容（続き） ＞ ａ．１号特定技能外国人の労働状況や生活状況を確認するため，当｜無（＿）" style="width:9.00em">）</p><p class="vi">Không (                 )</p></td>
 <td class="b-ttnt"><p class="ja a-center">無</p><p class="vi a-center">Không</p></td>
 <td class="b-tttt fld"><p class="ja a-center">別紙参照</p><p class="vi a-center">Xem tài liệu đính kèm.</p></td>
 <td class="b-tttt"><p class="ja">〒<input type="text" class="bl" id="f359" name="f359" data-label="Ⅳ 支援内容（続き） ＞ 有・無｜〒＿－" style="width:3.00em">－</p></td>
