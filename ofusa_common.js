@@ -4448,14 +4448,14 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     try{
       var L=_docLang();
       for(var i=1;i<=6;i++){
-        var j=document.getElementById('es_a'+i+'Amt'), e=document.getElementById('es_a'+i+'AmtEn'); if(!j||!e) continue;
+        var j=document.getElementById('es_a'+i+'Amt')||document.getElementById('f_allowance'+i+'Amount'), e=document.getElementById('es_a'+i+'AmtEn')||document.getElementById('f_allowance'+i+'AmountEn'); if(!j||!e) continue;   // 1-6号（es_a）と重説（f_allowance）
         if(String(e.value||'').trim() && e.dataset.autofill!=='1') continue;
         var w=_AMT_WORD[String(j.value||'').normalize('NFKC').replace(/\s/g,'')], t=w&&w[L];
         if(t && e.value!==t){ e.value=t; e.dataset.autofill='1'; if(typeof p==='function'){ try{ p(); }catch(_e){} } }
       }
     }catch(e){}
   }
-  document.addEventListener('input', function(ev){ if(ev.target && /^es_a\dAmt$/.test(ev.target.id||'')) _amtWordFill(); if(ev.target && /^es_a\dAmtEn$/.test(ev.target.id||'')) delete ev.target.dataset.autofill; }, true);
+  document.addEventListener('input', function(ev){ if(ev.target && /^(es_a\dAmt|f_allowance\dAmount)$/.test(ev.target.id||'')) _amtWordFill(); if(ev.target && /^(es_a\dAmtEn|f_allowance\dAmountEn)$/.test(ev.target.id||'')) delete ev.target.dataset.autofill; }, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_amtWordFill, 3500); } }catch(_e){} });
   // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
   //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
