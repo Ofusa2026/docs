@@ -4531,7 +4531,6 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       var ns=(w[0].emp_sets||[])[idx]||sets[idx];
       try{ window._empLoadedSet=JSON.parse(JSON.stringify(ns)); }catch(e){}   // 保存のときの「ほかの人が変えた」判定に引っかからないように
       if(window._empCtx) window._empCtx.empSets=w[0].emp_sets||sets;
-      try{ if(window._xwEmpSaved) window._xwEmpSaved(coId, idx); }catch(_x){}
       return true;
     }catch(e){ console.warn('[言語ごとの訳の自動保存]', e); return false; }
   }
@@ -4964,7 +4963,7 @@ function _p16MonthHours(){
   return h ? Math.round((h+(m||0)/60)*100)/100 : 0;
 }
 // ver.20261109.08: 時給・日給のとき、換算月給を自動で入れる（月給のときは何もしない）
-// ver.20261112.04: 式を年間で割る形に変更。時給×年間所定労働時間÷12／日給×年間所定労働日数÷12
+// ver.20261112.03: 式を年間で割る形に変更。時給×年間所定労働時間÷12／日給×年間所定労働日数÷12
 //   （年間の欄が空のときだけ、これまでどおり月の時間・日数で出す）。
 //   これから入れる書類だけ：読み込んだ時点で換算月給に値がある書類は変えず、この画面で給与・時間・日数を直したときに計算し直す。
 function _p16YearHours(){
@@ -6507,7 +6506,6 @@ function _structNoticeShow(){
         var ns=(w[0].emp_sets||[])[idx]||sets[idx];
         try{ window._empLoadedSet=JSON.parse(JSON.stringify(ns)); }catch(e){}
         if(window._empCtx) window._empCtx.empSets=w[0].emp_sets||sets;
-        try{ if(window._xwEmpSaved) window._xwEmpSaved(ctx.companyId, idx); }catch(_x){}
         try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
         try{ if(typeof slog==='function') slog('p16_sync',{meta:{keys:Object.keys(diff)}}); }catch(e){}
         if(typeof showToast==='function') showToast('🔗 案シスの雇用条件の金額を、この1-6号の計算に合わせました（'+msg.slice(0,3).join('、')+(msg.length>3?' ほか':'')+'）');
@@ -6520,106 +6518,15 @@ function _structNoticeShow(){
 })();
 
 
-/* ===== ver.20261112.04: ウィンドウを並べて複数の案件を進めるとき =====
-   ① 小さいウィンドウでも使えるように、上のボタン・左の入力欄を詰める
-   ② 別のウィンドウ（同じパソコンのSaysay）で、同じ案件・同じ雇用条件セットを開いていたら、上に注意を出す
-      ・同じ案件の同じ書類 → 赤（あとから保存した方で上書きされるため、直すのは片方だけ）
-      ・同じ雇用条件セットの別の案件／同じ案件の別の書類 → 黄
-   ③ 別のウィンドウで雇用条件セットが保存されたら、このウィンドウで直していなければ自動で読み込み直す
-      （直している途中なら読み込み直さず、保存のときの確認（ほかで変わっています）で選べる）
-   見えていない書類（Saysayの中で切り替えて隠れているもの）は数えない。 */
+/* ===== ver.20261112.05: 印刷・PDFに出さないもの、書類の表示 =====
+   ① 社内向けのお知らせ・メモ・確認の窓は、印刷・PDFに出さない（書類のページの中のものは対象外）
+   ② 書類が画面より広いとき、左が切れずに横に動かせる */
 (function(){
   try{
-    var st=document.createElement('style'); st.id='_xwCompact';
-    st.textContent='@media screen and (max-width:980px){'
-      +'.app-bar{flex-wrap:wrap;gap:4px;padding:4px 8px!important;}'
-      +'.app-bar-title{font-size:11px!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'
-      +'.app-bar .ver{display:none;}'
-      +'.bar-btns{flex-wrap:nowrap;overflow-x:auto;max-width:100%;gap:4px!important;}'
-      +'.bar-btns .btn,.bar-btns button{padding:3px 7px!important;font-size:10px!important;white-space:nowrap;flex-shrink:0;}'
-      +'.main{height:calc(100vh - 62px)!important;}'
-      +'.fp{width:250px!important;}'
-      +'.page-nav{flex-wrap:nowrap;overflow-x:auto;gap:3px!important;padding:4px 6px!important;}'
-      +'.page-nav>*{flex-shrink:0;white-space:nowrap;}'
-      +'.page-nav .pn-btn{padding:2px 6px!important;font-size:10px!important;}'
-      +'}'
-      +'@media screen{ #pageArea{align-items:safe center!important;overflow-x:auto!important;} }'   // 書類が画面より広いとき、左が切れずに横に動かせる
-      +'@media screen and (max-width:700px){ .fp{width:210px!important;} .fp .fg label{font-size:10px;} }'
-      // 社内向けのお知らせ・メモ・確認の窓は、印刷・PDFに出さない（書類のページの中のものは対象外）
-      +'@media print{ :is([id$="Modal"],[id$="modal"],[id$="Overlay"],[id$="Notice"],[id$="Toast"],[id$="Dlg"],[id$="Dialog"],#_xwToast,#_hwOver,#stylePanel,#_trBulk,#p16SavePrompt,#trWrong,#ofusaRepSelectBar,#aiCheck16Panel,.__toast,.xw-noprint)'
+    var st=document.createElement('style'); st.id='_ofusaPrintHide';
+    st.textContent='@media screen{ #pageArea{align-items:safe center!important;overflow-x:auto!important;} }'
+      +'@media print{ :is([id$="Modal"],[id$="modal"],[id$="Overlay"],[id$="Notice"],[id$="Toast"],[id$="Dlg"],[id$="Dialog"],#_hwOver,#stylePanel,#_trBulk,#p16SavePrompt,#trWrong,#ofusaRepSelectBar,#aiCheck16Panel,.__toast,.ofusa-noprint)'
       +':not(:is(.doc,.docabs,[id^="docP"],#__combinedPrintArea,.pmpage) *){display:none!important;} }';
     (document.head||document.documentElement).appendChild(st);
   }catch(_c){}
-  if(typeof BroadcastChannel==='undefined') return;
-  var ch; try{ ch=new BroadcastChannel('saysay-xw'); }catch(_b){ return; }
-  var rnd=function(){ return Math.random().toString(36).slice(2,10); };
-  var WID=(function(){ try{ var t=window.parent||window; if(!t.__xwId) t.__xwId=rnd(); return t.__xwId; }catch(e){ return rnd(); } })();   // Saysay（index）の画面ごとに1つ。分割表示の中の画面どうしも別あつかい
-  var FID=rnd(), others={}, lastWarn='', lastReload=0, wasVis=false;
-  var DOCNAME=function(file){ var m=String(file||'').match(/^(\d+)_(\d+)(?:_(\d+))?/); if(m) return '参考様式第'+m[1]+'-'+m[2]+(m[3]?'-'+m[3]:'')+'号'; if(/^juuyou/.test(file)) return '重要事項説明書'; if(/^suisen/.test(file)) return '推薦表'; return String(file||'').replace(/\.html$/,''); };
-  var FAM=function(file){ return String(file||'').replace(/\?.*$/,'').replace(/(_(id|en|vi|th|km|my|ne|zh|ko|test))?\.html$/,''); };
-  function visible(){ try{ var f=window.frameElement; if(!f) return true; return f.style.display!=='none' && f.offsetParent!==null; }catch(e){ return true; } }
-  function me(){
-    var i=window._lastCaseInfo||{}, idx=window._empLoadedIdx;
-    if(idx==null || idx==='') idx=(i.empSetIdx!=null && i.empSetIdx!=='')?i.empSetIdx:'';
-    return { t:'st', wid:WID, fid:FID, file:(location.pathname.split('/').pop()||''), caseId:String(i.caseId||''), companyId:String(i.companyId||''),
-      idx:String(idx), applicant:String(i.applicant||''), hasSet:!!window._empLoadedSet, vis:visible(), at:Date.now() };
-  }
-  function send(){ try{ ch.postMessage(me()); }catch(e){} }
-  function warn(){
-    var m=me(), lv=0, txt='';
-    if(!m.vis){ wasVis=false; return; }
-    if(!wasVis){ wasVis=true; lastWarn=''; }
-    if(m.caseId){
-      var now=Date.now(), same=[], caseOther=[], setOther=[];
-      Object.keys(others).forEach(function(k){
-        var o=others[k]; if(!o || now-o.at>13000){ delete others[k]; return; }
-        if(o.wid===WID || !o.vis || !o.caseId) return;
-        if(o.caseId===m.caseId){ if(FAM(o.file)===FAM(m.file)) same.push(o); else caseOther.push(o); }
-        else if(o.companyId && o.companyId===m.companyId && o.idx!=='' && o.idx===m.idx && o.hasSet && m.hasSet) setOther.push(o);
-      });
-      if(same.length){ lv=2; txt='⚠️ この案件の'+DOCNAME(m.file)+'を、別のウィンドウでも開いています。直すのはどちらか片方だけにしてください（あとから保存した方で上書きされます）。'; }
-      else if(setOther.length){ lv=1; txt='⚠️ 同じ雇用条件セットを、別のウィンドウ（'+setOther.map(function(o){ return (o.applicant||'別の案件')+'様・'+DOCNAME(o.file); }).slice(0,2).join('、')+'）でも開いています。片方で保存すると、もう片方は自動で読み込み直します。'; }
-      else if(caseOther.length){ lv=1; txt='ℹ️ この案件は、別のウィンドウでも開いています（'+caseOther.map(function(o){ return DOCNAME(o.file); }).slice(0,3).join('、')+'）。'; }
-      if(window._xwStale){ lv=2; txt='⚠️ 別のウィンドウで、この雇用条件セットが保存されました。このまま保存すると確認が出ます（直した内容を残すか選べます）。'; }
-    }
-    var key=lv+'|'+txt; if(key===lastWarn) return; lastWarn=key;
-    try{ if(window.parent && window.parent!==window) window.parent.postMessage({type:'XW_WARN', level:lv, text:txt}, '*'); }catch(e){}
-  }
-  function toast(t){
-    try{ var o=document.getElementById('_xwToast'); if(o) o.remove(); var d=document.createElement('div'); d.id='_xwToast'; d.textContent=t;
-      d.style.cssText='position:fixed;left:50%;top:46px;transform:translateX(-50%);z-index:99999;background:#0f766e;color:#fff;padding:7px 14px;border-radius:8px;font:700 12px sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);';
-      document.body.appendChild(d); setTimeout(function(){ try{ d.remove(); }catch(e){} }, 5000); }catch(e){}
-  }
-  function dirty(){
-    try{ if(typeof _editMode!=='undefined' && _editMode) return true; }catch(e){}
-    try{ if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()) return true; }catch(e){}
-    return false;
-  }
-  ch.onmessage=function(ev){
-    var d=ev.data||{}; if(!d.t || d.fid===FID) return;
-    if(d.t==='st'){ others[d.fid]=d; warn(); return; }
-    if(d.t==='bye'){ delete others[d.fid]; warn(); return; }
-    if(d.t==='es'){
-      if(d.wid===WID) return;
-      var m=me(); if(!m.companyId || String(d.companyId)!==m.companyId || String(d.idx)!==m.idx || !m.hasSet) return;
-      if(!m.vis) return;   // 隠れている書類は、次に開いたときに読み込み直される
-      if(dirty()){ window._xwStale=true; lastWarn=''; warn(); return; }
-      if(Date.now()-lastReload<20000) return;
-      lastReload=Date.now();
-      try{ var info=window._lastCaseInfo; if(info && info.caseId){ window.postMessage({type:'SELECT_CASE', info:info}, '*'); toast('🔄 別のウィンドウで保存された雇用条件を、読み込み直しました'); } }catch(e){}
-    }
-  };
-  window._xwEmpSaved=function(companyId, idx){ try{ window._xwStale=false; lastWarn=''; ch.postMessage({t:'es', wid:WID, fid:FID, companyId:String(companyId||''), idx:String(idx)}); }catch(e){} };
-  // 雇用条件の保存（上書き・新規）のあと、ほかのウィンドウに知らせる
-  setTimeout(function(){
-    try{
-      var o=window.saveEmpSetWithMode; if(typeof o!=='function' || o.__xw) return;
-      var w=async function(companyId){ var r=await o.apply(this, arguments); try{ if(r && r.saved){ var ix=(r.mode==='new')?r.newIdx:r.idx; window._xwEmpSaved(companyId, ix); } }catch(e){} return r; };
-      w.__xw=true; window.saveEmpSetWithMode=w;
-    }catch(e){}
-  }, 0);
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ window._xwStale=false; lastWarn=''; setTimeout(function(){ send(); warn(); }, 1500); setTimeout(function(){ send(); warn(); }, 5000); } }catch(_e){} });
-  window.addEventListener('pagehide', function(){ try{ ch.postMessage({t:'bye', fid:FID}); }catch(e){} });
-  setInterval(function(){ send(); warn(); }, 4000);
-  setTimeout(send, 800);
 })();
