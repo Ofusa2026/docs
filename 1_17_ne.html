@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ネパール語版・変更）</div>
-    <div class="ver">ver.20261112.11</div>
+    <div class="ver">ver.20261112.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2501,12 +2501,12 @@ function _p17HouseFill(ha, HP, C, T){
   var m=v.match(/^有\s*[（(](.*)[）)]\s*$/);
   if(m) inner=m[1].trim(); else if(v==='有') inner=''; else if(v.length<=14 && !/^有/.test(v)) inner=v; else return false;
   var note=String(HP.note||''), own=(C.f139===true) || /形態[:：]\s*(自己所有|社宅)/.test(note);
-  var lab={}, aText='', mainText='', main=own?'c':'b', ok=true;
+  var lab={}, aText='', mainText='', main=own?'c':'b', ok=true, ind=false;
   inner.split(/[／\/]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(seg){
     var lm=seg.match(/^([abcａｂｃ])\s*[:：]\s*(.+)$/);
     if(lm){ var k=lm[1].replace('ａ','a').replace('ｂ','b').replace('ｃ','c'); var t=lm[2].split('＝'); lab[k]=(t[1]||t[0]).trim(); return; }
     if(/^[bcｂｃ]\s*で(の入居に)?合意しな/.test(seg)){ aText=seg; main=/^[cｃ]/.test(seg)?'c':'b'; return; }
-    if(/^[bcｂｃ]\s*で実施$/.test(seg)){ main=/^[cｃ]/.test(seg)?'c':'b'; return; }
+    if(/^[bcｂｃ]\s*で実施$/.test(seg)){ main=/^[cｃ]/.test(seg)?'c':'b'; ind=true; return; }
     if(/[abcａｂｃ]\s*(は|を|で|に|の|が|＝)/.test(seg)){ ok=false; return; }
     if(/同行|補助|紹介|仲介|情報提供|賃借|社宅|寮|物件/.test(seg)){ ok=false; return; }   // 実施の時期ではなく方法が書いてある回答は、どの欄の話か決められないので触らない   // ほかの書き方で a・b・c に触れている回答は、読み違えないように触らない
     if(!mainText) mainText=seg; else ok=false;
@@ -2515,8 +2515,8 @@ function _p17HouseFill(ha, HP, C, T){
   if(lab.b && !lab.c) main='b'; else if(lab.c && !lab.b) main='c';
   var other=(main==='b')?'c':'b';
   var id={a:['f094','f095','f096','f097'], b:['f102','f103','f104','f105'], c:['f109','f110','f111','f112']};
-  C[id.a[0]]=true;  C[id.a[2]]=false; T[id.a[1]]=lab.a || aText || (main+'での入居に合意しなかった場合に実施');
-  C[id[main][0]]=true;  C[id[main][2]]=false; T[id[main][1]]=lab[main] || mainText || '適宜実施';
+  C[id.a[0]]=true;  C[id.a[2]]=false; T[id.a[1]]=main+'での入居に合意しなかった場合に実施';   // ver.20261112.12: a は「bでの入居に合意しなかった場合に実施」に統一（自己所有なら c）
+  C[id[main][0]]=true;  C[id[main][2]]=false; T[id[main][1]]='適宜実施';   // ver.20261112.12: b（自己所有なら c）は「適宜実施」に統一（回答の書き方に関係なく）
   if(lab[other]){ C[id[other][0]]=true; C[id[other][2]]=false; T[id[other][1]]=lab[other]; }
   else { C[id[other][0]]=false; C[id[other][2]]=true; T[id[other][3]]='a,'+main+'で実施'; }
   return true;
