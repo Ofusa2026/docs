@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261112.03
+ * - change(1-6号): 換算月給を 時給×年間所定労働時間÷12／日給×年間所定労働日数÷12 に（年間が空なら月の値）。作成済みの書類の値は変えない
  * ver.20261112.02
  * - fix(1-6号): 手当を空欄のまま保存した直接編集版でも、別紙の金額・計算方法をあとから入れれば書類に出るようにした（欄が無ければ足す）
  * ver.20261111.02
@@ -4960,15 +4962,27 @@ function _p16MonthHours(){
   var h=_mw16_num('es_monthlyH'), m=_mw16_num('es_monthlyMin');
   return h ? Math.round((h+(m||0)/60)*100)/100 : 0;
 }
-// ver.20261109.08: 時給・日給のとき、換算月給が空なら 時給×月の所定労働時間（日給×月の日数）で入れる（月給のときは何もしない）
-function _p16AutoCalcMonthly(){
+// ver.20261109.08: 時給・日給のとき、換算月給を自動で入れる（月給のときは何もしない）
+// ver.20261112.03: 式を年間で割る形に変更。時給×年間所定労働時間÷12／日給×年間所定労働日数÷12
+//   （年間の欄が空のときだけ、これまでどおり月の時間・日数で出す）。
+//   これから入れる書類だけ：読み込んだ時点で換算月給に値がある書類は変えず、この画面で給与・時間・日数を直したときに計算し直す。
+function _p16YearHours(){
+  var h=_mw16_num('es_yearlyH'), m=_mw16_num('es_yearlyMin');
+  return h ? h+(m||0)/60 : 0;
+}
+function _p16AutoCalcMonthly(force){
   try{
     var e=document.getElementById('es_calcMonthly'); if(!e) return;
     if(_mw16_num('es_salaryMonthly')) return;
-    if(e.dataset.manualCalc==='1') return;   // ver.20261111.07: この画面で換算月給を手で入れたときだけ変えない（案シスに古い値が残っていても、時給×時間で入れ直す）
-    var hr=_mw16_num('es_salaryHourly'), dy=_mw16_num('es_salaryDaily'), mh=_p16MonthHours();
+    if(e.dataset.manualCalc==='1') return;   // この画面で換算月給を手で入れたときは変えない
+    if(force!==true && String(e.value||'').trim()!=='' && e.dataset.autofill!=='1') return;   // 入っている値（作成済みの書類）は変えない
+    var hr=_mw16_num('es_salaryHourly'), dy=_mw16_num('es_salaryDaily'), mh=_p16MonthHours(), yh=_p16YearHours();
     var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
-    var v=hr&&mh ? Math.round(hr*mh) : (dy&&md ? Math.round(dy*md) : 0); if(!v) return;
+    var yd=String(_mw16_val('es_yearlyDays')).normalize('NFKC'); yd=/^\d+(\.\d+)?$/.test(yd)?Number(yd):0;
+    var v=0;
+    if(hr) v = yh ? Math.round(hr*yh/12) : (mh ? Math.round(hr*mh) : 0);
+    else if(dy) v = yd ? Math.round(dy*yd/12) : (md ? Math.round(dy*md) : 0);
+    if(!v) return;
     var s=v.toLocaleString('ja-JP'); if(e.value===s) return;
     e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
     if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc();   // 税金・社会保険料・雇用保険料も計算し直す（自動の欄だけ）
@@ -5106,7 +5120,7 @@ function _p16PrintCheck(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
-  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(/^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays)$/.test(id||'')) _p16AutoCalcMonthly(); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
+  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(ev.isTrusted && /^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|yearlyDays)$/.test(id||'')) _p16AutoCalcMonthly(true); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; var c2=document.getElementById('es_calcHourly'); if(c2) delete c2.dataset.manualCalc; } }catch(_e){} });
   // ver.20261109.12: 支払方法（口座振込／通貨払）は雇用条件セットを読んだあとに決まるので、表示が合っていなければ描き直す
   function _payRefresh(){
