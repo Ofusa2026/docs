@@ -226,6 +226,58 @@ window.OFUSA_MIN_WAGE = { // 令和7年度(2025年10月改定)。毎年10月改�
   "徳島":1046,"香川":1036,"愛媛":1033,"高知":1023,"福岡":1057,"佐賀":1030,"長崎":1031,
   "熊本":1034,"大分":1035,"宮崎":1023,"鹿児島":1026,"沖縄":1023 };
 window.OFUSA_MIN_WAGE_AVG = 1121; // 令和7年度 地域別最低賃金の全国加重平均（2025年10月）。毎年10月改定時に更新すること
+// ver.20261112.08: 令和8年度（2026年10月〜12月に順次発効）。厚労省「令和8年度地域別最低賃金額答申状況」より。
+//   判定には「今日」と「雇用契約の開始日」の遅い方の日付で、発効済みの額を使う（発効前は令和7年度の額）。
+window.OFUSA_MIN_WAGE_R8 = {
+  "北海道":[1131,"2026-10-01"],"青森":[1090,"2026-10-29"],"岩手":[1090,"2026-12-01"],"宮城":[1098,"2026-10-01"],"秋田":[1090,"2026-10-14"],"山形":[1092,"2026-10-30"],"福島":[1094,"2026-10-16"],
+  "茨城":[1136,"2026-10-18"],"栃木":[1125,"2026-10-01"],"群馬":[1120,"2026-10-03"],"埼玉":[1196,"2026-10-01"],"千葉":[1195,"2026-10-01"],"東京":[1280,"2026-10-01"],"神奈川":[1279,"2026-10-01"],
+  "新潟":[1108,"2026-10-01"],"富山":[1119,"2026-10-01"],"石川":[1113,"2026-10-03"],"福井":[1112,"2026-10-04"],"山梨":[1113,"2026-11-01"],"長野":[1117,"2026-10-02"],"岐阜":[1121,"2026-10-01"],
+  "静岡":[1154,"2026-10-15"],"愛知":[1195,"2026-10-01"],"三重":[1143,"2026-10-01"],"滋賀":[1136,"2026-10-03"],"京都":[1180,"2026-11-16"],"大阪":[1231,"2026-10-01"],"兵庫":[1172,"2026-10-01"],
+  "奈良":[1107,"2026-10-04"],"和歌山":[1101,"2026-10-03"],"鳥取":[1090,"2026-10-03"],"島根":[1092,"2026-10-10"],"岡山":[1104,"2026-10-02"],"広島":[1141,"2026-10-11"],"山口":[1101,"2026-10-08"],
+  "徳島":[1103,"2026-11-01"],"香川":[1092,"2026-10-01"],"愛媛":[1093,"2026-11-01"],"高知":[1086,"2026-10-29"],"福岡":[1114,"2026-10-04"],"佐賀":[1095,"2026-11-15"],"長崎":[1087,"2026-11-02"],
+  "熊本":[1092,"2026-12-01"],"大分":[1096,"2026-11-01"],"宮崎":[1085,"2026-10-24"],"鹿児島":[1090,"2026-10-25"],"沖縄":[1086,"2026-12-02"] };
+window.OFUSA_MIN_WAGE_AVG_R8 = [1177, "2026-10-01"];   // 全国加重平均（令和8年度）。最初の発効日から使う
+// ver.20261112.08: 案シスの「min_wages」表（定期タスクが厚労省の発表から自動更新）を読み、上の表より優先して使う。読めなければ上の表を使う
+window.OFUSA_MW_DB=null;
+async function _mw16_loadDB(){
+  try{
+    var rows=await sb('min_wages?select=pref,wage,effective_date,fiscal_year&order=effective_date.asc');
+    if(!Array.isArray(rows) || rows.length<40) return;
+    var m={}; rows.forEach(function(r){ var k=String(r.pref||''); if(!k||!r.wage||!r.effective_date) return; (m[k]=m[k]||[]).push({v:Number(r.wage), eff:String(r.effective_date).slice(0,10), fy:Number(r.fiscal_year)}); });
+    window.OFUSA_MW_DB=m;
+  }catch(e){ console.warn('[min_wages]', e); }
+}
+setTimeout(function(){ try{ if(document.getElementById('es_salaryMonthly') || document.getElementById('es_salaryHourly')) _mw16_loadDB(); }catch(e){} }, 1500);
+function _mw16_fmtD(d){ return String(d).replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1年$2月$3日'); }
+function _mw16_fyLabel(fy){ return fy ? ('令和'+(fy-2018)+'年度') : ''; }
+// 案シスの表から「判定日に発効済みの最新」と「その次（まだ発効していない額）」を取る
+function _mw16_fromDB(key){
+  var list=(window.OFUSA_MW_DB||{})[key]; if(!list || !list.length) return null;
+  var ref=_mw16_refDate(), cur=null, next=null;
+  list.forEach(function(r){ if(r.eff<=ref) cur=r; else if(!next) next=r; });
+  if(!cur) return null;
+  return {v:cur.v, label:_mw16_fyLabel(cur.fy)+'・'+_mw16_fmtD(cur.eff)+'発効', next:next?{v:next.v, eff:_mw16_fmtD(next.eff), fy:next.fy}:null};
+}
+// 判定に使う日付：今日と雇用契約の開始日の遅い方（YYYY-MM-DD）
+function _mw16_refDate(){
+  var d=new Date(), today=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  var y=_mw16_num('es_contractStartY'), m=_mw16_num('es_contractStartM'), dd=_mw16_num('es_contractStartD'), st='';
+  if(y>=2000 && m>=1 && m<=12) st=y+'-'+('0'+m).slice(-2)+'-'+('0'+(dd||1)).slice(-2);
+  return (st && st>today) ? st : today;
+}
+// その都道府県の最低賃金（{v:額, label:'令和8年度（2026-10-01発効）'}）
+function _mw16_minWage(pref){
+  var _db=_mw16_fromDB(pref); if(_db) return _db;
+  var r8=(window.OFUSA_MIN_WAGE_R8||{})[pref], ref=_mw16_refDate();
+  if(r8 && ref>=r8[1]) return {v:r8[0], label:'令和8年度・'+r8[1].replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1年$2月$3日')+'発効'};
+  var v=(window.OFUSA_MIN_WAGE||{})[pref];
+  return {v:v, next:(r8?{v:r8[0], eff:r8[1].replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1年$2月$3日'), fy:2026}:null), label:'令和7年度'+(r8?'（令和8年度 '+r8[0]+'円は'+r8[1].replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1年$2月$3日')+'発効）':'')};
+}
+function _mw16_avg(){
+  var _db=_mw16_fromDB('全国加重平均'); if(_db) return {v:_db.v, label:_db.label};
+  var a=window.OFUSA_MIN_WAGE_AVG_R8; if(a && _mw16_refDate()>=a[1]) return {v:a[0], label:'令和8年度'};
+  return {v:window.OFUSA_MIN_WAGE_AVG||0, label:'令和7年度'};
+}
 // ver.20261109.07: 建設の報酬基準用の所定内賃金（基本給＋毎月固定の手当。最低賃金法で除く通勤・精皆勤・家族手当と、時間外・深夜・休日の手当、固定残業代は除く）
 function _mw16_shoteinai(){
   var base=_mw16_num('es_salaryMonthly'), sum=base, parts=[base?('基本給'+base):''];
@@ -265,17 +317,18 @@ function _aiCheck16Local(rules){
   if(!hourly && monthly && th>0) hourly=Math.round((monthly+_mwAllow)/th);
   var isKensetsu=/建設/.test(_mw16_val('es_applicantField')+_mw16_val('es_applicantFieldEn'));
   if(pref && hourly){
-    var mw=OFUSA_MIN_WAGE[pref];
-    if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（令和7年度）。（月給'+(_mwAllow?'＋算入手当［'+_mwAllowNames.join('・')+'］':'')+'）÷月所定労働時間で判定。','P5');
-    else add('ok','最低賃金','最低賃金クリア（'+pref+'）','時給換算 '+hourly+'円 ≥ '+mw+'円。','P5');
+    var _mwo=_mw16_minWage(pref), mw=_mwo.v;
+    if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（'+_mwo.label+'）。（月給'+(_mwAllow?'＋算入手当［'+_mwAllowNames.join('・')+'］':'')+'）÷月所定労働時間で判定。','P5');
+    else add('ok','最低賃金','最低賃金クリア（'+pref+'）','時給換算 '+hourly+'円 ≥ '+mw+'円（'+_mwo.label+'）。','P5');
+    if(_mwo.next && hourly>=mw && hourly<_mwo.next.v) add('warn','最低賃金','もうすぐ最低賃金を下回ります（'+pref+'）','時給換算 '+hourly+'円。'+_mwo.next.eff+'から最低賃金が '+_mwo.next.v+'円'+(_mwo.next.fy?'（'+_mw16_fyLabel(_mwo.next.fy)+'）':'')+'に上がるため、それ以降は下回ります。','P5');   // ver.20261112.08
     if(isKensetsu){
       // ver.20261109.07: 建設は「所定内賃金÷月所定労働時間」が、地域別最低賃金×1.1 と 全国加重平均×1.1 のどちらも下回らないこと（国交省 受入計画の認定基準）
-      var stn=_mw16_shoteinai(), avg=window.OFUSA_MIN_WAGE_AVG||0;
+      var stn=_mw16_shoteinai(), _avo=_mw16_avg(), avg=_avo.v;
       var _hr=(!monthly)?_mw16_num('es_salaryHourly'):0, hk;
       if(_hr){ var _al=stn.sum; hk=th>0 ? Math.floor(_hr+_al/th) : _hr; stn.detail='時給'+_hr+(_al?'＋手当（'+stn.detail+'）÷月'+th.toFixed(1)+'h':''); }   // ver.20261109.08: 時給は 時給＋手当÷月時間
       else hk=(th>0 ? Math.floor(stn.sum/th) : hourly);
       var needR=Math.ceil(mw*1.1), needA=Math.ceil(avg*1.1), need=Math.max(needR,needA);
-      var basis=(needA>needR?'全国加重平均'+avg+'円×1.1＝'+needA+'円':pref+'最賃'+mw+'円×1.1＝'+needR+'円')+'（地域別×1.1＝'+needR+'円／全国加重平均×1.1＝'+needA+'円の高い方）';
+      var basis=(needA>needR?'全国加重平均（'+_avo.label+'）'+avg+'円×1.1＝'+needA+'円':pref+'最賃（'+_mwo.label+'）'+mw+'円×1.1＝'+needR+'円')+'（地域別×1.1＝'+needR+'円／全国加重平均×1.1＝'+needA+'円の高い方）';
       if(hk<need) add('out','建設報酬基準','建設の報酬基準を下回っています','時給換算 '+hk+'円 < '+need+'円。'+basis+'。'+(_hr?stn.detail+' で計算。':'所定内賃金 '+stn.detail+' ÷ 月'+th.toFixed(1)+'h で計算。'),'P5');
       else add('ok','建設報酬基準','建設の報酬基準クリア','時給換算 '+hk+'円 ≥ '+need+'円。'+basis+'。','P5');
     }
