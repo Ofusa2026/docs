@@ -3003,9 +3003,9 @@ async function loadCaseToForm(info, docKey, opts){
     // === 所属機関情報 ===
     const companyAddress = (co.pref||'')+(co.city||'')+(co.address||'');
     setValMulti(['es_orgName','f_company','f_orgName'], es.orgName || co.name);
-    setValMulti(['es_orgNameEn','f_companyEn','f_orgNameEn'], es.orgNameEn || co.name_en);
+    setValMulti(['es_orgNameEn','f_companyEn','f_orgNameEn'], co.name_en || es.orgNameEn);   // ver.20261112.13: 案シスの会社の英語を優先
     setValMulti(['es_orgAddress','f_address','f_orgAddress'], es.orgAddress || companyAddress);
-    setValMulti(['es_orgAddressEn','f_addressEn','f_orgAddressEn'], es.orgAddressEn || co.address_en);
+    setValMulti(['es_orgAddressEn','f_addressEn','f_orgAddressEn'], co.address_en || es.orgAddressEn);   // ver.20261112.13: 案シスの会社の英語を優先
     setValMulti(['es_orgTel','f_tel','f_orgTel'], es.orgTel || co.tel);
     setValMulti(['es_repName','f_repName'], es.repName || co.rep_name);
     setValMulti(['es_repTitle','f_repTitle'], es.repTitle || co.rep_title);
@@ -4413,6 +4413,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     document.querySelectorAll('input[id$="En"],textarea[id$="En"]').forEach(function(en){
       var ja = document.getElementById(en.id.slice(0,-2));
       if(!ja || ja.tagName==='SELECT') return;
+      // ver.20261112.13: 会社名・所在地・代表者名（ローマ字）は案シスの英語のまま使うので、言語ごとの翻訳・言語ちがいの直しの対象にしない
+      if(/^(es|f)_(orgName|orgAddress|orgTel|repName)En$/.test(en.id)) return;
       out.push({en:en, ja:ja});
     });
     return out;

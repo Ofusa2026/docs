@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20261112.01</div>
+    <div class="ver">ver.20261112.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794459578"></script>
+<script src="ofusa_common.js?v=1794472418"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1544,7 +1544,7 @@ async function loadFromDB(passedInfo){
   try{
     // 1. 案件基本情報 + 人材データ（persons）を同時取得
     const [cases, persons] = await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end,doc_create_date&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end,doc_create_date,app_type&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     const cas = cases && cases[0];
@@ -1562,9 +1562,11 @@ async function loadFromDB(passedInfo){
       : companyName
         ? 'companies?select=id,name,name_en,pref,city,address,address_en,tel,rep_name,rep_title,rep_name_en,rep_title_en,emp_sets&name=eq.'+encodeURIComponent(companyName)
         : null;
+    window._p16Co = null;
     if(_coQuery){
       const cos = await sb(_coQuery);
       const co = cos && cos[0];
+      window._p16Co = co || null;   // ver.20261112.13: 下で会社の英語を使うため
       if(co){
         // 所属機関基本情報をセット
         const _s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
@@ -1645,6 +1647,17 @@ async function loadFromDB(passedInfo){
 
     // 4. 雇用条件データをフォームにセット
     if(esData){ setFormValues(esData); window._lastEmpSet=esData; }
+    /* ver.20261112.13: 会社名・所在地の訳は、案シスの会社の英語（companies.name_en／address_en）を使う。
+         雇用条件セットに別の言語の訳（例：ベトナム語の「Thành phố」）が入っていても、案シスの英語が優先。 */
+    try{
+      var co=window._p16Co;
+      if(co){
+        if(String(co.name_en||'').trim())    { var _ne=document.getElementById('es_orgNameEn');    if(_ne) _ne.value=String(co.name_en).trim(); }
+        if(String(co.address_en||'').trim()) { var _ae=document.getElementById('es_orgAddressEn'); if(_ae) _ae.value=String(co.address_en).trim(); }
+      }
+    }catch(_coEn){}
+    /* ver.20261112.13: 変更・更新は日本にいるので入国予定日は書かない（雇用条件セットに残っていても空にする） */
+    try{ if(cas && /変更|更新/.test(String(cas.app_type||''))){ ['es_entryY','es_entryM','es_entryD'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; }); } }catch(_ent){}
     // ver.20261006.01: 契約期間は案件（アンシスの契約開始日・終了日）を優先。
     //   雇用条件セット側の contractStart/End は案件に日付が無い場合のみ使う。
     if(cas){
