@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261112.02
+ * - fix(1-6号): 手当を空欄のまま保存した直接編集版でも、別紙の金額・計算方法をあとから入れれば書類に出るようにした（欄が無ければ足す）
  * ver.20261111.02
  * - feat(1-6号): 税金（所得税＋住民税）・社会保険料・雇用保険料を自動計算（案シスと同じ OFUSA_TAXCALC。手で直した欄は上書きしない）
  * ver.20261102.01
@@ -1156,6 +1158,49 @@ function _currentUserId(){
    applyBindings: 編集呼び出し後に data-bind スパンへ現在値を差し込む
    p()（全再描画）を使わずに変数スパンだけ更新する
    ============================================================ */
+/* ver.20261112.02: 1-6号 別紙の手当。空欄のまま保存した直接編集版には金額・計算方法の欄そのものが無く、
+   あとでサイドバーに入れても書類に出なかった。足りない欄をその場で足してから値を流し込む（全言語版共通）。 */
+function _annexAllowRepair(area){
+  if(!area || !document.getElementById('es_a1Amt')) return;
+  var mk=function(id,money){ var s=document.createElement('span'); s.className='f'; s.setAttribute('data-bind',id); if(money) s.setAttribute('data-bind-fmt','1'); return s; };
+  var has=function(div,ids){ return ids.some(function(id){ return !!div.querySelector('[data-bind="'+id+'"]'); }); };
+  var after=function(div,re,sp){
+    var ns=Array.from(div.childNodes);
+    for(var i=0;i<ns.length;i++){ var n=ns[i]; if(n.nodeType!==3) continue; var m=re.exec(n.nodeValue); if(!m) continue;
+      var rest=n.splitText(m.index+m[0].length); div.insertBefore(sp,rest); return true; }
+    return false;
+  };
+  var beforeLast=function(div,ch,sp){
+    var ns=Array.from(div.childNodes);
+    for(var i=ns.length-1;i>=0;i--){ var n=ns[i]; if(n.nodeType!==3) continue; var k=n.nodeValue.lastIndexOf(ch); if(k<0) continue;
+      var rest=n.splitText(k); div.insertBefore(sp,rest); return true; }
+    return false;
+  };
+  ['a','b','c','d','e','f'].forEach(function(ltr,i){
+    var idx=i+1, P='es_a'+idx;
+    Array.from(area.querySelectorAll('div')).forEach(function(div){
+      var t=(div.textContent||'').replace(/^\s+/,'');
+      if(t.indexOf('('+ltr+')（')!==0 || t.indexOf('計算方法')<0 || t.indexOf('手当')<0) return;
+      if(div.querySelector('div')) return;
+      // 日本語の行
+      if(!has(div,[P+'Name'])) after(div,/^[\s　]*\([a-f]\)（/,mk(P+'Name'));
+      if(!has(div,[P+'Amt'])) after(div,/手当[\s　]*月[\s　]*/,mk(P+'Amt',true));
+      if(!has(div,[P+'Calc'])) after(div,/計算方法[：:][\s　]*/,mk(P+'Calc'));
+      // すぐ下の訳の行
+      var tr=div.nextElementSibling;
+      if(!tr || tr.tagName!=='DIV' || tr.querySelector('div')) return;
+      var tt=(tr.textContent||'').replace(/^\s+/,'');
+      if(tt.indexOf('('+ltr+')')!==0) return;
+      // 名称（訳）：英・韓・ネパール語は「名称＋手当」の順、ほかは「手当＋名称」の順
+      if(!has(tr,[P+'NameEn'])){
+        if(/^\s*\([a-f]\)\s?[（(]\s*(allowance|수당|भत्ता)/.test(tr.textContent||'')) after(tr,/^\s*\([a-f]\)\s?[（(]/,mk(P+'NameEn'));
+        else { var _nn=Array.from(tr.childNodes); for(var _i=0;_i<_nn.length;_i++){ var _n=_nn[_i]; if(_n.nodeType!==3) continue; var _m=/[\s　]*[,，]/.exec(_n.nodeValue); if(!_m) continue; var _r=_n.splitText(_m.index); tr.insertBefore(mk(P+'NameEn'),_r); break; } }
+      }
+      if(!has(tr,[P+'Amt',P+'AmtEn'])) after(tr,/[,，][\s　]*/,mk(P+'Amt',true));
+      if(!has(tr,[P+'CalcEn'])) beforeLast(tr,'）',mk(P+'CalcEn'));
+    });
+  });
+}
 const _OPT_SECOND_BINDS={es_category2:1,es_category2En:1,es_applicantField2:1,es_applicantField2En:1};
 function applyBindings(){
   const area=document.getElementById('pageArea');if(!area)return;
@@ -1178,6 +1223,7 @@ function applyBindings(){
       }
     });
   }catch(_e){}
+  try{ _annexAllowRepair(area); }catch(_e){}
   const spans=area.querySelectorAll('[data-bind]');
   spans.forEach(span=>{
     const id=span.getAttribute('data-bind');
