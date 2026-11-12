@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261111.09</div>
+    <div class="ver">ver.20261112.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -708,7 +708,8 @@ function p(){
     const ph=(val,key,isMoney=false)=>{
       // ver.20260831.02: 別紙の手当もクリックで入力欄へジャンプできるよう data-bind を付与
       if(val){const num=isMoney?Number(String(val).replace(/,/g,'')):NaN;const _bk=key==='Amount'?'Amt':key;return`<span class="f" data-bind="es_a${idx}${_bk}">${!isNaN(num)&&isMoney?num.toLocaleString('ja-JP'):esc(val)}</span>`;}
-      return'';
+      // ver.20261112.01: 空欄でも data-bind の入れ物を残す（直接編集版を保存したあとに金額・計算方法を入れても書類に反映されなかった）
+      {const _bk=key==='Amount'?'Amt':key;return`<span class="f" data-bind="es_a${idx}${_bk}"${isMoney?' data-bind-fmt="1"':''} style="color:#aaa;font-size:0.85em;font-family:monospace;">es.a${idx}${_bk}</span>`;}
     };
     annexAllow+=`<div>(${ltr})（${ph(n,'Name')}　手当　月　${ph(amt,'Amount',true)}${_amtTxt||/円$/.test(String(amt))?'':'円'}／計算方法：${ph(calc,'Calc')}）</div>`;
     annexAllow+=`<div class="id" style="font-size:7.5pt;">(${ltr}) (${ph(nEn,'NameEn')} allowance , ${_amtTxt?(amtEn?ph(amtEn,'AmtEn'):ph(amt,'Amount',true)):(ph(amt,'Amount',true)+' yen')} / Calculation method: ${ph(calcEn,'CalcEn')}）</div>`;
