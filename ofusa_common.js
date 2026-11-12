@@ -237,6 +237,21 @@ window.OFUSA_MIN_WAGE_R8 = {
   "徳島":[1103,"2026-11-01"],"香川":[1092,"2026-10-01"],"愛媛":[1093,"2026-11-01"],"高知":[1086,"2026-10-29"],"福岡":[1114,"2026-10-04"],"佐賀":[1095,"2026-11-15"],"長崎":[1087,"2026-11-02"],
   "熊本":[1092,"2026-12-01"],"大分":[1096,"2026-11-01"],"宮崎":[1085,"2026-10-24"],"鹿児島":[1090,"2026-10-25"],"沖縄":[1086,"2026-12-02"] };
 window.OFUSA_MIN_WAGE_AVG_R8 = [1177, "2026-10-01"];   // 全国加重平均（令和8年度）。最初の発効日から使う
+/* ver.20261112.17: 変形労働時間制の単位の訳（1-6号）。書類は「（　）単位の変形労働時間制」と単位の語を印字済みなので、
+   訳の欄は「1 bulan」「1 tháng」のように期間だけにする。別の言語の訳（ベトナム語版に「1 bulan」など）や
+   「Satuan Bulanan」「Đơn vị 1 năm」のように単位の語が入っているときは、その言語の決まった訳に直す */
+var _FLEX_TR={ id:['1 bulan','1 tahun'], vi:['1 tháng','1 năm'], en:['1 month','1 year'], ne:['१ महिना','१ वर्ष'], my:['၁ လ','၁ နှစ်'],
+  th:['1 เดือน','1 ปี'], zh:['1个月','1年'], ko:['1개월','1년'], km:['១ ខែ','១ ឆ្នាំ'] };
+function _flexUnitEnFix(lang, ja, en){
+  var t=_FLEX_TR[lang]; ja=String(ja||'').normalize('NFKC'); en=String(en||'').trim();
+  var kind = /年/.test(ja) ? 1 : (/(ヶ|か|カ|ケ|箇)?月/.test(ja) ? 0 : -1);
+  if(!t || kind<0) return en.replace(/^(satuan|đơn vị|per)\s+/i,'').replace(/\s*(unit|単位|单位|단위)$/i,'').trim();
+  if(!en) return t[kind];
+  var known=false; Object.keys(_FLEX_TR).forEach(function(k){ _FLEX_TR[k].forEach(function(x){ if(x.replace(/\s/g,'').toLowerCase()===en.replace(/\s/g,'').toLowerCase()) known=true; }); });
+  if(known || /satuan|bulanan|tahunan|đơn vị|unit|単位|单位|단위|^bulan$|^tahun$|^1?\s*(nam|thang)$/i.test(en) || /[ぁ-んァ-ヶ一-龥]/.test(en) && lang!=='zh') return t[kind];
+  return en;
+}
+window._flexUnitEnFix=_flexUnitEnFix;
 /* ver.20261112.14: 雇用条件セットの会社名・所在地の訳が「英語でない」（別の言語の訳が入っている）か。
    全角の数字・記号は半角にしてから、英字・数字・記号以外の文字や、インドネシア語・ベトナム語などの住所の語があれば英語でないとみなす */
 function _ofusaNotEnglish(s){

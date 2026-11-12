@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（英語版）</div>
-    <div class="ver">ver.20261112.14</div>
+    <div class="ver">ver.20261112.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794475467"></script>
+<script src="ofusa_common.js?v=1794475747"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1660,6 +1660,9 @@ async function loadFromDB(passedInfo){
         if(_ae && String(co.address_en||'').trim() && (!_ae.value.trim() || (_ofusaNotEnglish(_ae.value) && (!_aj || !_aj.value.trim() || _ofusaSameAddr(_aj.value, _coJa))))) _ae.value=String(co.address_en).trim();
       }
     }catch(_coEn){}
+    // ver.20261112.17: 変形労働時間制の単位の訳を、この書類の言語の決まった訳にそろえる（単位の語の二重・別の言語を防ぐ）
+    try{ var _fe=document.getElementById('es_flexUnitEn'), _fj=document.getElementById('es_flexUnit'), _ft=document.getElementById('es_flexType');
+      if(_fe && typeof _flexUnitEnFix==='function'){ var _nv=_flexUnitEnFix((((location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id)\.html$/i)||[0,'id'])[1].toLowerCase()), (_fj&&_fj.value)||(_ft&&_ft.value)||'', _fe.value); if(_nv!==_fe.value){ _fe.value=_nv; } } }catch(_fx){}
     /* ver.20261112.13: 変更・更新は日本にいるので入国予定日は書かない（雇用条件セットに残っていても空にする） */
     try{ if(cas && /変更|更新/.test(String(cas.app_type||''))){ ['es_entryY','es_entryM','es_entryD'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; }); } }catch(_ent){}
     // ver.20261006.01: 契約期間は案件（アンシスの契約開始日・終了日）を優先。
