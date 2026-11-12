@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261112.06</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261112.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -477,8 +477,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794447707';
-window.__DOCS_CACHE_BUSTER__ = '1794447707';
+window.__DOCS_CACHE_BUSTER__ = '1794448416';
+window.__DOCS_CACHE_BUSTER__ = '1794448416';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1838,6 +1838,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261112.07',
+    date: '2026-11-12',
+    notify: true,
+    items: [
+      '🖨 1-5+1-6まとめ印刷：1-5号のページに申請人の名前が入らないことがあったのを直しました（1-5号の読み込みが終わるまで待ってから印刷します）。まとめてPDFも同じように、読み込みが終わるまで待ちます。'
+    ]
+  },
   {
     version: 'ver.20261112.06',
     date: '2026-11-12',
@@ -3565,6 +3573,7 @@ function _loadDocForPrint(src, info){
             var d=win.document; var area=d.getElementById('pageArea');
             if(area && area.querySelector('.doc,.docabs,[id^="docP"]')){
               var reflected = wantName ? ((area.innerText||'').replace(/\s/g,'').indexOf(wantName)>=0) : true;
+              try{ if(typeof win._caseLoadDone==='string' && win._caseLoadDone!==String(info.caseId)) reflected=false; }catch(_ld){}   // ver.20261112.07: 書類の読み込みが終わるまで待つ
               if((reflected && tries>=(info._minTries||5)) || tries>=Math.max(22,(info._minTries||0)+8)){
                 clearInterval(timer);
                 var id='pm'+(++_pmSeq);

@@ -1776,10 +1776,23 @@ async function printBoth(){
   try{
     var idoc=ifr.contentDocument, iwin=ifr.contentWindow;
     if(info&&info.caseId&&iwin){
+      // ver.20261112.07: 相方（1-5号など）の読み込みが終わるまで待つ。
+      //   以前は 0.9秒だけ待って写していたため、通信が遅いと申請人の名前などが入る前に印刷されていた。
+      //   読み込みは SELECT_CASE の1回だけにする（loadFromDB を別に呼ぶと読み込みが2回走り、途中で欄が消えることがある）
       try{ iwin.postMessage({type:'SELECT_CASE', info:info}, '*'); }catch(e){}
-      if(typeof iwin.loadFromDB==='function'){ try{ await iwin.loadFromDB(info); }catch(e){} }
+      var _t0=Date.now(), _cid=String(info.caseId);
+      while(Date.now()-_t0<15000){
+        await new Promise(function(r){ setTimeout(r,200); });
+        var _done=false; try{ _done=(iwin._caseLoadDone===_cid); }catch(_e){}
+        if(_done) break;
+      }
+      // 名前の欄がある書類は、名前が入るまで少しだけ待つ（最大3秒）
+      try{
+        var _nm=idoc.getElementById('es_applicantName');
+        var _t1=Date.now(); while(_nm && !String(_nm.value||'').trim() && Date.now()-_t1<3000){ await new Promise(function(r){ setTimeout(r,200); }); }
+      }catch(_e){}
     }
-    await new Promise(function(r){ setTimeout(r,900); });
+    await new Promise(function(r){ setTimeout(r,400); });
     var otherDocs=idoc.querySelectorAll('.doc');
     if(!otherDocs.length){ if(typeof showToast==='function') showToast('⚠️ 相方書類の読込に失敗しました'); if(ifr.parentNode)ifr.parentNode.removeChild(ifr); return; }
     var host=document.createElement('div');
@@ -2823,6 +2836,7 @@ async function loadCaseToForm(info, docKey, opts){
   //   （その状態で保存すると空フィールドが emp_sets からも消える二次被害あり）
   opts = opts || {};
   if(!info||!info.caseId) return;
+  window._caseLoadDone='';   // ver.20261112.07: 読み込みが終わったら案件IDが入る（まとめ印刷が終わりを待つため）
   // ver.20260717: 直接編集が未保存のまま別の案件に切り替えると編集内容が失われる。
   // 画面は編集後の見た目のままなので気づけないため、切り替える前に確認する。
   // 同じ案件の再読込（言語切替など）では聞かない。
@@ -3218,8 +3232,10 @@ async function loadCaseToForm(info, docKey, opts){
     try{ await _htmlStoreRestore(info); }catch(_hs){ console.warn('[htmlStore restore]', _hs); }
     try{ _structNoticeHide(); window._tplSigBase=null; if(window._htmlFrozen) _structSetBase(); }catch(_sb){} // ver.20261028.01
     try{ if(window._htmlFrozen) _staleEditedCheck(); }catch(_st){ console.warn('[staleEdited]', _st); } // ver.20261106.03
+    window._caseLoadDone=String(info.caseId);
     if(typeof showToast==='function') showToast('✅ 案件データを読み込みました');
   } catch(e) {
+    window._caseLoadDone=String(info.caseId);
     console.error('[doc] loadCaseToForm error:', e);
     if(typeof showToast==='function') showToast('⚠️ 読込エラー: ' + e.message);
   }
