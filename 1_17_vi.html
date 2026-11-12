@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261112.09</div>
+    <div class="ver">ver.20261112.10</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1127,7 +1127,7 @@ function _p17Gender(opts){
    数字・番号・電話・メールはそのまま、日本語の文は辞書・AIの訳（訳せないときは赤）。空欄なら原本どおりの空き */
 function _p17Num(id){ var x=String(v(id)||'').replace(/\s*(名|人|時間|時)\s*$/,'').trim(); return x ? '<span class="f" data-bind="'+id+'">'+esc(x)+'</span>' : '&emsp;&emsp;'; }
 function _p17TrOr(id, blank){ var x=String(v(id)||'').trim(); if(!x) return blank; return '<span class="f" data-bind="'+id+'">'+_p17EscMark(_p17Vi(x))+'</span>'; }
-function _p17RegNo(){ var x=String(v('es_soRegNo')||'').trim(); if(!x) return ''; return '<span class="f" data-bind="es_soRegNo">'+esc(/登/.test(x)?x:'登'+x)+'</span>'; }
+function _p17RegNo(w){ var x=String(v('es_soRegNo')||'').trim(); if(!x) return ''; x=/登/.test(x)?x:'登'+x; if(w) x=x.replace('登', w); return '<span class="f" data-bind="es_soRegNo">'+esc(x)+'</span>'; }   // 訳の行は「登」をその言語の語に置き換える（例：19Đăng-000325）
 /* ver.20261105.20: 自由記入の値（実費の説明など）に外国語の行を付ける。辞書・AIの訳を使い、訳せないときは赤で知らせる */
 function _p17FxLine(id){
   var x=String(v(id)||'').trim(); if(!x) return '';
@@ -1357,7 +1357,7 @@ Họ và tên</p></td>
 <tr class="nosplit" style="height:5.36em">
 <td class="b-kknt vert" rowspan="11"><p class="ja a-center">　登録支援機関</p><p class="vi a-center">III. Cơ quan hỗ trợ có đăng ký</p></td>
 <td class="b-kttt" colspan="2"><p class="ja">１　登録番号</p><p class="vi a-center">Mã số đăng ký</p></td>
-<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">${/登/.test(v('es_soRegNo')||'') ? f('es_soRegNo') : '登'+f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">${_p17RegNo() || 'Đăng'}</p></td>
+<td class="b-kttt" colspan="2"><p class="ja" style="text-indent:3.00em">${/登/.test(v('es_soRegNo')||'') ? f('es_soRegNo') : '登'+f('es_soRegNo')}</p><p class="vi" style="text-indent:3.00em">${_p17RegNo('Đăng') || 'Đăng'}</p></td>
 <td class="b-kttt" colspan="3"><p class="ja a-center">２　登録年月日</p><p class="vi a-center" style="padding-left:1.89em;text-indent:-1.00em">Ngày tháng năm đăng ký</p></td>
 <td class="b-kttk" colspan="3"><p class="ja a-right">${f('es_soRegY')}年${f('es_soRegM')}月${f('es_soRegD')}日</p><p class="vi a-right">Ngày ${f('es_soRegD')} tháng ${f('es_soRegM')} năm ${f('es_soRegY')}</p></td>
 </tr>
