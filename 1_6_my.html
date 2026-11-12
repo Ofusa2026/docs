@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20261112.13</div>
+    <div class="ver">ver.20261112.14</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794472418"></script>
+<script src="ofusa_common.js?v=1794472786"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1655,8 +1655,12 @@ async function loadFromDB(passedInfo){
     try{
       var co=window._p16Co;
       if(co){
-        if(String(co.name_en||'').trim())    { var _ne=document.getElementById('es_orgNameEn');    if(_ne) _ne.value=String(co.name_en).trim(); }
-        if(String(co.address_en||'').trim()) { var _ae=document.getElementById('es_orgAddressEn'); if(_ae) _ae.value=String(co.address_en).trim(); }
+        // ver.20261112.14: 雇用条件セットの訳が空、または英語でない（別の言語の訳）ときだけ案シスの英語にする。
+        //   所在地は、雇用条件セットの住所（日本語）が会社の住所と同じときだけ（別の事業所の住所はそのまま）
+        var _ne=document.getElementById('es_orgNameEn'), _ae=document.getElementById('es_orgAddressEn'), _aj=document.getElementById('es_orgAddress');
+        var _coJa=(co.pref||'')+(co.city||'')+(co.address||'');
+        if(_ne && String(co.name_en||'').trim() && (!_ne.value.trim() || _ofusaNotEnglish(_ne.value))) _ne.value=String(co.name_en).trim();
+        if(_ae && String(co.address_en||'').trim() && (!_ae.value.trim() || (_ofusaNotEnglish(_ae.value) && (!_aj || !_aj.value.trim() || _ofusaSameAddr(_aj.value, _coJa))))) _ae.value=String(co.address_en).trim();
       }
     }catch(_coEn){}
     /* ver.20261112.13: 変更・更新は日本にいるので入国予定日は書かない（雇用条件セットに残っていても空にする） */

@@ -237,6 +237,17 @@ window.OFUSA_MIN_WAGE_R8 = {
   "徳島":[1103,"2026-11-01"],"香川":[1092,"2026-10-01"],"愛媛":[1093,"2026-11-01"],"高知":[1086,"2026-10-29"],"福岡":[1114,"2026-10-04"],"佐賀":[1095,"2026-11-15"],"長崎":[1087,"2026-11-02"],
   "熊本":[1092,"2026-12-01"],"大分":[1096,"2026-11-01"],"宮崎":[1085,"2026-10-24"],"鹿児島":[1090,"2026-10-25"],"沖縄":[1086,"2026-12-02"] };
 window.OFUSA_MIN_WAGE_AVG_R8 = [1177, "2026-10-01"];   // 全国加重平均（令和8年度）。最初の発効日から使う
+/* ver.20261112.14: 雇用条件セットの会社名・所在地の訳が「英語でない」（別の言語の訳が入っている）か。
+   全角の数字・記号は半角にしてから、英字・数字・記号以外の文字や、インドネシア語・ベトナム語などの住所の語があれば英語でないとみなす */
+function _ofusaNotEnglish(s){
+  s=String(s||'').normalize('NFKC').replace(/[・ー－―‐〜～「」『』（）、。]/g,'').replace(/[āáàâ]/gi,'a').replace(/[ēéèê]/gi,'e').replace(/[īíìî]/gi,'i').replace(/[ōóòô]/gi,'o').replace(/[ūúùû]/gi,'u').trim(); if(!s) return false;   // ローマ字の長音記号（ō など）は英語あつかい
+  return /[^\x00-\x7F]/.test(s) || /\b(Kota|Prefektur|Kabupaten|Provinsi|Kecamatan|Jalan|Thanh pho|Tinh|Quan|Phuong|Distrik)\b/i.test(s);
+}
+// 会社の所在地（日本語）と雇用条件セットの所在地（日本語）が同じ場所か（空白・全角半角・「番地」などの違いは無視）
+function _ofusaSameAddr(a,b){
+  var n=function(x){ return String(x||'').normalize('NFKC').replace(/\s/g,'').replace(/[丁目番地号の－ー―‐-]/g,''); };
+  return !!n(a) && n(a)===n(b);
+}
 // ver.20261112.08: 案シスの「min_wages」表（定期タスクが厚労省の発表から自動更新）を読み、上の表より優先して使う。読めなければ上の表を使う
 window.OFUSA_MW_DB=null;
 async function _mw16_loadDB(){
@@ -3003,9 +3014,9 @@ async function loadCaseToForm(info, docKey, opts){
     // === 所属機関情報 ===
     const companyAddress = (co.pref||'')+(co.city||'')+(co.address||'');
     setValMulti(['es_orgName','f_company','f_orgName'], es.orgName || co.name);
-    setValMulti(['es_orgNameEn','f_companyEn','f_orgNameEn'], co.name_en || es.orgNameEn);   // ver.20261112.13: 案シスの会社の英語を優先
+    setValMulti(['es_orgNameEn','f_companyEn','f_orgNameEn'], (es.orgNameEn && !_ofusaNotEnglish(es.orgNameEn)) ? es.orgNameEn : (co.name_en || es.orgNameEn));   // ver.20261112.14: 雇用条件セットの訳が英語でないときだけ案シスの英語
     setValMulti(['es_orgAddress','f_address','f_orgAddress'], es.orgAddress || companyAddress);
-    setValMulti(['es_orgAddressEn','f_addressEn','f_orgAddressEn'], co.address_en || es.orgAddressEn);   // ver.20261112.13: 案シスの会社の英語を優先
+    setValMulti(['es_orgAddressEn','f_addressEn','f_orgAddressEn'], (es.orgAddressEn && !(_ofusaNotEnglish(es.orgAddressEn) && (!es.orgAddress || _ofusaSameAddr(es.orgAddress, companyAddress)))) ? es.orgAddressEn : (co.address_en || es.orgAddressEn));   // ver.20261112.14: 別の事業所の住所は雇用条件セットのまま。英語でない訳で、会社と同じ住所のときだけ案シスの英語
     setValMulti(['es_orgTel','f_tel','f_orgTel'], es.orgTel || co.tel);
     setValMulti(['es_repName','f_repName'], es.repName || co.rep_name);
     setValMulti(['es_repTitle','f_repTitle'], es.repTitle || co.rep_title);
