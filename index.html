@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>O-Link Saysay</title>
+<script>/* ver.20261112.04: ?multi=1 → 分割表示の外枠、?pane=1 → 分割の中の1画面 */
+(function(){ var q=location.search; window.__XW_MULTI=/[?&]multi=1/.test(q); window.__XW_PANE=/[?&]pane=1/.test(q) && window.parent!==window;
+  document.documentElement.className+=(window.__XW_MULTI?' xw-multi':'')+(window.__XW_PANE?' xw-pane':''); })();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -77,12 +80,61 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .wn-section ul{list-style:none;padding:0;}
 .wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
 .wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#7c3aed;}
+/* ver.20261112.04: ウィンドウを小さくしても使える表示（画面を並べて複数の案件を進める用） */
+.xw-only{display:none;}
+.xw-btn{background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.xw-btn:hover{background:#475569;}
+#xwCase{display:none;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:800;color:#fde68a;}
+#xwWarn{display:none;margin:0;padding:5px 12px;font-size:11.5px;font-weight:700;line-height:1.45;}
+#xwWarn.lv1{display:block;background:#fef3c7;color:#92400e;border-bottom:1px solid #f59e0b;}
+#xwWarn.lv2{display:block;background:#fee2e2;color:#991b1b;border-bottom:1px solid #ef4444;}
+@media (max-width:1180px){
+  .xw-only{display:inline-block;}
+  .top-bar{padding:6px 10px;gap:8px;}
+  .top-bar .sub{display:none;}
+  .logo{font-size:13px;}
+  #xwCase{display:inline-block;}
+  #dgjBar{padding:3px 6px!important;margin-right:4px!important;}
+  #dgjBarName{display:none;}
+  #p17LangBar{padding:3px 6px!important;margin-right:4px!important;}
+  #p17LangNote{display:none;}
+  .body{position:relative;}
+  .sidebar{position:absolute;left:0;top:0;bottom:0;z-index:50;width:260px;transform:translateX(-100%);transition:transform .15s;box-shadow:6px 0 18px rgba(0,0,0,.45);}
+  body.xw-sb .sidebar{transform:none;}
+  body.xw-sb .body::after{content:"";position:absolute;inset:0;background:rgba(15,23,42,.45);z-index:40;}
+}
+
+/* ver.20261112.04: 分割表示（1つの画面に2〜4件） */
+html.xw-multi body>*:not(#xwMulti):not(script):not(style){display:none!important;}
+html.xw-pane .xw-win-btn{display:none!important;}
+html.xw-pane #docsWnToast{display:none!important;}
+#xwMulti{position:fixed;inset:0;display:flex;flex-direction:column;background:#0f172a;z-index:1;}
+#xwMBar{display:flex;align-items:center;gap:6px;padding:5px 10px;color:#e2e8f0;font-size:12px;flex-wrap:wrap;}
+#xwMBar .ttl{font-weight:800;color:#38bdf8;margin-right:6px;}
+#xwMBar .lay{background:#1e293b;color:#cbd5e1;border:1px solid #475569;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+#xwMBar .lay.on{background:#0369a1;border-color:#38bdf8;color:#fff;}
+#xwMBar .lay i{display:inline-grid;gap:1px;width:22px;height:14px;}
+#xwMBar .lay i b{background:currentColor;opacity:.75;border-radius:1px;}
+#xwMBar .sp{flex:1;}
+#xwMBar .hint{font-size:10.5px;color:#94a3b8;}
+#xwGrid{position:relative;flex:1;display:grid;gap:6px;padding:0 6px 6px;min-height:0;}
+.xw-pane{position:relative;border:2px solid #334155;border-radius:6px;overflow:hidden;background:#1e293b;min-width:0;min-height:0;}
+.xw-pane.focus{border-color:#38bdf8;}
+.xw-pane iframe{width:100%;height:100%;border:0;display:block;background:#fff;}
+.xw-split{position:absolute;z-index:5;background:transparent;}
+.xw-split:hover,.xw-split.drag{background:rgba(56,189,248,.55);}
+.xw-split.v{width:8px;cursor:col-resize;}
+.xw-split.h{height:8px;cursor:row-resize;}
+#xwCover{position:fixed;inset:0;z-index:99;display:none;}
+
 </style>
 </head>
 <body>
 <div class="top-bar">
+  <button type="button" class="xw-btn xw-only" onclick="xwToggleSidebar()" title="書類の一覧・case IDの貼り付け">☰ 書類</button>
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261112.03</span></div>
+  <span id="xwCase" title="このウィンドウで開いている案件"></span>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261112.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -98,6 +150,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       履歴 <span id="dgjBarCount" style="background:rgba(255,255,255,.25);padding:1px 6px;border-radius:99px;font-size:10px;">0</span>
     </button>
   </div>
+  <button type="button" class="xw-btn xw-win-btn" onclick="xwStartMulti()" title="1つの画面に2〜4件の案件を並べます（並べ方を選べて、境目のドラッグで幅も変えられます）" style="margin-right:4px;">🧩 分割表示</button>
+  <button type="button" class="xw-btn xw-win-btn" onclick="xwOpenWindow(false)" title="もう1つSaysayを開きます（画面の右半分）。ウィンドウを並べて、複数の案件を同時に進められます" style="margin-right:4px;">🪟 新しいウィンドウ</button>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
   </button>
@@ -123,6 +177,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div style="color:#64748b;text-align:center;padding:40px 0;">案件を選択すると履歴が表示されます</div>
   </div>
 </div>
+<div id="xwWarn"></div>
 <div class="body">
   <div class="sidebar">
     <div class="case-panel">
@@ -477,8 +532,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794398167';
-window.__DOCS_CACHE_BUSTER__ = '1794398167';
+window.__DOCS_CACHE_BUSTER__ = '1794445416';
+window.__DOCS_CACHE_BUSTER__ = '1794445416';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1514,6 +1569,7 @@ async function idxJumpByPaste(){
       nationality:row.nationality||''
     };
     idxSelectedCase=info;
+    try{ xwOnCase(info); }catch(_xw){}
     // ver.20261106.11: ヒアリングフォームの名前が案件管理システムと違えば、どちらを使うか聞く（待たずに進める）
     try{ idxNameCheck(info); }catch(_e){ console.warn('nameCheck err:',_e); }
     // ver.20261105.01: 1-17号を開いていれば、国籍に合った言語版へ入れ替える（手で選んだ言語はここで解除）
@@ -1833,11 +1889,22 @@ async function _docsAuthGateInit(){
     else { _docsShowLogin(); }
   }catch(e){ _docsShowLogin(); }
 }
-_docsAuthGateInit();
+if(!window.__XW_MULTI) _docsAuthGateInit();
 
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261112.04',
+    date: '2026-11-12',
+    notify: true,
+    items: [
+      '🧩 分割表示：上の「🧩 分割表示」で、1つの画面に2〜4件の案件を並べられるようにしました（2分割／大＋小／3列／大＋小2／2×2）。境目をドラッグすると幅を変えられます。',
+      '🪟 新しいウィンドウ：もう1つSaysayを画面の右半分に開けるようにしました。小さいウィンドウでも使えるよう、書類の一覧は「☰ 書類」で出し入れします。',
+      '⚠️ 同じ案件・同じ雇用条件セットを別の画面でも開いていると、上に注意が出ます。片方で雇用条件を保存すると、もう片方は自動で読み込み直します（直している途中なら、保存のときに確認が出ます）。',
+      '🖨 社内向けのお知らせ（黄色の「直接編集した書類に出ていないもの」など）や確認の窓は、印刷・PDFに出ないようにしました。'
+    ]
+  },
   {
     version: 'ver.20261112.03',
     date: '2026-11-12',
@@ -4712,6 +4779,174 @@ async function savePriorityDocs(){
 }
 
 
+
+/* ===== ver.20261112.04: ウィンドウを並べて複数の案件を進める =====
+   ・「🪟 新しいウィンドウ」で、もう1つSaysayを画面の右半分に開く（各ウィンドウは別々に案件を選べる）
+   ・小さいウィンドウでは、書類の一覧を「☰ 書類」で出し入れし、開いている案件名を上に出す
+   ・ウィンドウの名前（タブ・タスクバー）に申請人名を出して、どれがどの案件か分かるようにする
+   ・同じ案件／同じ雇用条件セットを別のウィンドウでも開いていたら、上に注意を出す（中身の確認は書類側 ofusa_common.js） */
+// 小さいウィンドウで、案件をまだ選んでいなければ、書類の一覧（case IDの貼り付け）を出しておく
+setTimeout(function(){ try{ if(window.matchMedia && matchMedia('(max-width:1180px)').matches && !idxSelectedCase && !/caseId=/.test(location.search)) xwToggleSidebar(true); }catch(_e){} }, 1200);
+function xwToggleSidebar(force){ var on=(force===undefined)?!document.body.classList.contains('xw-sb'):!!force; document.body.classList.toggle('xw-sb', on); }
+document.addEventListener('click', function(e){
+  try{
+    if(!document.body.classList.contains('xw-sb')) return;
+    var sb=document.querySelector('.sidebar'); if(!sb) return;
+    if(e.target.closest && e.target.closest('.xw-btn')) return;
+    if(!sb.contains(e.target)) { xwToggleSidebar(false); return; }
+    if(e.target.closest && e.target.closest('.item')) setTimeout(function(){ xwToggleSidebar(false); }, 120);   // 書類を選んだら閉じる
+  }catch(_e){}
+}, true);
+function xwOnCase(info){
+  try{
+    var nm=String(info.applicant||'').trim(), co=String(info.companyName||'').trim();
+    var c=document.getElementById('xwCase'); if(c){ c.textContent=nm?('👤 '+nm):''; c.title=(nm+(co?'／'+co:''))||''; }
+    document.title=(nm?nm+'｜':'')+'O-Link Saysay';
+  }catch(_e){}
+}
+function xwOpenWindow(withCase){
+  var url=location.pathname.replace(/[^\/]*$/,'')+'index.html';
+  if(withCase && idxSelectedCase && idxSelectedCase.caseId){
+    url+='?caseId='+encodeURIComponent(idxSelectedCase.caseId);
+    var d=window.cur; if(d && d!=='home') url+='&doc='+encodeURIComponent(d);
+  }
+  var W=(screen.availWidth||1600), H=(screen.availHeight||900), w=Math.max(640,Math.floor(W/2)), L=(screen.availLeft||0)+W-w, T=(screen.availTop||0);
+  var win=window.open(url, 'saysay_'+Date.now().toString(36), 'popup=yes,width='+w+',height='+H+',left='+L+',top='+T);
+  if(!win){ alert('ポップアップがブロックされました。アドレスバー右のアイコンから、このサイトのポップアップを許可してください。'); return; }
+  try{ win.focus(); }catch(_e){}
+}
+// 書類（iframe）から届く、別ウィンドウの注意を上に出す
+window.addEventListener('message', function(e){
+  try{
+    if(!e.data || e.data.type!=='XW_WARN') return;
+    var fr=[].slice.call(document.querySelectorAll('iframe')).find(function(f){ return f.contentWindow===e.source; });
+    if(fr && fr.style.display==='none') return;   // 見えていない書類からの知らせは出さない
+    var b=document.getElementById('xwWarn'); if(!b) return;
+    b.className=e.data.level?('lv'+e.data.level):''; b.textContent=e.data.text||'';
+  }catch(_e){}
+});
+
+/* ===== ver.20261112.04: 分割表示（1つの画面に2〜4件の案件を並べる） =====
+   ・外枠（index.html?multi=1）が、中に index.html?pane=1 を2〜4つ並べる。中の各画面は、ふつうのSaysayと同じに動く
+   ・並べ方：2分割／大＋小／3列／大＋小2つ／2×2。境目をドラッグすると幅・高さを変えられる
+   ・並べ方・幅・各画面で開いていた案件と書類は、このパソコンのブラウザに覚えておき、次に分割表示を開いたとき戻す
+   ・並べ方を減らしても、隠れた画面はそのまま残る（戻すと続きから）
+   ・同じ案件・同じ雇用条件セットの注意（別ウィンドウのときと同じ）は、分割した画面どうしでも出る */
+var XW_LAYOUTS={
+  '2':   {label:'2分割',  cols:[1,1],   rows:[1],   areas:[[0,0,1,1],[1,0,1,1]]},
+  'big': {label:'大＋小', cols:[2,1],   rows:[1],   areas:[[0,0,1,1],[1,0,1,1]]},
+  '3':   {label:'3列',    cols:[1,1,1], rows:[1],   areas:[[0,0,1,1],[1,0,1,1],[2,0,1,1]]},
+  'big2':{label:'大＋小2',cols:[2,1],   rows:[1,1], areas:[[0,0,1,2],[1,0,1,1],[1,1,1,1]]},
+  '4':   {label:'2×2',    cols:[1,1],   rows:[1,1], areas:[[0,0,1,1],[1,0,1,1],[0,1,1,1],[1,1,1,1]]}
+};
+var XW_KEY='saysay_xw_multi';
+function xwLoadState(){ var st=null; try{ st=JSON.parse(localStorage.getItem(XW_KEY)||'null'); }catch(e){} st=st||{}; if(!XW_LAYOUTS[st.layout]) st.layout='big'; st.sizes=st.sizes||{}; st.panes=Array.isArray(st.panes)?st.panes:[]; return st; }
+function xwSaveState(st){ try{ localStorage.setItem(XW_KEY, JSON.stringify(st)); }catch(e){} }
+function xwStartMulti(){
+  var st=xwLoadState();
+  if(idxSelectedCase && idxSelectedCase.caseId){
+    var me={caseId:idxSelectedCase.caseId, doc:(window.cur && window.cur!=='home')?window.cur:''};
+    st.panes=[me].concat((st.panes||[]).filter(function(p){ return p && p.caseId!==me.caseId; })).slice(0,4);
+  }
+  xwSaveState(st);
+  location.href=location.pathname.replace(/[^\/]*$/,'')+'index.html?multi=1';
+}
+// ---- 中の1画面：開いている案件・書類を外枠に知らせる。タイトル（印刷のファイル名）も外枠に写す ----
+if(window.__XW_PANE){
+  setInterval(function(){
+    try{ window.parent.postMessage({type:'XW_PANE', caseId:(idxSelectedCase&&idxSelectedCase.caseId)||'', doc:(window.cur&&window.cur!=='home')?window.cur:''}, '*'); }catch(e){}
+  }, 2000);
+  try{
+    var _xwT=document.querySelector('title');
+    if(_xwT) new MutationObserver(function(){ try{ window.parent.document.title=document.title; }catch(e){} }).observe(_xwT,{childList:true,subtree:true,characterData:true});
+  }catch(e){}
+}
+// 分割の中の画面：どれか1つの画面でログインしたら、ほかの画面も続けてログイン済みになる
+if(window.__XW_PANE){ window.addEventListener('storage', function(e){ try{ var ov=document.getElementById('docsLoginOverlay'); if(/auth-token/.test(e.key||'') && e.newValue && ov && ov.style.display!=='none' && getComputedStyle(ov).display!=='none'){ _docsHideLogin(); _docsAuthGateInit(); } }catch(_e){} }); }
+// ---- 外枠 ----
+if(window.__XW_MULTI){
+  (function(){
+    var st=xwLoadState(), panes=[], focusIdx=0;
+    var root=document.createElement('div'); root.id='xwMulti';
+    var icon=function(k){ var L=XW_LAYOUTS[k], h='<i style="grid-template-columns:'+L.cols.map(function(c){return c+'fr';}).join(' ')+';grid-template-rows:'+L.rows.map(function(r){return r+'fr';}).join(' ')+';">';
+      L.areas.forEach(function(a){ h+='<b style="grid-column:'+(a[0]+1)+' / span '+(a[2]||1)+';grid-row:'+(a[1]+1)+' / span '+(a[3]||1)+';"></b>'; }); return h+'</i>'; };
+    root.innerHTML='<div id="xwMBar"><span class="ttl">📁 Saysay 分割表示</span>'
+      +Object.keys(XW_LAYOUTS).map(function(k){ return '<button type="button" class="lay" data-k="'+k+'" title="'+XW_LAYOUTS[k].label+'">'+icon(k)+XW_LAYOUTS[k].label+'</button>'; }).join('')
+      +'<span class="hint">　境目をドラッグで幅を変えられます</span><span class="sp"></span>'
+      +'<button type="button" class="lay" id="xwReset" title="幅・高さを元に戻す">↺ 幅を戻す</button>'
+      +'<button type="button" class="lay" id="xwExit" title="分割をやめて、選んでいる画面（青い枠）の案件を、ふつうの画面で開きます">✕ 分割をやめる</button></div>'
+      +'<div id="xwGrid"></div><div id="xwCover"></div>';
+    document.body.appendChild(root);
+    var grid=root.querySelector('#xwGrid'), cover=root.querySelector('#xwCover');
+    document.title='Saysay 分割表示';
+    function paneUrl(p){ var u='index.html?pane=1'; if(p && p.caseId){ u+='&caseId='+encodeURIComponent(p.caseId); if(p.doc) u+='&doc='+encodeURIComponent(p.doc); } return u; }
+    function ensurePane(i){
+      if(panes[i]) return panes[i];
+      var d=document.createElement('div'); d.className='xw-pane';
+      var f=document.createElement('iframe'); f.src=paneUrl(st.panes[i]); f.setAttribute('title','Saysay '+(i+1));
+      d.appendChild(f); grid.appendChild(d);
+      d.addEventListener('mousedown', function(){ setFocus(i); }, true);
+      panes[i]={box:d, frame:f}; return panes[i];
+    }
+    function setFocus(i){ focusIdx=i; panes.forEach(function(p,j){ if(p) p.box.classList.toggle('focus', j===i); }); }
+    function sizes(){ var L=XW_LAYOUTS[st.layout], z=st.sizes[st.layout]; if(!z || !z.cols || z.cols.length!==L.cols.length || z.rows.length!==L.rows.length) z={cols:L.cols.slice(), rows:L.rows.slice()}; st.sizes[st.layout]=z; return z; }
+    function apply(){
+      var L=XW_LAYOUTS[st.layout], z=sizes();
+      grid.style.gridTemplateColumns=z.cols.map(function(c){ return c+'fr'; }).join(' ');
+      grid.style.gridTemplateRows=z.rows.map(function(r){ return r+'fr'; }).join(' ');
+      L.areas.forEach(function(a,i){ var p=ensurePane(i); p.box.style.display=''; p.box.style.gridColumn=(a[0]+1)+' / span '+(a[2]||1); p.box.style.gridRow=(a[1]+1)+' / span '+(a[3]||1); });
+      panes.forEach(function(p,i){ if(p && i>=L.areas.length) p.box.style.display='none'; });
+      if(focusIdx>=L.areas.length) focusIdx=0; setFocus(focusIdx);
+      root.querySelectorAll('.lay[data-k]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-k')===st.layout); });
+      xwSaveState(st); setTimeout(splitters, 30);
+    }
+    // 境目（ドラッグできる線）
+    function splitters(){
+      grid.querySelectorAll('.xw-split').forEach(function(x){ x.remove(); });
+      var L=XW_LAYOUTS[st.layout], z=sizes(), gap=6, pad=6, W=grid.clientWidth, H=grid.clientHeight;
+      var nC=z.cols.length, nR=z.rows.length, sC=z.cols.reduce(function(a,b){return a+b;},0), sR=z.rows.reduce(function(a,b){return a+b;},0);
+      var aw=W-pad*2-gap*(nC-1), ah=H-pad-gap*(nR-1);
+      var colX=[], x=pad; for(var i=0;i<nC;i++){ x+=z.cols[i]/sC*aw; colX.push(x); x+=gap; }
+      var rowY=[], y=0; for(var j=0;j<nR;j++){ y+=z.rows[j]/sR*ah; rowY.push(y); y+=gap; }
+      var colL=function(c){ return c===0?pad:colX[c-1]+gap; };
+      for(var c=0;c<nC-1;c++){ (function(c){ var e=document.createElement('div'); e.className='xw-split v'; e.style.left=(colX[c]-1)+'px'; e.style.top='0'; e.style.height=(H-pad)+'px'; e.title='ドラッグで幅を変更'; grid.appendChild(e); drag(e,'v',c,aw/sC); })(c); }
+      for(var r=0;r<nR-1;r++){ (function(r){
+        var cs=L.areas.filter(function(a){ return a[1]+(a[3]||1)-1===r; }).map(function(a){ return a[0]; }); if(!cs.length) return;
+        var x0=Math.min.apply(null,cs.map(colL)), x1=Math.max.apply(null,cs.map(function(c){ return colX[c]; }));
+        var e=document.createElement('div'); e.className='xw-split h'; e.style.top=(rowY[r]-1)+'px'; e.style.left=x0+'px'; e.style.width=(x1-x0)+'px'; e.title='ドラッグで高さを変更'; grid.appendChild(e); drag(e,'h',r,ah/sR);
+      })(r); }
+    }
+    function drag(el, dir, k, pxPerFr){
+      el.addEventListener('mousedown', function(ev){
+        ev.preventDefault(); var z=sizes(), arr=(dir==='v')?z.cols:z.rows, a0=arr[k], b0=arr[k+1], p0=(dir==='v')?ev.clientX:ev.clientY;
+        var minFr=(dir==='v'?360:200)/pxPerFr;
+        el.classList.add('drag'); cover.style.display='block'; cover.style.cursor=(dir==='v')?'col-resize':'row-resize';
+        function mv(e){ var d=((dir==='v')?e.clientX:e.clientY)-p0, df=d/pxPerFr; var a=a0+df, b=b0-df; if(a<minFr){ b-= (minFr-a); a=minFr; } if(b<minFr){ a-=(minFr-b); b=minFr; } if(a<minFr||b<minFr) return; arr[k]=+a.toFixed(3); arr[k+1]=+b.toFixed(3);
+          grid.style.gridTemplateColumns=z.cols.map(function(c){ return c+'fr'; }).join(' '); grid.style.gridTemplateRows=z.rows.map(function(r){ return r+'fr'; }).join(' '); }
+        function up(){ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); cover.style.display='none'; el.classList.remove('drag'); xwSaveState(st); splitters(); }
+        document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up);
+      });
+    }
+    root.querySelectorAll('.lay[data-k]').forEach(function(b){ b.addEventListener('click', function(){ st.layout=b.getAttribute('data-k'); apply(); }); });
+    root.querySelector('#xwReset').addEventListener('click', function(){ delete st.sizes[st.layout]; apply(); });
+    root.querySelector('#xwExit').addEventListener('click', function(){
+      if(!confirm('分割表示をやめて、青い枠の画面の案件をふつうの画面で開きます。\nそれぞれの画面で保存していない変更は消えます。よろしいですか？')) return;
+      var p=st.panes[focusIdx]||{}; var u='index.html'+(p.caseId?('?caseId='+encodeURIComponent(p.caseId)+(p.doc?'&doc='+encodeURIComponent(p.doc):'')):'');
+      location.href=location.pathname.replace(/[^\/]*$/,'')+u;
+    });
+    window.addEventListener('message', function(e){
+      try{
+        if(!e.data || e.data.type!=='XW_PANE') return;
+        var i=panes.findIndex(function(p){ return p && p.frame.contentWindow===e.source; }); if(i<0) return;
+        var cur=st.panes[i]||{}; if(cur.caseId!==e.data.caseId || cur.doc!==e.data.doc){ st.panes[i]={caseId:e.data.caseId, doc:e.data.doc}; xwSaveState(st); }
+      }catch(_e){}
+    });
+    // 画面の中（iframe）をクリックしたら、その画面を青い枠にする
+    window.addEventListener('blur', function(){ setTimeout(function(){ var a=document.activeElement; var i=panes.findIndex(function(p){ return p && p.frame===a; }); if(i>=0) setFocus(i); }, 0); });
+    window.addEventListener('resize', function(){ clearTimeout(window._xwRz); window._xwRz=setTimeout(splitters, 120); });
+    apply();
+  })();
+}
 </script>
 
 <!-- What's New トースト (share.html準拠・右からスライドイン) -->
