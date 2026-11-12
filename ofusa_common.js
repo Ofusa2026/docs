@@ -4549,7 +4549,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     if(/[\u0E00-\u0E7F]/.test(t)) return 'th';
     if(/[\u0900-\u097F]/.test(t)) return 'ne';
     if(/[\uAC00-\uD7AF]/.test(t)) return 'ko';
-    if(/[\u3040-\u30FF]/.test(t)) return 'ja';
+    if(/[\u3040-\u309F\u30A1-\u30FA\u30FD-\u30FF]/.test(t)) return 'ja';   // ver.20261112.15: 「・」「ー」はどの言語の訳でも使うので日本語あつかいしない（直しても同じ欄がくり返し「別の言語」と判定されていた）
+    if(/[\u4E00-\u9FFF]/.test(t)) return 'ja';   // 漢字だけの日本語（例：土曜・日曜）も日本語あつかい（中国語版では下で除く）
     var vi=(t.match(/[ăâđêôơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹĂÂĐÊÔƠƯẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ]/g)||[]).length;
     if(vi>=2) return 'vi';
     return '';
@@ -6611,4 +6612,38 @@ function _structNoticeShow(){
       +':not(:is(.doc,.docabs,[id^="docP"],#__combinedPrintArea,.pmpage) *){display:none!important;} }';
     (document.head||document.documentElement).appendChild(st);
   }catch(_c){}
+})();
+
+/* ===== ver.20261112.15: 同じ案件の読み込みを重ねない =====
+   Saysay本体（index.html）は、案件の情報を確実に届けるため同じ書類へ SELECT_CASE を最大5回送る。
+   書類はそのたびに案シスから読み直していたため、読み込みの約7割が3秒以内の重複だった（通信が遅いと表示が一瞬崩れる原因）。
+   ・書類が実際に読み込みを始めた（loadFromDB／loadCaseToForm が呼ばれた）ときに、その案件の情報を覚える
+   ・その後4秒以内に「同じ案件・同じ内容」の SELECT_CASE が来たら、書類には渡さない
+   ・まだ読み込みが始まっていない（書類の準備前に届いた）ときは止めないので、届かなくなることはない
+   ・別の案件・内容が違うとき（雇用条件セットの番号が変わった等）・info.force があるときは止めない */
+(function(){
+  var KEEP=4000;
+  function keyOf(info){
+    try{ if(!info||!info.caseId) return ''; var o={}; Object.keys(info).sort().forEach(function(k){ if(k!=='token' && k!=='force') o[k]=info[k]; }); o.__tok=!!info.token; /* ログイン情報が付いて届き直したときは止めない */ return JSON.stringify(o); }catch(e){ return ''; }
+  }
+  function mark(info){ var k=keyOf(info); if(k) window._lcfLast={key:k, t:Date.now()}; }
+  window.addEventListener('message', function(e){
+    try{
+      var d=e.data; if(!d || d.type!=='SELECT_CASE' || !d.info || d.info.force) return;
+      var L=window._lcfLast, k=keyOf(d.info);
+      if(L && k && L.key===k && Date.now()-L.t < KEEP){ e.stopImmediatePropagation(); }
+    }catch(_e){}
+  }, true);
+  function wrap(name){
+    try{
+      var f=window[name]; if(typeof f!=='function' || f.__lcf) return;
+      var w=function(info){ mark(info); return f.apply(this, arguments); };
+      w.__lcf=true; try{ Object.keys(f).forEach(function(k){ w[k]=f[k]; }); }catch(_k){}
+      window[name]=w;
+    }catch(e){}
+  }
+  wrap('loadCaseToForm');
+  function wrapAll(){ wrap('loadFromDB'); wrap('loadCaseToForm'); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrapAll); else wrapAll();
+  setTimeout(wrapAll, 0); setTimeout(wrapAll, 1500);
 })();
