@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261112.10</div>
+    <div class="ver">ver.20261112.11</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2486,6 +2486,39 @@ async function loadFromDB(passedInfo){
   }catch(e){ console.error(e); alert('読込エラー: '+e.message); }
 }
 
+/* ver.20261112.11: 住居確保（3-ア a・b・c）。登録支援機関の回答が a の欄に1つだけ書かれていて b・c が空のとき、
+   原本の書き方に合わせて分ける。物件が借上げ（未記入も含む）なら b、自己所有（社宅）なら c が本来の確保。
+     a ＝ 有（b（またはc）での入居に合意しなかった場合に実施）
+     b ＝ 有（回答の文。例：在留資格変更許可申請の後に確保する予定）
+     c ＝ 無（a,bで実施）　※自己所有なら b と c を入れ替える
+   「bで合意しない場合は…／雇用開始後…」のように a と b をまとめて書いた回答は、前からある分け方のまま。 */
+function _p17HouseFill(ha, HP, C, T){
+  if(String(HP.b||'').trim() || String(HP.c||'').trim()) return false;
+  var v=String(ha||'').trim(); if(!v || /^無/.test(v)) return false;
+  var inner;
+  var m=v.match(/^有\s*[（(](.*)[）)]\s*$/);
+  if(m) inner=m[1].trim(); else if(v==='有') inner=''; else if(v.length<=14 && !/^有/.test(v)) inner=v; else return false;
+  var note=String(HP.note||''), own=(C.f139===true) || /形態[:：]\s*(自己所有|社宅)/.test(note);
+  var lab={}, aText='', mainText='', main=own?'c':'b', ok=true;
+  inner.split(/[／\/]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(seg){
+    var lm=seg.match(/^([abcａｂｃ])\s*[:：]\s*(.+)$/);
+    if(lm){ var k=lm[1].replace('ａ','a').replace('ｂ','b').replace('ｃ','c'); var t=lm[2].split('＝'); lab[k]=(t[1]||t[0]).trim(); return; }
+    if(/^[bcｂｃ]\s*で(の入居に)?合意しな/.test(seg)){ aText=seg; main=/^[cｃ]/.test(seg)?'c':'b'; return; }
+    if(/^[bcｂｃ]\s*で実施$/.test(seg)){ main=/^[cｃ]/.test(seg)?'c':'b'; return; }
+    if(/[abcａｂｃ]\s*(は|を|で|に|の|が|＝)/.test(seg)){ ok=false; return; }
+    if(/同行|補助|紹介|仲介|情報提供|賃借|社宅|寮|物件/.test(seg)){ ok=false; return; }   // 実施の時期ではなく方法が書いてある回答は、どの欄の話か決められないので触らない   // ほかの書き方で a・b・c に触れている回答は、読み違えないように触らない
+    if(!mainText) mainText=seg; else ok=false;
+  });
+  if(!ok) return false;
+  if(lab.b && !lab.c) main='b'; else if(lab.c && !lab.b) main='c';
+  var other=(main==='b')?'c':'b';
+  var id={a:['f094','f095','f096','f097'], b:['f102','f103','f104','f105'], c:['f109','f110','f111','f112']};
+  C[id.a[0]]=true;  C[id.a[2]]=false; T[id.a[1]]=lab.a || aText || (main+'での入居に合意しなかった場合に実施');
+  C[id[main][0]]=true;  C[id[main][2]]=false; T[id[main][1]]=lab[main] || mainText || '適宜実施';
+  if(lab[other]){ C[id[other][0]]=true; C[id[other][2]]=false; T[id[other][1]]=lab[other]; }
+  else { C[id[other][0]]=false; C[id[other][2]]=true; T[id[other][3]]='a,'+main+'で実施'; }
+  return true;
+}
 // ===== ver.20261029.03: 登録支援機関ヒアリングの流し込み =====
 /* 読み方は Word版 1_17.html の so.ex_〜 と同じ（support_orgs.extra）。
    ・対応時間は登録支援機関により extra.supportHours と extra.hours の2通りで保存されているので両方読む。
@@ -2638,7 +2671,9 @@ async function _p17Hearing(so, _s){
      前半を a、後半を b に分けて、どちらも「有」にする。b に別の回答があるときは分けない。 */
   var _ha = String(HP.a || IS.housing || ''), _hm = _ha.match(/^\s*有\s*[（(](.*)[）)]\s*$/);
   var _hs = _hm ? _hm[1].split('／').map(function(x){ return x.trim(); }).filter(Boolean) : [];
-  if(_hs.length===2 && /^b/i.test(_hs[0]) && !String(HP.b||'').trim()){
+  if(_p17HouseFill(_ha, HP, C, T)){
+    sch++;
+  } else if(_hs.length===2 && /^b/i.test(_hs[0]) && !String(HP.b||'').trim()){
     C.f094=true; C.f096=false; T.f095=_hs[0];
     C.f102=true; C.f104=false; T.f103=_hs[1];
     sch++;
@@ -2647,6 +2682,8 @@ async function _p17Hearing(so, _s){
     if(apply(HP.b,           [['f102','f103','f104','f105']])) sch++;
   }
   if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
+  /* ver.20261112.11: a・b を分けて入れたのに c の回答が無いときは、原本どおり c＝無（a,bで実施） */
+  if(C.f102 && !C.f109 && !C.f111 && !String(HP.c||'').trim()){ C.f109=false; C.f111=true; T.f112='a,bで実施'; }
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
   else if(Object.keys(IS).length){
     // ver.20261104.01: 3-イ（口座・携帯・ライフライン）は義務的支援。回答が無ければ「有（適宜実施）」
@@ -2655,10 +2692,8 @@ async function _p17Hearing(so, _s){
   if(apply(IS.orientation, [['f184','f185','f186','f187']])) sch++;
   /* ver.20261030.06: 4 生活オリエンテーションの実施予定。回答が「適宜実施」などの決まり文句（または空）のときだけ、
      認定は「入国後遅滞なく」、変更は「変更許可後遅滞なく」にする。機関独自の書き方（例「入社後」）はそのまま。 */
-  if(C.f184 && /^(|有|適宜|適宜実施)$/.test(String(T.f185||'').trim())){
-    var _nin = /認定/.test((document.getElementById('es_appType')||{}).value||'');
-    T.f185 = _nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
-  }
+  // ver.20261112.11: 決まり文句（「有」「適宜」）のときは原本どおり「適宜実施」（以前の「入国後遅滞なく／変更許可後遅滞なく」への置き換えはやめた）
+  if(C.f184 && /^(|有|適宜)$/.test(String(T.f185||'').trim())) T.f185 = '適宜実施';
   if(apply(IS.japanese,    [['f205','f206','f207','f208'],['f213','f214','f215','f216'],['f220','f221','f222','f223']])) sch++;
   // ver.20261104.01: 日本語学習の回答が教室案内・教材・オンライン講座だけ（日本語教師との契約・講習に触れていない）なら、ｃは「無（a,bで実施）」
   var _jp = String(IS.japanese||'');
