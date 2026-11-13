@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261113.02
+ * - feat(1-6号): 社会保険料「不要（書類に記載しない）」のときは税金等の自動計算で社会保険料を入れない
  * ver.20261112.03
  * - change(1-6号): 換算月給を 時給×年間所定労働時間÷12／日給×年間所定労働日数÷12 に（年間が空なら月の値）。作成済みの書類の値は変えない
  * ver.20261112.02
@@ -6454,13 +6456,16 @@ function _structNoticeShow(){
     var r=compute(); if(!r.ok || !r.gross) return [];
     var changed=[];
     KEYS.forEach(function(k){
-      var e=el(MAP[k]); if(!e || e.dataset.taxAuto!=='1') return;
+      var e=el(MAP[k]); if(!e) return;
+      if(_none(k)){ e.dataset.taxAuto=''; return; }   // ver.20261113.02: 「不要（書類に記載しない）」は計算しない
+      if(e.dataset.taxAuto!=='1') return;
       if(r.values[k]==null) return;
       if(setVal(e, String(r.values[k]))) changed.push(MAP[k]);
     });
     return changed;
   }
   window._p16TaxRecalc=function(){ try{ return recalc(); }catch(e){ return []; } };   // ver.20261111.07: 時給から換算月給を入れ直したときにも呼ぶ
+  function _none(k){ var est=el(MAP[k]+'Est'); return !!(est && /不要/.test(est.value||'')); }
   function same(a,b){   // 金額として同じか（「14,126」と「14126」は同じ）
     a=(a==null?'':String(a)).trim(); b=(b==null?'':String(b)).trim();
     if(a===''||b==='') return false;
@@ -6477,6 +6482,7 @@ function _structNoticeShow(){
       var e=el(MAP[k]); if(!e) return;
       var cur=String(e.value||'').trim();
       e.dataset.taxAuto = (cur==='' || same(cur, av[k]) || same(cur, r.values[k])) ? '1' : '';
+      if(_none(k)) e.dataset.taxAuto='';
       if(!e._taxBound){
         e._taxBound=true;
         e.title='自動計算されます（手入力で上書き可・空にすると自動計算に戻ります）';

@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（ミャンマー語版）</div>
-    <div class="ver">ver.20261113.01</div>
+    <div class="ver">ver.20261113.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -429,7 +429,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
     </div>
     <div class="fs"><div class="fs-title">別紙 控除</div>
       <div class="fg"><label>税（円）<span class="fid">es.deductTax</span></label><input id="es_deductTax" oninput="p()"></div>
-      <div class="fg"><label>社会保険料（円）<span class="fid">es.deductSocialIns</span></label><input id="es_deductSocialIns" oninput="p()"></div>
+      <div class="fg"><label>社会保険料（円）<span class="fid">es.deductSocialIns</span></label><input id="es_deductSocialIns" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductSocialInsNone" onchange="_setSocNone(this.checked)" style="width:auto;margin:0;">不要（書類に記載しない）</label><input id="es_deductSocialInsEst" type="hidden"></div>
       <div class="fg"><label>雇用保険料（円）<span class="fid">es.deductEmpIns</span></label><input id="es_deductEmpIns" oninput="p()"></div>
       <div class="fg"><label>食費（円）<span class="fid">es.deductFood</span></label><input id="es_deductFood" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductFoodJippi" onchange="_setJippi('es_deductFood',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductFoodEst" type="hidden"></div>
       <div class="fg"><label>居住費（円）<span class="fid">es.deductHousing</span></label><input id="es_deductHousing" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductHousingJippi" onchange="_setJippi('es_deductHousing',this.checked)" style="width:auto;margin:0;">実費（合計に含めない）</label><input id="es_deductHousingEst" type="hidden"></div>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794544539"></script>
+<script src="ofusa_common.js?v=1794545663"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1188,7 +1188,7 @@ function p(){
     </tr>
     <tr>
       <td style="vertical-align:top;">(b) 社会保険料<br><span class="id" style="font-size:7pt;">(b) လူမှုဖူလုံရေးအာမခံ</span></td>
-      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;"><table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductSocialIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductSocialIns')}</td></tr></table></td>
+      <td style="text-align:right;vertical-align:top;padding-bottom:3px;white-space:nowrap;width:30%;">${_socNone()?'':`<table style='border-collapse:collapse;width:100%;'><tr><td style='white-space:nowrap;text-align:right;'>約&emsp;&emsp;&emsp;</td><td style='text-align:right;'>${_jAmt('es_deductSocialIns')}</td><td style='white-space:nowrap;width:1.5em;'>円${_jSuf('es_deductSocialIns')}</td></tr><tr><td style='white-space:nowrap;text-align:right;font-size:7pt;' class='id'>မှန်းခြေ&emsp;&emsp;&emsp;</td><td style='text-align:right;font-size:7pt;' class='id'>${_jT('es_deductSocialIns')}</td><td style='white-space:nowrap;font-size:7pt;' class='id'>ယန်း${_jSufE('es_deductSocialIns')}</td></tr></table>`}</td>
       <td></td>
     </tr>
     <tr>
@@ -1480,6 +1480,17 @@ function fPayL(jaId, enId){
   return '<span class="f" data-bind="'+enId+'">'+esc(t)+'</span>';
 }
 function _isKensetsu(){ return ((v('es_applicantField')||'')+(v('es_applicantFieldEn')||'')).includes('建設'); }
+/* ver.20261113.02: 社会保険料「不要（書類に記載しない）」— 農業など社会保険料を書かない案件用。
+   hidden の es_deductSocialInsEst='不要' で管理（雇用条件セットに保存）。不要のときは金額を空にして自動計算もしない。 */
+function _socNone(){ var est=document.getElementById('es_deductSocialInsEst'), on=!!(est && /不要/.test(est.value||''));
+  var cb=document.getElementById('es_deductSocialInsNone'), am=document.getElementById('es_deductSocialIns');
+  if(cb && cb.checked!==on) cb.checked=on;
+  if(am){ am.disabled=on; am.style.background=on?'#f1f5f9':''; if(on && am.value){ am.value=''; am.dispatchEvent(new Event('input',{bubbles:true})); } }
+  return on; }
+function _setSocNone(on){ var est=document.getElementById('es_deductSocialInsEst'), am=document.getElementById('es_deductSocialIns'); if(est) est.value=on?'不要':'';
+  if(am){ if(on){ am.dataset.taxAuto=''; } else { am.disabled=false; am.style.background=''; if(!String(am.value).trim()) am.dataset.taxAuto='1'; } }
+  _socNone(); if(!on){ try{ if(window._p16TaxRecalc) window._p16TaxRecalc(); }catch(_e){} }
+  if(typeof p==='function') p(); }
 function _isJippi(fld){ return /実費/.test(v(fld+'Est')||''); }
  function _jAmt(fld){ return ff(fld); }
 function _jT(fld){ return ff(fld); }
