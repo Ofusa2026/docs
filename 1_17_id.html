@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（インドネシア語版・変更）</div>
-    <div class="ver">ver.20261113.01</div>
+    <div class="ver">ver.20261113.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2572,7 +2572,7 @@ async function _p17Hearing(so, _s){
   var IS = Object.assign({}, ex.implSchedules || {});
   var HP = Object.assign({}, ex.housingPolicy||{});
   /* ver.20261113.01: 住居確保（3-ア a・b・c）と生活オリエンテーションの実施予定は、
-     登録支援機関が O-Link のヒアリングフォーム（form_responses.form_type='support_org'）で自分で入れた回答があればそれを優先する。
+     登録支援機関が O-Link で自分で入れた回答（ヒアリングフォーム／Share の標準情報・言語別の設定）があればそれを優先する。
      それ以外（案シスへの一括登録などで入った値）は使わず、決まった書き方にする。
        a＝有（bでの入居に合意しなかった場合に実施）／b＝有（適宜実施）／c＝無（a,bで実施）　※社宅（自己所有）なら b と c を入れ替える
        生活オリエンテーション＝有（適宜実施） */
@@ -2580,21 +2580,35 @@ async function _p17Hearing(so, _s){
   if(so && so.id){
     _olStd = true;
     try{
-      var _fr = await sb('form_responses?select=response&form_type=eq.support_org&case_id=eq.'+encodeURIComponent(so.id)+'&deleted_at=is.null&order=created_at.desc&limit=1');
-      var _rr = _fr && _fr[0] && _fr[0].response;
-      if(_rr){
-        var _rh = _rr.housingPolicy;
-        if(_rh && typeof _rh==='object' && (String(_rh.a||'').trim() || String(_rh.b||'').trim() || String(_rh.c||'').trim())) _olHP = _rh;
-        if(_rr.implSchedules && String(_rr.implSchedules.orientation||'').trim()) _olOri = String(_rr.implSchedules.orientation).trim();
+      var _fr = await sb('form_responses?select=response,created_at&form_type=eq.support_org&case_id=eq.'+encodeURIComponent(so.id)+'&deleted_at=is.null&order=created_at.desc&limit=1');
+      var _rr = _fr && _fr[0] && _fr[0].response, _frAt = (_fr && _fr[0] && _fr[0].created_at) || '';
+      var _hasHP = function(h){ return h && typeof h==='object' && (String(h.a||'').trim() || String(h.b||'').trim() || String(h.c||'').trim()); };
+      /* ver.20261113.02: O-Link の Share（登録支援機関ページ）の「1-17号の標準情報」で登録支援機関が保存した内容（extra._olinkStd17At の印付き）も
+         O-Link の回答として扱う。ヒアリングフォームの回答と両方あるときは、新しい方を使う。 */
+      var _stdAt = String(ex._olinkStd17At||'');
+      var _useStd = !!_stdAt && (!_rr || !_frAt || new Date(_stdAt) >= new Date(_frAt));
+      var _src = _useStd ? { housingPolicy: ex.housingPolicy, implSchedules: ex.implSchedules } : _rr;
+      if(_src){
+        if(_hasHP(_src.housingPolicy)) _olHP = _src.housingPolicy;
+        if(_src.implSchedules && String(_src.implSchedules.orientation||'').trim()) _olOri = String(_src.implSchedules.orientation).trim();
       }
+      if(!_olHP && _rr && _hasHP(_rr.housingPolicy)) _olHP = _rr.housingPolicy;
+      if(!_olOri && _rr && _rr.implSchedules && String(_rr.implSchedules.orientation||'').trim()) _olOri = String(_rr.implSchedules.orientation).trim();
     }catch(_e){ console.warn('[1-17 O-Link回答]', _e); }
+    // ver.20261113.02: Share の「言語別の設定」で登録支援機関が保存した住居確保（olink_saved_at の印付き）は、それをいちばん優先する
+    if(lo && lo.olink_saved_at && (String(lo.housing_policy_a||'').trim() || String(lo.housing_policy_b||'').trim() || String(lo.housing_policy_c||'').trim())){
+      _olHP = { a: lo.housing_policy_a||'', b: lo.housing_policy_b||'', c: lo.housing_policy_c||'' };
+    }
     if(_olHP){ HP = Object.assign({ note: HP.note||'' }, _olHP); IS.housing = ''; }
     else { HP = { a:'', b:'', c:'', note: HP.note||'' }; IS.housing = ''; }
     IS.orientation = _olOri;   // O-Link の回答が無ければ空 → 下で「有（適宜実施）」にする
   }
-  if(lo.housing_policy_a && (!_olStd || _olHP)) HP.a = lo.housing_policy_a;
-  if(lo.housing_policy_b && (!_olStd || _olHP)) HP.b = lo.housing_policy_b;
-  if(lo.housing_policy_c && (!_olStd || _olHP)) HP.c = lo.housing_policy_c;
+  // 言語別の設定の住居確保：自社支援（登録支援機関なし）は従来どおり。登録支援機関は O-Link で保存したもの（上で反映済み）だけ使う
+  if(!_olStd){
+    if(lo.housing_policy_a) HP.a = lo.housing_policy_a;
+    if(lo.housing_policy_b) HP.b = lo.housing_policy_b;
+    if(lo.housing_policy_c) HP.c = lo.housing_policy_c;
+  }
   var sch = 0;
   if(apply(IS.guidance,    [['f044',null,'f046','f047']])) sch++;
   /* ver.20261104.04: 住居の回答が「有（bで…合意しなかった場合に実施／雇用開始後一週間以内に実施）」のように
