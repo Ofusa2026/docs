@@ -6,7 +6,7 @@
  * - fix(1-6号): 手当を空欄のまま保存した直接編集版でも、別紙の金額・計算方法をあとから入れれば書類に出るようにした（欄が無ければ足す）
  * ver.20261111.02
  * - feat(1-6号): 税金（所得税＋住民税）・社会保険料・雇用保険料を自動計算（案シスと同じ OFUSA_TAXCALC。手で直した欄は上書きしない）
- * ver.20261102.01
+ * ver.20261113.01
  * - fix: 直接編集版・呼び戻した書類で、業務区分２（分野２）が空なのに「建築・es.category2」と出ていた → 空なら区切りの「・」ごと出さない
  * ver.20261029.01
  * - feat(利用ログ): saysay_logs に案シスで選んだ担当者名(user_name)も記録（共有アカウント mail@ でも人を区別）
@@ -1351,6 +1351,19 @@ function applyBindings(){
 function _bunyaPairTidy(area){
   var _clean=function(x){ return String(x||'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]/g,'').replace(/[（(][^）)]*(分野|特定技能)[^）)]*$/,'').replace(/\s*\([^()]*\)\s*$/,'').trim(); };
   [['es_category','es_category2'],['es_categoryEn','es_category2En']].forEach(function(pr){
+    // ver.20261113.01: 古い雛形で作った直接編集版は「業務区分・業務区分・業務区分」のように同じ欄（es_category）が
+    //   3つ並んだまま保存されており、同じ内容が3回出ていた。同じ親の中で2つ目以降の同じ欄は「・」ごと隠し、1つ目だけを出す
+    //   （2つ目の区分に値があるときは、このあとの処理で「・2つ目」が足される）。
+    try{
+      var _seen=[];
+      area.querySelectorAll('span.f[data-bind="'+pr[0]+'"]').forEach(function(sp){
+        var par=sp.parentNode; if(!par) return;
+        if(_seen.indexOf(par)<0){ _seen.push(par); return; }
+        var prev=sp.previousSibling;
+        if(prev && prev.nodeType===3) prev.nodeValue=prev.nodeValue.replace(/・\s*$/,'');
+        sp.parentNode.removeChild(sp);
+      });
+    }catch(_e){}
     // ver.20261105.08: 業務区分が1つのときに保存した直接編集版には2つ目の欄そのものが無く、
     //   あとで案シスで2つ目を選んでも出なかった。2つ目に値があれば、1つ目のすぐ後ろに「・2つ目」の欄を足す。
     try{
