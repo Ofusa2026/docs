@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261112.12</div>
+    <div class="ver">ver.20261113.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2573,11 +2573,32 @@ async function _p17Hearing(so, _s){
     });
     return true;
   };
-  var IS = ex.implSchedules || {};
+  var IS = Object.assign({}, ex.implSchedules || {});
   var HP = Object.assign({}, ex.housingPolicy||{});
-  if(lo.housing_policy_a) HP.a = lo.housing_policy_a;
-  if(lo.housing_policy_b) HP.b = lo.housing_policy_b;
-  if(lo.housing_policy_c) HP.c = lo.housing_policy_c;
+  /* ver.20261113.01: 住居確保（3-ア a・b・c）と生活オリエンテーションの実施予定は、
+     登録支援機関が O-Link のヒアリングフォーム（form_responses.form_type='support_org'）で自分で入れた回答があればそれを優先する。
+     それ以外（案シスへの一括登録などで入った値）は使わず、決まった書き方にする。
+       a＝有（bでの入居に合意しなかった場合に実施）／b＝有（適宜実施）／c＝無（a,bで実施）　※社宅（自己所有）なら b と c を入れ替える
+       生活オリエンテーション＝有（適宜実施） */
+  var _olHP = null, _olOri = '', _olStd = false;
+  if(so && so.id){
+    _olStd = true;
+    try{
+      var _fr = await sb('form_responses?select=response&form_type=eq.support_org&case_id=eq.'+encodeURIComponent(so.id)+'&deleted_at=is.null&order=created_at.desc&limit=1');
+      var _rr = _fr && _fr[0] && _fr[0].response;
+      if(_rr){
+        var _rh = _rr.housingPolicy;
+        if(_rh && typeof _rh==='object' && (String(_rh.a||'').trim() || String(_rh.b||'').trim() || String(_rh.c||'').trim())) _olHP = _rh;
+        if(_rr.implSchedules && String(_rr.implSchedules.orientation||'').trim()) _olOri = String(_rr.implSchedules.orientation).trim();
+      }
+    }catch(_e){ console.warn('[1-17 O-Link回答]', _e); }
+    if(_olHP){ HP = Object.assign({ note: HP.note||'' }, _olHP); IS.housing = ''; }
+    else { HP = { a:'', b:'', c:'', note: HP.note||'' }; IS.housing = ''; }
+    IS.orientation = _olOri;   // O-Link の回答が無ければ空 → 下で「有（適宜実施）」にする
+  }
+  if(lo.housing_policy_a && (!_olStd || _olHP)) HP.a = lo.housing_policy_a;
+  if(lo.housing_policy_b && (!_olStd || _olHP)) HP.b = lo.housing_policy_b;
+  if(lo.housing_policy_c && (!_olStd || _olHP)) HP.c = lo.housing_policy_c;
   var sch = 0;
   if(apply(IS.guidance,    [['f044',null,'f046','f047']])) sch++;
   /* ver.20261104.04: 住居の回答が「有（bで…合意しなかった場合に実施／雇用開始後一週間以内に実施）」のように
@@ -2585,7 +2606,8 @@ async function _p17Hearing(so, _s){
      前半を a、後半を b に分けて、どちらも「有」にする。b に別の回答があるときは分けない。 */
   var _ha = String(HP.a || IS.housing || ''), _hm = _ha.match(/^\s*有\s*[（(](.*)[）)]\s*$/);
   var _hs = _hm ? _hm[1].split('／').map(function(x){ return x.trim(); }).filter(Boolean) : [];
-  if(_p17HouseFill(_ha, HP, C, T)){
+  if(_olStd && !_olHP){ _p17HouseFill('有', HP, C, T); sch++; }   // ver.20261113.01: O-Link の回答が無い登録支援機関は決まった書き方
+  else if(!_olHP && _p17HouseFill(_ha, HP, C, T)){
     sch++;
   } else if(_hs.length===2 && /^b/i.test(_hs[0]) && !String(HP.b||'').trim()){
     C.f094=true; C.f096=false; T.f095=_hs[0];
@@ -2608,6 +2630,7 @@ async function _p17Hearing(so, _s){
      認定は「入国後遅滞なく」、変更は「変更許可後遅滞なく」にする。機関独自の書き方（例「入社後」）はそのまま。 */
   // ver.20261112.11: 決まり文句（「有」「適宜」）のときは原本どおり「適宜実施」（以前の「入国後遅滞なく／変更許可後遅滞なく」への置き換えはやめた）
   if(C.f184 && /^(|有|適宜)$/.test(String(T.f185||'').trim())) T.f185 = '適宜実施';
+  if(_olStd && !_olOri){ C.f184=true; C.f186=false; T.f185='適宜実施'; T.f187=''; }   // ver.20261113.01: O-Link の回答が無ければ「有（適宜実施）」
   if(apply(IS.japanese,    [['f205','f206','f207','f208'],['f213','f214','f215','f216'],['f220','f221','f222','f223']])) sch++;
   // ver.20261104.01: 日本語学習の回答が教室案内・教材・オンライン講座だけ（日本語教師との契約・講習に触れていない）なら、ｃは「無（a,bで実施）」
   var _jp = String(IS.japanese||'');
