@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261113.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261113.02</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -637,7 +637,7 @@ const DOC_LANG_SUPPORT = {
   '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
   '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si'],
   '1_16': ['id','vi','th','ne','my','km','en','ko','zh'],
-  'juuyou':['id','vi','km','my','ko','ne'],
+  'juuyou':['id','vi','km','my','ko','ne','en'],   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
 };
 // 日本語(ja) は多くの書類でデフォルト版（ID版）を流用表示する扱い
 // → resolveLangForDoc で 'ja' → その書類の先頭言語 にフォールバック
@@ -1006,6 +1006,7 @@ const LANG_FILES_JUUYOU={
   'my':'juuyou_my.html',
   'ko':'juuyou_ko.html',
   'ne':'juuyou_ne.html',
+  'en':'juuyou_en.html?v=1794557419',
 };
 function open_juuyou(lang){
   lang = lang || currentLang;
@@ -1844,6 +1845,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261113.02',
+    date: '2026-11-13',
+    notify: true,
+    items: [
+      '🇬🇧 重要事項事前説明書（建設）に英語版を作りました。フィリピン・スリランカ・インドなど、対応する言語版が無い国籍の人は、これまでインドネシア語版で開いていましたが、英語版で開くようになります。言語ボタンの「EN」でも選べます。'
+    ]
+  },
   {
     version: 'ver.20261113.01',
     date: '2026-11-13',

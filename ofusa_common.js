@@ -5822,8 +5822,9 @@ window.addEventListener('load', function(){
 var JUUYOU_WORK_STD={
   '土木':{
     ja:'指導者の指示・監督を受けながら、土木施設の新設、改築、維持、修繕に係る作業等に従事',
-    name:{vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
+    name:{en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
     tr:{
+      en:'Engaged in work related to the new construction, reconstruction, maintenance and repair of civil engineering facilities under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版
       vi:'Tham gia thực hiện các công việc liên quan đến xây dựng mới, cải tạo, duy trì và sửa chữa các công trình kỹ thuật dân dụng dưới sự chỉ đạo và giám sát của người hướng dẫn',
       id:'Melaksanakan pekerjaan yang berkaitan dengan pembangunan baru, rekonstruksi, pemeliharaan, dan perbaikan fasilitas teknik sipil di bawah arahan dan pengawasan pembimbing',
       my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် အရပ်ဘက်အင်ဂျင်နီယာ အဆောက်အအုံများ အသစ်တည်ဆောက်ခြင်း၊ ပြန်လည်ပြုပြင်ခြင်း၊ ထိန်းသိမ်းခြင်းနှင့် ပြုပြင်ခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
@@ -5833,8 +5834,9 @@ var JUUYOU_WORK_STD={
   },
   '建築':{
     ja:'指導者の指示・監督を受けながら、建築物の新築、増築、改築若しくは移転又は修繕若しくは模様替に係る作業等に従事',
-    name:{vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
+    name:{en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
     tr:{
+      en:'Engaged in work related to the new construction, extension, reconstruction, relocation, repair or remodeling of buildings under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版
       vi:'Tham gia thực hiện các công việc liên quan đến xây dựng mới, mở rộng, cải tạo, di dời, sửa chữa hoặc thay đổi diện mạo các công trình kiến trúc dưới sự chỉ đạo và giám sát của người hướng dẫn',
       id:'Melaksanakan pekerjaan yang berkaitan dengan pembangunan baru, perluasan, renovasi, pemindahan, perbaikan, atau perubahan tampilan bangunan di bawah arahan dan pengawasan pembimbing',
       my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် အဆောက်အအုံများ အသစ်ဆောက်လုပ်ခြင်း၊ တိုးချဲ့ခြင်း၊ ပြန်လည်ပြုပြင်ခြင်း၊ ရွှေ့ပြောင်းခြင်း၊ ပြုပြင်ခြင်း သို့မဟုတ် ပုံစံပြောင်းလဲခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
@@ -5844,8 +5846,9 @@ var JUUYOU_WORK_STD={
   },
   'ライフライン・設備':{
     ja:'指導者の指示・監督を受けながら、電気通信、ガス、水道、電気その他のライフライン・設備の整備・設置、変更又は修理に係る作業等に従事',
-    name:{vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
+    name:{en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
     tr:{
+      en:'Engaged in work related to the maintenance, installation, modification or repair of telecommunications, gas, water supply, electricity and other lifelines and facilities under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版
       vi:'Tham gia thực hiện các công việc liên quan đến bảo trì, lắp đặt, thay đổi hoặc sửa chữa viễn thông, khí đốt, cấp nước, điện và các cơ sở hạ tầng, thiết bị khác dưới sự chỉ đạo và giám sát của người hướng dẫn',
       id:'Melaksanakan pekerjaan yang berkaitan dengan pemeliharaan, pemasangan, perubahan, atau perbaikan telekomunikasi, gas, air, listrik, serta infrastruktur dan fasilitas lainnya di bawah arahan dan pengawasan pembimbing',
       my:'ကြီးကြပ်ရေးမှူးတစ်ဦး၏ လမ်းညွှန်မှုနှင့် ကြီးကြပ်မှုအောက်တွင် ဆက်သွယ်ရေး၊ ဓာတ်ငွေ့၊ ရေပေးဝေရေး၊ လျှပ်စစ်နှင့် အခြားအခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်းများကို ပြုပြင်ထိန်းသိမ်းခြင်း၊ တပ်ဆင်ခြင်း၊ ပြောင်းလဲခြင်း သို့မဟုတ် ပြင်ဆင်ခြင်းနှင့် ဆက်စပ်သော အလုပ်များတွင် ပါဝင်လုပ်ဆောင်သည်',
