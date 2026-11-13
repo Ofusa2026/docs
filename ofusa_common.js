@@ -177,6 +177,15 @@ function _sbWaitUserToken(){
     var iv=setInterval(function(){ var t2=_sbTokenFromLS(); if(_sbUserTokOk(t2)){ clearInterval(iv); _sbNeedLoginNotice(false); res(t2); } }, 1500);
   });
 }
+// ver.20261113.01: 直接編集版HTMLの読み書き（DBの company_edited_html。会社データ extra._edited からここへ移した）
+//   保存は今までどおり extra._edited に入れて PATCH すれば、DBのトリガーが別テーブルへ移す（set_edited_html RPC でも可）
+async function _getEditedHtml(companyId, doc, caseId){
+  const r = await sb('rpc/get_edited_html', { method:'POST', body: JSON.stringify({ p_company_id: String(companyId), p_doc: doc||null, p_case_id: caseId||null }) });
+  return (r && typeof r === 'object' && !Array.isArray(r)) ? r : {};
+}
+async function _delEditedHtml(companyId, doc, caseId){
+  return sb('rpc/del_edited_html', { method:'POST', body: JSON.stringify({ p_company_id: String(companyId), p_doc: doc, p_case_id: String(caseId) }) });
+}
 async function sb(path,opts={}){
   let _tok = _sbToken();
   if(!_sbUserTokOk(_tok)) _tok = await _sbWaitUserToken();
@@ -3739,7 +3748,17 @@ async function loadFormGenericFromDB(docKey, info){
   try {
     const cos = await sb('companies?select=extra&id=eq.'+companyId);
     const co = cos && cos[0];
-    if(!co || !co.extra) return;
+    if(!co) return;
+    // ver.20261113.01: 直接編集版は会社データ(extra._edited)から別テーブルへ移した（会社データが重くてDBが止まっていたため）。
+    //   この書類・この案件の分だけ取ってきて、今までと同じ co.extra._edited の形に入れる
+    try{
+      const _edKey0 = ((location.pathname.split('/').pop()||docKey).replace(/\.html.*$/,'')) || docKey;
+      if(info && info.caseId){
+        const _em = await _getEditedHtml(companyId, _edKey0, info.caseId);
+        if(_em && Object.keys(_em).length){ if(!co.extra || typeof co.extra!=='object') co.extra = {}; co.extra['_edited'] = _em; }
+      }
+    }catch(_e){ console.warn('[edited load]', _e); }
+    if(!co.extra) return;
     const idx = parseInt(empSetIdx||0)||0;
     const data = co.extra && co.extra[docKey] && co.extra[docKey][String(idx)];
     // ver.20260717: ここで `if(!data) return;` していたため、通常のフォーム値(extra[docKey])が
@@ -3831,13 +3850,8 @@ async function discardEditedGeneric(){
     if(!cid){ const q = await sb('cases?select=company_id&id=eq.'+info.caseId); if(q && q[0]) cid = q[0].company_id; }
     if(!cid){ if(typeof showToast==='function') showToast('⚠️ 会社情報が取得できません'); return; }
     const _edKey = (location.pathname.split('/').pop()||'').replace(/\.html.*$/,'');
-    const r = await sb('companies?select=id,extra&id=eq.'+cid);
-    const c = r && r[0];
-    const ex = c && c.extra && typeof c.extra === 'object' ? JSON.parse(JSON.stringify(c.extra)) : {};
-    if(ex['_edited'] && ex['_edited'][_edKey] && ex['_edited'][_edKey][info.caseId]){
-      delete ex['_edited'][_edKey][info.caseId];
-      await sb('companies?id=eq.'+cid, { method:'PATCH', headers:{'Prefer':'return=minimal'}, body: JSON.stringify({ extra: ex }) });
-    }
+    // ver.20261113.01: 直接編集版は別テーブル（company_edited_html）。消すのもRPCで
+    await _delEditedHtml(cid, _edKey, info.caseId);
     window._htmlFrozen = false; window._editedRestored = false;
     // ver.20260716: 破棄後に_editModeを解除しないとp()が早期returnしてプレビューが空になるバグを修正
     if(typeof _editMode !== 'undefined') _editMode = false;

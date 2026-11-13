@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（タイ語版）</div>
-    <div class="ver">ver.20261112.17</div>
+    <div class="ver">ver.20261113.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -507,7 +507,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 </div>
 
-<script src="ofusa_common.js?v=1794541589"></script>
+<script src="ofusa_common.js?v=1794544539"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1788,8 +1788,8 @@ async function saveForm(){
         if(_area && info.caseId){
           // ⑦: read-modify-write競合を避け、DB側で該当パスのみ原子的に更新（jsonb_set RPC）
           await sb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:companyId,p_doc:'1_6_th',p_case_id:info.caseId,p_html:(typeof getBindResetHtml==='function'?getBindResetHtml():_area.innerHTML),p_saved_at:new Date().toISOString(),p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
-          const _rex=await sb('companies?select=extra&id=eq.'+companyId);
-          const _sv=_rex&&_rex[0]&&_rex[0].extra&&_rex[0].extra['_edited']&&_rex[0].extra['_edited']['1_6_th']&&_rex[0].extra['_edited']['1_6_th'][info.caseId];
+          const _rex=await _getEditedHtml(companyId,'1_6_th',info.caseId);   // ver.20261113.01: 直接編集版は別テーブル
+          const _sv=_rex&&_rex['1_6_th']&&_rex['1_6_th'][info.caseId];
           if(!_sv||!_sv.html) throw new Error('直接編集版の保存確認に失敗しました');
           _editedSaved=true;
         }
@@ -1825,13 +1825,7 @@ async function discardEditedFromDB(){
   try{
     if(!cid){ const q=await sb('cases?select=company_id&id=eq.'+info.caseId); if(q&&q[0])cid=q[0].company_id; }
     if(!cid){ showToast('⚠️ 会社情報が取得できません'); return; }
-    const r=await sb('companies?select=id,extra&id=eq.'+cid);
-    const c=r&&r[0];
-    const ex=c&&c.extra&&typeof c.extra==='object'?JSON.parse(JSON.stringify(c.extra)):{};
-    if(ex['_edited']&&ex['_edited']['1_6_th']&&ex['_edited']['1_6_th'][info.caseId]){
-      delete ex['_edited']['1_6_th'][info.caseId];
-      await sb('companies?id=eq.'+cid,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({extra:ex})});
-    }
+    await _delEditedHtml(cid,'1_6_th',info.caseId);   // ver.20261113.01: 直接編集版は別テーブル
     window._htmlFrozen=false;
     if(typeof p==='function') p();
     showToast('♻️ 編集版を破棄しました');
