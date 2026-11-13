@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－１６号（シンハラ語）斡旋有無切替</title>
+<style>.fp-case{display:none!important;}
+/* 画面: 記入箇所は淡い黄色でハイライト（視認用）。印刷時は消す。 */
+.doc .f{ background:#fff7cc !important; }
+@media print{
+  .doc .f, span.f{ background:none !important; background-color:transparent !important; }
+}
+
+</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:12mm!important;line-height:1.38!important;min-height:auto!important}
+.id{color:#555;font-size:0.88em;}
+.tbl{width:100%;border-collapse:collapse;font-size:9.5pt;}
+.tbl td,.tbl th{border:1px solid #000;padding:2px 5px;vertical-align:top;}
+.tbl tr{page-break-inside:avoid;}
+.tbl td.dashed-bottom{border-bottom:1px dashed #888;}
+.tbl .lbl{width:28%;}
+.chk{display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;text-align:center;line-height:1em;margin-right:4px;}
+.chk-on{background:#000;color:#fff;font-weight:bold;}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+input.chk-box:checked{background:#fff;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #000;border-width:0 2px 2px 0;transform:rotate(45deg);}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:8mm!important;page-break-after:always;zoom:0.85;}
+  .doc:last-child{page-break-after:auto;}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+<style>
+/* ver.20261111.02: 画面の幅がせまいと fitDocToPreview() が .doc を縮めて表示する（zoom）。その大きさのまま印刷され、
+   人によって書類が小さく刷られていた（幅1000pxで84%）。印刷のときは画面の幅に関係なく元の大きさに戻す */
+@media print{ .doc{zoom:1!important} }
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 参考様式第１－１６号（シンハラ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
+    <div class="ver">ver.20261113.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('1_16').then(function(){ _ttSyncToCase(); })" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg"><label>書類作成日</label><input id="f_docDate" oninput="p()"></div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>作成責任者（役職・氏名）</label><input id="f_author" oninput="p()"></div>
+      <input id="f_companyEn" type="hidden"><input id="f_authorEn" type="hidden"><input id="f_docDateEn" type="hidden">
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">職業紹介（あっせん）</div>
+      <div class="fg"><label>あっせんの有無</label><select id="es_assen" onchange="p()"><option value="無">無</option><option value="有">有</option></select></div>
+      <div class="fg"><label>許可・届出受理番号</label><input id="f_ag_license" oninput="p()"></div>
+      <div class="fg"><label>職業紹介事業者の区分</label><select id="f_ag_type" onchange="p()"><option value=""></option><option value="有料">有料職業紹介事業者</option><option value="無料">無料職業紹介事業者</option></select></div>
+      <div class="fg"><label>職業紹介事業者の氏名</label><input id="f_ag_name" oninput="p()"></div>
+      <div class="fg"><label>職業紹介事業者の住所</label><input id="f_ag_addr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_ag_tel" oninput="p()"></div>
+      <div class="fg"><label>支払費用（求職者）</label><input id="f_ag_fee_seeker" oninput="p()"></div>
+      <div class="fg"><label>支払費用（求人者）</label><input id="f_ag_fee_employer" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">取次機関（国外）</div>
+      <div class="fg"><label>取次ぎの有無</label><select id="es_toritsugi" onchange="p()"><option value="無">無</option><option value="有">有</option></select></div>
+      <div class="fg"><label>氏名又は名称</label><input id="f_tt_name" oninput="p()"></div>
+      <div class="fg"><label>所在国</label><input id="f_tt_country" oninput="p()"></div>
+      <div class="fg"><label>所在地</label><input id="f_tt_addr" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_tt_tel" oninput="p()"></div>
+      <div class="fg"><label>費用(求職者)額</label><input id="f_tt_fee_seeker" oninput="p()"></div>
+      <div class="fg"><label>費用(求職者)名目</label><input id="f_tt_nom_seeker" oninput="p()"></div>
+      <div class="fg"><label>費用(求人者)額</label><input id="f_tt_fee_employer" oninput="p()"></div>
+      <div class="fg"><label>費用(求人者)名目</label><input id="f_tt_nom_employer" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">事前ガイダンス</div>
+      <div class="fg"><label>計画通り実施</label>
+        <select id="f_guidance" onchange="p()">
+          <option value="有">有 / Ya</option>
+          <option value="無">無 / Tidak</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">自国等の機関への支払（最大5件）</div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※該当なしの場合は空欄のまま</div>
+      <div class="fg"><label>①支払先機関名</label><input id="f_p1_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>①名目</label><input id="f_p1_kind" oninput="p()"></div>
+        <div class="fg"><label>①年月日</label><input id="f_p1_date" oninput="p()"></div>
+        <div class="fg"><label>①金額（円）</label><input id="f_p1_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>②支払先機関名</label><input id="f_p2_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>②名目</label><input id="f_p2_kind" oninput="p()"></div>
+        <div class="fg"><label>②年月日</label><input id="f_p2_date" oninput="p()"></div>
+        <div class="fg"><label>②金額（円）</label><input id="f_p2_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>③支払先機関名</label><input id="f_p3_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>③名目</label><input id="f_p3_kind" oninput="p()"></div>
+        <div class="fg"><label>③年月日</label><input id="f_p3_date" oninput="p()"></div>
+        <div class="fg"><label>③金額（円）</label><input id="f_p3_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>④支払先機関名</label><input id="f_p4_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>④名目</label><input id="f_p4_kind" oninput="p()"></div>
+        <div class="fg"><label>④年月日</label><input id="f_p4_date" oninput="p()"></div>
+        <div class="fg"><label>④金額（円）</label><input id="f_p4_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>⑤支払先機関名</label><input id="f_p5_name" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>⑤名目</label><input id="f_p5_kind" oninput="p()"></div>
+        <div class="fg"><label>⑤年月日</label><input id="f_p5_date" oninput="p()"></div>
+        <div class="fg"><label>⑤金額（円）</label><input id="f_p5_amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>合計（円）</label><input id="f_p_total" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1794556155"></script>
+<script>
+// 手数料として有効な値か判定する。
+// 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
+function _isRealFee(v){
+  if(v===null || v===undefined) return false;
+  const s=String(v).trim();
+  if(!s || s==='-' || s==='‐' || s==='ー' || s==='—') return false;
+  if(/待ち|済|完了|作成|中$|不要|なし|無し/.test(s)) return false;   // ステータス文言
+  if(/GMT|\d{4}-\d{2}-\d{2}|Mon |Tue |Wed |Thu |Fri |Sat |Sun /.test(s)) return false;  // 日付
+  let t=s.replace(/[，,\s]/g,'');
+  const man=t.match(/^([0-9.]+)万/);              // 「20万円」
+  if(man) return parseFloat(man[1])>0;
+  const num=t.match(/([0-9]+)/);                  // 「25000円」「25,000円」
+  return !!num && parseInt(num[1],10)>0;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const guidance = v('f_guidance') || '有';
+  const guidY = guidance==='有' ? 'chk-on' : '';
+  const guidN = guidance==='無' ? 'chk-on' : '';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10pt;margin-bottom:2px;">参考様式第１－１６号</div>
+<div style="text-align:left;font-size:9pt;" class="id">යොමු පෝරමය අංක 1-16</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用の経緯に係る説明書</div>
+<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">රැකියාවේ පසුබිම පැහැදිලි කිරීමේ පත්‍රිකාව</div>
+<div style="font-size:10pt;margin-bottom:2mm;">特定技能外国人　${f('f_applicant')}　との間で特定技能雇用契約を締結するに当たっての雇用の経緯は以下のとおりです。</div>
+<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">නිශ්චිත කුසලතා විදේශික ශ්‍රමික ${f('f_applicant')} අතර නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුව තීරණය කිරීම සඳහා වන රැකියාවේ පසුබිම පහත සඳහන් වේ.</div>
+
+<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">රැකියා නියෝජිත ආයතනය (ජපානය තුළ)</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td class="lbl">１　あっせんの有無<br><span class="id">භාවිතා කරනවාද නොකරනවාද යන්න</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">ඔව්</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">නැත</span>
+    </td>
+  </tr>
+  <tr>
+    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">අවසරය ලබා දුන් කුවිතාන්සි අංකය</span><br><span class="id">(අවසරය ලබා දුන් දිනය)</span></td>
+    <td colspan="3">${f('f_ag_license')}</td>
+  </tr>
+  <tr>
+    <td>３　職業紹介事業者の区分<br><span class="id">රැකියා නියෝජිත ආයතන වර්ගය</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">ගාස්තු අය කරන රැකියා නියෝජිත ආයතනයකි</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">ගාස්තු අය නොකරන රැකියා නියෝජිත ආයතනයකි</span>
+    </td>
+  </tr>
+  <tr>
+    <td>４　職業紹介事業者の氏名<br><span class="id">රැකියා නියෝජිත ආයතනයේ නම</span></td>
+    <td colspan="3">${f('f_ag_name')}</td>
+  </tr>
+  <tr>
+    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">රැකියා නියෝජිත ආයතනයේ ලිපිනය (දුරකථන අංකය)</span></td>
+    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>
+  </tr>
+  <tr>
+    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">රැකියා නියෝජිතයාට ගෙවනු ලැබූ මුදල</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>
+    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">යෙන්</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>
+    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">ගෙවීම් වශයෙන්</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">බඳවා ගන්නා ආයතනය (නිශ්චිත කුසලතා සඳහා බඳවා ගන්නා ආයතනය)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>
+    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">යෙන්</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>
+    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">ගෙවීම් වශයෙන්</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）<span class="id">(සැලකිලිමත් වන්න)</span></div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ඔබ ඉහත 1 කොටසේ "නැත" යන්න සලකුණු කලේ නම් 2 කොටස සහ ඊට පහළ කොටස් පිරවීමට අවශ්‍ය නොවේ.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">අංක 2 සිට 5 දක්වා සෞඛ්‍ය, කම්කරු හා සුබසාධන අමාත්‍යාංශයේ සේවා නියුක්ති ආරක්‍ෂක කාර්‍යාංශයේ වෙබ් අඩවියේ “මානව සම්පත් ඒකාබද්ධ සේවා අඩවිය” භාවිතා කර, අදාළ රැකියා නියෝජිත ආයතනය පිළිබඳව තොරතුරු ඇතුලත් කරන්න. තවද ඒ සමග අදාළ තොරතුරු පෙන්වා ඇති තිරයේ පිටපතක්ද අමුණන්න.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">6 වන තීරුවේ රැකියා අපේක්‍ෂකයින් සහ රැකියාවට බඳවා ගන්නා ආයතනය විසින් රැකියා නියෝජිත ආයතනයට ගෙවූ මුදල සහ අරමුණ සඳහන් කරන්න. තවද රැකියා අපේක්‍ෂකයින් විසින් ජපන් යෙන් හැර වෙනත් මුදල් ඒකකයකින් රැකියා නියෝජිතයාට මුදල් ගෙවා ඇත්නම් එම මුදල ජපන් යෙන් බවට පරිවර්ථනය කර සඳහන් කරන්න.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">４　職業紹介事業者との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">ඔබ රැකියා නියෝජිත ආයතනය සමග ගිවිසුමක් අත්සන් කර ඇත්නම් එහි ඡායා පිටපතක්ද අමුණන්න.</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">අතරමැදි නියෝජිත සංවිධානය (විදේශීය) (අංක 1 හි "ඔව්" යන්න සලකුණු කර ඇත්නම් පමණක් ඉන් පහල ඇති කොටස් පුරවන්න)</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <colgroup>
+    <col style="width:28%;">
+    <col style="width:22%;">
+    <col style="width:12%;">
+    <col>
+  </colgroup>
+  <tr>
+    <td class="lbl">１　取次ぎの有無<br><span class="id">අතරමැදි නියෝජිත සංවිධානයක සේවය ලබාගෙන ඇති නැති බව</span></td>
+    <td colspan="2" style="text-align:center;border-right:none;">
+      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">ඔව්</span>
+    </td>
+    <td style="text-align:center;border-left:none;">
+      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">නැත</span>
+    </td>
+  </tr>
+  <tr>
+    <td>２　氏名又は名称<br><span class="id">අතරමැදි නියෝජිත සංවිධානයේ නම</span></td>
+    <td colspan="3">${f('f_tt_name')}</td>
+  </tr>
+  <tr>
+    <td>３　所在国<br><span class="id">අතරමැදි නියෝජිත සංවිධානය පිහිටා ඇති රට</span></td>
+    <td colspan="3">${f('f_tt_country')}</td>
+  </tr>
+  <tr>
+    <td>４　所在地<br><span class="id">අතරමැදි නියෝජිත සංවිධානයේ ලිපිනය</span></td>
+    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>
+  </tr>
+  <tr>
+    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">අතරමැදි නියෝජිත සංවිධානයට ගෙවන ලද මුදල</span></td>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>
+    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">යෙන්</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ගෙවීම් වශයෙන්</span></td>
+  </tr>
+  <tr>
+    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">බඳවා ගන්නා ආයතනය (නිශ්චිත කුසලතා සඳහා බඳවා ගන්නා ආයතනය)</span></td>
+    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>
+    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">යෙන්</span>）</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>
+    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ගෙවීම් වශයෙන්</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）<span class="id">(සැලකිලිමත් වන්න)</span></div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">අතරමැදි නියෝජිත සංවිධානයක් යනු රැකියා නියෝජිත ආයතනය, රැකියා සඳහා බඳවා ගන්නා ආයතනයට රැකියා අපේක්‍ෂකයින් ගේ තොරතුරු ලබා දීමේදී අතරමැදිව සම්බන්ධ කර ගන්නා පාර්ශ්වයයි. අදාළ රැකියා නියෝජිත ආයතනය, රැකියා අපේක්‍ෂකයා හා සම්බන්ධ තොරතුරු ලබා ගැනීමේදී අතරමැදියෙකු වශයෙන් මෙම සංවිධානය ක්‍රියාත්මක වේ.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ඔබ ඉහත 1 කොටසේ "නැත" යන්න සලකුණු කලේ නම් 2 කොටස සහ ඊට පහළ කොටස් පිරවීමට අවශ්‍ය නොවේ.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
+  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">5 වන තීරය තුළ බඳවා ගැනීමේ ආයතනය සහ රැකියා අපේක්‍ෂකයින් අතරමැදි නියෝජිත සංවිධානයට ගෙවනු ලැබූ මුදල සහ ඒ මුදල් ලබා දීමේ අරමුණ සඳහන් කරන්න. තවද බඳවා ගැනීමේ ආයතනය සහ රැකියා අපේක්‍ෂකයින් ජපන් යෙන් හැර වෙනත් මුදලකින් ගෙවීම් සිදු කරනු ලැබ ඇත්නම් ඒ මුදලේ වටිනාකම ජපන් යෙන්වලට හරවා අදාල මුදල සඳහන් කරන්න.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
+  <div style="padding-left:1.5em;" class="id">අතරමැදි නියෝජිත සංවිධානයක් සමග කිසියම් ගිවිසුමක් අත්සන කර ඇත්නම් එහි පිටපතක්ද අමුණන්න.</div>
+</div>
+
+</div>
+<div class="doc">
+<div class="page-num-label">P3</div>
+<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">ජපානයට ඇතුලත් වීමට පෙර මාර්ගෝපදේශ සිදු කිරීම</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <tr>
+    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">නිශ්චිත කුසලතා විදේශික ශ්‍රමික කාණ්ඩ අංක 1 යටතේ තීරණය කර ඇති උපකාරක සැලසුම්වලට අනුව සිදු කල නොකල බව</span></td>
+    <td style="text-align:center;">
+      <input type="checkbox" class="chk-box" ${guidance==='有'?'checked':''}>有　
+      <input type="checkbox" class="chk-box" ${guidance==='無'?'checked':''}>無<br>
+      <span class="id">ඔව් / නැත</span>
+    </td>
+  </tr>
+</table>
+
+<div style="font-size:10pt;margin-bottom:2mm;">以上の１から３までの内容について相違ありません。なお，求職者（申請人）が在留資格「特定技能」の活動を行うことに関連して保証金，違約金の支払等の不適切な費用徴収がされていないことを本人から聞き取るなどして確認しています。</div>
+<div style="font-size:9pt;margin-bottom:4mm;" class="id">ඉහත 1 සිට 3 දක්වා අන්තර්ගතයේ වෙනසක් නැත. මීට අමතරව, රැකියා අපේක්‍ෂකයා (අයදුම්කරු)ගේ පදිංචි තත්වය (නිශ්චිත කුසලතා) ලබා ගැනීම හා සම්බන්ධව ආරක්‍ෂක තැන්පතු ගෙවීම සහ දඩ මුදල් ගෙවීම වැනි නුසුදුසු ගාස්තු එකතු කර නොමැති බව අදාල පුද්ගලයාගෙන් විමසා තහවුරු කර ගන්නා ලදී.</div>
+
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">සැකසූ දිනය：${f('f_docDateEn')}</div>
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
+<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">නිශ්චිත කුසලතා සඳහා අනුබද්ධ ආයතනයේ නම　${f('f_companyEn')}</div>
+<div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
+<div style="font-size:9pt;text-align:right;" class="id">ලියකියවිලි සැකසීම භාරකාරීව සිටින පුද්ගලයාගේ නම සහ තනතුර　${f('f_authorEn')}</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු) ඔහුගේ හෝ ඇයගේ මව් රටේ සංවිධානයන්ට ගෙවන ලද වියදම් යනාදිය</span></div>
+<table class="tbl" style="margin-bottom:4mm;">
+  <tr>
+    <th style="text-align:center;width:6%;">#</th>
+    <th style="text-align:center;">支払先機関の名称<br><span class="id">ගෙවීම් සිදු කරන ලද සංවිධානයේ නම</span></th>
+    <th style="text-align:center;width:18%;">名目<br><span class="id">අරමුණ</span></th>
+    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">ගෙවන ලද දිනය</span></th>
+    <th style="text-align:center;width:20%;">支払金額<br><span class="id">ගෙවන ලද මුදල</span></th>
+  </tr>
+  <tr>
+    <td style="text-align:center;">１</td>
+    <td>${f('f_p1_name') || '該当なし'}</td>
+    <td>${f('f_p1_kind')}</td>
+    <td>${f('f_p1_date')}</td>
+    <td>${f('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">２</td>
+    <td>${f('f_p2_name')}</td>
+    <td>${f('f_p2_kind')}</td>
+    <td>${f('f_p2_date')}</td>
+    <td>${f('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">３</td>
+    <td>${f('f_p3_name')}</td>
+    <td>${f('f_p3_kind')}</td>
+    <td>${f('f_p3_date')}</td>
+    <td>${f('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">４</td>
+    <td>${f('f_p4_name')}</td>
+    <td>${f('f_p4_kind')}</td>
+    <td>${f('f_p4_date')}</td>
+    <td>${f('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">５</td>
+    <td>${f('f_p5_name')}</td>
+    <td>${f('f_p5_kind')}</td>
+    <td>${f('f_p5_date')}</td>
+    <td>${f('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+  <tr>
+    <td colspan="4" style="text-align:right;">計　<span class="id">එකතුව</span></td>
+    <td>${f('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>
+  </tr>
+</table>
+<div style="font-size:8.5pt;margin-bottom:4mm;">
+  <div style="margin-bottom:1mm;">（注意）</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　自国等の機関は，特段対象を限定するものではなく，特定技能雇用契約の申込みの取次ぎ又は活動の準備に関与した全ての機関をいう。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　支払金額については，現地通貨又は米ドルで記載し，括弧書きで日本円に換算した金額を記載すること。</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:2mm;">３　名目については，申請人に示した名目どおりに記載すること。</div>
+  <div style="margin-bottom:1mm;" class="id">(සැලකිලිමත් වන්න)</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. තම මව් රටේ පිහිටා ඇති සංවිධාන යනු, විශේෂිත ඉලක්කයන් අරමුණු කර ගනිමින් සීමා සහිතව පවත්වාගෙන යන ඒවා නොව, නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුවල අයදුම් කිරීම සහ අදාල ක්‍රියාකාරකම් සඳහා වන පෙර සූදානම් කිරීම් හා සම්බන්ධ සියලුම සංවිධාන වේ.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. ගෙවන ලද මුදල් සම්බන්ධව තොරතුරු ඉදිරිපත් කිරීමේදී තමාගේ රටේ දේශීය මුදල් ඒකකයෙන් හෝ ඇමරිකන් ඩොලරවලින් සඳහන් කර, එම මුදලේ වටිනාකම ජපන් යෙන්වලින් ගණනය කර වරහන් තුළ සඳහන් කරන්න.</div>
+  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. ”අරමුණ” සඳහන් කිරීමේදී අයදුම්කරුට සංවිධානය මගින් පැවසූ අරමුණ සඳහන් කරන්න.</div>
+</div>
+
+<div style="font-size:10pt;margin-bottom:2mm;">特定技能雇用契約の申込みの取次ぎ又は在留資格「特定技能」に係る活動の準備に関して，自国等の機関に対し，上記の費用の額及び内訳について十分に理解した上で支払いました。また，上記の費用以外の費用については，徴収されていません。</div>
+<div style="font-size:9pt;margin-bottom:4mm;" class="id">නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුවලට අදාල අයදුම් කිරීමේ කටයුතු සහ පදිංචි තත්වය (නිශ්චිත කුසලතා) හා සම්බන්ධව පෙර සූදානම් කටයුතු හා සම්බන්ධයෙන් මාගේ මව් රටේ සංවිධාන වෙත ඉහල සඳහන් මුදල් ගෙවූ අරමුණ පිලිබඳ අවබෝධයෙන් අදාල මුදල් ගෙවන ලද අතර, ඉහත සඳහන් මුදල් වලට අමතරව කිසිඳු මුදලක් ගෙවා නැත.</div>
+<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">අයදුම්කරුගේ අත්සන</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _applyFontSize();
+  _apply1_16_siFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _apply1_16_siFontSize(){
+  const st=document.getElementById('_1_16_siFontStyle')||document.createElement('style');
+  st.id='_1_16_siFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10pt"]{font-size:${(10*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9.5pt"]{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:8.5pt"]{font-size:${(8.5*s).toFixed(2)}pt!important}`,
+    `.tbl{font-size:${(10*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+const AGENCY_MASTER = {
+  '株式会社マックス':{addr:'東京都大田区蒲田５丁目２８番４号　ＥＣＳ第２７ビル２０２', tel:'03-5711-0805', license:'13-ユ-302361', type:'有料'},
+};
+// ver.20261028.03: 「DB保存」で、取次機関（国外）の欄を案件の送り出し機関（cases.senddashi_org / senddashi_payment）にも書き戻す（案シスの案件画面「送り出し機関情報」に出る）
+//   ver.20261028.04: この画面で取次機関の欄（取次ぎの有無・氏名・所在国・所在地・電話・費用・名目）を手で直したときだけ書き戻す（_ttDirty）。
+//     フォームの保存値は会社ごとに共用なので、直していないのに前の人の内容を案件へ書き込まないため。
+//     「取次ぎの有無」を「無」にしたときは「送り出し機関省略」として書く
+//   ・「取次ぎの有無」が「有」で欄がぜんぶ空のときは書き換えない（読み込めなかっただけで案件の値を消さないため）
+//   ・支払いは「費用(求職者)額」「費用(求人者)額」のどちらか一方だけ入っているときに書く（求職者＝申請人／求人者＝所属機関。両方・どちらも空なら書き換えない）
+window._ttDirty=false;
+(function(){
+  var on=function(e){ var t=e && e.target; if(t && t.id && (t.id==='es_toritsugi' || t.id.indexOf('f_tt_')===0)) window._ttDirty=true; };
+  document.addEventListener('input', on, true); document.addEventListener('change', on, true);
+})();
+async function _ttSyncToCase(){
+  try{
+    var info=null, sel=document.getElementById('caseSelect');
+    if(sel && sel.value){ try{ info=JSON.parse(sel.value); }catch(e){} }
+    if((!info || !info.caseId) && window._lastCaseInfo && window._lastCaseInfo.caseId) info=window._lastCaseInfo;
+    if(!info || !info.caseId) return;
+    if(!window._ttDirty) return;
+    var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+    var patch={};
+    if(g('es_toritsugi')!=='有'){ patch={ senddashi_org:{ not_used:true }, senddashi_payment:{ not_used:true } }; }
+    else {
+    var org={ name:g('f_tt_name'), country:g('f_tt_country'), address:g('f_tt_addr'), tel:g('f_tt_tel') };
+    if(org.name || org.country || org.address || org.tel) patch.senddashi_org=org;
+    var fs=g('f_tt_fee_seeker').replace(/[,，円\s]/g,''), fe=g('f_tt_fee_employer').replace(/[,，円\s]/g,'');
+    if(fs && !fe) patch.senddashi_payment={ payer:'申請人', amount:fs };
+    else if(fe && !fs) patch.senddashi_payment={ payer:'所属機関', amount:fe };
+    }
+    if(!Object.keys(patch).length) return;
+    await sb('cases?id=eq.'+encodeURIComponent(info.caseId), { method:'PATCH', headers:{ 'Prefer':'return=minimal' }, body:JSON.stringify(patch) });
+    window._ttDirty=false;
+    if(typeof showToast==='function') showToast('🔁 送り出し機関（取次機関欄）を案件にも反映しました');
+  }catch(e){
+    console.warn('[doc 1_16] senddashi sync failed:', e);
+    if(typeof showToast==='function') showToast('⚠️ 案件への送り出し機関の反映に失敗しました：'+e.message);
+  }
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  }
+  if(!info||!info.caseId){ console.warn('[doc] no caseId'); return; }
+  console.log('[doc] loadFromDB caseId='+info.caseId+' companyId='+info.companyId+' companyName='+info.companyName);
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cases,cos,intakes]=await Promise.all([
+      caseId?sb('cases?select=applicant,doc_create_date,senddashi_org,senddashi_payment&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,author_name,author_title,rep_name,rep_title,author_name_en,rep_name_en,rep_title_en,name_en,emp_sets,extra&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      caseId?sb('intake_requests?select=agency_name,agency_office,intro_fee,senddashi_org,senddashi_payment&case_id=eq.'+caseId):Promise.resolve([])
+    ]);
+    const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    if(co){
+      s('f_company',co.name||'');
+      // ver.20260827.04: author_name に役職が既に含まれる場合の二重表示を防止
+      (function(){
+        var _at=(co.author_title||co.rep_title||'').trim();
+        var _an=(co.author_name||co.rep_name||'').trim();
+        s('f_author', (_at && _an && _an.replace(/[\s　]+/g,'').indexOf(_at.replace(/[\s　]+/g,''))===0) ? _an : [_at,_an].filter(Boolean).join('　'));
+      })();
+      // ver.20260731: 翻訳行用 ①企業名ローマ字(orgNameEn) ②作成責任者英語(extra.docAuthors['1_16'])
+      var _es0=(co.emp_sets&&co.emp_sets[0])||{};
+      s('f_companyEn', _es0.orgNameEn||'');
+      var _da16=(co.extra&&co.extra.docAuthors&&co.extra.docAuthors['1_16'])||{};
+      (function(){
+        var _atE=(_da16.titleEn||co.rep_title_en||'').trim();
+        var _anE=(_da16.nameEn||co.author_name_en||co.rep_name_en||'').trim();
+        s('f_authorEn', (_atE && _anE && _anE.toLowerCase().indexOf(_atE.toLowerCase())===0) ? _anE : [_atE,_anE].filter(Boolean).join(' '));
+      })();
+    }
+    if(cas){
+      s('f_applicant',cas.applicant||'');
+      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`; var e2=document.getElementById('f_docDateEn'); if(e2)e2.value=d.getFullYear()+' වසර '+(d.getMonth()+1)+' මාසය '+d.getDate()+' දිනය';}}
+    }
+    if(ir && ir.agency_name){
+      s('f_ag_name', ir.agency_name);
+      if(ir.agency_office) s('f_ag_addr', ir.agency_office);
+      if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
+      const _am=AGENCY_MASTER[ir.agency_name];
+      if(_am){ s('f_ag_addr',_am.addr); s('f_ag_tel',_am.tel); s('f_ag_license',_am.license); const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value)_t.value=_am.type; }
+      // ver.20261109.03: 一覧（AGENCY_MASTER）に無い職業紹介事業者は、案シスの登録支援機関（職業紹介の許可番号つき）から入れる
+      else if(typeof findSupportOrg==='function'){
+        try{
+          const _so=await findSupportOrg(ir.agency_name,'name,zip,pref,city,address_detail,address,tel,job_permit_no');
+          const _pn=String((_so&&_so.job_permit_no)||'').normalize('NFKC').replace(/[\s]/g,'').replace(/[ー－‐―−]/g,'-');
+          if(_so && /\d/.test(_pn) && !/不明|未定/.test(_pn)){
+            const _m=_pn.match(/^(\d{2})-?(ユ|特)-?(\d{6})/);
+            const _lic=_m?(_m[1]+'-'+_m[2]+'-'+_m[3]):_pn;
+            const _zip=String(_so.zip||'').normalize('NFKC').replace(/[^0-9-]/g,'');
+            const _ad=(_so.address_detail?(String(_so.pref||'')+String(_so.city||'')+String(_so.address_detail)):String(_so.address||'')).trim();
+            const E=id=>{ const e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+            if(!E('f_ag_license')) s('f_ag_license',_lic);
+            if(_ad && !/[都道府県市区町村郡]/.test(E('f_ag_addr'))) s('f_ag_addr',(_zip?'〒'+_zip+'　':'')+_ad);   // 空、または郵便番号だけのとき
+            if(!E('f_ag_tel') && _so.tel) s('f_ag_tel',String(_so.tel).normalize('NFKC').trim());
+            const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value&&_m&&_m[2]==='ユ') _t.value='有料';
+          }
+        }catch(_e){ console.warn('[1-16 職業紹介事業者]', _e); }
+      }
+      // ver.20260717: 以前は agency_name があれば無条件で「有」にしていたが、
+      // agency_name は intake_requests 2,388件すべてに入っており（＝登録支援機関名がそのまま入る）、
+      // 斡旋の有無を表す項目ではなかった。そのため手で「無」にしても読込のたびに「有」へ戻っていた。
+      // 実際に手数料が発生している場合のみ「有」とする。
+      // ※ intro_fee には「申請済み」等のステータスや日付が混入しているため（96件）、
+      //   金額として解釈できる値だけを採用する。「25,000円」「20万円」等の表記ゆれも拾う。
+      const _as=document.getElementById('es_assen');
+      if(_as && _isRealFee(ir.intro_fee)) _as.value='有';
+    }
+    // ver.20261028.02: 送り出し機関（取次機関欄）に自動反映＋名目「紹介料・送出し費用」を自動セット
+    // ver.20261028.03: 案件（cases.senddashi_*）の値を先に見る。案件がどちらも空（null）のときだけ受信トレイ（intake_requests）の値。
+    //   案シスで「送り出し機関省略」にした案件は {not_used:true} が入っているので、受信トレイの値は出さない
+    // ver.20261028.04: 送り出し機関の情報（入力 or 省略）がある案件は、取次機関の欄をその案件の内容で入れ直す（空の欄も空にする）。
+    //   この画面のフォーム保存値は会社ごと（同じ会社のほかの人と共用）なので、そのままだと前の人の送り出し機関が残るため。
+    //   情報が何も無い案件（更新・変更や古い案件）は、今までどおり触らない
+    try{
+      var _pj=function(x){ if(x && typeof x==='string'){ try{ x=JSON.parse(x);}catch(_){ x=null; } } return (x && typeof x==='object') ? x : null; };
+      var _useCase = !!(cas && (cas.senddashi_org || cas.senddashi_payment));
+      var _so = _pj(_useCase ? cas.senddashi_org : (ir && ir.senddashi_org));
+      var _sp = _pj(_useCase ? cas.senddashi_payment : (ir && ir.senddashi_payment));
+      var S=function(id, val){ var e=document.getElementById(id); if(e) e.value=(val==null?'':String(val)); };
+      if(_so || _sp){
+        var _omit = !!(_so && _so.not_used);
+        var _tsel=document.getElementById('es_toritsugi');
+        if(_omit){
+          S('f_tt_name',''); S('f_tt_country',''); S('f_tt_addr',''); S('f_tt_tel','');
+          if(_tsel) _tsel.value='無';
+        } else if(_so){
+          S('f_tt_name', _so.name); S('f_tt_country', _so.country); S('f_tt_addr', _so.address); S('f_tt_tel', _so.tel);
+          if(_tsel) _tsel.value='有';
+        }
+        var _payer = (_sp && !_sp.not_used) ? (_sp.payer||'') : (_omit ? '支払なし' : '');
+        var _amt = (_sp && !_sp.not_used) ? String(_sp.amount||'') : '';
+        if(_payer==='申請人'){
+          S('f_tt_fee_seeker', _amt); S('f_tt_nom_seeker', '紹介料・送出し費用');
+          S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
+        } else if(_payer==='所属機関'){
+          S('f_tt_fee_employer', _amt); S('f_tt_nom_employer', '紹介料・送出し費用');
+          S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', '');
+        } else if(_payer==='支払なし'){
+          // 支払なし（または省略）のときは、費用の欄も名目も空にする
+          S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', ''); S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
+        }
+      }
+      window._ttDirty=false;   // ここまでは読み込み。これ以降に取次機関の欄を手で直したときだけ、DB保存で案件へ書き戻す
+    }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
+    if(!v('f_docDate')){const n=new Date();document.getElementById('f_docDate').value=`令和${n.getFullYear()-2018}年${n.getMonth()+1}月${n.getDate()}日`;}
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  // まず共通関数で全入力欄を埋める
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_16'); }
+  // 書類固有の追加処理があれば loadFromDB で補完
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>

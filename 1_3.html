@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－３号（別紙）　受診者の申告書</div>
-    <div class="ver">ver.20260423.003</div>
+    <div class="ver">ver.20261113.01</div>
   </div>
 </div>
 
@@ -46,6 +46,7 @@
   <button class="lbtn" data-lang="km" onclick="showLang('km')" title="カンボジア語">🇰🇭</button>
   <button class="lbtn" data-lang="my" onclick="showLang('my')" title="ミャンマー語">🇲🇲</button>
   <button class="lbtn" data-lang="en" onclick="showLang('en')" title="英語">🇬🇧</button>
+  <button class="lbtn" data-lang="si" onclick="showLang('si')" title="シンハラ語">🇱🇰</button>
   <button class="btn-dl" id="btnDownload" onclick="downloadCurrent()">⬇ ダウンロード</button>
 </div>
 <div class="hint">※ 印刷してご本人に記入・署名してもらう書類です。</div>
@@ -64,6 +65,7 @@ const PDF_FILES = {
   km: { path: 'pdf/1_3_km.pdf', name: '参考様式第1-3号別紙_カンボジア語.pdf',   label: 'カンボジア語' },
   my: { path: 'pdf/1_3_my.pdf', name: '参考様式第1-3号別紙_ミャンマー語.pdf',   label: 'ミャンマー語' },
   en: { path: 'pdf/1_3_en.pdf', name: '参考様式第1-3号別紙_英語.pdf',           label: '英語' },
+  si: { path: 'pdf/1_3_si.pdf', name: '参考様式第1-3号別紙_シンハラ語.pdf',     label: 'シンハラ語' },   // ver.20261113.01
 };
 let currentLang = 'id';
 
