@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261113.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261113.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -637,7 +637,7 @@ const DOC_LANG_SUPPORT = {
   '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
   '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si'],
   '1_16': ['id','vi','th','ne','my','km','en','ko','zh','si'],   // ver.20261113.03: シンハラ語を追加
-  'juuyou':['id','vi','km','my','ko','ne','en'],   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
+  'juuyou':['id','vi','km','my','ko','ne','en','si'],   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
 };
 // 日本語(ja) は多くの書類でデフォルト版（ID版）を流用表示する扱い
 // → resolveLangForDoc で 'ja' → その書類の先頭言語 にフォールバック
@@ -816,8 +816,9 @@ const LANG_FILES_1_17={
   'km':'1_17_km.html?v=1794466290',
   'my':'1_17_my.html?v=1794466290',
   'en':'1_17_en.html?v=1794466290',
+  'si':'1_17_si.html?v=1794563000',   // ver.20261113.04: シンハラ語版
 };
-const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語']];
+const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語'],['si','🇱🇰 シンハラ語']];
 // 国籍から決まる言語（決まらないときは null）
 function p17LangFromCase(){
   if(!idxSelectedCase) return null;
@@ -1009,6 +1010,7 @@ const LANG_FILES_JUUYOU={
   'ko':'juuyou_ko.html',
   'ne':'juuyou_ne.html',
   'en':'juuyou_en.html?v=1794557419',
+  'si':'juuyou_si.html?v=1794563000',
 };
 function open_juuyou(lang){
   lang = lang || currentLang;
@@ -1847,6 +1849,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261113.04',
+    date: '2026-11-13',
+    notify: true,
+    items: [
+      '🇱🇰 1-17号（支援計画書）と重要事項事前説明書（建設）にシンハラ語版を作りました。国籍が「スリランカ」の案件は自動でシンハラ語で開きます。これで 1-3号別紙・1-5号・1-6号・1-16号・1-17号・重要事項事前説明書がすべてシンハラ語で作れます。'
+    ]
+  },
   {
     version: 'ver.20261113.03',
     date: '2026-11-13',

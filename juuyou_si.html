@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>様式第２（第３条関係）雇用契約に係る重要事項事前説明書（シンハラ語）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:15mm!important;line-height:1.45!important;min-height:auto!important}
+.id{color:#555;font-size:0.88em;}
+.row{margin-bottom:2mm;}
+.ja{font-size:10.5pt;}
+.vi{color:#555;font-size:9.5pt;margin-top:0.5mm;}
+.sec{margin-bottom:3.5mm;}
+.sec.allow4 .row{margin-bottom:0.8mm;}
+.sec-h{font-size:11pt;font-weight:bold;margin-bottom:1mm;}
+.sec-h-vi{color:#555;font-size:9.5pt;margin-bottom:1.5mm;}
+.box{border:1px solid #000;padding:2mm 3mm;margin-bottom:2.5mm;}
+input.chk-box{appearance:none;-webkit-appearance:none;display:inline-block;width:1.1em;height:1.1em;border:1px solid #000;vertical-align:middle;margin-right:4px;cursor:pointer;background:#fff;position:relative;}
+input.chk-box:checked{background:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+/* 背景グラフィックOFFでもチェックが消えないよう、印刷時は黒枠+黒レ点(背景に依存しない)で表示 */
+@media print{
+  input.chk-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  input.chk-box:checked{background:#fff !important;}
+  input.chk-box:checked::after{border-color:#000 !important;left:3px;top:0px;width:4px;height:8px;border-width:0 2px 2px 0;}
+}
+.tbl-amt{width:100%;border-collapse:collapse;font-size:10pt;}
+.tbl-amt td{padding:1mm 2mm;vertical-align:top;}
+/* ver.20260817.02: 下線を linear-gradient に変更。改行しても各行の下だけに線が引かれ、
+   inline-block 時のように空セル・改行余白まで下線が伸びる不具合を修正。 */
+.under{display:inline;padding:0 2px;background-image:linear-gradient(transparent 95%,#000 95%,#000 100%);background-repeat:repeat-x;}
+.under:empty::before{content:"\3000\3000\3000\3000";color:transparent;}
+@media print{
+  .app-bar,.fp,#jKensetsuModal{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:15mm!important}
+  .f[style*="color:#aaa"]{visibility:hidden}
+}
+</style>
+<style>
+/* ver.20261111.02: 画面の幅がせまいと fitDocToPreview() が .doc を縮めて表示する（zoom）。その大きさのまま印刷され、
+   人によって書類が小さく刷られていた（幅1000pxで84%）。印刷のときは画面の幅に関係なく元の大きさに戻す */
+@media print{ .doc{zoom:1!important} }
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（シンハラ語）</div>
+    <div class="ver">ver.20261113.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('juuyou',{revMap:_J_REV})" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">基本情報</div>
+      <div class="fg3">
+        <div class="fg"><label>作成日（年）</label><input id="f_createY" oninput="p()"></div>
+        <div class="fg"><label>月</label><input id="f_createM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_createD" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>機関名（日）</label><input id="f_orgName" oninput="p()"></div>
+      <div class="fg"><label>機関名（ローマ字）</label><input id="f_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>所在地（日）</label><input id="f_orgAddress" oninput="p()"></div>
+      <div class="fg"><label>所在地（ローマ字）</label><input id="f_orgAddressEn" oninput="p()"></div>
+      <div class="fg"><label>電話番号</label><input id="f_orgTel" oninput="p()"></div>
+      <div class="fg"><label>代表者 役職（日）</label><input id="f_repTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者 役職（ローマ字）</label><input id="f_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者 氏名（日）</label><input id="f_repName" oninput="p()"></div>
+      <div class="fg"><label>代表者 氏名（ローマ字）</label><input id="f_repNameEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">１．基本賃金</div>
+      <div class="fg"><label>月額（円）</label><input id="f_salaryMonthly" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">２．諸手当</div>
+      <div class="fg3">
+        <div class="fg"><label>(a)手当名（日）</label><input id="f_allowance1Name" oninput="p()"></div>
+        <div class="fg"><label>(a)手当名（ローマ字）</label><input id="f_allowance1NameEn" oninput="p()"></div>
+        <div class="fg"><label>(a)金額（円）</label><input id="f_allowance1Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(a)計算方法（日）</label><input id="f_allowance1Calc" oninput="p()"></div>
+      <div class="fg"><label>(a)計算方法（ローマ字）</label><input id="f_allowance1CalcEn" oninput="p()"></div>
+      <div class="fg"><label>(a)金額（訳）<span style="font-weight:400;color:#64748b;">※「実費」など、金額が文字のときだけ</span></label><input id="f_allowance1AmountEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(b)手当名（日）</label><input id="f_allowance2Name" oninput="p()"></div>
+        <div class="fg"><label>(b)手当名（ローマ字）</label><input id="f_allowance2NameEn" oninput="p()"></div>
+        <div class="fg"><label>(b)金額（円）</label><input id="f_allowance2Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(b)計算方法（日）</label><input id="f_allowance2Calc" oninput="p()"></div>
+      <div class="fg"><label>(b)計算方法（ローマ字）</label><input id="f_allowance2CalcEn" oninput="p()"></div>
+      <div class="fg"><label>(b)金額（訳）<span style="font-weight:400;color:#64748b;">※「実費」など、金額が文字のときだけ</span></label><input id="f_allowance2AmountEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(c)手当名（日）</label><input id="f_allowance3Name" oninput="p()"></div>
+        <div class="fg"><label>(c)手当名（ローマ字）</label><input id="f_allowance3NameEn" oninput="p()"></div>
+        <div class="fg"><label>(c)金額（円）</label><input id="f_allowance3Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(c)計算方法（日）</label><input id="f_allowance3Calc" oninput="p()"></div>
+      <div class="fg"><label>(c)計算方法（ローマ字）</label><input id="f_allowance3CalcEn" oninput="p()"></div>
+      <div class="fg"><label>(c)金額（訳）<span style="font-weight:400;color:#64748b;">※「実費」など、金額が文字のときだけ</span></label><input id="f_allowance3AmountEn" oninput="p()"></div>
+      <div class="fg3">
+        <div class="fg"><label>(d)手当名（日）</label><input id="f_allowance4Name" oninput="p()"></div>
+        <div class="fg"><label>(d)手当名（ローマ字）</label><input id="f_allowance4NameEn" oninput="p()"></div>
+        <div class="fg"><label>(d)金額（円）</label><input id="f_allowance4Amount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>(d)計算方法（日）</label><input id="f_allowance4Calc" oninput="p()"></div>
+      <div class="fg"><label>(d)計算方法（ローマ字）</label><input id="f_allowance4CalcEn" oninput="p()"></div>
+      <div class="fg"><label>(d)金額（訳）<span style="font-weight:400;color:#64748b;">※「実費」など、金額が文字のときだけ</span></label><input id="f_allowance4AmountEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">３．固定残業代</div>
+      <div class="fg"><label>固定残業</label>
+        <select id="f_fixedOT" onchange="onFixedOTSelect()">
+          <option value="無">無 / නැත</option>
+          <option value="有">有 / ඔව්</option>
+        </select>
+      </div>
+      <div style="font-size:9px;color:#888;font-family:sans-serif;padding:2px 6px;">※プレビュー上の「有」「無」クリックでも切替可</div>
+      <div class="fg3">
+        <div class="fg"><label>時間</label><input id="f_fixedOTHours" oninput="p()"></div>
+        <div class="fg"><label>金額（円）</label><input id="f_fixedOTAmount" oninput="p()"></div>
+      </div>
+      <div class="fg"><label>計算方法（日）</label><input id="f_fixedOTCalc" oninput="p()"></div>
+      <div class="fg"><label>ගණනය කිරීමේ ක්‍රමය (si)</label><input id="f_fixedOTCalcEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">４．月支払概算額</div>
+      <div class="fg"><label>合計（円）</label><input id="f_salaryTotal" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">５．控除項目</div>
+      <div class="fg"><label>(a)税金（円）</label><input id="f_deductTax" oninput="p()"></div>
+      <div class="fg"><label>(b)社会保険料（円）</label><input id="f_deductSocialIns" oninput="p()"></div>
+      <div class="fg"><label>(c)雇用保険料（円）</label><input id="f_deductEmpIns" oninput="p()"></div>
+      <div class="fg"><label>(d)食費（円）</label><input id="f_deductFood" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductFoodJippi" onchange="_setJippiJ('es_deductFood',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductFoodEst" type="hidden"></div>
+      <div class="fg"><label>(e)居住費（円）</label><input id="f_deductHousing" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductHousingJippi" onchange="_setJippiJ('es_deductHousing',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductHousingEst" type="hidden"></div>
+      <div class="fg"><label>(f)水道光熱費（円）</label><input id="f_deductUtility" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductUtilityJippi" onchange="_setJippiJ('es_deductUtility',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductUtilityEst" type="hidden"></div>
+      <div class="fg"><label>(g)その他（名目）</label><input id="f_deductOther1Name" oninput="p()"></div>
+      <div class="fg"><label>(g)その他（円）</label><input id="f_deductOther1Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther1AmountJippi" onchange="_setJippiJ('es_deductOther1Amount',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductOther1AmountEst" type="hidden"></div>
+      <div class="fg"><label>控除合計（円）</label><input id="f_deductTotal" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">６．手取り支給額</div>
+      <div class="fg"><label>手取り（円）</label><input id="f_netPay" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">７．業務内容</div>
+      <div class="fg"><label>従事させる業務区分（日）</label><input id="f_workType" oninput="p()"></div>
+      <div class="fg"><label>රැකියා වර්ගීකරණය (si)</label><input id="f_workTypeEn" oninput="p()"></div>
+      <div class="fg"><label>従事させる工事業の種類（日）</label><input id="f_workCat" oninput="_koujiSync()" placeholder="例：とび・土工工事業,舗装工事業"></div>
+      <div class="fg"><label>ඉදිකිරීම් කටයුතු වර්ගය (si)</label><input id="f_workCatEn" oninput="p()"></div>
+      <div class="fg"><label>具体的職種・作業内容（日）</label><textarea id="f_workDetail" oninput="p()" rows="3"></textarea></div>
+      <div class="fg"><label>නිශ්චිත රැකියාව සහ කාර්ය විස්තර (si)</label><textarea id="f_workDetailEn" oninput="p()" rows="3"></textarea></div>
+    </div>
+    <div class="fs"><div class="fs-title">８．昇給</div>
+      <div class="fg"><label>昇給額（日）</label><input id="f_raiseAmount" oninput="p()"></div>
+      <div class="fg"><label>වැටුප් වැඩිවීමේ මුදල (si)</label><input id="f_raiseAmountEn" oninput="p()"></div>
+      <div class="fg"><label>昇給条件（日）</label><input id="f_raiseCond" oninput="p()"></div>
+      <div class="fg"><label>වැටුප් වැඩිවීමේ කොන්දේසි (si)</label><input id="f_raiseCondEn" oninput="p()"></div>
+      <div class="fg"><label>昇給時期（日）</label><input id="f_raiseTime" oninput="p()"></div>
+      <div class="fg"><label>වැටුප් වැඩිවීමේ කාලය (si)</label><input id="f_raiseTimeEn" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(2)">P2</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(3)">P3</button>
+    <button class="pn-btn pn-btn-page" onclick="scrollToPage(4)">P4</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1794562953"></script>
+<script>
+// 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
+let _fixedOTState = '無';
+function onFixedOTSelect(){
+  // 左パネルのセレクト変更を状態に反映
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) _fixedOTState = sel.value;
+  p();
+}
+function toggleFixedOT(val){
+  // プレビュー上のクリック→状態を変更し、セレクトにも反映
+  _fixedOTState = val;
+  const sel = document.getElementById('f_fixedOT');
+  if(sel) sel.value = val;
+  p();
+}
+function p(){
+  // ver.20261112.06: 手当の金額が「実費」「出張日数×2,000円」など文字のとき、訳の行には金額（訳）を出し、円・yenを重ねない
+  const _jyAv=n=>{const e=document.getElementById('f_allowance'+n+'Amount'); return String(e&&e.value||'').normalize('NFKC').trim();};
+  const _jyTxt=n=>{const v=_jyAv(n); return !!v && !/^[\d,.\s]+円?$/.test(v);};
+  const _jyYen=n=>{const v=_jyAv(n); return !_jyTxt(n) && !/円$/.test(v);};
+  const _jyAmtTr=n=>{const e=document.getElementById('f_allowance'+n+'AmountEn'); return (_jyTxt(n) && e && String(e.value||'').trim()) ? ff('f_allowance'+n+'AmountEn') : ff('f_allowance'+n+'Amount');};
+  // ver.20261030.09: (d)4つ目の手当は入力があるときだけ表示（1ページに収めるため手当欄の行間を少し詰める）
+  const _a4On=['f_allowance4Name','f_allowance4NameEn','f_allowance4Amount','f_allowance4Calc','f_allowance4CalcEn'].some(function(k){var e=document.getElementById(k);return e&&String(e.value||'').trim();});
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  const fixedOT = _fixedOTState || '無';
+  const otY = fixedOT==='有' ? 'chk-on' : '';
+  const otN = fixedOT==='無' ? 'chk-on' : '';
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="text-align:left;font-size:10pt;margin-bottom:2px;">様式第２（第３条関係）</div>
+<div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用契約に係る重要事項事前説明書</div>
+<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">රැකියා ගිවිසුම සම්බන්ධ වැදගත් කරුණු පිළිබඳ පූර්ව පැහැදිලි කිරීම</div>
+<div style="height:1.8em;">&nbsp;</div>
+<div style="height:1.8em;">&nbsp;</div>
+
+<div class="row ja">建設特定技能受入計画を申請予定である（特定技能所属機関名）<span class="under">${f('f_orgName')}</span>は、雇用契約に係る重要事項について、下記内容を事前に説明し、内容を理解させたうえで国土交通省へ申請する。</div>
+<div class="row vi"><span class="under">${f('f_orgNameEn')}</span> (නිශ්චිත කුසලතා අනුබද්ධ ආයතනයේ නම) වන අපි, ඉදිකිරීම් ක්ෂේත්‍රයේ නිශ්චිත කුසලතා පිළිගැනීමේ සැලැස්ම සඳහා අයදුම් කිරීමට නියමිතය. ඊට පෙර, රැකියා ගිවිසුම සම්බන්ධ වැදගත් කරුණු කලින් පැහැදිලි කර, ඔබ ඒවා තේරුම් ගත් පසු ඉඩම්, යටිතල පහසුකම්, ප්‍රවාහන සහ සංචාරක අමාත්‍යාංශයට අයදුම් කරන්නෙමු.</div>
+
+<div class="sec">
+  <div class="sec-h">１．基本賃金</div>
+  <div class="sec-h-vi">මූලික වැටුප</div>
+  <div class="row ja">月額（<span class="under">${ff('f_salaryMonthly')}</span>円　手当<span class="under">&nbsp;</span>円、手当<span class="under">&nbsp;</span>円を含む。）</div>
+  <div class="row vi">මාසික වැටුප（<span class="under">${ff('f_salaryMonthly')}</span> යෙන්; දීමනාව <span class="under">&nbsp;</span> යෙන් සහ දීමනාව <span class="under">&nbsp;</span> යෙන් ඇතුළුව）</div>
+</div>
+
+<div class="sec${_a4On?' allow4':''}">
+  <div class="sec-h">２．諸手当の額及び計算方法（時間外労働の割増賃金は除く。）</div>
+  <div class="sec-h-vi">එක් එක් දීමනාවේ මුදල සහ ගණනය කිරීමේ ක්‍රමය (අතිකාල වැඩ සඳහා අමතර වැටුප් හැර)</div>
+  <div class="row ja">(a)（<span class="under">${f('f_allowance1Name')}</span>手当　<span class="under">${ff('f_allowance1Amount')}</span>${_jyYen(1)?'円':''}／計算方法：<span class="under">${f('f_allowance1Calc')}</span>）</div>
+  <div class="row vi">(a)（දීමනාව: <span class="under">${f('f_allowance1NameEn')}</span>,　<span class="under">${_jyAmtTr(1)}</span>${_jyTxt(1)?'':' යෙන්'}／ගණනය කිරීමේ ක්‍රමය：<span class="under">${f('f_allowance1CalcEn')}</span>）</div>
+  <div class="row ja">(b)（<span class="under">${f('f_allowance2Name')}</span>手当　<span class="under">${ff('f_allowance2Amount')}</span>${_jyYen(2)?'円':''}／計算方法：<span class="under">${f('f_allowance2Calc')}</span>）</div>
+  <div class="row vi">(b)（දීමනාව: <span class="under">${f('f_allowance2NameEn')}</span>,　<span class="under">${_jyAmtTr(2)}</span>${_jyTxt(2)?'':' යෙන්'}／ගණනය කිරීමේ ක්‍රමය：<span class="under">${f('f_allowance2CalcEn')}</span>）</div>
+  <div class="row ja">(c)（<span class="under">${f('f_allowance3Name')}</span>手当　<span class="under">${ff('f_allowance3Amount')}</span>${_jyYen(3)?'円':''}／計算方法：<span class="under">${f('f_allowance3Calc')}</span>）</div>
+  <div class="row vi">(c)（දීමනාව: <span class="under">${f('f_allowance3NameEn')}</span>,　<span class="under">${_jyAmtTr(3)}</span>${_jyTxt(3)?'':' යෙන්'}／ගණනය කිරීමේ ක්‍රමය：<span class="under">${f('f_allowance3CalcEn')}</span>）</div>
+  ${_a4On?`
+  <div class="row ja">(d)（<span class="under">${f('f_allowance4Name')}</span>手当　<span class="under">${ff('f_allowance4Amount')}</span>${_jyYen(4)?'円':''}／計算方法：<span class="under">${f('f_allowance4Calc')}</span>）</div>
+  <div class="row vi">(d)（දීමනාව: <span class="under">${f('f_allowance4NameEn')}</span>,　<span class="under">${_jyAmtTr(4)}</span>${_jyTxt(4)?'':' යෙන්'}／ගණනය කිරීමේ ක්‍රමය：<span class="under">${f('f_allowance4CalcEn')}</span>）</div>
+  `:''}
+</div>
+
+<div class="sec">
+  <div class="sec-h">３．固定残業代　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span>有　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span>無）</div>
+  <div class="sec-h-vi">ස්ථාවර අතිකාල දීමනාව　（<span class="chk-toggle" onclick="toggleFixedOT('有')" style="cursor:pointer;user-select:none;padding:0 2px;">${otY?'☑':'☐'}</span> ඔව්　・　<span class="chk-toggle" onclick="toggleFixedOT('無')" style="cursor:pointer;user-select:none;padding:0 2px;">${otN?'☑':'☐'}</span> නැත）</div>
+  <div class="row ja" style="font-size:9.5pt;">（固定残業代が有る場合は以下に記入）</div>
+  <div class="row vi">(ස්ථාවර අතිකාල දීමනාවක් ඇත්නම් පහත පුරවන්න)</div>
+  <div class="row ja">（<span class="under">${f('f_fixedOTHours')}</span>時間　<span class="under">${ff('f_fixedOTAmount')}</span>円【計算方法】<span class="under">${f('f_fixedOTCalc')}</span>）</div>
+  <div class="row vi">（<span class="under">${f('f_fixedOTHours')}</span> පැය　<span class="under">${ff('f_fixedOTAmount')}</span> යෙන්【ගණනය කිරීමේ ක්‍රමය】<span class="under">${f('f_fixedOTCalcEn')}</span>）</div>
+  <div class="row ja" style="font-size:9.5pt;">固定残業代を超えた労働時間分については割増賃金を追加で支払う。</div>
+  <div class="row vi">ස්ථාවර අතිකාල පැය ඉක්මවන වැඩ කරන පැය සඳහා අමතර අතිකාල දීමනාව ගෙවනු ලැබේ.</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">４．１か月当たりの支払概算額（１＋２＋３）</div>
+  <div class="row ja" style="font-size:9.5pt;">（１．基本賃金の月額に算入した手当については、二重に計上しないように注意すること。）</div>
+  <div class="row vi">(1. හි මාසික මූලික වැටුපට ඇතුළත් කර ඇති දීමනා දෙවරක් ගණන් නොකිරීමට සැලකිලිමත් වන්න.)</div>
+  <div class="row ja" style="text-align:right;">約　<span class="under">${ff('f_salaryTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">මාසික ගෙවීමේ ඇස්තමේන්තුව (1+2+3)　දළ වශයෙන්　<span class="under">${ff('f_salaryTotal')}</span>　යෙන්（එකතුව）</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P2</div>
+
+<div class="sec">
+  <div class="sec-h">５．賃金支払時に控除する項目</div>
+  <div class="sec-h-vi">වැටුප් ගෙවීමේදී අඩු කරනු ලබන අයිතම</div>
+  <table class="tbl-amt">
+    <tr>
+      <td style="width:45%;" class="ja">(a)税　　　金</td>
+      <td style="width:55%;" class="ja">（<span class="under">${ff('f_deductTax')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(a) බදු</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductTax')}</span> යෙන්）</td>
+    </tr>
+    <tr>
+      <td class="ja">(b)社会保険料</td>
+      <td class="ja">（<span class="under">${ff('f_deductSocialIns')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(b) සමාජ රක්ෂණ වාරික</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductSocialIns')}</span> යෙන්）</td>
+    </tr>
+    <tr>
+      <td class="ja">(c)雇用保険料</td>
+      <td class="ja">（<span class="under">${ff('f_deductEmpIns')}</span>円）</td>
+    </tr>
+    <tr>
+      <td class="vi">(c) රැකියා රක්ෂණ වාරික</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductEmpIns')}</span> යෙන්）</td>
+    </tr>
+    <tr>
+      <td class="ja">(d)食　　　費</td>
+      <td class="ja">（<span class="under">${ff('f_deductFood')}</span>円）${_jSufJa('es_deductFood')}</td>
+    </tr>
+    <tr>
+      <td class="vi">(d) ආහාර වියදම්</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductFood')}</span> යෙන්）${_jSufLo('es_deductFood')}</td>
+    </tr>
+    <tr>
+      <td class="ja">(e)居　住　費</td>
+      <td class="ja">（<span class="under">${ff('f_deductHousing')}</span>円）${_jSufJa('es_deductHousing')}</td>
+    </tr>
+    <tr>
+      <td class="vi">(e) නිවාස වියදම්</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductHousing')}</span> යෙන්）${_jSufLo('es_deductHousing')}</td>
+    </tr>
+    <tr>
+      <td class="ja">(f)その他（水道光熱費）</td>
+      <td class="ja">（<span class="under">${ff('f_deductUtility')}</span>円）${_jSufJa('es_deductUtility')}</td>
+    </tr>
+    <tr>
+      <td class="vi">(f) වෙනත් (විදුලිය, ජලය ආදී උපයෝගිතා)</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductUtility')}</span> යෙන්）${_jSufLo('es_deductUtility')}</td>
+    </tr>
+    <tr>
+      <td class="ja">(g)その他（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）${_jSufJa('es_deductOther1Amount')}</td>
+    </tr>
+    <tr>
+      <td class="vi">(g) වෙනත්（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="vi">（දළ වශයෙන් <span class="under">${ff('f_deductOther1Amount')}</span> යෙන්）${_jSufLo('es_deductOther1Amount')}</td>
+    </tr>
+  </table>
+  <div class="row ja" style="text-align:right;margin-top:2mm;">控除する金額　約　<span class="under">${ff('f_deductTotal')}</span>　円（合計）</div>
+  <div class="row vi" style="text-align:right;">අඩු කරන මුදල　දළ වශයෙන්　<span class="under">${ff('f_deductTotal')}</span>　යෙන්（එකතුව）</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">６．手取り支給額（４－５）　約　<span class="under">${ff('f_netPay')}</span>　円（合計）</div>
+  <div class="sec-h-vi">අතට ලැබෙන වැටුප (4-5)　දළ වශයෙන්　<span class="under">${ff('f_netPay')}</span>　යෙන්（එකතුව）</div>
+  <div class="row ja" style="font-size:9pt;">※欠勤等がない場合であって、時間外労働の割増賃金等は除く。</div>
+  <div class="row vi" style="font-size:8.5pt;">※නිවාඩු නොගත් අවස්ථාවක, අතිකාල වැඩ සඳහා අමතර වැටුප් ආදිය හැර.</div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">７．業務内容（従事させる業務区分、従事させる工事業の種類、具体的職種及び作業内容）</div>
+  <div class="row ja" style="font-size:9.5pt;">（職種名等だけでなく具体的にどのような現場でどのような業務に従事させるのか説明すること）</div>
+  <div class="sec-h-vi">කාර්ය විස්තර (රැකියා වර්ගීකරණය, ඉදිකිරීම් කටයුතු වර්ගය, නිශ්චිත රැකියාව සහ කාර්ය විස්තර)<br>(රැකියා නාමය පමණක් නොව, කුමන ආකාරයේ ස්ථානයක කුමන කාර්යයක නියැලෙන්නේද යන්න නිශ්චිතව පැහැදිලි කරන්න)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">従事させる業務区分：<span class="under" style="min-width:20em;">${f('f_workType')}</span></div>
+    <div class="row vi">රැකියා වර්ගීකරණය：<span class="under" style="min-width:20em;">${f('f_workTypeEn')}</span></div>
+    <div class="row ja">従事させる工事業の種類：<span class="under" style="min-width:20em;">${f('f_workCat')}</span></div>
+    <div class="row vi">ඉදිකිරීම් කටයුතු වර්ගය：<span class="under" style="min-width:20em;">${f('f_workCatEn')}</span></div>
+    <div class="row ja">従事させる具体的職種及び作業内容：<span class="under" style="min-width:20em;">${f('f_workDetail')}</span></div>
+    <div class="row vi">නිශ්චිත රැකියාව සහ කාර්ය විස්තර：<span class="under" style="min-width:20em;">${f('f_workDetailEn')}</span></div>
+  </div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P3</div>
+
+<div class="sec">
+  <div class="sec-h">８．技能の習熟等に応じた昇給について</div>
+  <div class="row ja" style="font-size:9.5pt;">（昇給額、昇給条件及び昇給時期について説明すること。従事させる具体的職種及び作業内容に応じた同等の技能を有する日本人が従事する場合の報酬と同等以上になるよう留意すること。）</div>
+  <div class="sec-h-vi">කුසලතා ප්‍රගුණ කිරීම අනුව වැටුප් වැඩිවීම<br>(වැටුප් වැඩිවීමේ මුදල, කොන්දේසි සහ කාලය පැහැදිලි කරන්න. සිදු කරන රැකියාවේ සමාන කුසලතා ඇති ජපන් සේවකයින්ට සමාන හෝ ඊට වැඩි වැටුප් වැඩිවීමක් විය යුතු බව සලකන්න)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">昇給額：<span class="under" style="min-width:20em;">${f('f_raiseAmount')}</span></div>
+    <div class="row vi">වැටුප් වැඩිවීමේ මුදල：<span class="under" style="min-width:20em;">${f('f_raiseAmountEn')}</span></div>
+    <div class="row ja">昇給条件：<span class="under" style="min-width:20em;">${f('f_raiseCond')}</span></div>
+    <div class="row vi">වැටුප් වැඩිවීමේ කොන්දේසි：<span class="under" style="min-width:20em;">${f('f_raiseCondEn')}</span></div>
+    <div class="row ja">昇給時期：<span class="under" style="min-width:20em;">${f('f_raiseTime')}</span></div>
+    <div class="row vi">වැටුප් වැඩිවීමේ කාලය：<span class="under" style="min-width:20em;">${f('f_raiseTimeEn')}</span></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">９．従事させる業務区分、工事業等に応じた安全衛生教育及び技能の習得について</div>
+  <div class="row ja" style="font-size:9.5pt;">（安全衛生教育の実施内容や、技能検定の受験時期や合格後の支給手当、昇給への反映等について説明すること）</div>
+  <div class="sec-h-vi">රැකියා වර්ගීකරණය අනුව ආරක්ෂාව සහ සෞඛ්‍ය අධ්‍යාපනය සහ කුසලතා ප්‍රගුණ කිරීම<br>(ආරක්ෂාව සහ සෞඛ්‍ය අධ්‍යාපනයේ අන්තර්ගතය, කුසලතා පරීක්ෂණවලට පෙනී සිටින කාලය, සමත් වූ පසු දීමනා සහ වැටුප් වැඩිවීමට එය බලපාන ආකාරය පැහැදිලි කරන්න)</div>
+  <div style="padding:1mm 0;">
+    <div class="row ja">採用時、作業内容の変更、労働安全衛生法上に定める危険又は有害な業務、職長等の職務に従事することとなったとき、法令に安全衛生教育の実施が必要とされるときは安全衛生教育を実施する。受入れ後1年以内に建設キャリアアップシステムのレベル２に相当する技能教育を施す。また、受入れ後3年以内に技能検定1級、取得を目標とするため、社内勉強会の開催等を行う。</div>
+    <div class="row vi">රැකියාවට බඳවා ගන්නා විට, කාර්ය විස්තර වෙනස් වන විට, කාර්මික ආරක්ෂාව සහ සෞඛ්‍ය පනතේ නියම කර ඇති අනතුරුදායක හෝ හානිකර කාර්යයක නියැලෙන විට, ප්‍රධානියා (ෆෝමන්) ලෙස පත් කරන විට, හෝ නීතියෙන් ආරක්ෂාව සහ සෞඛ්‍ය අධ්‍යාපනය අවශ්‍ය වන සෑම විටම, ආරක්ෂාව සහ සෞඛ්‍ය අධ්‍යාපනය ලබා දෙනු ලැබේ. පිළිගැනීමෙන් වසරක් ඇතුළත, ඉදිකිරීම් වෘත්තීය දියුණු කිරීමේ පද්ධතියේ (CCUS) 2 වන මට්ටමට සමාන තාක්ෂණික පුහුණුව ලබා දෙන්නෙමු. එසේම, පිළිගැනීමෙන් වසර තුනක් ඇතුළත කුසලතා පරීක්ෂණයේ (技能検定) 1 වන ශ්‍රේණිය සමත් වීම අරමුණු කරගෙන ආයතනය තුළ අධ්‍යයන සැසි පවත්වන්නෙමු.</div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-h">10．個人情報の提供に係る同意について</div>
+  <div class="row ja" style="font-size:9.5pt;">（建設特定技能受入計画の適正な実施を確保するため、建設キャリアアップシステムを運営する一般財団法人建設業振興基金、適正就労監理機関及び特定技能外国人受入事業実施法人へ認定受入計画に記載された内容（個人情報を含む。）を提供することに同意しているか）</div>
+  <div class="sec-h-vi">පුද්ගලික තොරතුරු ලබා දීමට එකඟතාවය<br>(ඉදිකිරීම් ක්ෂේත්‍රයේ නිශ්චිත කුසලතා සේවකයින් නිසි ලෙස පිළිගැනීම සහතික කිරීම සඳහා, අනුමත පිළිගැනීමේ සැලැස්මේ ඇති තොරතුරු (පුද්ගලික තොරතුරු ඇතුළුව) ඉදිකිරීම් කර්මාන්ත ප්‍රවර්ධන අරමුදල (CCUS ක්‍රියාත්මක කරන ආයතනය), නිසි රැකියා අධීක්ෂණ ආයතනය සහ නිශ්චිත කුසලතා පිළිගැනීමේ ව්‍යාපෘතිය ක්‍රියාත්මක කරන ආයතනය වෙත ලබා දීමට ඔබ එකඟද?)</div>
+  <div class="row ja">　　<input type="checkbox" class="chk-box" checked>同意している。　　　<input type="checkbox" class="chk-box">同意していない。</div>
+  <div class="row vi">　　☑ මම එකඟ වෙමි　　　☐ මම එකඟ නොවෙමි</div>
+</div>
+</div>
+
+<div class="doc">
+<div class="page-num-label">P4</div>
+<!-- ver.20261106.10: 10．個人情報の提供に係る同意はP3へ。P4は説明・署名欄だけ -->
+
+<div class="sec" style="margin-top:6mm;">
+  <div class="row ja">(西暦) <span class="under">${f('f_createY')}</span>年 <span class="under">${f('f_createM')}</span>月 <span class="under">${f('f_createD')}</span>日、前記１から10の内容について以下の者が十分に理解することができる言語（シンハラ語）にて説明し、内容を理解していることを確認した。</div>
+  <div class="row vi"><span class="under">${f('f_createY')}</span> වසර <span class="under">${f('f_createM')}</span> මාසය <span class="under">${f('f_createD')}</span> දින, ඉහත 1 සිට 10 දක්වා අන්තර්ගතය මට සම්පූර්ණයෙන්ම තේරුම් ගත හැකි භාෂාවෙන් (සිංහල) පැහැදිලි කර දුන් අතර, මම එය තේරුම් ගත් බව තහවුරු කරමි.</div>
+</div>
+
+<div style="margin-top:8mm;text-align:left;font-size:10.5pt;">
+  <div style="margin-bottom:8mm;">（サイン / අත්සන）　<span style="display:inline-block;border-bottom:1px solid #000;width:18em;">&nbsp;</span>　殿</div>
+</div>
+
+<table style="width:65%;margin-left:auto;margin-right:0;border-collapse:collapse;font-size:10pt;margin-top:4mm;">
+  <tr>
+    <td style="width:38%;padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">説明者</div>
+      <div class="vi">පැහැදිලි කළ තැනැත්තා</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repNameEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">特定技能所属機関名</div>
+      <div class="vi">නිශ්චිත කුසලතා අනුබද්ධ ආයතනයේ නම</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgNameEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">所在地</div>
+      <div class="vi">ලිපිනය</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgAddress')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_orgAddressEn')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">電話番号</div>
+      <div class="vi">දුරකථන අංකය</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_orgTel')}</span></div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja">代表者　役職・氏名</div>
+      <div class="vi">නියෝජිතයා  තනතුර・නම</div>
+    </td>
+    <td style="padding:1mm 2mm;vertical-align:top;">
+      <div class="ja"><span class="under" style="min-width:14em;">${f('f_repTitle')} ${f('f_repName')}</span></div>
+      <div class="vi"><span class="under" style="min-width:14em;">${f('f_repTitleEn')} ${f('f_repNameEn')}</span></div>
+    </td>
+  </tr>
+</table>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
+  _applyFontSize();
+  _applyJuuyouSiFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applyJuuyouSiFontSize(){
+  const st=document.getElementById('_juuyouSiFontStyle')||document.createElement('style');
+  st.id='_juuyouSiFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/10;
+  st.textContent=[
+    `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:11pt"]{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10.5pt"]{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:10pt"]{font-size:${(10*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9.5pt"]{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:8.5pt"]{font-size:${(8.5*s).toFixed(2)}pt!important}`,
+    `.ja{font-size:${(10.5*s).toFixed(2)}pt!important}`,
+    `.vi{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.sec-h{font-size:${(11*s).toFixed(2)}pt!important}`,
+    `.sec-h-vi{font-size:${(9.5*s).toFixed(2)}pt!important}`,
+    `.tbl-amt{font-size:${(10*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+// ===== 建設分野の昇給フォーマット（ver.20260715） =====
+// 1-6号の建設モーダルと同じ流儀。重説は昇給3欄のみ扱う。
+// アンシス(emp_sets)には昇給額/昇給時期に対応するキーが無く、salaryRaiseCond の文章1件のみ。
+// そのため参照(雇用条件書セット)は昇給条件にだけ付ける。
+// OKで入れた値は setAutoDefault で印を付け、DB保存時 emp_sets には書き戻さない（実データ保護）。
+var _JK_JA={amt:"1,000円以上/月", cond:"経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。", time:"１年１回入社月頃"};
+var _JK_TR={amt:"මසකට යෙන් 1,000 හෝ ඊට වැඩි", cond:"සේවා පළපුරුද්ද මත පදනම්ව අනිවාර්යයෙන්ම ක්‍රියාත්මක කරන අතර, කුසලතා ප්‍රගුණතාවය සහ වැඩ කිරීමේ ආකල්පය සැලකිල්ලට ගනී.", time:"වසරකට වරක්, සමාගමට බැඳුණු මාසය පමණ"};
+function _jKensetsuModal(){
+  try{
+    var _es=window._lastEmpSet||{};
+    var cat=(_es.category||window._lastJobCategory||'');
+    // 判定は「建設分野」。『土木』『建築』だと「建築物内部の清掃(ビルクリーニング分野)」を誤検出するため使わない。
+    if(!/建設分野/.test(cat)) return;
+    var rc=document.getElementById('f_raiseCond');
+    if(rc && rc.value===_JK_JA.cond) return;           // 既に適用済みなら出さない
+    var a=document.getElementById('jm_amt');  if(a) a.value=_JK_JA.amt;
+    var c=document.getElementById('jm_cond'); if(c) c.value=_JK_JA.cond;
+    var t=document.getElementById('jm_time'); if(t) t.value=_JK_JA.time;
+    var r=document.getElementById('jm_ref');  if(r) r.textContent=_es.salaryRaiseCond||'（なし）';
+    var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='flex';
+  }catch(e){}
+}
+function jm_use(){
+  var f=document.getElementById('jm_cond'), r=document.getElementById('jm_ref');
+  if(f&&r&&r.textContent&&r.textContent!=='（なし）') f.value=r.textContent;
+}
+function closeJKensetsu(){ var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='none'; }
+function applyJKensetsu(){
+  try{
+    var _es=window._lastEmpSet||{};
+    var vals={amt:document.getElementById('jm_amt').value, cond:document.getElementById('jm_cond').value, time:document.getElementById('jm_time').value};
+    var map={amt:['f_raiseAmount','f_raiseAmountEn'], cond:['f_raiseCond','f_raiseCondEn'], time:['f_raiseTime','f_raiseTimeEn']};
+    var noTr=[];
+    Object.keys(map).forEach(function(k){
+      var ja=map[k][0], en=map[k][1], val=(vals[k]||'').trim();
+      setAutoDefault(ja, val);
+      var tr='';
+      if(val===_JK_JA[k]) tr=_JK_TR[k];                                        // 既定値のまま → 用意した訳
+      else if(k==='cond' && val===(_es.salaryRaiseCond||'')) tr=_es.salaryRaiseCondEn||''; // 「これを使う」→ アンシスの訳
+      if(tr) setAutoDefault(en, tr);
+      else if(val) { var e=document.getElementById(en); if(e){ e.value=''; delete e.dataset.autofill; } noTr.push(k); }
+    });
+    closeJKensetsu(); p();
+    if(noTr.length && typeof showToast==='function') showToast('⚠️ 文言を変更したため訳が入りません（'+noTr.length+'欄）。訳は手入力してください');
+    else if(typeof showToast==='function') showToast('✅ 建設フォーマットを反映しました');
+  }catch(e){ closeJKensetsu(); }
+}
+
+var _KOUJI_TR={"土木工事業": "සිවිල් ඉංජිනේරු කටයුතු", "建築工事業": "ගොඩනැගිලි ඉදිකිරීම් කටයුතු", "大工工事業": "වඩු කටයුතු", "左官工事業": "බදාම කටයුතු", "とび・土工工事業": "පලංචි සහ පස් කටයුතු", "石工事業": "ගල් කටයුතු", "屋根工事業": "වහල කටයුතු", "電気工事業": "විදුලි කටයුතු", "管工事業": "නල කටයුතු", "タイル・れんが・ブロック工事業": "උළු, ගඩොල් සහ බ්ලොක් කටයුතු", "鋼構造物工事業": "වානේ ව්‍යුහ කටයුතු", "鉄筋工事業": "යකඩ කම්බි කටයුතු", "舗装工事業": "මාර්ග ආවරණ කටයුතු", "しゅんせつ工事業": "කැණීම් (ඩ්‍රෙජිං) කටයුතු", "板金工事業": "තහඩු කටයුතු", "ガラス工事業": "වීදුරු කටයුතු", "塗装工事業": "තීන්ත ආලේප කටයුතු", "防水工事業": "ජල ආරක්ෂණ කටයුතු", "内装仕上工事業": "අභ්‍යන්තර නිමාව කටයුතු", "機械器具設置工事業": "යන්ත්‍ර සවි කිරීමේ කටයුතු", "熱絶縁工事業": "තාප පරිවාරක කටයුතු", "電気通信工事業": "විදුලි සංදේශ කටයුතු", "造園工事業": "භූමි අලංකරණ කටයුතු", "さく井工事業": "ළිං විදීමේ කටයුතු", "建具工事業": "දොර ජනෙල් සවි කිරීමේ කටයුතු", "水道施設工事業": "ජල සැපයුම් පහසුකම් කටයුතු", "消防施設工事業": "ගිනි නිවීමේ පහසුකම් කටයුතු", "清掃施設工事業": "අපද්‍රව්‍ය පිරිපහදු පහසුකම් කටයුතු", "解体工事業": "කඩා ඉවත් කිරීමේ කටයුතු"};
+// ver.20260715: 従事させる工事業の種類の訳欄(f_workCatEn)は値をセットする処理が無く常に空だった。
+// 建設業許可29業種は固定語彙なので辞書で訳す。辞書に無い語は原文のままにする（誤訳を出さない）。
+// ver.20260715: 従事工事業はアンシス未入力が9割のため手入力が前提。
+// 日本語欄に打った内容を辞書で訳し、訳欄へ自動反映する。
+// 訳欄を手で直した場合は上書きしない（setAutoDefault の印で判定）。
+function _koujiSync(){
+  var ja=document.getElementById('f_workCat'), en=document.getElementById('f_workCatEn');
+  if(!ja||!en) return;
+  if(en.value && en.dataset.autofill!=='1') return;   // 手入力済みの訳は尊重
+  var tr=_koujiTr(ja.value);
+  if(tr){ setAutoDefault('f_workCatEn', tr); } else { en.value=''; delete en.dataset.autofill; }
+  p();
+}
+function _koujiTr(s){
+  if(!s) return '';
+  return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||_KOUJI_TR[t+'工事業']||_KOUJI_TR[t.replace(/一式/,'')+'工事業']||t):'';   /* ver.20261106.07: 「土木」「建築一式」のような書き方も訳す */})
+         .filter(Boolean).join('、');
+}
+const _J_REV={f_allowance1AmountEn:'allowance1AmtEn',f_allowance2AmountEn:'allowance2AmtEn',f_allowance3AmountEn:'allowance3AmtEn',f_allowance4AmountEn:'allowance4AmtEn',f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_allowance4Calc:'allowance4Cond',f_allowance4Amount:'allowance4Amount',f_allowance4Name:'allowance4Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
+
+// ver.20260910.01: 実費フラグ（1-6号と同仕様）。案シスの雇用条件 deductXxxType(true) が
+//   共通 loadCaseToForm の橋渡しで es_deductXxxJippi/Est に入る。手動チェックも可。
+function _jpJ(base){ var cb=document.getElementById(base+'Jippi'); var est=document.getElementById(base+'Est'); return !!(cb&&cb.checked)||/実費/.test((est&&est.value)||''); }
+function _jSufJa(base){ return _jpJ(base)?'（実費）':''; }
+function _jSufLo(base){ return _jpJ(base)?'（සැබෑ වියදම）':''; }
+function _setJippiJ(base,checked){ var e=document.getElementById(base+'Est'); if(e){ e.value=checked?'実費':''; } p(); }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel||!sel.value) return;
+    try{ info=JSON.parse(sel.value); }catch(e){ return; }
+  }
+  if(!info||!info.caseId){ console.warn('[doc] no caseId'); return; }
+  console.log('[doc] loadFromDB caseId='+info.caseId+' companyId='+info.companyId+' companyName='+info.companyName);
+  const {caseId,companyId,companyName}=info;
+  try{
+    const [cas0,cos,per0]=await Promise.all([
+      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en,residence_status&id=eq.'+caseId):Promise.resolve([]),
+      companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
+      caseId?sb('persons?select=kokko_jyuji_koujigyo&case_id=eq.'+caseId):Promise.resolve([])
+    ]);
+    const co=cos&&cos[0]; const cas=cas0&&cas0[0]; const per=per0&&per0[0];
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    // emp_setのキー不一致欄を補完（共通関数が拾えないキー名のもの）
+    let _es={};
+    if(co && Array.isArray(co.emp_sets)){ const _i=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1; _es=(_i>=0?co.emp_sets[_i]:null)||{}; }   // ver.20261023.04: 未選択なら1番目を使わず、選んでもらう
+    window.__jyEs=_es;   // ver.20261106.14: 印刷前に金額を雇用条件と比べるため
+    const S=(id,val)=>{const e=document.getElementById(id); if(e && val!=null && val!=='' && !e.value) e.value=val;};
+    S('f_deductSocialIns', _es.deductSocial);
+    S('f_deductEmpIns', _es.deductEmployment);
+    S('f_raiseCond', _es.salaryRaiseCond);
+    S('f_raiseCondEn', _es.salaryRaiseCondEn);
+    S('f_salaryTotal', _es.totalMonthly);
+    [1,2,3,4].forEach(function(n){ S('f_allowance'+n+'AmountEn', _es['allowance'+n+'AmtEn']||_es['allowance'+n+'AmountEn']); });   // ver.20261112.06: 金額（訳）
+    S('f_allowance1Calc', _es.allowance1Cond); S('f_allowance1CalcEn', _es.allowance1CondEn);
+    S('f_allowance2Calc', _es.allowance2Cond); S('f_allowance2CalcEn', _es.allowance2CondEn);
+    S('f_allowance3Calc', _es.allowance3Cond); S('f_allowance3CalcEn', _es.allowance3CondEn);
+    S('f_allowance3Amount', _es.allowance3Amount);
+    S('f_allowance3Name', _es.allowance3Name); S('f_allowance3NameEn', _es.allowance3NameEn);
+    S('f_allowance4Calc', _es.allowance4Cond); S('f_allowance4CalcEn', _es.allowance4CondEn);   // ver.20261030.09: (d)4つ目の手当
+    S('f_allowance4Amount', _es.allowance4Amount);
+    S('f_allowance4Name', _es.allowance4Name); S('f_allowance4NameEn', _es.allowance4NameEn);
+    S('f_workType', _es.category || (cas&&cas.job_category)); S('f_workTypeEn', _es.categoryEn || (cas&&cas.job_category_en));
+    S('f_workCat', (per&&per.kokko_jyuji_koujigyo)?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
+    if(per&&per.kokko_jyuji_koujigyo){ var _e=document.getElementById('f_workCatEn');
+      if(_e && !_e.value) setAutoDefault('f_workCatEn', _koujiTr(per.kokko_jyuji_koujigyo)); }
+    S('f_workDetail', _es.foreignerJobDesc); S('f_workDetailEn', _es.foreignerJobDescEn);
+    // ver.20261106.07: 「７．業務内容」を自動で作る（業務区分「土木・建築」、作業内容は国交省の業務区分の定型文＋この言語の訳）。
+    //   雇用条件の値そのまま（未加工）や空欄のときだけ入れ替え、手で直して保存した内容はそのまま残す。自動で入れた値は案シスに書き戻さない。
+    try{
+      const _is2=/2号|２号/.test((cas&&cas.residence_status)||'');
+      const _A=(typeof juuyouWorkAuto==='function')?juuyouWorkAuto(_es,'si',_is2):null;
+      if(_A && _A.keys.length){
+        const _nz=x=>String(x==null?'':x).normalize('NFKC').replace(/[\s　]/g,'');
+        const _raw=new Set([_es.category,_es.category2,_es.categoryEn,_es.category2En,_es.foreignerJobDesc,_es.foreignerJobDescEn,cas&&cas.job_category,cas&&cas.job_category_en].map(_nz).filter(Boolean));
+        const _put=(id,val)=>{ if(!val) return; const e=document.getElementById(id); if(!e) return; const c=_nz(e.value); if(!c || _raw.has(c) || (e.dataset&&e.dataset.autofill==='1')) setAutoDefault(id,val); };
+        _put('f_workType',_A.type); _put('f_workTypeEn',_A.typeEn); _put('f_workDetail',_A.detail); _put('f_workDetailEn',_A.detailEn);
+        // 「工事業の種類」に業務区分（建築（建設分野…）など）がそのまま入っていたら消す（工事業は人材の「従事させる工事業」から入れる）
+        const _cats=new Set([_es.category,_es.category2,_es.categoryEn,_es.category2En].map(_nz).filter(Boolean));
+        ['f_workCat','f_workCatEn'].forEach(id=>{ const e=document.getElementById(id); if(e && _cats.has(_nz(e.value))){ e.value=''; if(e.dataset) delete e.dataset.autofill; } });
+        { const e=document.getElementById('f_workCat'); if(e && !e.value && per && per.kokko_jyuji_koujigyo){ let _kj=String(per.kokko_jyuji_koujigyo).split(',').map(x=>x.trim()).filter(Boolean); if(typeof koujiFilterByCategory==='function') _kj=koujiFilterByCategory(_kj,[_es.category,_es.category2].filter(Boolean)); e.value=_kj.join('、'); } }
+        // ver.20261106.09: 工事業の種類は、会社が国土交通省から受けている建設業許可の業種（companies.permit_types）を入れる。
+        //   空欄・人材の「従事させる工事業」のまま・自動で入れた値 のときだけ入れ替え、手で直して保存した内容は残す。
+        //   案シスに許可業種が無い会社は、国交省の建設業者検索で調べて入れる（案シスには書き込まない）。
+        window.__jyCats=[_es.category,_es.category2].filter(Boolean);
+        { const _ldSeq=(window.__juuyouLoadSeq=(window.__juuyouLoadSeq||0)+1);
+          const _applyPt=(_pt)=>{
+            const e=document.getElementById('f_workCat');
+            if(typeof koujiFilter==='function') _pt=koujiFilter(_pt);   // 土木工事業・建築工事業は入れない
+            if(typeof koujiFilterByCategory==='function') _pt=koujiFilterByCategory(_pt, window.__jyCats);   // 業務区分に合う工事業だけ（国交省の対応表）
+            if(!e || !_pt || !_pt.length) return false;
+            const _perKj=_nz(per&&per.kokko_jyuji_koujigyo?String(per.kokko_jyuji_koujigyo).split(',').join('、'):'');
+            const c=_nz(e.value);
+            if(!c || c===_perKj || (e.dataset&&e.dataset.autofill==='1')){
+              setAutoDefault('f_workCat', _pt.join('、'));
+              const en=document.getElementById('f_workCatEn'); if(en){ en.value=''; en.dataset.autofill='1'; }   // 訳は日本語に合わせて作り直す
+              return true;
+            }
+            return false;
+          };
+          const _pt=String((co&&co.permit_types)||'').split(/[,、，]/).map(x=>x.trim()).filter(Boolean);
+          if(_pt.length){ _applyPt(_pt); }
+          else if(co && co.name && typeof mlitPermitLookup==='function'){
+            mlitPermitLookup(co).then(function(r){
+              if(_ldSeq!==window.__juuyouLoadSeq) return;            // 別の案件に切り替わっていたら何もしない
+              if(r && !r.city_mismatch && typeof mlitSaveToCompany==='function') mlitSaveToCompany(co, r);   // 案シスの会社情報（空欄のところだけ）にも入れる
+              if(r && r.permit_types && r.permit_types.length && _applyPt(r.permit_types)){
+                if(typeof _koujiSync==='function'){ try{ _koujiSync(); }catch(_ks2){} }
+                if(typeof showToast==='function') showToast('工事業の種類を、国土交通省の建設業許可（'+(r.lic||'')+'）から入れました'+(r.city_mismatch?'。国交省に登録の所在地（'+(r.mlit_addr||'')+'）が案シスと違います。同じ会社か確認してください':'')+(r.expired?'。許可の有効期限（'+r.expiry+'）が過ぎています。更新されているか確認してください':''), (r.expired||r.city_mismatch)?9000:4000);
+              }
+            }).catch(function(){});
+          }
+        }
+        { const e=document.getElementById('f_workCat');   // ver.20261106.10: 土木工事業・建築工事業は重要事項事前説明書に出さない
+          if(e && e.value && typeof koujiFilter==='function'){
+            const _tk=String(e.value).split(/[、,，]/).map(x=>x.trim()).filter(Boolean), _kp=koujiFilter(_tk);
+            if(_kp.length!==_tk.length){ e.value=_kp.join('、'); e.dataset.autofill='1'; const en=document.getElementById('f_workCatEn'); if(en){ en.value=''; en.dataset.autofill='1'; } }
+          } }
+        if(typeof _koujiSync==='function'){ try{ _koujiSync(); }catch(_ks){} }
+      }
+    }catch(_wa){ console.warn('[juuyou workAuto]',_wa); }
+    S('f_fixedOTCalc', _es.fixedOTName); S('f_fixedOTCalcEn', _es.fixedOTNameEn);
+    if(co){
+      s('f_orgName',co.name||'');
+      s('f_orgAddress',((co.pref||'')+(co.city||'')+(co.address||''))||'');
+      s('f_orgTel',co.tel||'');
+      s('f_repTitle',co.author_title||'');
+      (function(){var t=co.author_title||'',n=co.author_name||'';
+        if(t&&n.indexOf(t)===0){ n=n.slice(t.length).replace(/^[\s　]+/,''); }
+        s('f_repName',n);})();
+    }
+    if(!v('f_createY')){
+      const n=new Date();
+      document.getElementById('f_createY').value=String(n.getFullYear());
+      document.getElementById('f_createM').value=String(n.getMonth()+1);
+      document.getElementById('f_createD').value=String(n.getDate());
+    }
+    // 代表者氏名の先頭に役職が重複していれば除去（ソース問わず・空白無視）
+    (function(){
+      var te=document.getElementById('f_repTitle'),ne=document.getElementById('f_repName');
+      if(!ne||!ne.value) return;
+      var t=((te&&te.value)||'').replace(/[\s\u3000]/g,'');
+      if(!t) return;
+      var n=ne.value.replace(/^[\s\u3000]+/,'');
+      if(n.replace(/[\s\u3000]/g,'').indexOf(t)!==0) return;
+      var i=0,cnt=0;
+      while(i<n.length&&cnt<t.length){ if(!/[\s\u3000]/.test(n[i]))cnt++; i++; }
+      ne.value=n.slice(i).replace(/^[\s\u3000]+/,'');
+    })();
+    window._lastEmpSet=_es; window._lastJobCategory=(cas&&cas.job_category)||'';
+    p(); showToast('✅ データを読み込みました');
+    setTimeout(_jKensetsuModal, 300);
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp = document.querySelector('.pp');
+    const area = document.getElementById('pageArea');
+    if(!pp || !area) return;
+    const ppW = pp.clientWidth - 40;
+    const docW = 794;
+    if(ppW < docW){
+      const scale = ppW / docW;
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = scale; });
+    } else {
+      area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom = 1; });
+    }
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){
+      try{
+        const d=JSON.parse(o.value);
+        if(d.caseId===info.caseId){sel.value=o.value;found=true;break;}
+      }catch(e2){}
+    }
+    if(!found){
+      const opt=document.createElement('option');
+      opt.value=JSON.stringify(info);
+      opt.textContent='（indexから選択）';
+      sel.appendChild(opt);
+      sel.value=opt.value;
+    }
+  }
+  // まず共通関数で全入力欄を埋める
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'juuyou'); }
+  // 書類固有の追加処理があれば loadFromDB で補完
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+
+// ver.20261106.11: 印刷・PDFの前に、必須欄の空欄と、訳が入っていない欄を知らせる
+const JY_REQUIRED=[['f_createY','作成日（年）'],['f_createM','作成日（月）'],['f_createD','作成日（日）'],['f_orgName','特定技能所属機関名'],['f_orgAddress','所在地'],['f_orgTel','電話番号'],['f_repName','代表者 氏名'],
+  ['f_salaryMonthly','１．基本賃金（月額）'],['f_salaryTotal','４．１か月当たりの支払概算額'],['f_netPay','６．手取り支給額'],
+  ['f_workType','７．従事させる業務区分'],['f_workCat','７．従事させる工事業の種類'],['f_workDetail','７．具体的職種及び作業内容'],
+  ['f_raiseAmount','８．昇給額'],['f_raiseCond','８．昇給条件'],['f_raiseTime','８．昇給時期']];
+const JY_TR=[['f_orgName','機関名'],['f_orgAddress','所在地'],['f_repTitle','代表者 役職'],['f_repName','代表者 氏名'],
+  ['f_allowance1Name','２．手当(a)の名前'],['f_allowance1Calc','２．手当(a)の計算方法'],['f_allowance2Name','２．手当(b)の名前'],['f_allowance2Calc','２．手当(b)の計算方法'],
+  ['f_allowance3Name','２．手当(c)の名前'],['f_allowance3Calc','２．手当(c)の計算方法'],['f_allowance4Name','２．手当(d)の名前'],['f_allowance4Calc','２．手当(d)の計算方法'],
+  ['f_fixedOTCalc','３．固定残業代の計算方法'],['f_workType','７．業務区分'],['f_workCat','７．工事業の種類'],['f_workDetail','７．作業内容'],
+  ['f_raiseAmount','８．昇給額'],['f_raiseCond','８．昇給条件'],['f_raiseTime','８．昇給時期']];
+function jyPrintCheck(){
+  const has=id=>!!document.getElementById(id);
+  const g=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+  const miss=JY_REQUIRED.filter(x=>has(x[0])&&!g(x[0])).map(x=>x[1]);
+  if((typeof _fixedOTState!=='undefined'&&_fixedOTState)==='有'){
+    [['f_fixedOTHours','３．固定残業代の時間'],['f_fixedOTAmount','３．固定残業代の金額']].forEach(x=>{ if(has(x[0])&&!g(x[0])) miss.push(x[1]); });
+  }
+  ['1','2','3','4'].forEach((i,k)=>{ if(g('f_allowance'+i+'Name') && has('f_allowance'+i+'Amount') && !g('f_allowance'+i+'Amount')) miss.push('２．手当('+'abcd'[k]+')の金額'); });
+  if(typeof koujiOutOfCategory==='function' && g('f_workCat')){ const bad=koujiOutOfCategory(g('f_workCat').split(/[、,，]/).map(x=>x.trim()).filter(Boolean), window.__jyCats); if(bad.length) miss.push('７．工事業の種類に、業務区分（'+(window.__jyCats||[]).map(c=>String(c).replace(/[（(].*$/,'')).join('・')+'）に合わないものがあります：'+bad.join('、')); }
+  const tr=JY_TR.filter(x=>g(x[0]) && has(x[0]+'En') && !g(x[0]+'En')).map(x=>x[1]);
+  // ver.20261106.14: 金額が雇用条件（案シスの雇用条件＝1-6号の元）と合っているか
+  const diff=[];
+  const es=window.__jyEs||{};
+  const num=x=>{const t=String(x==null?'':x).normalize('NFKC').replace(/[,，\s円]/g,''); return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null;};
+  const fmt=n=>n==null?'空欄':n.toLocaleString('ja-JP')+'円';
+  const CMPF=[['f_salaryMonthly',['salaryMonthly'],'１．基本賃金（月額）'],['f_allowance1Amount',['allowance1Amount','allowance1Amt'],'２．手当(a)'],['f_allowance2Amount',['allowance2Amount','allowance2Amt'],'２．手当(b)'],
+    ['f_allowance3Amount',['allowance3Amount','allowance3Amt'],'２．手当(c)'],['f_allowance4Amount',['allowance4Amount','allowance4Amt'],'２．手当(d)'],['f_fixedOTAmount',['fixedOTAmount','fixedOTAmt'],'３．固定残業代'],
+    ['f_salaryTotal',['totalMonthly'],'４．１か月当たりの支払概算額'],['f_deductTax',['deductTax'],'５．(a)税金'],['f_deductSocialIns',['deductSocial'],'５．(b)社会保険料'],['f_deductEmpIns',['deductEmployment'],'５．(c)雇用保険料'],
+    ['f_deductFood',['deductFood'],'５．(d)食費'],['f_deductHousing',['deductHousing'],'５．(e)居住費'],['f_deductUtility',['deductUtility'],'５．(f)水道光熱費'],['f_deductOther1Amount',['deductOther1Amount'],'５．(g)その他'],
+    ['f_deductTotal',['deductTotal'],'５．控除する金額（合計）'],['f_netPay',['netPay'],'６．手取り支給額']];
+  CMPF.forEach(x=>{
+    if(!has(x[0])) return;
+    if(x[0]==='f_fixedOTAmount' && (typeof _fixedOTState!=='undefined'&&_fixedOTState)!=='有') return;
+    let ev=null; for(const k of x[1]){ const n=num(es[k]); if(n!=null){ ev=n; break; } }
+    if(ev==null) return;                         // 雇用条件に数字が無い項目は比べない
+    const jv=num(g(x[0]));
+    if(jv!==ev && !(jv==null && ev===0)) diff.push(x[2]+'：この書類 '+fmt(jv)+' ／ 雇用条件 '+fmt(ev));
+  });
+  return {miss:miss, tr:tr, diff:diff};
+}
+(function(){
+  const _orig=window.doPrint;
+  if(typeof _orig!=='function') return;
+  window.doPrint=function(){
+    if(!window._skipOverflowCheck && !((typeof _editMode!=='undefined')&&_editMode)){
+      const r=jyPrintCheck();
+      if(r.miss.length || r.tr.length || r.diff.length){
+        let msg='';
+        if(r.diff.length) msg+='金額が雇用条件（案シスの雇用条件・1-6号）と違います：\n・'+r.diff.join('\n・')+'\n\n';
+        if(r.miss.length) msg+='次の欄を確認してください（空欄など）：\n・'+r.miss.join('\n・')+'\n\n';
+        if(r.tr.length) msg+='次の欄は外国語の訳が入っていません：\n・'+r.tr.join('\n・')+'\n（左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます）\n\n';
+        if(!confirm(msg+'このまま印刷しますか？')) return;
+      }
+    }
+    return _orig.apply(this,arguments);
+  };
+})();
+</script>
+<div id="jKensetsuModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;max-width:540px;width:92%;padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-family:sans-serif;box-sizing:border-box;">
+    <div style="font-size:15px;font-weight:bold;margin-bottom:4px;color:#1e293b;">🏗️ 分野が「建設」です</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:14px;">建設用フォーマットを確認・編集し、OKで反映します。</div>
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給額</label>
+    <input id="jm_amt" style="width:100%;margin:4px 0 12px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給条件</label>
+    <textarea id="jm_cond" style="width:100%;height:56px;margin:4px 0 6px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;resize:vertical;"></textarea>
+    <div style="font-size:11px;color:#64748b;margin:0 0 12px;line-height:1.5;">雇用条件書セット：<span id="jm_ref" style="color:#334155;">－</span> <button type="button" onclick="jm_use()" style="font-size:10px;padding:1px 8px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:4px;cursor:pointer;">これを使う</button></div>
+    <label style="font-size:12px;font-weight:bold;color:#334155;">昇給時期</label>
+    <input id="jm_time" style="width:100%;margin:4px 0 14px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
+    <div style="text-align:right;">
+      <button onclick="closeJKensetsu()" style="padding:7px 16px;margin-right:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button>
+      <button onclick="applyJKensetsu()" style="padding:7px 22px;font-size:13px;border:none;background:#2563eb;color:#fff;border-radius:6px;cursor:pointer;">OK</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
