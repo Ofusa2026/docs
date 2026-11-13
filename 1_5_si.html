@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>参考様式第１－５号 特定技能雇用契約書（シンハラ語）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ofusa_common.css?v=1784720947">
+<style>
+.doc{
+  background:white;
+  width:794px;
+  min-height:1123px;
+  flex-shrink:0;
+  margin:0 0 24px 0;
+  padding:15mm 14mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  font-family:'MS Mincho','Yu Mincho','Hiragino Mincho ProN','Noto Sans Sinhala','Iskoola Pota','Nirmala UI',serif;
+  font-size:8.5pt;line-height:1.9;color:#000;
+  position:relative;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+.page-num-label{
+  position:absolute;top:5px;right:8px;
+  font-size:8px;color:#bbb;font-family:sans-serif;
+  background:white;padding:0 2px;
+}
+.id{color:#000;}
+.sign-box{
+  border:1px solid #555;
+  padding:6px 10px;
+  margin-top:4px;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+}
+.sign-row{
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:8px;
+}
+.sign-label{
+  white-space:nowrap;
+  font-size:8pt;
+  min-width:2em;
+}
+.sign-content{
+  flex:1;
+  border-bottom:1px solid #aaa;
+  min-height:40px;
+  font-size:8pt;
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（シンハラ語版）</div>
+    <div class="ver">ver.20261113.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn btn-save" onclick="saveFormGeneric('1_5')">💾 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+    <button class="btn btn-print" onclick="printBoth()" style="background:#7c3aed;color:#fff;">🖨️ 1-5+1-6まとめ印刷</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>🔍 登録支援機関</label>
+    <select id="filterOrg" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
+    <label>🏢 所属機関</label>
+    <select id="filterCompany" onchange="filterCases()" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;"></select>
+    <label>🔤 検索（案件名・人材名）</label>
+    <input id="filterKeyword" oninput="filterCases()" placeholder="名前・案件名で絞り込み" style="width:100%;padding:4px;border:1px solid #bbb;border-radius:3px;font-size:11px;margin-bottom:5px;">
+    <label>👤 案件選択 <span id="caseCount" style="font-size:9px;color:#888;"></span></label>
+    <select id="caseSelect" size="6" style="width:100%;padding:2px;border:1px solid #bbb;border-radius:3px;font-size:11px;" onchange="selectCase()"></select>
+  </div>
+  <div class="fp-inner" id="formArea">
+    <div class="fs"><div class="fs-title">所属機関</div>
+      <div class="fg"><label>機関名（日）<span class="fid">es.orgName</span></label><input id="es_orgName" oninput="p()"></div>
+      <div class="fg"><label>機関名（SI）<span class="fid">es.orgNameEn</span></label><input id="es_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>代表者役職（日）<span class="fid">es.repTitle</span></label><input id="es_repTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名（日）<span class="fid">es.repName</span></label><input id="es_repName" oninput="p()"></div>
+      <div class="fg"><label>代表者役職（SI）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名（SI）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">作成日</div>
+      <div class="fg"><label>作成年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
+      <div class="fg"><label>作成月<span class="fid">es.createM</span></label><input id="es_createM" oninput="p()"></div>
+      <div class="fg"><label>作成日<span class="fid">es.createD</span></label><input id="es_createD" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">特定技能外国人</div>
+      <div class="fg"><label>氏名（日）<span class="fid">es.applicantName</span></label><input id="es_applicantName" oninput="p()"></div>
+      <div class="fg"><label>氏名（SI）<span class="fid">es.applicantNameEn</span></label><input id="es_applicantNameEn" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1794556155"></script>
+<script>
+docId='1_5_si';
+const _title='📄 参考様式第１－５号　特定技能雇用契約書（シンハラ語版）';
+// f, v, esc, _fontSize, _editMode は ofusa_common.js で宣言済み
+
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea');
+  if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">යොමු ආකෘති අංක 1-5</span></div>
+
+<div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:0.15em;margin:6px 0 2px;">特　定　技　能　雇　用　契　約　書</div>
+<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">නිශ්චිත කුසලතා වෘත්තිකයින් සඳහා වන රැකියා කොන්ත්‍රාත්තුව</div>
+
+<div style="font-size:8.5pt;line-height:1.8;margin-bottom:8px;">
+  特定技能所属機関　${f('es_orgName')}　（以下「甲」という。）と<br>
+  <span class="id" style="font-size:7.5pt;">නිශ්චිත කුසලතා සඳහා අනුබද්ධ ආයතනය　${f('es_orgNameEn')}</span><br>
+  <span class="id" style="font-size:7.5pt;">(මෙතැන් පටන් 「පළමු පාර්ශවය」 ලෙස හඳුන්වනු ලබන) අතර</span><br>
+  特定技能外国人（候補者を含む。）　${f('es_applicantName')}　（以下「乙」という。）は、<br>
+  <span class="id" style="font-size:7.5pt;">නිශ්චිත කුසලතා සහිත විදේශික වෘත්තිකයින් (අයදුම්කරුවන් ඇතුළුව)　${f('es_applicantNameEn')}</span><br>
+  <span class="id" style="font-size:7.5pt;">(මෙතැන් පටන් 「දෙවන පාර්ශවය」 ලෙස හඳුන්වනු ලබන)</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:4px;">
+  別添の雇用条件書に記載された内容に従い，特定技能雇用契約を締結する。<br>
+  <span class="id" style="font-size:7.5pt;">වෙනම අමුණා ඇති රැකියා කොන්දේසි පත්‍රයේ සඳහන් කර ඇති අන්තර්ගතයට අනුව, නිශ්චිත කුසලතා සඳහා වන රැකියා කොන්ත්‍රාත්තුව ගිවිසුම් ගත කරන ලදී.</span>
+</div>
+
+
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  本雇用契約は、乙が、在留資格「特定技能１号」若しくは「特定技能２号」の上陸許可又は在留資格変更許可等を受けた日から、甲乙双方が速やかに調整を行い、同日から１か月以内の甲乙双方の合意により定めた日から雇用を開始するものとする。<br>
+  <span class="id" style="font-size:7pt;">මෙම රැකියා කොන්ත්‍රාත්තුව යටතේ, දෙවන පාර්ශවය "නිශ්චිත කුසලතා අංක 1" හෝ "නිශ්චිත කුසලතා අංක 2" යන පදිංචි තත්ත්වය යටතේ ගොඩබෑමේ අවසරය හෝ පදිංචි තත්ත්වය වෙනස් කිරීමේ අවසරය ආදිය ලැබුණු දින සිට, පළමු පාර්ශවය සහ දෙවන පාර්ශවය වහාම සම්බන්ධීකරණය කර, එම දින සිට මාසයක් ඇතුළත දෙපාර්ශවයේ එකඟතාවයෙන් තීරණය කරන ලද දිනයේ සිට රැකියාව ආරම්භ කරනු ලැබේ.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  雇用条件書に記載の雇用契約期間（雇用契約の始期と終期）は、甲乙双方の調整により定めた雇用を開始する日に伴って変更されるものとする。<br>
+  <span class="id" style="font-size:7pt;">රැකියා කොන්දේසි පත්‍රයේ දක්වා ඇති රැකියා කොන්ත්‍රාත්තුවේ කාලසීමාව (රැකියා කොන්ත්‍රාත්තුවේ ආරම්භක සහ අවසන් දිනයන්), පළමු පාර්ශවය සහ දෙවන පාර්ශවය අතර සම්බන්ධීකරණය මගින් තීරණය කරනු ලබන රැකියා ආරම්භක දිනයට අනුකූලව වෙනස් කරනු ලැබේ.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  甲乙双方は、乙の在留資格に係る審査結果を互いに情報共有することとする。<br>
+  <span class="id" style="font-size:7pt;">පළමු පාර්ශවය සහ දෙවන පාර්ශවය යන දෙදෙනාම, දෙවන පාර්ශවයේ පදිංචි තත්ත්වය පිළිබඳ විභාග ප්‍රතිඵල සම්බන්ධයෙන් තොරතුරු එකිනෙකා සමඟ බෙදා ගනු ඇත.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:6px;">
+  なお，雇用契約を更新することなく雇用契約期間を満了した場合，及び乙が何らかの事由で在留資格を喪失した時点で雇用契約は終了するものとする。<br>
+  <span class="id" style="font-size:7pt;">තවද, රැකියා කොන්ත්‍රාත්තුව අලුත් නොකර රැකියා කොන්ත්‍රාත් කාලය අවසන් වූ අවස්ථාවකදී, නැතහොත් කිසියම් හේතුවක් නිසා දෙවන පාර්ශවයේ පදිංචි තත්ත්වය අහිමි වූ අවස්ථාවේදී, මෙම රැකියා කොන්ත්‍රාත්තුව අවසන් වේ.</span>
+</div>
+
+<div style="font-size:8.5pt;margin-bottom:12px;">
+  本雇用契約書及び雇用条件書は２部作成し，甲乙それぞれが保有するものとする。<br>
+  <span class="id" style="font-size:7pt;">මෙම රැකියා කොන්ත්‍රාත්තුව සහ රැකියා කොන්දේසි පත්‍රිකාව පිටපත් දෙකක් සකස් කර, පළමු පාර්ශවය සහ දෙවන පාර්ශවය එක් පිටපත බැගින් තබා ගනු ඇත.</span>
+</div>
+
+
+
+<!-- 締結日 -->
+<div style="text-align:right;font-size:8pt;margin-bottom:10px;line-height:1.8;">
+  ${f('es_createY')}　年　${f('es_createM')}　月　${f('es_createD')}　日　締結<br>
+  <span class="id" style="font-size:7.5pt;">${f('es_createY')} වසර ${f('es_createM')} මස ${f('es_createD')} දින (ගිවිසුම් ගත කරන ලදී)</span>
+</div>
+
+<!-- 署名欄 -->
+<div style="display:flex;font-size:8pt;margin-top:8px;line-height:1.9;">
+  <!-- 甲（左カラム）-->
+  <div style="flex:1;">
+    <div style="margin-left:10em;">${f('es_orgName')}</div>
+    <div style="display:flex;align-items:flex-end;"><span style="width:3em;">甲</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitle')}　${f('es_repName')}</span><span style="width:3em;text-align:right;"><span style="display:inline-block;border:1px solid #000;border-radius:50%;width:1.6em;height:1.6em;line-height:1.6em;text-align:center;vertical-align:middle;">印</span></span></div>
+    <div style="height:0.8em;"></div>
+    <div style="font-size:7.5pt;">（特定技能所属機関名・代表者役職名・氏名・捺印）</div>
+    <div style="height:0.8em;"></div>
+    <div style="margin-left:10em;">${f('es_orgNameEn')}</div>
+    <div style="display:flex;align-items:center;"><span style="min-width:3em;">පළමු පාර්ශවය</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">නිල මුද්‍රාව</span></div>
+    <div style="font-size:7pt;">(නිශ්චිත කුසලතා සඳහා අනුබද්ධ සංවිධානයේ නම・<br>නියෝජිතයාගේ තනතුර・නම・නිල මුද්‍රාව)</div>
+  </div>
+  <!-- 乙（右カラム）-->
+  <div style="flex:1;padding-left:3em;" class="sign-field" data-signer="applicant" data-label="乙署名">
+    <div style="line-height:1.9;">&nbsp;</div><!-- orgName行と高さ合わせ -->
+    <div style="display:flex;align-items:flex-end;"><span style="width:3em;flex:none;">乙</span>
+      <div class="sign-field-area" style="height:22px;flex:1;position:relative;border-top:none;border-bottom:1px solid #000;margin-top:0;">
+        <span class="sign-field-placeholder" style="color:#bbb;font-size:9px;">← 署名</span>
+        <img class="sign-field-img" style="display:none;max-height:20px;">
+      </div>
+    </div>
+    <div style="height:0.8em;"></div>
+    <div style="font-size:7.5pt;">（特定技能外国人の署名）</div>
+    <div style="height:0.8em;"></div>
+    <div>&nbsp;</div>
+    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">දෙවන පාර්ශවය</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>
+    <div style="font-size:7pt;">(නිශ්චිත කුසලතා විදේශික වෘත්තිකයාගේ අත්සන)</div>
+  </div>
+</div>
+
+</div><!-- /doc -->
+`;
+  _fontSize=(_fontSize===8.5)?8.5:_fontSize;
+  _applyFontSize();
+  _apply15_siFontSize();
+  setupPageTracker();
+}
+
+function _apply15_siFontSize(){
+  const st=document.getElementById('_15_siFontStyle')||document.createElement('style');
+  st.id='_15_siFontStyle';
+  document.head.appendChild(st);
+  const s=_fontSize/8.5;
+  st.textContent=[
+    `.doc [style*="font-size:13pt"]{font-size:${(13*s).toFixed(2)}pt!important}`,
+    `.doc [style*="font-size:9pt"]{font-size:${(9*s).toFixed(2)}pt!important}`,
+  ].join('');
+}
+
+p();
+
+// index.htmlからの案件選択を受信（自動追加）
+if(!window._selectCaseListenerAdded){
+  window._selectCaseListenerAdded=true;
+  window.addEventListener('message', function(e){
+    if(!e.data||e.data.type!=='SELECT_CASE') return;
+    const info=e.data.info;
+    if(!info||!info.caseId) return;
+    console.log('[doc] SELECT_CASE received:', info);
+    const sel=document.getElementById('caseSelect');
+    if(sel){
+      let found=false;
+      for(let o of sel.options){
+        try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){}
+      }
+      if(!found){
+        const opt=document.createElement('option');
+        opt.value=JSON.stringify(info);
+        opt.textContent='（indexから選択）';
+        sel.appendChild(opt);
+        sel.value=opt.value;
+      }
+    }
+    if(typeof loadFromDB==='function'){ loadFromDB(info); }
+    else if(typeof loadCaseToForm==='function'){ loadCaseToForm(info, '1_5'); }
+  });
+}
+
+</script>
+</body>
+</html>
