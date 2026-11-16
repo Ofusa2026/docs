@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.01
+ * - feat: 性別・生年月日が案シスに無い案件で、右上にお知らせを出してその場で入れられるように（案シスにも保存できる）
  * ver.20261113.03
  * - feat: シンハラ語（si）版の書類（1_6_si.html / 1_5_si.html）に対応
  * ver.20261113.02
@@ -7009,4 +7011,92 @@ function _structNoticeShow(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBtn); else addBtn();
   try{ var st=document.createElement('style'); st.textContent='@media print{#_wageOnlyBtn,#_wageOnly{display:none!important}}'; (document.head||document.documentElement).appendChild(st); }catch(e){}
+})();
+
+/* ver.20261116.01: 性別・生年月日が案シスに入っていない案件でも、その場で入れて書類を作れるようにする。
+   案件を読み込んだあと、書類に性別・生年月日の欄があって空なら、右上にお知らせを出す。
+   選んで「書類に入れる」を押すと書類に入り、チェックが付いていれば案シスの人材情報にも保存する（次からは自動で入る）。 */
+(function(){
+  if(window._ofGBInit) return; window._ofGBInit=true;
+  // 支援責任者・支援担当者の履歴書は、性別・生年月日がその人のもの（申請人ではない）なので出さない
+  if(/(^|\/)(1_20|1_22)(_[a-z]+)?\.html/.test(location.pathname)) return;
+  var $=function(id){ return document.getElementById(id); };
+  var val=function(id){ var e=$(id); return e ? String(e.value||'').trim() : ''; };
+  var fire=function(e){ try{ e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} };
+  function setV(id,v){
+    var e=$(id); if(!e) return false;
+    if(e.tagName==='SELECT'){
+      var hit=[].filter.call(e.options,function(o){ return (o.value||o.text)===v || o.text===v; })[0];
+      if(!hit) return false; e.value=hit.value||hit.text;
+    } else e.value=v;
+    fire(e); return true;
+  }
+  function genderIds(){ return ['f_gender','es_gender'].filter(function(i){ return !!$(i); }); }
+  function birthT(){
+    if($('f_birthdate')) return {ids:['f_birthdate']};
+    if($('f_birthDate')) return {ids:['f_birthDate']};
+    if($('f_birthY') && $('f_birthM') && $('f_birthD')) return {ids:['f_birthY','f_birthM','f_birthD'], ymd:true};
+    return null;
+  }
+  function close(){ var b=$('_ofGBBox'); if(b) b.remove(); }
+  function check(caseId){
+    close();
+    if(!caseId) return;
+    var gi=genderIds(), needG = gi.length && gi.every(function(i){ return !val(i); });
+    var bt=birthT(), needB = !!(bt && bt.ids.every(function(i){ return !val(i); }));
+    // 生年月日の欄が無く年齢だけの書類（1-4号など）は、年齢が空なら生年月日を聞いて年齢を出す
+    var ageIds=['f_age','es_age'].filter(function(i){ return !!$(i); });
+    if(!bt && ageIds.length && ageIds.every(function(i){ return !val(i); })){ bt={ids:[], ageOnly:true}; needB=true; }
+    if(!needG && !needB) return;
+    var miss=[]; if(needG) miss.push('性別'); if(needB) miss.push(bt.ageOnly?'生年月日（年齢）':'生年月日');
+    var box=document.createElement('div'); box.id='_ofGBBox';
+    box.style.cssText='position:fixed;top:10px;right:10px;z-index:99999;background:#fffbeb;border:2px solid #f59e0b;border-radius:10px;padding:10px 12px;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:13px;line-height:1.6;max-width:330px;font-family:sans-serif;';
+    box.innerHTML='<div style="font-weight:700;color:#92400e;margin-bottom:4px;">⚠ 案シスに「'+miss.join('」「')+'」が入っていません</div>'
+      +'<div style="color:#78350f;margin-bottom:6px;">ここで入れると、この書類に入ります。</div>'
+      +(needG?'<div style="margin-bottom:4px;">性別　<label><input type="radio" name="_ofGBg" value="男"> 男</label>　<label><input type="radio" name="_ofGBg" value="女"> 女</label></div>':'')
+      +(needB?'<div style="margin-bottom:4px;">生年月日'+(bt.ageOnly?'（年齢を出すため）':'')+'　<input type="date" id="_ofGBb" style="font-size:13px;padding:2px 4px;"></div>':'')
+      +'<label style="display:block;margin:4px 0 8px;color:#374151;"><input type="checkbox" id="_ofGBsave" checked> 案シスの人材情報にも保存する（次からは自動で入ります）</label>'
+      +'<button type="button" id="_ofGBok" style="background:#d97706;color:#fff;border:0;border-radius:6px;padding:5px 12px;font-weight:700;cursor:pointer;">書類に入れる</button> '
+      +'<button type="button" id="_ofGBno" style="background:#fff;color:#6b7280;border:1px solid #d1d5db;border-radius:6px;padding:5px 10px;cursor:pointer;">あとで</button>'
+      +'<div id="_ofGBmsg" style="margin-top:6px;font-size:12px;color:#b91c1c;"></div>';
+    document.body.appendChild(box);
+    $('_ofGBno').onclick=close;
+    $('_ofGBok').onclick=async function(){
+      var msg=$('_ofGBmsg'), up={};
+      var gr=document.querySelector('input[name="_ofGBg"]:checked'), g=gr?gr.value:'';
+      var b=needB ? String(($('_ofGBb')||{}).value||'') : '';
+      if(needG && !g && needB && !b){ msg.textContent='性別か生年月日を入れてください。'; return; }
+      if(g){ gi.forEach(function(i){ setV(i,g); }); up.gender=g; }
+      if(b && /^\d{4}-\d{2}-\d{2}$/.test(b)){
+        var p=b.split('-');
+        if(bt.ymd){ setV('f_birthY',String(parseInt(p[0],10))); setV('f_birthM',String(parseInt(p[1],10))); setV('f_birthD',String(parseInt(p[2],10))); }
+        else if(!bt.ageOnly) setV(bt.ids[0], b);
+        up.birthdate=b;
+        // 年齢の欄が空なら生年月日から入れる
+        ['f_age','es_age'].forEach(function(id){ if($(id) && !val(id)){
+          var t=new Date(), a=t.getFullYear()-(+p[0]); if(t.getMonth()+1<+p[1] || (t.getMonth()+1==+p[1] && t.getDate()<+p[2])) a--; setV(id,String(a)); } });
+      }
+      try{ if(typeof window.p==='function') window.p(); }catch(_){}
+      if(Object.keys(up).length && ($('_ofGBsave')||{}).checked){
+        try{
+          await sb('persons?case_id=eq.'+encodeURIComponent(caseId),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(up)});
+          box.innerHTML='<div style="color:#166534;font-weight:700;">✅ 書類に入れ、案シスにも保存しました</div>';
+        }catch(e){ box.innerHTML='<div style="color:#b91c1c;font-weight:700;">書類には入れましたが、案シスへの保存に失敗しました。案シスで入れてください。</div>'; }
+      } else box.innerHTML='<div style="color:#166534;font-weight:700;">✅ 書類に入れました</div>';
+      setTimeout(close, 2500);
+    };
+  }
+  try{ var st=document.createElement('style'); st.textContent='@media print{#_ofGBBox{display:none!important}}'; (document.head||document.documentElement).appendChild(st); }catch(e){}
+  // 案件を選び直したら、読み込みが終わるのを待って（共通の読み込みを使わない書類は6秒まで）確かめる
+  var last='';
+  setInterval(function(){
+    var li=window._lastCaseInfo, id=String((li&&li.caseId)||window._caseLoadDone||'');
+    if(!id || id===last) return;
+    last=id; var t0=Date.now();
+    var w=setInterval(function(){
+      var cur=String((window._lastCaseInfo&&window._lastCaseInfo.caseId)||window._caseLoadDone||'');
+      if(cur!==id){ clearInterval(w); return; }
+      if(window._caseLoadDone===id || Date.now()-t0>6000){ clearInterval(w); setTimeout(function(){ var c2=String((window._lastCaseInfo&&window._lastCaseInfo.caseId)||window._caseLoadDone||''); if(c2===id) check(id); }, 2500); }
+    }, 500);
+  }, 800);
 })();

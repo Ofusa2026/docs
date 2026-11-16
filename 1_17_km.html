@@ -561,7 +561,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（カンボジア語版・変更）</div>
-    <div class="ver">ver.20261116.12</div>
+    <div class="ver">ver.20261116.13</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -687,7 +687,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794850001"></script>
+<script src="ofusa_common.js?v=1794860001"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -1002,6 +1002,53 @@ document.addEventListener('change', function(e){ if(e.target && /^f(38[4-9]|39[0
    通訳者は、この書類の言語（P17_LANG）に対応する人だけを載せる。自社支援・未登録のときは手書き用の空欄の表にする。 */
 var P17_LANG = 'km';
 var P17_BESSI_L = {"staff": "បញ្ជីឈ្មោះអ្នកទទួលបន្ទុកការគាំទ្រ", "interp": "បញ្ជីឈ្មោះអ្នកបកប្រែ", "annex": "ឯកសារភ្ជាប់", "org": "ឈ្មោះស្ថាប័នគាំទ្រ", "name": "ឈ្មោះ", "kana": "ហ្វូរីហ្គាណា", "title": "តួនាទី", "tel": "លេខទូរស័ព្ទ", "aff": "ស្ថាប័នដែលចំណុះ", "nat": "សញ្ជាតិ", "lang": "ភាសា", "none": "មិនមានការចុះឈ្មោះ", "mgr": "បញ្ជីឈ្មោះអ្នកទទួលខុសត្រូវការគាំទ្រ"};
+/* ver.20261116.06: 別紙の支援責任者・支援担当者の英語表記が空のとき、ふりがなからローマ字（氏名）、よくある役職は辞書で英語（役職）を入れる */
+function _p17Romaji(k){
+  k=String(k||'').replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60);}).replace(/[・･　]/g,' ').trim();
+  if(!k || /[^ぁ-ゖー\s]/.test(k)) return '';
+  var Y={'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo','りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo'};
+  var S='あa,いi,うu,えe,おo,かka,きki,くku,けke,こko,さsa,しshi,すsu,せse,そso,たta,ちchi,つtsu,てte,とto,なna,にni,ぬnu,ねne,のno,はha,ひhi,ふfu,へhe,ほho,まma,みmi,むmu,めme,もmo,やya,ゆyu,よyo,らra,りri,るru,れre,ろro,わwa,ゐi,ゑe,をo,がga,ぎgi,ぐgu,げge,ごgo,ざza,じji,ずzu,ぜze,ぞzo,だda,ぢji,づzu,でde,どdo,ばba,びbi,ぶbu,べbe,ぼbo,ぱpa,ぴpi,ぷpu,ぺpe,ぽpo,ゔvu,ぁa,ぃi,ぅu,ぇe,ぉo,ゃya,ゅyu,ょyo'.split(','),M={};
+  S.forEach(function(x){ M[x.charAt(0)]=x.slice(1); });
+  var words=k.split(/\s+/).map(function(w){
+    var o='',i=0,sok=false;
+    while(i<w.length){
+      var c=w.charAt(i), two=w.substr(i,2), r;
+      if(c==='っ'){ sok=true; i++; continue; }
+      if(c==='ー'){ i++; continue; }
+      if(c==='ん'){ var nx=w.charAt(i+1); var nr=Y[w.substr(i+1,2)]||M[nx]||''; o+= /^[bmp]/.test(nr)?'m':'n'; i++; continue; }
+      if(Y[two]){ r=Y[two]; i+=2; } else if(M[c]!==undefined){ r=M[c]; i++; } else return '';
+      if(sok){ o+= /^ch/.test(r)?'t':r.charAt(0); sok=false; }
+      o+=r;
+    }
+    o=o.replace(/ou/g,'o').replace(/oo/g,'o').replace(/uu/g,'u');   // パスポートと同じ書き方（長音は書かない）
+    return o.toUpperCase();
+  });
+  return words.indexOf('')>=0 ? '' : words.join(' ');
+}
+var _P17_TITLE_EN=[['代表取締役社長','President and CEO'],['代表取締役会長','Chairman and CEO'],['代表取締役','Representative Director'],['取締役社長','President'],['専務取締役','Senior Managing Director'],['常務取締役','Managing Director'],['取締役','Director'],['代表理事','Representative Director'],['理事長','Chairperson'],['専務理事','Executive Director'],['常務理事','Managing Director'],['理事','Director'],['代表社員','Representative Partner'],['事務局長','Secretary General'],['統括事務長','Chief Administrator'],['事務長','Administrator'],['管理本部長','General Manager, Administration'],['本部長','General Manager'],['事業部長','Division Manager'],['部長','General Manager'],['次長','Deputy General Manager'],['課長','Section Manager'],['係長','Chief'],['主任','Chief'],['室長','Office Manager'],['支店長','Branch Manager'],['所長','Office Manager'],['シニアマネージャー','Senior Manager'],['マネージャー','Manager'],['マネジャー','Manager'],['リーダー','Leader'],['社長','President'],['会長','Chairman'],['代表','Representative'],['一般社員','Staff'],['社員','Staff'],['職員','Staff'],['スタッフ','Staff'],['総務','General Affairs'],['職業紹介責任者','Employment Placement Manager'],['支援責任者','Support Manager'],['支援担当者','Support Staff'],['役職なし','None'],['なし','None'],['無','None']];
+function _p17TitleEn(t){
+  t=String(t||'').replace(/\s/g,'');
+  if(!t) return '';
+  for(var i=0;i<_P17_TITLE_EN.length;i++) if(t===_P17_TITLE_EN[i][0]) return _P17_TITLE_EN[i][1];
+  for(var j=0;j<_P17_TITLE_EN.length;j++){ var k=_P17_TITLE_EN[j][0]; if(k.length>=2 && !/なし|^無$/.test(k) && t.slice(-k.length)===k) return _P17_TITLE_EN[j][1]; }
+  return '';
+}
+/* 英語表記の空欄を埋める。名前がそのまま入っている役職(英)・日本語のままの英語表記は、無いものとして作り直す */
+function _p17FillEn(o, M0, flag){
+  var nz=function(x){ return String(x||'').replace(/[\s　]/g,'').toLowerCase(); };
+  var same=!!(M0 && M0.name && nz(o.name)===nz(M0.name));
+  var r={}; for(var k in o) r[k]=o[k];
+  if(!String(r.title||'').trim() && same && M0.title && !/^(別紙参照|　)$/.test(M0.title)) r.title=M0.title;
+  var te=String(r.title_en||'').trim();
+  if(te && (!/[A-Za-z]/.test(te) || nz(te)===nz(r.name_en) || nz(te)===nz(r.name) || (same && nz(te)===nz(M0.name_en)) || /^(coe|no|daihyoutorishimariyaku|riji)$/i.test(te))) te='';
+  if(!te){ var t2=_p17TitleEn(r.title); if(t2){ te=t2; flag.en=true; } }
+  r.title_en=te;
+  var ne=String(r.name_en||'').trim();
+  if(ne && !/[A-Za-z]/.test(ne)) ne='';
+  if(!ne){ var kana=r.kana||(same?M0.kana:''); var rm=/[一-龥々]/.test(String(r.name||'')) ? _p17Romaji(kana) : ''; /* 漢字の名前だけ（カタカナ・英字の名前＝外国の方などはローマ字にしない） */ if(rm){ ne=rm; flag.en=true; } }
+  r.name_en=ne;
+  return r;
+}
 function _p17BessiData(){
   /* ver.20261105.13: 別紙は必ず作る。名簿が無いときも、分かる人を1名でも載せる。
      支援担当者：①別紙の名簿 → ②支援責任者（担当者を兼ねる人として1名）
@@ -1024,6 +1071,10 @@ function _p17BessiData(){
     staff = [{ name:M0.name, name_en:M0.name_en||'', title: bad(M0.title)?'':M0.title, title_en:M0.title_en||'', tel:M0.tel||'' }];
     fb.staff = true;
   }
+  var _enf={en:false};
+  mgrs = mgrs.map(function(o){ return _p17FillEn(o, M0, _enf); });
+  staff = staff.map(function(o){ return _p17FillEn(o, M0, _enf); });
+  fb.en = _enf.en;
   if(!interp.length){
     var LANGJA = { vi:/ベトナム/, id:/インドネシア/, zh:/中国|台湾/, th:/タイ/, ne:/ネパール/, km:/クメール|カンボジア/, my:/ミャンマー|ビルマ/, en:/英語/ };
     var re = LANGJA[P17_LANG];
@@ -2356,7 +2407,7 @@ async function loadFromDB(passedInfo){
         _s('es_soTel', so.tel);
         // ７ 支援業務を行う体制の概要（支援責任者・人数）
         /* ver.20261105.14: 支援責任者は別紙に載せるので、本文は「別紙参照」。読み込んだ値は別紙用に覚えておく */
-        window._p17MgrReal = { name: so.support_manager_name||so.support_manager||'', title: so.support_manager_title||'', kana: so.support_manager_kana||'', tel: so.tel||'' };
+        window._p17MgrReal = { name: so.support_manager_name||so.support_manager||'', title: so.support_manager_title||'', kana: so.support_manager_kana||'', name_en: so.support_manager_name_en||'', title_en: so.support_manager_title_en||'', tel: so.tel||'' };
         _s('es_soMgrKana', '\u3000');
         _s('es_soMgr', '別紙参照');
         _s('es_soMgrTitle', '\u3000');   // ver.20261105.20: 「別紙参照」は氏名欄だけ（役職欄と重ねない）
@@ -3139,6 +3190,7 @@ function _p17TodoItems(){
     if(d.fb.mgr)    items.push({t:'別紙の支援責任者は案シスの支援責任者で代わりに記載', go:'_p17GoBessi()', info:1});
     if(d.fb.staff)  items.push({t:'別紙の支援担当者は支援責任者で代わりに記載', go:'_p17GoBessi()', info:1});
     if(d.fb.interp) items.push({t:'別紙の通訳者はO-Linkヒアリングから記載', go:'_p17GoBessi()', info:1});
+    if(d.fb.en)     items.push({t:'別紙の英語表記（氏名・役職）が未登録のため、ふりがな・役職から自動で入れました。念のため確認してください', go:'_p17GoBessi()', info:1});
   }catch(e){}
   return items;
 }
