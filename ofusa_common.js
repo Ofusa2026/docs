@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.21
+ * - feat: まとめPDFで指定した作成日を、案件の書類作成日の代わりに使う（案シスは変えない）
  * ver.20261116.19
  * - feat: 印刷で数mm（5mm以内）だけはみ出すときは、文字を少し小さくして自動で収める（印刷後に元に戻す）
  * ver.20261116.18
@@ -146,6 +148,10 @@
   window._docCheckMode=false; try{ var fe=window.frameElement; window._docCheckMode=!!(fe && fe.getAttribute('data-doc-check')==='1'); }catch(_f){}
 }catch(_e){} })();
 
+// ver.20261116.21: まとめPDF（複数人）で「作成日をそろえる」を指定したときは、案件の書類作成日の代わりにその日付を使う
+//   （案シスの案件は変えない。この画面で読む案件の doc_create_date だけを置き換える）
+window._docDateOv='';
+window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE' && e.data.info){ var d=String(e.data.info.docDate||''); window._docDateOv=/^\d{4}-\d{2}-\d{2}$/.test(d)?d:''; } }catch(_e){} });
 // ===== Supabase =====
 const SB_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
 const SB_KEY='sb_publishable_3ptyILIpGIcNA5sUBhFMbA_n0VxpY2u';
@@ -238,6 +244,7 @@ async function sb(path,opts={}){
   const t = await r.text();
   if(!r.ok){ const e = t ? JSON.parse(t) : {}; throw new Error(e.message || e.hint || ('HTTP ' + r.status)); }
   const _res = t ? JSON.parse(t) : null;
+  try{ if(window._docDateOv && _method==='GET' && /^cases\?/.test(path) && Array.isArray(_res)) _res.forEach(function(r){ if(r && typeof r==='object') r.doc_create_date=window._docDateOv; }); }catch(_dd){}
   // ver.20261109.09: 「🔍 出どころ」表示のため、1件ずつ読んだ行（案件・会社・人材・登録支援機関など）を覚えておく
   try{ if(_method==='GET' && Array.isArray(_res) && _res.length && _res.length<=3){ const _tb=String(path).split('?')[0]; (window._srcRows=window._srcRows||{})[_tb]=_res[0]; } }catch(_sr){}
   return _res;

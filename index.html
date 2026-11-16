@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.20</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.21</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -488,8 +488,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794930001';
-window.__DOCS_CACHE_BUSTER__ = '1794930001';
+window.__DOCS_CACHE_BUSTER__ = '1794940001';
+window.__DOCS_CACHE_BUSTER__ = '1794940001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1849,6 +1849,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.21',
+    date: '2026-11-16',
+    notify: false,
+    items: [
+      '⚡ 1-17号・1-6号・重要事項事前説明書などの言語版を、前より速く開けるようにしました（ファイルを小さくし、案シスの画面を開いたときに本体を先に読み込んでおきます）。',
+      '📅 「会社・グループの複数人をまとめてPDF」で、選んだ全員の書類の作成日を1つの日付にそろえられるようにしました（案シスの案件は変えません）。'
+    ]
+  },
   {
     version: 'ver.20261116.20',
     date: '2026-11-16',
@@ -3850,13 +3859,13 @@ function _loadDocForPrint(src, info){
     var ifr=document.createElement('iframe');
     ifr.style.cssText='position:fixed;left:-10000px;top:0;width:1400px;height:1200px;border:0;';
     ifr.setAttribute('data-pm-fixed','1');   // ver.20261106.05: 選択中の案件で上書きされないように
-    ifr._pmInfo={caseId:info.caseId,companyId:info.companyId,companyName:info.companyName};   // 準備完了の合図には、この案件を送り直す
+    ifr._pmInfo={caseId:info.caseId,companyId:info.companyId,companyName:info.companyName,docDate:info.docDate||''};   // 準備完了の合図には、この案件を送り直す
     var done=false;
     var finish=function(res){ if(done) return; done=true; try{document.body.removeChild(ifr);}catch(e){} resolve(res); };
     ifr.onload=function(){
       try{
         var win=ifr.contentWindow;
-        try{ win.postMessage({type:'SELECT_CASE',info:{caseId:info.caseId,companyId:info.companyId,companyName:info.companyName}}, '*'); }catch(e){}
+        try{ win.postMessage({type:'SELECT_CASE',info:{caseId:info.caseId,companyId:info.companyId,companyName:info.companyName,docDate:info.docDate||''}}, '*'); }catch(e){}
         var tries=0;
         var wantName=(info.companyName||'').replace(/\s/g,'').slice(0,4);
         var timer=setInterval(function(){
@@ -3985,7 +3994,7 @@ window._bpLeft=function(){ return (window._bpUnits||[]).filter(function(u){ retu
 function _bpOpenP17(u){
   var x=u.p17.x, src=u.p17.file+(u.p17.file.indexOf('?')<0?('?v='+(window.__DOCS_CACHE_BUSTER__||Date.now())):'');
   var w=window.open(src, '_blank'); if(!w){ alert('ポップアップがブロックされました。ポップアップを許可してから再度お試しください。'); return; }
-  var info={caseId:x.id, companyId:x.company_id||'', companyName:x._coName||''};
+  var info={caseId:x.id, companyId:x.company_id||'', companyName:x._coName||'', docDate:u.p17.docDate||''};
   var want=String(info.companyName||'').replace(/\s/g,'').slice(0,4), tries=0, sent=false;
   var t=setInterval(function(){
     tries++;
@@ -4032,6 +4041,17 @@ async function _mpLoadGroups(){
 //   ・訳が空の欄（1-5・1-6・1-16・重要事項説明書・1-17号の言語版）
 //   ・そのほか印刷前チェックで出る注意（空欄など）
 var _dcRun=null;
+// ver.20261116.21: 言語版の書類（1-5・1-6・1-16・1-17・重要事項）は、本体を読み込んでから言語の行を差し替えて表示する。
+//   案シスの画面を開いて少したったら、本体と共通のプログラムを先に読み込んでおき、書類を開くときの待ち時間を減らす。
+(function(){
+  function warm(){
+    var v=window.__DOCS_CACHE_BUSTER__||'';
+    ['1_5.html','1_6.html','1_16_en.html','1_17_en.html','juuyou_en.html','ofusa_common.js'].forEach(function(f,i){
+      setTimeout(function(){ try{ fetch(f+'?v='+v,{credentials:'same-origin'}).then(function(r){ return r.text(); }).catch(function(){}); }catch(e){} }, i*400);
+    });
+  }
+  if(document.readyState==='complete') setTimeout(warm,3000); else window.addEventListener('load',function(){ setTimeout(warm,3000); });
+})();
 function _dcEsc(v){ return String(v==null?'':v).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function _dcLangName(l){ if(!l||l==='ja') return '日本語'; return (typeof _PM_LANG_LABEL!=='undefined' && _PM_LANG_LABEL[l]) || l; }
 function _dcDocName(dk){ var lb=_pmDocLabel(dk); return (lb && lb.name) ? (lb.name+(lb.sub?(' '+lb.sub):'')) : dk; }
@@ -4506,6 +4526,8 @@ function _mpRender(){
     +((st.split||'one')==='one'?'<span style="font-size:11px;color:#64748b;margin-left:4px;">並び：</span><label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='person'?'checked':'')+' onchange="_mpState.order=\'person\'"> 人順</label>'
       +'<label style="font-size:11px;"><input type="radio" name="mpOrder" '+(st.order==='doc'?'checked':'')+' onchange="_mpState.order=\'doc\'"> 書類順</label>':'')
     +'<div style="flex-basis:100%;height:0;"></div>'
+    +'<label title="選んだ全員の書類の作成日を、この日付にそろえます（空なら案件ごとの書類作成日のまま）。案シスの案件は変えません" style="font-size:12px;cursor:pointer;">📅 作成日をそろえる：<input type="date" id="mpDocDate" value="'+(st.docDate||'')+'" onchange="_mpState.docDate=this.value" style="font-size:12px;padding:2px 4px;"></label>'
+    +(st.docDate?'<button type="button" onclick="_mpState.docDate=\'\';_mpRender()" style="font-size:11px;padding:2px 8px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">そろえない</button>':'')
     +'<span id="mpCount" style="flex:1;font-size:12.5px;color:#0f766e;font-weight:700;text-align:right;"></span>'
     +'<button onclick="document.getElementById(\'mpModal\').remove()" style="padding:8px 14px;background:#f1f5f9;border:none;border-radius:8px;cursor:pointer;">キャンセル</button>'
     +'<button onclick="_mpDocCheck()" title="選んだ人の書類（選んだ書類）を裏で開いて、エラー・はみ出し・訳の言語ちがい・訳が空の欄を調べます（書類は書き換えません）" style="padding:8px 14px;background:#1e40af;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">🩺 チェックだけ</button>'
@@ -4641,7 +4663,7 @@ async function _mpDocCheck(){
   if(!ppl.length){ alert('人を選んでください。'); return; }
   var jobs=[];
   ppl.forEach(function(x){
-    var info={_batch:'check', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||'', empSetIdx:(x.emp_set_idx!=null?String(x.emp_set_idx):'')};
+    var info={_batch:'check', docDate:st.docDate||'', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||'', empSetIdx:(x.emp_set_idx!=null?String(x.emp_set_idx):'')};
     allDocs.filter(function(k){ return pd[x.id].indexOf(k)>=0 && _PM_EXCLUDE.indexOf(k)<0; }).forEach(function(dk){
       var l=x._lang;
       if(dk==='1_3'){ var rl=resolveLangForDoc('1_3', l)||'en'; jobs.push({dk:dk, lang:rl, want:l, pdf:'pdf/1_3_'+rl+'.pdf', info:info, who:x.applicant}); return; }
@@ -4688,8 +4710,8 @@ async function _mpExecute(){
         continue;
       }
       if(!f){ failed.push(x.applicant+'：'+j.dk); continue; }
-      var info={_batch:'multi', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
-      if(j.dk==='1_17_vi'){ p17Units.push({x:x, file:f.file, lang:f.lang}); continue; }   // ver.20261111.10: 1-17号はA4横で組み方が違うので、まとめには入れず1-17号の画面で印刷する
+      var info={_batch:'multi', docDate:st.docDate||'', caseId:x.id, companyId:x.company_id||st.coId, companyName:x._coName||st.coName, applicant:x.applicant, nationality:x.nationality||'', appType:x.app_type||'', residenceStatus:x.residence_status||'', applicantField:x.applicant_field||'', orgName:x.org||''};
+      if(j.dk==='1_17_vi'){ p17Units.push({x:x, file:f.file, lang:f.lang, docDate:st.docDate||''}); continue; }   // ver.20261111.10: 1-17号はA4横で組み方が違うので、まとめには入れず1-17号の画面で印刷する
       var res=await _loadDocForPrint(f.file+(f.file.indexOf('?')<0?('?v='+busterV):''), info);
       if(res){
         // 開いた書類に別の人の名前が出ていないか（取り違え防止）：申請人名が書類に無ければ失敗扱い
