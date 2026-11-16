@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.18
+ * - feat: 重要事項説明書のタイ語版の業務内容
  * ver.20261116.16
  * - fix: 全書類チェックで外の文字（フォント）が読めないだけのときはエラーにしない
  * ver.20261116.15
@@ -6006,8 +6008,9 @@ window.addEventListener('load', function(){
 var JUUYOU_WORK_STD={
   '土木':{
     ja:'指導者の指示・監督を受けながら、土木施設の新設、改築、維持、修繕に係る作業等に従事',
-    name:{zh:'土木',tl:'Gawaing Sibil (Civil Engineering)',mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
+    name:{th:'งานวิศวกรรมโยธา',zh:'土木',tl:'Gawaing Sibil (Civil Engineering)',mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
     tr:{
+      th:'ทำงานที่เกี่ยวข้องกับการก่อสร้างใหม่ การปรับปรุง การบำรุงรักษา และการซ่อมแซมสิ่งก่อสร้างทางวิศวกรรมโยธา ภายใต้คำแนะนำและการควบคุมดูแลของผู้ฝึกสอน',   // ver.20261116.18: 重要事項事前説明書のタイ語版
       zh:'在指导员的指示和监督下，从事土木设施的新建、改建、维护、修缮等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, muling pagtatayo, pagpapanatili at pagkukumpuni ng mga pasilidad na sibil',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор иргэний инженерийн байгууламжийг шинээр барих, шинэчлэн барих, арчлах, засварлахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
@@ -6022,8 +6025,9 @@ var JUUYOU_WORK_STD={
   },
   '建築':{
     ja:'指導者の指示・監督を受けながら、建築物の新築、増築、改築若しくは移転又は修繕若しくは模様替に係る作業等に従事',
-    name:{zh:'建筑',tl:'Pagtatayo ng Gusali (Building Construction)',mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
+    name:{th:'งานก่อสร้างอาคาร',zh:'建筑',tl:'Pagtatayo ng Gusali (Building Construction)',mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
     tr:{
+      th:'ทำงานที่เกี่ยวข้องกับการก่อสร้างใหม่ การต่อเติม การปรับปรุง การย้าย การซ่อมแซม หรือการปรับเปลี่ยนรูปแบบอาคาร ภายใต้คำแนะนำและการควบคุมดูแลของผู้ฝึกสอน',   // ver.20261116.18: 重要事項事前説明書のタイ語版
       zh:'在指导员的指示和监督下，从事建筑物的新建、扩建、改建或迁移、修缮或改装等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, pagpapalawak, muling pagtatayo, paglilipat, pagkukumpuni o pagbabago ng anyo ng mga gusali',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор барилга байгууламжийг шинээр барих, өргөтгөх, шинэчлэн барих, нүүлгэн шилжүүлэх, засварлах буюу өнгө үзэмжийг өөрчлөхтэй холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
@@ -6038,8 +6042,9 @@ var JUUYOU_WORK_STD={
   },
   'ライフライン・設備':{
     ja:'指導者の指示・監督を受けながら、電気通信、ガス、水道、電気その他のライフライン・設備の整備・設置、変更又は修理に係る作業等に従事',
-    name:{zh:'生命线·设备',tl:'Lifeline at Pasilidad',mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
+    name:{th:'ระบบสาธารณูปโภคและอุปกรณ์',zh:'生命线·设备',tl:'Lifeline at Pasilidad',mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
     tr:{
+      th:'ทำงานที่เกี่ยวข้องกับการจัดเตรียม การติดตั้ง การเปลี่ยนแปลง หรือการซ่อมแซมระบบโทรคมนาคม แก๊ส ประปา ไฟฟ้า และระบบสาธารณูปโภคและอุปกรณ์อื่นๆ ภายใต้คำแนะนำและการควบคุมดูแลของผู้ฝึกสอน',   // ver.20261116.18: 重要事項事前説明書のタイ語版
       zh:'在指导员的指示和监督下，从事电信、燃气、自来水、电力及其他生命线·设备的整备、安装、变更或修理等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa pagsasaayos, pagkakabit, pagbabago o pagkukumpuni ng telekomunikasyon, gas, tubig, kuryente at iba pang lifeline at pasilidad',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор цахилгаан холбоо, хий, усан хангамж, цахилгаан болон бусад амьдралын дэд бүтэц, тоног төхөөрөмжийг засварлах, суурилуулах, өөрчлөх буюу засахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
