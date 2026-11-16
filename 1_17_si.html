@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（シンハラ語版・変更）</div>
-    <div class="ver">ver.20261113.01</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -702,6 +702,16 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
      f084 … 出入国の送迎 ｂ「実施方法」の 送迎方法 */
 /* ver.20261030.05: f368 … 9-ｃ 労働法令違反の通報「有（認知次第実施）」（通報は義務なので常に有） */
 /* ver.20261104.03: f380s … Ⅴ 住居地「同上」を既定でチェック */
+/* ver.20261116.01: 1 事前ガイダンスの実施方法。登録支援機関ヒアリングの回答（implMethods.guidance）があればそれを使う。
+     認定は本人が海外にいるので「対面」は付けず、対面だけの回答なら「テレビ電話」にする。回答が無ければ従来どおり（認定＝テレビ電話／変更＝テレビ電話＋対面）。 */
+window._p17GuidIM = window._p17GuidIM || null;
+function _p17GuidChecks(C, nin){
+  var g = window._p17GuidIM;
+  if(!g){ C.f051 = true; C.f050 = !nin; return; }
+  C.f050 = !!g.face && !nin;
+  C.f052 = !!g.other;
+  C.f051 = !!g.video || (!C.f050 && !C.f052);
+}
 function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true, f380s:true }; }
 window._p17Check = window._p17Check || _p17DefaultChecks();
 document.addEventListener('change', function(e){
@@ -747,7 +757,7 @@ document.addEventListener('input', function(e){ _p17FitInput(e.target); });
 function _p17AppTypeChanged(){
   var nin = /認定/.test((document.getElementById('es_appType')||{}).value||'');
   var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
-  C.f051 = true; C.f050 = !nin;
+  _p17GuidChecks(C, nin);
   if(C.f125 || C.f126){ C.f125 = !nin; C.f126 = nin; }
   if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(String(T.f185||''))) T.f185 = nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
   p();
@@ -2273,7 +2283,7 @@ async function loadFromDB(passedInfo){
     _s('es_appType', (cas&&cas.app_type)||'');
     /* ver.20261030.06: 1 事前ガイダンスの実施方法。認定は本人が海外にいるので「テレビ電話」だけ、
        変更は日本にいるので「テレビ電話」「対面」の両方（該当するもの全てにチェックする欄）。 */
-    (function(){ var C=window._p17Check=window._p17Check||{}; var nin=/認定/.test((cas&&cas.app_type)||''); C.f051=true; C.f050=!nin; })();
+    (function(){ var C=window._p17Check=window._p17Check||{}; var nin=/認定/.test((cas&&cas.app_type)||''); window._p17GuidIM=null; _p17GuidChecks(C, nin); })();
     var _cs = (cas&&cas.contract_start) || pd.contract_start || pd.contractStart || '';   /* ver.20261111.11: 契約期間は案件（案シスの契約開始日・終了日）を先に見て、無ければ人材側（1-6号・1-25号・推薦表とそろえる） */
     var _m  = String((typeof ofusaToISO==='function'?ofusaToISO(_cs):_cs)).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);   // ver.20261106.04: 和暦も読む
     if(_m) _s('es_contractStart', _m[1]+'/'+('0'+_m[2]).slice(-2)+'/'+('0'+_m[3]).slice(-2));
@@ -2753,6 +2763,9 @@ async function _p17Hearing(so, _s){
     C[x[2]] = lcHas ? !!lc.accompany : true;
     C[x[3]] = lcHas ? !!lc.other : false;
   });
+  var gm = IM.guidance || {};
+  window._p17GuidIM = (gm.face || gm.video || gm.other) ? gm : null;
+  if(window._p17GuidIM){ _p17GuidChecks(C, /認定/.test((document.getElementById('es_appType')||{}).value||'')); used.push('事前ガイダンスの実施方法'); }
   var om = IM.orientation || {}, omHas = Object.keys(om).length>0;
   if(C.f184){ C.f190 = omHas ? !!om.face : true; C.f191 = omHas ? !!om.video : false; }
   if(review.length){

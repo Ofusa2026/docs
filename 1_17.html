@@ -140,7 +140,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20261111.11</span>
+  <span class="ver">ver.20261116.01</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -234,6 +234,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ver.20261116.01: 通訳者は1人目固定ではなく、申請人の国籍の言語に合う人を選ぶ（言語別設定で上書き済みならその人）。合う人がいなければ1人目。 */
+function _p17PickInterp(arr, c, overridden){
+  arr = Array.isArray(arr) ? arr : [];
+  if(overridden || arr.length < 2) return arr[0] || {};
+  var nat = String((c&&c.nationality)||'');
+  var map = [[/ベトナム|VIET/i,/ベトナム|Vietnam/i],[/インドネシア|INDONESIA/i,/インドネシア|Indonesia/i],[/ミャンマー|MYANMAR/i,/ミャンマー|ビルマ|Myanmar|Burmese/i],
+    [/ネパール|NEPAL/i,/ネパール|Nepal/i],[/中国|CHINA/i,/中国|Chinese/i],[/タイ|THAI/i,/タイ語|Thai/i],[/カンボジア|CAMBODIA/i,/カンボジア|クメール|Khmer/i],
+    [/韓国|KOREA/i,/韓国|Korean/i],[/スリランカ|SRI/i,/シンハラ|Sinhala/i],[/フィリピン|インド|バングラデシュ|PHILIPPINES|INDIA|BANGLADESH/i,/英語|English/i]];
+  for(var i=0;i<map.length;i++){
+    if(!map[i][0].test(nat)) continue;
+    var hit = arr.filter(function(o){ return o && map[i][1].test(String(o.language||'')); });
+    if(hit.length) return hit[0];
+  }
+  return arr[0] || {};
+}
+
 // ===== ver.20261103: ログインしていないときはDBを読まない・書かない（裏口対策）=====
 //   案シスと同じログイン（同じサイトなので、案シスでログインしていればそのまま使えます）。
 //   ログインが切れていたら自動で更新し、だめなら「ログインしてください」の画面を出して、ログイン後に続きを送ります。
@@ -1477,7 +1493,7 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         var k=_soF.substring(3);
         var H=_ex.supportHours||{}, CM=_ex.consultMethods||{}, EC=_ex.emergencyContact||{};
         var RM=_ex.regularMeeting||{}, IH=_ex.implHours||{}, IS=_ex.implSchedules||{};
-        var HP=_ex.housingPolicy||{}, SC=_ex.symbiosisCheck||{}, IP=(_ex.interpreters||[])[0]||{};
+        var HP=_ex.housingPolicy||{}, SC=_ex.symbiosisCheck||{}, IP=_p17PickInterp(_ex.interpreters, c, !!(_langOverride && (_langOverride.translator_name||_langOverride.translator_org)));
         // 対応時間（曜日別）
         var dayMap={hourMon:'mon',hourTue:'tue',hourWed:'wed',hourThu:'thu',hourFri:'fri',hourSat:'sat',hourSun:'sun',hourHol:'hol'};
         if(dayMap[k]) return _hourStr(H[dayMap[k]]);
