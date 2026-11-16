@@ -256,7 +256,7 @@ window.OFUSA_MIN_WAGE_AVG_R8 = [1177, "2026-10-01"];   // 全国加重平均（�
    訳の欄は「1 bulan」「1 tháng」のように期間だけにする。別の言語の訳（ベトナム語版に「1 bulan」など）や
    「Satuan Bulanan」「Đơn vị 1 năm」のように単位の語が入っているときは、その言語の決まった訳に直す */
 var _FLEX_TR={ id:['1 bulan','1 tahun'], vi:['1 tháng','1 năm'], en:['1 month','1 year'], ne:['१ महिना','१ वर्ष'], my:['၁ လ','၁ နှစ်'],
-  th:['1 เดือน','1 ปี'], zh:['1个月','1年'], ko:['1개월','1년'], km:['១ ខែ','១ ឆ្នាំ'], si:['මාස 1','වසර 1'], mn:['1 сар','1 жил'] };
+  th:['1 เดือน','1 ปี'], zh:['1个月','1年'], ko:['1개월','1년'], km:['១ ខែ','១ ឆ្នាំ'], si:['මාස 1','වසර 1'], mn:['1 сар','1 жил'], tl:['1 buwan','1 taon'] };
 function _flexUnitEnFix(lang, ja, en){
   var t=_FLEX_TR[lang]; ja=String(ja||'').normalize('NFKC'); en=String(en||'').trim();
   var kind = /年/.test(ja) ? 1 : (/(ヶ|か|カ|ケ|箇)?月/.test(ja) ? 0 : -1);
@@ -1229,7 +1229,8 @@ var _WR_TR={
   ne:{pre:'○विस्तृत रूपमा, कामको नियमको ', post:' मा उल्लेख छ।', sep:', ', one:function(n){return 'धारा '+n;}, rng:function(a,b){return 'धारा '+a+' देखि धारा '+b;}},
   si:{pre:'○විස්තර සඳහා සේවා නීතිරීතිවල ', post:' බලන්න.', sep:', ', one:function(n){return n+' වන වගන්තිය';}, rng:function(a,b){return a+' වන වගන්තියේ සිට '+b+' වන වගන්තිය දක්වා';}},
   km:{pre:'◦សម្រាប់ព័ត៌មានលម្អិត សូមមើលបទបញ្ជាការងារ ', post:'', sep:', ', one:function(n){return 'មាត្រា '+n;}, rng:function(a,b){return 'មាត្រា '+a+' ដល់មាត្រា '+b;}},
-  mn:{pre:'○Дэлгэрэнгүйг Хөдөлмөрийн дотоод журмын ', post:'-ээс харна уу.', sep:', ', one:function(n){return n+'-р зүйл';}, rng:function(a,b){return a+'-р зүйл～'+b+'-р зүйл';}}   // ver.20261116.08: モンゴル語
+  mn:{pre:'○Дэлгэрэнгүйг Хөдөлмөрийн дотоод журмын ', post:'-ээс харна уу.', sep:', ', one:function(n){return n+'-р зүйл';}, rng:function(a,b){return a+'-р зүйл～'+b+'-р зүйл';}},   // ver.20261116.08: モンゴル語
+  tl:{pre:'○Para sa detalye, tingnan ang ', post:' ng Mga Patakaran sa Pagtatrabaho.', sep:', ', one:function(n){return 'Artikulo '+n;}, rng:function(a,b){return 'Artikulo '+a+' hanggang Artikulo '+b;}}   // ver.20261116.13: タガログ語
 };
 function _wrTR(pfx, lang){
   var t=_WR_TR[lang]||_WR_TR.en;
@@ -1261,7 +1262,8 @@ var _HEALTH_FREQ_TR={
   ne:['त्यसपछि प्रत्येक १ वर्षमा','त्यसपछि प्रत्येक ६ महिनामा'],
   si:['ඉන්පසු සෑම වසරකට වරක් පවත්වනු ලැබේ','ඉන්පසු සෑම මාස හයකට වරක් පවත්වනු ලැබේ'],
   km:['បន្ទាប់មកអនុវត្តម្តងក្នុងមួយឆ្នាំ','បន្ទាប់មកអនុវត្តរៀងរាល់ ៦ ខែម្តង'],
-  mn:['дараа нь жил бүр хийнэ','дараа нь 6 сар тутам хийнэ']
+  mn:['дараа нь жил бүр хийнэ','дараа нь 6 сар тутам хийнэ'],
+  tl:['pagkatapos ay isasagawa bawat 1 taon','pagkatapos ay isasagawa bawat 6 na buwan']
 };
 function healthFreqTR(lang){
   var t=_HEALTH_FREQ_TR[lang]||_HEALTH_FREQ_TR.en;
@@ -4113,7 +4115,7 @@ document.addEventListener('click', function(e){
   };
   // ===== ver.20261111.04: 訳は言語ごとにも保存する（_tr_<言語>）。別の言語の訳が入っている共通の訳の欄は上書きしない =====
   //   雇用条件セットの「〇〇En」は全言語で同じ欄のため、ベトナム語版で保存すると、インドネシア語版などにもベトナム語が出ていた。
-  function _trDocLang(){ var m=(location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id|si|mn)\.html$/i); return m?m[1].toLowerCase():'id'; }
+  function _trDocLang(){ var m=(location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id|si|mn|tl)\.html$/i); return m?m[1].toLowerCase():'id'; }
   function _trSplit(values, existing){
     try{
       var L=_trDocLang(), sc=window._scriptOf||function(){ return ''; }, latin=(L==='en'||L==='id');
@@ -4456,13 +4458,13 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
 (function(){
   function _docLang(){
     try{
-      var m = (location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id|si|mn)\.html$/i);
+      var m = (location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id|si|mn|tl)\.html$/i);
       if(m) return m[1].toLowerCase();
     }catch(e){}
     return 'id'; // 無印ファイル（1_6.html 等）はインドネシア語版
   }
-  var LANG_JA = {id:'インドネシア語',en:'英語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',ko:'韓国語',zh:'中国語',si:'シンハラ語',mn:'モンゴル語'};
-  var LANG_EN = {id:'Indonesian',en:'English',vi:'Vietnamese',th:'Thai',ne:'Nepali',my:'Burmese (Myanmar)',km:'Khmer',ko:'Korean',zh:'Simplified Chinese',si:'Sinhala',mn:'Mongolian (Cyrillic)'};
+  var LANG_JA = {id:'インドネシア語',en:'英語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',ko:'韓国語',zh:'中国語',si:'シンハラ語',mn:'モンゴル語',tl:'タガログ語'};
+  var LANG_EN = {id:'Indonesian',en:'English',vi:'Vietnamese',th:'Thai',ne:'Nepali',my:'Burmese (Myanmar)',km:'Khmer',ko:'Korean',zh:'Simplified Chinese',si:'Sinhala',mn:'Mongolian (Cyrillic)',tl:'Tagalog (Filipino)'};
   // ver.20261005.01: 訳語固定の用語集（AI翻訳のゆれ防止）。
   //   日本語欄が用語と完全一致 → APIを使わずこの訳語で確定。
   //   文中に含まれる場合 → プロンプトに対訳指示として渡す。
@@ -4618,9 +4620,9 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   // ver.20261111.06: 1-6号の手当の金額が「実費」などの文字のとき、訳を自動で入れる
   var _AMT_WORD={
-    '実費':{id:'Biaya aktual',en:'Actual cost',vi:'Chi phí thực tế',km:'ថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်',ne:'वास्तविक खर्च',th:'ตามที่จ่ายจริง',zh:'实际费用',ko:'실비',si:'සත්‍ය වියදම',mn:'Бодит зардал'},
-    '実費支給':{id:'Dibayar sesuai biaya aktual',en:'Paid at actual cost',vi:'Chi trả theo chi phí thực tế',km:'ផ្តល់ជូនតាមថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်အတိုင်း ပေးသည်',ne:'वास्तविक खर्च अनुसार भुक्तानी',th:'จ่ายตามที่จ่ายจริง',zh:'按实际费用支付',ko:'실비 지급',si:'සත්‍ය වියදම අනුව ගෙවනු ලැබේ',mn:'Бодит зардлаар олгоно'},
-    '全額支給':{id:'Dibayar penuh',en:'Paid in full',vi:'Chi trả toàn bộ',km:'ផ្តល់ជូនទាំងស្រុង',my:'အပြည့်အဝ ပေးသည်',ne:'पूरा भुक्तानी',th:'จ่ายเต็มจำนวน',zh:'全额支付',ko:'전액 지급',si:'සම්පූර්ණයෙන්ම ගෙවනු ලැබේ',mn:'Бүрэн олгоно'}
+    '実費':{id:'Biaya aktual',en:'Actual cost',vi:'Chi phí thực tế',km:'ថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်',ne:'वास्तविक खर्च',th:'ตามที่จ่ายจริง',zh:'实际费用',ko:'실비',si:'සත්‍ය වියදම',mn:'Бодит зардал',tl:'Aktwal na gastos'},
+    '実費支給':{id:'Dibayar sesuai biaya aktual',en:'Paid at actual cost',vi:'Chi trả theo chi phí thực tế',km:'ផ្តល់ជូនតាមថ្លៃចំណាយជាក់ស្តែង',my:'အမှန်တကယ် ကုန်ကျစရိတ်အတိုင်း ပေးသည်',ne:'वास्तविक खर्च अनुसार भुक्तानी',th:'จ่ายตามที่จ่ายจริง',zh:'按实际费用支付',ko:'실비 지급',si:'සත්‍ය වියදම අනුව ගෙවනු ලැබේ',mn:'Бодит зардлаар олгоно',tl:'Ibibigay ayon sa aktwal na gastos'},
+    '全額支給':{id:'Dibayar penuh',en:'Paid in full',vi:'Chi trả toàn bộ',km:'ផ្តល់ជូនទាំងស្រុង',my:'အပြည့်အဝ ပေးသည်',ne:'पूरा भुक्तानी',th:'จ่ายเต็มจำนวน',zh:'全额支付',ko:'전액 지급',si:'සම්පූර්ණයෙන්ම ගෙවනු ලැබේ',mn:'Бүрэн олгоно',tl:'Ibibigay nang buo'}
   };
   function _amtWordFill(){
     try{
@@ -4683,7 +4685,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p6RangeWarn, 4500); } }catch(_e){} });
   // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
   //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
-  var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語',si:'シンハラ語',mn:'モンゴル語'};
+  var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語',si:'シンハラ語',mn:'モンゴル語',tl:'タガログ語'};
   function _scriptOf(t){
     t=String(t||''); if(!t.trim()) return '';
     if(/[\u1780-\u17FF]/.test(t)) return 'km';
@@ -5980,8 +5982,9 @@ window.addEventListener('load', function(){
 var JUUYOU_WORK_STD={
   '土木':{
     ja:'指導者の指示・監督を受けながら、土木施設の新設、改築、維持、修繕に係る作業等に従事',
-    name:{mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
+    name:{tl:'Gawaing Sibil (Civil Engineering)',mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
     tr:{
+      tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, muling pagtatayo, pagpapanatili at pagkukumpuni ng mga pasilidad na sibil',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор иргэний инженерийн байгууламжийг шинээр барих, шинэчлэн барих, арчлах, засварлахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, සිවිල් ඉංජිනේරු පහසුකම් අලුතින් ඉදිකිරීම, ප්‍රතිසංස්කරණය, නඩත්තුව සහ අලුත්වැඩියාව සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版
       en:'Engaged in work related to the new construction, reconstruction, maintenance and repair of civil engineering facilities under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版
@@ -5994,8 +5997,9 @@ var JUUYOU_WORK_STD={
   },
   '建築':{
     ja:'指導者の指示・監督を受けながら、建築物の新築、増築、改築若しくは移転又は修繕若しくは模様替に係る作業等に従事',
-    name:{mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
+    name:{tl:'Pagtatayo ng Gusali (Building Construction)',mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
     tr:{
+      tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, pagpapalawak, muling pagtatayo, paglilipat, pagkukumpuni o pagbabago ng anyo ng mga gusali',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор барилга байгууламжийг шинээр барих, өргөтгөх, шинэчлэн барих, нүүлгэн шилжүүлэх, засварлах буюу өнгө үзэмжийг өөрчлөхтэй холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, ගොඩනැගිලි අලුතින් ඉදිකිරීම, දිගු කිරීම, ප්‍රතිසංස්කරණය, ස්ථානගත කිරීම, අලුත්වැඩියාව හෝ නවීකරණය සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版
       en:'Engaged in work related to the new construction, extension, reconstruction, relocation, repair or remodeling of buildings under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版
@@ -6008,8 +6012,9 @@ var JUUYOU_WORK_STD={
   },
   'ライフライン・設備':{
     ja:'指導者の指示・監督を受けながら、電気通信、ガス、水道、電気その他のライフライン・設備の整備・設置、変更又は修理に係る作業等に従事',
-    name:{mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
+    name:{tl:'Lifeline at Pasilidad',mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
     tr:{
+      tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa pagsasaayos, pagkakabit, pagbabago o pagkukumpuni ng telekomunikasyon, gas, tubig, kuryente at iba pang lifeline at pasilidad',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор цахилгаан холбоо, хий, усан хангамж, цахилгаан болон бусад амьдралын дэд бүтэц, тоног төхөөрөмжийг засварлах, суурилуулах, өөрчлөх буюу засахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, විදුලි සංදේශ, ගෑස්, ජල සැපයුම, විදුලිය සහ අනෙකුත් ජීවන අවශ්‍යතා සේවා සහ පහසුකම් සකස් කිරීම, සවි කිරීම, වෙනස් කිරීම හෝ අලුත්වැඩියාව සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版
       en:'Engaged in work related to the maintenance, installation, modification or repair of telecommunications, gas, water supply, electricity and other lifelines and facilities under the instruction and supervision of a supervisor',   // ver.20261113.01: 重要事項事前説明書の英語版

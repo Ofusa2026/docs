@@ -49,6 +49,9 @@
   <button class="lbtn" data-lang="si" onclick="showLang('si')" title="シンハラ語">🇱🇰</button>
   <button class="lbtn" data-lang="mn" onclick="showLang('mn')" title="モンゴル語">🇲🇳</button>
   <button class="lbtn" data-lang="ko" onclick="showLang('ko')" title="韓国語">🇰🇷</button>
+  <button class="lbtn" data-lang="zh" onclick="showLang('zh')" title="中国語">🇨🇳</button>
+  <button class="lbtn" data-lang="ne" onclick="showLang('ne')" title="ネパール語">🇳🇵</button>
+  <button class="lbtn" data-lang="tl" onclick="showLang('tl')" title="タガログ語">🇵🇭</button>
   <button class="btn-dl" id="btnDownload" onclick="downloadCurrent()">⬇ ダウンロード</button>
 </div>
 <div class="hint">※ 印刷してご本人に記入・署名してもらう書類です。</div>
@@ -70,6 +73,9 @@ const PDF_FILES = {
   si: { path: 'pdf/1_3_si.pdf', name: '参考様式第1-3号別紙_シンハラ語.pdf',     label: 'シンハラ語' },   // ver.20261113.01
   mn: { path: 'pdf/1_3_mn.pdf', name: '参考様式第1-3号別紙_モンゴル語.pdf',     label: 'モンゴル語' },   // ver.20261116.08
   ko: { path: 'pdf/1_3_ko.pdf?v=1794830201', name: '参考様式第1-3号別紙_韓国語.pdf',       label: '韓国語' },   // ver.20261116.11
+  zh: { path: 'pdf/1_3_zh.pdf?v=1794870001', name: '参考様式第1-3号別紙_中国語.pdf',       label: '中国語' },   // ver.20261116.13: 入管の中国語版の文言
+  ne: { path: 'pdf/1_3_ne.pdf?v=1794870001', name: '参考様式第1-3号別紙_ネパール語.pdf',   label: 'ネパール語' },   // ver.20261116.13: 入管のネパール語版の文言
+  tl: { path: 'pdf/1_3_tl.pdf?v=1794870001', name: '参考様式第1-3号別紙_タガログ語.pdf',   label: 'タガログ語' },   // ver.20261116.13: 入管のタガログ語版の文言
 };
 let currentLang = 'id';
 
