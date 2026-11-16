@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.11</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -507,7 +507,7 @@ const docs={
   '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1794393342'},
   '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1794393342'},
   'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1794393342'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1794562000'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1794830201'},
   '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1794393342'},
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1794393342'},
   '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1794393342'},
@@ -578,7 +578,7 @@ const docs={
   '1_31':{navId:'nav-1_31',frameId:'frame-1_31',file:'1_31.html?v=1794393342'},
   '1_32':{navId:'nav-1_32',frameId:'frame-1_32',file:'1_32.html?v=1794393342'},
   'shozoku_daihyou':{navId:'nav-shozoku_daihyou',frameId:'frame-shozoku_daihyou',file:'shozoku_daihyou.html?v=1794393342'},
-  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1794562000'},
+  '1_3':{navId:'nav-1_3',frameId:'frame-1_3',file:'1_3.html?v=1794830201'},
   '1_4':{navId:'nav-1_4',frameId:'frame-1_4',file:'1_4.html?v=1794393342'},
   'henkou':{navId:'nav-henkou',frameId:'frame-henkou',file:'henkou_moushidesho.html?v=1794393342'},
   '1_10':{navId:'nav-1_10',frameId:'frame-1_10',file:'1_10.html?v=1794393342'},
@@ -641,7 +641,7 @@ let currentLang = 'id';
 // 各書類の対応言語リスト（LANG_FILES_xxx に存在するキーと対応）
 // この順で先頭を「デフォルト/フォールバック言語」とする
 const DOC_LANG_SUPPORT = {
-  '1_3':  ['id','vi','th','km','my','en','si','mn'],     // PDF方式（ver.20261113.03: シンハラ語を追加）
+  '1_3':  ['id','vi','th','km','my','en','si','mn','ko'],   // ver.20261116.11: 韓国語を追加     // PDF方式（ver.20261113.03: シンハラ語を追加）
   '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
   '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],
   '1_16': ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],   // ver.20261113.03: シンハラ語を追加
@@ -1867,6 +1867,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.11',
+    date: '2026-11-16',
+    notify: true,
+    items: [
+      '🇰🇷 1-3号別紙（受診者の申告書）に韓国語版を作りました。国籍が「韓国」の案件は自動で韓国語版になります。入管に韓国語の公式版が無いため、シンハラ語版と同じ形（日本語の下に韓国語）で作っています。これで韓国語は 1-3号別紙・1-5号・1-6号・1-16号・1-17号・重要事項事前説明書がそろいました。'
+    ]
+  },
   {
     version: 'ver.20261116.10',
     date: '2026-11-16',
@@ -4264,7 +4272,7 @@ function _pmLoadPdfJs(){
 }
 async function _pm13Pages(lang){
   try{
-    var L=['id','vi','th','km','my','en','si','mn'].indexOf(lang)>=0 ? lang : 'en';
+    var L=['id','vi','th','km','my','en','si','mn','ko'].indexOf(lang)>=0 ? lang : 'en';   // ver.20261116.11: 韓国語
     if(_pm13Cache[L]) return Object.assign({}, _pm13Cache[L], {id:'pm'+(++_pmSeq)});
     var lib=await _pmLoadPdfJs();
     var pdf=await lib.getDocument('pdf/1_3_'+L+'.pdf').promise;
