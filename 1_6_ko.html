@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（韓国語版）</div>
-    <div class="ver">ver.20261113.02</div>
+    <div class="ver">ver.20261116.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -1510,10 +1510,20 @@ function _kensetsuBonus(txt){
   if(!count&&months.length>=2) return '年'+months.length+'回（'+ms+'）業績による。';
   return txt;
 }
+// ver.20261116.02: 建設フォーマットの確認は「サイン書類作成」まで（サイン書類を送ったあとは出さない＝サイン済みの書類と中身がずれないように）。
+//   案件が選ばれていない（ステータスが空）ときは今までどおり出す。案シスの一覧に無い書き方は、申請前の段階の言葉が入っていれば出す。
+var KEN_FMT_STATUSES=['未着手','★ヒアリングフォーム送付','ヒアリングフォーム回答待ち(送付済)','雇用条件待ち','1-6作成','★1-6企業送付','1-6企業確認待ち(送付済)','1-6修正','★1-6修正送付','サイン書類作成'];
+function _kenFmtStatusOk(st){
+  st=String(st||'').trim(); if(!st) return true;
+  if(KEN_FMT_STATUSES.indexOf(st)>=0) return true;
+  if(/サイン書類送付|返送待ち|押印|書類待ち|スキャン|申請|審査|追完|許可|受取|交付|完了|他社/.test(st)) return false;
+  return /未着手|ヒアリング|雇用条件|1-6|サイン書類作成/.test(st);
+}
 function maybeApplyKensetsuFormat(){
   try{
     const fld=(v('es_applicantField')||'')+(v('es_applicantFieldEn')||'');
     if(!fld.includes('建設')) return;
+    if(!_kenFmtStatusOk(window._p16CaseStatus)) return;   // ver.20261116.02: サイン書類作成まで
     const rc=document.getElementById('es_raiseCondition');
     if(rc && /経験年数に(応じて昇給する|基づき必ず実施)/.test(rc.value||'')) return;
     var kr=document.getElementById('km_raise'); if(kr) kr.value='年1回★月に1,000円以上昇給。経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。';
@@ -1555,10 +1565,11 @@ async function loadFromDB(passedInfo){
   try{
     // 1. 案件基本情報 + 人材データ（persons）を同時取得
     const [cases, persons] = await Promise.all([
-      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end,doc_create_date,app_type&id=eq.'+caseId),
+      sb('cases?select=id,name,applicant,applicant_field,applicant_field_en,company_id,emp_set_idx,contract_start,contract_end,doc_create_date,app_type,status&id=eq.'+caseId),
       sb('persons?select=*&case_id=eq.'+caseId)
     ]);
     const cas = cases && cases[0];
+    window._p16CaseStatus = (cas && cas.status) || '';   // ver.20261116.02: 建設フォーマットの確認を出すかに使う
     const _pdRaw = persons && persons[0];
     // personsはdataカラム（JSONB）かフラット形式かを両方対応
     const pd = (_pdRaw && _pdRaw.data) || _pdRaw;

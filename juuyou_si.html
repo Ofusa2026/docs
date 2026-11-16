@@ -49,7 +49,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（シンハラ語）</div>
-    <div class="ver">ver.20261113.01</div>
+    <div class="ver">ver.20261116.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -499,12 +499,22 @@ function _applyJuuyouSiFontSize(){
 // OKで入れた値は setAutoDefault で印を付け、DB保存時 emp_sets には書き戻さない（実データ保護）。
 var _JK_JA={amt:"1,000円以上/月", cond:"経験年数に基づき必ず実施し、技能習熟度および勤務態度を考慮する。", time:"１年１回入社月頃"};
 var _JK_TR={amt:"මසකට යෙන් 1,000 හෝ ඊට වැඩි", cond:"සේවා පළපුරුද්ද මත පදනම්ව අනිවාර්යයෙන්ම ක්‍රියාත්මක කරන අතර, කුසලතා ප්‍රගුණතාවය සහ වැඩ කිරීමේ ආකල්පය සැලකිල්ලට ගනී.", time:"වසරකට වරක්, සමාගමට බැඳුණු මාසය පමණ"};
+// ver.20261116.02: 建設フォーマットの確認は「サイン書類作成」まで（サイン書類を送ったあとは出さない＝サイン済みの書類と中身がずれないように）。
+//   案件が選ばれていない（ステータスが空）ときは今までどおり出す。案シスの一覧に無い書き方は、申請前の段階の言葉が入っていれば出す。
+var KEN_FMT_STATUSES=['未着手','★ヒアリングフォーム送付','ヒアリングフォーム回答待ち(送付済)','雇用条件待ち','1-6作成','★1-6企業送付','1-6企業確認待ち(送付済)','1-6修正','★1-6修正送付','サイン書類作成'];
+function _kenFmtStatusOk(st){
+  st=String(st||'').trim(); if(!st) return true;
+  if(KEN_FMT_STATUSES.indexOf(st)>=0) return true;
+  if(/サイン書類送付|返送待ち|押印|書類待ち|スキャン|申請|審査|追完|許可|受取|交付|完了|他社/.test(st)) return false;
+  return /未着手|ヒアリング|雇用条件|1-6|サイン書類作成/.test(st);
+}
 function _jKensetsuModal(){
   try{
     var _es=window._lastEmpSet||{};
     var cat=(_es.category||window._lastJobCategory||'');
     // 判定は「建設分野」。『土木』『建築』だと「建築物内部の清掃(ビルクリーニング分野)」を誤検出するため使わない。
     if(!/建設分野/.test(cat)) return;
+    if(!_kenFmtStatusOk(window._lastCaseStatus)) return;   // ver.20261116.02: サイン書類作成まで
     var rc=document.getElementById('f_raiseCond');
     if(rc && rc.value===_JK_JA.cond) return;           // 既に適用済みなら出さない
     var a=document.getElementById('jm_amt');  if(a) a.value=_JK_JA.amt;
@@ -579,7 +589,7 @@ async function loadFromDB(passedInfo){
   const {caseId,companyId,companyName}=info;
   try{
     const [cas0,cos,per0]=await Promise.all([
-      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en,residence_status&id=eq.'+caseId):Promise.resolve([]),
+      caseId?sb('cases?select=emp_set_idx,job_category,job_category_en,residence_status,status&id=eq.'+caseId):Promise.resolve([]),
       companyId?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&id=eq.${companyId}`)
         :companyName?sb(`companies?select=name,pref,city,address,author_name,author_title,tel,emp_sets,permit_types,id,permit_pref_code,permit_general_type,permit_number,construction_license_expiry&name=eq.${encodeURIComponent(companyName)}`):Promise.resolve([]),
       caseId?sb('persons?select=kokko_jyuji_koujigyo&case_id=eq.'+caseId):Promise.resolve([])
@@ -692,7 +702,7 @@ async function loadFromDB(passedInfo){
       while(i<n.length&&cnt<t.length){ if(!/[\s\u3000]/.test(n[i]))cnt++; i++; }
       ne.value=n.slice(i).replace(/^[\s\u3000]+/,'');
     })();
-    window._lastEmpSet=_es; window._lastJobCategory=(cas&&cas.job_category)||'';
+    window._lastEmpSet=_es; window._lastJobCategory=(cas&&cas.job_category)||''; window._lastCaseStatus=(cas&&cas.status)||'';
     p(); showToast('✅ データを読み込みました');
     setTimeout(_jKensetsuModal, 300);
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
