@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（中国語版・変更）</div>
-    <div class="ver">ver.20261116.02</div>
+    <div class="ver">ver.20261116.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -684,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794556155"></script>
+<script src="ofusa_common.js?v=1794816001"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -759,7 +759,7 @@ function _p17AppTypeChanged(){
   var C = window._p17Check = window._p17Check || {}, T = window._p17Text = window._p17Text || {};
   _p17GuidChecks(C, nin);
   if(C.f125 || C.f126){ C.f125 = !nin; C.f126 = nin; }
-  if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(String(T.f185||''))) T.f185 = nin ? '入国後遅滞なく' : '変更許可後遅滞なく';
+  if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(String(T.f185||'').trim())) T.f185 = '適宜実施';   // ver.20261116.04: 以前の自動の書き方は「適宜実施」に（申請種別で切り替えない）
   p();
 }
 
@@ -2702,6 +2702,7 @@ async function _p17Hearing(so, _s){
     if(_olHP){ HP = Object.assign({ note: HP.note||'' }, _olHP); IS.housing = ''; }
     else { HP = { a:'', b:'', c:'', note: HP.note||'' }; IS.housing = ''; }
     IS.orientation = _olOri;   // O-Link の回答が無ければ空 → 下で「有（適宜実施）」にする
+    window._p17OlOri = _olOri;
   }
   // 言語別の設定の住居確保：自社支援（登録支援機関なし）は従来どおり。登録支援機関は O-Link で保存したもの（上で反映済み）だけ使う
   if(!_olStd){
@@ -2944,6 +2945,9 @@ async function _p17LoadSaved(){
   var st = r.state;
   Object.keys(st.side||{}).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=st.side[id]; });
   window._p17Text  = Object.assign({}, st.text||{});
+  /* ver.20261116.04: 11/12より前の保存は、生活オリエンテーションの実施予定が自動で「変更許可後遅滞なく／入国後遅滞なく」になっている。
+     いまの決まった書き方「適宜実施」に直して読み込む（登録支援機関の回答がそう書いてあるときはそのまま）。 */
+  try{ var _o185=String(window._p17Text.f185||'').trim(); if(/^(入国後遅滞なく|変更許可後遅滞なく)$/.test(_o185) && !(window._p17OlOri && String(window._p17OlOri).indexOf(_o185)>=0)) window._p17Text.f185='適宜実施'; }catch(_o){}
   window._p17Check = Object.assign(_p17DefaultChecks(), st.check||{});
   window._p17Radio = Object.assign({}, st.radio||{});
   p();
