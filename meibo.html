@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>名簿（支援計画書 対象者名簿・申請人名簿）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+/* ver.20261116.07: 複数の案件を選んで作る名簿（1号特定技能外国人支援計画書 対象者名簿／申請人名簿）。15人ごとに1ページ */
+.doc{padding:22mm 20mm 20mm 20mm!important;font-size:10.5pt!important;line-height:1.5!important;min-height:auto!important;font-family:"MS Gothic","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;}
+.doc .ttl{text-align:center;font-size:11pt;margin:14mm 0 10mm;}
+.doc .hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #000;padding:0 0 2mm;margin:0 0 10mm;font-size:10.5pt;}
+.doc .hd .lb{white-space:nowrap;}
+.doc .hd .vl{flex:1;text-align:left;padding-left:8mm;}
+.doc table.mb{width:100%;border-collapse:collapse;}
+.doc table.mb th,.doc table.mb td{border:1px solid #000;height:9.6mm;padding:0 2mm;font-weight:normal;font-size:10.5pt;}
+.doc table.mb th{text-align:center;}
+.doc table.mb td.c{text-align:center;}
+.doc table.mb tr>*:first-child{width:8mm;text-align:center;padding:0;}
+.doc table.mb{border:1.5px solid #000;}
+.mb-row{border:1px solid #d1d5db;border-radius:6px;padding:4px 6px;margin-bottom:6px;background:#fff;}
+.mb-row .mb-h{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;}
+.mb-row .mb-h button{font-size:10px;border:1px solid #cbd5e1;background:#fff;border-radius:4px;cursor:pointer;padding:1px 6px;}
+.mb-row .mb-g{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px;}
+.mb-row .mb-g input{width:100%;box-sizing:border-box;font-size:11px;padding:3px 5px;}
+.mb-row .mb-g label{font-size:10px;color:#64748b;display:block;}
+@media print{
+  html,body,.main,.pp,#pageArea{background:#fff!important}
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;page-break-after:always;}
+  .doc:last-child{page-break-after:auto;}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .doc{zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 名簿（支援計画書 対象者名簿・申請人名簿）</div>
+    <div class="ver">ver.20261116.07</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">名簿の種類</div>
+      <div class="fg">
+        <select id="f_kind" onchange="p()">
+          <option value="both" selected>両方まとめて（対象者名簿＋申請人名簿）</option>
+          <option value="taisho">1号特定技能外国人支援計画書　対象者名簿</option>
+          <option value="shinsei">申請人名簿</option>
+        </select>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">案件をまとめて選ぶ（複数人）</div>
+      <div class="fg"><label>案件ID（case_〜 を貼り付け／受付番号・氏名でも可）</label>
+        <div style="display:flex;gap:4px;">
+          <input id="ms_key" placeholder="case_1789…" style="flex:1;min-width:0;" onkeydown="if(event.key==='Enter'){event.preventDefault();msSearch();}">
+          <button type="button" onclick="msSearch()" style="background:#2563eb;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;font-size:12px;flex-shrink:0;">検索</button>
+        </div>
+      </div>
+      <div id="ms_hit" style="display:none;font-size:11px;background:#eef4ff;border:1px solid #b9cbe8;border-radius:4px;padding:6px 8px;margin-bottom:6px;line-height:1.55;color:#1e3a5f;"></div>
+      <div id="ms_tabs" style="display:none;gap:4px;margin-bottom:6px;flex-wrap:wrap;"></div>
+      <div id="ms_ctrl" style="display:none;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11px;color:#8ab;">
+        <span id="ms_count">選択中 1件</span>
+        <span>
+          <button type="button" onclick="msAll(true)" style="font-size:11px;cursor:pointer;">全選択</button>
+          <button type="button" onclick="msAll(false)" style="font-size:11px;cursor:pointer;">解除</button>
+        </span>
+      </div>
+      <div id="ms_list" style="display:none;border:1px solid #ccc;border-radius:4px;max-height:220px;overflow:auto;background:#fff;"></div>
+      <div class="fg" style="margin-top:6px;">
+        <button type="button" id="ms_apply" onclick="msApply()" style="display:none;width:100%;background:#16a34a;color:#fff;border:none;border-radius:4px;padding:7px;cursor:pointer;font-size:12px;">▼ 選択した案件を名簿へ反映</button>
+      </div>
+      <div id="ms_warn" style="display:none;font-size:11px;background:#fef3c7;border:1px solid #f59e0b;border-radius:4px;padding:6px 8px;margin-top:6px;color:#92400e;line-height:1.5;"></div>
+    </div>
+    <div class="fs" id="fs_company"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+    </div>
+    <div class="fs" id="fs_appdate"><div class="fs-title">申請年月日（空なら空欄のまま）</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+        <div class="fg"><label>年</label><input id="f_appY" oninput="p()" placeholder="2026"></div>
+        <div class="fg"><label>月</label><input id="f_appM" oninput="p()"></div>
+        <div class="fg"><label>日</label><input id="f_appD" oninput="p()"></div>
+      </div>
+    </div>
+    <div class="fs"><div class="fs-title">名簿の中身（手で直せます）</div>
+      <div id="rowsEditor"></div>
+      <button type="button" onclick="mbAddRow()" style="width:100%;font-size:12px;padding:5px;border:1px dashed #64748b;background:#f8fafc;border-radius:4px;cursor:pointer;">＋ 1人足す</button>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <span id="pageBtns"><button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button></span>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">10.5pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=1794820003"></script>
+<script>
+var MB_PER_PAGE=15;
+// 名簿の行：{nat, name, birth, gender, rno}
+var _mbRows=[];
+function _mbBirth(x){
+  var s=String(x||'').normalize('NFKC').trim(); if(!s) return '';
+  var m=s.match(/^(\d{4})[-\/.年](\d{1,2})[-\/.月](\d{1,2})/); if(!m) return s;
+  return m[1]+'年'+('0'+m[2]).slice(-2)+'月'+('0'+m[3]).slice(-2)+'日';
+}
+function _mbGender(x){ var s=String(x||'').trim(); if(/^(男|male|m)$/i.test(s)||/男/.test(s)) return '男'; if(/^(女|female|f)$/i.test(s)||/女/.test(s)) return '女'; return s; }
+function _mbRno(x){ var s=String(x||'').trim(); return (/[～~〜]/.test(s)) ? '' : s; }   // 「C809096～97」のようにまとめた番号は人ごとに分けられないので空欄
+// 左の欄（行ごと）を作り直す
+function mbRenderEditor(){
+  var w=document.getElementById('rowsEditor'); if(!w) return;
+  var kind=v('f_kind')||'both';
+  if(!_mbRows.length){ w.innerHTML='<div style="font-size:11px;color:#888;padding:4px 2px 8px;">上で案件を選んで「名簿へ反映」を押すと、ここに並びます。</div>'; return; }
+  w.innerHTML=_mbRows.map(function(r,i){
+    var inp=function(k,lb){ return '<div><label>'+lb+'</label><input value="'+esc(r[k]||'')+'" oninput="mbSet('+i+',\''+k+'\',this.value)"></div>'; };
+    return '<div class="mb-row"><div class="mb-h"><span>'+(i+1)+'.</span><span>'
+      +(i>0?'<button type="button" onclick="mbMove('+i+',-1)">▲</button> ':'')
+      +(i<_mbRows.length-1?'<button type="button" onclick="mbMove('+i+',1)">▼</button> ':'')
+      +'<button type="button" onclick="mbDel('+i+')">削除</button></span></div><div class="mb-g">'
+      +inp('nat','国籍・地域')+inp('name','申請人氏名')
+      +(kind!=='shinsei' ? inp('birth','生年月日')+inp('gender','性別') : '')+(kind!=='taisho' ? inp('rno','受理番号') : '')
+      +'</div></div>';
+  }).join('');
+}
+function mbSet(i,k,val){ if(_mbRows[i]){ _mbRows[i][k]=val; p(); } }
+function mbMove(i,d){ var j=i+d; if(j<0||j>=_mbRows.length) return; var t=_mbRows[i]; _mbRows[i]=_mbRows[j]; _mbRows[j]=t; mbRenderEditor(); p(); }
+function mbDel(i){ _mbRows.splice(i,1); mbRenderEditor(); p(); }
+function mbAddRow(){ _mbRows.push({nat:'',name:'',birth:'',gender:'',rno:''}); mbRenderEditor(); p(); }
+var _mbKindPrev='';
+function p(){
+  if(_editMode) return;
+  var w=document.getElementById('pageArea'); if(!w) return;
+  var kindSel=v('f_kind')||'both';
+  if(kindSel!==_mbKindPrev){ _mbKindPrev=kindSel; mbRenderEditor(); }
+  var fc=document.getElementById('fs_company'), fa=document.getElementById('fs_appdate');
+  if(fc) fc.style.display=(kindSel!=='shinsei')?'':'none';
+  if(fa) fa.style.display=(kindSel!=='taisho')?'':'none';
+  var pages=Math.max(1, Math.ceil(_mbRows.length/MB_PER_PAGE));
+  var html='', pno=0;
+  var kinds=(kindSel==='both')?['taisho','shinsei']:[kindSel];
+  kinds.forEach(function(kind){
+  for(var pg=0; pg<pages; pg++){
+    var rows='';
+    for(var k=0;k<MB_PER_PAGE;k++){
+      var i=pg*MB_PER_PAGE+k, r=_mbRows[i];
+      var has=r && (String(r.name||'').trim()||String(r.nat||'').trim());
+      var no=has ? String(i+1) : '';
+      if(kind==='taisho'){
+        rows+='<tr><td>'+no+'</td><td class="c">'+esc(r&&r.nat||'')+'</td><td>'+esc(r&&r.name||'')+'</td><td class="c">'+esc(r&&r.birth||'')+'</td><td class="c">'+esc(r&&r.gender||'')+'</td></tr>';
+      }else{
+        rows+='<tr><td>'+no+'</td><td class="c">'+esc(r&&r.nat||'')+'</td><td>'+esc(r&&r.name||'')+'</td><td class="c">'+esc(r&&r.rno||'')+'</td></tr>';
+      }
+    }
+    var head, ttl, cols;
+    if(kind==='taisho'){
+      ttl='1号特定技能外国人支援計画書　対象者名簿';
+      head='<div class="hd"><span class="lb">特定技能所属機関</span><span class="vl">'+f('f_company')+'</span></div>';
+      cols='<tr><th></th><th style="width:17%;">国籍・地域</th><th style="width:40%;">申請人氏名</th><th style="width:24%;">生年月日</th><th style="width:10%;">性別</th></tr>';
+    }else{
+      ttl='申請人名簿';
+      var Y=String(v('f_appY')||'').trim(), M=String(v('f_appM')||'').trim(), D=String(v('f_appD')||'').trim();
+      var sp='　　　';
+      head='<div class="hd" style="justify-content:flex-start;gap:0;"><span class="lb" style="width:42%;">申請年月日</span><span>'
+        +(Y?'<span class="f" data-bind="f_appY">'+esc(Y)+'</span>':sp)+'年　　'+(M?'<span class="f" data-bind="f_appM">'+esc(M)+'</span>':sp)+'月　　'+(D?'<span class="f" data-bind="f_appD">'+esc(D)+'</span>':sp)+'日</span></div>';
+      cols='<tr><th></th><th style="width:17%;">国籍・地域</th><th style="width:49%;">申請人氏名</th><th style="width:26%;">受理番号</th></tr>';
+    }
+    pno++;
+    html+='<div class="doc"><div class="page-num-label">P'+pno+'</div><div class="ttl">'+ttl+'</div>'+head
+      +'<table class="mb">'+cols+rows+'</table></div>';
+  }
+  });
+  w.innerHTML=html;
+  var pb=document.getElementById('pageBtns');
+  if(pb){ var b=''; for(var q=1;q<=pno;q++) b+='<button class="pn-btn pn-btn-page'+(q===1?' active':'')+'" onclick="scrollToPage('+q+')">P'+q+'</button>'; pb.innerHTML=b; }
+  _fontSize=(_fontSize===8.5)?10.5:_fontSize;
+  _mbApplyFont();
+  var lbl=document.getElementById('fontSizeLabel'); if(lbl) lbl.textContent=_fontSize+'pt';
+  if(typeof setupPageTracker==='function') setupPageTracker();
+  fitDocToPreview();
+}
+function _mbApplyFont(){
+  var st=document.getElementById('_mbFontStyle')||document.createElement('style');
+  st.id='_mbFontStyle'; document.head.appendChild(st);
+  var s=_fontSize/10.5;
+  st.textContent='.doc,.doc table.mb th,.doc table.mb td,.doc .hd{font-size:'+(10.5*s).toFixed(2)+'pt!important} .doc .ttl{font-size:'+(11*s).toFixed(2)+'pt!important}';
+}
+async function loadFromDB(passedInfo){
+  var info=passedInfo;
+  if(!info){ var sel=document.getElementById('caseSelect'); if(!sel||!sel.value) return; try{ info=JSON.parse(sel.value); }catch(e){ return; } }
+  if(!info||!info.caseId) return;
+  try{
+    var keyEl=document.getElementById('ms_key'); if(keyEl) keyEl.value=info.caseId;
+    await msSearch();
+    msAll(true);
+    await msApply();
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); console.error(e); }
+}
+// ===== 案件をまとめて選ぶ（書類送付状と同じ） =====
+var _msBase=null,_msScope='name',_msRows=[],_msSel={};
+var MS_SEL='id,name,applicant,org,company,receipt_no,case_no,nationality';
+async function msSearch(){
+  var key=(document.getElementById('ms_key').value||'').trim();
+  if(!key){ showToast('⚠️ 案件IDを入力してください'); return; }
+  try{
+    var rows=[];
+    if(/^case_/i.test(key)) rows=await sb('cases?select='+MS_SEL+'&id=eq.'+encodeURIComponent(key));
+    if(!rows||!rows.length){
+      var k=encodeURIComponent('*'+key+'*');
+      rows=await sb('cases?select='+MS_SEL+'&or=(receipt_no.ilike.'+k+',case_no.ilike.'+k+',applicant.ilike.'+k+',id.ilike.'+k+')&limit=5');
+    }
+    if(!rows||!rows.length){ showToast('⚠️ 見つかりませんでした'); return; }
+    _msBase=rows[0]; _msScope='name'; _msSel={}; _msSel[_msBase.id]=true;
+    var hit=document.getElementById('ms_hit');
+    hit.style.display='block';
+    hit.innerHTML='<b>'+esc(_msBase.applicant||'（申請人未設定）')+'</b>　／　'+esc(_msBase.company||'')+'　／　'+esc(_msBase.org||'')+'<br>案件名：'+esc(_msBase.name||'');
+    await msLoadScope();
+  }catch(e){ showToast('⚠️ 検索エラー: '+e.message); console.error(e); }
+}
+async function msLoadScope(){
+  var b=_msBase; if(!b) return;
+  var q;
+  if(_msScope==='name') q='name=eq.'+encodeURIComponent(b.name||'');
+  else if(_msScope==='company') q='company=eq.'+encodeURIComponent(b.company||'');
+  else q='org=eq.'+encodeURIComponent(b.org||'');
+  try{
+    var rows=await sb('cases?select='+MS_SEL+'&'+q+'&order=name.asc,applicant.asc&limit=200');
+    _msRows=(rows||[]).filter(function(r){return r&&r.id;});
+    _msRows.sort(function(a,c){return (a.id===b.id?-1:0)-(c.id===b.id?-1:0);});
+    var keep={}; keep[b.id]=true;
+    _msRows.forEach(function(r){ if(_msSel[r.id]) keep[r.id]=true; });
+    _msSel=keep;
+    msRenderTabs(); msRenderList();
+  }catch(e){ showToast('⚠️ 読込エラー: '+e.message); }
+}
+function msRenderTabs(){
+  var t=document.getElementById('ms_tabs');
+  t.style.display='flex';
+  var defs=[['name','同じ案件名'],['company','同じ所属機関'],['org','同じ登録支援機関']];
+  t.innerHTML=defs.map(function(d){
+    var on=(_msScope===d[0]);
+    return '<button type="button" onclick="msSetScope(\''+d[0]+'\')" style="font-size:11px;padding:3px 10px;border-radius:999px;cursor:pointer;border:1px solid '+(on?'#2563eb':'#889')+';background:'+(on?'#2563eb':'transparent')+';color:'+(on?'#fff':'#9ab')+';">'+d[1]+'</button>';
+  }).join('');
+}
+function msSetScope(s){ _msScope=s; msLoadScope(); }
+function msRenderList(){
+  var w=document.getElementById('ms_list');
+  w.style.display='block';
+  document.getElementById('ms_ctrl').style.display='flex';
+  document.getElementById('ms_apply').style.display='block';
+  w.innerHTML=_msRows.map(function(r){
+    var base=(r.id===_msBase.id);
+    var no=(r.receipt_no||r.case_no||'').trim();
+    var label=(no?esc(no)+'　':'')+esc(r.applicant||'（申請人未設定）')+(base?'（起点）':'');
+    return '<label style="display:flex;gap:6px;align-items:flex-start;padding:6px 8px;border-bottom:1px solid #eee;font-size:12px;color:#333;cursor:pointer;'+(base?'background:#f0f6ff;':'')+'">'
+      +'<input type="checkbox" '+(_msSel[r.id]?'checked ':'')+(base?'disabled ':'')+'onchange="msToggle(\''+r.id+'\',this.checked)" style="margin-top:2px;">'
+      +'<span style="line-height:1.5;">'+label+'<br><span style="color:#888;font-size:10px;">'+esc(r.company||'')+'　'+esc(r.name||'')+'</span></span></label>';
+  }).join('');
+  msCount();
+}
+function msToggle(id,on){ if(_msBase&&id===_msBase.id) return; _msSel[id]=on; msCount(); }
+function msAll(on){ _msRows.forEach(function(r){ _msSel[r.id]=on||(r.id===_msBase.id); }); msRenderList(); }
+function msCount(){ var n=_msRows.filter(function(r){return _msSel[r.id];}).length; document.getElementById('ms_count').textContent='選択中 '+n+'件'; }
+function msSelectedRows(){ return _msRows.filter(function(r){return _msSel[r.id];}); }
+function msWarn(msg){ var w=document.getElementById('ms_warn'); if(!msg){ w.style.display='none'; return; } w.style.display='block'; w.innerHTML=msg; }
+async function msApply(){
+  var rows=msSelectedRows();
+  if(!rows.length){ showToast('⚠️ 反映する案件を選択してください'); return; }
+  var per={};
+  try{
+    var ids=rows.map(function(r){ return '"'+String(r.id).replace(/"/g,'')+'"'; }).join(',');
+    var ps=await sb('persons?select=case_id,nationality,birthdate,gender&case_id=in.('+encodeURIComponent(ids)+')');
+    (ps||[]).forEach(function(x){ if(x && x.case_id && !per[x.case_id]) per[x.case_id]=x; });
+  }catch(e){ console.warn('[名簿] persons', e); }
+  _mbRows=rows.map(function(r){
+    var pd=per[r.id]||{};
+    return { nat:String(pd.nationality||r.nationality||'').trim(), name:String(r.applicant||'').trim(), birth:_mbBirth(pd.birthdate), gender:_mbGender(pd.gender), rno:_mbRno(r.receipt_no||r.case_no) };
+  });
+  var comps={}; rows.forEach(function(r){ var c=String(r.company||'').trim(); if(c) comps[c]=1; });
+  var ck=Object.keys(comps);
+  if(ck.length===1){ var e=document.getElementById('f_company'); if(e) e.value=ck[0]; }
+  var warns=[];
+  if(ck.length>1) warns.push('⚠️ 所属機関が複数まざっています（'+ck.slice(0,3).map(esc).join('、')+'）。対象者名簿の所属機関名を確かめてください。');
+  var miss=_mbRows.filter(function(r){ return !r.nat || !r.birth || !r.gender; }).map(function(r){ return r.name||'（氏名なし）'; });
+  if(miss.length && (v('f_kind')||'both')!=='shinsei') warns.push('※ 国籍・生年月日・性別が案シスに入っていない人がいます：'+miss.slice(0,5).map(esc).join('、')+'（左の欄で入れられます）');
+  if(_mbRows.length>MB_PER_PAGE) warns.push('※ '+_mbRows.length+'人なので、'+Math.ceil(_mbRows.length/MB_PER_PAGE)+'ページに分かれます（1ページ15人）。');
+  msWarn(warns.join('<br>'));
+  mbRenderEditor(); p(); showToast('✅ '+rows.length+'人を名簿に反映しました');
+}
+
+initCaseSelect(); mbRenderEditor(); p();
+
+function fitDocToPreview(){
+  requestAnimationFrame(function(){
+    var pp=document.querySelector('.pp'), area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    var ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(function(d){ d.style.zoom=(ppW<docW)?(ppW/docW):1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  var info=e.data.info;
+  if(!info||!info.caseId) return;
+  var sel=document.getElementById('caseSelect');
+  if(sel){
+    var found=false;
+    for(var o of sel.options){ try{ var d=JSON.parse(o.value); if(d.caseId===info.caseId){ sel.value=o.value; found=true; break; } }catch(e2){} }
+    if(!found){ var opt=document.createElement('option'); opt.value=JSON.stringify(info); opt.textContent='（indexから選択）'; sel.appendChild(opt); sel.value=opt.value; }
+  }
+  window._lastCaseInfo=info;
+  loadFromDB(info);
+});
+</script>
+</body>
+</html>

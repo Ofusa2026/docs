@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.06</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -301,6 +301,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📨</span>
       <div>書類送付状<span class="item-sub">サイン書類・押印書類・在留カード等 5種</span></div>
     </div>
+    <div class="item" id="nav-meibo" onclick="open_doc('meibo')">
+      <span class="item-icon">👥</span>
+      <div>名簿（複数人）<span class="item-sub">支援計画書 対象者名簿／申請人名簿・案件をまとめて選んで作成</span></div>
+    </div>
     <div class="item" id="nav-shashin_teishutsu" onclick="open_doc('shashin_teishutsu')">
       <span class="item-icon">📷</span>
       <div>写真提出用紙<span class="item-sub">案件IDで自動入力・顔写真をドラッグ&amp;ドロップ</span></div>
@@ -410,6 +414,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-tsuika_shiryo"></iframe>
     <iframe id="frame-riyu_sho"></iframe>
     <iframe id="frame-soufujou"></iframe>
+    <iframe id="frame-meibo"></iframe>
     <iframe id="frame-shashin_teishutsu"></iframe>
     <iframe id="frame-zairyu_teisei"></iframe>
     <iframe id="frame-suisenhyo"></iframe>
@@ -478,8 +483,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794820002';
-window.__DOCS_CACHE_BUSTER__ = '1794820002';
+window.__DOCS_CACHE_BUSTER__ = '1794820003';
+window.__DOCS_CACHE_BUSTER__ = '1794820003';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -517,6 +522,7 @@ const docs={
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1794393342'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1794393342'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1794393342'},
+  'meibo':{navId:'nav-meibo',frameId:'frame-meibo',file:'meibo.html?v=1794820003'},   // ver.20261116.07: 名簿（複数人）
   'shashin_teishutsu':{navId:'nav-shashin_teishutsu',frameId:'frame-shashin_teishutsu',file:'shashin_teishutsu.html?v=1794393342'},   // ver.20261006.05
   'zairyu_teisei':{navId:'nav-zairyu_teisei',frameId:'frame-zairyu_teisei',file:'zairyu_teisei.html?v=1794393342'},   // ver.20261007.01
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1794393342'},
@@ -587,6 +593,7 @@ const docs={
   'tsuika_shiryo':{navId:'nav-tsuika_shiryo',frameId:'frame-tsuika_shiryo',file:'tsuika_shiryo.html?v=1794393342'},
   'riyu_sho':{navId:'nav-riyu_sho',frameId:'frame-riyu_sho',file:'riyu_sho.html?v=1794393342'},
   'soufujou':{navId:'nav-soufujou',frameId:'frame-soufujou',file:'soufujou.html?v=1794393342'},
+  'meibo':{navId:'nav-meibo',frameId:'frame-meibo',file:'meibo.html?v=1794820003'},   // ver.20261116.07: 名簿（複数人）
   'suisenhyo':{navId:'nav-suisenhyo',frameId:'frame-suisenhyo',file:'suisenhyo.html?v=1794393342'},
   'madoguchi':{navId:'nav-madoguchi',frameId:'frame-madoguchi',file:'madoguchi.html?v=1794393342'},
   'shinsei_henkou':{navId:'nav-shinsei_henkou',frameId:'frame-shinsei_henkou',file:'shinsei_henkou.html?v=1794400001'},
@@ -1593,7 +1600,7 @@ var DGJ_DOC_LABELS = {
   '1_11':'1-11号','1_16':'1-16号 雇用の経緯に係る説明書',
   '1_23':'1-23号','1_25':'1-25号','1_27':'1-27号','1_29':'1-29号','1_30':'1-30号','1_31':'1-31号','1_32':'1-32号',
   '1_1':'1-1号','iko':'移行準備説明書','tk2go':'移行準備説明書(2号)','myanmar':'理由書(ミャンマー)','irai':'依頼書','ininjou':'委任状','henkou':'変更申出書',
-  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状','shashin_teishutsu':'写真提出用紙','zairyu_teisei':'在留カード記載事項訂正願出書（参考様式５）',
+  'juuyou':'重要事項説明書','madoguchi':'窓口','suisenhyo':'推薦票','torisage':'取り下げ書','tesuryo':'手数料納付書','tsuika_shiryo':'追加資料提出','riyu_sho':'理由書','soufujou':'書類送付状','meibo':'名簿（複数人）','shashin_teishutsu':'写真提出用紙','zairyu_teisei':'在留カード記載事項訂正願出書（参考様式５）',
   'shinsei_henkou':'申請書(変更)','shinsei_henkou2':'申請書(変更)②','shinsei_henkou3':'申請書(変更)③',
   'shinsei_henkou_org1':'申請書(所属機関)①','shinsei_henkou_org2':'申請書(所属機関)②',
   'shinsei_henkou_org3':'申請書(所属機関)③','shinsei_henkou_org4':'申請書(所属機関)④'
@@ -1849,6 +1856,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.07',
+    date: '2026-11-16',
+    notify: false,
+    items: [
+      '👥 新しい書類「名簿（複数人）」を追加しました（その他 ＞ 書類送付状の下）。1号特定技能外国人支援計画書の対象者名簿と申請人名簿を、案件をまとめて選んで自動で作れます。国籍・氏名・生年月日・性別・所属機関は案シスから入り、15人を超えると次のページに続きます。'
+    ]
+  },
   {
     version: 'ver.20261116.06',
     date: '2026-11-16',
