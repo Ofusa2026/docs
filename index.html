@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.19</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.20</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -488,8 +488,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794920001';
-window.__DOCS_CACHE_BUSTER__ = '1794920001';
+window.__DOCS_CACHE_BUSTER__ = '1794930001';
+window.__DOCS_CACHE_BUSTER__ = '1794930001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1849,6 +1849,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.20',
+    date: '2026-11-16',
+    notify: false,
+    items: [
+      '👥 複数人の「🩺 チェックだけ」の結果から、「開く」でその人の案件に切り替えて書類を開けるようにしました。右下の「チェック結果に戻る」で一覧に戻れます。'
+    ]
+  },
   {
     version: 'ver.20261116.19',
     date: '2026-11-16',
@@ -4058,6 +4066,7 @@ function openDocCheck(){
   var c=idxSelectedCase;
   if(!c || !c.caseId){ alert('先に、案件を1件選んでください。'); return; }
   var old=document.getElementById('dcModal'); if(old) old.remove();
+  var _ob=document.getElementById('dcBack'); if(_ob) _ob.remove();
   var lang=idxLangFromNationality(c.nationality)||'en';
   var nP=_dcJobs('prio',false).length, nA=_dcJobs('all',false).length, nAL=_dcJobs('all',true).length, nPL=_dcJobs('prio',true).length;
   var m=document.createElement('div'); m.id='dcModal';
@@ -4200,6 +4209,14 @@ function _dcText(run){
   });
   return L.join('\n');
 }
+// ver.20261116.20: 複数人のチェック結果から書類を開いたあと、結果の一覧に戻るボタン（右下）
+function _dcBackBtn(m){
+  var old=document.getElementById('dcBack'); if(old) old.remove();
+  var b=document.createElement('button'); b.id='dcBack'; b.type='button'; b.textContent='🩺 チェック結果に戻る';
+  b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:99999;padding:9px 14px;border:0;border-radius:10px;background:#1e40af;color:#fff;font:700 12.5px sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3);cursor:pointer;';
+  b.onclick=function(){ if(document.body.contains(m)) m.style.display='flex'; b.remove(); };
+  document.body.appendChild(b);
+}
 function _dcShowResult(run){
   var old=document.getElementById('dcModal'); if(old) old.remove();
   var rows=run.jobs.map(function(j,i){ return {j:j, r:run.res[i], i:i}; }).filter(function(x){ return x.r; });
@@ -4221,7 +4238,7 @@ function _dcShowResult(run){
     h+='<div class="dcRow" data-sev="'+r.sev+'" style="border:1px solid #e5e7eb;border-left:4px solid '+col[r.sev]+';background:'+bg[r.sev]+';border-radius:7px;padding:6px 10px;margin:6px 0;'+(r.sev===0?'display:none;':'')+'">'
       +'<div style="display:flex;gap:8px;align-items:center;"><b>'+ic[r.sev]+' '+(j.who?(_dcEsc(j.who)+'・'):'')+_dcEsc(_dcDocName(j.dk))+'</b>'
       +'<span style="font-size:11px;color:#475569;">'+_dcEsc(_dcLangName(j.lang))+(j.want && j.lang!==j.want && j.lang!=='ja'?('（'+_dcEsc(_dcLangName(j.want))+'の版が無いので）'):'')+(r.pages?(' ・'+r.pages+'ページ'):'')+(r.note?(' ・'+_dcEsc(r.note)):'')+'</span>'
-      +(j.file && !j.info?'<button type="button" class="dcOpen" data-i="'+x.i+'" style="margin-left:auto;padding:2px 9px;border:1px solid #94a3b8;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;">開く</button>':'')+'</div>'
+      +(j.file || j.pdf?'<button type="button" class="dcOpen" data-i="'+x.i+'" style="margin-left:auto;padding:2px 9px;border:1px solid #94a3b8;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;">開く</button>':'')+'</div>'
       +(r.items.length?('<div style="margin-top:3px;font-size:11.5px;line-height:1.6;">'+r.items.map(function(t){ return '<div>'+_dcEsc(t)+'</div>'; }).join('')+'</div>'):'')
       +'</div>';
   });
@@ -4232,7 +4249,7 @@ function _dcShowResult(run){
     +'<button type="button" id="dcClose" style="margin-left:auto;padding:7px 16px;border:0;border-radius:8px;background:#1e40af;color:#fff;font-weight:700;cursor:pointer;">閉じる</button></div></div>';
   m.innerHTML=h; document.body.appendChild(m);
   m.querySelector('#dcHideOk').onchange=function(){ var on=this.checked; [].slice.call(m.querySelectorAll('.dcRow[data-sev="0"]')).forEach(function(el){ el.style.display=on?'none':''; }); };
-  m.querySelector('#dcClose').onclick=function(){ m.remove(); };
+  m.querySelector('#dcClose').onclick=function(){ m.remove(); var bb=document.getElementById('dcBack'); if(bb) bb.remove(); };
   m.querySelector('#dcAgain').onclick=function(){ m.remove(); openDocCheck(); };
   m.querySelector('#dcCopy').onclick=function(){
     var t=_dcText(run), b=this;
@@ -4240,8 +4257,17 @@ function _dcShowResult(run){
     try{ navigator.clipboard.writeText(t).then(ok, function(){ prompt('コピーしてください', t); }); }catch(e){ prompt('コピーしてください', t); }
   };
   [].slice.call(m.querySelectorAll('.dcOpen')).forEach(function(b){
-    b.onclick=function(){
-      var j=run.jobs[+b.getAttribute('data-i')]; m.remove();
+    b.onclick=async function(){
+      var j=run.jobs[+b.getAttribute('data-i')];
+      // ver.20261116.20: 複数人のチェックでは、その人の案件に切り替えてから書類を開く（結果の画面は閉じずに裏へ回す）
+      if(j.info && j.info.caseId && (!idxSelectedCase || String(idxSelectedCase.caseId)!==String(j.info.caseId))){
+        try{
+          m.style.display='none'; _dcBackBtn(m);
+          var inp=document.getElementById('idx_caseIdPaste'); if(inp){ inp.value=j.info.caseId; await idxJumpByPaste(); }
+          await new Promise(function(r){ setTimeout(r,500); });
+        }catch(e){ console.warn('[全書類チェック] 案件の切り替え', e); }
+      } else if(!j.info){ m.remove(); }
+      else { m.style.display='none'; _dcBackBtn(m); }
       try{
         if(j.lang && j.lang!=='ja' && j.lang!==currentLang && (DOC_LANG_SUPPORT[j.dk]||j.dk==='1_17_vi')) setGlobalLang(j.lang);
         var nav=document.getElementById('nav-'+j.dk); if(nav) nav.click();
