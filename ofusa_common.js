@@ -1011,7 +1011,7 @@ window.resolveEmpSetIdx = async function(co, cas, info){
 // ※誤った支援機関名を誓約書等に載せないため、正規化して2件以上ヒットした場合は採用しない（空欄のまま）。
 const _soCache={};
 function _soNorm(s){
-  return String(s||'')
+  return String(s||'').normalize('NFKC')   // ver.20261116.02: 全角・半角の違い（「株式会社ＲＰＪ」と「株式会社RPJ」）も同じとみなす
     .replace(/[（(][^）)]*[）)]\s*$/,'')   // 末尾の括弧サフィックス（(82)等）を除去
     .replace(/[\s\u3000]/g,'')            // 半角/全角スペースを除去
     .toUpperCase();
@@ -1023,6 +1023,11 @@ async function findSupportOrg(name, cols){
   // ① 完全一致（従来どおり）
   try{
     const r=await sb('support_orgs?select='+sel+'&name=eq.'+encodeURIComponent(raw));
+    // ver.20261116.02: 同じ名前が2件あるとき（案シスでの重複登録）は、情報が多い方を使う（空の方を読んで書類が空欄になるのを防ぐ）
+    if(r&&r.length>1){
+      const _sc=o=>Object.keys(o||{}).filter(k=>{ const v=o[k]; return v!=null && v!=='' && !(Array.isArray(v)&&!v.length) && !(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length); }).length;
+      return r.slice().sort((a,b)=>_sc(b)-_sc(a))[0];
+    }
     if(r&&r[0]) return r[0];
   }catch(e){}
   // ② 正規化一致（selごとにキャッシュ）
@@ -1032,6 +1037,19 @@ async function findSupportOrg(name, cols){
     if(!_soCache[sel]) _soCache[sel]=await sb('support_orgs?select='+sel+'&limit=500');
     const hits=(_soCache[sel]||[]).filter(o=>_soNorm(o.name)===key);
     if(hits.length===1) return hits[0];
+    // ver.20261116.02: 同じ名前が2件以上あるときは、情報が多い方（登録番号・住所・支援責任者が入っている方）を使う。差が無ければ使わない
+    if(hits.length>1){
+      const score=o=>['reg_no','address','support_manager','tel','rep_name'].filter(k=>o&&String(o[k]||'').trim()).length;
+      const sorted=hits.slice().sort((a,b)=>score(b)-score(a));
+      if(score(sorted[0])>score(sorted[1])) return sorted[0];
+    }
+    // ver.20261116.02: 「RPJ」のように法人の種類（株式会社など）を付けずに書かれた名前も、1件だけ当たるときは同じとみなす
+    const strip=t=>t.replace(/株式会社|有限会社|合同会社|一般社団法人|[（(]株[）)]/g,'');
+    const key2=strip(key);
+    if(key2 && key2.length>=2){
+      const hits2=(_soCache[sel]||[]).filter(o=>strip(_soNorm(o.name))===key2);
+      if(hits2.length===1) return hits2[0];
+    }
   }catch(e){}
   return null;
 }
@@ -4615,18 +4633,33 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         var full=_p6Norm((co.pref||'')+(co.city||'')+(co.address||''));
         if(!val('es_officeAddressEn') && co.address_en && (!val('es_officeAddress') || _p6Norm(val('es_officeAddress'))===full)) setAuto('es_officeAddressEn', co.address_en);
       }
-      var key=_apiKey(); if(!key){ if(typeof p==='function') try{ p(); }catch(_e){} return; }
+      var key=_apiKey();   // 無くても、前に訳したもの（共有の訳）は入れる
       var pick=function(ids){ return ids.map(function(id){ var en=g(id), ja=g(id.slice(0,-2)); return (en&&ja&&ja.tagName!=='SELECT'&&String(ja.value||'').trim()&&!String(en.value||'').trim())?{en:en,ja:ja}:null; }).filter(Boolean); };
       var runs=[[pick(_P6_EN_IDS),'en'],[pick(_P6_LANG_IDS),_docLang()]];
       for(var k=0;k<runs.length;k++){
         var pr=runs[k][0], lg=runs[k][1]; if(!pr.length) continue;
-        var arr=await _callTranslate(pr, lg, key, GLOSS[lg]||[]);
-        pr.forEach(function(x,i){ var t=String(arr[i]||'').trim(); if(t && !String(x.en.value||'').trim()) setAuto(x.en.id, t); });
+        // ver.20261116.02: 前に訳したもの（言語ごとの共有の訳 settings.tr_dict_<言語>）を先に使い、無いものだけAIで訳す。AIで訳したものは共有の訳に覚える
+        var dict={}; try{ dict=await _trdLoad(lg); }catch(_d){}
+        var rest=[]; pr.forEach(function(x){ var t=dict[_trdKey(x.ja.value)]; if(t) setAuto(x.en.id, t); else rest.push(x); });
+        if(!rest.length || !key) continue;
+        var arr=await _callTranslate(rest, lg, key, GLOSS[lg]||[]), add={};
+        rest.forEach(function(x,i){ var t=String(arr[i]||'').trim(); if(t && !String(x.en.value||'').trim()){ setAuto(x.en.id, t); add[_trdKey(x.ja.value)]=t; } });
+        try{ await _trdSave(lg, add); }catch(_s){}
       }
       if(typeof p==='function') try{ p(); }catch(_e){}
     }catch(e){ console.warn('[1-6 訳の自動入力]', e); }
   }
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var _i=e.data.info; setTimeout(function(){ _p6AutoFill(_i); }, 4000); } }catch(_e){} });
+  // ver.20261116.02: 1-6号の所定労働の日数・時間がありえない数字なら知らせる（案シスの雇用条件で、時間を日数の欄に入れるなどのずれ）
+  function _p6RangeWarn(){
+    if(!_p6Is16()) return;
+    var R=[['es_weeklyDays',0,7,'週の所定労働日数','日'],['es_monthlyDays',0,31,'月の所定労働日数','日'],['es_yearlyDays',0,366,'年間の所定労働日数','日'],
+           ['es_weeklyH',1,60,'週の所定労働時間','時間'],['es_monthlyH',1,300,'月の所定労働時間','時間'],['es_yearlyH',500,3000,'年間の所定労働時間','時間']], bad=[];
+    R.forEach(function(r){ var e=document.getElementById(r[0]); if(!e) return; var t=String(e.value||'').normalize('NFKC').replace(/[^0-9.]/g,''); if(t==='') return; var v=parseFloat(t);
+      if(v<r[1]||v>r[2]){ bad.push(r[3]+' '+v+r[4]); e.style.background='#fee2e2'; e.style.borderColor='#dc2626'; } });
+    if(bad.length && typeof showToast==='function') showToast('⚠️ 雇用条件の数字がおかしい欄があります（赤い欄）：'+bad.join('、')+'。案シスの雇用条件セットを確認してください', 9000);
+  }
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p6RangeWarn, 4500); } }catch(_e){} });
   // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
   //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
   var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語',si:'シンハラ語'};

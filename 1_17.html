@@ -140,7 +140,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20261116.01</span>
+  <span class="ver">ver.20261116.02</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -664,8 +664,12 @@ async function loadCaseById(caseId, companyId){
   // 支援機関（案件のorg名で引く）
   var soRow = null;
   if(cRow.org){
-    var so = await _sb.from("support_orgs").select("*").eq("name", cRow.org).limit(1);
-    if(!so.error && so.data && so.data.length) soRow = so.data[0];
+    // ver.20261116.02: 書類共通の照合（全角半角・括弧つき・重複のときは情報が多い方）を使う。見つからなければ従来どおり完全一致
+    try{ if(typeof findSupportOrg==='function') soRow = await findSupportOrg(cRow.org, '*'); }catch(_f){}
+    if(!soRow){
+      var so = await _sb.from("support_orgs").select("*").eq("name", cRow.org).limit(1);
+      if(!so.error && so.data && so.data.length) soRow = so.data[0];
+    }
   }
 
   // グローバル配列/オブジェクトに格納（既存データを上書き）

@@ -26,7 +26,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -184,7 +184,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794816001"></script>
+<script src="ofusa_common.js?v=1794820000"></script>
 <script>
 const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
 const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
@@ -679,8 +679,25 @@ window.addEventListener('message', async function(e){
   // まず共通関数で全入力欄を埋める
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, '1_11'); }
   // 書類固有の追加処理があれば loadFromDB で補完
-  if(typeof loadFromDB==='function') loadFromDB(info);
+  if(typeof loadFromDB==='function') await loadFromDB(info);
+  try{ await _fin11Reuse(info); }catch(_e){ console.warn('[1-11 前回の値]', _e); }
 });
+/* ver.20261116.01: 決算（売上高・経常損益・純損益・純資産の3期分）と離職者数は会社ごとに同じなので、
+   この会社で前に保存した1-11号（雇用条件セットが違っても）の値を、空いている欄にだけ入れる。
+   売上高（前年度）は、それも無ければ案シスの会社の「売上高」を使う。入れた欄は黄色で知らせる。 */
+var _FIN11_IDS=['f_salesY1','f_salesY2','f_salesY3','f_plY1','f_plY2','f_plY3','f_netY1','f_netY2','f_netY3','f_assetsY1','f_assetsY2','f_assetsY3','f_jpVQ','f_jpIQ','f_fgnVQ','f_fgnIQ'];
+async function _fin11Reuse(info){
+  if(!info || !info.companyId) return;
+  const r=await sb('companies?select=sales,extra&id=eq.'+encodeURIComponent(info.companyId)); const co=r&&r[0]; if(!co) return;
+  const saved=(co.extra&&co.extra['1_11'])||{};
+  const rows=Object.keys(saved).map(k=>saved[k]).filter(x=>x&&typeof x==='object'&&_FIN11_IDS.some(id=>String(x[id]||'').trim()))
+    .sort((a,b)=>(Date.parse(b._savedAt||'')||0)-(Date.parse(a._savedAt||'')||0));
+  const src=rows[0]||{}; let n=0;
+  const put=(id,v)=>{ const e=document.getElementById(id); if(!e||String(e.value||'').trim()||!String(v||'').trim()) return; e.value=v; e.style.background='#fef9c3'; setTimeout(()=>{ e.style.background=''; },3000); n++; };
+  _FIN11_IDS.forEach(id=>put(id, src[id]));
+  put('f_salesY1', co.sales);
+  if(n){ if(typeof p==='function') p(); if(typeof showToast==='function') showToast('📋 決算・離職者数を、この会社で前に保存した値から入れました（'+n+'欄・黄色）。今回の年度に合っているか確認してください'); }
+}
 
 initCaseSelect(); p();
 </script>
