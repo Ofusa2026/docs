@@ -4162,7 +4162,7 @@ document.addEventListener('click', function(e){
     var idx=parseInt(curIdx||0)||0;
     if(mode==='new'){
       var defName='条件セット'+(empSets.length+1);
-      var nm=window.prompt('新しい雇用条件セットの名前を入力してください',defName);
+      var nm=(window._empSaveNew && window._empSaveNew.name) ? String(window._empSaveNew.name) : window.prompt('新しい雇用条件セットの名前を入力してください',defName);   // ver.20261116.06: 「賃金だけ変える」から来たときは名前を聞かない
       if(nm===null) return {saved:false};
       var newSet=Object.assign({},_trSplit(values, (curIdx!=null&&empSets[parseInt(curIdx,10)])||null),{setName:(nm||defName),_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       empSets.push(newSet);
@@ -6546,7 +6546,8 @@ function _structNoticeShow(){
     });
     return changed;
   }
-  window._p16TaxRecalc=function(){ try{ return recalc(); }catch(e){ return []; } };   // ver.20261111.07: 時給から換算月給を入れ直したときにも呼ぶ
+  window._p16TaxRecalc=function(){ try{ return recalc(); }catch(e){ return []; } };
+  window._p16TaxCompute=function(){ try{ return compute(); }catch(e){ return null; } };   // ver.20261116.06: 「賃金だけ変える」で差額を出すため   // ver.20261111.07: 時給から換算月給を入れ直したときにも呼ぶ
   function _none(k){ var est=el(MAP[k]+'Est'); return !!(est && /不要/.test(est.value||'')); }
   function same(a,b){   // 金額として同じか（「14,126」と「14126」は同じ）
     a=(a==null?'':String(a)).trim(); b=(b==null?'':String(b)).trim();
@@ -6778,4 +6779,146 @@ function _structNoticeShow(){
   function wrapAll(){ wrap('loadFromDB'); wrap('loadCaseToForm'); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrapAll); else wrapAll();
   setTimeout(wrapAll, 0); setTimeout(wrapAll, 1500);
+})();
+
+/* ===== ver.20261116.06: 1-6号「✏️ 賃金・手当・控除・就業先だけ変える」 =====
+   雇用条件はほぼ同じで、賃金・手当・控除・就業先だけ違う人のために、いまの雇用条件セットを元に
+   その部分だけ変えた「この人用のセット」を作り、この案件に紐づける（元のセットは変えない）。
+   金額を変えると、換算時給・換算月給・税金・社会保険料・雇用保険料・控除合計・手取りはいつもの自動計算で計算し直してから保存する。 */
+(function(){
+  var path=String(location.pathname||'');
+  if(!/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)) return;
+  function el(id){ return document.getElementById(id); }
+  function val(id){ var e=el(id); return e?String(e.value||'').trim():''; }
+  function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function money(x){ var t=String(x||'').normalize('NFKC').replace(/[円\s]/g,'').trim(); if(/^[\d,]+$/.test(t)){ var n=parseInt(t.replace(/,/g,''),10); return isNaN(n)?t:n.toLocaleString('ja-JP'); } return String(x||'').trim(); }
+  function same(a,b,isMoney){ var t=function(x){ return String(x||'').replace(/\r?\n/g,'').trim(); }; return isMoney ? String(money(a)).replace(/,/g,'')===String(money(b)).replace(/,/g,'') : t(a)===t(b); }   // 住所の改行は入力欄で消えるので比べない
+  // 欄の一覧（グループ・行）。m=金額、tr=訳の欄（日本語の欄と組）
+  function groups(){
+    var G=[];
+    var sal=[['es_salaryMonthly','月給（円）'],['es_salaryDaily','日給（円）'],['es_salaryHourly','時給（円）']];
+    var has=sal.filter(function(x){ return val(x[0]); });
+    var g1={title:'💴 賃金', open:true, rows:(has.length?has:sal).map(function(x){ return [{id:x[0], label:x[1], m:true}]; })};
+    if(val('es_fixedOTAmount') || val('es_fixedOTName')) g1.rows.push([{id:'es_fixedOTAmount', label:'固定残業代（円）'+(val('es_fixedOTName')?'：'+val('es_fixedOTName'):''), m:true}]);
+    G.push(g1);
+    var g2={title:'🧾 手当', open:true, rows:[]}, added=false;
+    for(var i=1;i<=6;i++){
+      var used=!!(val('es_a'+i+'Name')||val('es_a'+i+'Amt'));
+      if(!used){ if(added || !el('es_a'+i+'Name')) continue; added=true; }
+      g2.rows.push([{id:'es_a'+i+'Name', label:(used?'手当'+i:'手当を足す')+'：名称', w:'38%'},{id:'es_a'+i+'Amt', label:'金額（円）', m:true, w:'24%'},{id:'es_a'+i+'Calc', label:'計算方法', w:'38%'}]);
+      g2.rows.push([{id:'es_a'+i+'NameEn', label:'名称（訳）', tr:'es_a'+i+'Name', w:'38%'},{id:'es_a'+i+'AmtEn', label:'金額（訳）※文字のとき', w:'24%'},{id:'es_a'+i+'CalcEn', label:'計算方法（訳）', tr:'es_a'+i+'Calc', w:'38%'}]);
+    }
+    G.push(g2);
+    G.push({title:'➖ 控除（税金・社会保険料・雇用保険料は自動で計算し直します）', open:true, rows:[
+      [{id:'es_deductFood', label:'食費（円）', m:true, w:'33%'},{id:'es_deductHousing', label:'居住費（円）', m:true, w:'33%'},{id:'es_deductUtility', label:'水道光熱費（円）', m:true, w:'34%'}],
+      [{id:'es_deductOther1Name', label:'その他：名目', w:'38%'},{id:'es_deductOther1NameEn', label:'名目（訳）', tr:'es_deductOther1Name', w:'38%'},{id:'es_deductOther1Amount', label:'金額（円）', m:true, w:'24%'}]
+    ]});
+    var g4={title:'🏢 就業先', open:false, rows:[
+      [{id:'es_officeName', label:'事業所名'},{id:'es_officeNameEn', label:'事業所名（訳）', tr:'es_officeName'}],
+      [{id:'es_officeAddress', label:'所在地'},{id:'es_officeAddressEn', label:'所在地（訳）', tr:'es_officeAddress'}],
+      [{id:'es_officeTel', label:'連絡先'}]
+    ]};
+    if(val('es_subOfficeName')||val('es_subOfficeAddress')) g4.rows.push(
+      [{id:'es_subOfficeName', label:'事業所名②'},{id:'es_subOfficeNameEn', label:'事業所名②（訳）', tr:'es_subOfficeName'}],
+      [{id:'es_subOfficeAddress', label:'所在地②'},{id:'es_subOfficeAddressEn', label:'所在地②（訳）', tr:'es_subOfficeAddress'}],
+      [{id:'es_subOfficeTel', label:'連絡先②'}]);
+    if(val('es_dispatchOfficeName')||val('es_dispatchOfficeAddress')) g4.rows.push(
+      [{id:'es_dispatchOfficeName', label:'派遣先事業所名'},{id:'es_dispatchOfficeNameEn', label:'派遣先事業所名（訳）', tr:'es_dispatchOfficeName'}],
+      [{id:'es_dispatchOfficeAddress', label:'派遣先所在地'},{id:'es_dispatchOfficeAddressEn', label:'派遣先所在地（訳）', tr:'es_dispatchOfficeAddress'}],
+      [{id:'es_dispatchOfficeTel', label:'派遣先連絡先'}]);
+    G.push(g4);
+    G.forEach(function(g){ g.rows=g.rows.map(function(r){ return r.filter(function(c){ return !!el(c.id); }); }).filter(function(r){ return r.length; }); });
+    return G.filter(function(g){ return g.rows.length; });
+  }
+  var IN='width:100%;box-sizing:border-box;padding:6px 8px;border:1.5px solid #cbd5e1;border-radius:6px;font-size:13px;';
+  function open(){
+    var info=window._lastCaseInfo||{};
+    if(!info.caseId){ alert('先に案件を選んでください。'); return; }
+    var set=window._empLoadedSet, idx=window._empLoadedIdx;
+    if(!set || idx==null || idx===''){ alert('この案件には雇用条件セットが読み込まれていません。\n先に元にする雇用条件セットを選んでください。'); return; }
+    var G=groups(), base=String(set.setName||('条件セット'+(parseInt(idx,10)+1)));
+    var who=String(info.applicant||val('es_applicantName')||'').trim();
+    var cell=function(c){ return '<div style="min-width:0;"><label style="display:block;font-size:11px;font-weight:700;color:'+(c.tr?'#64748b':'#334155')+';margin:6px 0 2px;">'+esc(c.label)+'</label>'
+      +'<input data-wid="'+c.id+'"'+(c.m?' data-m="1" inputmode="numeric"':'')+(c.tr?' data-tr="'+c.tr+'"':'')+' value="'+esc(val(c.id))+'" style="'+IN+(c.tr?'background:#f8fafc;':'')+'"></div>'; };
+    var w=document.createElement('div'); w.id='_wageOnly';
+    w.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100000;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
+    w.innerHTML='<div style="background:#fff;border-radius:10px;width:min(620px,96vw);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.3);">'
+      +'<div style="padding:14px 18px 6px;"><div style="font-weight:700;font-size:15px;margin-bottom:6px;">✏️ 賃金・手当・控除・就業先だけ変える（この人用のセットを作る）</div>'
+      +'<div style="font-size:12px;color:#475569;line-height:1.6;">いまの雇用条件セット「'+esc(base)+'」をそのまま写して、変えた欄だけ書き換えた新しいセットを作り、この案件に紐づけます。<b>元のセットは変わりません。</b>換算時給・税金・社会保険料・控除合計・手取りは自動で計算し直します。</div></div>'
+      +'<div style="overflow:auto;padding:0 18px;flex:1;">'
+      +G.map(function(g){ return '<details'+(g.open?' open':'')+' style="border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;margin:8px 0;"><summary style="cursor:pointer;font-weight:700;font-size:13px;">'+esc(g.title)+'</summary>'
+        +g.rows.map(function(r){ return '<div style="display:grid;gap:8px;grid-template-columns:'+r.map(function(c){ return (parseFloat(c.w)||50)+'fr'; }).join(' ')+';">'+r.map(cell).join('')+'</div>'; }).join('')+'</details>'; }).join('')
+      +'<label style="display:block;font-size:12px;font-weight:700;margin:10px 0 3px;">新しいセットの名前</label><input id="_woName" value="'+esc(base+((who && base.indexOf(who)<0)?'（'+who+'）':'（一部変更）'))+'" style="'+IN+'">'
+      +'<label style="display:flex;gap:6px;align-items:flex-start;font-size:12px;margin-top:10px;line-height:1.5;"><input type="checkbox" id="_woTax" checked style="margin-top:2px;">税金・社会保険料・雇用保険料も新しい金額に合わせる（自動計算の欄は計算し直し、手で入れた金額は計算の差額だけ増減します）</label>'
+      +'</div>'
+      +'<div style="padding:8px 18px 14px;"><div id="_woMsg" style="font-size:12px;color:#b91c1c;min-height:16px;margin-bottom:6px;"></div>'
+      +'<div style="display:flex;gap:8px;justify-content:flex-end;"><button id="_woCancel" style="padding:8px 14px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;font-size:13px;">キャンセル</button>'
+      +'<button id="_woOk" style="padding:8px 14px;border:0;background:#0f766e;color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;">作って保存</button></div></div></div>';
+    document.body.appendChild(w);
+    var close=function(){ try{ w.remove(); }catch(e){} };
+    w.querySelector('#_woCancel').onclick=close;
+    w.onclick=function(e){ if(e.target===w) close(); };
+    var warnedTr=false;
+    w.querySelector('#_woOk').onclick=async function(){
+      var msg=w.querySelector('#_woMsg'), ch=[], chIds={}, moneyCh=false;
+      var ins=[].slice.call(w.querySelectorAll('input[data-wid]'));
+      for(var i=0;i<ins.length;i++){
+        var id=ins[i].getAttribute('data-wid'), isM=ins[i].getAttribute('data-m')==='1', raw=ins[i].value, ov=val(id);
+        var nv=isM?money(raw):String(raw||'').trim();
+        if(isM && nv && !/^[\d,]+$/.test(nv)){ msg.textContent='金額は数字で入れてください（'+ins[i].previousSibling.textContent+'）'; ins[i].focus(); return; }
+        if(!same(nv, ov, isM)){ ch.push([id,nv]); chIds[id]=1; if(isM) moneyCh=true; }
+      }
+      var nm=String(w.querySelector('#_woName').value||'').trim(), reTax=!!(w.querySelector('#_woTax')||{}).checked;
+      if(!ch.length){ msg.textContent='どの欄も変わっていません。変えるところを書き換えてください。'; return; }
+      if(!nm){ msg.textContent='新しいセットの名前を入れてください。'; return; }
+      // 日本語を変えたのに訳がそのままの欄
+      var stale=ins.filter(function(x){ var t=x.getAttribute('data-tr'); return t && chIds[t] && !chIds[x.getAttribute('data-wid')] && String(x.value||'').trim(); })
+                   .map(function(x){ return x.previousSibling.textContent; });
+      if(stale.length && !warnedTr){ warnedTr=true; msg.textContent='日本語を変えたのに、訳がそのままの欄があります：'+stale.join('、')+'。訳も直すか、このままでよければもう一度「作って保存」を押してください。'; return; }
+      this.disabled=true; this.textContent='計算して保存しています…';
+      var K=[['deductTax','es_deductTax'],['deductSocial','es_deductSocialIns'],['deductEmployment','es_deductEmpIns']], r0=null, man={};
+      var num=function(x){ var t=String(x==null?'':x).normalize('NFKC').replace(/[,円\s]/g,''); return /^-?\d+$/.test(t)?parseInt(t,10):null; };
+      var taxSrc=moneyCh || chIds.es_officeAddress || chIds.es_a1Name || chIds.es_a2Name || chIds.es_a3Name || chIds.es_a4Name || chIds.es_a5Name || chIds.es_a6Name;
+      if(reTax && taxSrc && typeof window._p16TaxCompute==='function'){ r0=window._p16TaxCompute(); K.forEach(function(k){ var e=el(k[1]), est=el(k[1]+'Est'); if(e && e.dataset.taxAuto!=='1' && !(est && /不要/.test(est.value||'')) && num(e.value)!=null) man[k[0]]=num(e.value); }); }
+      try{
+        ch.forEach(function(c){ var e=el(c[0]); if(!e) return; e.value=c[1]; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); });
+        await new Promise(function(r){ setTimeout(r, 700); });
+        // 画面で手で直したときと同じ計算（換算月給・換算時給）。この画面で手で入れた換算の値はそのまま
+        if(moneyCh || chIds.es_a1Name || chIds.es_a2Name || chIds.es_a3Name || chIds.es_a4Name || chIds.es_a5Name || chIds.es_a6Name){
+          try{ if(typeof _p16AutoCalcMonthly==='function') _p16AutoCalcMonthly(true); }catch(e){}
+          try{ if(typeof _p16AutoCalcHourly==='function') _p16AutoCalcHourly(true); }catch(e){}
+        }
+        try{ if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc(); }catch(e){}   // 自動の欄
+        // 手で入れた欄：前の金額＋（新しい計算－前の計算）。住民税なしの人などの前提を崩さないため
+        if(reTax && r0 && r0.ok && typeof window._p16TaxCompute==='function'){
+          var r1=window._p16TaxCompute();
+          if(r1 && r1.ok) K.forEach(function(k){
+            if(man[k[0]]==null) return; var a=num(r0.values[k[0]]), b2=num(r1.values[k[0]]); if(a==null || b2==null || a===b2) return;
+            var e=el(k[1]); var nv=Math.max(0, man[k[0]]+(b2-a)); e.value=nv.toLocaleString('ja-JP'); e.dispatchEvent(new Event('input',{bubbles:true}));
+          });
+        }
+        await new Promise(function(r){ setTimeout(r, 500); });
+        try{ if(typeof p==='function') p(); }catch(e){}
+        close();
+        window._empSaveNew={name:nm};
+        if(typeof saveForm==='function') await saveForm();
+      }catch(e){ alert('保存できませんでした：'+(e&&e.message||e)); }
+      finally{ window._empSaveNew=null; }
+    };
+    setTimeout(function(){ var f=w.querySelector('input[data-wid]'); if(f){ f.focus(); f.select(); } }, 50);
+  }
+  window._wageOnlyOpen=open;
+  function addBtn(){
+    try{
+      if(el('_wageOnlyBtn')) return;
+      var fp=document.querySelector('.fp'); if(!fp) return;
+      var b=document.createElement('button'); b.id='_wageOnlyBtn'; b.type='button'; b.textContent='✏️ 賃金・手当・控除・就業先だけ変える（この人用のセット）';
+      b.title='いまの雇用条件セットを元に、賃金・手当・控除・就業先だけ変えた新しいセットを作って、この案件に紐づけます（元のセットは変わりません）';
+      b.style.cssText='display:block;width:calc(100% - 12px);margin:6px;padding:7px 8px;border:1.5px solid #0f766e;background:#f0fdfa;color:#0f766e;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;line-height:1.4;';
+      b.onclick=open;
+      fp.insertBefore(b, fp.firstChild);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBtn); else addBtn();
+  try{ var st=document.createElement('style'); st.textContent='@media print{#_wageOnlyBtn,#_wageOnly{display:none!important}}'; (document.head||document.documentElement).appendChild(st); }catch(e){}
 })();

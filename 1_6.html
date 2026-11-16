@@ -84,7 +84,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－６号　雇用条件書（インドネシア語版）</div>
-    <div class="ver">ver.20261116.02</div>
+    <div class="ver">ver.20261116.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck16()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -508,7 +508,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1794820001"></script>
+<script src="ofusa_common.js?v=1794820002"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1865,7 +1865,8 @@ async function saveForm(){
     //   雇用条件の変更は保留し、書類（直接編集版）だけ下書き保存する。
     //   「💾 DB保存」「✅ 完了して保存」を押したときに1回だけ聞く。
     let _skipEmpSave = false;
-    if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
+    if(window._empSaveNew){ mode = 'new'; }   // ver.20261116.06: 「💴 賃金だけ変える」から来たときは新しいセット
+    else if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()){
       if(window._autosaving){
         _skipEmpSave = true;
       }else{

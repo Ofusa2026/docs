@@ -44,7 +44,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 ទម្រង់យោងលេខ ១-១៦（カンボジア語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261116.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -77,6 +77,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     <div class="fs"><div class="fs-title">職業紹介（あっせん）</div>
       <div class="fg"><label>あっせんの有無</label><select id="es_assen" onchange="p()"><option value="無">無</option><option value="有">有</option></select></div>
       <div class="fg"><label>許可・届出受理番号</label><input id="f_ag_license" oninput="p()"></div>
+      <div class="fg"><label>受理年月日</label><input id="f_ag_licenseDate" oninput="p()" placeholder="例：平成22年7月1日"></div>
       <div class="fg"><label>職業紹介事業者の区分</label><select id="f_ag_type" onchange="p()"><option value=""></option><option value="有料">有料職業紹介事業者</option><option value="無料">無料職業紹介事業者</option></select></div>
       <div class="fg"><label>職業紹介事業者の氏名</label><input id="f_ag_name" oninput="p()"></div>
       <div class="fg"><label>職業紹介事業者の住所</label><input id="f_ag_addr" oninput="p()"></div>
@@ -154,10 +155,21 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794820001"></script>
+<script src="ofusa_common.js?v=1794820002"></script>
 <script>
 // 手数料として有効な値か判定する。
 // 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
+// ver.20261116.06: 4 自国等の機関への支払。入力が1件も無ければ1行目に「該当なし」、空の欄には欄名を出さない（空のまま）
+function _p16Pay(id){ return v(id) ? f(id) : ''; }
+function _p16PayNone(){ for(var i=1;i<=5;i++){ if(['name','kind','date','amount'].some(function(k){ return String(v('f_p'+i+'_'+k)||'').trim(); })) return false; } return true; }
+// ver.20261116.06: 職業紹介の許可・届出の受理年月日（"20100701" など）を和暦に
+function _p16Wareki(x){
+  var s=String(x||'').normalize('NFKC').trim(); if(!s) return '';
+  var m=s.match(/^(\d{4})[-\/年.]?(\d{1,2})[-\/月.]?(\d{1,2})日?$/); if(!m) return s;
+  var y=+m[1], mo=+m[2], d=+m[3], n=y*10000+mo*100+d, era, ey;
+  if(n>=20190501){ era='令和'; ey=y-2018; } else if(n>=19890108){ era='平成'; ey=y-1988; } else { era='昭和'; ey=y-1925; }
+  return era+(ey===1?'元':ey)+'年'+mo+'月'+d+'日';
+}
 function _isRealFee(v){
   if(v===null || v===undefined) return false;
   const s=String(v).trim();
@@ -205,7 +217,7 @@ function p(){
   </tr>
   <tr>
     <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">លេខការអនុញ្ញាត・លេខការទទួលយកការជូនដំណឹង</span><br><span class="id">(ថ្ងៃ ខែ ឆ្នាំ នៃការទទួលយក)</span></td>
-    <td colspan="3">${f('f_ag_license')}</td>
+    <td colspan="3">${f('f_ag_license')}${v('f_ag_licenseDate') ? '（'+f('f_ag_licenseDate')+'）' : ''}</td>
   </tr>
   <tr>
     <td>３　職業紹介事業者の区分<br><span class="id">ចំណាត់ថ្នាក់នៃក្រុមហ៊ុនណែនាំការងារ</span></td>
@@ -359,42 +371,42 @@ function p(){
   </tr>
   <tr>
     <td style="text-align:center;">１</td>
-    <td>${f('f_p1_name') || '該当なし'}</td>
-    <td>${f('f_p1_kind')}</td>
-    <td>${f('f_p1_date')}</td>
-    <td>${f('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">មិនមាន</span>' : '')}</td>
+    <td>${_p16Pay('f_p1_kind')}</td>
+    <td>${_p16Pay('f_p1_date')}</td>
+    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
   <tr>
     <td style="text-align:center;">２</td>
-    <td>${f('f_p2_name')}</td>
-    <td>${f('f_p2_kind')}</td>
-    <td>${f('f_p2_date')}</td>
-    <td>${f('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${_p16Pay('f_p2_name')}</td>
+    <td>${_p16Pay('f_p2_kind')}</td>
+    <td>${_p16Pay('f_p2_date')}</td>
+    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
   <tr>
     <td style="text-align:center;">３</td>
-    <td>${f('f_p3_name')}</td>
-    <td>${f('f_p3_kind')}</td>
-    <td>${f('f_p3_date')}</td>
-    <td>${f('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${_p16Pay('f_p3_name')}</td>
+    <td>${_p16Pay('f_p3_kind')}</td>
+    <td>${_p16Pay('f_p3_date')}</td>
+    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
   <tr>
     <td style="text-align:center;">４</td>
-    <td>${f('f_p4_name')}</td>
-    <td>${f('f_p4_kind')}</td>
-    <td>${f('f_p4_date')}</td>
-    <td>${f('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${_p16Pay('f_p4_name')}</td>
+    <td>${_p16Pay('f_p4_kind')}</td>
+    <td>${_p16Pay('f_p4_date')}</td>
+    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
   <tr>
     <td style="text-align:center;">５</td>
-    <td>${f('f_p5_name')}</td>
-    <td>${f('f_p5_kind')}</td>
-    <td>${f('f_p5_date')}</td>
-    <td>${f('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${_p16Pay('f_p5_name')}</td>
+    <td>${_p16Pay('f_p5_kind')}</td>
+    <td>${_p16Pay('f_p5_date')}</td>
+    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
   <tr>
     <td colspan="4" style="text-align:right;">計　<span class="id">សរុប</span></td>
-    <td>${f('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
@@ -492,6 +504,7 @@ async function loadFromDB(passedInfo){
     ]);
     const cas=cases&&cases[0]; const co=cos&&cos[0]; const ir=intakes&&intakes[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
+    const E0=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():'';};
     if(co){
       s('f_company',co.name||'');
       // ver.20260827.04: author_name に役職が既に含まれる場合の二重表示を防止
@@ -516,23 +529,26 @@ async function loadFromDB(passedInfo){
     }
     if(ir && ir.agency_name){
       s('f_ag_name', ir.agency_name);
-      if(ir.agency_office) s('f_ag_addr', ir.agency_office);
+      if(ir.agency_office && /\d|[０-９]/.test(ir.agency_office) && !/[（(][^）)]*[都道府県][^）)]*[）)]\s*$/.test(ir.agency_office) && !E0('f_ag_addr')) s('f_ag_addr', ir.agency_office);   // ver.20261116.06
       if(ir.intro_fee) s('f_ag_fee_seeker', String(ir.intro_fee));
       const _am=AGENCY_MASTER[ir.agency_name];
       if(_am){ s('f_ag_addr',_am.addr); s('f_ag_tel',_am.tel); s('f_ag_license',_am.license); const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value)_t.value=_am.type; }
       // ver.20261109.03: 一覧（AGENCY_MASTER）に無い職業紹介事業者は、案シスの登録支援機関（職業紹介の許可番号つき）から入れる
-      else if(typeof findSupportOrg==='function'){
+      if(typeof findSupportOrg==='function'){   // ver.20261116.06: 一覧にある機関でも、空いている欄は入れる
         try{
-          const _so=await findSupportOrg(ir.agency_name,'name,zip,pref,city,address_detail,address,tel,job_permit_no');
+          const _so=await findSupportOrg(ir.agency_name,'name,zip,pref,city,address_detail,address,tel,job_permit_no,job_permit_date');
           const _pn=String((_so&&_so.job_permit_no)||'').normalize('NFKC').replace(/[\s]/g,'').replace(/[ー－‐―−]/g,'-');
           if(_so && /\d/.test(_pn) && !/不明|未定/.test(_pn)){
             const _m=_pn.match(/^(\d{2})-?(ユ|特)-?(\d{6})/);
             const _lic=_m?(_m[1]+'-'+_m[2]+'-'+_m[3]):_pn;
             const _zip=String(_so.zip||'').normalize('NFKC').replace(/[^0-9-]/g,'');
-            const _ad=(_so.address_detail?(String(_so.pref||'')+String(_so.city||'')+String(_so.address_detail)):String(_so.address||'')).trim();
+            const _pc=String(_so.pref||'')+String(_so.city||''), _dt=String(_so.address_detail||'').trim();
+            const _ad=(_dt?((_so.pref && _dt.indexOf(String(_so.pref))===0) ? _dt : (_pc+_dt)):String(_so.address||'')).trim();   // ver.20261116.06: 番地に都道府県が入っているときは重ねない
             const E=id=>{ const e=document.getElementById(id); return e?String(e.value||'').trim():''; };
             if(!E('f_ag_license')) s('f_ag_license',_lic);
-            if(_ad && !/[都道府県市区町村郡]/.test(E('f_ag_addr'))) s('f_ag_addr',(_zip?'〒'+_zip+'　':'')+_ad);   // 空、または郵便番号だけのとき
+            // ver.20261116.06: 空・郵便番号だけ・番地の数字が無い（「株式会社アイデム（東京都新宿区）」のような事業所名）ときは入れ直す。手で直した住所（番地あり）はそのまま
+            if(_ad && (!/[都道府県市区町村郡]/.test(E('f_ag_addr')) || !/[0-9０-９一二三四五六七八九十]/.test(E('f_ag_addr').replace(/〒[\s\S]*?[　 ]/,'')) || E('f_ag_addr')===String(ir.agency_office||'').trim())) s('f_ag_addr',(_zip?'〒'+_zip+'　':'')+_ad);
+            if(!E('f_ag_licenseDate') && _so.job_permit_date) s('f_ag_licenseDate',_p16Wareki(_so.job_permit_date));
             if(!E('f_ag_tel') && _so.tel) s('f_ag_tel',String(_so.tel).normalize('NFKC').trim());
             const _t=document.getElementById('f_ag_type'); if(_t&&!_t.value&&_m&&_m[2]==='ユ') _t.value='有料';
           }

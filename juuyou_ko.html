@@ -49,7 +49,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（韓国語）</div>
-    <div class="ver">ver.20261116.03</div>
+    <div class="ver">ver.20261116.06</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -151,6 +151,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
       <div class="fg"><label>(e)居住費（円）</label><input id="f_deductHousing" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductHousingJippi" onchange="_setJippiJ('es_deductHousing',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductHousingEst" type="hidden"></div>
       <div class="fg"><label>(f)水道光熱費（円）</label><input id="f_deductUtility" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductUtilityJippi" onchange="_setJippiJ('es_deductUtility',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductUtilityEst" type="hidden"></div>
       <div class="fg"><label>(g)その他（名目）</label><input id="f_deductOther1Name" oninput="p()"></div>
+      <div class="fg"><label>(g)その他（名目・訳）</label><input id="f_deductOther1NameEn" oninput="p()"></div>
       <div class="fg"><label>(g)その他（円）</label><input id="f_deductOther1Amount" oninput="p()"><label style="display:inline-flex;align-items:center;gap:3px;margin-top:2px;font-size:11px;color:#555;font-weight:normal;cursor:pointer;"><input type="checkbox" id="es_deductOther1AmountJippi" onchange="_setJippiJ('es_deductOther1Amount',this.checked)" style="width:auto;margin:0;">実費（実費）表記</label><input id="es_deductOther1AmountEst" type="hidden"></div>
       <div class="fg"><label>控除合計（円）</label><input id="f_deductTotal" oninput="p()"></div>
     </div>
@@ -190,7 +191,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794820001"></script>
+<script src="ofusa_common.js?v=1794820002"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -334,7 +335,7 @@ function p(){
       <td class="ja">（<span class="under">${ff('f_deductOther1Amount')}</span>円）${_jSufJa('es_deductOther1Amount')}</td>
     </tr>
     <tr>
-      <td class="vi">(g) 기타（<span class="under">${f('f_deductOther1Name')}</span>）</td>
+      <td class="vi">(g) 기타（<span class="under">${v('f_deductOther1NameEn') ? f('f_deductOther1NameEn') : f('f_deductOther1Name')}</span>）</td>
       <td class="vi">（약 <span class="under">${ff('f_deductOther1Amount')}</span> 엔）${_jSufLo('es_deductOther1Amount')}</td>
     </tr>
   </table>
@@ -583,7 +584,7 @@ function _koujiTr(s){
   return String(s).split(/[,、]/).map(function(x){var t=x.trim(); return t?(_KOUJI_TR[t]||_KOUJI_TR[t+'工事業']||_KOUJI_TR[t.replace(/一式/,'')+'工事業']||t):'';   /* ver.20261106.07: 「土木」「建築一式」のような書き方も訳す */})
          .filter(Boolean).join('、');
 }
-const _J_REV={f_allowance1AmountEn:'allowance1AmtEn',f_allowance2AmountEn:'allowance2AmtEn',f_allowance3AmountEn:'allowance3AmtEn',f_allowance4AmountEn:'allowance4AmtEn',f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_allowance4Calc:'allowance4Cond',f_allowance4Amount:'allowance4Amount',f_allowance4Name:'allowance4Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
+const _J_REV={f_deductOther1Name:'deductOther1Name',f_deductOther1NameEn:'deductOther1NameEn',f_allowance1AmountEn:'allowance1AmtEn',f_allowance2AmountEn:'allowance2AmtEn',f_allowance3AmountEn:'allowance3AmtEn',f_allowance4AmountEn:'allowance4AmtEn',f_deductTax:'deductTax',f_deductFood:'deductFood',f_deductHousing:'deductHousing',f_deductUtility:'deductUtility',f_deductTotal:'deductTotal',f_deductSocialIns:'deductSocial',f_deductEmpIns:'deductEmployment',f_bonusCond:'bonusCond',f_raiseCond:'salaryRaiseCond',f_salaryTotal:'totalMonthly',f_allowance1Calc:'allowance1Cond',f_allowance2Calc:'allowance2Cond',f_allowance3Calc:'allowance3Cond',f_allowance3Amount:'allowance3Amount',f_allowance3Name:'allowance3Name',f_allowance4Calc:'allowance4Cond',f_allowance4Amount:'allowance4Amount',f_allowance4Name:'allowance4Name',f_workType:'category',f_workDetail:'foreignerJobDesc',f_fixedOTCalc:'fixedOTName',f_retirementDetail:'retirementDetail'};
 
 // ver.20260910.01: 実費フラグ（1-6号と同仕様）。案シスの雇用条件 deductXxxType(true) が
 //   共通 loadCaseToForm の橋渡しで es_deductXxxJippi/Est に入る。手動チェックも可。
@@ -617,6 +618,7 @@ async function loadFromDB(passedInfo){
     const S=(id,val)=>{const e=document.getElementById(id); if(e && val!=null && val!=='' && !e.value) e.value=val;};
     S('f_deductSocialIns', _es.deductSocial);
     S('f_deductEmpIns', _es.deductEmployment);
+    S('f_deductOther1Name', _es.deductOther1Name); S('f_deductOther1NameEn', _es.deductOther1NameEn);   // ver.20261116.06: (g)その他の名目と訳
     S('f_raiseCond', _es.salaryRaiseCond);
     S('f_raiseCondEn', _es.salaryRaiseCondEn);
     S('f_salaryTotal', _es.totalMonthly);
