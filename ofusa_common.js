@@ -4479,6 +4479,22 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   function _apiKey(){
     try{ return localStorage.getItem('ofusa_apiKey') || localStorage.getItem('claudeApiKey') || ''; }catch(e){ return ''; }
   }
+  // ver.20261116.12: APIキーが無い人でも、ログインしていればサーバーのAIで訳せる（Supabase translate-fields）
+  function _aiAvail(key){ try{ return !!key || (typeof _sbToken==='function' && typeof _sbUserTokOk==='function' && _sbUserTokOk(_sbToken())); }catch(e){ return !!key; } }
+  async function _srvTranslate(texts, lang, gl, addrs){
+    var tok=_sbToken(); if(!_sbUserTokOk(tok)) throw new Error('ログインが切れています。案シスで開き直してください');
+    var out=new Array(texts.length).fill('');
+    for(var k=0;k<texts.length;k+=30){
+      var items=[]; for(var i=k;i<Math.min(k+30,texts.length);i++){ if(String(texts[i]||'').trim()) items.push({key:String(i), text:String(texts[i]), addr:!!(addrs&&addrs[i])}); }
+      if(!items.length) continue;
+      var r=await fetch(SB_URL+'/functions/v1/translate-fields',{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({lang:lang,items:items,glossary:(gl||[]).slice(0,200)})});
+      var j={}; try{ j=await r.json(); }catch(_e){}
+      if(!r.ok) throw new Error((j&&j.message)||('翻訳サーバー '+r.status));
+      (j.items||[]).forEach(function(it){ var n=parseInt(it.key,10); if(!isNaN(n)) out[n]=String(it.translation||'').trim(); });
+    }
+    return out;
+  }
+  window._aiAvail=_aiAvail; window._srvTranslate=_srvTranslate;
   // ver.20260831.04: 住所欄かどうか（ID・ラベル文言から判定）
   function _isAddr(el){
     try{
@@ -4509,6 +4525,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       var _re=_e.length? await _callTranslate(_e,'en',key,[]) : [], _ro=_o.length? await _callTranslate(_o,lang,key,gl) : [];
       var _ie=0,_io=0; return pairs.map(function(x){ return _isE(x) ? (_re[_ie++]||'') : (_ro[_io++]||''); });
     }
+    if(!key) return await _srvTranslate(pairs.map(function(p){ return String(p.ja.value||''); }), lang, gl, pairs.map(function(p){ return _isAddr(p.ja)||_isAddr(p.en); }));   // ver.20261116.12
       var hasAddr=false;
     var payload = pairs.map(function(p,i){
       var isA=_isAddr(p.ja)||_isAddr(p.en); if(isA) hasAddr=true;
@@ -4541,9 +4558,9 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   window.translateEmptyFields = async function(onlyKey){
     var lang=_docLang(), key=_apiKey();
-    if(!key){
-      if(typeof showToast==='function') showToast('⚠️ APIキーが未設定です。案シスの設定画面でAPIキーを登録してください');
-      else alert('APIキーが未設定です。案シスの設定画面でAPIキーを登録してください。');
+    if(!_aiAvail(key)){   // ver.20261116.12: キーが無くてもログイン中ならサーバーで訳す
+      if(typeof showToast==='function') showToast('⚠️ ログインが切れています。案シスで開き直してください');
+      else alert('ログインが切れています。案シスで開き直してください。');
       return;
     }
     var pairs=_pairs().filter(function(p){
@@ -4643,7 +4660,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         // ver.20261116.02: 前に訳したもの（言語ごとの共有の訳 settings.tr_dict_<言語>）を先に使い、無いものだけAIで訳す。AIで訳したものは共有の訳に覚える
         var dict={}; try{ dict=await _trdLoad(lg); }catch(_d){}
         var rest=[]; pr.forEach(function(x){ var t=dict[_trdKey(x.ja.value)]; if(t) setAuto(x.en.id, t); else rest.push(x); });
-        if(!rest.length || !key) continue;
+        if(!rest.length || !_aiAvail(key)) continue;
         var arr=await _callTranslate(rest, lg, key, GLOSS[lg]||[]), add={};
         rest.forEach(function(x,i){ var t=String(arr[i]||'').trim(); if(t && !String(x.en.value||'').trim()){ setAuto(x.en.id, t); add[_trdKey(x.ja.value)]=t; } });
         try{ await _trdSave(lg, add); }catch(_s){}
@@ -4758,7 +4775,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         if(!hit && _TRD[lang]) hit=_TRD[lang][_trdKey(pr.ja.value)]||'';
         if(hit){ pr.en.value=hit; mem++; } else need.push(pr);
       });
-      if(need.length && key){
+      if(need.length && _aiAvail(key)){
         for(var k=0;k<need.length;k+=15){
           var part=need.slice(k,k+15);
           try{ var arr=await _callTranslate(part, lang, key, gl); part.forEach(function(pr,i){ var t=String(arr[i]||'').trim(); if(t){ pr.en.value=t; ai++; } }); }catch(e){ console.warn('[自動翻訳]', e); }
@@ -4780,7 +4797,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         +'<br>（前に確認した訳 '+mem+' か所'+(ai?'・AI翻訳 '+ai+' か所':'')+(left?'・<span style="color:#b91c1c;">訳せなかった '+left+' か所</span>':'')+'）緑の欄を確認してください。'
         +(saved?'<br>次からはこの訳が自動で入ります。':'')
         +(ai?'<br><span style="color:#92400e;">AIの訳は念のため内容を確認してください。</span>':'')
-        +(left&&!key?'<br><span style="color:#b91c1c;">APIキーが未設定のため、AI翻訳はしていません。</span>':'')
+        +(left&&!_aiAvail(key)?'<br><span style="color:#b91c1c;">ログインが切れているため、AI翻訳はしていません。</span>':'')
         +'<br><button type="button" id="trWrongUndo" style="margin-top:4px;padding:2px 8px;border:1px solid #86efac;background:#fff;color:#166534;border-radius:6px;font-size:11px;cursor:pointer;">元に戻す</button>';
       var anchor=document.getElementById('srcAuto')||document.getElementById('_srcBtn');
       if(anchor && anchor.parentNode===host) anchor.insertAdjacentElement('afterend', box); else host.insertBefore(box, host.firstChild);
@@ -4790,6 +4807,66 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   window._wlAutoFix=_wlAutoFix;
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var o=document.getElementById('trWrong'); if(o) o.remove(); setTimeout(_wlAutoFix, 5500); setTimeout(function(){ if(!document.getElementById('trWrong') && !window._wlBusy) _wlShow(); }, 12000); } }catch(_e){} });
+  // ===== ver.20261116.12: 訳が空の欄を、開いたときに自動で入れる（1-5・1-6・1-16・重要事項説明書の言語版） =====
+  //   雇用条件セットに、この言語の訳がまだ無い会社でも、訳の欄が空のまま書類にならないように。
+  //   順番：前に確認した訳（共有の訳）→ 用語集 → AI翻訳（APIキーが無くてもログイン中ならサーバーで訳す）。
+  //   入れた訳は、その雇用条件セットの「この言語用の訳」（_tr_<言語>）に保存し、次からはそのまま入る。人の名前・住所・電話などは訳さない。
+  var _EF_SKIP=/(applicant|Applicant|rep|Rep|Mgr|mgr|Author|author|interp|Interp|staff|Staff|person|Person|resp|Resp|manager|Manager|contact|Contact|family|Family|kin|Kin)[A-Za-z0-9]*Name\d*En$|(Addr|addr|Address|address|Kana|kana|Mail|mail|Tel|tel)\d*En$/;
+  function _efIsLangDoc(){ return /^(1_5|1_6|1_16|juuyou)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
+  function _efPairs(){ return _emptyPairs().filter(function(pr){ return !_EF_SKIP.test(pr.en.id) && !/^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(pr.en.id); }); }
+  window._efPairs=_efPairs;
+  async function _efAutoFill(){
+    if(!_efIsLangDoc()) return;
+    for(var w=0; w<40 && window._wlBusy; w++) await new Promise(function(r){ setTimeout(r,500); });
+    if(window._wlBusy) return;
+    window._wlBusy=true;
+    try{
+      if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return;
+      var lang=_docLang(); if(!lang || lang==='ja') return;
+      var prs=_efPairs(); if(!prs.length) return;
+      var key=_apiKey(), gl=GLOSS[lang]||[], mem=0, ai=0, err='';
+      try{ await _trdLoad(lang); }catch(_t){}
+      var need=[];
+      prs.forEach(function(pr){
+        var jv=String(pr.ja.value||'').replace(/[\s　]/g,''), hit='';
+        for(var gi=0;gi<gl.length;gi++){ if(gl[gi][0]===jv){ hit=gl[gi][1]; break; } }
+        if(!hit && _TRD[lang]) hit=_TRD[lang][_trdKey(pr.ja.value)]||'';
+        if(hit){ pr.en.value=hit; mem++; } else need.push(pr);
+      });
+      if(need.length && _aiAvail(key)){
+        for(var k=0;k<need.length;k+=15){
+          var part=need.slice(k,k+15);
+          try{ var arr=await _callTranslate(part, lang, key, gl); part.forEach(function(pr,i){ var t=String(arr[i]||'').trim(); if(t && !String(pr.en.value||'').trim()){ pr.en.value=t; ai++; } }); }catch(e){ err=e&&e.message||String(e); console.warn('[空の訳の自動入力]', e); }
+        }
+      }
+      var fixes={}, filled=[];
+      prs.forEach(function(pr){ if(String(pr.en.value||'').trim()){ pr.en.dataset.autofill='1'; pr.en.style.background='#ecfdf5'; fixes[_wlDbKey(pr.en)]=pr.en.value; filled.push(pr); } });
+      if(!filled.length && !err && !need.length) return;
+      if(need.length && !_aiAvail(key) && !err) err='ログインが切れているためAI翻訳できません';
+      if(typeof p==='function'){ try{ p(); }catch(e){} }
+      try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+      var saved=filled.length ? await _wlSaveTr(lang, fixes) : false;
+      try{ if(typeof slog==='function') slog('ef_autofill',{meta:{n:prs.length, mem:mem, ai:ai, saved:saved, lang:lang, err:err}}); }catch(e){}
+      var left=prs.length-filled.length;
+      var old=document.getElementById('trEmpty'); if(old) old.remove();
+      var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host) return;
+      var box=document.createElement('div'); box.id='trEmpty';
+      box.style.cssText='margin:0 0 8px;padding:7px 9px;border:1px solid '+(left?'#fca5a5':'#86efac')+';border-radius:8px;background:'+(left?'#fef2f2':'#f0fdf4')+';color:'+(left?'#991b1b':'#166534')+';font-size:11px;line-height:1.55;';
+      box.innerHTML='<b>🌐 訳が空だった欄 '+prs.length+' か所'+(filled.length?'のうち '+filled.length+' か所に、自動で'+(LANG_JA[lang]||'')+'の訳を入れました':'')+'</b>'
+        +(filled.length?'<br>（前に確認した訳 '+mem+' か所'+(ai?'・AI翻訳 '+ai+' か所':'')+'）緑の欄を確認してください。'+(saved?'次からはこの訳が自動で入ります。':''):'')
+        +(ai?'<br><span style="color:#92400e;">AIの訳は念のため内容を確認してください。</span>':'')
+        +(left?'<br><span style="color:#b91c1c;">訳せなかった欄が '+left+' か所あります'+(err?'（'+String(err).replace(/[<>&]/g,'')+'）':'')+'。</span>':'')
+        +'<br>'+(filled.length?'<button type="button" id="trEmptyUndo" style="margin-top:4px;padding:2px 8px;border:1px solid #86efac;background:#fff;color:#166534;border-radius:6px;font-size:11px;cursor:pointer;">元に戻す</button> ':'')
+        +(left?'<button type="button" id="trEmptyRetry" style="margin-top:4px;padding:2px 8px;border:none;background:#0f766e;color:#fff;border-radius:6px;font-size:11px;cursor:pointer;">もう一度訳す</button>':'');
+      var anchor=document.getElementById('trWrong')||document.getElementById('srcAuto')||document.getElementById('_srcBtn');
+      if(anchor && anchor.parentNode===host) anchor.insertAdjacentElement('afterend', box); else host.insertBefore(box, host.firstChild);
+      var ub=box.querySelector('#trEmptyUndo'); if(ub) ub.onclick=function(){ filled.forEach(function(pr){ pr.en.value=''; pr.en.style.background=''; delete pr.en.dataset.autofill; }); if(typeof p==='function'){ try{ p(); }catch(e){} } box.remove(); };
+      var rb=box.querySelector('#trEmptyRetry'); if(rb) rb.onclick=function(){ box.remove(); _efAutoFill(); };
+    }catch(e){ console.warn('[空の訳の自動入力]', e); }
+    finally{ window._wlBusy=false; }
+  }
+  window._efAutoFill=_efAutoFill;
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var o=document.getElementById('trEmpty'); if(o) o.remove(); setTimeout(_efAutoFill, 7000); } }catch(_e){} });
   // 印刷の前にも確認（1-6号は印刷前チェックの中で出すので除く）
   setTimeout(function(){
     try{
@@ -4799,6 +4876,8 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
         if(!window._skipOverflowCheck){
           var l=_wrongLangPairs();
           if(l.length && !confirm('🌐 訳が別の言語になっている欄があります（'+_wlSummary(l)+'）。\nこの書類は'+(LANG_JA[_docLang()]||'')+'版です。\n\nこのまま印刷しますか？（直す場合は「キャンセル」→ 左の「消して入れ直す」）')) return;
+          var _ep=_efIsLangDoc()?_efPairs():[];   // ver.20261116.12: 訳が空の欄が残っていたら知らせる
+          if(_ep.length && !confirm('🌐 訳が空の欄が '+_ep.length+' か所あります（'+_ep.slice(0,5).map(function(x){ return _fieldLabel(x.ja); }).join('、')+(_ep.length>5?' ほか':'')+'）。\n空のまま印刷すると、その行は日本語だけになります。\n\nこのまま印刷しますか？（入れる場合は「キャンセル」→ 左の「🌐 訳が空いている欄をまとめて翻訳」）')) return;
           var ti=(typeof window._jyTotalsIssue==='function')?window._jyTotalsIssue():[];   // ver.20261111.08: 重説の合計
           if(ti.length && !confirm(ti.join('\n')+'\n\n（左の「合計」「控除合計」「手取り」を空にすると、内訳から自動で計算します）\nこのまま印刷しますか？')) return;
         }
@@ -4848,7 +4927,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     var lang=_docLang(), key=_apiKey();
     var pairs=_emptyPairs();
     if(!pairs.length){ if(typeof showToast==='function') showToast('✅ 訳が空いている欄はありません'); return; }
-    if(!key){ if(typeof showToast==='function') showToast('⚠️ APIキーが未設定です。案シスの設定画面でAPIキーを登録してください'); return; }
+    if(!_aiAvail(key)){ if(typeof showToast==='function') showToast('⚠️ ログインが切れています。案シスで開き直してください'); return; }
     if(!confirm('日本語が入っていて訳が空いている欄が '+pairs.length+' か所あります。\n'+(LANG_JA[lang]||lang)+'に訳して、確認画面を出します（まだ入力欄には入れません）。よろしいですか？')) return;
     var t=(typeof showToast==='function')?showToast('🌐 '+pairs.length+'か所を翻訳しています…',0):null;
     try{ await _trdLoad(lang); }catch(_t){}
@@ -5267,6 +5346,8 @@ function _p16SavePrompt(){
 }
 function _p16BothPay(probs){ try{ var m=_mw16_num('es_salaryMonthly'), h=_mw16_num('es_salaryHourly'), d=_mw16_num('es_salaryDaily'); if(m && (h||d)) probs.push('⚠ 月給と'+(h?'時給':'日給')+'の両方が入っています（月給 '+m.toLocaleString('ja-JP')+'円／'+(h?'時給 '+h.toLocaleString('ja-JP'):'日給 '+d.toLocaleString('ja-JP'))+'円）。書類は月給になります。違う方を消してください'); }catch(e){} }
 function _p16WrongLang(probs){ try{ if(typeof window._wlSummary==='function'){ var s=window._wlSummary(); if(s) probs.push('⛔ 訳が別の言語になっています（'+s+'）。左の「消して入れ直す」で直してください'); } }catch(e){} }
+// ver.20261116.12: 1-6号も、訳が空の欄が残っていたら印刷前に知らせる
+function _p16EmptyTr(probs){ try{ if(typeof window._efPairs==='function'){ var l=window._efPairs(); if(l.length) probs.push('⚠ 訳が空の欄が '+l.length+' か所あります（その行は日本語だけになります）。左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます'); } }catch(e){} }
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
@@ -5299,6 +5380,7 @@ function _p16PrintCheck(){
     }
   }catch(e){}
   _p16WrongLang(probs);   // ver.20261111.04
+  _p16EmptyTr(probs);
   _p16BothPay(probs);     // ver.20261111.08
   return {miss:miss, probs:probs};
 }

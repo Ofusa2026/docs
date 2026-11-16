@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.11</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.12</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -484,8 +484,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794840001';
-window.__DOCS_CACHE_BUSTER__ = '1794840001';
+window.__DOCS_CACHE_BUSTER__ = '1794850001';
+window.__DOCS_CACHE_BUSTER__ = '1794850001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -673,7 +673,7 @@ function setGlobalLang(lang){
   // ver.20261105.14: 国旗ボタンでも1-17号の言語版を切り替える（韓国語の1-17号は無いので英語。日本語版は無いので何もしない）
   //   国籍どおりの言語を押したとき（案件ジャンプで自動で呼ばれたときも）は「手で選択中」にせず、自動のままにする
   else if(cur==='1_17_vi'){
-    var _l=(lang==='ko')?'en':lang;
+    var _l=lang;   // ver.20261116.12: 韓国語版ができたので韓国語もそのまま
     if(LANG_FILES_1_17[_l]){
       if(_l===(p17LangFromCase()||'vi')){
         p17ManualLang=null;
@@ -747,29 +747,19 @@ function idxLangFromNationality(nat){
 }
 
 let cur1_5Lang='id';
+// ver.20261116.12: 言語ファイル一覧は重複をなくし、?v= は書かない（開くときに __DOCS_CACHE_BUSTER__ を付ける）
 const LANG_FILES_1_5={
-  'id':'1_5.html?v=1794393342',
-  'vi':'1_5_vi.html?v=1794393342',
-  'th':'1_5_th.html?v=1794393342',
-  'ne':'1_5_ne.html?v=1794393342',
-  'my':'1_5_my.html?v=1794393342',
-  'km':'1_5_km.html?v=1794393342',
-  'en':'1_5_en.html?v=1794393342',
-  'ko':'1_5_ko.html?v=1794393342',
-  'zh':'1_5_zh.html?v=1794393342',
-  'si':'1_5_si.html?v=1794554100',
-  'mn':'1_5_mn.html?v=1794830001',
-  'id':'1_5.html?v=1794393342',
-  'vi':'1_5_vi.html?v=1794393342',
-  'th':'1_5_th.html?v=1794393342',
-  'ne':'1_5_ne.html?v=1794393342',
-  'my':'1_5_my.html?v=1794393342',
-  'km':'1_5_km.html?v=1794393342',
-  'en':'1_5_en.html?v=1794393342',
-  'ko':'1_5_ko.html?v=1794393342',
-  'zh':'1_5_zh.html?v=1794393342',
-  'si':'1_5_si.html?v=1794554100',
-  'mn':'1_5_mn.html?v=1794830001',
+  'id':'1_5.html',
+  'vi':'1_5_vi.html',
+  'th':'1_5_th.html',
+  'ne':'1_5_ne.html',
+  'my':'1_5_my.html',
+  'km':'1_5_km.html',
+  'en':'1_5_en.html',
+  'ko':'1_5_ko.html',
+  'zh':'1_5_zh.html',
+  'si':'1_5_si.html',
+  'mn':'1_5_mn.html',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -819,17 +809,17 @@ function open_1_5(lang){
 //   ・画面上部の言語選択（#p17LangBar）は frame-1_17_vi が見えているあいだだけ出す（p17WatchFrame）
 let p17ManualLang=null;
 const LANG_FILES_1_17={
-  'vi':'1_17_vi.html?v=1794466290',
-  'id':'1_17_id.html?v=1794466290',
-  'zh':'1_17_zh.html?v=1794466290',
-  'th':'1_17_th.html?v=1794466290',
-  'ne':'1_17_ne.html?v=1794466290',
-  'km':'1_17_km.html?v=1794466290',
-  'my':'1_17_my.html?v=1794466290',
-  'en':'1_17_en.html?v=1794466290',
-  'si':'1_17_si.html?v=1794830102',   // ver.20261113.04: シンハラ語版
-  'mn':'1_17_mn.html?v=1794830001',   // ver.20261116.08: モンゴル語版
-  'ko':'1_17_ko.html?v=1794830101',   // ver.20261116.10: 韓国語版
+  'vi':'1_17_vi.html',
+  'id':'1_17_id.html',
+  'zh':'1_17_zh.html',
+  'th':'1_17_th.html',
+  'ne':'1_17_ne.html',
+  'km':'1_17_km.html',
+  'my':'1_17_my.html',
+  'en':'1_17_en.html',
+  'si':'1_17_si.html',   // ver.20261113.04: シンハラ語版
+  'mn':'1_17_mn.html',   // ver.20261116.08: モンゴル語版
+  'ko':'1_17_ko.html',   // ver.20261116.10: 韓国語版
 };
 const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語'],['si','🇱🇰 シンハラ語'],['mn','🇲🇳 モンゴル語'],['ko','🇰🇷 韓国語']];
 // 国籍から決まる言語（決まらないときは null）
@@ -894,28 +884,17 @@ function p17WatchFrame(){
 }
 let cur1_6Lang='id';
 const LANG_FILES={
-  'id':'1_6.html?v=1794600000',
-  'vi':'1_6_vi.html?v=1794600000',
-  'th':'1_6_th.html?v=1794600000',
-  'ne':'1_6_ne.html?v=1794600000',
-  'my':'1_6_my.html?v=1794600000',
-  'km':'1_6_km.html?v=1794600000',
-  'en':'1_6_en.html?v=1794600000',
-  'ko':'1_6_ko.html?v=1794830102',
-  'zh':'1_6_zh.html?v=1794600000',
-  'si':'1_6_si.html?v=1794830102',
-  'mn':'1_6_mn.html?v=1794830001',
-  'id':'1_6.html?v=1794600000',
-  'vi':'1_6_vi.html?v=1794600000',
-  'th':'1_6_th.html?v=1794600000',
-  'ne':'1_6_ne.html?v=1794600000',
-  'my':'1_6_my.html?v=1794600000',
-  'km':'1_6_km.html?v=1794600000',
-  'en':'1_6_en.html?v=1794600000',
-  'ko':'1_6_ko.html?v=1794830102',
-  'zh':'1_6_zh.html?v=1794600000',
-  'si':'1_6_si.html?v=1794830102',
-  'mn':'1_6_mn.html?v=1794830001',
+  'id':'1_6.html',
+  'vi':'1_6_vi.html',
+  'th':'1_6_th.html',
+  'ne':'1_6_ne.html',
+  'my':'1_6_my.html',
+  'km':'1_6_km.html',
+  'en':'1_6_en.html',
+  'ko':'1_6_ko.html',
+  'zh':'1_6_zh.html',
+  'si':'1_6_si.html',
+  'mn':'1_6_mn.html',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -959,28 +938,17 @@ function open_1_6(lang){
 }
 let cur1_16Lang='id';
 const LANG_FILES_1_16={
-  'id':'1_16_id.html?v=1794393342',
-  'vi':'1_16_vi.html?v=1794393342',
-  'th':'1_16_th.html?v=1794393342',
-  'ne':'1_16_ne.html?v=1794393342',
-  'my':'1_16_my.html?v=1794393342',
-  'km':'1_16_km.html?v=1794393342',
-  'en':'1_16_en.html?v=1794393342',
-  'ko':'1_16_ko.html?v=1794393342',
-  'zh':'1_16_zh.html?v=1794393342',
-  'si':'1_16_si.html?v=1794562000',
-  'mn':'1_16_mn.html?v=1794830001',
-  'id':'1_16_id.html?v=1794393342',
-  'vi':'1_16_vi.html?v=1794393342',
-  'th':'1_16_th.html?v=1794393342',
-  'ne':'1_16_ne.html?v=1794393342',
-  'my':'1_16_my.html?v=1794393342',
-  'km':'1_16_km.html?v=1794393342',
-  'en':'1_16_en.html?v=1794393342',
-  'ko':'1_16_ko.html?v=1794393342',
-  'zh':'1_16_zh.html?v=1794393342',
-  'si':'1_16_si.html?v=1794562000',
-  'mn':'1_16_mn.html?v=1794830001',
+  'id':'1_16_id.html',
+  'vi':'1_16_vi.html',
+  'th':'1_16_th.html',
+  'ne':'1_16_ne.html',
+  'my':'1_16_my.html',
+  'km':'1_16_km.html',
+  'en':'1_16_en.html',
+  'ko':'1_16_ko.html',
+  'zh':'1_16_zh.html',
+  'si':'1_16_si.html',
+  'mn':'1_16_mn.html',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1026,9 +994,9 @@ const LANG_FILES_JUUYOU={
   'my':'juuyou_my.html',
   'ko':'juuyou_ko.html',
   'ne':'juuyou_ne.html',
-  'en':'juuyou_en.html?v=1794557419',
-  'si':'juuyou_si.html?v=1794563000',
-  'mn':'juuyou_mn.html?v=1794840001',
+  'en':'juuyou_en.html',
+  'si':'juuyou_si.html',
+  'mn':'juuyou_mn.html',
 };
 function open_juuyou(lang){
   lang = lang || currentLang;
@@ -1084,7 +1052,7 @@ function open_doc(key){
       let _p17Swap=false;
       if(k==='1_17_vi'){
         const _pl=p17LangNow();
-        if(fr.dataset.lang!==_pl || !fr.src || fr.src===window.location.href){ fr.dataset.lang=_pl; fr.src=LANG_FILES_1_17[_pl]; _p17Swap=true; }
+        if(fr.dataset.lang!==_pl || !fr.src || fr.src===window.location.href){ fr.dataset.lang=_pl; fr.src=LANG_FILES_1_17[_pl]+'?v='+(window.__DOCS_CACHE_BUSTER__||Date.now()); _p17Swap=true; }
       }
       else if(!fr.src || fr.src===window.location.href) fr.src=docs[k].file;
       fr.style.display='block';
@@ -1867,6 +1835,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.12',
+    date: '2026-11-16',
+    notify: false,
+    items: [
+      '🌐 訳が空の欄に、開いたときに自動で訳が入るようにしました（1-5・1-6・1-16・重要事項説明書）。前に確認した訳 → 用語集 → AI翻訳の順で入れ、雇用条件セットに保存するので次からはそのまま入ります。APIキーが無くてもログイン中なら訳せます（1-17号のAI翻訳も同じ）。',
+      '🖨 印刷のときに、訳が空の欄が残っていたら知らせるようにしました。',
+      '🇰🇷 国旗ボタンで韓国語を選んだとき、1-17号も韓国語版で開くようにしました。'
+    ]
+  },
   {
     version: 'ver.20261116.11',
     date: '2026-11-16',

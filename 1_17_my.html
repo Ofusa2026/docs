@@ -561,7 +561,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ミャンマー語版・変更）</div>
-    <div class="ver">ver.20261116.05</div>
+    <div class="ver">ver.20261116.12</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -687,7 +687,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794840001"></script>
+<script src="ofusa_common.js?v=1794850001"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -911,7 +911,7 @@ function _p17ViBarUpdate(){
   bar.innerHTML='⚠ ミャンマー語に訳せていない箇所が <b>'+list.length+'</b> 件あります（画面では赤色。印刷には色は出ません）'
     + (_p17AiBusy ? '　<span>AIで翻訳中…</span>' : '<button type="button" onclick="_p17AiTranslate(true)">AIで翻訳</button>');
   var fresh=list.filter(function(x){ return !_p17AiTried[_p17Nk(x)]; });
-  if(fresh.length && !_p17AiBusy && _p17ApiKey()) setTimeout(function(){ _p17AiTranslate(false); }, 300);
+  if(fresh.length && !_p17AiBusy && (_p17ApiKey() || (window._aiAvail && window._aiAvail('')))) setTimeout(function(){ _p17AiTranslate(false); }, 300);
 }
 async function _p17SaveLearned(add){
   try{ localStorage.setItem('p17_my_learned', JSON.stringify(window._p17ViLearned)); }catch(e){}
@@ -925,7 +925,7 @@ async function _p17SaveLearned(add){
 async function _p17AiTranslate(manual){
   if(_p17AiBusy) return;
   var key=_p17ApiKey();
-  if(!key){ var m='APIキーが未設定のためAI翻訳できません。案シスの設定画面でAPIキーを登録してください。'; if(typeof showToast==='function') showToast('⚠️ '+m); else alert(m); return; }
+  if(!key && !(window._aiAvail && window._aiAvail(''))){ var m='APIキーが未設定のためAI翻訳できません。案シスの設定画面でAPIキーを登録してください。'; if(typeof showToast==='function') showToast('⚠️ '+m); else alert(m); return; }
   var list=Object.keys(window._p17Untr||{}).filter(function(x){ return manual || !_p17AiTried[_p17Nk(x)]; });
   if(!list.length) return;
   list.forEach(function(x){ _p17AiTried[_p17Nk(x)]=true; });
@@ -939,12 +939,16 @@ async function _p17AiTranslate(manual){
       +'・カッコや記号が片方だけでも、そのまま訳して記号は残してよい\n\n'
       + list.map(function(x,i){ return (i+1)+'. '+x; }).join('\n')
       +'\n\n回答は文字列のJSON配列のみ（順序は入力と同じ）。例: ["...","..."]';
+    var arr;
+    if(!key){ arr=await window._srvTranslate(list, P17_LANG, []); }   // ver.20261116.12: APIキーが無い人はサーバーのAIで訳す
+    else {
     var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
     var j=await r.json(); if(j.error) throw new Error(j.error.message||'API error');
     var text=((j.content&&j.content[0]&&j.content[0].text)||'').replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-    var arr=JSON.parse(text.slice(text.indexOf('['), text.lastIndexOf(']')+1));
+    arr=JSON.parse(text.slice(text.indexOf('['), text.lastIndexOf(']')+1));
+    }
     var add={};
     list.forEach(function(x,i){ var v=String(arr[i]||'').trim(); if(v && !_P17_JP.test(v)){ add[_p17Nk(x)]=v; } });
     Object.assign(window._p17ViLearned, add);
