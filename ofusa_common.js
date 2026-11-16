@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.19
+ * - feat: 印刷で数mm（5mm以内）だけはみ出すときは、文字を少し小さくして自動で収める（印刷後に元に戻す）
  * ver.20261116.18
  * - feat: 重要事項説明書のタイ語版の業務内容
  * ver.20261116.16
@@ -1757,6 +1759,14 @@ function doPrint(){
   try{
     if(!window._skipOverflowCheck && typeof checkPrintOverflow==='function' && !((typeof _editMode!=='undefined') && _editMode)){
       var _ov=checkPrintOverflow();
+      // ver.20261116.19: 数mm（5mm以内）だけはみ出すときは、聞かずに文字を少し（最大1pt）小さくして収める。印刷が終わったら画面の文字は元に戻す
+      var _fit=_fitSmallOverflow(_ov);
+      if(_fit && _fit.ok){
+        try{ if(typeof showToast==='function') showToast('🔍 少しはみ出していたので、文字を '+_fit.from+'pt → '+_fit.to+'pt にして収めました（画面は元に戻します）'); }catch(_t){}
+        var _back=function(){ window.removeEventListener('afterprint',_back); try{ if(_fontSize!==_fit.from) changeFontSize(_fit.from-_fontSize); }catch(_b){} };
+        window.addEventListener('afterprint',_back); setTimeout(_back, 60000);
+        _ov=[];
+      }
       if(_ov && _ov.length){ _showOverflowDialog(_ov); return; }
     }
   }catch(_oc){ console.warn('[overflowCheck]', _oc); }
@@ -6247,6 +6257,21 @@ function checkPrintOverflow(){
   return res;
 }
 window.checkPrintOverflow=checkPrintOverflow;
+// ver.20261116.19: はみ出しが数mm（5mm以内）だけなら、文字を最大1pt（0.5ptずつ）小さくして収める。収まらなければ元の大きさに戻す
+//   戻り値：{ok:true/false, from:元の大きさ, to:今の大きさ}。はみ出しが大きいときや直接編集中は null（何もしない）
+function _fitSmallOverflow(ov){
+  try{
+    ov=ov||checkPrintOverflow();
+    if(!ov || !ov.length || !ov.every(function(o){ return o.overMm<=5; })) return null;
+    if(typeof changeFontSize!=='function' || typeof _fontSize==='undefined' || _fontSize<=6) return null;
+    if(typeof _editMode!=='undefined' && _editMode) return null;
+    var st=_fontSize, left=ov;
+    for(var k=0; k<2 && left.length; k++){ changeFontSize(-0.5); left=checkPrintOverflow(); }
+    if(left.length){ if(_fontSize!==st) changeFontSize(st-_fontSize); return {ok:false, from:st, to:st}; }
+    return {ok:true, from:st, to:_fontSize};
+  }catch(e){ console.warn('[fitSmallOverflow]', e); return null; }
+}
+window._fitSmallOverflow=_fitSmallOverflow;
 function _showOverflowDialog(ov, note){
   var old=document.getElementById('_ovDlg'); if(old && old.parentNode) old.parentNode.removeChild(old);
   var lines=ov.map(function(o){ return '・'+o.page+'ページ目が 約'+Math.max(1,o.overMm)+'mm（'+Math.max(1,Math.round(o.overPx/16))+'行ほど）はみ出しています'; }).join('<br>');
