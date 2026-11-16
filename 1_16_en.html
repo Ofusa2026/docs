@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>参考様式第１－１６号（英語）斡旋有無切替</title>
+<title>参考様式第１－１６号 雇用の経緯に係る説明書</title>
 <style>.fp-case{display:none!important;}
 /* 画面: 記入箇所は淡い黄色でハイライト（視認用）。印刷時は消す。 */
 .doc .f{ background:#fff7cc !important; }
@@ -29,7 +29,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 @media print{
   .app-bar,.fp{display:none!important}
   .main{display:block!important}
-  .doc{box-shadow:none!important;margin:0!important;padding:8mm!important;page-break-after:always;zoom:0.85;}
+  .doc{box-shadow:none!important;margin:0!important;padding:7mm 8mm!important;page-break-after:always;zoom:0.85;}   /* ver.20261116.16: 英語版の1ページ目が約1mmはみ出していたため、上下の余白を1mmずつ小さく */
   .doc:last-child{page-break-after:auto;}
   .f[style*="color:#aaa"]{visibility:hidden}
 }
@@ -39,12 +39,1055 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
    人によって書類が小さく刷られていた（幅1000pxで84%）。印刷のときは画面の幅に関係なく元の大きさに戻す */
 @media print{ .doc{zoom:1!important} }
 </style>
+<script>
+// ver.20261116.16: 1-16号は、言語ごとに別のファイルだったものを、この1つ（1_16_en.html）にまとめました。
+//   言語ごとに違うのは、下の表（T16）の文言と日付の書き方だけです。様式の形や入力欄を直すときは、このファイルだけ直せば全部の言語に反映されます。
+//   1_16_vi.html などのほかの言語のファイルは、このファイルを読み込む入口です（ファイル名で言語が決まります）。
+var _L16=((location.pathname.split('/').pop()||'').match(/^1_16_([a-z]{2})\.html$/i)||[])[1]||'en';
+var T16={
+  en:{
+    title:"参考様式第１－１６号（英語）斡旋有無切替",
+    appTitle:"📄 参考様式第１－１６号（英語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_enFontStyle",
+    dfmt:function(d){ return d.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][d.getMonth()]+' '+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">Reference Form 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Explanation of Employment Background</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Regarding the conclusion of the employment contract with specified skilled worker ${f('f_applicant')}, the employment background is as follows.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Employment placement business provider (in Japan)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">Use of an employment placement service</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Yes</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">No</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Acceptance No. for approval and notification</span><br><span class="id">(Date of acceptance and receipt)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">Category of the employment placement business provider</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">Fee-charging employment placement business provider</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Free employment placement business provider</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">Name of the employment placement business provider</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Address of the employment placement business provider (Telephone number)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Expenses paid to the employment placement business provider</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Job seeker (the applicant)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">yen</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">Description</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">For payment of</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Job offeror (the organization of affiliation of the specified skilled worker)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">yen</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">Description</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">For payment of</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Notes)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">If you ticked "No" in section 1, you do not need to fill out sections below section 2.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the relevant information for the applicable employment placement business provider in sections 2, 3, 4, and 5, using the "Comprehensive Human Resource Services Website" which is operated by the Employment Security Bureau of the Ministry of Health, Labour and Welfare. Furthermore, attach a copy of the screen on which the information in question is posted.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the amount and description of the money paid by the job seeker and job offeror to the employment placement business provider in section 6. Please note that if the job seeker paid the expense in a currency other than yen, you must state the amount paid in the local currency, as well as that amount converted to yen.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">If you have a written contract exchanged with the employment placement business provider, please attach a copy of it.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Agent organization (outside Japan) (Only those who ticked "Yes" in section 1 above need to fill in the form below)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">Use of service provided by the agent organization</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Yes</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">No</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">Name of the agent organization</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">Country where the agent organization is located</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">Address of the agent organization</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Expenses paid to the agent organization</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Job seeker (the applicant)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">yen</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">Description</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">For payment of</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Job offeror (the organization of affiliation of the specified skilled worker)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">yen</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">Description</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">For payment of</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Notes)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">The agent organization here means an entity which serves as an intermediary for information with regard to job seekers etc. between the employment placement business provider and the relevant employment placement business provider when the former makes employment placement of the job seeker to the job offeror.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">If you ticked "No" in section 1, you do not need to fill out sections below section 2.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the amount and description of the money paid by the job seeker and job offeror to the agent organization in section 5. Please note that if the job seeker or job offeror paid the expense in a currency other than yen, you must state the amount paid in the local currency, as well as that amount converted to yen.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">If you have a written contract exchanged with the agent organization, please attach a copy of it.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pre-Departure Orientation</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Whether or not the orientation was conducted as laid out in the Support Plan for Specified Skilled Worker (i)</span></td>`,
+    L345:()=>`      <span class="id">Yes / No</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">The contents of 1 to 3 above are all true. I have confirmed, such as through inquiries to the applicant, that no improper expenses, such as payment of any security deposit or penalty for breach of contract, has been collected from the job seeker (the applicant) in relation to any activity with the status of residence "Specified Skilled Worker".</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Date of preparation：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Name of the organization of affiliation of specified skilled worker　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">Name and position of the person responsible for preparation　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Expenses paid by the job seeker (the applicant) to organizations in his/her own country</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">Name of the organization that received the payment</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">Description</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Date of payment</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Amount paid</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Not applicable</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">Total</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(Notes)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Organizations in his/her own country are not particularly limited to the organizations involved in the agency for the application for the employment contract for specified skilled work or preparation of activities therefor.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. The amount paid should be stated in the local currency or US dollars, and the amount converted to Japanese yen should be stated in parentheses.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. As for the description, fill in exactly the description shown to the applicant.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">I understand the amount and breakdown of the above-mentioned expenses and made the payment to the organizations in my own country in relation to the agency for the application for the employment contract for specified skilled work or preparation of activities concerning the status of residence "Specified Skilled Worker". Also, no other expenses than the above-mentioned have been collected from me.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Applicant's signature</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  id:{
+    title:"参考様式第１－１６号（インドネシア語）斡旋有無切替",
+    appTitle:"📄 参考様式第１－１６号（インドネシア語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_idFontStyle",
+    dfmt:function(d){ return d.getDate()+' '+['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][d.getMonth()]+' '+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">Formulir Referensi 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Formulir Penjelasan Detail Rekrutmen Kerja</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Berikut adalah detail rekrutmen kerja dalam kontrak kerja keterampilan khusus yang disepakati dengan pekerja asing berketerampilan khusus ${f('f_applicant')}.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Agen tenaga kerja (Jepang)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">Ada/tidak ada mediasi</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Ada</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">Tidak ada</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Nomor izin/penerimaan pemberitahuan</span><br><span class="id">(tanggal penerimaan pemberitahuan)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">Klasifikasi agen tenaga kerja</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">Agen tenaga kerja dengan komisi</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Agen tenaga kerja tanpa komisi</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">Nama agen tenaga kerja</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Alamat agen tenaga kerja<br>(nomor telepon)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 <span class="id">Nomor telepon</span>　${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen tenaga kerja</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">Yen</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">Nominal</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">Sebagai</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">Yen</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">Nominal</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">Sebagai</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Perhatian)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Jika mencentang jawaban "Tidak ada" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Untuk kolom 2 hingga kolom 5, tulis informasi tentang agen tenaga kerja tersebut dengan memanfaatkan Situs Terpadu Layanan Sumber Daya Manusia yang terdapat pada situs web Biro Jaminan Kerja, Kementerian Kesehatan, Ketenagakerjaan, dan Kesejahteraan. Selain itu, lampirkan screenshot layar tempat informasi tersebut dimuat.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Pada kolom 6, tulis jumlah dan nominal yang dibayarkan oleh pencari kerja dan perekrut kerja kepada agen tenaga kerja. Selain itu, jika pencari kerja membayar biaya dalam mata uang selain yen Jepang, tulis jumlah yang dibayarkan dalam mata uang tersebut dan jumlah konversinya dalam yen Jepang.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">Jika ada dokumen kontrak yang dibuat dengan agen tenaga kerja, lampirkan salinan kontrak tersebut.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Agen perantara (luar Jepang) (hanya diisi bila mencentang jawaban "Ada" pada kolom 1)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">Ada/tidak ada perantaraan</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Ada</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">Tidak ada</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">Nama</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">Negara domisili</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">Alamat</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 <span class="id">Nomor telepon</span>　${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Biaya yang dibayarkan kepada agen perantara</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Pencari kerja (pemohon)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">Yen</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">Nominal</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">Sebagai</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Perekrut kerja (organisasi afiliasi pekerja berketerampilan khusus)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Jumlah</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">Yen</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">Nominal</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">Sebagai</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Perhatian)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Agen perantara adalah pihak yang melakukan perantaraan informasi mengenai pencari kerja bagi agen tenaga kerja, saat agen tenaga kerja tersebut melakukan mediasi antara pencari kerja dan perekrut kerja.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Jika mencentang "Tidak ada" pada kolom 1, maka tidak perlu mengisi kolom 2 dan seterusnya.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Pada kolom 5, tulis jumlah dan nominal yang dibayarkan oleh pencari kerja dan perekrut kerja kepada agen perantara. Selain itu, jika pencari kerja membayar biaya dalam mata uang selain yen Jepang, tulis jumlah yang dibayarkan dalam mata uang tersebut dan jumlah konversinya dalam yen Jepang.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">Jika ada dokumen kontrak yang dibuat dengan agen perantara, lampirkan salinan kontrak tersebut.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pelaksanaan panduan awal</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Pelaksanaan Sesuai yang Ditetapkan pada Rencana Bantuan Pekerja Asing Berketerampilan Khusus 1</span></td>`,
+    L345:()=>`      <span class="id">Ya / Tidak</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Isi dari poin 1 hingga poin 3 di atas sudah sesuai. Selain itu, dipastikan dari tanya jawab dengan pemohon bahwa pencari kerja (pemohon) tidak dipungut biaya yang tidak semestinya seperti uang jaminan, uang denda dll terkait kegiatan izin tinggal "keterampilan khusus".</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Tanggal pengisian：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Nama organisasi afiliasi pekerja berketerampilan khusus　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">Nama dan jabatan penanggung jawab pengisian　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Biaya yang dibayarkan oleh pencari kerja (pemohon) ke lembaga di negara sendiri dll</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">Nama lembaga penerima pembayaran</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">Nominal</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Tanggal Bayar</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Jumlah Pembayaran</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Tidak ada</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">Total</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(Catatan)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Lembaga di negara sendiri dll. tidak terbatas pada level khusus saja tapi pada semua lembaga yang terlibat dalam agen perantara permohonan untuk kontrak kerja keterampilan khusus atau pada persiapan kegiatannya.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. Mengenai jumlah pembayaran, isikan dalam mata uang lokal atau dolar AS, dan isikan jumlah yang dikonversi ke mata uang yen Jepang dalam tanda kurung.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. Mengenai kolom nominal, isikan persis seperti nominal ditunjukkan pemohon.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Setelah sepenuhnya memahami jumlah dan rincian biaya di atas, saya membayar ke lembaga di negara sendiri dll. terkait agen perantara permohonan kontrak kerja keterampilan khusus atau persiapan kegiatan yang terkait dengan izin tinggal "keterampilan khusus". Dan tidak ada lagi biaya dipungut selain pengeluaran di atas.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Tanda tangan pemohon</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  vi:{
+    title:"参考様式第１－１６号（ベトナム語）斡旋有無切替",
+    appTitle:"📄 Mẫu tham khảo số 1-16（ベトナム語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_viFontStyle",
+    dfmt:function(d){ return 'Ngày '+d.getDate()+' tháng '+(d.getMonth()+1)+' năm '+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">Mẫu tham khảo số 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Bản giải trình quá trình tuyển dụng</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Quá trình tuyển dụng trong hợp đồng lao động kỹ năng đặc định với người lao động nước ngoài kỹ năng đặc định ${f('f_applicant')} như sau.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Đơn vị giới thiệu việc làm (tại Nhật Bản)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">Có/không có giới thiệu</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Có</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">Không</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Số tiếp nhận giấy phép・thông báo</span><br><span class="id">(Ngày tháng năm tiếp nhận)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">Phân loại đơn vị giới thiệu việc làm</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">Đơn vị giới thiệu việc làm có thu phí</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Đơn vị giới thiệu việc làm miễn phí</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">Tên đơn vị giới thiệu việc làm</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Địa chỉ đơn vị giới thiệu việc làm (số điện thoại)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Chi phí đã trả cho đơn vị giới thiệu việc làm</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Người tìm việc (người nộp đơn)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Số tiền</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">yên</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">Danh mục</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">với tư cách là</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Đơn vị tuyển dụng (cơ quan tiếp nhận kỹ năng đặc định)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Số tiền</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">yên</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">Danh mục</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">với tư cách là</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Lưu ý)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Nếu đánh dấu "Không" ở mục 1, không cần điền các mục từ 2 trở đi.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Từ mục 2 đến mục 5, sử dụng "Trang web tổng hợp dịch vụ nhân lực" trên trang web của Cục An ninh Việc làm thuộc Bộ Y tế, Lao động và Phúc lợi, điền thông tin tương ứng về đơn vị giới thiệu việc làm. Ngoài ra, đính kèm bản chụp màn hình đăng thông tin đó.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Ở mục 6, ghi số tiền và danh mục mà người tìm việc và đơn vị tuyển dụng đã trả cho đơn vị giới thiệu việc làm. Ngoài ra, nếu người tìm việc đã trả chi phí bằng loại tiền khác yên Nhật, hãy ghi số tiền đã trả bằng loại tiền đó và số tiền quy đổi sang yên Nhật.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">Nếu có hợp đồng đã ký với đơn vị giới thiệu việc làm, hãy đính kèm bản sao của hợp đồng đó.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Cơ quan trung gian (nước ngoài) (Chỉ điền khi đánh dấu "Có" ở mục 1)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">Có/không có trung gian</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Có</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">Không</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">Tên</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">Quốc gia</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">Địa chỉ</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Chi phí đã trả cho cơ quan trung gian</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Người tìm việc (người nộp đơn)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Số tiền</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">yên</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">Danh mục</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">với tư cách là</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Đơn vị tuyển dụng (cơ quan tiếp nhận kỹ năng đặc định)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Số tiền</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">yên</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">Danh mục</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">với tư cách là</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Lưu ý)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Cơ quan trung gian là cơ quan trung gian thông tin liên quan đến người tìm việc, khi đơn vị giới thiệu việc làm thực hiện giới thiệu người tìm việc cho đơn vị tuyển dụng.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Nếu đánh dấu "Không" ở mục 1, không cần điền các mục từ 2 trở đi.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Ở mục 5, ghi số tiền và danh mục mà người tìm việc và đơn vị tuyển dụng đã trả cho cơ quan trung gian. Ngoài ra, nếu người tìm việc và đơn vị tuyển dụng đã trả chi phí bằng loại tiền khác yên Nhật, hãy ghi số tiền đã trả bằng loại tiền đó và số tiền quy đổi sang yên Nhật.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">Nếu có hợp đồng đã ký với cơ quan trung gian, hãy đính kèm bản sao.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Thực hiện hướng dẫn trước khi nhập cảnh</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Có/không thực hiện theo đúng kế hoạch hỗ trợ người lao động nước ngoài kỹ năng đặc định số 1</span></td>`,
+    L345:()=>`      <span class="id">Có / Không</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Nội dung từ mục 1 đến mục 3 ở trên là đúng sự thật. Ngoài ra, đã xác nhận qua phỏng vấn người nộp đơn rằng người tìm việc (người nộp đơn) không bị thu phí không thỏa đáng như tiền đặt cọc, tiền phạt liên quan đến hoạt động có tư cách lưu trú "kỹ năng đặc định".</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Ngày lập：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Tên cơ quan tiếp nhận kỹ năng đặc định　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">Họ tên và chức vụ người chịu trách nhiệm lập　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Chi phí mà người tìm việc (người nộp đơn) đã trả cho các cơ quan ở nước mình</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">Tên cơ quan nhận thanh toán</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">Danh mục</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Ngày thanh toán</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Số tiền thanh toán</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Không có</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">Tổng</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(Lưu ý)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Cơ quan ở nước mình không giới hạn đối tượng đặc biệt mà là tất cả các cơ quan tham gia vào việc trung gian đơn đăng ký hợp đồng lao động kỹ năng đặc định hoặc chuẩn bị hoạt động.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. Về số tiền thanh toán, ghi bằng nội tệ hoặc đô la Mỹ, và ghi số tiền quy đổi sang yên Nhật trong ngoặc đơn.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. Về danh mục, ghi đúng như danh mục đã được nêu cho người nộp đơn.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Về việc trung gian đơn đăng ký hợp đồng lao động kỹ năng đặc định hoặc chuẩn bị hoạt động liên quan đến tư cách lưu trú "kỹ năng đặc định", tôi đã thanh toán cho cơ quan ở nước mình sau khi đã hiểu đầy đủ về số tiền và chi tiết các khoản chi phí trên. Ngoài ra, không có khoản chi phí nào khác được thu ngoài các khoản chi phí nêu trên.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Chữ ký người nộp đơn</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  th:{
+    title:"参考様式第１－１６号（タイ語）斡旋有無切替",
+    appTitle:"📄 แบบอ้างอิงที่ 1-16（タイ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_thFontStyle",
+    dfmt:function(d){ return d.getDate()+' '+['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'][d.getMonth()]+' '+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">แบบอ้างอิงที่ 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">เอกสารคำอธิบายรายละเอียดการจ้างงาน</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">รายละเอียดการจ้างงานในการทำสัญญาจ้างงานทักษะเฉพาะกับคนต่างด้าวทักษะเฉพาะ ${f('f_applicant')} มีดังต่อไปนี้</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">ผู้ประกอบการจัดหางาน (ในประเทศ)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">การจัดหางานมี/ไม่มี</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">มี</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">ไม่มี</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">หมายเลขการอนุญาต・การรับแจ้ง</span><br><span class="id">(วันที่รับแจ้ง)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">ประเภทของผู้ประกอบการจัดหางาน</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">ผู้ประกอบการจัดหางานแบบเสียค่าบริการ</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">ผู้ประกอบการจัดหางานแบบไม่เสียค่าบริการ</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">ชื่อผู้ประกอบการจัดหางาน</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">ที่อยู่ผู้ประกอบการจัดหางาน (หมายเลขโทรศัพท์)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">ค่าใช้จ่ายที่จ่ายให้ผู้ประกอบการจัดหางาน</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">ผู้หางาน (ผู้ยื่นคำขอ)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">เยน</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">ในฐานะ</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">ผู้จ้างงาน (องค์กรในสังกัดทักษะเฉพาะ)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">เยน</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">ในฐานะ</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(หมายเหตุ)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">หากเลือก "ไม่มี" ในช่องที่ 1 ไม่จำเป็นต้องกรอกช่องที่ 2 เป็นต้นไป</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ช่องที่ 2 ถึง 5 ใช้ "เว็บไซต์รวมบริการทรัพยากรบุคคล" ของสำนักงานจัดหางานกระทรวงสาธารณสุข แรงงานและสวัสดิการ กรอกข้อมูลที่เกี่ยวข้องเกี่ยวกับผู้ประกอบการจัดหางานดังกล่าว นอกจากนี้ให้แนบภาพหน้าจอที่แสดงข้อมูลดังกล่าว</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ในช่องที่ 6 กรอกจำนวนเงินและรายการที่ผู้หางานและผู้จ้างงานจ่ายให้ผู้ประกอบการจัดหางาน นอกจากนี้ หากผู้หางานจ่ายค่าใช้จ่ายเป็นสกุลเงินอื่นนอกจากเงินเยน ให้ระบุจำนวนเงินที่จ่ายในสกุลเงินนั้นและจำนวนที่แปลงเป็นเงินเยน</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">หากมีสัญญาที่ทำไว้กับผู้ประกอบการจัดหางาน ให้แนบสำเนามาด้วย</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">องค์กรตัวกลาง (ต่างประเทศ) (กรอกเฉพาะกรณีที่เลือก "มี" ในข้อ 1)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">การดำเนินการผ่านตัวกลางมี/ไม่มี</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">มี</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">ไม่มี</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">ชื่อ</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">ประเทศที่ตั้ง</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">ที่อยู่</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">ค่าใช้จ่ายที่จ่ายให้องค์กรตัวกลาง</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">ผู้หางาน (ผู้ยื่นคำขอ)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">เยน</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">ผู้จ้างงาน (องค์กรในสังกัดทักษะเฉพาะ)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">จำนวนเงิน</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">เยน</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">รายการ</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ในฐานะ</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(หมายเหตุ)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">องค์กรตัวกลาง หมายถึง ผู้ที่ทำหน้าที่เป็นตัวกลางในการส่งต่อข้อมูลเกี่ยวกับผู้หางาน ฯลฯ ให้กับผู้ประกอบการจัดหางาน เมื่อผู้ประกอบการจัดหางานทำการจัดหางานให้แก่ผู้จ้างงาน</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">หากเลือก "ไม่มี" ในช่องที่ 1 ไม่จำเป็นต้องกรอกช่องที่ 2 เป็นต้นไป</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ในช่องที่ 5 กรอกจำนวนเงินและรายการที่ผู้หางานและผู้จ้างงานจ่ายให้องค์กรตัวกลาง นอกจากนี้ หากผู้หางานและผู้จ้างงานจ่ายค่าใช้จ่ายเป็นสกุลเงินอื่นนอกจากเงินเยน ให้ระบุจำนวนเงินที่จ่ายในสกุลเงินนั้นและจำนวนที่แปลงเป็นเงินเยน</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">หากมีสัญญาที่ทำไว้กับองค์กรตัวกลาง ให้แนบสำเนามาด้วย</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">การดำเนินการแนะนำล่วงหน้า</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">มี/ไม่มีการดำเนินการตามที่กำหนดในแผนการสนับสนุนคนต่างด้าวทักษะเฉพาะหมายเลข 1</span></td>`,
+    L345:()=>`      <span class="id">มี / ไม่มี</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">เนื้อหาในข้อ 1 ถึง 3 ข้างต้นไม่มีความแตกต่าง นอกจากนี้ ได้ยืนยันจากการสอบถามผู้ยื่นคำขอว่าผู้หางาน (ผู้ยื่นคำขอ) ไม่ถูกเรียกเก็บค่าใช้จ่ายที่ไม่เหมาะสม เช่น เงินประกัน ค่าปรับ ที่เกี่ยวข้องกับการทำกิจกรรมในสถานภาพการพำนัก "ทักษะเฉพาะ"</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">วันที่จัดทำ：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ชื่อองค์กรในสังกัดทักษะเฉพาะ　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">ชื่อและตำแหน่งของผู้รับผิดชอบในการจัดทำ　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">ค่าใช้จ่ายที่ผู้หางาน (ผู้ยื่นคำขอ) จ่ายให้แก่องค์กรในประเทศของตน ฯลฯ</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">ชื่อองค์กรผู้รับชำระเงิน</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">รายการ</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">วันที่ชำระเงิน</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">จำนวนเงินที่ชำระ</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">ไม่มี</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">รวม</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(หมายเหตุ)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. องค์กรในประเทศของตน ฯลฯ ไม่ได้จำกัดเฉพาะเจาะจง แต่หมายถึงทุกองค์กรที่เกี่ยวข้องกับการเป็นตัวกลางในการยื่นคำขอสัญญาจ้างงานทักษะเฉพาะหรือการเตรียมกิจกรรม</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. เกี่ยวกับจำนวนเงินที่ชำระ ให้ระบุเป็นสกุลเงินท้องถิ่นหรือดอลลาร์สหรัฐ และให้ระบุจำนวนที่แปลงเป็นเงินเยนในวงเล็บ</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. เกี่ยวกับรายการ ให้กรอกตามรายการที่ระบุให้ผู้ยื่นคำขอเห็น</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">เกี่ยวกับการเป็นตัวกลางในการยื่นคำขอสัญญาจ้างงานทักษะเฉพาะหรือการเตรียมกิจกรรมที่เกี่ยวข้องกับสถานภาพการพำนัก "ทักษะเฉพาะ" ได้ชำระเงินให้องค์กรในประเทศของตน ฯลฯ หลังจากเข้าใจจำนวนเงินและรายละเอียดของค่าใช้จ่ายข้างต้นเป็นอย่างดีแล้ว นอกจากนี้ ไม่ได้ถูกเรียกเก็บค่าใช้จ่ายอื่นใดนอกเหนือจากค่าใช้จ่ายข้างต้น</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">ลายเซ็นผู้ยื่นคำขอ</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  km:{
+    title:"参考様式第１－１６号（カンボジア語）斡旋有無切替",
+    appTitle:"📄 ទម្រង់យោងលេខ ១-១៦（カンボジア語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_kmFontStyle",
+    dfmt:function(d){ return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">ទម្រង់យោងលេខ ១-១៦</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">ឯកសារពន្យល់អំពីប្រវត្តិនៃការជួល</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">ប្រវត្តិនៃការជួលក្នុងការចុះកិច្ចសន្យាការងារជំនាញជាក់លាក់ជាមួយជនបរទេសជំនាញជាក់លាក់ ${f('f_applicant')} មានដូចខាងក្រោម។</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">ក្រុមហ៊ុនណែនាំការងារ (ក្នុងប្រទេសជប៉ុន)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">មាន/គ្មាន ការណែនាំ</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">មាន</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">គ្មាន</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">លេខការអនុញ្ញាត・លេខការទទួលយកការជូនដំណឹង</span><br><span class="id">(ថ្ងៃ ខែ ឆ្នាំ នៃការទទួលយក)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">ចំណាត់ថ្នាក់នៃក្រុមហ៊ុនណែនាំការងារ</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">ក្រុមហ៊ុនណែនាំការងារដែលយកថ្លៃ</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">ក្រុមហ៊ុនណែនាំការងារមិនយកថ្លៃ</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">ឈ្មោះក្រុមហ៊ុនណែនាំការងារ</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">អាសយដ្ឋានក្រុមហ៊ុនណែនាំការងារ (លេខទូរស័ព្ទ)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">ចំណាយដែលបានបង់ជូនក្រុមហ៊ុនណែនាំការងារ</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">អ្នកស្វែងរកការងារ (អ្នកដាក់ពាក្យ)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ចំនួនទឹកប្រាក់</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">យ៉ន</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">ចំណងជើង</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">ជា</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">អ្នកជួល (ស្ថាប័នសម្រាប់ជំនាញជាក់លាក់)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ចំនួនទឹកប្រាក់</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">យ៉ន</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">ចំណងជើង</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">ជា</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(សម្គាល់)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ប្រសិនបើបានធីក "គ្មាន" នៅចំណុច ១ មិនចាំបាច់បំពេញចំណុច ២ ឡើងទៅទេ។</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ចំណុច ២ ដល់ ៥ សូមប្រើ "គេហទំព័រសេវាកម្មធនធានមនុស្សរួម" នៃការិយាល័យសន្តិសុខការងារនៃក្រសួងសុខាភិបាល ការងារ និងសុខុមាលភាព ដើម្បីបំពេញព័ត៌មានពាក់ព័ន្ធទៅនឹងក្រុមហ៊ុនណែនាំការងារនោះ។ ព្រមទាំងភ្ជាប់ច្បាប់ចម្លងនៃអេក្រង់ដែលមានព័ត៌មាននេះ។</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ចំណុច ៦ សូមបំពេញចំនួនទឹកប្រាក់ និងចំណងជើងដែលអ្នកស្វែងរកការងារ និងអ្នកជួលបានបង់ជូនក្រុមហ៊ុនណែនាំការងារ។ ប្រសិនបើអ្នកស្វែងរកការងារបានបង់ចំណាយជាប្រាក់ផ្សេងពីប្រាក់យ៉នជប៉ុន សូមកត់ត្រាចំនួនទឹកប្រាក់ដែលបានបង់ជាប្រាក់នោះ និងចំនួនដែលបានប្តូរទៅជាប្រាក់យ៉នជប៉ុន។</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">ប្រសិនបើមានកិច្ចសន្យាដែលបានចុះជាមួយក្រុមហ៊ុនណែនាំការងារ សូមភ្ជាប់ច្បាប់ចម្លងនៃកិច្ចសន្យានោះ។</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">ស្ថាប័នអន្តរការី (ក្រៅប្រទេសជប៉ុន) (បំពេញបានតែក្នុងករណីដែលបានធីក "មាន" នៅចំណុច ១)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">មាន/គ្មាន ការអន្តរការី</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">មាន</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">គ្មាន</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">ឈ្មោះ</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">ប្រទេសដែលស្ថិតនៅ</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">អាសយដ្ឋាន</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">ចំណាយដែលបានបង់ជូនស្ថាប័នអន្តរការី</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">អ្នកស្វែងរកការងារ (អ្នកដាក់ពាក្យ)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ចំនួនទឹកប្រាក់</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">យ៉ន</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">ចំណងជើង</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ជា</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">អ្នកជួល (ស្ថាប័នសម្រាប់ជំនាញជាក់លាក់)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ចំនួនទឹកប្រាក់</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">យ៉ន</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">ចំណងជើង</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ជា</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(សម្គាល់)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ស្ថាប័នអន្តរការីសំដៅលើអ្នកដែលធ្វើការផ្តល់ព័ត៌មានទាក់ទងនឹងអ្នកស្វែងរកការងារ ឲ្យទៅក្រុមហ៊ុនណែនាំការងារ នៅពេលដែលក្រុមហ៊ុនណែនាំការងារនោះធ្វើការណែនាំការងារឲ្យអ្នកជួល។</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ប្រសិនបើបានធីក "គ្មាន" នៅចំណុច ១ មិនចាំបាច់បំពេញចំណុច ២ ឡើងទៅទេ។</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ចំណុច ៥ សូមបំពេញចំនួនទឹកប្រាក់ និងចំណងជើងដែលអ្នកស្វែងរកការងារ និងអ្នកជួលបានបង់ជូនស្ថាប័នអន្តរការី។</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">ប្រសិនបើមានកិច្ចសន្យាដែលបានចុះជាមួយស្ថាប័នអន្តរការី សូមភ្ជាប់ច្បាប់ចម្លង។</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">ការណែនាំជាមុន</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">បានអនុវត្តតាមដូចដែលបានកំណត់ក្នុងផែនការជំនួយជនបរទេសជំនាញជាក់លាក់លេខ ១ ឬអត់</span></td>`,
+    L345:()=>`      <span class="id">មាន / គ្មាន</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">មាតិកានៃចំណុច ១ ដល់ ៣ ខាងលើមិនមានភាពខុសប្លែកគ្នាទេ។ លើសពីនេះទៀត បានបញ្ជាក់តាមរយៈការសាកសួរអ្នកដាក់ពាក្យថាអ្នកស្វែងរកការងារ (អ្នកដាក់ពាក្យ) មិនត្រូវបានគេបង់ចំណាយមិនសមរម្យ ដូចជាប្រាក់កក់ ប្រាក់ពិន័យ ទាក់ទងនឹងសកម្មភាពស្ថានភាពស្នាក់នៅ "ជំនាញជាក់លាក់"។</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ថ្ងៃ ខែ ឆ្នាំ នៃការរៀបចំ：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ឈ្មោះស្ថាប័នសម្រាប់ជំនាញជាក់លាក់　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">ឈ្មោះនិងតំណែងនៃអ្នកទទួលខុសត្រូវ　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">ចំណាយដែលអ្នកស្វែងរកការងារ (អ្នកដាក់ពាក្យ) បានបង់ជូនស្ថាប័នក្នុងប្រទេសកំណើត ។ល។</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">ឈ្មោះស្ថាប័នដែលទទួលបានការទូទាត់</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">ចំណងជើង</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">ថ្ងៃ ខែ ឆ្នាំ នៃការទូទាត់</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">ចំនួនទឹកប្រាក់ដែលបានទូទាត់</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">មិនមាន</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">សរុប</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(សម្គាល់)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. ស្ថាប័នក្នុងប្រទេសកំណើត ។ល។ មិនមានកំណត់វិសាលភាពពិសេសទេ ប៉ុន្តែសំដៅលើស្ថាប័នទាំងអស់ដែលបានចូលរួមក្នុងការអន្តរការីការដាក់ពាក្យកិច្ចសន្យាការងារជំនាញជាក់លាក់ ឬការរៀបចំសកម្មភាព។</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. អំពីចំនួនទឹកប្រាក់ដែលបានទូទាត់ សូមកត់ជារូបិយប័ណ្ណក្នុងស្រុក ឬជាដុល្លារអាមេរិក ហើយកត់ចំនួនដែលប្តូរទៅជាប្រាក់យ៉នជប៉ុននៅក្នុងវង់ក្រចក។</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. អំពីចំណងជើង សូមបំពេញតាមចំណងជើងដែលបានបង្ហាញដល់អ្នកដាក់ពាក្យ។</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">ទាក់ទងនឹងការអន្តរការីការដាក់ពាក្យកិច្ចសន្យាការងារជំនាញជាក់លាក់ ឬការរៀបចំសកម្មភាពដែលពាក់ព័ន្ធនឹងស្ថានភាពស្នាក់នៅ "ជំនាញជាក់លាក់" បានទូទាត់ទៅស្ថាប័នក្នុងប្រទេសកំណើត ។ល។ បន្ទាប់ពីបានយល់ច្បាស់អំពីចំនួនទឹកប្រាក់ និងលម្អិតនៃចំណាយខាងលើ។ លើសពីនេះ មិនមានចំណាយផ្សេងទៀតត្រូវបានគេទារ ក្រៅពីចំណាយខាងលើទេ។</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">ហត្ថលេខាអ្នកដាក់ពាក្យ</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  my:{
+    title:"参考様式第１－１６号（ミャンマー語）斡旋有無切替",
+    appTitle:"📄 ကိုးကား ပုံစံ ၁-၁၆（ミャンマー語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_myFontStyle",
+    dfmt:function(d){ return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">ကိုးကား ပုံစံ ၁-၁၆</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">အလုပ်ခန့်ထားခြင်းနှင့် ပတ်သက်သော ရှင်းလင်းချက် စာရွက်</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">သီးသန့်ကျွမ်းကျင်မှုနိုင်ငံခြားသား ${f('f_applicant')} နှင့် သီးသန့်ကျွမ်းကျင်မှုအလုပ်ခန့်ထားခြင်း စာချုပ်ချုပ်ဆိုရာတွင် အလုပ်ခန့်ထားခြင်းအခြေအနေမှာ အောက်ပါအတိုင်းဖြစ်သည်။</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်း (ပြည်တွင်း)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">ဆက်သွယ်ရှာဖွေပေးမှု ရှိ/မရှိ</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">ရှိ</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">မရှိ</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">ခွင့်ပြုချက်・အကြောင်းကြား လက်ခံအမှတ်</span><br><span class="id">(လက်ခံသည့် နေ့စွဲ)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်း အမျိုးအစား</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">အခကြေးငွေရ အလုပ်ရှာဖွေရေးလုပ်ငန်း</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">အခမဲ့ အလုပ်ရှာဖွေရေးလုပ်ငန်း</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်း အမည်</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်း လိပ်စာ (ဖုန်းနံပါတ်)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်းသို့ ပေးချေသည့် ကုန်ကျစရိတ်</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">အလုပ်ရှာသူ (လျှောက်ထားသူ)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ပမာဏ</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">ယန်း</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">အမည်</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">အဖြစ်</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">အလုပ်ခန့်သူ (သီးသန့်ကျွမ်းကျင်မှု ဆက်စပ်အဖွဲ့အစည်း)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ပမာဏ</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">ယန်း</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">အမည်</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">အဖြစ်</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(သတိပြုရန်)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">၁ အကွက်တွင် မရှိ ကို အမှတ်အသားပြုလျှင်၊ ၂ မှ စ၍ အောက်ရှိ အကွက်များကို ဖြည့်စရာမလိုပါ။</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">၂ မှ ၅ အကွက်အထိကို ကျန်းမာရေး အလုပ်သမား လူမှုဖူလုံရေး ဝန်ကြီးဌာန အလုပ်အကိုင် လုံခြုံရေးဗျူရို၏ ဝက်ဘ်ဆိုဒ်ရှိ "လူ့စွမ်းအား ဝန်ဆောင်မှု ပေါင်းစပ် ဆိုဒ်" ကို အသုံးပြု၍ သက်ဆိုင်သော အလုပ်ရှာဖွေရေး လုပ်ငန်းနှင့် ပတ်သက်သော သက်ဆိုင်ရာ အချက်အလက်များကို ဖြည့်သွင်းပါ။ ထို့ပြင် ထိုအချက်အလက် တင်ပြထားသော ဖန်သားပြင် မိတ္တူကိုလည်း ပူးတွဲပါ။</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">၆ အကွက်တွင် အလုပ်ရှာသူနှင့် အလုပ်ခန့်သူမှ အလုပ်ရှာဖွေရေးလုပ်ငန်းသို့ ပေးချေသည့် ပမာဏနှင့် အမည်ကို ရေးသွင်းပါ။ အကယ်၍ အလုပ်ရှာသူသည် ဂျပန်ယန်းမှတစ်ပါး အခြားငွေကြေးဖြင့် ပေးချေခဲ့လျှင် ၎င်းငွေကြေးဖြင့် ပေးချေသည့် ပမာဏနှင့် ဂျပန်ယန်းသို့ ပြောင်းလဲထားသည့် ပမာဏကို ရေးသွင်းပါ။</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">အလုပ်ရှာဖွေရေးလုပ်ငန်းနှင့် ချုပ်ဆိုထားသော စာချုပ်ရှိပါက ၎င်း၏ မိတ္တူကို ပူးတွဲပါ။</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">ဆက်သွယ်ပေးသည့် အဖွဲ့အစည်း (ပြည်ပ) (၁ တွင် "ရှိ" ကို အမှတ်အသားပြုထားလျှင်သာ ဖြည့်သွင်းပါ)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">ဆက်သွယ်ပေးမှု ရှိ/မရှိ</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">ရှိ</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">မရှိ</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">အမည်</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">တည်ရှိသော နိုင်ငံ</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">လိပ်စာ</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">ဆက်သွယ်ပေးသည့် အဖွဲ့အစည်းသို့ ပေးချေသည့် ကုန်ကျစရိတ်</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">အလုပ်ရှာသူ (လျှောက်ထားသူ)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ပမာဏ</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">ယန်း</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">အမည်</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">အဖြစ်</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">အလုပ်ခန့်သူ (သီးသန့်ကျွမ်းကျင်မှု ဆက်စပ်အဖွဲ့အစည်း)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">ပမာဏ</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">ယန်း</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">အမည်</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">အဖြစ်</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(သတိပြုရန်)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ဆက်သွယ်ပေးသည့် အဖွဲ့အစည်း ဆိုသည်မှာ အလုပ်ရှာဖွေရေးလုပ်ငန်းသည် အလုပ်ခန့်သူထံ အလုပ်ရှာသူကို ညွှန်းဆိုပေးရာတွင် ထိုအလုပ်ရှာဖွေရေးလုပ်ငန်းအား အလုပ်ရှာသူစသည်တို့နှင့်ပတ်သက်သည့် အချက်အလက်များကို ဆက်သွယ်ပေးသည့် သူကို ဆိုသည်။</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">၁ အကွက်တွင် မရှိ ကို အမှတ်အသားပြုလျှင်၊ ၂ မှ စ၍ အောက်ရှိ အကွက်များကို ဖြည့်စရာမလိုပါ။</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">၅ အကွက်တွင် အလုပ်ရှာသူနှင့် အလုပ်ခန့်သူမှ ဆက်သွယ်ပေးသည့်အဖွဲ့အစည်းသို့ ပေးချေသည့် ပမာဏနှင့် အမည်ကို ရေးသွင်းပါ။</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">ဆက်သွယ်ပေးသည့်အဖွဲ့အစည်းနှင့် ချုပ်ဆိုထားသော စာချုပ်ရှိပါက ၎င်း၏ မိတ္တူကို ပူးတွဲပါ။</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">ကြိုတင် လမ်းညွှန်မှု ဆောင်ရွက်ခြင်း</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">အမှတ်(၁) သီးသန့်ကျွမ်းကျင်မှုနိုင်ငံခြားသား ပံ့ပိုးမှု အစီအစဉ်တွင် သတ်မှတ်ထားသည့် အတိုင်း ဆောင်ရွက်ထားခြင်း ရှိ/မရှိ</span></td>`,
+    L345:()=>`      <span class="id">ရှိ / မရှိ</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">အထက်ပါ ၁ မှ ၃ အထိ၏ အကြောင်းအရာများတွင် ကွဲလွဲမှုမရှိပါ။ ထို့ပြင် အလုပ်ရှာသူ (လျှောက်ထားသူ) သည် နေထိုင်ခွင့် "သီးသန့်ကျွမ်းကျင်မှု" အတွက် လုပ်ဆောင်ခြင်းနှင့် ပတ်သက်၍ အာမခံငွေ၊ ပျက်ကွက်ကြေး စသည့် မသင့်လျော်သော ကုန်ကျစရိတ်များ ကောက်ခံခံခြင်း မရှိကြောင်း သူ့ထံမှ စုံစမ်းမေးမြန်းခြင်းဖြင့် အတည်ပြုထားပါသည်။</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">ပြုစုသည့် နေ့စွဲ：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">သီးသန့်ကျွမ်းကျင်မှု ဆက်စပ်အဖွဲ့အစည်း အမည်　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">ပြုစုသည့်တာဝန်ခံ၏ အမည်နှင့် ရာထူး　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">အလုပ်ရှာသူ (လျှောက်ထားသူ) မှ မိမိနိုင်ငံစသည့် အဖွဲ့အစည်းသို့ ပေးချေသည့် ကုန်ကျစရိတ်</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">ငွေပေးချေရသည့် အဖွဲ့အစည်း အမည်</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">အမည်</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">ပေးချေသည့် နေ့စွဲ</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">ပေးချေသည့် ပမာဏ</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">မရှိပါ</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">စုစုပေါင်း</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(သတိပြုရန်)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. မိမိနိုင်ငံစသည့် အဖွဲ့အစည်းဆိုရာတွင် အထူးသဖြင့် ကန့်သတ်ထားခြင်းမရှိဘဲ၊ သီးသန့်ကျွမ်းကျင်မှုအလုပ်ခန့်ထားခြင်းစာချုပ်၏ လျှောက်ထားခြင်းကို ဆက်သွယ်ပေးခြင်း သို့မဟုတ် လုပ်ဆောင်မှု ပြင်ဆင်ခြင်းတွင် ပါဝင်ပတ်သက်သော အဖွဲ့အစည်းအားလုံးကို ဆိုသည်။</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. ပေးချေသည့်ပမာဏနှင့်ပတ်သက်၍၊ ဒေသသုံးငွေကြေး သို့မဟုတ် အမေရိကန်ဒေါ်လာဖြင့် ရေးသွင်းပြီး၊ ဂျပန်ယန်းသို့ ပြောင်းလဲထားသည့် ပမာဏကို ကွင်းအတွင်း၌ ရေးသွင်းပါ။</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. အမည်နှင့်ပတ်သက်၍ လျှောက်ထားသူအား ပြထားသည့် အမည်အတိုင်း ရေးသွင်းပါ။</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">သီးသန့်ကျွမ်းကျင်မှုအလုပ်ခန့်ထားခြင်းစာချုပ်လျှောက်ထားခြင်း၏ ဆက်သွယ်ပေးခြင်း သို့မဟုတ် နေထိုင်ခွင့် "သီးသန့်ကျွမ်းကျင်မှု" နှင့် ပတ်သက်သော လုပ်ဆောင်မှု ပြင်ဆင်ခြင်းတွင် မိမိနိုင်ငံစသည့် အဖွဲ့အစည်းအား အထက်ပါ ကုန်ကျစရိတ်ပမာဏနှင့် အသေးစိတ်ကို လုံလောက်စွာ နားလည်ပြီး ပေးချေခဲ့ပါသည်။ ထို့ပြင် အထက်ပါ ကုန်ကျစရိတ်မှတစ်ပါး အခြားကုန်ကျစရိတ်များ ကောက်ခံခြင်း မရှိပါ။</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">လျှောက်ထားသူ လက်မှတ်</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  ne:{
+    title:"参考様式第１－１６号（ネパール語）斡旋有無切替",
+    appTitle:"📄 सन्दर्भ फारम नं. 1-16（ネパール語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_neFontStyle",
+    dfmt:function(d){ return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">सन्दर्भ फारम नं. 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">रोजगारको विवरण सम्बन्धी व्याख्यात्मक दस्तावेज</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">विशिष्ट सीपयुक्त विदेशी कामदार ${f('f_applicant')} सँग विशिष्ट सीप रोजगार सम्झौता गर्दा रोजगारको विवरण निम्नानुसार छ।</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">रोजगार पर्चीकर्ता (जापान भित्र)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">पर्चीकरण छ/छैन</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">छ</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">छैन</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">अनुमति・सूचना स्वीकृति नम्बर</span><br><span class="id">(स्वीकृत मिति)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">रोजगार पर्चीकर्ताको वर्गीकरण</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">शुल्क लिने रोजगार पर्चीकर्ता</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">शुल्क नलिने रोजगार पर्चीकर्ता</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">रोजगार पर्चीकर्ताको नाम</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">रोजगार पर्चीकर्ताको ठेगाना (फोन नम्बर)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">रोजगार पर्चीकर्तालाई तिरेको खर्च</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">काम खोज्ने (आवेदक)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">रकम</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">येन</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">शीर्षक</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">को रूपमा</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">रोजगार दिने (विशिष्ट सीप सम्बद्ध निकाय)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">रकम</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">येन</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">शीर्षक</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">को रूपमा</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(ध्यान दिनुहोस्)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">कलम 1 मा छैन मा चिन्ह लगाएको अवस्थामा 2 देखि मुनिका कलममा लेख्नु पर्दैन।</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">कलम 2 देखि 5 सम्म, स्वास्थ्य, श्रम र कल्याण मन्त्रालयको रोजगार सुरक्षा ब्युरोको वेबसाइटमा रहेको "मानव संसाधन सेवाहरूको एकीकृत साइट" प्रयोग गरी, सम्बन्धित रोजगार पर्चीकर्ताको सम्बन्धित जानकारी भर्नुहोस्। साथै, उक्त जानकारी राखिएको स्क्रिनको प्रतिलिपि संलग्न गर्नुहोस्।</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">कलम 6 मा, काम खोज्ने र रोजगार दिने व्यक्तिले रोजगार पर्चीकर्तालाई तिरेको रकम र शीर्षक लेख्नुहोस्। साथै, यदि काम खोज्ने व्यक्तिले जापानी येन बाहेकको मुद्रामा खर्च तिरेको छ भने, उक्त मुद्रामा तिरेको रकम र जापानी येनमा रूपान्तरित रकम लेख्नुहोस्।</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">रोजगार पर्चीकर्तासँग गरिएको सम्झौता भएमा, त्यसको प्रतिलिपि संलग्न गर्नुहोस्।</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">मध्यस्थ निकाय (जापान बाहिर) (1 मा "छ" मा चिन्ह लगाएको खण्डमा मात्र भर्ने)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">मध्यस्थता छ/छैन</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">छ</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">छैन</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">नाम</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">स्थित देश</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">ठेगाना</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">मध्यस्थ निकायलाई तिरेको खर्च</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">काम खोज्ने (आवेदक)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">रकम</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">येन</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">शीर्षक</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">को रूपमा</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">रोजगार दिने (विशिष्ट सीप सम्बद्ध निकाय)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">रकम</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">येन</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">शीर्षक</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">को रूपमा</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(ध्यान दिनुहोस्)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">मध्यस्थ निकाय भनेको रोजगार पर्चीकर्ताले रोजगार दिनेलाई काम खोज्नेको पर्चीकरण गर्दा, उक्त रोजगार पर्चीकर्तालाई काम खोज्ने आदिको जानकारी मध्यस्थता गर्ने व्यक्ति हो।</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">कलम 1 मा छैन मा चिन्ह लगाएको अवस्थामा 2 देखि मुनिका कलममा लेख्नु पर्दैन।</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">कलम 5 मा, काम खोज्ने र रोजगार दिने व्यक्तिले मध्यस्थ निकायलाई तिरेको रकम र शीर्षक लेख्नुहोस्। साथै, यदि काम खोज्ने र रोजगार दिने व्यक्तिले जापानी येन बाहेकको मुद्रामा खर्च तिरेको छ भने, उक्त मुद्रामा तिरेको रकम र जापानी येनमा रूपान्तरित रकम लेख्नुहोस्।</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">मध्यस्थ निकायसँग गरिएको सम्झौता भएमा, त्यसको प्रतिलिपि संलग्न गर्नुहोस्।</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">पूर्व मार्गदर्शन कार्यान्वयन</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">पहिलो नम्बर विशिष्ट सीप विदेशी कामदार सहयोग योजनामा तय गरिए अनुसार कार्यान्वयन गरिएको छ/छैन</span></td>`,
+    L345:()=>`      <span class="id">छ / छैन</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">माथिको 1 देखि 3 सम्मको विवरणमा कुनै फरक छैन। साथै, विशिष्ट निवास योग्यता "विशिष्ट सीप" सँग सम्बन्धित गतिविधि गर्ने सन्दर्भमा, काम खोज्ने (आवेदक) बाट जमानत, जरिवाना जस्ता अनुपयुक्त शुल्क असुल नगरिएको भन्ने कुरा आवेदकसँग सोधपुछ गरेर पुष्टि गरिएको छ।</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">तयार पारेको मिति：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">विशिष्ट सीप सम्बद्ध निकायको नाम　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">तयार पारेको जिम्मेवार व्यक्तिको नाम र पद　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">काम खोज्ने (आवेदक) ले आफ्नो देश आदिको निकायलाई तिरेको खर्च</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">भुक्तानी प्राप्त गर्ने निकायको नाम</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">शीर्षक</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">भुक्तानी मिति</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">भुक्तानी रकम</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">लागू हुँदैन</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">जम्मा</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(ध्यान दिनुहोस्)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. आफ्नो देश आदिको निकाय भन्नाले विशेष उद्देश्यमा सीमित नगरी, विशिष्ट सीप रोजगार सम्झौताको आवेदन मध्यस्थता वा गतिविधिको तयारीमा संलग्न सबै निकायलाई जनाउँछ।</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. भुक्तानी रकम स्थानीय मुद्रा वा अमेरिकी डलरमा लेख्ने र कोष्ठकमा जापानी येनमा रूपान्तरित रकम लेख्ने।</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. शीर्षकका बारेमा आवेदकलाई देखाएको शीर्षक अनुसार लेख्ने।</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">विशिष्ट सीप रोजगार सम्झौताको आवेदन मध्यस्थता वा निवास योग्यता "विशिष्ट सीप" सँग सम्बन्धित गतिविधिको तयारीको सन्दर्भमा, आफ्नो देश आदिको निकायलाई उक्त खर्चको रकम र विवरण राम्रोसँग बुझेर भुक्तानी गरेको छु। साथै, उक्त खर्च बाहेकका खर्चहरू असुल गरिएको छैन।</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">आवेदकको हस्ताक्षर</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  ko:{
+    title:"参考様式第１－１６号（韓国語）斡旋有無切替",
+    appTitle:"📄 참고 양식 1-16호（한국어）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_koFontStyle",
+    dfmt:function(d){ return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일'; },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">참고 양식 1-16호</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">고용의 경위에 관한 설명서</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">특정기능외국인 ${f('f_applicant')}과의 사이에 특정기능고용계약을 체결함에 있어서 고용의 경위는 다음과 같습니다.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">직업소개사업자(국내)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">알선의 유무</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">유</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">무</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">허가・신고 접수번호</span><br><span class="id">(접수 접수 연월일)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">직업소개사업자의 구분</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">유료 직업소개사업자</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">무료 직업소개사업자</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">직업소개사업자의 성명</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">직업소개사업자의 주소(전화번호)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">직업소개사업자에게 지불한 비용</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">구직자(신청인)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">엔</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">명목</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">으로</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">구인자(특정기능소속기관)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">엔</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">명목</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">으로</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(주의)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">1란에서 무에 체크를 한 경우에는 2 이하의 란은 기재할 필요 없음.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">2부터 5란까지는 후생노동성 직업안정국 홈페이지의 "인재서비스 종합 사이트"를 활용하여 당해 직업소개사업자에 대한 해당하는 정보를 기입할 것. 또한 당해 정보가 게재된 화면의 사본을 첨부할 것.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">6란은 구직자 및 구인자가 직업소개사업자에게 지불한 금액 및 명목에 대하여 기재할 것. 또한 구직자가 일본 엔 이외로 비용을 지불한 경우에는 당해 통화로 지불한 금액 및 일본 엔으로 환산한 금액을 기재할 것.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">직업소개사업자와의 사이에 맺은 계약서가 있으면 그 사본을 첨부할 것.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">중개기관(해외)(1에서 유에 체크한 경우에만 기재)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">중개의 유무</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">유</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">무</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">성명 또는 명칭</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">소재국</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">소재지</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">중개기관에 지불한 비용</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">구직자(신청인)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">엔</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">명목</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">으로</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">구인자(특정기능소속기관)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">금액</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">엔</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">명목</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">으로</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(주의)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">중개기관이란 직업소개사업자가 구인자에게 구직자를 알선할 때 당해 직업소개사업자에 대하여 구직자 등에 관한 정보의 중개를 행하는 자를 말한다.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">1란에서 무에 체크를 한 경우에는 2 이하의 란은 기재할 필요 없음.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">5란은 구직자 및 구인자가 중개기관에 지불한 금액 및 명목에 대하여 기재할 것. 또한 구직자 및 구인자가 일본 엔 이외로 비용을 지불한 경우에는 당해 통화로 지불한 금액 및 일본 엔으로 환산한 금액을 기재할 것.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">중개기관과의 사이에 맺은 계약서가 있으면 그 사본을 첨부할 것.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">사전 가이던스 실시</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">제1호 특정기능외국인 지원계획에 정한 대로 실시하고 있는지의 유무</span></td>`,
+    L345:()=>`      <span class="id">유 / 무</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">이상의 1부터 3까지의 내용에 상위가 없습니다. 또한 구직자(신청인)가 재류자격 "특정기능"의 활동을 하는 것에 관련해서 보증금, 위약금의 지불 등 부적절한 비용 징수를 받지 않았음을 본인에게 청취하는 등으로 확인하고 있습니다.</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">작성 연월일：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">특정기능소속기관의 성명 또는 명칭　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">작성 책임자의 성명 및 직위　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">구직자(신청인)가 자국 등의 기관에 지불한 비용</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">지불처 기관의 명칭</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">명목</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">지불 연월일</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">지불 금액</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">해당 없음</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">계</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(주의)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. 자국 등의 기관이란 특별히 대상을 한정하는 것이 아니라 특정기능고용계약의 신청 중개 또는 활동 준비에 관여한 모든 기관을 말한다.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. 지불 금액에 대해서는 현지 통화 또는 미국 달러로 기재하고, 괄호 안에 일본 엔으로 환산한 금액을 기재할 것.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. 명목에 대해서는 신청인에게 나타낸 명목대로 기재할 것.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">특정기능고용계약 신청의 중개 또는 재류자격 "특정기능"에 관한 활동 준비에 관하여 자국 등의 기관에 대하여 상기 비용의 금액 및 내역에 대해서 충분히 이해한 후 지불하였습니다. 또한 상기 비용 이외의 비용에 대해서는 징수되지 않았습니다.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">신청인 서명</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  zh:{
+    title:"参考様式第１－１６号（中国語）斡旋有無切替",
+    appTitle:"📄 参考格式第１－１６号（中国語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_zhFontStyle",
+    dfmt:function(d){ return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日'; },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">参考格式第1-16号</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">有关雇用经过的说明书</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">特定技能外国人${f('f_applicant')}的特定技能雇用合同签订经过如下。</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">职业介绍业者（国内）</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">有无中介</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">有</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">无</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">许可・申报受理编号（受理登记年月日）</span><br><span class="id"></span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">职业介绍业者的分类</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">有偿职业介绍业者</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">无偿职业介绍业者</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">职业介绍业者的姓名</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">职业介绍业者的住址（电话号码）</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">支付给职业介绍业者的费用</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">求职者（申请人）</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">日元</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">名目</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">作为</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">招聘者（特定技能所属机构）</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">日元</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">名目</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">作为</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">（注意）</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">第1栏勾选"无"时，无需填写第2栏以下内容。</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">第2栏至第5栏应利用厚生劳动省职业安定局网站的"人才服务综合网站"，填写该职业介绍业者的相关信息。同时附上刊载此信息的画面副本。</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">第6栏应填写求职者及招聘者支付给职业介绍业者的金额及名目。另外，如果求职者以日元以外的货币支付费用时，请记载以该货币支付的金额及折算为日元的金额。</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">如与职业介绍业者之间签订有合同，请附上该合同的副本。</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">中介机构（国外）（仅在第1栏勾选"有"时填写）</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">有无中介</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">有</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">无</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">姓名或名称</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">所在国</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">所在地</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">支付给中介机构的费用</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">求职者（申请人）</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">日元</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">名目</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">作为</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">招聘者（特定技能所属机构）</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">金额</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">日元</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">名目</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">作为</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">（注意）</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">中介机构是指职业介绍业者向招聘者介绍求职者时，向该职业介绍业者中介求职者等相关信息的人。</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">第1栏勾选"无"时，无需填写第2栏以下内容。</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">第5栏应填写求职者及招聘者支付给中介机构的金额及名目。另外，如果求职者及招聘者以日元以外的货币支付费用时，请记载以该货币支付的金额及折算为日元的金额。</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">如与中介机构之间签订有合同，请附上该合同的副本。</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">事前指导的实施</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">是否按第1号特定技能外国人支援计划规定实施</span></td>`,
+    L345:()=>`      <span class="id">有 / 无</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">以上第1至第3的内容无任何出入。此外，已经通过向本人询问等方式确认了求职者（申请人）在从事在留资格"特定技能"的活动时未被收取保证金、违约金等不适当费用。</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">填写年月日：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">特定技能所属机构的姓名或名称　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">填写负责人的姓名及职位　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">求职者（申请人）支付给本国等机构的费用</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">支付对象机构的名称</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">名目</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">支付年月日</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">支付金额</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">无</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">合计</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">（注意）</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. 本国等机构不特别限定对象，指所有参与特定技能雇用合同申请中介或活动准备的机构。</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. 支付金额以当地货币或美元记载，在括号内记载折算为日元的金额。</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. 关于名目，请按照向申请人所示的名目填写。</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">关于特定技能雇用合同申请的中介或在留资格"特定技能"相关活动的准备，已在充分理解上述费用金额及明细的基础上向本国等机构进行支付。同时，未被征收上述费用以外的费用。</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">申请人签名</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  si:{
+    title:"参考様式第１－１６号（シンハラ語）斡旋有無切替",
+    appTitle:"📄 参考様式第１－１６号（シンハラ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_siFontStyle",
+    dfmt:function(d){ return d.getFullYear()+' වසර '+(d.getMonth()+1)+' මාසය '+d.getDate()+' දිනය'; },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">යොමු පෝරමය අංක 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">රැකියාවේ පසුබිම පැහැදිලි කිරීමේ පත්‍රිකාව</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">නිශ්චිත කුසලතා විදේශික ශ්‍රමික ${f('f_applicant')} අතර නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුව තීරණය කිරීම සඳහා වන රැකියාවේ පසුබිම පහත සඳහන් වේ.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">රැකියා නියෝජිත ආයතනය (ජපානය තුළ)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">භාවිතා කරනවාද නොකරනවාද යන්න</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">ඔව්</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">නැත</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">අවසරය ලබා දුන් කුවිතාන්සි අංකය</span><br><span class="id">(අවසරය ලබා දුන් දිනය)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">රැකියා නියෝජිත ආයතන වර්ගය</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">ගාස්තු අය කරන රැකියා නියෝජිත ආයතනයකි</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">ගාස්තු අය නොකරන රැකියා නියෝජිත ආයතනයකි</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">රැකියා නියෝජිත ආයතනයේ නම</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">රැකියා නියෝජිත ආයතනයේ ලිපිනය (දුරකථන අංකය)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">රැකියා නියෝජිතයාට ගෙවනු ලැබූ මුදල</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">යෙන්</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">ගෙවීම් වශයෙන්</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">බඳවා ගන්නා ආයතනය (නිශ්චිත කුසලතා සඳහා බඳවා ගන්නා ආයතනය)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">යෙන්</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">ගෙවීම් වශයෙන්</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(සැලකිලිමත් වන්න)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ඔබ ඉහත 1 කොටසේ "නැත" යන්න සලකුණු කලේ නම් 2 කොටස සහ ඊට පහළ කොටස් පිරවීමට අවශ්‍ය නොවේ.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">අංක 2 සිට 5 දක්වා සෞඛ්‍ය, කම්කරු හා සුබසාධන අමාත්‍යාංශයේ සේවා නියුක්ති ආරක්‍ෂක කාර්‍යාංශයේ වෙබ් අඩවියේ “මානව සම්පත් ඒකාබද්ධ සේවා අඩවිය” භාවිතා කර, අදාළ රැකියා නියෝජිත ආයතනය පිළිබඳව තොරතුරු ඇතුලත් කරන්න. තවද ඒ සමග අදාළ තොරතුරු පෙන්වා ඇති තිරයේ පිටපතක්ද අමුණන්න.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">6 වන තීරුවේ රැකියා අපේක්‍ෂකයින් සහ රැකියාවට බඳවා ගන්නා ආයතනය විසින් රැකියා නියෝජිත ආයතනයට ගෙවූ මුදල සහ අරමුණ සඳහන් කරන්න. තවද රැකියා අපේක්‍ෂකයින් විසින් ජපන් යෙන් හැර වෙනත් මුදල් ඒකකයකින් රැකියා නියෝජිතයාට මුදල් ගෙවා ඇත්නම් එම මුදල ජපන් යෙන් බවට පරිවර්ථනය කර සඳහන් කරන්න.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">ඔබ රැකියා නියෝජිත ආයතනය සමග ගිවිසුමක් අත්සන් කර ඇත්නම් එහි ඡායා පිටපතක්ද අමුණන්න.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">අතරමැදි නියෝජිත සංවිධානය (විදේශීය) (අංක 1 හි "ඔව්" යන්න සලකුණු කර ඇත්නම් පමණක් ඉන් පහල ඇති කොටස් පුරවන්න)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">අතරමැදි නියෝජිත සංවිධානයක සේවය ලබාගෙන ඇති නැති බව</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">ඔව්</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">නැත</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">අතරමැදි නියෝජිත සංවිධානයේ නම</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">අතරමැදි නියෝජිත සංවිධානය පිහිටා ඇති රට</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">අතරමැදි නියෝජිත සංවිධානයේ ලිපිනය</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">අතරමැදි නියෝජිත සංවිධානයට ගෙවන ලද මුදල</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">යෙන්</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ගෙවීම් වශයෙන්</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">බඳවා ගන්නා ආයතනය (නිශ්චිත කුසලතා සඳහා බඳවා ගන්නා ආයතනය)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">මුදල</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">යෙන්</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">අරමුණ</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">ගෙවීම් වශයෙන්</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(සැලකිලිමත් වන්න)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">අතරමැදි නියෝජිත සංවිධානයක් යනු රැකියා නියෝජිත ආයතනය, රැකියා සඳහා බඳවා ගන්නා ආයතනයට රැකියා අපේක්‍ෂකයින් ගේ තොරතුරු ලබා දීමේදී අතරමැදිව සම්බන්ධ කර ගන්නා පාර්ශ්වයයි. අදාළ රැකියා නියෝජිත ආයතනය, රැකියා අපේක්‍ෂකයා හා සම්බන්ධ තොරතුරු ලබා ගැනීමේදී අතරමැදියෙකු වශයෙන් මෙම සංවිධානය ක්‍රියාත්මක වේ.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">ඔබ ඉහත 1 කොටසේ "නැත" යන්න සලකුණු කලේ නම් 2 කොටස සහ ඊට පහළ කොටස් පිරවීමට අවශ්‍ය නොවේ.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">5 වන තීරය තුළ බඳවා ගැනීමේ ආයතනය සහ රැකියා අපේක්‍ෂකයින් අතරමැදි නියෝජිත සංවිධානයට ගෙවනු ලැබූ මුදල සහ ඒ මුදල් ලබා දීමේ අරමුණ සඳහන් කරන්න. තවද බඳවා ගැනීමේ ආයතනය සහ රැකියා අපේක්‍ෂකයින් ජපන් යෙන් හැර වෙනත් මුදලකින් ගෙවීම් සිදු කරනු ලැබ ඇත්නම් ඒ මුදලේ වටිනාකම ජපන් යෙන්වලට හරවා අදාල මුදල සඳහන් කරන්න.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">අතරමැදි නියෝජිත සංවිධානයක් සමග කිසියම් ගිවිසුමක් අත්සන කර ඇත්නම් එහි පිටපතක්ද අමුණන්න.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">ජපානයට ඇතුලත් වීමට පෙර මාර්ගෝපදේශ සිදු කිරීම</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">නිශ්චිත කුසලතා විදේශික ශ්‍රමික කාණ්ඩ අංක 1 යටතේ තීරණය කර ඇති උපකාරක සැලසුම්වලට අනුව සිදු කල නොකල බව</span></td>`,
+    L345:()=>`      <span class="id">ඔව් / නැත</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">ඉහත 1 සිට 3 දක්වා අන්තර්ගතයේ වෙනසක් නැත. මීට අමතරව, රැකියා අපේක්‍ෂකයා (අයදුම්කරු)ගේ පදිංචි තත්වය (නිශ්චිත කුසලතා) ලබා ගැනීම හා සම්බන්ධව ආරක්‍ෂක තැන්පතු ගෙවීම සහ දඩ මුදල් ගෙවීම වැනි නුසුදුසු ගාස්තු එකතු කර නොමැති බව අදාල පුද්ගලයාගෙන් විමසා තහවුරු කර ගන්නා ලදී.</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">සැකසූ දිනය：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">නිශ්චිත කුසලතා සඳහා අනුබද්ධ ආයතනයේ නම　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">ලියකියවිලි සැකසීම භාරකාරීව සිටින පුද්ගලයාගේ නම සහ තනතුර　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">රැකියා අපේක්‍ෂකයා (අයදුම්කරු) ඔහුගේ හෝ ඇයගේ මව් රටේ සංවිධානයන්ට ගෙවන ලද වියදම් යනාදිය</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">ගෙවීම් සිදු කරන ලද සංවිධානයේ නම</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">අරමුණ</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">ගෙවන ලද දිනය</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">ගෙවන ලද මුදල</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">අදාළ නොවේ</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">එකතුව</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........යෙන්)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(සැලකිලිමත් වන්න)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. තම මව් රටේ පිහිටා ඇති සංවිධාන යනු, විශේෂිත ඉලක්කයන් අරමුණු කර ගනිමින් සීමා සහිතව පවත්වාගෙන යන ඒවා නොව, නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුවල අයදුම් කිරීම සහ අදාල ක්‍රියාකාරකම් සඳහා වන පෙර සූදානම් කිරීම් හා සම්බන්ධ සියලුම සංවිධාන වේ.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. ගෙවන ලද මුදල් සම්බන්ධව තොරතුරු ඉදිරිපත් කිරීමේදී තමාගේ රටේ දේශීය මුදල් ඒකකයෙන් හෝ ඇමරිකන් ඩොලරවලින් සඳහන් කර, එම මුදලේ වටිනාකම ජපන් යෙන්වලින් ගණනය කර වරහන් තුළ සඳහන් කරන්න.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. ”අරමුණ” සඳහන් කිරීමේදී අයදුම්කරුට සංවිධානය මගින් පැවසූ අරමුණ සඳහන් කරන්න.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">නිශ්චිත කුසලතා රැකියා කොන්ත්‍රාත්තුවලට අදාල අයදුම් කිරීමේ කටයුතු සහ පදිංචි තත්වය (නිශ්චිත කුසලතා) හා සම්බන්ධව පෙර සූදානම් කටයුතු හා සම්බන්ධයෙන් මාගේ මව් රටේ සංවිධාන වෙත ඉහල සඳහන් මුදල් ගෙවූ අරමුණ පිලිබඳ අවබෝධයෙන් අදාල මුදල් ගෙවන ලද අතර, ඉහත සඳහන් මුදල් වලට අමතරව කිසිඳු මුදලක් ගෙවා නැත.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">අයදුම්කරුගේ අත්සන</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  mn:{
+    title:"参考様式第１－１６号（モンゴル語）斡旋有無切替",
+    appTitle:"📄 参考様式第１－１６号（モンゴル語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_siFontStyle",
+    dfmt:function(d){ return d.getFullYear()+' он '+(d.getMonth()+1)+' сар '+d.getDate()+' өдөр'; },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">Лавлагааны загвар 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Хөдөлмөр эрхлэх үйл явцтай холбоотой тайлбар бичиг</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Тусгай ур чадвартай гадаадын иргэн ${f('f_applicant')} -ын хоорондох тусгай ур чадвартанг ажиллуулах гэрээг байгуулсантай холбоотой хөдөлмөр эрхлэх үйл явц нь дараах байдалтай байна.</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Ажлын байрыг танилцуулах ажилтан (дотоод)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">Зуучлагч байгаа эсэх</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Тийм</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">Үгүй</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Зөвшөөрөл・өргөдөл хүлээн авах дугаар</span><br><span class="id">(Хүлээн авах огноо)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">Ажлын байрыг танилцуулах ажилтаны ангилал</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">Төлбөртэй танилцуулах ажилтан</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Төлбөргүй танилцуулах ажилтан</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">Ажлын байрыг танилцуулах ажилтаны нэр</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Ажлын байрыг танилцуулах ажилтаны хаяг (Утасны дугаар)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Ажлын байрыг танилцуулах ажилтанд төлсөн төлбөр</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Ажил горилогч (Хүсэлт гаргагч)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Мөнгөн дүн</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">иен</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">Нэршил</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">болгож</span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Ажил олгогч (Тусгай ур чадвартай ажилтан харъяалагдах байгууллага)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Мөнгөн дүн</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">иен</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">Нэршил</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">болгож</span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Анхаар)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">1-р хэсэгт "Үгүй" гэж дугуйлсан бол, 2-оос доош хэсгүүдэд тэмдэглэгээ хийх шаардлагагүй.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">2-5-р хэсэгт, Эрүүл мэнд, Хөдөлмөр Нийгмийн халамжийн Яамны Ажлын байрыг тогтворжуулах хэлтсийн вэбсайтын “Хүний нөөцийн үйлчилгээний нэгдсэн сайт”-аас хайлт хийж, тухайн ажлын байрыг танилцуулах ажилтны талаарх тохирох мэдээллийг бөглөнө. Мөн, тэр тухай мэдээлэл агуулсан веб хуудасны хуулбарыг хавсаргана.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">6 -р хэсэгт, ажил горилогч болон ажил олгогчийн ажлын байрыг танилцуулах ажилтанд төлөх мөнгөн дүн болон нэршлийн талаарх тэмдэглэгээг хийнэ. Гэхдээ, ажил горилогч нь Япон иенээс бусад мөнгөн дэвсгэртээр төлбөрөө төлсөн тохиолдолд, тухайн мөнгөн тэмдэгтээр төлсөн дүн болон япон иенд хөрвүүлсэн дүнг бичнэ.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">Ажлын байрыг танилцуулагч ажилтаны хооронд хийгдсэн гэрээ байгаа бол, түүний хуулбарыг хавсаргана.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Зуучлагч байгууллага (гадаад) (1-р хэсэгт "Тийм" гэж бөглөсөн тохиолдолд л бичнэ)</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">Зуучлагч байгаа эсэх</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Тийм</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">Үгүй</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">Овог нэр болон компанийн нэр</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">Оршин байгаа улс</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">Оршин байгаа газар</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Зуучлагч байгууллагад төлсөн төлбөр</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Ажил горилогч (Хүсэлт гаргагч)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Мөнгөн дүн</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">иен</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">Нэршил</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">болгож</span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Ажил олгогч (Тусгай ур чадвартай ажилтан харъяалагдах байгууллага)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Мөнгөн дүн</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">иен</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">Нэршил</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">болгож</span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(Анхаар)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Зуучлагч байгууллага гэдэг нь, ажлын байрыг танилцуулагч ажилтан нь ажил олгогчид ажил горилогчийн туслалцаа үзүүлэхийн хамт, тухайн ажлын байрыг танилцуулагч эзэнд хандан ажил горилогч зэрэгтэй холбоотой мэдээллээр ханган зуучилдаг хүнийг хэлнэ.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">1-р хэсэгт "Үгүй" гэж дугуйлсан бол, 2-оос доош хэсгүүдэд тэмдэглэгээ хийх шаардлагагүй.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">5 -р хэсэгт, ажил горилогч болон ажил олгогчийн зуучлагч байгууллагад төлөх мөнгөн дүн болон нэршлийн талаарх тэмдэглэгээг хийнэ. Гэхдээ, ажил горилогч болон ажил олгогч нь япон иенээс бусад мөнгөн дэвсгэртээр төлбөрөө төлсөн тохиолдолд, тухайн мөнгөн тэмдэгтээр төлсөн дүн болон япон иенд хөрвүүлсэн дүнг бичнэ.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">Зуучлагч байгууллагын хооронд хийгдсэн гэрээ байгаа бол, түүний хуулбарыг хавсаргана.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Урьдчилан танилцуулга хийгдсэн эсэх</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">“1-р Тусгай ур чадвартай гадаад иргэн дэмжих төлөвлөгөө”-нд тодорхойлсон дагуу хэрэгжүүлсэн эсэх</span></td>`,
+    L345:()=>`      <span class="id">Тийм / Үгүй</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Дээрх 1-3-д дурдсан нь үнэн болохыг баталж байна. Мөн, ажил хайгч (хүсэлт гаргагч)-ийг “Тусгай ур чадвар” статустай визээр ажиллахтай холбогдуулан зохимжгүй хураамж, тухайлбал батлан даалт, зөрчлийн нөхөн төлбөр зэрэг илүү төлбөр хураагдаагүй эсэхийг тухайн иргэнээс асууж тодруулсан байна.</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Энэхүү баримтыг үйлдсэн огноо：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Тусгай ур чадвартай ажилтан харъяалагдах байгууллагын нэр　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">Энэхүү баримтыг үйлдсэн хариуцагчийн нэр болон ажил үүрэг　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Ажил хайгч нь эх орны байгууллагад төлсөн хураамж</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">Хураамж авсан байгууллагын нэр</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">Нэршил</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Төлбөр хийсэн огноо</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Мөнгөн дүн</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Байхгүй</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">Нийт</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........иен)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(Анхаар)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Эх орны байгууллага гэдэг нь тодорхой байгууллагыг нэрлэсэн биш, харин “Тусгай ур чадварын хөдөлмөрийн гэрээ” байгуулахад зуучилсан, ажилд орох бэлтгэл хангахад тусалсан зэрэг оролцоотой бүх байгууллага хамрагдана.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. Төлсөн хураамжийг төгрөгөөр эсвэл ам.доллароор бичиж, ард нь хаалтад иенд хөрвүүлсэн дүнг бичнэ.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. ”Хураамжийн нэр төрөл” гэдэгт ямар нэр дор төлөгдсөн хураамж болохыг бичнэ.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">“Тусгай ур чадварын хөдөлмөрийн гэрээ” байгуулахаар зуучлах үйлчилгээ, “Тусгай ур чадвартай иргэн” статустай визээр ажиллах бэлтгэл хангах үйлчилгээний хураамжийг түүний мөнгөн дүн, задаргааны талаар сайтар ойлгосон үндсэн дээр төлбөр хийсэн. Түүнчлэн, дээр дурдсанаас өөр төлбөр хураагдаагүй гэдгийг баталж байна.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Хүсэлт гаргагчийн гарын үсэг</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  },
+  tl:{
+    title:"参考様式第１－１６号（タガログ語）斡旋有無切替",
+    appTitle:"📄 参考様式第１－１６号（タガログ語）　雇用の経緯に係る説明書【斡旋有無 切替対応】",
+    stid:"_1_16_siFontStyle",
+    dfmt:function(d){ return 'Ika-'+d.getDate()+' ng '+['Enero','Pebrero','Marso','Abril','Mayo','Hunyo','Hulyo','Agosto','Setyembre','Oktubre','Nobyembre','Disyembre'][d.getMonth()]+', Taon '+d.getFullYear(); },
+    L195:()=>`<div style="text-align:left;font-size:9pt;" class="id">Sangguniang Dokumento 1-16</div>`,
+    L197:()=>`<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">PALIWANAG TUNGKOL SA DETALYE NG TRABAHO</div>`,
+    L199:()=>`<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Ang detalye ng trabaho para sa pagpapatibay ng kontrata ng pagtatrabaho ng Specified Skilled Worker ni ${f('f_applicant')}, na isang dayuhang Specified Skilled Worker, ay ang mga sumusunod:</div>`,
+    L201:()=>`<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Employment Agency (Sa loob ng bansa)</span></div>`,
+    L210:()=>`    <td class="lbl">１　あっせんの有無<br><span class="id">May tagapamagitan ba?</span></td>`,
+    L212:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Mayroon</span>`,
+    L215:()=>`      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">Wala</span>`,
+    L219:()=>`    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Numero ng Lisensiya/ Notification Receipt</span><br><span class="id">(Petsa ng pagtanggap)</span></td>`,
+    L223:()=>`    <td>３　職業紹介事業者の区分<br><span class="id">Klasipikasyon ng Employment Agency</span></td>`,
+    L225:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">May bayad</span>`,
+    L228:()=>`      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Walang bayad</span>`,
+    L232:()=>`    <td>４　職業紹介事業者の氏名<br><span class="id">Pangalan ng Employment Agency</span></td>`,
+    L236:()=>`    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Address ng Employment Agency (Numero ng Telepono)</span></td>`,
+    L237:()=>`    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>`,
+    L240:()=>`    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Binayarang gastusin sa employment agency</span></td>`,
+    L241:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Ang naghahanap ng trabaho (Aplikante)</span></td>`,
+    L242:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Halaga</span></td>`,
+    L243:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">Yen</span>）</td>`,
+    L246:()=>`    <td style="text-align:center;">名目<br><span class="id">Para sa</span></td>`,
+    L247:()=>`    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id"></span></td>`,
+    L250:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Employer (Kumpanya kung saan magtatrabaho ang Dayuhang Specified Skilled Worker)</span></td>`,
+    L251:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Halaga</span></td>`,
+    L252:()=>`    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">Yen</span>）</td>`,
+    L255:()=>`    <td style="text-align:center;">名目<br><span class="id">Para sa</span></td>`,
+    L256:()=>`    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id"></span></td>`,
+    L260:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(PAALALA)</span></div>`,
+    L262:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Kung “Wala” ang may check sa Seksyon 1, hindi kailangang sagutin ang Seksyon 2 pababa.</div>`,
+    L264:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Sa Seksyon 2 hanggang 5, gamitin ang “Human Resources Development” sa website ng Employment Security Bureau, Ministry of Health, Labour and Welfare para sa paglagay ng naaangkop na impormasyon tungkol sa nasabing ahensya. Bukod pa dito, maglakip ng kopya ng screen kung saan nai-post ang kaugnay na impormasyon.</div>`,
+    L266:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Sa Seksyon 6, dapat maisulat ang halaga ng binayaran ng naghahanap ng trabaho at ng nag-aalok ng trabaho sa ahensya at kung para saan ito. Kung ang naghahanap ng trabaho ay nagbayad ng halaga na gamit ang salapi maliban sa Japanese Yen, ang halaga ng binayaran sa salaping iyon at ang katumbas na halaga nito sa Japanese Yen ay dapat isulat.</div>`,
+    L268:()=>`  <div style="padding-left:1.5em;" class="id">Kung may kontrata na ginawa sa ahensya, kailangang maglakip ng kopya nito.</div>`,
+    L274:()=>`<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Ahensya (Sa ibang bansa) (Sulatan lamang kung “Mayroon” ang naka-check sa (１) )</span></div>`,
+    L283:()=>`    <td class="lbl">１　取次ぎの有無<br><span class="id">May tagapamagitan ba?</span></td>`,
+    L285:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Mayroon</span>`,
+    L288:()=>`      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">Wala</span>`,
+    L292:()=>`    <td>２　氏名又は名称<br><span class="id">Pangalan o Tawag</span></td>`,
+    L296:()=>`    <td>３　所在国<br><span class="id">Bansa kung saan ito matatagpuan</span></td>`,
+    L300:()=>`    <td>４　所在地<br><span class="id">Lugar kung saan ito matatagpuan</span></td>`,
+    L301:()=>`    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>`,
+    L304:()=>`    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Binayaran sa ahensya</span></td>`,
+    L305:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Ang naghahanap ng trabaho (Aplikante)</span></td>`,
+    L306:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Halaga</span></td>`,
+    L307:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">Yen</span>）</td>`,
+    L310:()=>`    <td style="text-align:center;">名目<br><span class="id">Para sa</span></td>`,
+    L311:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id"></span></td>`,
+    L314:()=>`    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Employer (Kumpanya kung saan magtatrabaho ang Dayuhang Specified Skilled Worker)</span></td>`,
+    L315:()=>`    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Halaga</span></td>`,
+    L316:()=>`    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">Yen</span>）</td>`,
+    L319:()=>`    <td style="text-align:center;">名目<br><span class="id">Para sa</span></td>`,
+    L320:()=>`    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id"></span></td>`,
+    L324:()=>`  <div style="margin-bottom:1mm;">（注意）<span class="id">(PAALALA)</span></div>`,
+    L326:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Ang isang intermediary agency ay nangangahulugang isang tao na magbibigay impormasyon tungkol sa mga naghahanap ng trabaho sa ahensya sa pagrerekomenda ng isang naghahanap ng trabaho sa isang nag-aalok ng trabaho.</div>`,
+    L328:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Kung “Wala” ang may check sa Seksyon 1, hindi kailangang sagutin ang Seksyon 2 pababa.</div>`,
+    L330:()=>`  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Sa Seksyon 5, dapat maisulat ang halaga ng binayaran ng naghahanap ng trabaho at ng nag-aalok ng trabaho sa intermediary agency at kung para saan ito. Kung ang naghahanap ng trabaho ay nagbayad ng halaga gamit ang salapi maliban sa Japanese Yen, ang halaga ng binayaran sa saliping iyon at ang katumbas na halaga nito sa Japanese Yen ay dapat isulat.</div>`,
+    L332:()=>`  <div style="padding-left:1.5em;" class="id">Kung may kontrata na ginawa sa intermediary agency, kailangang maglakip ng kopya nito.</div>`,
+    L338:()=>`<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pagsasagawa ng Paunang Gabay</span></div>`,
+    L341:()=>`    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Kung may naisagawa na ayon sa itinakda ng planong pangsuporta sa mga type 1 na dayuhang teknikal na manggagawa o wala</span></td>`,
+    L345:()=>`      <span class="id">Mayroon・Wala</span>`,
+    L351:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Tunay ang mga nilalaman mula sa 1 hanggang sa 3 sa ibaba. Bilang karagdagang, kinumpirma sa pamamagitan ng pagdinig mula sa naghahanap ng trabaho (aplikante) na Hindi siya siningil ng hindi naaangkop na gastos tulad ng bayad sa deposito, multa atbp. na nauugnay sa mga aktibidad na sakop ng katayuan ng paninirahan na “Teknikal na Manggagawa”.</div>`,
+    L354:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Petsa ng Paglikha：${f('f_docDateEn')}</div>`,
+    L356:()=>`<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Pangalan o Tawag sa Ahensya na Nabibilang ng Specified Skilled Worker　${f('f_companyEn')}</div>`,
+    L358:()=>`<div style="font-size:9pt;text-align:right;" class="id">Pangalan at Tungkulin ng May Pananagutan sa Paggawa nito　${f('f_authorEn')}</div>`,
+    L363:()=>`<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Mga gastos na binayaran ng naghahanap ng trabaho (aplikante) sa mga ahente sa sariling bansa atbp.</span></div>`,
+    L367:()=>`    <th style="text-align:center;">支払先機関の名称<br><span class="id">Pangalan ng ahenteng binayaran</span></th>`,
+    L368:()=>`    <th style="text-align:center;width:18%;">名目<br><span class="id">Para sa</span></th>`,
+    L369:()=>`    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Petsa ng pagbabayad</span></th>`,
+    L370:()=>`    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Halaga</span></th>`,
+    L374:()=>`    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Wala</span>' : '')}</td>`,
+    L377:()=>`    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L384:()=>`    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L391:()=>`    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L398:()=>`    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L405:()=>`    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L408:()=>`    <td colspan="4" style="text-align:right;">計　<span class="id">Kabuuan</span></td>`,
+    L409:()=>`    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........Yen)</span></td>`,
+    L417:()=>`  <div style="margin-bottom:1mm;" class="id">(PAALALA)</div>`,
+    L418:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Ang mga ahente sa sariling bansa atbp. ay hindi lamang nalilimitahan sa natatanging ahente kundi lahat ng ahenteng nauugnay sa pamamagitan o paghahanda para sa aplikasyon sa kontrata sa pagtatrabaho ng teknikal na mangagawa.</div>`,
+    L419:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. Para sa Halaga ng Bayad, isulat ito sa lokal na pera o sa dolyar ng US at isulat ang halagang pinalitan sa Japanese Yen sa mga panaklong.</div>`,
+    L420:()=>`  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. Para sa “Para sa”, isulat ayon sa bagay na ipinahayag sa aplikante.</div>`,
+    L424:()=>`<div style="font-size:9pt;margin-bottom:4mm;" class="id">Tungkol sa pamamagitan para sa aplikasyon sa Kontrata ng Pagtatrabaho ng Teknikal na Manggagawa o sa paghahandang may kaugnayan sa aktibidad ng katayuang ng paninirahan na “Teknikal na Manggaawa”, nagbayad ako matapos kong maunawaang mabuti ang halagang nasa itaas at detalye ng binayaran. Bukod pa dito, hindi ako sinigil ng anumang bayad maliban sa nasa itaas.</div>`,
+    L425:()=>`<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Pirma ng Aplikante</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>`
+  }
+};
+if(!T16[_L16]) _L16='en';
+var _T16=T16[_L16];
+document.title=_T16.title;
+</script>
 </head>
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title">📄 参考様式第１－１６号（英語）　雇用の経緯に係る説明書【斡旋有無 切替対応】</div>
-    <div class="ver">ver.20261116.06</div>
+    <div class="app-bar-title"></div>
+    <div class="ver">ver.20261116.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -140,6 +1183,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
     </div>
   </div>
 </div>
+<script>(function(){ var t=document.querySelector('.app-bar .app-bar-title'); if(t) t.textContent=_T16.appTitle; })();</script>
 <div class="pp">
   <div class="page-nav">
     <span class="page-nav-label">ページ:</span>
@@ -155,7 +1199,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794880001"></script>
+<script src="ofusa_common.js?v=1794890001"></script>
 <script>
 // 手数料として有効な値か判定する。
 // 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
@@ -192,13 +1236,13 @@ function p(){
 <div class="doc">
 <div class="page-num-label">P1</div>
 <div style="text-align:left;font-size:10pt;margin-bottom:2px;">参考様式第１－１６号</div>
-<div style="text-align:left;font-size:9pt;" class="id">Reference Form 1-16</div>
+${_T16.L195()}
 <div style="font-size:14pt;font-weight:bold;text-align:center;margin:4mm 0 1mm;">雇用の経緯に係る説明書</div>
-<div style="font-size:10pt;text-align:center;margin-bottom:4mm;" class="id">Explanation of Employment Background</div>
+${_T16.L197()}
 <div style="font-size:10pt;margin-bottom:2mm;">特定技能外国人　${f('f_applicant')}　との間で特定技能雇用契約を締結するに当たっての雇用の経緯は以下のとおりです。</div>
-<div style="font-size:9.5pt;margin-bottom:4mm;" class="id">Regarding the conclusion of the employment contract with specified skilled worker ${f('f_applicant')}, the employment background is as follows.</div>
+${_T16.L199()}
 
-<div style="font-size:11pt;margin-bottom:2mm;">１　職業紹介事業者（国内）　<span class="id">Employment placement business provider (in Japan)</span></div>
+${_T16.L201()}
 <table class="tbl" style="margin-bottom:4mm;">
   <colgroup>
     <col style="width:28%;">
@@ -207,71 +1251,71 @@ function p(){
     <col>
   </colgroup>
   <tr>
-    <td class="lbl">１　あっせんの有無<br><span class="id">Use of an employment placement service</span></td>
+${_T16.L210()}
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box" ${v('es_assen')==='有'?'checked':''}>有<br><span class="id">Yes</span>
+${_T16.L212()}
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box" ${v('es_assen')!=='有'?'checked':''}>無<br><span class="id">No</span>
+${_T16.L215()}
     </td>
   </tr>
   <tr>
-    <td>２　許可・届出受理番号<br>（受理受付年月日）<br><span class="id">Acceptance No. for approval and notification</span><br><span class="id">(Date of acceptance and receipt)</span></td>
+${_T16.L219()}
     <td colspan="3">${f('f_ag_license')}${v('f_ag_licenseDate') ? '（'+f('f_ag_licenseDate')+'）' : ''}</td>
   </tr>
   <tr>
-    <td>３　職業紹介事業者の区分<br><span class="id">Category of the employment placement business provider</span></td>
+${_T16.L223()}
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='有料'?'checked':''}>有料職業紹介事業者<br><span class="id">Fee-charging employment placement business provider</span>
+${_T16.L225()}
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box" ${v('f_ag_type')==='無料'?'checked':''}>無料職業紹介事業者<br><span class="id">Free employment placement business provider</span>
+${_T16.L228()}
     </td>
   </tr>
   <tr>
-    <td>４　職業紹介事業者の氏名<br><span class="id">Name of the employment placement business provider</span></td>
+${_T16.L232()}
     <td colspan="3">${f('f_ag_name')}</td>
   </tr>
   <tr>
-    <td>５　職業紹介事業者の住所<br>（電話番号）<br><span class="id">Address of the employment placement business provider (Telephone number)</span></td>
-    <td colspan="3">${f('f_ag_addr')}<br>（電話番号 ${f('f_ag_tel')}）</td>
+${_T16.L236()}
+${_T16.L237()}
   </tr>
   <tr>
-    <td rowspan="4" class="lbl">６　職業紹介事業者へ支払った費用<br><span class="id">Expenses paid to the employment placement business provider</span></td>
-    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Job seeker (the applicant)</span></td>
-    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>
-    <td class="dashed-bottom">（${f('f_ag_fee_seeker')}　円 <span class="id">yen</span>）</td>
+${_T16.L240()}
+${_T16.L241()}
+${_T16.L242()}
+${_T16.L243()}
   </tr>
   <tr>
-    <td style="text-align:center;">名目<br><span class="id">Description</span></td>
-    <td style="text-align:right;">${f('f_tt_nom_seeker')}　として <span class="id">For payment of</span></td>
+${_T16.L246()}
+${_T16.L247()}
   </tr>
   <tr>
-    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Job offeror (the organization of affiliation of the specified skilled worker)</span></td>
-    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>
-    <td class="dashed-bottom">（${f('f_ag_fee_employer')}　円 <span class="id">yen</span>）</td>
+${_T16.L250()}
+${_T16.L251()}
+${_T16.L252()}
   </tr>
   <tr>
-    <td style="text-align:center;">名目<br><span class="id">Description</span></td>
-    <td style="text-align:right;">${f('f_tt_nom_employer')}　として <span class="id">For payment of</span></td>
+${_T16.L255()}
+${_T16.L256()}
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
-  <div style="margin-bottom:1mm;">（注意）<span class="id">(Notes)</span></div>
+${_T16.L260()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">If you ticked "No" in section 1, you do not need to fill out sections below section 2.</div>
+${_T16.L262()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　２から５欄までは，厚生労働省職業安定局ホームページの「人材サービス総合サイト」を活用し，当該職業紹介事業者についての該当する情報を記入すること。また，併せて当該情報が掲載されている画面の写しを添付すること。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the relevant information for the applicable employment placement business provider in sections 2, 3, 4, and 5, using the "Comprehensive Human Resource Services Website" which is operated by the Employment Security Bureau of the Ministry of Health, Labour and Welfare. Furthermore, attach a copy of the screen on which the information in question is posted.</div>
+${_T16.L264()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">３　６欄は，求職者及び求人者が職業紹介事業者に支払った額及び名目について記載すること。なお，求職者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the amount and description of the money paid by the job seeker and job offeror to the employment placement business provider in section 6. Please note that if the job seeker paid the expense in a currency other than yen, you must state the amount paid in the local currency, as well as that amount converted to yen.</div>
+${_T16.L266()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">４　職業紹介事業者との間で交わした契約書があれば，その写しを添付すること。</div>
-  <div style="padding-left:1.5em;" class="id">If you have a written contract exchanged with the employment placement business provider, please attach a copy of it.</div>
+${_T16.L268()}
 </div>
 </div>
 
 <div class="doc">
 <div class="page-num-label">P2</div>
-<div style="font-size:11pt;margin-bottom:2mm;">２　取次機関（国外）（１で有にチェックを付した場合のみ記載）　<span class="id">Agent organization (outside Japan) (Only those who ticked "Yes" in section 1 above need to fill in the form below)</span></div>
+${_T16.L274()}
 <table class="tbl" style="margin-bottom:4mm;">
   <colgroup>
     <col style="width:28%;">
@@ -280,133 +1324,133 @@ function p(){
     <col>
   </colgroup>
   <tr>
-    <td class="lbl">１　取次ぎの有無<br><span class="id">Use of service provided by the agent organization</span></td>
+${_T16.L283()}
     <td colspan="2" style="text-align:center;border-right:none;">
-      <input type="checkbox" class="chk-box" ${v('es_toritsugi')==='有'?'checked':''}>有<br><span class="id">Yes</span>
+${_T16.L285()}
     </td>
     <td style="text-align:center;border-left:none;">
-      <input type="checkbox" class="chk-box" ${v('es_toritsugi')!=='有'?'checked':''}>無<br><span class="id">No</span>
+${_T16.L288()}
     </td>
   </tr>
   <tr>
-    <td>２　氏名又は名称<br><span class="id">Name of the agent organization</span></td>
+${_T16.L292()}
     <td colspan="3">${f('f_tt_name')}</td>
   </tr>
   <tr>
-    <td>３　所在国<br><span class="id">Country where the agent organization is located</span></td>
+${_T16.L296()}
     <td colspan="3">${f('f_tt_country')}</td>
   </tr>
   <tr>
-    <td>４　所在地<br><span class="id">Address of the agent organization</span></td>
-    <td colspan="3">${f('f_tt_addr')}<br>（電話番号 ${f('f_tt_tel')}）</td>
+${_T16.L300()}
+${_T16.L301()}
   </tr>
   <tr>
-    <td rowspan="4" class="lbl">５　取次機関へ支払った費用<br><span class="id">Expenses paid to the agent organization</span></td>
-    <td rowspan="2" style="vertical-align:middle;text-align:center;">求職者（申請人）<br><span class="id">Job seeker (the applicant)</span></td>
-    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>
-    <td class="dashed-bottom">（${f('f_tt_fee_seeker')}　円 <span class="id">yen</span>）</td>
+${_T16.L304()}
+${_T16.L305()}
+${_T16.L306()}
+${_T16.L307()}
   </tr>
   <tr>
-    <td style="text-align:center;">名目<br><span class="id">Description</span></td>
-    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">For payment of</span></td>
+${_T16.L310()}
+${_T16.L311()}
   </tr>
   <tr>
-    <td rowspan="2" style="vertical-align:middle;text-align:center;">求人者（特定技能所属機関）<br><span class="id">Job offeror (the organization of affiliation of the specified skilled worker)</span></td>
-    <td class="dashed-bottom" style="text-align:center;">額<br><span class="id">Amount</span></td>
-    <td class="dashed-bottom">（${f('f_tt_fee_employer')}　円 <span class="id">yen</span>）</td>
+${_T16.L314()}
+${_T16.L315()}
+${_T16.L316()}
   </tr>
   <tr>
-    <td style="text-align:center;">名目<br><span class="id">Description</span></td>
-    <td style="text-align:right;">　　　　　　　　　　　　として <span class="id">For payment of</span></td>
+${_T16.L319()}
+${_T16.L320()}
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
-  <div style="margin-bottom:1mm;">（注意）<span class="id">(Notes)</span></div>
+${_T16.L324()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　取次機関とは，職業紹介事業者が求人者に求職者のあっせんを行うに際し，当該職業紹介事業主に対し求職者等に係る情報の取次ぎを行う者をいう。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">The agent organization here means an entity which serves as an intermediary for information with regard to job seekers etc. between the employment placement business provider and the relevant employment placement business provider when the former makes employment placement of the job seeker to the job offeror.</div>
+${_T16.L326()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　１欄で無にチェックを付した場合には，２以下の欄の記載は不要とする。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">If you ticked "No" in section 1, you do not need to fill out sections below section 2.</div>
+${_T16.L328()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">３　５欄は，求職者及び求人者が取次機関に支払った額及び名目について記載すること。なお，求職者及び求人者が日本円以外で費用を支払った場合は，当該通貨で支払った額及び日本円に換算した額を記載すること。</div>
-  <div style="padding-left:1.5em;margin-bottom:0.8mm;" class="id">Fill in the amount and description of the money paid by the job seeker and job offeror to the agent organization in section 5. Please note that if the job seeker or job offeror paid the expense in a currency other than yen, you must state the amount paid in the local currency, as well as that amount converted to yen.</div>
+${_T16.L330()}
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">４　取次機関との間で交わした契約書があれば，その写しを添付すること。</div>
-  <div style="padding-left:1.5em;" class="id">If you have a written contract exchanged with the agent organization, please attach a copy of it.</div>
+${_T16.L332()}
 </div>
 
 </div>
 <div class="doc">
 <div class="page-num-label">P3</div>
-<div style="font-size:11pt;margin-bottom:2mm;">３　事前ガイダンスの実施　<span class="id">Pre-Departure Orientation</span></div>
+${_T16.L338()}
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
-    <td style="width:70%;">第１号特定技能外国人支援計画に定めるとおりに実施していることの有無<br><span class="id">Whether or not the orientation was conducted as laid out in the Support Plan for Specified Skilled Worker (i)</span></td>
+${_T16.L341()}
     <td style="text-align:center;">
       <input type="checkbox" class="chk-box" ${guidance==='有'?'checked':''}>有　
       <input type="checkbox" class="chk-box" ${guidance==='無'?'checked':''}>無<br>
-      <span class="id">Yes / No</span>
+${_T16.L345()}
     </td>
   </tr>
 </table>
 
 <div style="font-size:10pt;margin-bottom:2mm;">以上の１から３までの内容について相違ありません。なお，求職者（申請人）が在留資格「特定技能」の活動を行うことに関連して保証金，違約金の支払等の不適切な費用徴収がされていないことを本人から聞き取るなどして確認しています。</div>
-<div style="font-size:9pt;margin-bottom:4mm;" class="id">The contents of 1 to 3 above are all true. I have confirmed, such as through inquiries to the applicant, that no improper expenses, such as payment of any security deposit or penalty for breach of contract, has been collected from the job seeker (the applicant) in relation to any activity with the status of residence "Specified Skilled Worker".</div>
+${_T16.L351()}
 
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成年月日：${f('f_docDate')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Date of preparation：${f('f_docDateEn')}</div>
+${_T16.L354()}
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">特定技能所属機関の氏名又は名称　${f('f_company')}</div>
-<div style="font-size:9pt;margin-bottom:3mm;text-align:right;" class="id">Name of the organization of affiliation of specified skilled worker　${f('f_companyEn')}</div>
+${_T16.L356()}
 <div style="font-size:10pt;margin-bottom:1mm;text-align:right;">作成責任者の氏名及び役職　${f('f_author')}</div>
-<div style="font-size:9pt;text-align:right;" class="id">Name and position of the person responsible for preparation　${f('f_authorEn')}</div>
+${_T16.L358()}
 </div>
 
 <div class="doc">
 <div class="page-num-label">P4</div>
-<div style="font-size:11pt;margin-bottom:2mm;">４　求職者（申請人）が自国等の機関に支払った費用　<span class="id">Expenses paid by the job seeker (the applicant) to organizations in his/her own country</span></div>
+${_T16.L363()}
 <table class="tbl" style="margin-bottom:4mm;">
   <tr>
     <th style="text-align:center;width:6%;">#</th>
-    <th style="text-align:center;">支払先機関の名称<br><span class="id">Name of the organization that received the payment</span></th>
-    <th style="text-align:center;width:18%;">名目<br><span class="id">Description</span></th>
-    <th style="text-align:center;width:18%;">支払年月日<br><span class="id">Date of payment</span></th>
-    <th style="text-align:center;width:20%;">支払金額<br><span class="id">Amount paid</span></th>
+${_T16.L367()}
+${_T16.L368()}
+${_T16.L369()}
+${_T16.L370()}
   </tr>
   <tr>
     <td style="text-align:center;">１</td>
-    <td>${v('f_p1_name') ? f('f_p1_name') : (_p16PayNone() ? '該当なし<br><span class="id">Not applicable</span>' : '')}</td>
+${_T16.L374()}
     <td>${_p16Pay('f_p1_kind')}</td>
     <td>${_p16Pay('f_p1_date')}</td>
-    <td>${v('f_p1_amount') ? '（'+f('f_p1_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L377()}
   </tr>
   <tr>
     <td style="text-align:center;">２</td>
     <td>${_p16Pay('f_p2_name')}</td>
     <td>${_p16Pay('f_p2_kind')}</td>
     <td>${_p16Pay('f_p2_date')}</td>
-    <td>${v('f_p2_amount') ? '（'+f('f_p2_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L384()}
   </tr>
   <tr>
     <td style="text-align:center;">３</td>
     <td>${_p16Pay('f_p3_name')}</td>
     <td>${_p16Pay('f_p3_kind')}</td>
     <td>${_p16Pay('f_p3_date')}</td>
-    <td>${v('f_p3_amount') ? '（'+f('f_p3_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L391()}
   </tr>
   <tr>
     <td style="text-align:center;">４</td>
     <td>${_p16Pay('f_p4_name')}</td>
     <td>${_p16Pay('f_p4_kind')}</td>
     <td>${_p16Pay('f_p4_date')}</td>
-    <td>${v('f_p4_amount') ? '（'+f('f_p4_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L398()}
   </tr>
   <tr>
     <td style="text-align:center;">５</td>
     <td>${_p16Pay('f_p5_name')}</td>
     <td>${_p16Pay('f_p5_kind')}</td>
     <td>${_p16Pay('f_p5_date')}</td>
-    <td>${v('f_p5_amount') ? '（'+f('f_p5_amount')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L405()}
   </tr>
   <tr>
-    <td colspan="4" style="text-align:right;">計　<span class="id">Total</span></td>
-    <td>${v('f_p_total') ? '（'+f('f_p_total')+' 円）' : '（　　　　円）'}<br><span class="id">(.........yen)</span></td>
+${_T16.L408()}
+${_T16.L409()}
   </tr>
 </table>
 <div style="font-size:8.5pt;margin-bottom:4mm;">
@@ -414,26 +1458,26 @@ function p(){
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">１　自国等の機関は，特段対象を限定するものではなく，特定技能雇用契約の申込みの取次ぎ又は活動の準備に関与した全ての機関をいう。</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;">２　支払金額については，現地通貨又は米ドルで記載し，括弧書きで日本円に換算した金額を記載すること。</div>
   <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:2mm;">３　名目については，申請人に示した名目どおりに記載すること。</div>
-  <div style="margin-bottom:1mm;" class="id">(Notes)</div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">1. Organizations in his/her own country are not particularly limited to the organizations involved in the agency for the application for the employment contract for specified skilled work or preparation of activities therefor.</div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;margin-bottom:0.4mm;" class="id">2. The amount paid should be stated in the local currency or US dollars, and the amount converted to Japanese yen should be stated in parentheses.</div>
-  <div style="text-indent:-1.5em;padding-left:1.5em;" class="id">3. As for the description, fill in exactly the description shown to the applicant.</div>
+${_T16.L417()}
+${_T16.L418()}
+${_T16.L419()}
+${_T16.L420()}
 </div>
 
 <div style="font-size:10pt;margin-bottom:2mm;">特定技能雇用契約の申込みの取次ぎ又は在留資格「特定技能」に係る活動の準備に関して，自国等の機関に対し，上記の費用の額及び内訳について十分に理解した上で支払いました。また，上記の費用以外の費用については，徴収されていません。</div>
-<div style="font-size:9pt;margin-bottom:4mm;" class="id">I understand the amount and breakdown of the above-mentioned expenses and made the payment to the organizations in my own country in relation to the agency for the application for the employment contract for specified skilled work or preparation of activities concerning the status of residence "Specified Skilled Worker". Also, no other expenses than the above-mentioned have been collected from me.</div>
-<div style="margin-top:6mm;text-align:right;font-size:10pt;">申請人の署名　<span class="id">Applicant's signature</span>　<span style="display:inline-block;border-bottom:1px solid #000;width:20em;">&nbsp;</span></div>
+${_T16.L424()}
+${_T16.L425()}
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 10 : _fontSize;
   _applyFontSize();
-  _apply1_16_enFontSize();
+  _apply1_16LangFontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
   setupPageTracker();
   fitDocToPreview();
 }
-function _apply1_16_enFontSize(){
-  const st=document.getElementById('_1_16_enFontStyle')||document.createElement('style');
-  st.id='_1_16_enFontStyle'; document.head.appendChild(st);
+function _apply1_16LangFontSize(){
+  const st=document.getElementById(_T16.stid)||document.createElement('style');
+  st.id=_T16.stid; document.head.appendChild(st);
   const s=_fontSize/10;
   st.textContent=[
     `.doc [style*="font-size:14pt"]{font-size:${(14*s).toFixed(2)}pt!important}`,
@@ -525,7 +1569,7 @@ async function loadFromDB(passedInfo){
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
-      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`; var e2=document.getElementById('f_docDateEn'); if(e2)e2.value=d.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][d.getMonth()]+' '+d.getFullYear();}}
+      if(cas.doc_create_date){const d=new Date(cas.doc_create_date);if(!isNaN(d)){const e=document.getElementById('f_docDate');if(e)e.value=`令和${d.getFullYear()-2018}年${d.getMonth()+1}月${d.getDate()}日`; var e2=document.getElementById('f_docDateEn'); if(e2)e2.value=_T16.dfmt(d);}}
     }
     if(ir && ir.agency_name){
       s('f_ag_name', ir.agency_name);

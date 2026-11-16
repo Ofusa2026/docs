@@ -52,12 +52,362 @@
   font-size:8pt;
 }
 </style>
+<script>
+// ver.20261116.16: 1-5号は、言語ごとに別のファイルだったものを、この1つにまとめました。
+//   言語ごとに違うのは、下の表（T15）の文言だけです。様式の形や入力欄を直すときは、このファイルだけ直せば全部の言語に反映されます。
+//   1_5_vi.html などの言語のファイルは、このファイルを読み込む入口です（ファイル名で言語が決まります。1_5.html はインドネシア語）。
+var _L15=((location.pathname.split('/').pop()||'').match(/^1_5_([a-z]{2})\.html$/i)||[])[1]||'id';
+var T15={
+  id:{
+    title:"参考様式第１－５号 特定技能雇用契約書",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）",
+    lab:"ID",
+    docId:"1_5",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）",
+    link:"",
+    stid:"_15FontStyle",
+    dockey:true,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Format Referensi 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Perjanjian Kerja Pekerja Berketerampilan Khusus</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">Organisasi afiliasi pekerja berketerampilan khusus　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Pertama") dan</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">Pekerja berketerampilan khusus (termasuk calon pekerja)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Kedua")</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">dengan ini mengikat diri dalam perjanjian kerja pekerja berketerampilan khusus sesuai isi yang tercantum dalam syarat kerja terlampir.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">Perjanjian kerja ini berlaku mulai dari tanggal Pihak Kedua masuk ke Jepang atau tanggal Pihak Kedua menerima izin perubahan visa tinggal, dsb. dengan izin tinggal "Pekerja Berketerampilan Khusus 1" atau "Pekerja Berketerampilan Khusus 2", dengan penyesuaian yang akan segera dilakukan oleh kedua belah pihak untuk memulai pekerjaan yang akan ditentukan melalui kesepakatan bersama antara Pihak Pertama dan Pihak Kedua dalam kurun waktu satu bulan sejak tanggal tersebut.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">Periode perjanjian kerja (masa mulai dan berakhirnya perjanjian kerja) yang tercantum dalam syarat kerja harus diubah sesuai tanggal mulai kerja yang ditentukan berdasarkan kesepakatan kedua belah pihak.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">Kedua belah pihak akan saling berbagi informasi mengenai hasil keputusan terkait status visa Pihak Kedua.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">Perjanjian kerja berakhir pada saat perjanjian kerja tidak diperbarui dan periode perjanjian kerja telah berakhir, atau bila Pihak Kedua telah kehilangan izin tinggal karena suatu alasan.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">Perjanjian kerja ini dan syarat kerja dibuat dalam 2 (dua) rangkap dan masing-masing disimpan oleh Pihak Pertama dan Pihak Kedua.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">Pengikatan dilakukan tanggal ${f('es_createD')} / ${f('es_createM')} / ${f('es_createY')}</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Pihak Pertama</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">ttd.</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(Nama organisasi afiliasi pekerja berketerampilan<br>khusus, nama, jabatan, dan tanda tangan direktur<br>representatifnya)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Pihak Kedua</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(Tanda tangan pekerja asing berketerampilan khusus)</div>`
+  },
+  vi:{
+    title:"参考様式第１－５号 特定技能雇用契約書（ベトナム語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（ベトナム語版）",
+    lab:"VI",
+    docId:"1_5_vi",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（ベトナム語版）",
+    link:"",
+    stid:"_15_viFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Mẫu Tham Khảo 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Hợp Đồng Tuyển Dụng Kỹ Năng Đặc Định</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">Cơ quan liên kết kỹ năng đặc định　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(dưới đây gọi là bên A) và</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">Người nước ngoài có kỹ năng đặc định (bao gồm cả ứng viên)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(dưới đây gọi là bên B)</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">cùng ký kết Hợp đồng Kỹ năng Đặc định theo nội dung được mô tả trong Bản Điều kiện Tuyển dụng đi kèm.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">Từ ngày bên B được cấp phép nhập cảnh vào Nhật với tư cách lưu trú "Kỹ năng đặc định số 1" hoặc "Kỹ năng đặc định số 2" hay được cấp phép thay đổi tư cách lưu trú, v.v, bên A và bên B sẽ cùng nhanh chóng thu xếp, và trong vòng 1 tháng kể từ ngày này, hợp đồng tuyển dụng này sẽ bắt đầu tuyển dụng từ ngày được xác định dựa theo sự thỏa thuận của hai bên.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">Thời gian hợp đồng tuyển dụng trong bản điều kiện tuyển dụng (thời gian bắt đầu và kết thúc hợp đồng tuyển dụng) được thay đổi dựa theo ngày bắt đầu tuyển dụng được xác định theo sự thu xếp của bên A và bên B.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">Bên A và bên B sẽ chia sẻ thông tin cho nhau về kết quả thẩm tra liên quan đến tư cách lưu trú của bên B.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">Trường hợp hết thời hạn hợp đồng tuyển dụng mà không có gia hạn hợp đồng tuyển dụng và bên B vì lý do gì đó mà bị mất tư cách lưu trú thì hợp đồng tuyển dụng kết thúc tại thời điểm đó.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">Hợp đồng Tuyển dụng này và Bản Điều kiện Tuyển dụng được lập thành 2 bản, bên A và bên B mỗi bên giữ một bản.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">Ký vào ngày ${f('es_createD')} tháng ${f('es_createM')} năm ${f('es_createY')}</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Bên A</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">Đóng dấu</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(Tên cơ quan liên kết kỹ năng đặc định/<br>Chức vụ người đại diện/Tên họ/Đóng dấu)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Bên B</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(Chữ ký của người nước ngoài có kỹ năng đặc định)</div>`
+  },
+  th:{
+    title:"参考様式第１－５号 特定技能雇用契約書（タイ語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（タイ語版）",
+    lab:"TH",
+    docId:"1_5_th",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（タイ語版）",
+    link:"",
+    stid:"_15_thFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">แบบฟอร์มอ้างอิงเลขที่ 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">สัญญาการว่าจ้างแรงงานเฉพาะทาง</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">องค์กรที่แรงงานเฉพาะทางสังกัด　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(ซึ่งต่อไปจะเรียกว่า "ผู้ว่าจ้าง") และ</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">แรงงานเฉพาะทางชาวต่างชาติ (รวมถึงผู้สมัครที่ยังไม่ได้เดินทางไปปฏิบัติงาน)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(ซึ่งต่อไปนี้จะเรียกว่า "ผู้รับจ้าง")</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">ได้ร่วมตกลงทำสัญญาการว่าจ้างแรงงานเฉพาะทางตามเงื่อนไขที่ระบุในเอกสารเงื่อนไขการว่าจ้างซึ่งเป็นเอกสารแนบ</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">สัญญาว่าจ้างฉบับนี้จะมีผลบังคับใช้เมื่อผู้รับจ้างได้เข้ามายังประเทศญี่ปุ่นโดยมีสถานการพำนักเป็น "ทักษะเฉพาะทางที่ 1" หรือ "ทักษะเฉพาะทางที่ 2" ตั้งแต่วันที่ได้รับอนุญาตดังกล่าว โดยทั้งผู้ว่าจ้างและผู้รับจ้างจะทำการปรับตกลงกันโดยเร็ว และเริ่มการจ้างงานตั้งแต่วันที่ได้ตกลงร่วมกันของทั้งสองฝ่ายภายใน 1 เดือนนับจากวันดังกล่าว</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">ระยะเวลาของสัญญาจ้างงานที่ระบุในเอกสารเงื่อนไขการว่าจ้างงาน (วันเริ่มต้นและวันสิ้นสุดของสัญญาจ้างงาน) จะถูกปรับเปลี่ยนตามวันที่เริ่มต้นการจ้างงานที่กำหนดโดยการปรับตกลงระหว่างผู้ว่าจ้างและผู้รับจ้าง</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">ผู้ว่าจ้างและผู้รับจ้าง จะทำการแลกเปลี่ยนข้อมูลเกี่ยวกับผลการตรวจสอบสถานภาพการพำนักของผู้รับจ้าง</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">ทั้งนี้ ในกรณีที่สิ้นสุดระยะเวลาตามสัญญาว่าจ้างโดยที่ไม่มีการต่อสัญญาว่าจ้าง หรือในกรณีที่ผู้รับจ้างสูญเสียสถานการพำนักไม่ว่าด้วยสาเหตุใดๆ ก็ตาม ให้ถือว่าสัญญาว่าจ้างฉบับนี้สิ้นสุดลง</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">สัญญาว่าจ้างฉบับนี้และเอกสารเงื่อนไขการว่าจ้างได้ถูกจัดทำขึ้นเป็น 2 ฉบับ โดยผู้ว่าจ้างและผู้รับจ้างต่างถือไว้ฝ่ายละ 1 ฉบับ</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} ปี ${f('es_createM')} เดือน ${f('es_createD')} วัน ที่ทำสัญญา</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">ผู้ว่าจ้าง</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">ตราประทับ</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(ชื่อองค์กรที่แรงงานเฉพาะทางสังกัด,<br>ชื่อตำแหน่งตัวแทนองค์กร, ชื่อ-นามสกุล, ตราประทับ)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">ผู้รับจ้าง</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(ลายมือชื่อของแรงงานเฉพาะทางชาวต่างชาติ)</div>`
+  },
+  km:{
+    title:"参考様式第１－５号 特定技能雇用契約書（カンボジア語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（カンボジア語版）",
+    lab:"KM",
+    docId:"1_5_km",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（カンボジア語版）",
+    link:"",
+    stid:"_15_kmFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">ទម្រង់ឯកសារយោង លេខ 1 – 5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">កិច្ចសន្យាការងារសម្រាប់ជនបរទេសក្នុងជំនាញជាក់លាក់</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">ស្ថាប័នដែលជនបរទេសក្នុងជំនាញជាក់លាក់ធ្វើការ　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">（ខាងក្រោមនេះនឹងហៅថា「ភាគីក」）និង</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">ជនបរទេសក្នុងជំនាញជាក់លាក់（រួមទាំងបេក្ខជន）　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">（ខាងក្រោមនេះនឹងហៅថា「ភាគីខ」）គឺ</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">ចុះកិច្ចសន្យាការងារសម្រាប់ជនបរទេសក្នុងជំនាញជាក់លាក់ដោយស្របតាមខ្លឹមសារដែលបានកត់ត្រានៅក្នុងឯកសារភ្ជាប់ស្តីអំពីលក្ខខណ្ឌការងារ។</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">កិច្ចសន្យាការងារនេះ នឹងមានសុពលភាពចាប់ពីពេលវេលាដែលភាគីខបានទទួលការអនុញ្ញាតនិរទេសឬអនុញ្ញាតផ្លាស់ប្តូរប្រភេទនៃការស្នាក់នៅជា«ជនបរទេសក្នុងជំនាញជាក់លាក់លេខទី 1»ឬ «ជនបរទេសក្នុងជំនាញជាក់លាក់លេខទី 2»។ ភាគីក និងភាគីខ នឹងសម្របសម្រួលគ្នាយ៉ាងឆាប់រហ័ស ហើយការងារនឹងចាប់ផ្តើមនៅថ្ងៃដែលបានព្រមព្រៀងគ្នារវាងភាគីក និងភាគីខ ក្នុងរយៈពេល 1 ខែចាប់ពីថ្ងៃដដែល។</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">រយៈពេលនៃកិច្ចសន្យាការងារ（ថ្ងៃចាប់ផ្តើម និងថ្ងៃបញ្ចប់នៃកិច្ចសន្យាការងារ）ដែលបានកត់ត្រានៅក្នុងឯកសារស្តីអំពីលក្ខខណ្ឌការងារ នឹងត្រូវបានផ្លាស់ប្តូរស្របតាមថ្ងៃចាប់ផ្តើមការងារ ដែលត្រូវបានកំណត់តាមការសម្របសម្រួលរវាងភាគីក និងភាគីខ។</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">ភាគី ក និងភាគី ខ ត្រូវចែករំលែកគ្នាទៅវិញទៅមក នូវព័ត៌មានស្ដីពីលទ្ធផលនៃការពិនិត្យអំពីលក្ខណៈសម្បត្តិនៃការស្នាក់នៅរបស់ភាគី ខ។</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">ម៉្យាងទៀត កិច្ចសន្យាការងារនេះនឹងត្រូវបញ្ចប់ ក្នុងករណីផុតពេលកំណត់កិច្ចសន្យាការងារ ដោយមិនបានពន្យារកិច្ចសន្យាការងារជាថ្មី និងនៅពេលដែលភាគីខ បាត់បង់សិទ្ធិស្នាក់នៅដោយសារហេតុណាមួយ។</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">កិច្ចសន្យាការងារ និងឯកសារស្តីអំពីលក្ខខណ្ឌការងារនេះ នឹងត្រូវបានធ្វើឡើងជា 2 ច្បាប់ដូចគ្នា ហើយភាគីក និងភាគីខត្រូវរក្សាទុកម្នាក់មួយច្បាប់រៀងៗខ្លួន។</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">កាលបរិច្ឆេទចុះកិច្ចសន្យា ${f('es_createY')} ឆ្នាំ ${f('es_createM')} ខែ ${f('es_createD')} ថ្ងៃ</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">ភាគីក</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">（ត្រា）</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(ឈ្មោះស្ថាប័ននៃជនបរទេសក្នុងជំនាញជាក់លាក់・<br>ឈ្មោះតួនាទីអ្នកតំណាង・ឈ្មោះ・ត្រា)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">ភាគីខ</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(ហត្ថលេខាជនបរទេសក្នុងជំនាញជាក់លាក់)</div>`
+  },
+  my:{
+    title:"参考様式第１－５号 特定技能雇用契約書（ミャンマー語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（ミャンマー語版）",
+    lab:"MY",
+    docId:"1_5_my",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（ミャンマー語版）",
+    link:"",
+    stid:"_15_myFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">ရည်ညွှန်းပုံစံအမှတ် ၁-၅</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">အထူးကျွမ်းကျင်လုပ်သား အလုပ်ခန့်အပ်ခြင်းသဘောတူစာချုပ်</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">အထူးကျွမ်းကျင်လုပ်သားဆောင်ရွက်မည့်အဖွဲ့အစည်း　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(အောက်တွင် "ပထမပါတီ" ဟုပြောမည်။) နှင့်</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">နိုင်ငံခြားသားအထူးကျွမ်းကျင်လုပ်သားများ(စာမေးပွဲဖြေဆိုမည့်ကျောင်းသားများအပါအဝင်)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(အောက်တွင် "ဒုတိယပါတီ" ဟုပြောမည်။)တို့သည်</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">ပူးတွဲပါ အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်များတွင်ဖော်ပြထားသည့်အကြောင်းအရာများအောက်ရှိအထူးကျွမ်းကျင်လုပ်သား အလုပ်ခန့်အပ်ခြင်းသဘောတူစာချုပ်ကို အကောင်အထည်ဖော်ဆောင်ရွက်ရန် သဘောတူပါသည်။</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">ဤအလုပ်ခန့်အပ်စာချုပ်တွင် ဒုတိယပါတီသည် နေထိုင်ခွင့်အမျိုးအစား "အထူးကျွမ်းကျင်လုပ်သား (၁)" သို့မဟုတ် "အထူးကျွမ်းကျင်လုပ်သား (၂)"ဖြင့် ဂျပန်နိုင်ငံသို့ဝင်ရောက်ခြင်း သို့မဟုတ် နေထိုင်ခွင့်အမျိုးအစားပြောင်းလဲခြင်း ခွင့်ပြုချက်ကျသည့်ရက်မှစပြီး ပထမပါတီနှင့် ဒုတိယပါတီအချင်းချင်း လျင်မြန်စွာ ညှိနှိုင်းပြီး တူညီသောရက်မှစ၍ ၁ လအတွင်း ပထမပါတီနှင့် ဒုတိယပါတီနှစ်ဦးနှစ်ဖက်၏ သဘောတူညီချက်ဖြင့် သတ်မှတ်ထားသည့်ရက်မှစ၍ အလုပ်ခန့်အပ်မည်။</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">အလုပ်ခန့်အပ် စာချုပ်တွင် ဖော်ပြထားသည့် အလုပ်ခန့်အပ်စာချုပ်ကာလ (အလုပ်ခန့်အပ် စာချုပ်စတင်ချိန်နှင့် ပြီးဆုံးချိန်)အား ပထမပါတီနှင့် ဒုတိယပါတီ နှစ်ဦးနှစ်ဖက်၏ စီစဉ်ညှိနှိုင်းမှုအရ သတ်မှတ်ထားသည့် အလုပ်ခန့်အပ်မှုစတင် သည့်ရက်ကိုလိုက်၍ ပြောင်းလဲသည်ဟု သတ်မှတ်ပါသည်။</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">ပထမပါတီနှင့် ဒုတိယပါတီနှစ်ဖက်လုံးသည် ဒုတိယပါတီ၏ နေထိုင်ခွင့်အမျိုးအစားနှင့်သက်ဆိုင်သည့် စစ်ဆေးမှုရလဒ်ကို သတင်းအချက်အလက်များ အပြန်အလှန်မျှဝေရမည်ဟု သတ်မှတ်ပါသည်။</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">ထို့အပြင် အလုပ်ခန့်အပ်ခြင်းသဘောတူညီချက်စာချုပ်အားသက်တမ်းတိုးခြင်းမရှိဘဲစာချုပ်သက်တမ်းကာလပြီးဆုံးသွားပါက သို့မဟုတ် ဒုတိယပါတီမှ အကြောင်းအရင်းတစ်ခုခုကြောင့် နေထိုင်ခွင့်ဆုံးရှုံးခဲ့ပါက ထိုအချိန်မှစ၍ဤအလုပ်ခန့်အပ်ခြင်းသဘောတူညီချက်စာချုပ်သည်အဆုံးသတ်မည်ဖြစ်ပါသည်။</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">ဤအလုပ်ခန့်အပ်ခြင်းသဘောတူညီချက်စာချုပ်နှင့်အလုပ်ခန့်အပ်ခြင်းသတ်မှတ်ချက်စာချုပ်ကို ၂ စုံပြုလုပ်ပြီး ပထမပါတီနှင့်ဒုတိယပါတီအသီးသီးမှ ၁ စုံစီသိမ်းထားရမည်ဖြစ်ပါသည်။</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} ခုနှစ် ${f('es_createM')} လ ${f('es_createD')} ရက်တွင် ချုပ်ဆိုပါသည်</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">ပထမပါတီ</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">တံဆိပ်တုံး</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(အထူးကျွမ်းကျင်လုပ်သားဆောင်ရွက်မည့်အဖွဲ့အစည်း<br>အမည်၊ကိုယ်စားလှယ်၏ရာထူး၊အမည်နှင့်တံဆိပ်တုံး)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">ဒုတိယပါတီ</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(နိုင်ငံခြားသားအထူးကျွမ်းကျင်လုပ်သား၏အမည်)</div>`
+  },
+  en:{
+    title:"参考様式第１－５号 特定技能雇用契約書（英語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（英語版）",
+    lab:"EN",
+    docId:"1_5_en",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（英語版）",
+    link:"",
+    stid:"_15_enFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Reference Form 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">EMPLOYMENT CONTRACT FOR SPECIFIED SKILLED WORKERS</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">Organization of affiliation of the specified skilled worker　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(hereinafter referred to as "organization") and</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">Specified skilled worker (including specified skilled worker candidates)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(hereinafter referred to as "specified skilled worker")</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">This Employment Contract is hereby entered into in accordance with the contents described in the attached Written Employment Conditions.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">This employment contract will commence on a date to be determined by mutual agreement between the organization and the specified skilled worker within one month from the date the specified skilled worker receives landing permission for the status of residence "Specified Skilled Worker No. 1" or "Specified Skilled Worker No. 2", or permission for change of status of residence, etc.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">The period of the Employment Contract (beginning and end of the Employment Contract) stated in the Written Employment Conditions shall be changed in accordance with the start date of employment specified with the adjustment made between the organization and the specified skilled worker.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">The organization and the specified skilled worker shall share with each other the results of the assessment of the specified skilled worker's status of residence.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">The Employment Contract shall be terminated at the time of the period of the Employment Contract expiring without being renewed, or if the specified skilled worker has forfeited the status of residence for any reason.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">The Employment Contract and Written Employment Conditions shall be prepared in duplicate, and one copy shall be retained by each party.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">Entered into on ${f('es_createD')} / ${f('es_createM')} / ${f('es_createY')}</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Organization</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">Seal</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(Name of the organization of affiliation of the<br>specified skilled worker, and name, title and seal<br>of its representative)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Specified skilled worker</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(Signature of the specified skilled worker)</div>`
+  },
+  ne:{
+    title:"参考様式第１－５号 特定技能雇用契約書（ネパール語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（ネパール語版）",
+    lab:"NE",
+    docId:"1_5_ne",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（ネパール語版）",
+    link:"",
+    stid:"_15_neFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">आधार फारम १ भाग – ५</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">विशेष सीपको रोजगार सम्बन्धी सम्झौता पत्र</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">विशेष सीप भएका बिदेशीहरु संग्लन संस्था　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(तल 「पहिलो पक्ष」 भन्ने|) र</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">विशेष सीप भएको विदेशी (कामको उम्मेदवार सहित|)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(तल 「दोस्रो पक्ष」 भन्ने|) ले</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">तलको रोजगार सम्बन्धी नियमहरूको पालना गर्ने गरेर, विशेष सीपको रोजगार सम्झौतापत्रमा हस्ताक्षर गरिनेछ।</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">यो रोजगार सम्झौता दोस्रो पक्षले "निर्दिष्ट दक्ष श्रमिक श्रेणी १" वा "निर्दिष्ट दक्ष श्रमिक श्रेणी २" को निवास योग्यताको अवतरण अनुमति वा निवास योग्यता परिवर्तन अनुमति आदि प्राप्त गरेको दिनदेखि, पहिलो पक्ष र दोस्रो पक्ष दुवैले तुरुन्तै समन्वय गरी, उक्त दिनदेखि १ महिनाभित्र पहिलो पक्ष र दोस्रो पक्षको सहमतिमा तोकिएको दिनदेखि रोजगारी सुरु गरिनेछ।</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">रोजगार शर्त पत्रमा उल्लेखित रोजगार सम्झौता अवधि (रोजगार सम्झौताको सुरु र अन्त्य मिति) पहिलो पक्ष र दोस्रो पक्षले समन्वय गरी निर्धारित गरिएको रोजगारी सुरु हुने मितिको आधारमा परिवर्तन गरिनेछ।</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">पहिलो पक्ष र दोस्रो पक्षले दोस्रो पक्षको आवासीय अनुमति सम्बन्धी मूल्यांकनको परिणामहरू एक अर्कासँग साझा गर्नेछन्।</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">तर, रोजगार सम्झौतापत्रलाई नविकरण नगराई रोजगार सम्झौताको अवधि सकिएमा साथै दोस्रो पक्षले कुनै कारणले बसोबासको योग्यता गुमाएको त्यही समयमा यो रोजगारी सम्झौता सकिने छ।</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">यो रोजगारी सम्झौतापत्र र रोजगारी सर्तपत्रको २ वटा कपी बनाएर, पहिलो पक्ष र दोस्रो पक्षले राख्नेछन्।</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} वर्ष ${f('es_createM')} महिना ${f('es_createD')} दिन (दर्ता गरिएको)</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">पहिलो पक्ष</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">छाप</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(विशेष सीपमा संलग्न संस्थाको नाम・<br>प्रतिनिधिको पद・नाम・छाप)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">दोस्रो पक्ष</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(विशेष सीप भएको विदेशीको हस्ताक्षर)</div>`
+  },
+  ko:{
+    title:"参考様式第１－５号 特定技能雇用契約書（韓国語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（韓国語版）",
+    lab:"KO",
+    docId:"1_5_ko",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（韓国語版）",
+    link:"",
+    stid:"_15_koFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">참고 양식 제1-5호</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">특정기능 고용계약서</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">특정기능 소속 기관　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(이하 "갑"이라고 한다.)과</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">특정기능 외국인(후보자 포함)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(이하 「을」이라고 한다.)은,</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">별첨의 고용 조건서에 기재된 내용에 따라 특정 기능 고용 계약을 체결한다.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">본 고용계약은 을이 재류자격 「특정기능 1호」 또는 「특정기능 2호」의 상륙허가 또는 재류자격 변경허가 등을 받은 날부터 갑을 쌍방이 신속하게 조정하고, 같은 날로부터 1개월 이내의 갑을 쌍방의 합의로 정한 날부터 고용을 개시하는 것으로 한다.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">고용조건서에 기재된 고용계약기간(고용계약의 시기와 종기)은 갑을 쌍방의 조정에 의해 정한 고용을 개시하는 날에 따라 변경된다.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">갑을 쌍방은 을의 재류자격에 관한 심사결과를 서로 정보공유하기로 한다.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">또한 고용계약을 갱신하지 않고 고용계약기간을 만료한 경우 및 을이 어떠한 사유로 재류자격을 상실한 시점에서 고용계약은 종료하는 것으로 한다.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">본 고용계약서 및 고용조건서는 2부 작성하여 갑과 을이 각각 보유한다.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} 년 ${f('es_createM')} 월 ${f('es_createD')} 일 체결</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">갑</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">인</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(특정기능 소속 기관명·<br>대표자 직책명·성명·날인)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">을</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(특정기능 외국인의 서명)</div>`
+  },
+  zh:{
+    title:"参考様式第１－５号 特定技能雇用契約書（中国語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（中国語版）",
+    lab:"ZH",
+    docId:"1_5_zh",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（中国語版）",
+    link:"",
+    stid:"_15_zhFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">参考式样第1-5号</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">特 定 技 能 雇 佣 合 同</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">特定技能所属机构　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">（以下简称"甲方"）与</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">特定技能外国人（含候补生）　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">（以下简称"乙方"），</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">遵照附件雇佣条件书所载内容，签订特定技能雇佣合同。</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">本雇佣合同于乙方持"特定技能1号"或"特定技能2号"在留资格入境日本，或乙方将其他在留资格变更为该"特定技能1号"或"特定技能2号"在留资格后，甲乙双方从获得许可日起迅速协商，在1个月以内甲乙双方合意确定日期，从该确定的日期开始雇佣。</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">雇佣条件书中所记载的雇佣合同期（雇佣合同开始日期和结束日期）需根据甲乙双方协商确定的雇佣开始日期进行更改。</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">甲乙双方应共享关于乙方在留资格审查结果的信息。</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">此外，雇佣合同期满且未更新或乙方因某种理由丧失在留资格时，雇佣合同终止。</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">制作本雇佣合同及雇佣条件书2份，甲乙双方各持一份。</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} 年 ${f('es_createM')} 月 ${f('es_createD')} 日 签订</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">甲方</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">盖章</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">（特定技能所属机构名称、代表人职务、<br>姓名、盖章）</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">乙方</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">（特定技能外国人签名）</div>`
+  },
+  si:{
+    title:"参考様式第１－５号 特定技能雇用契約書（シンハラ語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN','Noto Sans Sinhala','Iskoola Pota','Nirmala UI',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（シンハラ語版）",
+    lab:"SI",
+    docId:"1_5_si",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（シンハラ語版）",
+    link:"<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&display=swap\" rel=\"stylesheet\">",
+    stid:"_15_siFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">යොමු ආකෘති අංක 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">නිශ්චිත කුසලතා වෘත්තිකයින් සඳහා වන රැකියා කොන්ත්‍රාත්තුව</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">නිශ්චිත කුසලතා සඳහා අනුබද්ධ ආයතනය　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(මෙතැන් පටන් 「පළමු පාර්ශවය」 ලෙස හඳුන්වනු ලබන) අතර</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">නිශ්චිත කුසලතා සහිත විදේශික වෘත්තිකයින් (අයදුම්කරුවන් ඇතුළුව)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(මෙතැන් පටන් 「දෙවන පාර්ශවය」 ලෙස හඳුන්වනු ලබන)</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">වෙනම අමුණා ඇති රැකියා කොන්දේසි පත්‍රයේ සඳහන් කර ඇති අන්තර්ගතයට අනුව, නිශ්චිත කුසලතා සඳහා වන රැකියා කොන්ත්‍රාත්තුව ගිවිසුම් ගත කරන ලදී.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">මෙම රැකියා කොන්ත්‍රාත්තුව යටතේ, දෙවන පාර්ශවය "නිශ්චිත කුසලතා අංක 1" හෝ "නිශ්චිත කුසලතා අංක 2" යන පදිංචි තත්ත්වය යටතේ ගොඩබෑමේ අවසරය හෝ පදිංචි තත්ත්වය වෙනස් කිරීමේ අවසරය ආදිය ලැබුණු දින සිට, පළමු පාර්ශවය සහ දෙවන පාර්ශවය වහාම සම්බන්ධීකරණය කර, එම දින සිට මාසයක් ඇතුළත දෙපාර්ශවයේ එකඟතාවයෙන් තීරණය කරන ලද දිනයේ සිට රැකියාව ආරම්භ කරනු ලැබේ.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">රැකියා කොන්දේසි පත්‍රයේ දක්වා ඇති රැකියා කොන්ත්‍රාත්තුවේ කාලසීමාව (රැකියා කොන්ත්‍රාත්තුවේ ආරම්භක සහ අවසන් දිනයන්), පළමු පාර්ශවය සහ දෙවන පාර්ශවය අතර සම්බන්ධීකරණය මගින් තීරණය කරනු ලබන රැකියා ආරම්භක දිනයට අනුකූලව වෙනස් කරනු ලැබේ.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">පළමු පාර්ශවය සහ දෙවන පාර්ශවය යන දෙදෙනාම, දෙවන පාර්ශවයේ පදිංචි තත්ත්වය පිළිබඳ විභාග ප්‍රතිඵල සම්බන්ධයෙන් තොරතුරු එකිනෙකා සමඟ බෙදා ගනු ඇත.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">තවද, රැකියා කොන්ත්‍රාත්තුව අලුත් නොකර රැකියා කොන්ත්‍රාත් කාලය අවසන් වූ අවස්ථාවකදී, නැතහොත් කිසියම් හේතුවක් නිසා දෙවන පාර්ශවයේ පදිංචි තත්ත්වය අහිමි වූ අවස්ථාවේදී, මෙම රැකියා කොන්ත්‍රාත්තුව අවසන් වේ.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">මෙම රැකියා කොන්ත්‍රාත්තුව සහ රැකියා කොන්දේසි පත්‍රිකාව පිටපත් දෙකක් සකස් කර, පළමු පාර්ශවය සහ දෙවන පාර්ශවය එක් පිටපත බැගින් තබා ගනු ඇත.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} වසර ${f('es_createM')} මස ${f('es_createD')} දින (ගිවිසුම් ගත කරන ලදී)</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">පළමු පාර්ශවය</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">නිල මුද්‍රාව</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(නිශ්චිත කුසලතා සඳහා අනුබද්ධ සංවිධානයේ නම・<br>නියෝජිතයාගේ තනතුර・නම・නිල මුද්‍රාව)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">දෙවන පාර්ශවය</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(නිශ්චිත කුසලතා විදේශික වෘත්තිකයාගේ අත්සන)</div>`
+  },
+  mn:{
+    title:"参考様式第１－５号 特定技能雇用契約書（モンゴル語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN','Times New Roman','Noto Serif',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（モンゴル語版）",
+    lab:"MN",
+    docId:"1_5_mn",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（モンゴル語版）",
+    link:"",
+    stid:"_15_mnFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Нэмэлт маягт №1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Тусгай ур чадварын хөдөлмөрийн гэрээ</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">Тусгай ур чадварын харьяа байгууллага　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(цаашид “Ажил олгогч” гэх) болон</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">Тусгай ур чадвартай гадаад иргэн (горилогч хамаарна)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(цаашид “Ажилтан” гэх) нар нь</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">хавсралт Хөдөлмөр эрхлэлтийн нөхцөлд бичигдсэн агуулгын дагуу Тусгай ур чадварын хөдөлмөрийн гэрээг байгуулав.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">Энэхүү хөдөлмөрийн гэрээ нь Ажилтан “Тусгай ур чадварын 1-р зэрэг” болон “Тусгай ур чадварын 2-р зэрэг”-н оршин суух зөвшөөрлөөр Япон улсад ирсэн эсвэл оршин суух статусыг өөрчлөх зөвшөөрөл авсан өдрөөс эхлэн, хоёр тал нэн даруй зохицуулалт хийж, тус өдрөөс хойш нэг сарын дотор хоёр талуудын харилцан тохиролцсон өдрөөс хүчин төгөлдөр болно.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">Хөдөлмөр эрхлэлтийн нөхцөлд бичигдсэн хөдөлмөрийн гэрээний хугацааг (хөдөлмөрийн гэрээний эхлэх болон дуусах хугацаа) хоёр талуудын харилцан тохиролцсон ажилд орох өдрийг үндэслэн өөрчилнө.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">Хоёр талууд Ажилтны оршин суух статустай холбогдох шалгалтын үр дүнгийн талаар харилцан мэдээлэл солилцоно.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">Түүнчлэн, хөдөлмөрийн гэрээг сунгалгүйгээр гэрээний хугацааг дуусгавар болгосон тохиолдолд, мөн ажилтан нь ямар нэгэн шалтгаанаар оршин суух зөвшөөрлийг хүчингүй болгуулсан тохиолдолд тухайн үеэс эхлэн хөдөлмөрийн гэрээг дуусгавар болсонд тооцно.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">Энэхүү Хөдөлмөрийн гэрээ болон Хөдөлмөр эрхлэлтийн нөхцөлийг 2 хувь үйлдэж, Ажил олгогч, Ажилтан нар нь тус бүр нэг хувийг хадгална.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} он ${f('es_createM')} сар ${f('es_createD')} өдөр байгуулав.</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Ажил олгогч</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">Тамга</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(Тусгай ур чадварын харьяа байгууллагын нэр,<br>Төлөөлөгч захирлын нэр, овог нэр, тамга)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Ажилтан</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(Тусгай ур чадвартай гадаад иргэний гарын үсэг)</div>`
+  },
+  tl:{
+    title:"参考様式第１－５号 特定技能雇用契約書（タガログ語）",
+    font:"'MS Mincho','Yu Mincho','Hiragino Mincho ProN','Times New Roman','Noto Serif',serif",
+    appTitle:"📄 参考様式第１－５号　特定技能雇用契約書（タガログ語版）",
+    lab:"MN",
+    docId:"1_5_tl",
+    _title:"📄 参考様式第１－５号　特定技能雇用契約書（タガログ語版）",
+    link:"",
+    stid:"_15_tlFontStyle",
+    dockey:false,
+    L120:()=>`<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Sangguniang Dokumento 1-5</span></div>`,
+    L123:()=>`<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">KONTRATA SA PAGTATRABAHO NG TEKNIKAL NA MANGGAGAWA</div>`,
+    L127:()=>`  <span class="id" style="font-size:7.5pt;">Ang institusyong papasukan ng teknikal na manggagawa　${f('es_orgNameEn')}</span><br>`,
+    L128:()=>`  <span class="id" style="font-size:7.5pt;">(tatawaging “organisasyon”) at</span><br>`,
+    L130:()=>`  <span class="id" style="font-size:7.5pt;">ang dayuhang teknikal na manggagawa (o taong namamasukan)　${f('es_applicantNameEn')}</span><br>`,
+    L131:()=>`  <span class="id" style="font-size:7.5pt;">(tatawaging “teknikal na manggagawa”)</span>`,
+    L136:()=>`  <span class="id" style="font-size:7.5pt;">ay pumapasok sa Kontrata sa Pagtatrabaho ng Teknikal na Manggawa na ito, alinsunod sa mga nilalaman ng kalakip na Mga Kondisyon ng Pagtatrabaho.</span>`,
+    L143:()=>`  <span class="id" style="font-size:7pt;">Ang kontrata ng pagtatrabahong ito ay agad na aayusin ng parehong organisasyon at teknikal na manggagawa mula sa petsa kung kailan natanggap ng teknikal na manggagawa ang pahintulot sa landing para sa katayuan ng paninirahan na "Specified Skilled Worker No. 1" o "Specified Skilled Worker No. 2" o pahintulot na baguhin ang katayuan ng paninirahan atbp., at ang pagtatrabaho ay dapat na magsimula sa petsang napagkasunduan ng parehong organisasyon at teknikal na manggagawa sa loob ng isang buwan mula sa petsa.</span>`,
+    L148:()=>`  <span class="id" style="font-size:7pt;">Ang panahon ng Kontrata sa Pagtatrabaho (simula at pagtatapos ng Kontrata sa Pagtatrabaho) na nakasaad sa Mga Kondisyon ng Pagtatrabaho ay babaguhin alinsunod sa petsa ng pagsisimula ng pagtatrabaho na itinakda sa pamamagitan ng pag-aayos ng parehong organisasyon at teknikal na manggagawa.</span>`,
+    L153:()=>`  <span class="id" style="font-size:7pt;">Ang parehong organisasyon at teknikal na manggagawa ay dapat na magbahaginan ng impormasyon tungkol sa mga resulta ng pagsusuring may kaugnayan sa katayuan ng paninirahan ng teknikal na manggagawa.</span>`,
+    L158:()=>`  <span class="id" style="font-size:7pt;">Ang Kontrata sa Pagtatrabaho na ito ay mawawalan ng bisa kung matapos ang panahon ng kontrata nang hindi na-renew, o kung mawala ang residence status ng teknikal na manggagawa buhat ng anumang dahilan.</span>`,
+    L163:()=>`  <span class="id" style="font-size:7pt;">Ang Kontrata sa Pagtatrabaho at ang Mga Kondisyon ng Pagtatrabaho ay dapat ihanda nang may dalawang kopya, isa para sa organisasyon at isa para sa teknikal na manggagawa.</span>`,
+    L171:()=>`  <span class="id" style="font-size:7.5pt;">${f('es_createY')} Taon ${f('es_createM')} Buwan ${f('es_createD')} Araw (Petsa ng pagpasok sa kontrata).</span>`,
+    L184:()=>`    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Organisasyon</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">Selyo</span></div>`,
+    L185:()=>`    <div style="font-size:7pt;">(Pangalan ng institusyong papasukan ng teknikal na manggagawa<br>at pangalan, posisyon, at selyo ng kinatawan nito)</div>`,
+    L200:()=>`    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Teknikal na manggagawa</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>`,
+    L201:()=>`    <div style="font-size:7pt;">(Lagda ng teknikal na manggagawa)</div>`
+  }
+};
+if(!T15[_L15]) _L15='id';
+var _T15=T15[_L15];
+document.title=_T15.title;
+(function(){ var st=document.createElement('style'); st.textContent='.doc{font-family:'+_T15.font+';}'; document.head.appendChild(st);
+  if(_T15.link){ var w=document.createElement('div'); w.innerHTML=_T15.link; [].slice.call(w.childNodes).forEach(function(n){ document.head.appendChild(n); }); }
+  if(_T15.dockey) window.OFUSA_DOC_KEY='1_5'; })();
+</script>
 </head>
 <body>
 <div class="app-bar">
   <div>
-    <div class="app-bar-title" id="docTitle">📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）</div>
-    <div class="ver">ver.20260803.04</div>
+    <div class="app-bar-title" id="docTitle"></div>
+    <div class="ver">ver.20261116.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn btn-save" onclick="saveFormGeneric('1_5')">💾 DB保存</button>
@@ -83,11 +433,11 @@
   <div class="fp-inner" id="formArea">
     <div class="fs"><div class="fs-title">所属機関</div>
       <div class="fg"><label>機関名（日）<span class="fid">es.orgName</span></label><input id="es_orgName" oninput="p()"></div>
-      <div class="fg"><label>機関名（ID）<span class="fid">es.orgNameEn</span></label><input id="es_orgNameEn" oninput="p()"></div>
+      <div class="fg"><label>機関名（<span class="l15lab"></span>）<span class="fid">es.orgNameEn</span></label><input id="es_orgNameEn" oninput="p()"></div>
       <div class="fg"><label>代表者役職（日）<span class="fid">es.repTitle</span></label><input id="es_repTitle" oninput="p()"></div>
       <div class="fg"><label>代表者氏名（日）<span class="fid">es.repName</span></label><input id="es_repName" oninput="p()"></div>
-      <div class="fg"><label>代表者役職（ID）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
-      <div class="fg"><label>代表者氏名（ID）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
+      <div class="fg"><label>代表者役職（<span class="l15lab"></span>）<span class="fid">es.repTitleEn</span></label><input id="es_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者氏名（<span class="l15lab"></span>）<span class="fid">es.repNameEn</span></label><input id="es_repNameEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">作成日</div>
       <div class="fg"><label>作成年<span class="fid">es.createY</span></label><input id="es_createY" oninput="p()"></div>
@@ -96,19 +446,19 @@
     </div>
     <div class="fs"><div class="fs-title">特定技能外国人</div>
       <div class="fg"><label>氏名（日）<span class="fid">es.applicantName</span></label><input id="es_applicantName" oninput="p()"></div>
-      <div class="fg"><label>氏名（ID）<span class="fid">es.applicantNameEn</span></label><input id="es_applicantNameEn" oninput="p()"></div>
+      <div class="fg"><label>氏名（<span class="l15lab"></span>）<span class="fid">es.applicantNameEn</span></label><input id="es_applicantNameEn" oninput="p()"></div>
     </div>
   </div>
 </div>
+<script>document.getElementById('docTitle').textContent=_T15.appTitle; [].slice.call(document.querySelectorAll('.l15lab')).forEach(function(x){ x.textContent=_T15.lab; });</script>
 <div class="pp">
   <div id="pageArea"></div>
 </div>
 </div>
-<script>window.OFUSA_DOC_KEY = '1_5';</script>
-<script src="ofusa_common.js?v=1794880001"></script>
+<script src="ofusa_common.js?v=1794890001"></script>
 <script>
-docId='1_5';
-const _title='📄 参考様式第１－５号　特定技能雇用契約書（インドネシア語版）';
+docId=_T15.docId;
+const _title=_T15._title;
 // f, v, esc, _fontSize, _editMode は ofusa_common.js で宣言済み
 
 function p(){
@@ -118,50 +468,50 @@ function p(){
   w.innerHTML=`
 <div class="doc">
 <div class="page-num-label">P1</div>
-<div style="font-size:8pt;margin-bottom:2px;">参考様式第１－５号<br><span class="id">Format Referensi 1-5</span></div>
+${_T15.L120()}
 
 <div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:0.15em;margin:6px 0 2px;">特　定　技　能　雇　用　契　約　書</div>
-<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">Perjanjian Kerja Pekerja Berketerampilan Khusus</div>
+${_T15.L123()}
 
 <div style="font-size:8.5pt;line-height:1.8;margin-bottom:8px;">
   特定技能所属機関　${f('es_orgName')}　（以下「甲」という。）と<br>
-  <span class="id" style="font-size:7.5pt;">Organisasi afiliasi pekerja berketerampilan khusus　${f('es_orgNameEn')}</span><br>
-  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Pertama") dan</span><br>
+${_T15.L127()}
+${_T15.L128()}
   特定技能外国人（候補者を含む。）　${f('es_applicantName')}　（以下「乙」という。）は、<br>
-  <span class="id" style="font-size:7.5pt;">Pekerja berketerampilan khusus (termasuk calon pekerja)　${f('es_applicantNameEn')}</span><br>
-  <span class="id" style="font-size:7.5pt;">(selanjutnya disebut "Pihak Kedua")</span>
+${_T15.L130()}
+${_T15.L131()}
 </div>
 
 <div style="font-size:8.5pt;margin-bottom:4px;">
   別添の雇用条件書に記載された内容に従い，特定技能雇用契約を締結する。<br>
-  <span class="id" style="font-size:7.5pt;">dengan ini mengikat diri dalam perjanjian kerja pekerja berketerampilan khusus sesuai isi yang tercantum dalam syarat kerja terlampir.</span>
+${_T15.L136()}
 </div>
 
 
 
 <div style="font-size:8.5pt;margin-bottom:6px;">
   本雇用契約は、乙が、在留資格「特定技能１号」若しくは「特定技能２号」の上陸許可又は在留資格変更許可等を受けた日から、甲乙双方が速やかに調整を行い、同日から１か月以内の甲乙双方の合意により定めた日から雇用を開始するものとする。<br>
-  <span class="id" style="font-size:7pt;">Perjanjian kerja ini berlaku mulai dari tanggal Pihak Kedua masuk ke Jepang atau tanggal Pihak Kedua menerima izin perubahan visa tinggal, dsb. dengan izin tinggal "Pekerja Berketerampilan Khusus 1" atau "Pekerja Berketerampilan Khusus 2", dengan penyesuaian yang akan segera dilakukan oleh kedua belah pihak untuk memulai pekerjaan yang akan ditentukan melalui kesepakatan bersama antara Pihak Pertama dan Pihak Kedua dalam kurun waktu satu bulan sejak tanggal tersebut.</span>
+${_T15.L143()}
 </div>
 
 <div style="font-size:8.5pt;margin-bottom:6px;">
   雇用条件書に記載の雇用契約期間（雇用契約の始期と終期）は、甲乙双方の調整により定めた雇用を開始する日に伴って変更されるものとする。<br>
-  <span class="id" style="font-size:7pt;">Periode perjanjian kerja (masa mulai dan berakhirnya perjanjian kerja) yang tercantum dalam syarat kerja harus diubah sesuai tanggal mulai kerja yang ditentukan berdasarkan kesepakatan kedua belah pihak.</span>
+${_T15.L148()}
 </div>
 
 <div style="font-size:8.5pt;margin-bottom:6px;">
   甲乙双方は、乙の在留資格に係る審査結果を互いに情報共有することとする。<br>
-  <span class="id" style="font-size:7pt;">Kedua belah pihak akan saling berbagi informasi mengenai hasil keputusan terkait status visa Pihak Kedua.</span>
+${_T15.L153()}
 </div>
 
 <div style="font-size:8.5pt;margin-bottom:6px;">
   なお，雇用契約を更新することなく雇用契約期間を満了した場合，及び乙が何らかの事由で在留資格を喪失した時点で雇用契約は終了するものとする。<br>
-  <span class="id" style="font-size:7pt;">Perjanjian kerja berakhir pada saat perjanjian kerja tidak diperbarui dan periode perjanjian kerja telah berakhir, atau bila Pihak Kedua telah kehilangan izin tinggal karena suatu alasan.</span>
+${_T15.L158()}
 </div>
 
 <div style="font-size:8.5pt;margin-bottom:12px;">
   本雇用契約書及び雇用条件書は２部作成し，甲乙それぞれが保有するものとする。<br>
-  <span class="id" style="font-size:7pt;">Perjanjian kerja ini dan syarat kerja dibuat dalam 2 (dua) rangkap dan masing-masing disimpan oleh Pihak Pertama dan Pihak Kedua.</span>
+${_T15.L163()}
 </div>
 
 
@@ -169,7 +519,7 @@ function p(){
 <!-- 締結日 -->
 <div style="text-align:right;font-size:8pt;margin-bottom:10px;line-height:1.8;">
   ${f('es_createY')}　年　${f('es_createM')}　月　${f('es_createD')}　日　締結<br>
-  <span class="id" style="font-size:7.5pt;">Pengikatan dilakukan tanggal ${f('es_createD')} / ${f('es_createM')} / ${f('es_createY')}</span>
+${_T15.L171()}
 </div>
 
 <!-- 署名欄 -->
@@ -182,8 +532,8 @@ function p(){
     <div style="font-size:7.5pt;">（特定技能所属機関名・代表者役職名・氏名・捺印）</div>
     <div style="height:0.8em;"></div>
     <div style="margin-left:10em;">${f('es_orgNameEn')}</div>
-    <div style="display:flex;align-items:center;"><span style="min-width:3em;">Pihak Pertama</span><span style="flex:1;text-align:center;border-bottom:1px solid #000;padding:0 0.5em 2px;">${f('es_repTitleEn')}　${f('es_repNameEn')}</span><span style="min-width:3em;text-align:right;">ttd.</span></div>
-    <div style="font-size:7pt;">(Nama organisasi afiliasi pekerja berketerampilan<br>khusus, nama, jabatan, dan tanda tangan direktur<br>representatifnya)</div>
+${_T15.L184()}
+${_T15.L185()}
   </div>
   <!-- 乙（右カラム）-->
   <div style="flex:1;padding-left:3em;" class="sign-field" data-signer="applicant" data-label="乙署名">
@@ -198,8 +548,8 @@ function p(){
     <div style="font-size:7.5pt;">（特定技能外国人の署名）</div>
     <div style="height:0.8em;"></div>
     <div>&nbsp;</div>
-    <div style="display:flex;align-items:flex-end;"><span style="white-space:nowrap;">Pihak Kedua</span><span style="flex:1;border-bottom:1px solid #000;height:1.2em;margin-left:0.5em;"></span></div>
-    <div style="font-size:7pt;">(Tanda tangan pekerja asing berketerampilan khusus)</div>
+${_T15.L200()}
+${_T15.L201()}
   </div>
 </div>
 
@@ -207,13 +557,13 @@ function p(){
 `;
   _fontSize=(_fontSize===8.5)?8.5:_fontSize;
   _applyFontSize();
-  _apply15FontSize();
+  _apply15LangFontSize();
   setupPageTracker();
 }
 
-function _apply15FontSize(){
-  const st=document.getElementById('_15FontStyle')||document.createElement('style');
-  st.id='_15FontStyle';
+function _apply15LangFontSize(){
+  const st=document.getElementById(_T15.stid)||document.createElement('style');
+  st.id=_T15.stid;
   document.head.appendChild(st);
   const s=_fontSize/8.5;
   st.textContent=[

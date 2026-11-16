@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.16
+ * - fix: 全書類チェックで外の文字（フォント）が読めないだけのときはエラーにしない
  * ver.20261116.15
  * - feat: 全書類チェック用にエラーを記録／チェックの枠では訳の自動修正・自動入力・利用ログをしない／重要事項説明書の中国語の業務内容
  * ver.20261116.01
@@ -132,6 +134,7 @@
     if(tg && tg!==window && (tg.src||tg.href)){
       var _u=String(tg.src||tg.href), _a=(tg.getAttribute&&(tg.getAttribute('src')||tg.getAttribute('href')))||'';
       if(!_a || _u.split('#')[0]===location.href.split('#')[0] || /^(data|blob):/.test(_u)) return;   // 空の画像（写真なし）などは数えない
+      if(/fonts\.(googleapis|gstatic)\.com/.test(_u)) return;   // 外の文字（フォント）が読めないだけなら、書類の問題ではない
       add('読み込めないファイル: '+_u.split('/').pop().split('?')[0]); return; }
     if(e && e.message) add(e.message+(e.filename?(' （'+String(e.filename).split('/').pop().split('?')[0]+' '+e.lineno+'行）'):''));
   }catch(_){} }, true);
