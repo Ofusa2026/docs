@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261116.15
+ * - feat: 全書類チェック用にエラーを記録／チェックの枠では訳の自動修正・自動入力・利用ログをしない／重要事項説明書の中国語の業務内容
  * ver.20261116.01
  * - feat: 性別・生年月日が案シスに無い案件で、右上にお知らせを出してその場で入れられるように（案シスにも保存できる）
  * ver.20261113.03
@@ -119,6 +121,23 @@
  * - 書類別の作成責任者(companies.extra.docAuthors)に対応。項目単位で無ければ既定author_*
  * - promptEmpSaveMode 保存モーダル: 上書き/新規作成の上下を入替、新規作成ボタンの青強調を解除し両ボタンを対等なグレー表示に
  */
+
+// ver.20261116.15: 「全書類チェック」用に、この書類で起きたエラーを覚えておく（画面の表示は変えない）
+//   案シスの全書類チェックの枠（data-doc-check）で開いたときは、訳の自動修正・自動入力をしない（チェックだけ）
+(function(){ try{
+  var E=window.__docErrs=window.__docErrs||[];
+  var add=function(t){ t=String(t||'').slice(0,240); if(!t || /ResizeObserver/.test(t) || E.length>=20) return; if(E.indexOf(t)<0) E.push(t); };
+  window.addEventListener('error', function(e){ try{
+    var tg=e && e.target;
+    if(tg && tg!==window && (tg.src||tg.href)){
+      var _u=String(tg.src||tg.href), _a=(tg.getAttribute&&(tg.getAttribute('src')||tg.getAttribute('href')))||'';
+      if(!_a || _u.split('#')[0]===location.href.split('#')[0] || /^(data|blob):/.test(_u)) return;   // 空の画像（写真なし）などは数えない
+      add('読み込めないファイル: '+_u.split('/').pop().split('?')[0]); return; }
+    if(e && e.message) add(e.message+(e.filename?(' （'+String(e.filename).split('/').pop().split('?')[0]+' '+e.lineno+'行）'):''));
+  }catch(_){} }, true);
+  window.addEventListener('unhandledrejection', function(e){ try{ var r=e&&e.reason; add('Promise: '+String((r&&r.message)||r)); }catch(_){} });
+  window._docCheckMode=false; try{ var fe=window.frameElement; window._docCheckMode=!!(fe && fe.getAttribute('data-doc-check')==='1'); }catch(_f){}
+}catch(_e){} })();
 
 // ===== Supabase =====
 const SB_URL='https://ehwlgbwpycglmopiqyty.supabase.co';
@@ -4764,6 +4783,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     }catch(e){ console.warn('[言語ごとの訳の自動保存]', e); return false; }
   }
   async function _wlAutoFix(){
+    if(window._docCheckMode) return;   // ver.20261116.15: 全書類チェック中は直さない（見るだけ）
     if(window._wlBusy) return; window._wlBusy=true;
     try{
       if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen){ _wlShow(); return; }
@@ -4820,7 +4840,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   function _efPairs(){ return _emptyPairs().filter(function(pr){ return !_EF_SKIP.test(pr.en.id) && !/^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(pr.en.id); }); }
   window._efPairs=_efPairs;
   async function _efAutoFill(){
-    if(!_efIsLangDoc()) return;
+    if(!_efIsLangDoc() || window._docCheckMode) return;   // ver.20261116.15: 全書類チェック中は入れない（見るだけ）
     for(var w=0; w<40 && window._wlBusy; w++) await new Promise(function(r){ setTimeout(r,500); });
     if(window._wlBusy) return;
     window._wlBusy=true;
@@ -5223,6 +5243,7 @@ function _slogBuild(event, extra){
 window._slogBody=function(event, extra){ try{ return _slogBuild(event, extra); }catch(e){ return null; } };   // ver.20261109.08: まとめPDFの記録用
 function slog(event, extra){
   try{
+    if(window._docCheckMode) return;   // ver.20261116.15: 全書類チェックで開いただけのときは利用ログに残さない
     var body=_slogBuild(event, extra);
     fetch(SB_URL+'/rest/v1/saysay_logs',{method:'POST',keepalive:true,
       headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -5982,8 +6003,9 @@ window.addEventListener('load', function(){
 var JUUYOU_WORK_STD={
   '土木':{
     ja:'指導者の指示・監督を受けながら、土木施設の新設、改築、維持、修繕に係る作業等に従事',
-    name:{tl:'Gawaing Sibil (Civil Engineering)',mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
+    name:{zh:'土木',tl:'Gawaing Sibil (Civil Engineering)',mn:'Иргэний инженерийн барилга',si:'සිවිල් ඉංජිනේරු',en:'Civil Engineering',vi:'Xây dựng dân dụng',id:'Teknik Sipil',my:'အရပ်ဘက်အင်ဂျင်နီယာ',km:'វិស្វកម្មស៊ីវិល',ne:'सिभिल इन्जिनियरिङ',ko:'토목'},
     tr:{
+      zh:'在指导员的指示和监督下，从事土木设施的新建、改建、维护、修缮等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, muling pagtatayo, pagpapanatili at pagkukumpuni ng mga pasilidad na sibil',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор иргэний инженерийн байгууламжийг шинээр барих, шинэчлэн барих, арчлах, засварлахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, සිවිල් ඉංජිනේරු පහසුකම් අලුතින් ඉදිකිරීම, ප්‍රතිසංස්කරණය, නඩත්තුව සහ අලුත්වැඩියාව සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版
@@ -5997,8 +6019,9 @@ var JUUYOU_WORK_STD={
   },
   '建築':{
     ja:'指導者の指示・監督を受けながら、建築物の新築、増築、改築若しくは移転又は修繕若しくは模様替に係る作業等に従事',
-    name:{tl:'Pagtatayo ng Gusali (Building Construction)',mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
+    name:{zh:'建筑',tl:'Pagtatayo ng Gusali (Building Construction)',mn:'Барилга',si:'ගොඩනැගිලි ඉදිකිරීම්',en:'Building Construction',vi:'Kiến trúc',id:'Arsitektur',my:'အဆောက်အအုံဆောက်လုပ်ရေး',km:'សំណង់អគារ',ne:'भवन निर्माण',ko:'건축'},
     tr:{
+      zh:'在指导员的指示和监督下，从事建筑物的新建、扩建、改建或迁移、修缮或改装等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa bagong pagtatayo, pagpapalawak, muling pagtatayo, paglilipat, pagkukumpuni o pagbabago ng anyo ng mga gusali',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор барилга байгууламжийг шинээр барих, өргөтгөх, шинэчлэн барих, нүүлгэн шилжүүлэх, засварлах буюу өнгө үзэмжийг өөрчлөхтэй холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, ගොඩනැගිලි අලුතින් ඉදිකිරීම, දිගු කිරීම, ප්‍රතිසංස්කරණය, ස්ථානගත කිරීම, අලුත්වැඩියාව හෝ නවීකරණය සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版
@@ -6012,8 +6035,9 @@ var JUUYOU_WORK_STD={
   },
   'ライフライン・設備':{
     ja:'指導者の指示・監督を受けながら、電気通信、ガス、水道、電気その他のライフライン・設備の整備・設置、変更又は修理に係る作業等に従事',
-    name:{tl:'Lifeline at Pasilidad',mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
+    name:{zh:'生命线·设备',tl:'Lifeline at Pasilidad',mn:'Амьдралын дэд бүтэц, тоног төхөөрөмж',si:'ජීවන අවශ්‍යතා සේවා සහ පහසුකම්',en:'Lifelines and Facilities',vi:'Cơ sở hạ tầng và thiết bị',id:'Infrastruktur dan Fasilitas',my:'အခြေခံအဆောက်အအုံနှင့် စက်ပစ္စည်း',km:'ហេដ្ឋារចនាសម្ព័ន្ធ និងបរិក្ខារ',ne:'पूर्वाधार तथा उपकरण',ko:'라이프라인·설비'},
     tr:{
+      zh:'在指导员的指示和监督下，从事电信、燃气、自来水、电力及其他生命线·设备的整备、安装、变更或修理等相关作业',   // ver.20261116.15: 重要事項事前説明書の中国語版
       tl:'Sa ilalim ng utos at superbisyon ng tagapangasiwa, gagawa ng mga trabahong may kaugnayan sa pagsasaayos, pagkakabit, pagbabago o pagkukumpuni ng telekomunikasyon, gas, tubig, kuryente at iba pang lifeline at pasilidad',   // ver.20261116.13: 重要事項事前説明書のタガログ語版
       mn:'Удирдагчийн заавар, хяналтын дор цахилгаан холбоо, хий, усан хангамж, цахилгаан болон бусад амьдралын дэд бүтэц, тоног төхөөрөмжийг засварлах, суурилуулах, өөрчлөх буюу засахтай холбоотой ажилд оролцоно',   // ver.20261116.09: 重要事項事前説明書のモンゴル語版
       si:'අධීක්ෂකයෙකුගේ උපදෙස් සහ අධීක්ෂණය යටතේ, විදුලි සංදේශ, ගෑස්, ජල සැපයුම, විදුලිය සහ අනෙකුත් ජීවන අවශ්‍යතා සේවා සහ පහසුකම් සකස් කිරීම, සවි කිරීම, වෙනස් කිරීම හෝ අලුත්වැඩියාව සම්බන්ධ කටයුතුවල නියැලීම',   // ver.20261113.04: 重要事項事前説明書のシンハラ語版

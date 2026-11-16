@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（タイ語版・変更）</div>
-    <div class="ver">ver.20261116.13</div>
+    <div class="ver">ver.20261116.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -684,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794870001"></script>
+<script src="ofusa_common.js?v=1794880001"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -908,7 +908,7 @@ function _p17ViBarUpdate(){
   bar.innerHTML='⚠ タイ語に訳せていない箇所が <b>'+list.length+'</b> 件あります（画面では赤色。印刷には色は出ません）'
     + (_p17AiBusy ? '　<span>AIで翻訳中…</span>' : '<button type="button" onclick="_p17AiTranslate(true)">AIで翻訳</button>');
   var fresh=list.filter(function(x){ return !_p17AiTried[_p17Nk(x)]; });
-  if(fresh.length && !_p17AiBusy && (_p17ApiKey() || (window._aiAvail && window._aiAvail('')))) setTimeout(function(){ _p17AiTranslate(false); }, 300);
+  if(fresh.length && !_p17AiBusy && !window._docCheckMode && (_p17ApiKey() || (window._aiAvail && window._aiAvail('')))) setTimeout(function(){ _p17AiTranslate(false); }, 300);
 }
 async function _p17SaveLearned(add){
   try{ localStorage.setItem('p17_th_learned', JSON.stringify(window._p17ViLearned)); }catch(e){}

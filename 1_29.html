@@ -25,7 +25,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－２９号　書類省略に当たっての誓約書</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261116.15</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -65,7 +65,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794870001"></script>
+<script src="ofusa_common.js?v=1794880001"></script>
 <script>
 function p(){
   if(_editMode) return;
@@ -96,7 +96,7 @@ function p(){
 <div style="margin-bottom:16px;">３　出入国在留管理局が行う、関係書類の提出指導、事情聴取、実地調査等の調査に応じること</div>
 <div style="text-align:right;margin-bottom:4px;">${f('f_docDate')}</div>
 <div style="text-align:right;">特定技能所属機関名　　　${f('f_company')}</div>`;
-  _fontSize = (_fontSize === 8.5) ? 14 : _fontSize;
+  _fontSize = (_fontSize === 8.5) ? 13 : _fontSize;   // ver.20261116.15: 14ptだと1ページに収まらず2ページになるため13ptに
   _applyFontSize();
   _apply1_29FontSize();
   const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
