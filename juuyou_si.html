@@ -49,7 +49,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 様式第２（第３条関係）雇用契約に係る重要事項事前説明書（シンハラ語）</div>
-    <div class="ver">ver.20261116.02</div>
+    <div class="ver">ver.20261116.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -508,6 +508,7 @@ function _kenFmtStatusOk(st){
   if(/サイン書類送付|返送待ち|押印|書類待ち|スキャン|申請|審査|追完|許可|受取|交付|完了|他社/.test(st)) return false;
   return /未着手|ヒアリング|雇用条件|1-6|サイン書類作成/.test(st);
 }
+var _jmOrig={};   // ver.20261116.03: 開いたときに書類に入っていた値（そのままならOKで触らない）
 function _jKensetsuModal(){
   try{
     var _es=window._lastEmpSet||{};
@@ -515,11 +516,17 @@ function _jKensetsuModal(){
     // 判定は「建設分野」。『土木』『建築』だと「建築物内部の清掃(ビルクリーニング分野)」を誤検出するため使わない。
     if(!/建設分野/.test(cat)) return;
     if(!_kenFmtStatusOk(window._lastCaseStatus)) return;   // ver.20261116.02: サイン書類作成まで
-    var rc=document.getElementById('f_raiseCond');
-    if(rc && rc.value===_JK_JA.cond) return;           // 既に適用済みなら出さない
-    var a=document.getElementById('jm_amt');  if(a) a.value=_JK_JA.amt;
-    var c=document.getElementById('jm_cond'); if(c) c.value=_JK_JA.cond;
-    var t=document.getElementById('jm_time'); if(t) t.value=_JK_JA.time;
+    // ver.20261116.03: すでに作った書類では出さない／出すときも今の内容を入れて開く（OKで今の内容を既定の文に置き換えない）
+    var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+    if(g('f_kenFmtChecked')==='1') return;             // ［OK］か［確認済み］を押してDB保存したもの
+    var cur={amt:g('f_raiseAmount'), cond:g('f_raiseCond'), time:g('f_raiseTime')};
+    if(cur.cond===_JK_JA.cond) return;                 // 既に適用済みなら出さない
+    if(cur.amt && cur.time && cur.cond) return;        // 昇給額・条件・時期がそろっている＝すでに作った書類
+    var made=!!(cur.amt||cur.time);                    // 途中まで作ってある（昇給条件も書類の内容を使う）
+    _jmOrig={amt:cur.amt, cond:made?cur.cond:'', time:cur.time};
+    var a=document.getElementById('jm_amt');  if(a) a.value=cur.amt||_JK_JA.amt;
+    var c=document.getElementById('jm_cond'); if(c) c.value=(made&&cur.cond)?cur.cond:_JK_JA.cond;
+    var t=document.getElementById('jm_time'); if(t) t.value=cur.time||_JK_JA.time;
     var r=document.getElementById('jm_ref');  if(r) r.textContent=_es.salaryRaiseCond||'（なし）';
     var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='flex';
   }catch(e){}
@@ -527,6 +534,12 @@ function _jKensetsuModal(){
 function jm_use(){
   var f=document.getElementById('jm_cond'), r=document.getElementById('jm_ref');
   if(f&&r&&r.textContent&&r.textContent!=='（なし）') f.value=r.textContent;
+}
+// ver.20261116.03: ［確認済み（反映しない）］＝ 書類の内容はそのままで閉じる。OKと同じく印を付け、DB保存すると次から出ない
+function _jmSetChecked(){ var e=document.getElementById('f_kenFmtChecked'); if(e) e.value='1'; }
+function jmChecked(){
+  _jmSetChecked(); closeJKensetsu();
+  if(typeof showToast==='function') showToast('✅ 今の内容のまま閉じました（建設フォーマットは反映していません）。DB保存すると次からは出ません');
 }
 function closeJKensetsu(){ var mo=document.getElementById('jKensetsuModal'); if(mo) mo.style.display='none'; }
 function applyJKensetsu(){
@@ -537,6 +550,7 @@ function applyJKensetsu(){
     var noTr=[];
     Object.keys(map).forEach(function(k){
       var ja=map[k][0], en=map[k][1], val=(vals[k]||'').trim();
+      if(val && val===(_jmOrig[k]||'')) return;   // ver.20261116.03: 書類に入っていた値のまま → 日本語も訳も触らない
       setAutoDefault(ja, val);
       var tr='';
       if(val===_JK_JA[k]) tr=_JK_TR[k];                                        // 既定値のまま → 用意した訳
@@ -544,7 +558,7 @@ function applyJKensetsu(){
       if(tr) setAutoDefault(en, tr);
       else if(val) { var e=document.getElementById(en); if(e){ e.value=''; delete e.dataset.autofill; } noTr.push(k); }
     });
-    closeJKensetsu(); p();
+    _jmSetChecked(); closeJKensetsu(); p();
     if(noTr.length && typeof showToast==='function') showToast('⚠️ 文言を変更したため訳が入りません（'+noTr.length+'欄）。訳は手入力してください');
     else if(typeof showToast==='function') showToast('✅ 建設フォーマットを反映しました');
   }catch(e){ closeJKensetsu(); }
@@ -823,7 +837,9 @@ function jyPrintCheck(){
     <label style="font-size:12px;font-weight:bold;color:#334155;">昇給時期</label>
     <input id="jm_time" style="width:100%;margin:4px 0 14px;font-size:12px;padding:6px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box;">
     <div style="text-align:right;">
-      <button onclick="closeJKensetsu()" style="padding:7px 16px;margin-right:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button>
+      <input type="hidden" id="f_kenFmtChecked">
+      <button onclick="closeJKensetsu()" title="何も変えずに閉じます（次に開いたときもまた出ます）" style="padding:7px 16px;margin-right:8px;font-size:13px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;">キャンセル</button>
+      <button onclick="jmChecked()" title="書類の内容は変えずに閉じます。DB保存すると、この雇用条件では次から出ません" style="padding:7px 14px;margin-right:8px;font-size:13px;border:1px solid #16a34a;background:#f0fdf4;color:#15803d;font-weight:bold;border-radius:6px;cursor:pointer;">✅ 確認済み（反映しない）</button>
       <button onclick="applyJKensetsu()" style="padding:7px 22px;font-size:13px;border:none;background:#2563eb;color:#fff;border-radius:6px;cursor:pointer;">OK</button>
     </div>
   </div>
