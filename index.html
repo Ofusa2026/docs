@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -143,6 +143,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         <button class="glbtn" data-lang="th" onclick="setGlobalLang('th')" title="タイ語">🇹🇭</button>
         <button class="glbtn" data-lang="ne" onclick="setGlobalLang('ne')" title="ネパール語">🇳🇵</button>
         <button class="glbtn" data-lang="si" onclick="setGlobalLang('si')" title="シンハラ語">🇱🇰</button>
+        <button class="glbtn" data-lang="mn" onclick="setGlobalLang('mn')" title="モンゴル語">🇲🇳</button>
         <button class="glbtn" data-lang="my" onclick="setGlobalLang('my')" title="ミャンマー語">🇲🇲</button>
         <button class="glbtn" data-lang="km" onclick="setGlobalLang('km')" title="カンボジア語">🇰🇭</button>
         <button class="glbtn" data-lang="en" onclick="setGlobalLang('en')" title="英語">🇬🇧</button>
@@ -434,7 +435,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         <select id="ssLang" onchange="ssLoad()" style="padding:5px 8px;border-radius:6px;border:none;font-size:12px;">
           <option value="id">インドネシア語</option><option value="en">英語</option>
           <option value="km">カンボジア語</option><option value="ko">韓国語</option><option value="my">ミャンマー語</option>
-          <option value="ne">ネパール語</option><option value="th">タイ語</option><option value="vi">ベトナム語</option><option value="zh">中国語</option><option value="si">シンハラ語</option>
+          <option value="ne">ネパール語</option><option value="th">タイ語</option><option value="vi">ベトナム語</option><option value="zh">中国語</option><option value="si">シンハラ語</option><option value="mn">モンゴル語</option>
         </select>
         <select id="ssDoc" onchange="ssLoad()" style="padding:5px 8px;border-radius:6px;border:none;font-size:12px;"></select>
         <span id="ssMsg" style="font-size:11px;opacity:.85;"></span>
@@ -483,8 +484,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794820003';
-window.__DOCS_CACHE_BUSTER__ = '1794820003';
+window.__DOCS_CACHE_BUSTER__ = '1794830001';
+window.__DOCS_CACHE_BUSTER__ = '1794830001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -640,10 +641,10 @@ let currentLang = 'id';
 // 各書類の対応言語リスト（LANG_FILES_xxx に存在するキーと対応）
 // この順で先頭を「デフォルト/フォールバック言語」とする
 const DOC_LANG_SUPPORT = {
-  '1_3':  ['id','vi','th','km','my','en','si'],     // PDF方式（ver.20261113.03: シンハラ語を追加）
-  '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
-  '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si'],
-  '1_16': ['id','vi','th','ne','my','km','en','ko','zh','si'],   // ver.20261113.03: シンハラ語を追加
+  '1_3':  ['id','vi','th','km','my','en','si','mn'],     // PDF方式（ver.20261113.03: シンハラ語を追加）
+  '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
+  '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],
+  '1_16': ['id','vi','th','ne','my','km','en','ko','zh','si','mn'],   // ver.20261113.03: シンハラ語を追加
   'juuyou':['id','vi','km','my','ko','ne','en','si'],   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
 };
 // 日本語(ja) は多くの書類でデフォルト版（ID版）を流用表示する扱い
@@ -706,7 +707,7 @@ function idxNotice(lines){
 }
 async function idxCaseNotices(row, lang){
   var L=[], nat=String(row.nationality||'').trim();
-  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語',si:'シンハラ語'};
+  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語',si:'シンハラ語',mn:'モンゴル語'};
   var natN=nat.normalize('NFKC').toUpperCase().replace(/\s/g,'');
   if(!nat || /確認中|その他/.test(nat)) L.push('国籍が「'+(nat||'空欄')+'」のため、言語は今のまま（'+(LN[currentLang]||currentLang)+'）です。案シスの国籍を確認してください');
   else if(lang==='en' && !_IDX_EN_OK.test(natN)) L.push('国籍「'+nat+'」から言語を判定できないため、英語版で開きます。案シスの国籍の書き方を確認してください');
@@ -740,6 +741,7 @@ function idxLangFromNationality(nat){
   if(/中国|台湾|CHINA|CHINESE|TAIWAN/.test(n)) return 'zh';
   if(/韓国|KOREA/.test(n)) return 'ko';
   if(/タイ|THAI/.test(n)) return 'th';
+  if(/モンゴル|MONGOL/.test(n)) return 'mn';   // ver.20261116.08: モンゴル語版（1-3別紙・1-5・1-6・1-16・1-17。重要事項事前説明書は英語）
   if(/スリランカ|SRILANKA|SRI-LANKA|シンハラ|SINHALA/.test(n)) return 'si';   // ver.20261113.01: 1-5・1-6以外はsi版が無いので、resolveLangForDocで英語（英語版が無い書類はID版）になる＝今までと同じ
   return 'en'; // フィリピン・スリランカ・インド・欧米等（対応言語版なし）は英語
 }
@@ -756,6 +758,7 @@ const LANG_FILES_1_5={
   'ko':'1_5_ko.html?v=1794393342',
   'zh':'1_5_zh.html?v=1794393342',
   'si':'1_5_si.html?v=1794554100',
+  'mn':'1_5_mn.html?v=1794830001',
   'id':'1_5.html?v=1794393342',
   'vi':'1_5_vi.html?v=1794393342',
   'th':'1_5_th.html?v=1794393342',
@@ -766,6 +769,7 @@ const LANG_FILES_1_5={
   'ko':'1_5_ko.html?v=1794393342',
   'zh':'1_5_zh.html?v=1794393342',
   'si':'1_5_si.html?v=1794554100',
+  'mn':'1_5_mn.html?v=1794830001',
 };
 function open_1_5(lang){
   lang = lang || currentLang;
@@ -824,8 +828,9 @@ const LANG_FILES_1_17={
   'my':'1_17_my.html?v=1794466290',
   'en':'1_17_en.html?v=1794466290',
   'si':'1_17_si.html?v=1794563000',   // ver.20261113.04: シンハラ語版
+  'mn':'1_17_mn.html?v=1794830001',   // ver.20261116.08: モンゴル語版
 };
-const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語'],['si','🇱🇰 シンハラ語']];
+const P17_LANG_LABELS=[['vi','🇻🇳 ベトナム語'],['id','🇮🇩 インドネシア語'],['zh','🇨🇳 中国語'],['th','🇹🇭 タイ語'],['ne','🇳🇵 ネパール語'],['km','🇰🇭 カンボジア語'],['my','🇲🇲 ミャンマー語'],['en','🌐 英語'],['si','🇱🇰 シンハラ語'],['mn','🇲🇳 モンゴル語']];
 // 国籍から決まる言語（決まらないときは null）
 function p17LangFromCase(){
   if(!idxSelectedCase) return null;
@@ -898,6 +903,7 @@ const LANG_FILES={
   'ko':'1_6_ko.html?v=1794600000',
   'zh':'1_6_zh.html?v=1794600000',
   'si':'1_6_si.html?v=1794600000',
+  'mn':'1_6_mn.html?v=1794830001',
   'id':'1_6.html?v=1794600000',
   'vi':'1_6_vi.html?v=1794600000',
   'th':'1_6_th.html?v=1794600000',
@@ -908,6 +914,7 @@ const LANG_FILES={
   'ko':'1_6_ko.html?v=1794600000',
   'zh':'1_6_zh.html?v=1794600000',
   'si':'1_6_si.html?v=1794600000',
+  'mn':'1_6_mn.html?v=1794830001',
 };
 function open_1_6(lang){
   lang = lang || currentLang;
@@ -961,6 +968,7 @@ const LANG_FILES_1_16={
   'ko':'1_16_ko.html?v=1794393342',
   'zh':'1_16_zh.html?v=1794393342',
   'si':'1_16_si.html?v=1794562000',
+  'mn':'1_16_mn.html?v=1794830001',
   'id':'1_16_id.html?v=1794393342',
   'vi':'1_16_vi.html?v=1794393342',
   'th':'1_16_th.html?v=1794393342',
@@ -971,6 +979,7 @@ const LANG_FILES_1_16={
   'ko':'1_16_ko.html?v=1794393342',
   'zh':'1_16_zh.html?v=1794393342',
   'si':'1_16_si.html?v=1794562000',
+  'mn':'1_16_mn.html?v=1794830001',
 };
 function open_1_16(lang){
   lang = lang || currentLang;
@@ -1856,6 +1865,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261116.08',
+    date: '2026-11-16',
+    notify: false,
+    items: [
+      '🇲🇳 モンゴル語版を追加しました：1-3号別紙（受診者の申告書）・1-5号（特定技能雇用契約書）・1-6号（雇用条件書）・1-16号（雇用の経緯に係る説明書）・1-17号（支援計画書）。国籍が「モンゴル」の案件は自動でモンゴル語で開きます（重要事項事前説明書は英語版）。言語ボタンの「🇲🇳」でも切り替えられます。'
+    ]
+  },
   {
     version: 'ver.20261116.07',
     date: '2026-11-16',
@@ -3331,7 +3348,7 @@ async function reorderNavByPriority(info){
 }
 
 // ver.20260925.02: 必要書類（優先書類）をまとめて1つのPDFに
-var _PM_LANG_LABEL={id:'🇮🇩 インドネシア語',vi:'🇻🇳 ベトナム語',th:'🇹🇭 タイ語',ne:'🇳🇵 ネパール語',my:'🇲🇲 ミャンマー語',km:'🇰🇭 クメール語',en:'🇬🇧 英語',ko:'🇰🇷 韓国語',zh:'🇨🇳 中国語',si:'🇱🇰 シンハラ語',ja:'🇯🇵 日本語'};
+var _PM_LANG_LABEL={id:'🇮🇩 インドネシア語',vi:'🇻🇳 ベトナム語',th:'🇹🇭 タイ語',ne:'🇳🇵 ネパール語',my:'🇲🇲 ミャンマー語',km:'🇰🇭 クメール語',en:'🇬🇧 英語',ko:'🇰🇷 韓国語',zh:'🇨🇳 中国語',si:'🇱🇰 シンハラ語',mn:'🇲🇳 モンゴル語',ja:'🇯🇵 日本語'};
 var _PM_EXCLUDE=['1_17'];   // ver.20261111.10: 1-17号（言語版 1_17_vi）と1-3号もまとめてPDFで作れるように。Word版の1_17だけ除く
 // docKey → 実ファイルパス（指定言語の版）
 function _docFileForPrint(docKey, lang){
@@ -3987,7 +4004,7 @@ function _mpRender(){
   var st=_mpState; if(!st) return;
   var old=document.getElementById('mpModal'); if(old) old.remove();
   var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
-  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語',si:'シンハラ語'};
+  var LN={vi:'ベトナム語',id:'インドネシア語',my:'ミャンマー語',ne:'ネパール語',km:'クメール語',zh:'中国語',ko:'韓国語',th:'タイ語',en:'英語',si:'シンハラ語',mn:'モンゴル語'};
   var q=String(st.q||'').trim();
   var ppl=_mpViewRows().filter(function(x){ return !q || (String(x.applicant)+String(x.name||'')+String(x.nationality||'')).indexOf(q)>=0; });
   var _multiCo=ppl.some(function(x){ return x.company_id!==st.coId; });
@@ -4220,7 +4237,7 @@ function _pmLoadPdfJs(){
 }
 async function _pm13Pages(lang){
   try{
-    var L=['id','vi','th','km','my','en','si'].indexOf(lang)>=0 ? lang : 'en';
+    var L=['id','vi','th','km','my','en','si','mn'].indexOf(lang)>=0 ? lang : 'en';
     if(_pm13Cache[L]) return Object.assign({}, _pm13Cache[L], {id:'pm'+(++_pmSeq)});
     var lib=await _pmLoadPdfJs();
     var pdf=await lib.getDocument('pdf/1_3_'+L+'.pdf').promise;
