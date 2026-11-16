@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（ベトナム語版・変更）</div>
-    <div class="ver">ver.20261116.01</div>
+    <div class="ver">ver.20261116.02</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2644,6 +2644,18 @@ async function _p17Hearing(so, _s){
   if(apply(HP.c,           [['f109','f110','f111','f112']])) sch++;
   /* ver.20261112.11: a・b を分けて入れたのに c の回答が無いときは、原本どおり c＝無（a,bで実施） */
   if(C.f102 && !C.f109 && !C.f111 && !String(HP.c||'').trim()){ C.f109=false; C.f111=true; T.f112='a,bで実施'; }
+  /* ver.20261116.02: ヒアリングフォーム・O-Link の住居方針は「有」「無」だけで届く。（　）の中が空にならないよう、決まった書き方を入れる。
+       a 有＝「b（またはc）での入居に合意しなかった場合に実施」／本来の確保（b か c）有＝「適宜実施」／無＝「a,bで実施」など */
+  (function(){
+    var bare=function(x){ return /^[有無]$/.test(String(x||'').trim()); };
+    if(!(bare(HP.a)||bare(HP.b)||bare(HP.c))) return;
+    var id={a:['f094','f095','f096','f097'], b:['f102','f103','f104','f105'], c:['f109','f110','f111','f112']};
+    var main=C.f102?'b':(C.f109?'c':'');
+    ['a','b','c'].forEach(function(k){ if(!bare(HP[k])) return; var r=id[k];
+      if(C[r[0]] && !String(T[r[1]]||'').trim()) T[r[1]] = (k==='a' && main) ? main+'での入居に合意しなかった場合に実施' : '適宜実施';
+      if(C[r[2]] && !String(T[r[3]]||'').trim()) T[r[3]] = (k==='a') ? (main ? main+'で実施' : '') : ((C.f094 && main) ? 'a,'+main+'で実施' : (main && main!==k ? main+'で実施' : ''));
+    });
+  })();
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
   else if(Object.keys(IS).length){
     // ver.20261104.01: 3-イ（口座・携帯・ライフライン）は義務的支援。回答が無ければ「有（適宜実施）」
