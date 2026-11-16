@@ -33,7 +33,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用4）　特定技能</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -301,12 +301,12 @@ async function loadFromDB(passedInfo){
   const {caseId, companyId, companyName}=info;
   resetForm();
   try{
-    const cases=await sb('cases?select=org,company,company_id&id=eq.'+caseId);
+    const cases=await sb('cases?select=org,company,company_id,support_fee,so_office_idx&id=eq.'+caseId);
     const cas=cases&&cases[0];
     const s=(id,val)=>{const e=document.getElementById(id);if(e&&val)e.value=val;};
     // 5 登録支援機関：名前の揺れ（「株式会社KMT(82)」等）は findSupportOrg が3段照合で吸収する
     if(cas&&cas.org&&typeof findSupportOrg==='function'){
-      const org=await findSupportOrg(cas.org,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages');
+      const org=await findSupportOrg(cas.org,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages,offices,support_staff_list');
       if(org){
         s('f_roName',org.name||'');
         s('f_roCorp',org.corp_no||'');
@@ -322,7 +322,15 @@ async function loadFromDB(passedInfo){
         const rd=_regYmd(org.reg_date); if(rd[0]){ s('f_roRegY',rd[0]); s('f_roRegM',rd[1]); s('f_roRegD',rd[2]); }
         s('f_roSm',org.support_manager||'');
         s('f_roLang',org.languages||'');
+        // ver.20261116.01: 支援を行う事業所・支援担当者（まとめ版の申請書と同じ入れ方）
+        try{ var _o=(typeof org.offices==='string')?JSON.parse(org.offices):org.offices; var _oi=parseInt(cas&&cas.so_office_idx||0)||0;
+          var _t=(Array.isArray(_o)&&_o.length)?(_o[_oi]||_o[0]):null;
+          s('f_roOffice', (_t&&(_t.officeName||''))||org.name||'');
+          s('f_roOfficeAddr', (_t&&(_t.officeAddress||((_t.officePref||'')+(_t.officeCity||'')+(_t.officeAddressDetail||''))))||org.address||'');
+        }catch(_e){ s('f_roOffice', org.name||''); }
+        try{ var _l=(typeof org.support_staff_list==='string')?JSON.parse(org.support_staff_list):org.support_staff_list; var _ss=(Array.isArray(_l)&&_l.length)?(_l[0].name||_l[0]||''):''; s('f_roSs', _ss||'支援計画書のとおり'); }catch(_e){ s('f_roSs','支援計画書のとおり'); }
       }
+      if(cas&&cas.support_fee) s('f_roFee', String(cas.support_fee));
     }
     // 記名欄は特定技能所属機関（雇用する企業）
     let co=null;

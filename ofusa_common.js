@@ -4482,6 +4482,13 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   // ver.20261106.05: 翻訳APIの呼び出し（1欄ずつの🌐と、まとめて翻訳の両方で使う）
   async function _callTranslate(pairs, lang, key, gl){
+    // ver.20261116.01: 1-6号の事業所名・所在地は、どの言語版でも英語で書く（案シスの会社名・住所の英語と同じ扱い）
+    if(lang!=='en' && pairs.some(function(x){ return x && x.en && /^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(x.en.id); })){
+      var _isE=function(x){ return /^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(x.en.id); };
+      var _e=pairs.filter(_isE), _o=pairs.filter(function(x){ return !_isE(x); });
+      var _re=_e.length? await _callTranslate(_e,'en',key,[]) : [], _ro=_o.length? await _callTranslate(_o,lang,key,gl) : [];
+      var _ie=0,_io=0; return pairs.map(function(x){ return _isE(x) ? (_re[_ie++]||'') : (_ro[_io++]||''); });
+    }
       var hasAddr=false;
     var payload = pairs.map(function(p,i){
       var isA=_isAddr(p.ja)||_isAddr(p.en); if(isA) hasAddr=true;
@@ -4589,6 +4596,37 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   document.addEventListener('input', function(ev){ if(ev.target && /^(es_a\dAmt|f_allowance\dAmount)$/.test(ev.target.id||'')) _amtWordFill(); if(ev.target && /^(es_a\dAmtEn|f_allowance\dAmountEn)$/.test(ev.target.id||'')) delete ev.target.dataset.autofill; }, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_amtWordFill, 3500); } }catch(_e){} });
+  // ===== ver.20261116.01: 1-6号（雇用条件書）の訳の欄を自動で入れる =====
+  //   ・事業所名・所在地は英語（案シスの会社の英語名・英語住所。会社と違う事業所なら英語に翻訳）
+  //   ・分野・業務区分はこの書類の言語に翻訳
+  //   どれも訳の欄が空のときだけ。翻訳はAPIキーがあるときだけ（無ければ従来どおり🌐で手動）。入れた欄は黄色で知らせる。
+  var _P6_EN_IDS=['es_officeNameEn','es_officeAddressEn'], _P6_LANG_IDS=['es_applicantFieldEn','es_categoryEn','es_category2En'];
+  function _p6Is16(){ return /^1_6(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
+  function _p6Norm(x){ return String(x||'').normalize('NFKC').replace(/[\s　\-－ー‐]/g,''); }
+  async function _p6AutoFill(info){
+    if(!_p6Is16()) return;
+    var g=function(id){ return document.getElementById(id); }, val=function(id){ var e=g(id); return e?String(e.value||'').trim():''; };
+    var setAuto=function(id, t){ var e=g(id); if(!e||!t) return; e.value=t; e.dataset.autofill='1'; e.style.background='#fef9c3'; setTimeout(function(){ e.style.background=''; },3000); };
+    try{
+      var cid=(info&&info.companyId)||''; var co=null;
+      if(cid && typeof sb==='function'){ var r=await sb('companies?select=name,name_en,pref,city,address,address_en&id=eq.'+encodeURIComponent(cid)); co=r&&r[0]; }
+      if(co){
+        if(!val('es_officeNameEn') && co.name_en && (!val('es_officeName') || _p6Norm(val('es_officeName'))===_p6Norm(co.name))) setAuto('es_officeNameEn', co.name_en);
+        var full=_p6Norm((co.pref||'')+(co.city||'')+(co.address||''));
+        if(!val('es_officeAddressEn') && co.address_en && (!val('es_officeAddress') || _p6Norm(val('es_officeAddress'))===full)) setAuto('es_officeAddressEn', co.address_en);
+      }
+      var key=_apiKey(); if(!key){ if(typeof p==='function') try{ p(); }catch(_e){} return; }
+      var pick=function(ids){ return ids.map(function(id){ var en=g(id), ja=g(id.slice(0,-2)); return (en&&ja&&ja.tagName!=='SELECT'&&String(ja.value||'').trim()&&!String(en.value||'').trim())?{en:en,ja:ja}:null; }).filter(Boolean); };
+      var runs=[[pick(_P6_EN_IDS),'en'],[pick(_P6_LANG_IDS),_docLang()]];
+      for(var k=0;k<runs.length;k++){
+        var pr=runs[k][0], lg=runs[k][1]; if(!pr.length) continue;
+        var arr=await _callTranslate(pr, lg, key, GLOSS[lg]||[]);
+        pr.forEach(function(x,i){ var t=String(arr[i]||'').trim(); if(t && !String(x.en.value||'').trim()) setAuto(x.en.id, t); });
+      }
+      if(typeof p==='function') try{ p(); }catch(_e){}
+    }catch(e){ console.warn('[1-6 訳の自動入力]', e); }
+  }
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var _i=e.data.info; setTimeout(function(){ _p6AutoFill(_i); }, 4000); } }catch(_e){} });
   // ===== ver.20261111.04: 訳の欄に、この書類と別の言語の訳が入っていないか見る =====
   //   案シスの雇用条件セットの訳の欄は全言語で同じ欄のため、別の言語版で保存すると上書きされる（例：インドネシア語版にベトナム語）。
   var _WL_NAME={vi:'ベトナム語',km:'クメール語',my:'ミャンマー語',th:'タイ語',ne:'ネパール語',ko:'韓国語',ja:'日本語のまま',zh:'中国語',si:'シンハラ語'};

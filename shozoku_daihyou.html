@@ -66,7 +66,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 所属機関の代表者に関する申告書</div>
-    <div class="ver">ver.20260821.05</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -213,6 +213,11 @@ async function loadFromDB(){
           const authEl = document.getElementById('f_author');
           if(authEl && !authEl.value && saved.author) authEl.value = saved.author;
         }
+        // ver.20261116.01: 保存した値が無ければ、会社の情報（代表者の英字氏名・作成者）から入れる
+        const nEl2 = document.getElementById('f_rep_name_en');
+        if(nEl2 && !nEl2.value && co.rep_name_en) nEl2.value = co.rep_name_en;
+        const aEl2 = document.getElementById('f_author');
+        if(aEl2 && !aEl2.value){ const _au = co.author_name || ((co.rep_title||'')+' '+(co.rep_name||'')).trim(); if(_au) aEl2.value = _au; }
       }
     }
     const yEl = document.getElementById('f_dateY');
@@ -241,10 +246,12 @@ window.addEventListener('message', async function(e){
     if(tEl) tEl.value = '';
   }catch(_e){}
   window._lastCaseInfo = info;
-  await loadFromDB();
+  // ver.20261116.01: 共通の読み込み（loadCaseToForm）が入力欄を空にしてから入れ直すため、先に呼んでからこの書類の読み込みをする
+  //   （以前は逆の順で、作成日・会社の情報が入ったあとに消えていた）
   if(typeof loadCaseToForm === 'function'){
     try{ await loadCaseToForm(info, 'shozoku_daihyou'); }catch(_e){}
   }
+  await loadFromDB();
   p();
 });
 document.addEventListener('DOMContentLoaded', function(){

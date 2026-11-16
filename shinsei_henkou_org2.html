@@ -34,7 +34,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🏢 在留資格変更許可申請書（所属機関等作成用2）　特定技能</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -285,7 +285,7 @@ async function loadFromDB(passedInfo){
     const cid=companyId||(cas&&cas.company_id);
     // ver.20260715: 実在する列のみ指定する。存在しない列を混ぜるとPostgRESTがエラーを返し反映が全部止まる。
     // 実データ件数(2,032社中): corp_no=1466 / capital=1512 / sales=1488 / employees=1514 / labor_ins_no=1410 / rep_name=1540
-    const sel='name,corp_no,pref,city,address,tel,capital,sales,employees,labor_ins_no,author_name,author_title,rep_name,rep_title';
+    const sel='name,corp_no,emp_ins_no,emp_sets,pref,city,address,tel,capital,sales,employees,labor_ins_no,author_name,author_title,rep_name,rep_title';
     if(cid){ const r=await sb('companies?select='+sel+'&id=eq.'+cid); co=r&&r[0]; }
     if(!co){
       const nm=companyName||(cas&&cas.company);
@@ -300,6 +300,14 @@ async function loadFromDB(passedInfo){
       s('f_capital',co.capital||'');
       s('f_sales',co.sales||'');
       s('f_staff',co.employees||'');
+      // ver.20261116.01: 雇用保険適用事業所番号・勤務させる事業所（まとめ版の申請書と同じ入れ方）
+      s('f_coEi',co.emp_ins_no||'');
+      try{
+        var _es={}, _idx=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
+        if(Array.isArray(co.emp_sets)&&_idx>=0) _es=co.emp_sets[_idx]||{};
+        s('f_office', String(_es.officeName||_es.orgName||'').trim() || co.name || '');
+        s('f_officeAddr', String(_es.officeAddr||_es.orgAddress||'').trim() || ((co.pref||'')+(co.city||'')+(co.address||'')));
+      }catch(_e){}
       s('f_rep',((co.rep_title||co.author_title||'')+' '+(co.rep_name||co.author_name||'')).trim());
       // ver.20260715: 労働保険番号は自動分割しない。
       // アンシスの実データは桁数がバラバラ（14桁1,135件/13桁69件/11桁60件/15桁21件/18桁17件…）で、

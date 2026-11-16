@@ -192,7 +192,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20261111.11</div>
+    <div class="ver">ver.20261116.01</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -1982,7 +1982,7 @@ async function loadFromDB(passedInfo){
     // ===== 申請人1 =====
     {
     const [persons,cases]=await Promise.all([
-      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,hoped_stay_period,expire,residence_card&case_id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality,birthdate,gender,birth_place,spouse,occupation,home_country_address,address,jp_postal_code,jp_address,jp_detail_address,phone,tel_num,cel_phone,passport,passport_expiry,residence_status,stay_period,hoped_stay_period,expire,residence_card,total_stay_year,total_stay_month&case_id=eq.'+caseId),
       sb('cases?select=applicant,expire&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -2014,6 +2014,9 @@ async function loadFromDB(passedInfo){
       // ver.20260715: 13 希望する在留期間。固定「1年」にしていたが実データは「3年」が5,025件で大多数、
       // 「1年」は92件しかない。アンシスの hoped_stay_period(5,394件)から反映する。
       s('f_newPeriod',pd.hoped_stay_period||'');
+      // ver.20261116.01: 通算在留期間（変更の申請書と同じく persons.total_stay_year / total_stay_month）
+      if(pd.total_stay_year!=null && pd.total_stay_year!=='') s('f_totalY',String(pd.total_stay_year));
+      if(pd.total_stay_month!=null && pd.total_stay_month!=='') s('f_totalM',String(pd.total_stay_month));
     } else if(cas){
       s('f_name',cas.applicant||'');
       const ex=_ymd(cas.expire); s('f_expY',ex[0]); s('f_expM',ex[1]); s('f_expD',ex[2]);
@@ -2022,7 +2025,7 @@ async function loadFromDB(passedInfo){
     // ===== 申請人2 =====
     {
     const [persons,cases]=await Promise.all([
-      sb('persons?select=jp_exam_1,jp_exam_loc_1,jp_eval_type,residence_status&case_id=eq.'+caseId),
+      sb('persons?select=jp_exam_1,jp_exam_loc_1,jp_eval_type,residence_status,skill_eval_type,gijutsu_type,gijutsu_work,gijutsu_proof&case_id=eq.'+caseId),
       sb('cases?select=company,company_id&id=eq.'+caseId)
     ]);
     const pd=persons&&persons[0], cas=cases&&cases[0];
@@ -2063,6 +2066,13 @@ async function loadFromDB(passedInfo){
       // 18 技能水準：技能実習2号からの変更なら「技能実習2号を良好に修了」が既定
       if(/技能実習\s*2号/.test(pd.residence_status||'')) s('f_sk','jisshu');
       else if(/技能実習/.test(ev)) s('f_sk','jisshu');
+      // ver.20261116.01: 技能実習の職種・作業・修了の証明を人材の情報から入れる（変更の申請書と同じ）
+      if(/技能実習/.test((pd.skill_eval_type||'')+(pd.jp_eval_type||'')+(pd.residence_status||'')+(pd.gijutsu_proof||''))){
+        s('f_ti1Occ', pd.gijutsu_type||'');
+        s('f_ti1Ope', pd.gijutsu_work||pd.gijutsu_type||'');
+        var _gp=String(pd.gijutsu_proof||'');
+        if(/検定|試験/.test(_gp)) s('f_ti1Prf','test'); else if(/書面|実習状況/.test(_gp)) s('f_ti1Prf','doc');
+      }
     }
     }
     // ===== 申請人3 =====
