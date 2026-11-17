@@ -140,7 +140,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20261116.02</span>
+  <span class="ver">ver.20261117.16</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1497,7 +1497,21 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         var k=_soF.substring(3);
         var H=_ex.supportHours||{}, CM=_ex.consultMethods||{}, EC=_ex.emergencyContact||{};
         var RM=_ex.regularMeeting||{}, IH=_ex.implHours||{}, IS=_ex.implSchedules||{};
-        var HP=_ex.housingPolicy||{}, SC=_ex.symbiosisCheck||{}, IP=_p17PickInterp(_ex.interpreters, c, !!(_langOverride && (_langOverride.translator_name||_langOverride.translator_org)));
+        /* ver.20261117.01: 回答が無い項目は、ヒアリングフォーム・O-Link の最初から入る値（標準の内容）で入れる（言語別の1-17号と同じ）。
+           対応時間はヒアリングフォーム（supportHours）が空なら O-Link（hours）を使う。 */
+        var _hasHrs=function(o){ return !!o && typeof o==='object' && Object.keys(o).some(function(d){ var x=o[d]||{}; return x.none===true||!!x.from||!!x.to; }); };
+        if(!_hasHrs(H) && _hasHrs(_ex.hours)) H=_ex.hours;
+        var _em=function(x){ return !String(x==null?'':x).trim(); };
+        var _isDef={guidance:'有', escort:'入国時・帰国時に実施', orientation:'適宜実施', procedures:'適宜実施', japanese:'適宜実施', consultation:'適宜実施', exchange:'適宜実施', jobchange:'非自発的離職時に実施'};
+        var _soOk=!!(_so&&_so.name);
+        if(_soOk){ IS=Object.assign({}, IS); Object.keys(_isDef).forEach(function(q){ if(_em(IS[q])) IS[q]=_isDef[q]; });
+        RM=Object.assign({}, RM); if(_em(RM.method)) RM.method='faceOnline'; if(_em(RM.schedule)) RM.schedule='3か月に1回以上';
+        IH=Object.assign({}, IH); if(_em(IH.guidance)) IH.guidance='3'; if(_em(IH.orientation)) IH.orientation='8';
+        var _cmEmpty=function(o){ return !o.f2f && !o.tel && !o.mail && _em(o.other); };
+        if(_cmEmpty(CM)) CM={f2f:true, tel:!!_so.tel, mail:false, telNo:_so.tel||''};
+        if(_cmEmpty(EC)) EC=Object.assign({}, CM); }
+        var SC0=_ex.symbiosisCheck||{};
+        var HP=_ex.housingPolicy||{}, SC=(_soOk && !SC0.hp && _em(SC0.other)) ? Object.assign({}, SC0, {hp:true}) : SC0, IP=_p17PickInterp(_ex.interpreters, c, !!(_langOverride && (_langOverride.translator_name||_langOverride.translator_org)));
         // 対応時間（曜日別）
         var dayMap={hourMon:'mon',hourTue:'tue',hourWed:'wed',hourThu:'thu',hourFri:'fri',hourSat:'sat',hourSun:'sun',hourHol:'hol'};
         if(dayMap[k]) return _hourStr(H[dayMap[k]]);

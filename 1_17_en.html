@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（英語版・変更）</div>
-    <div class="ver">ver.20261116.17</div>
+    <div class="ver">ver.20261117.16</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -2286,7 +2286,7 @@ async function loadFromDB(passedInfo){
   var info=passedInfo;
   if(!info){ var sel=document.getElementById('caseSelect'); if(!sel||!sel.value) return; try{info=JSON.parse(sel.value);}catch(e){return;} }
   if(!info||!info.caseId) return;
-  window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null; window._p17OfficeNote = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
+  window._p17DefUsed = []; window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null; window._p17OfficeNote = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
   var caseId=info.caseId, companyId=info.companyId, companyName=info.companyName;
   var _s=function(id,val){var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val;};
   /* ver.20261013.02: 住所文字列を 都道府県／市区町村／以降 に分割（1_17.html Word版 splitAddress と同一仕様） */
@@ -2766,8 +2766,35 @@ async function _p17Hearing(so, _s){
     if(lo.housing_policy_b) HP.b = lo.housing_policy_b;
     if(lo.housing_policy_c) HP.c = lo.housing_policy_c;
   }
+  /* ver.20261117.01: 登録支援機関の回答が無い項目は、ヒアリングフォーム・O-Link の最初から入る値（標準の内容）で入れる。
+       日本語学習・交流促進・転職支援・相談苦情・公的手続・定期面談・生活オリエンテーションの時間・共生施策の確認方法・相談方法・緊急時対応。
+       対応時間・電話番号など機関ごとに違う事実は決めて入れない（相談方法の電話番号だけは機関の代表番号を使う）。 */
+  var _defUsed = [];
+  if(so && so.id){
+    var _e = function(x){ return !String(x==null?'':x).trim(); };
+    if(_e(IS.japanese)){ IS.japanese = '有（日本語教室案内・自主学習教材/オンライン講座情報提供、いずれも適宜実施）'; _defUsed.push('日本語学習'); }
+    if(_e(IS.exchange)){ IS.exchange = '有（適宜実施）'; _defUsed.push('日本人との交流'); }
+    if(_e(IS.jobchange)){ IS.jobchange = '有（非自発的離職時に実施）'; _defUsed.push('転職支援'); }
+    if(_e(IS.consultation)){ IS.consultation = '適宜実施'; _defUsed.push('相談・苦情'); }
+    if(_e(IS.procedures)){ IS.procedures = '有（適宜実施）'; _defUsed.push('公的手続'); }
+    if(_e(IS.guidance)){ IS.guidance = '有'; }
+    var _g = function(id){ var el=document.getElementById(id); return el ? String(el.value||'').trim() : ''; };
+    if(!sched){ _s('es_meetSchedule', '3か月に1回以上'); C.f353 = true; C.f355 = false; _defUsed.push('定期面談の時期'); }
+    if(!mk){ C.f360 = false; C.f361 = true; C.f362 = false; C.f408 = true; C.f409 = false; _defUsed.push('定期面談の方法'); }
+    if(!ohm){ _s('es_orientHours', '8'); _defUsed.push('生活オリエンテーション8時間'); }
+    if(!SC.hp && !C.f385){ C.f384 = true; _defUsed.push('共生施策（ホームページで確認）'); }
+    var _tel = String(so.tel||'').trim();
+    if(!CM.f2f && !CM.tel && !CM.mail && !String(CM.other||'').trim()){
+      C.f253 = true; C.f254 = !!_tel; C.f258 = false; C.f260 = false; if(_tel) _s('es_cmTel', _tel); _defUsed.push('相談方法（直接面談・電話）');
+    } else if(CM.tel && _e(CM.telNo) && _tel){ _s('es_cmTel', _tel); }
+    if(!EC.f2f && !EC.tel && !EC.mail && !String(EC.other||'').trim()){
+      C.f262 = !!C.f253; C.f263 = !!C.f254; C.f267 = !!C.f258; C.f269 = !!C.f260;   // 相談方法と同じ（ヒアリングフォームと同じ動き）
+      _s('es_emTel', _g('es_cmTel')||(C.f254?_tel:'')); _s('es_emMail', _g('es_cmMail')); _s('es_emOther', _g('es_cmOther')); _defUsed.push('緊急時対応（相談方法と同じ）');
+    } else if(EC.tel && _e(EC.telNo)){ _s('es_emTel', _g('es_cmTel')||_tel); }
+  }
+  window._p17DefUsed = _defUsed;
   var sch = 0;
-  if(apply(IS.guidance,    [['f044',null,'f046','f047']])) sch++;
+  if(apply(IS.guidance,   [['f044',null,'f046','f047']])) sch++;
   /* ver.20261104.04: 住居の回答が「有（bで…合意しなかった場合に実施／雇用開始後一週間以内に実施）」のように
      a（bで合意しないときの代わり）と b（本来の確保）をまとめて書いている場合は、
      前半を a、後半を b に分けて、どちらも「有」にする。b に別の回答があるときは分けない。 */
@@ -2814,7 +2841,8 @@ async function _p17Hearing(so, _s){
   if(C.f205) T.f206=_p17JpSched(T.f206); if(C.f213) T.f214=_p17JpSched(T.f214);   // ver.20261116.05: 実施予定は時期だけ（内容の説明は「適宜実施」）
   // ver.20261104.01: 日本語学習の回答が教室案内・教材・オンライン講座だけ（日本語教師との契約・講習に触れていない）なら、ｃは「無（a,bで実施）」
   var _jp = String(IS.japanese||'');
-  if(/教室|教材|オンライン|アプリ/.test(_jp) && !/教師|講習/.test(_jp) && !/^無/.test(_jp)){ C.f220=false; C.f222=true; delete T.f221; T.f223='a,bで実施'; }
+  if(((/教室|教材|オンライン|アプリ/.test(_jp) && !/教師|講習/.test(_jp)) || (_jp.trim() && /^(有)?[（(]?(適宜実施|適宜)?[）)]?$/.test(_jp.trim()))) && !/^無/.test(_jp)){   // ver.20261117.01: 「適宜実施」「有」だけ（フォームの最初の値）も標準どおり c＝無
+   C.f220=false; C.f222=true; delete T.f221; T.f223='a,bで実施'; }
   // 相談・苦情は回答が「直接面談・電話…」など方法の列挙なので、有にチェックだけ入れる（欄には「適宜実施」が印字済み）
   if(String(IS.consultation||'').trim()){ C.f235 = true; C.f237 = false; sch++; }
   if(apply(IS.exchange,    [['f271','f272','f273','f274']])) sch++;
@@ -2847,6 +2875,9 @@ async function _p17Hearing(so, _s){
   if(note && window._p17Review && window._p17Review.length){
     note.innerHTML += '<br><span style="color:#b45309">⚠ 次の回答はとても長い（80字超）ので（　）内を空けています。必要なら本文に書いてください：<br>・'
       + window._p17Review.map(function(x){ return String(x).replace(/</g,'&lt;'); }).join('<br>・') + '</span>';
+  }
+  if(note && _defUsed.length){
+    note.innerHTML += '<br><span style="color:#475569">ℹ️ 回答が無いので標準の内容で入れました：' + _defUsed.join('・') + '</span>';
   }
 }
 // ===== ver.20261020.03: 自社支援（1-11-2号・1-11-3号・1-20号・1-22号と同じ読み方） =====
@@ -3281,6 +3312,10 @@ function _p17TodoItems(){
     if(days>90) items.push({t:'Ⅴ 共生施策の確認日が '+y+'/'+m+'/'+d+'（作成日の約'+Math.round(days/30)+'か月前）。最近確認した日か見直してください', go:"_p17GoField('es_symM')"});
   })();
   if(window._p17Check && window._p17Check.f129){ var _f131=document.getElementById('f131'); if(_f131 && !String(_f131.value||'').trim()) items.push({t:'住居の同居人数が空欄（雇用条件に人数が無いため）', go:"_p17Flash(document.getElementById('f131'))"}); }
+  /* ver.20261117.01: 対応時間は機関ごとに違うので決めて入れない。空なら知らせる。標準の内容で入れた項目はお知らせに出す */
+  if(!window._p17SelfWhy && g('es_soName') && !['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Hol'].some(function(d){ return g('es_h'+d+'F')||g('es_h'+d+'T'); }))
+    items.push({t:'対応時間が空欄（登録支援機関の回答が無いため。O-Linkかヒアリングフォームで入れてもらうか、ここで入れてください）', go:"_p17GoField('es_hMonF')"});
+  if(window._p17DefUsed && window._p17DefUsed.length) items.push({t:'回答が無いので標準の内容で入れました：'+window._p17DefUsed.join('・'), go:"_p17Flash(document.getElementById('p17HearingNote'))", info:1});
   need.forEach(function(x){ var e=document.getElementById(x[0]); if(e && !g(x[0])) items.push({t:x[1]+'が空欄', go:"_p17GoField('"+x[0]+"')"}); });
   var ON=window._p17OfficeNote;
   if(ON && !ON.guessed) items.push({t:'支援を行う事業所は「'+ON.name+'」で作成（案シスの案件情報「使用する支援事業所」が未選択のため1つ目。別の事業所なら案シスで選んで開き直してください）', go:"_p17GoField('es_soOfficeAddress')", info:1});
