@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.18</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.19</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -4796,6 +4796,17 @@ function _isaPcApplyMarks(S, res){
   }); });
   return out;
 }
+// ver.20261117.19: 1-17号（Saysay で作ったもの）の文字を判定用に取り出す。チェック欄は☑/☐、入力欄は中の値。外国語の部分は除いて日本語だけにする
+function _isaP17Text(doc){
+  var t=document.createElement('template'); t.innerHTML=doc.html; var root=t.content;
+  root.querySelectorAll('style,script').forEach(function(e){ e.remove(); });
+  root.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(function(el){ el.replaceWith(document.createTextNode((el.checked||el.hasAttribute('checked'))?'☑':'☐')); });
+  root.querySelectorAll('input,textarea,select').forEach(function(el){ var v=el.value||el.getAttribute('value')||el.textContent||''; el.replaceWith(document.createTextNode(' '+v+' ')); });
+  var bes=[].slice.call(root.querySelectorAll('.p17bessi')).map(function(e){ return e.textContent||''; }).join('\n');
+  root.querySelectorAll('.p17bessi').forEach(function(e){ e.remove(); });
+  var main=String(root.textContent||'').replace(/[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\u0E00-\u0E7F\u1780-\u17FF\u1000-\u109F\u0900-\u097F\u0D80-\u0DFF\uAC00-\uD7AF\u1800-\u18AF\u0400-\u04FF]+/g,' ').replace(/[ \t\u3000]+/g,' ').replace(/\s*\n\s*/g,'\n').replace(/\n{2,}/g,'\n');
+  return {text:main.slice(0,14000), bessi:String(bes).replace(/\s+/g,' ').slice(0,3000), cut:main.length>14000};
+}
 // AI チェック本体
 async function _isaPrecheck(S, allFiles, fileHtml, docHtml, prog, docsP){
   var rowOf={};
@@ -4826,7 +4837,9 @@ async function _isaPrecheck(S, allFiles, fileHtml, docHtml, prog, docsP){
   var rows=[]; S.tables.forEach(function(t){ t.lines.forEach(function(L){ rows.push({hyou:_isaHyou(t.key), no:String(L.r.no||''), name:_isaRowName(L).slice(0,70), opt:L.opt?String(L.opt).slice(0,30):undefined, req:L.r.req||'', val:L.val||'空欄', src:String(L.src||'').slice(0,90)}); }); });
   var made=Object.keys(docHtml).map(function(d){ return _pmDocLabel(d).name||d; });
   var unsigned=[]; S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val==='有' && L._signDoc && !(L.files||[]).length && !(L.signPages||[]).length) unsigned.push(_pmDocLabel(L._signDoc).name||L._signDoc); }); });
-  var r=await _isaFnAt('isa-precheck',{action:'judge', today:new Date().toISOString().slice(0,10), meta:_isaPcMeta(S), rows:rows, saysay:{made:made, unsigned:unsigned}, pages:ext});
+  // ver.20261117.19: Saysay で作った1-17号の中身（チェック欄は☑/☐、日本語の部分）と別紙の名簿も判定に渡す（名簿・通訳者の言語・実施方法の抜けを見る）
+  var p17=null; Object.keys(docHtml||{}).forEach(function(d){ if(!p17 && /^1_17/.test(d) && docHtml[d]){ try{ p17=_isaP17Text(docHtml[d]); p17.doc=_pmDocLabel(d).name||d; }catch(e){ console.warn(e); } } });
+  var r=await _isaFnAt('isa-precheck',{action:'judge', today:new Date().toISOString().slice(0,10), meta:_isaPcMeta(S), rows:rows, saysay:{made:made, unsigned:unsigned, p17:p17}, pages:ext});
   var res=r.result||{meta:{},attachments:[],checks:[]};
   var notes=[]; if(cut) notes.push('ページが多いため先頭'+MAX+'ページだけ読みました'); if(errs.length) notes.push('読み取りに失敗したページがあります（'+errs.length+'回）');
   if(notes.length) res.meta.note=(res.meta.note?res.meta.note+'／':'')+notes.join('／');
