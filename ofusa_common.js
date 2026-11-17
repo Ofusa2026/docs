@@ -4191,7 +4191,10 @@ document.addEventListener('click', function(e){
       var out=Object.assign({}, values), tr=Object.assign({}, (existing&&existing['_tr_'+L])||{}), n=0;
       Object.keys(values).forEach(function(k){
         if(!/En$/.test(k) || k.charAt(0)==='_') return;
-        var v=values[k]; if(v==null || String(v).trim()==='') return;
+        var v=values[k];
+        // ver.20261117.26: 訳の欄を消して保存したときは、言語ごとの控え（_tr_xx）からも消す（呼び戻すと控えの訳が戻っていたため）
+        if(v!=null && String(v).trim()==='' && Object.prototype.hasOwnProperty.call(tr,k)){ delete tr[k]; n++; return; }
+        if(v==null || String(v).trim()==='') return;
         tr[k]=v; n++;
         var old=existing ? existing[k] : '';
         if(old==null || String(old).trim()==='' || String(old)===String(v)) return;   // 空なら共通の欄にも入れる

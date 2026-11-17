@@ -508,7 +508,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611171634"></script>
+<script src="ofusa_common.js?v=2611171651"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1757,7 +1757,8 @@ async function loadFromDB(passedInfo){
     _jippiDefault();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）
-    ['es_dailyMins','es_weeklyMin','es_monthlyMin','es_yearlyMin'].forEach(_id=>{const _e=document.getElementById(_id);if(_e && !_e.value)_e.value='0';});
+    // ver.20261117.26: 時間（H）が入っているときだけ。時間も空の欄（変形労働で1日の時間を書かない等）に「0分」を出さない（消して保存しても、呼び戻すと0分がまた出ていたため）
+    [['es_dailyMins','es_dailyHours'],['es_weeklyMin','es_weeklyH'],['es_monthlyMin','es_monthlyH'],['es_yearlyMin','es_yearlyH']].forEach(([_id,_h])=>{const _e=document.getElementById(_id), _he=document.getElementById(_h);if(_e && !_e.value && _he && String(_he.value||'').trim())_e.value='0';});
 
     // 5. 今日の日付を作成日にセット（未入力の場合）
     const today = new Date();
