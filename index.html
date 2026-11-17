@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.17</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.18</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.18',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📁 申請書類一式（入管の提出書類一覧表つき）を、［🖨 印刷画面を開く］を押したときに人材のドライブにも自動で保存するようにしました。置き場所は「★在留資格申請書類／03 スキャン／日付のフォルダ」で、ファイル名は「氏名_申請書類一式_日付_時刻.pdf」です（作り直しても上書きせず、日付つきで残ります）。保存できたかは結果の画面と、グループの一覧に出ます',
+    ]
+  },
   {
     version: 'ver.20261117.17',
     date: '2026-11-17',
@@ -4121,6 +4129,7 @@ async function _isaDriveFiles(c, p, co){
   var pu=(p&&p.extra&&p.extra.driveUrl)||(Array.isArray(du)&&du[0])||c.drive_url||'';
   var pid=_isaFolderId(pu);
   out.folder=pid ? ('https://drive.google.com/drive/folders/'+pid) : '';   // ver.20261117.09: できたPDFの保存先として結果の画面に出す
+  out.pid=pid;
   // ver.20261117.10: 人材・アップロード・会社のフォルダは同時に読みに行く（前は1つずつ）
   var _upId0=_isaFolderId(Array.isArray(du)&&du[0]);
   var _cids0=[]; ['drive_url','drive_url2','drive_url3','drive_url4','drive_url5'].forEach(function(k){ var id=_isaFolderId(co&&co[k]); if(id && _cids0.indexOf(id)<0) _cids0.push(id); });
@@ -4131,6 +4140,8 @@ async function _isaDriveFiles(c, p, co){
     var t=await _pP;
     var all=(t&&t.status==='ok'&&Array.isArray(t.items))?t.items:[];
     if(!all.length) out.note.push('人材のドライブを読めませんでした');
+    out.treeOk=!!all.length;
+    var _sd=_isaScanDirOf(all); out.scan=_sd.scan; out.appDir=_sd.appDir;   // ver.20261117.18: 一式の保存先（★在留資格申請書類／03 スキャン）
     all.filter(_isaIsDoc).forEach(function(f){
       var path=String(f.path||''); try{ path=path.normalize('NFKC'); }catch(e){}
       if(/企業押印済|押印済|サイン済/.test(path)) out.sign.push(f);
@@ -4279,7 +4290,7 @@ async function _isaSetStart(targets){
     var restDocs=targets.filter(function(dk){ return !docUsed[dk] && !(dk==='1_17' && docUsed['1_17_vi']); });
     var restFiles=drv.up.concat(drv.sign).filter(function(f){ return !used[f.id] && !(SG && SG.used[f.id]); });
     var restSign=SG ? Object.keys(SG.byKey).filter(function(k){ return !B.sgUsed[k]; }).map(function(k){ return {key:k, label:ISA_SIGN_LABEL[k]||k, pages:SG.byKey[k], on:false}; }).concat(SG.other.length?[{key:'other', label:'様式が分からないページ', pages:SG.other, on:false}]:[]) : [];
-    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', t0:_isaT0,
+    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', pid:drv.pid||'', scanDir:drv.scan||null, appDir:drv.appDir||null, treeOk:!!drv.treeOk, t0:_isaT0,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
@@ -4886,8 +4897,8 @@ function _isaPcRender(){
     +(cnt.warn?'<div style="font-weight:800;font-size:13px;margin-top:10px;color:#b26a00;">⚡ 目で確認するもの</div>'+list('warn','#b26a00'):'')
     +'<div style="font-weight:800;font-size:13px;margin-top:14px;color:#4c1d95;">📎 不足書類のお知らせ</div>'+notice
     +'</div>'
-    +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div style="flex:1;font-size:11px;color:#64748b;min-width:160px;">✅の中身とページ番号はExcelに入っています</div>'
-    +(S.folder?'<a href="'+E(S.folder)+'" target="_blank" rel="noopener" title="印刷画面で保存したPDFは、ここ（人材のドライブ）に入れてください" style="padding:9px 12px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">📁 人材のドライブ</a>':'')
+    +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div id="isaSaveSt" style="flex:1 1 100%;font-size:11.5px;color:#64748b;line-height:1.6;">'+_isaSaveHtml(P)+'</div><div style="flex:1;"></div>'
+    +(S.folder?'<a href="'+E(S.folder)+'" target="_blank" rel="noopener" title="人材のドライブを開きます（一式のPDFは［🖨 印刷画面を開く］を押すと「03 スキャン」に自動で保存します）" style="padding:9px 12px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">📁 人材のドライブ</a>':'')
     +'<button onclick="_isaPcClose()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
     +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
@@ -5034,7 +5045,8 @@ function _isaGrpRender(){
   var rows=G.list.map(function(it, i){
     var s=ISA_GRP_ST[it.st]||ISA_GRP_ST.wait, P=it.S&&it.S.pc, cnt={out:0,warn:0}; ((P&&P.res&&P.res.checks)||[]).forEach(function(c){ if(cnt[c.severity]!=null) cnt[c.severity]++; });
     var noI=P && !P.collected.some(function(c){ return c.dk==='isa_ichiran'; });
-    var info=it.st==='done' ? ('⛔'+cnt.out+' ⚡'+cnt.warn+(P.items.length?'・不足'+P.items.length:'')+(noI||it.S.ichiranStale?'・<b style="color:#b91c1c;">一覧表を確認</b>':'')) : E(it.msg);
+    var sv=P&&P.save, svT=!sv?'':(sv.st==='ok'?'・<a href="'+E(sv.url)+'" target="_blank" rel="noopener" style="color:#047857;font-weight:700;">📁 ドライブに保存済み</a>':(sv.st==='run'?'・<span style="color:#1d4ed8;">⏳ ドライブに保存中</span>':'・<b style="color:#b91c1c;">📁 ドライブに保存できず</b>'));   // ver.20261117.18
+    var info=it.st==='done' ? ('⛔'+cnt.out+' ⚡'+cnt.warn+(P.items.length?'・不足'+P.items.length:'')+(noI||it.S.ichiranStale?'・<b style="color:#b91c1c;">一覧表を確認</b>':'')+svT) : E(it.msg);
     var btns='';
     if(it.st==='done') btns='<button onclick="_isaGrpOpen('+i+')" style="padding:6px 10px;border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">結果を見る</button>'
       +'<button onclick="_isaGrpPrint('+i+')" style="padding:6px 10px;border:none;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">🖨 印刷</button>';
@@ -5084,6 +5096,259 @@ function _isaPcPrint(){
   if(P.attach && P.items.length) col.push({dk:'fusoku', html:_isaNoticeDoc(P.res.meta, P.items)});
   _openMergedPrintWindow(col, {applicant:S.info.applicant, _fullTitle:(S.info.applicant||'')+'_申請書類一式'});
   if(!P.logged){ P.logged=1; try{ _bpPostLogs(P.collected.filter(function(x){ return x.dk!=='drive' && x.dk!=='isa_ichiran'; })); }catch(e){} _isaPostSetLog(S, P); }
+  _isaPcSave(col);   // ver.20261117.18: 同じ一式を人材のドライブ（03 スキャン）に日付つきで保存
+}
+// ===== ver.20261117.18: 作った申請書類一式を、人材のドライブ（★在留資格申請書類／03 スキャン／YYYYMMDD）にPDFで保存する =====
+//   ・［🖨 印刷画面を開く］を押したときに、印刷画面と同じ中身で1回だけ保存（同じ中身なら2回押しても1つ）
+//   ・ファイル名は「氏名_申請書類一式_YYYYMMDD_HHMM.pdf」＝作り直しても上書きしない（日付つきで残す）
+//   ・置き場所は案シスの［📎 スキャン書類作成］と同じ（03 スキャン／日付のフォルダ）。無ければ作る
+//   ・ブラウザの「PDFに保存」は自動で押せないので、ページごとに画像にしてPDFにする（ドライブの書類・一覧表は元の画像をそのまま綴じる）
+var ISA_SAVE_SCALE=1.7, ISA_SAVE_JPG=0.82;   // 約160dpi（文字は十分読める・37ページで8MBほど）
+function _isaScanNorm(s){ var x=String(s||''); try{ x=x.normalize('NFKC'); }catch(e){} return x.trim().replace(/^[0-9]+[.、,]?\s*/,'').replace(/\s+/g,''); }
+function _isaScanDirOf(items){
+  var dirs=(items||[]).filter(function(f){ return f && f.isFolder; });
+  var pth=function(f){ var x=String(f.path||''); try{ x=x.normalize('NFKC'); }catch(e){} return x; };
+  var sc=dirs.filter(function(f){ return _isaScanNorm(f.name)==='スキャン'; });
+  var scA=sc.filter(function(f){ return /在留資格申請書類/.test(pth(f)); });
+  var ap=dirs.filter(function(f){ return _isaScanNorm(f.name).indexOf('在留資格申請書類')>=0; });
+  var pick=function(f){ return f ? {id:f.id, path:String(f.path||f.name||'')} : null; };
+  return {scan:pick(scA[0]||sc[0]), appDir:pick(ap[0])};
+}
+var _isaPdfLibP=null;
+function _isaLoadPdfLib(){
+  if(window.PDFLib) return Promise.resolve(window.PDFLib);
+  if(_isaPdfLibP) return _isaPdfLibP;
+  var load=function(src){ return new Promise(function(ok,ng){ var s=document.createElement('script'); s.src=src; s.onload=function(){ window.PDFLib?ok(window.PDFLib):ng(new Error('pdf-lib')); }; s.onerror=function(){ ng(new Error('PDFを作る部品を読み込めませんでした')); }; document.head.appendChild(s); }); };
+  _isaPdfLibP=load('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js').catch(function(){ return load('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'); }).catch(function(e){ _isaPdfLibP=null; throw e; });
+  return _isaPdfLibP;
+}
+// 印刷のときの見た目にする：@media print の中身はいつも効かせる・画面だけの指定は捨てる・幅の条件は紙の幅で決める
+function _isaPrintCss(rules, win){
+  var s='';
+  for(var i=0;i<rules.length;i++){
+    var r=rules[i];
+    try{
+      if(r.type===4){
+        var mt=String((r.media&&r.media.mediaText)||r.conditionText||'').toLowerCase();
+        if(/\bnot\s+print\b/.test(mt)) continue;
+        if(/\bprint\b/.test(mt)) s+=_isaPrintCss(r.cssRules, win);
+        else if(/\bscreen\b/.test(mt)) continue;
+        else if(!mt || mt==='all' || (win && win.matchMedia && win.matchMedia(mt).matches)) s+=_isaPrintCss(r.cssRules, win);
+      } else if(r.type===12){ s+='@supports '+r.conditionText+'{\n'+_isaPrintCss(r.cssRules, win)+'}\n'; }
+      else if(r.type===3 || r.type===6){ }   // @import / @page
+      else s+=r.cssText+'\n';
+    }catch(e){}
+  }
+  return s;
+}
+function _isaLenMm(v){ var m=String(v||'').trim().match(/^(-?[\d.]+)\s*(mm|cm|in|pt|px)?$/); if(!m) return 0; var n=+m[1]; return ({cm:n*10, in:n*25.4, pt:n*25.4/72, px:n*25.4/96})[m[2]]!=null ? ({cm:n*10, in:n*25.4, pt:n*25.4/72, px:n*25.4/96})[m[2]] : n; }
+function _isaPageBoxes(sheets){
+  var boxes={};
+  var rd=function(r){
+    var sz=String(r.style.getPropertyValue('size')||'').toLowerCase(), land=/landscape/.test(sz);
+    var mm=function(k){ return _isaLenMm(r.style.getPropertyValue(k)); };
+    return {w:land?297:210, h:land?210:297, mt:mm('margin-top'), mr:mm('margin-right'), mb:mm('margin-bottom'), ml:mm('margin-left')};
+  };
+  sheets.forEach(function(sh){ try{ [].slice.call(sh.cssRules).forEach(function(r){ if(r.type===6){ var k=String(r.selectorText||'').trim(); if(!k || /^:/.test(k)){ if(!boxes['']) boxes['']=rd(r); } else boxes[k]=rd(r); } }); }catch(e){} });
+  if(!boxes['']) boxes['']={w:210, h:297, mt:0, mr:0, mb:0, ml:0};
+  return boxes;
+}
+function _isaWait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function _isaFrame(w){ return new Promise(function(r){ (w||window).requestAnimationFrame(function(){ (w||window).requestAnimationFrame(function(){ r(); }); }); }); }
+function _isaDataBytes(u){ var b64=String(u).split(',')[1]||''; var bin=atob(b64), a=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+function _isaXmlText(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+// 外のファイル（書類の背景の画像など）を data: にして中に入れる。同じものは1回だけ読む
+function _isaUrlData(u, cache){
+  var abs=u; try{ abs=new URL(u, location.href).href; }catch(e){}
+  if(cache[abs]) return cache[abs];
+  cache[abs]=fetch(abs,{cache:'force-cache'}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.blob(); }).then(function(b){ return new Promise(function(ok){ var fr=new FileReader(); fr.onload=function(){ ok(String(fr.result)); }; fr.onerror=function(){ ok(''); }; fr.readAsDataURL(b); }); }).catch(function(){ return ''; });
+  return cache[abs];
+}
+async function _isaInlineCssUrls(css, cache){
+  var re=/url\(\s*(['"]?)([^'")]+)\1\s*\)/g, m, urls=[];
+  while((m=re.exec(css))){ var u=m[2].trim(); if(u && !/^(data:|#|about:)/i.test(u) && urls.indexOf(u)<0) urls.push(u); }
+  var map={}; await Promise.all(urls.map(function(u){ return _isaUrlData(u, cache).then(function(v){ if(v) map[u]=v; }); }));
+  return css.replace(re, function(all, q, u){ u=u.trim(); return map[u] ? 'url("'+map[u]+'")' : all; });
+}
+async function _isaInlineImgs(root, cache){
+  var els=[].slice.call(root.querySelectorAll('img'));
+  await Promise.all(els.map(function(im){ var u=im.getAttribute('src')||''; if(!u || /^data:/i.test(u)) return null; return _isaUrlData(u, cache).then(function(v){ if(v) im.setAttribute('src', v); }); }));
+  var st=[].slice.call(root.querySelectorAll('[style*="url("]'));
+  for(var i=0;i<st.length;i++){ var v2=await _isaInlineCssUrls(st[i].getAttribute('style')||'', cache); st[i].setAttribute('style', v2); }
+}
+async function _isaSvgToJpeg(svg, pw, ph){
+  var img=new Image(); img.decoding='sync';
+  await new Promise(function(ok,ng){ img.onload=ok; img.onerror=function(){ ng(new Error('ページを画像にできませんでした')); }; img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg); });
+  try{ await img.decode(); }catch(e){}
+  var cv=document.createElement('canvas'); cv.width=pw; cv.height=ph;
+  var g=cv.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,pw,ph); g.drawImage(img,0,0,pw,ph);
+  return cv;
+}
+// 一式をPDFにする → {b64, pages, bytes}
+async function _isaSetPdf(col, prog){
+  var L=await _isaLoadPdfLib();
+  var M=_mergedPrintHtml(col, {});
+  var ifr=document.createElement('iframe');
+  ifr.style.cssText='position:fixed;left:-30000px;top:0;width:794px;height:1123px;border:0;opacity:0;pointer-events:none;';
+  ifr.setAttribute('data-pm-fixed','1');
+  document.body.appendChild(ifr);
+  try{
+    var d=ifr.contentDocument, w=ifr.contentWindow;
+    d.open(); d.write('<!DOCTYPE html><html lang="ja"><head>'+M.head+'</head><body>'+M.body+'</body></html>'); d.close();
+    for(var t=0; t<60 && d.readyState!=='complete'; t++) await _isaWait(250);
+    try{ if(d.fonts && d.fonts.ready) await Promise.race([d.fonts.ready, _isaWait(5000)]); }catch(e){}
+    var sheets=[].slice.call(d.styleSheets), boxes=_isaPageBoxes(sheets);
+    // 書類ごとのスタイル（ほかの書類のスタイルは持ち込まない＝軽くする）
+    var common='', perDoc={};
+    sheets.forEach(function(sh){ var tx=''; try{ tx=_isaPrintCss(sh.cssRules, w); }catch(e){ return; } var id=sh.ownerNode && sh.ownerNode.getAttribute && sh.ownerNode.getAttribute('data-pm'); if(id) perDoc[id]=(perDoc[id]||'')+tx; else common+=tx; });
+    var extra='html,body{margin:0!important;padding:0!important;background:#fff!important;} .pmdoc .pmpage{box-shadow:none!important;}';
+    [].slice.call(d.querySelectorAll('style,link[rel="stylesheet"]')).forEach(function(x){ x.remove(); });
+    var st=d.createElement('style'); st.textContent=common+Object.keys(perDoc).map(function(k){ return perDoc[k]; }).join('')+extra; d.head.appendChild(st);
+    await _isaFrame(w);
+    // ページ（印刷の1ページ）を並べる
+    var pages=[];
+    [].slice.call(d.querySelectorAll('.pmdoc')).forEach(function(doc){
+      var ps=[].slice.call(doc.querySelectorAll('.p17page'));
+      if(!ps.length) ps=[].slice.call(doc.querySelectorAll('.pmpage')).filter(function(el){ var p=el.parentElement; return !(p && p.closest && p.closest('.pmpage')); });
+      ps.forEach(function(el){ pages.push({el:el, doc:doc}); });
+    });
+    if(!pages.length) throw new Error('綴じるページがありません');
+    var out=await L.PDFDocument.create(), PT=72/25.4, PX=25.4/96, n=0, ucache={}, docCss={};
+    var host=d.createElement('div'); host.style.cssText='position:absolute;left:0;top:0;z-index:2147483647;background:#fff;'; d.body.appendChild(host);
+    for(var i=0;i<pages.length;i++){
+      var pg=pages[i], el=pg.el, doc=pg.doc;
+      if(prog) prog('PDFを作っています… '+(i+1)+'／'+pages.length+'ページ');
+      // どの紙か（名前のついたページ：1-17号＝A4横・余白10mm／1-11-2・3＝A4横 など）
+      var nm='', a=el; while(a && a!==d.body){ var pv=''; try{ pv=w.getComputedStyle(a).page; }catch(e){} if(pv && pv!=='auto'){ nm=pv; break; } a=a.parentElement; }
+      var B=Object.assign({}, boxes[nm]||boxes['']), cw=B.w-B.ml-B.mr, ch=B.h-B.mt-B.mb;
+      // 1ページだけの写しを作って、紙の中身の幅で並べ直す（セレクタが同じように効くよう、外側の箱も写す）
+      var chain=el.cloneNode(true), up=el.parentElement;
+      while(up && up!==d.body){ var sh=up.cloneNode(false); if(up===doc){ sh.style.setProperty('width', cw+'mm','important'); sh.style.setProperty('margin','0','important'); } sh.appendChild(chain); chain=sh; up=up.parentElement; }
+      host.innerHTML=''; host.style.width=cw+'mm'; host.appendChild(chain);
+      await _isaFrame(w);
+      var solo=host.querySelector('.p17page')&&el.classList.contains('p17page') ? host.querySelector('.p17page') : (function(){ var q=host.querySelectorAll('.pmpage'); for(var k=0;k<q.length;k++){ var p=q[k].parentElement; if(!(p && p.closest && p.closest('.pmpage'))) return q[k]; } return host.firstElementChild; })();
+      var hr=host.getBoundingClientRect(), r=solo.getBoundingClientRect();
+      var dx=r.left-hr.left, dy=r.top-hr.top, ew=Math.max(1,r.width), eh=Math.max(1,r.height);
+      // 用紙より大きい（横長の書類が縦の紙）ときは向きを入れ替える
+      if(ew*PX>cw+2 && eh*PX<=B.w-B.mt-B.mb+2 && !nm){ var tw=B.w; B.w=B.h; B.h=tw; cw=B.w-B.ml-B.mr; ch=B.h-B.mt-B.mb; }
+      var fit=Math.min(1, cw/(ew*PX));   // 横にはみ出すときだけ縮める
+      var imgs=[].slice.call(solo.querySelectorAll('img')), onlyImg=imgs.length===1 && !String(solo.textContent||'').trim() && /^data:image\/(jpeg|jpg|png)/i.test(imgs[0].getAttribute('src')||'');
+      if(onlyImg){
+        // ドライブの書類・一覧表・署名済みのページ：元の画像をそのまま綴じる（画質を落とさない）
+        var src=imgs[0].getAttribute('src'), ir=imgs[0].getBoundingClientRect();
+        var emb=/^data:image\/png/i.test(src) ? await out.embedPng(_isaDataBytes(src)) : await out.embedJpg(_isaDataBytes(src));
+        var bw=ir.width*PX*fit, bh=ir.height*PX*fit, sc2=Math.min(bw/emb.width, bh/emb.height), iw=emb.width*sc2, ih=emb.height*sc2;
+        var bx=B.ml+(ir.left-hr.left)*PX*fit+(bw-iw)/2, by=B.mt+(ir.top-hr.top)*PX*fit+(bh-ih)/2;
+        var p1=out.addPage([B.w*PT, B.h*PT]); p1.drawImage(emb, {x:bx*PT, y:(B.h-by-ih)*PT, width:iw*PT, height:ih*PT}); n++;
+        continue;
+      }
+      // Saysay の書類：ブラウザでそのまま描いて画像にする（画像として描くときは外のファイルを読めないので、背景・画像は中に入れる）
+      await _isaInlineImgs(host, ucache);
+      host.style.position='static';
+      var x=new XMLSerializer().serializeToString(host);
+      host.style.position='absolute';
+      if(!docCss[doc.id]) docCss[doc.id]=await _isaInlineCssUrls(common+(perDoc[doc.id]||'')+extra, ucache);
+      var css=docCss[doc.id], s=ISA_SAVE_SCALE, fw=Math.ceil(hr.width)+2, fh=Math.ceil(dy+eh)+2;
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+Math.ceil(ew*s)+'" height="'+Math.ceil(eh*s)+'" viewBox="'+dx+' '+dy+' '+ew+' '+eh+'">'
+        +'<foreignObject x="0" y="0" width="'+fw+'" height="'+fh+'"><div xmlns="http://www.w3.org/1999/xhtml" lang="ja" style="width:'+fw+'px;background:#fff;"><style>'+_isaXmlText(css)+'</style>'+x+'</div></foreignObject></svg>';
+      var cv=await _isaSvgToJpeg(svg, Math.ceil(ew*s), Math.ceil(eh*s));
+      // 紙より長いページは、紙の長さで切って次のページへ（印刷と同じ）
+      var segPx=(ch/fit)/PX*s, total=cv.height, nSeg=Math.max(1, Math.ceil((total-2)/segPx - 0.02));
+      for(var g2=0; g2<nSeg; g2++){
+        var sy=Math.round(g2*segPx), sh2=Math.min(total-sy, Math.round(segPx));
+        var part=cv; if(nSeg>1){ part=document.createElement('canvas'); part.width=cv.width; part.height=sh2; var gg=part.getContext('2d'); gg.fillStyle='#fff'; gg.fillRect(0,0,part.width,sh2); gg.drawImage(cv,0,sy,cv.width,sh2,0,0,cv.width,sh2); }
+        var jp=await out.embedJpg(_isaDataBytes(part.toDataURL('image/jpeg', ISA_SAVE_JPG)));
+        var wmm=ew*PX*fit, hmm=(sh2/s)*PX*fit, px0=B.ml+dx*PX*fit, py0=B.mt+(g2===0?dy*PX*fit:0);
+        var p2=out.addPage([B.w*PT, B.h*PT]); p2.drawImage(jp, {x:px0*PT, y:(B.h-py0-hmm)*PT, width:wmm*PT, height:hmm*PT}); n++;
+      }
+      await _isaWait(0);
+    }
+    var b64=await out.saveAsBase64();
+    return {b64:b64, pages:n, bytes:Math.round(b64.length*3/4)};
+  } finally { try{ ifr.remove(); }catch(e){} }
+}
+// 大きいデータは POST で送る（返事が読めないときは、フォルダを見て入ったか確かめる＝送り直さない）
+async function _isaGasPost(action, data, ms){
+  var ctl=(typeof AbortController!=='undefined')?new AbortController():null, tm=ctl?setTimeout(function(){ try{ ctl.abort(); }catch(e){} }, ms||240000):0;
+  try{
+    var r=await fetch(ISA_GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:action, data:data}),redirect:'follow',signal:ctl?ctl.signal:undefined});
+    var tx=await r.text(); if(tm) clearTimeout(tm);
+    var m=tx.match(/^[^({]*\(([\s\S]*)\)\s*;?\s*$/);
+    try{ return JSON.parse(m?m[1]:tx); }catch(e){ return {status:'unknown'}; }
+  }catch(e){ if(tm) clearTimeout(tm); return {status:'unknown', msg:String((e&&e.message)||e)}; }
+}
+async function _isaGasList(id){ var t=await _isaGas('listDriveTree',{folderId:id, maxDepth:1}, 60000); return (t&&t.status==='ok'&&Array.isArray(t.items)) ? t.items : null; }
+async function _isaMkDir(parent, name){
+  var r=await _isaGas('createDriveFolder',{parentFolderId:parent, folderName:name}, 60000);
+  if(r && r.status==='ok' && r.folderId) return r.folderId;
+  var its=await _isaGasList(parent)||[]; var hit=its.filter(function(f){ return f.isFolder && String(f.name||'').trim()===name; })[0];   // 返事が来なかっただけのことがある
+  if(hit) return hit.id;
+  throw new Error('「'+name+'」フォルダを作れませんでした'+((r&&(r.msg||r.message))?('（'+(r.msg||r.message)+'）'):''));
+}
+// 保存先：03 スキャン／YYYYMMDD（無ければ作る）
+async function _isaScanDayDir(S, ymd){
+  if(!(S.scanDir && S.scanDir.id)){
+    if(!S.pid) throw new Error('人材のドライブフォルダが案シスに登録されていないため、保存できません');
+    if(!S.treeOk){ var t=await _isaGas('listDriveTree',{folderId:S.pid, maxDepth:3}, 90000); var all=(t&&t.status==='ok'&&Array.isArray(t.items))?t.items:null; if(!all) throw new Error('人材のドライブを読めませんでした'); var sd=_isaScanDirOf(all); S.scanDir=sd.scan; S.appDir=sd.appDir; S.treeOk=true; }
+    if(!(S.scanDir && S.scanDir.id)){ var par=(S.appDir&&S.appDir.id)||S.pid; S.scanDir={id:await _isaMkDir(par, '03 スキャン'), path:(S.appDir?S.appDir.path+'/':'')+'03 スキャン', made:1}; }
+  }
+  var its=await _isaGasList(S.scanDir.id); if(!its) throw new Error('「03 スキャン」フォルダを読めませんでした');
+  var hit=its.filter(function(f){ return f.isFolder && String(f.name||'').trim()===ymd; })[0];
+  if(!hit) return {id:await _isaMkDir(S.scanDir.id, ymd), names:[]};
+  var day=await _isaGasList(hit.id)||[];   // 同じ分に作り直したときに名前が重ならないように
+  return {id:hit.id, names:day.filter(function(f){ return !f.isFolder; }).map(function(f){ return String(f.name||''); })};
+}
+function _isaSaveSig(col){ return col.map(function(c){ var h=c.html||{}; return (c.dk||'')+':'+(h.id||'')+':'+String(h.html||'').length; }).join('|'); }
+function _isaSaveHtml(P){
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var v=P&&P.save;
+  if(!v) return '📁 ［🖨 印刷画面を開く］を押すと、この一式を人材のドライブ「03 スキャン」に日付つきで保存します<br>✅の中身とページ番号はExcelに入っています';
+  if(v.st==='run') return '<span style="color:#1d4ed8;font-weight:700;">⏳ ドライブに保存しています</span>　'+E(v.msg||'');
+  if(v.st==='ok') return '<span style="color:#047857;font-weight:700;">✅ ドライブに保存しました</span>（03 スキャン／'+E(v.ymd)+'・'+v.pages+'ページ）<br>'
+    +(v.url?'<a href="'+E(v.url)+'" target="_blank" rel="noopener" style="color:#1d4ed8;font-weight:700;">📄 '+E(v.name)+'</a>':E(v.name))
+    +(v.dirUrl?'　<a href="'+E(v.dirUrl)+'" target="_blank" rel="noopener" style="color:#1d4ed8;">📁 フォルダを開く</a>':'');
+  return '<span style="color:#b91c1c;font-weight:700;">⚠ ドライブに保存できませんでした</span>　'+E(v.msg||'')+'　<button onclick="_isaPcSave(null)" style="padding:3px 9px;border:1px solid #fca5a5;background:#fff;color:#b91c1c;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">もう一度</button>';
+}
+function _isaSaveShow(S, P){
+  if(_isaSt===S){ var el=document.getElementById('isaSaveSt'); if(el) el.innerHTML=_isaSaveHtml(P); }
+  if(document.getElementById('isaGrpModal') && typeof _isaGrpRender==='function') try{ _isaGrpRender(); }catch(e){}
+}
+async function _isaPcSave(col){
+  var S=_isaSt, P=S&&S.pc; if(!P) return;
+  if(!col){ col=P.collected.slice(); if(P.attach && P.items.length) col.push({dk:'fusoku', html:_isaNoticeDoc(P.res.meta, P.items)}); }
+  var sig=_isaSaveSig(col);
+  if(P.save && P.save.sig===sig && (P.save.st==='run' || P.save.st==='ok')) return;   // 同じ中身は1回だけ
+  var dt=new Date(), z=function(n){ return ('0'+n).slice(-2); }, ymd=dt.getFullYear()+z(dt.getMonth()+1)+z(dt.getDate()), hm=z(dt.getHours())+z(dt.getMinutes());
+  var v=P.save={st:'run', sig:sig, msg:'準備しています…', ymd:ymd};
+  var show=function(){ _isaSaveShow(S, P); };
+  show();
+  try{
+    await _isaWait(1500);   // 印刷画面を先に開かせる
+    var pdf=await _isaSetPdf(col, function(t){ v.msg=t; show(); });
+    v.msg='ドライブに送っています…（'+(pdf.bytes/1048576).toFixed(1)+'MB）'; show();
+    var dir=await _isaScanDayDir(S, ymd);
+    var base=(_isaFnSafe(S.info.applicant)||String(S.info.caseId||'申請人'))+'_申請書類一式_'+ymd+'_'+hm, name=base+'.pdf', kk=2;
+    while(dir.names.indexOf(name)>=0 || (P.savedNames||[]).indexOf(name)>=0) name=base+'_'+(kk++)+'.pdf';
+    (P.savedNames=P.savedNames||[]).push(name);
+    var r=await _isaGasPost('uploadFileToDrive', {folderId:dir.id, fileName:name, base64:pdf.b64, mimeType:'application/pdf'});
+    var fid=(r&&(r.fileId||r.id))||'', url=(r&&(r.url||r.fileUrl))||'';
+    if(!(r && r.status==='ok' && (fid||url))){
+      if(r && r.status==='error') throw new Error(r.msg||r.message||'保存に失敗しました');
+      v.msg='保存できたか確かめています…'; show();
+      for(var k=0;k<12 && !url;k++){
+        await _isaWait(k?5000:2500);
+        var its=await _isaGasList(dir.id)||[]; var hit=its.filter(function(f){ return !f.isFolder && String(f.name||'')===name; })[0];
+        if(hit){ fid=hit.id; url=hit.url||('https://drive.google.com/file/d/'+hit.id+'/view'); }
+      }
+      if(!url) throw new Error('保存できたか確かめられませんでした（フォルダを開いて確かめてください）');
+    }
+    if(!url && fid) url='https://drive.google.com/file/d/'+fid+'/view';
+    v.st='ok'; v.name=name; v.url=url; v.dirUrl='https://drive.google.com/drive/folders/'+dir.id; v.pages=pdf.pages; v.msg='';
+    show();
+  }catch(e){
+    console.warn('[isaSave]', e);
+    v.st='ng'; v.msg=String((e&&e.message)||e); show();
+  }
 }
 // Excel（ExcelJS をその場で読み込む）
 var _isaXlP=null;
@@ -6136,11 +6401,22 @@ async function _pm13Pages(lang){
 function _openMergedPrintWindow(collected, info){
   var w=window.open('', '_blank');
   if(!w){ alert('ポップアップがブロックされました。ポップアップを許可してから再度お試しください。'); return; }
+  var M=_mergedPrintHtml(collected, info);
+  w.document.open();
+  w.document.write('<!DOCTYPE html><html lang="ja"><head>'+M.head+'</head><body>'+M.body
+    + '<scr'+'ipt>(function(){var p=document.querySelectorAll(".pmpage");if(p.length)p[p.length-1].classList.add("pmlast");'
+    + 'window.onload=function(){setTimeout(function(){window.print();},800);};})();</scr'+'ipt>'
+    + '</body></html>');
+  w.document.close();
+}
+// ver.20261117.18: 印刷画面の中身（head／body）を作る。ドライブ保存のPDFもこれを使う（印刷と同じ見た目にするため1か所だけ）
+function _mergedPrintHtml(collected, info){
+  info=info||{};
   var title=info._fullTitle ? info._fullTitle : (info._title ? (info._title+'_書類') : ((info.applicant?info.applicant+'様_':'')+'スキャン必要書類'));   // ver.20261109.08: 人ごと・書類ごとに分けるときは名前をそのまま   // ver.20261106.05: 複数人まとめは「会社名_◯名分_書類」
   var links=[]; collected.forEach(function(c){ (c.html.links||[]).forEach(function(h){ if(links.indexOf(h)<0) links.push(h); }); });
   var head='<meta charset="UTF-8"><title>'+title+'</title>'
     + links.map(function(h){return '<link rel="stylesheet" href="'+h+'">';}).join('')
-    + collected.map(function(c){ return '<style>'+c.html.css+'</style>'; }).join('')
+    + collected.map(function(c){ return '<style data-pm="'+c.html.id+'">'+c.html.css+'</style>'; }).join('')
     + '<style>'
     + 'html,body{margin:0;padding:0;background:#fff;}'
     + '.pmdoc #pageArea{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important;padding:0!important;margin:0!important;}'
@@ -6157,13 +6433,8 @@ function _openMergedPrintWindow(collected, info){
     + '.pm13 img{display:block;width:210mm;height:297mm;object-fit:contain;}'
     + '@media screen{body{background:#e5e7eb;} .pmdoc .pmpage{margin:12px auto!important;box-shadow:0 1px 6px rgba(0,0,0,.25)!important;}}'
     + '</style>';
-  var body=collected.map(function(c){ return '<div class="pmdoc" id="'+c.html.id+'">'+c.html.html+'</div>'; }).join('');
-  w.document.open();
-  w.document.write('<!DOCTYPE html><html lang="ja"><head>'+head+'</head><body>'+body
-    + '<scr'+'ipt>(function(){var p=document.querySelectorAll(".pmpage");if(p.length)p[p.length-1].classList.add("pmlast");'
-    + 'window.onload=function(){setTimeout(function(){window.print();},800);};})();</scr'+'ipt>'
-    + '</body></html>');
-  w.document.close();
+  var body=collected.map(function(c){ return '<div class="pmdoc" id="'+c.html.id+'" data-dk="'+String(c.dk||'').replace(/"/g,'')+'">'+c.html.html+'</div>'; }).join('');
+  return {title:title, head:head, body:body};
 }
 
 function toggleOtherDocs(){
