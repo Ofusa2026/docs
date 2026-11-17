@@ -186,7 +186,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.02</div>
+    <div class="ver">ver.20261117.03</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -793,7 +793,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794960001"></script>
+<script src="ofusa_common.js?v=1794970001"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -1839,13 +1839,13 @@ async function loadFromDB(passedInfo){
     }
     // ===== 機関2 =====
     {
-    const cases=await sb('cases?select=company,company_id&id=eq.'+caseId);
+    const cases=await sb('cases?select=company,company_id,emp_set_idx&id=eq.'+caseId);
     const cas=cases&&cases[0];
     let co=null;
     const cid=companyId||(cas&&cas.company_id);
     // ver.20260715: 実在する列のみ指定する。存在しない列を混ぜるとPostgRESTがエラーを返し反映が全部止まる。
     // 実データ件数(2,032社中): corp_no=1466 / capital=1512 / sales=1488 / employees=1514 / labor_ins_no=1410 / rep_name=1540
-    const sel='name,corp_no,pref,city,address,tel,capital,sales,employees,labor_ins_no,author_name,author_title,rep_name,rep_title';
+    const sel='name,corp_no,emp_ins_no,emp_sets,pref,city,address,tel,capital,sales,employees,labor_ins_no,author_name,author_title,rep_name,rep_title';   // ver.20261117.03: 雇用保険番号・雇用条件セット（事業所）も読む
     if(cid){ const r=await sb('companies?select='+sel+'&id=eq.'+cid); co=r&&r[0]; }
     if(!co){
       const nm=companyName||(cas&&cas.company);
@@ -1855,6 +1855,11 @@ async function loadFromDB(passedInfo){
     if(co){
       s('f_o2coName',co.name||'');
       s('f_coCorp',co.corp_no||'');
+      s('f_coEi',co.emp_ins_no||'');   // ver.20261117.03: 雇用保険適用事業所番号（変更の申請書と同じ）
+      // ver.20261117.03: (10)勤務させる事業所: 雇用条件セットの事業所名・住所。無ければ会社本体（変更の申請書と同じ）
+      var _es2={}; try{ var _sets=co.emp_sets; if(typeof _sets==='string') _sets=JSON.parse(_sets); var _ix=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(Object.assign({},co,{emp_sets:_sets}),cas,window._lastCaseInfo||{}):parseInt((cas&&cas.emp_set_idx)||'0',10); if(Array.isArray(_sets)&&_ix>=0) _es2=_sets[_ix]||{}; }catch(_e2){}
+      { var _officeName=(_es2.officeName||_es2.orgName||'').trim(), _officeAddr=(_es2.officeAddr||_es2.orgAddress||'').trim(), _coFullAddr=((co.pref||'')+(co.city||'')+(co.address||'')).trim();
+        s('f_office', _officeName || co.name || ''); s('f_officeAddr', _officeAddr || _coFullAddr || ''); }
       s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||''))||'');
       s('f_coTel',co.tel||'');
       s('f_capital',String(co.capital||'').replace(/[，,]/g,''));
