@@ -186,7 +186,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.16</div>
+    <div class="ver">ver.20261117.21</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -244,8 +244,8 @@
       <div class="fg"><label>所属2 申請人の活動内容</label><select id="f_tkOrgAct" onchange="p()"><option value=""></option><option value="gaiko">外交，公用</option><option value="other">弁護士…その他（特定技能の移行準備など）</option><option value="epa">EPA就学介護福祉士候補者</option><option value="kaji">家事使用人</option><option value="fuyo">扶養を受ける活動</option><option value="nikkei">日系四世</option></select></div>
       <div class="fg"><label>所属4 活動内容詳細</label><textarea id="f_tkDetail" oninput="p()" rows="3"></textarea></div>
       <div class="fg"><label>所属5(8) うち外国人職員数（名）</label><input id="f_staffFr" oninput="p()"></div>
-      <div class="fg"><label>所属6 職務上の地位</label><input id="f_position" oninput="p()" placeholder="例：作業員"></div>
-      <div class="fg"><label>所属7 就労予定期間</label><input id="f_workPeriod" oninput="p()" placeholder="例：6月"></div>
+      <div class="fg"><label>所属6 職務上の地位</label><input id="f_position" oninput="p()" placeholder="例：正社員"></div>
+      <div class="fg"><label>所属7 就労予定期間</label><input id="f_workPeriod" oninput="p()" placeholder="例：長期"></div>
     </div>
     <div class="fs"><div class="fs-title">📷 顔写真</div>
       <!-- ver.20260810.10: 顔写真アップロード対応 -->
@@ -1035,7 +1035,9 @@ function _dg(id,i){ const s=v_(id).replace(/[^0-9A-Za-z]/g,''); return s[i]||'';
     }
     if(key){ if(_tkApply(key,false)) ch=true; }
     // ver.20261117.16: 「申請人の活動内容」は自動で入れない（移行準備などは、どの選択肢にも当たらないため）。書類の上でクリックして選ぶ
-    ch=set('f_workPeriod', v_('f_newPeriod'))||ch;
+    // ver.20261117.21: 所属6・7は特定活動ではふつう「正社員」「長期」なので最初から入れる（空欄のときだけ。違うときは書き換えてOK）
+    ch=set('f_position', '正社員')||ch;
+    ch=set('f_workPeriod', '長期')||ch;
     if(ch && typeof p==='function') p();
   }
   setInterval(fillTk, 1500);
@@ -1527,7 +1529,7 @@ ${v('f_fam5Lv')==='無'?'<div class="cirs" style="left:113.48mm;top:253.00mm"></
 <div class="doc docabs" id="docP2">
 <div class="page-num-label">P2</div>
 ${v('f_tkAct')?'<span class="av avm" style="left:24.15mm;top:166.86mm;font-size:9.8pt;">■</span>':''}
-<div class="av avg avfit" data-w="118.0" style="left:43.15mm;top:167.26mm;font-size:8.60pt;max-width:118.0mm;">${f('f_tkAct')}</div>
+<div class="av avg avfit" data-w="107.0" style="left:50.20mm;top:167.26mm;font-size:8.60pt;max-width:107.0mm;">${f('f_tkAct')}</div>
 </div>
 <div class="doc docabs" id="docP3">
 <div class="page-num-label">P3</div>
@@ -1535,7 +1537,7 @@ ${v('f_tkAct')?'<span class="av avm" style="left:24.15mm;top:166.86mm;font-size:
 <div class="av avg avfit" data-w="66.0" style="left:156.90mm;top:19.10mm;font-size:8.60pt;transform:translateX(-50%);max-width:66.0mm;">${f('f_office')}</div>
 <div class="av avg avfit" data-w="148.0" style="left:40.00mm;top:28.87mm;font-size:8.60pt;max-width:148.0mm;">${v_('f_officeAddr')?f('f_officeAddr'):f('f_coAddr')}</div>
 <div class="av avg" style="left:77.20mm;top:38.63mm;font-size:8.60pt;transform:translateX(-50%);">${f('f_coTel')}</div>
-<div class="av avg avwrap" style="left:12.83mm;top:183.95mm;font-size:8.60pt;width:182.0mm;height:24.0mm;">${f('f_tkPurpose')}</div>
+<div class="av avg avwrap" style="left:15.60mm;top:183.95mm;font-size:8.60pt;width:173.0mm;height:23.0mm;">${f('f_tkPurpose')}</div>
 </div>
 <div class="doc docabs" id="docP4">
 <div class="page-num-label">P4</div>
@@ -1606,22 +1608,22 @@ ${v('f_tkOrgAct')==='nikkei'?'<span class="av avm" style="left:13.21mm;top:81.19
 <div class="av avg" style="left:86.32mm;top:163.71mm;font-size:9pt;transform:translateX(-50%);">${_dg('f_coEi',10)}</div>
 <div class="av avg" style="left:183.25mm;top:171.90mm;font-size:9.50pt;transform:translateX(-50%);">${f('f_bizMain')}</div>
 <div class="av avg avfit" data-w="15.6" style="left:180.48mm;top:178.01mm;font-size:8.50pt;transform:translateX(-50%);max-width:15.6mm;">${f('f_bizSub')}</div>
-<div class="av avg avfit" data-w="92.0" style="left:27.77mm;top:183.20mm;font-size:8.00pt;max-width:92.0mm;">${v_('f_officeAddr')?f('f_officeAddr'):f('f_coAddr')}</div>
-<div class="av avg" style="left:138.54mm;top:183.31mm;font-size:8.60pt;">${f('f_coTel')}</div>
+<div class="av avg avfit" data-w="76.0" style="left:40.50mm;top:183.20mm;font-size:8.60pt;max-width:76.0mm;">${v_('f_officeAddr')?f('f_officeAddr'):f('f_coAddr')}</div>
+<div class="av avg" style="left:146.00mm;top:183.31mm;font-size:8.60pt;">${f('f_coTel')}</div>
 <div class="av avg" style="left:71.19mm;top:189.50mm;font-size:8.60pt;transform:translateX(-100%);">${ff('f_capital')}</div>
 <div class="av avg" style="left:181.97mm;top:189.50mm;font-size:8.60pt;transform:translateX(-100%);">${ff('f_sales')}</div>
 <div class="av avg" style="left:72.56mm;top:195.62mm;font-size:8.60pt;transform:translateX(-100%);">${ff('f_staff')}</div>
 <div class="av avg" style="left:161.18mm;top:195.62mm;font-size:8.60pt;transform:translateX(-100%);">${ff('f_staffFr')}</div>
-<div class="av avg avfit" data-w="48.0" style="left:32.23mm;top:201.99mm;font-size:8.60pt;max-width:48.0mm;">${f('f_position')}</div>
-<div class="av avg avfit" data-w="58.0" style="left:123.77mm;top:201.99mm;font-size:8.60pt;max-width:58.0mm;">${f('f_workPeriod')}</div>
+<div class="av avg avfit" data-w="26.0" style="left:46.00mm;top:202.50mm;font-size:8.60pt;max-width:26.0mm;">${f('f_position')}</div>
+<div class="av avg avfit" data-w="54.0" style="left:140.20mm;top:202.50mm;font-size:8.60pt;max-width:54.0mm;">${f('f_workPeriod')}</div>
 <div class="av avg" style="left:50.42mm;top:216.09mm;font-size:9.00pt;transform:translateX(-100%);">${ff('f_pay')}</div>
 </div>
 <div class="doc docabs" id="docP6">
 <div class="page-num-label">P6</div>
 <div class="av avg avfit" data-w="110.0" style="left:20.00mm;top:269.81mm;font-size:8.60pt;max-width:110.0mm;">${f('f_o4coName')}　${f('f_coRep')}</div>
-<div class="av avg" style="left:139.80mm;top:269.81mm;font-size:9.00pt;transform:translateX(-100%);">${f('f_oSigY')}</div>
-<div class="av avg" style="left:160.72mm;top:269.81mm;font-size:9.00pt;transform:translateX(-100%);">${f('f_oSigM')}</div>
-<div class="av avg" style="left:180.57mm;top:269.81mm;font-size:9.00pt;transform:translateX(-100%);">${f('f_oSigD')}</div>
+<div class="av avg" style="left:142.85mm;top:269.81mm;font-size:9.00pt;transform:translateX(-50%);">${f('f_oSigY')}</div>
+<div class="av avg" style="left:164.40mm;top:269.81mm;font-size:9.00pt;transform:translateX(-50%);">${f('f_oSigM')}</div>
+<div class="av avg" style="left:183.30mm;top:269.81mm;font-size:9.00pt;transform:translateX(-50%);">${f('f_oSigD')}</div>
 </div>
 
 `;
