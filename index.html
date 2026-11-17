@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.15</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.16</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -491,8 +491,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794990006';
-window.__DOCS_CACHE_BUSTER__ = '1794990006';
+window.__DOCS_CACHE_BUSTER__ = '1794990007';
+window.__DOCS_CACHE_BUSTER__ = '1794990007';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1866,6 +1866,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.16',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📄 特定活動の窓口申請書（変更・更新）：申請人等作成用3「18 勤務先」の名称・支店・電話番号を線の真ん中に、所在地を少し右に寄せました。',
+      '☑ 特定活動の窓口申請書：所属機関等作成用1の「契約の形態（雇用・委任・請負）」と「申請人の活動内容」を、書類の上の□をクリックして選べるようにしました（もう一度押すと外れます）。契約の形態は初めから「雇用」です。',
+      '🚫 特定活動の窓口申請書：「申請人の活動内容」に自動で■が入っていたのをやめました（移行準備などは、どの選択肢にも当たらないため）。'
+    ]
+  },
   {
     version: 'ver.20261117.15',
     date: '2026-11-17',

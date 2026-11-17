@@ -186,7 +186,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.11</div>
+    <div class="ver">ver.20261117.16</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -800,7 +800,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990006"></script>
+<script src="ofusa_common.js?v=1794990007"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -972,15 +972,15 @@ const SP=[
 
 // ver.20261117.04: 特定活動の種類ごとの文例（17 活動内容・22 在留目的・所属4 活動内容詳細・在留期間・理由）。案件に合わせて直して使う
 var TK_TPL={
-  ikou1:{label:'特定技能1号への移行準備', act:'特定技能1号への移行準備', org:'other', period:'6月',
+  ikou1:{label:'特定技能1号への移行準備', act:'特定技能1号への移行準備', org:'', period:'6月',
     purpose:function(c){ return '特定技能1号への在留資格変更に向けた準備（技能試験・日本語試験の受験や必要書類の準備）を行うため、引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。'; },
     detail:function(c){ return '特定技能1号への移行準備期間中、'+c.job; },
     reason:{'変更':'特定技能1号への移行準備のため','更新':'特定技能1号への移行準備を続けるため'}},
-  ikou2:{label:'特定技能2号への移行準備', act:'特定技能2号への移行準備', org:'other', period:'6月',
+  ikou2:{label:'特定技能2号への移行準備', act:'特定技能2号への移行準備', org:'', period:'6月',
     purpose:function(c){ return '特定技能2号への在留資格変更に必要な技能試験の受験や書類の準備を行うため、引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。'; },
     detail:function(c){ return '特定技能2号への移行準備期間中、'+c.job; },
     reason:{'変更':'特定技能2号への移行準備のため','更新':'特定技能2号への移行準備を続けるため'}},
-  myanmar:{label:'ミャンマー国籍者の緊急避難措置', act:'本国情勢を踏まえた緊急避難措置（ミャンマー）', org:'other', period:'',
+  myanmar:{label:'ミャンマー国籍者の緊急避難措置', act:'本国情勢を踏まえた緊急避難措置（ミャンマー）', org:'', period:'',
     purpose:function(c){ return '本国の情勢により帰国が困難であるため、本邦での在留を希望します。引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労し、滞在費は所属機関から支払われる報酬により支弁します。'; },
     detail:function(c){ return c.job; },
     reason:{'変更':'本国の情勢により帰国が困難なため','更新':'本国の情勢により引き続き帰国が困難なため'}},
@@ -1034,7 +1034,7 @@ function _dg(id,i){ const s=v_(id).replace(/[^0-9A-Za-z]/g,''); return s[i]||'';
       ch=set('f_staffFr', co.foreign_employees)||ch;
     }
     if(key){ if(_tkApply(key,false)) ch=true; }
-    else { ch=set('f_tkOrgAct','other')||ch; }
+    // ver.20261117.16: 「申請人の活動内容」は自動で入れない（移行準備などは、どの選択肢にも当たらないため）。書類の上でクリックして選ぶ
     ch=set('f_workPeriod', v_('f_newPeriod'))||ch;
     if(ch && typeof p==='function') p();
   }
@@ -1531,10 +1531,10 @@ ${v('f_tkAct')?'<span class="av avm" style="left:24.15mm;top:166.86mm;font-size:
 </div>
 <div class="doc docabs" id="docP3">
 <div class="page-num-label">P3</div>
-<div class="av avg avfit" data-w="64.0" style="left:28.35mm;top:19.10mm;font-size:8.60pt;max-width:64.0mm;">${f('f_o2coName')}</div>
-<div class="av avg avfit" data-w="60.0" style="left:123.60mm;top:19.25mm;font-size:8.60pt;max-width:60.0mm;">${f('f_office')}</div>
-<div class="av avg avfit" data-w="150.0" style="left:30.35mm;top:28.87mm;font-size:8.60pt;max-width:150.0mm;">${v_('f_officeAddr')?f('f_officeAddr'):f('f_coAddr')}</div>
-<div class="av avg" style="left:34.35mm;top:38.63mm;font-size:8.60pt;">${f('f_coTel')}</div>
+<div class="av avg avfit" data-w="54.0" style="left:63.50mm;top:19.10mm;font-size:8.60pt;transform:translateX(-50%);max-width:54.0mm;">${f('f_o2coName')}</div>
+<div class="av avg avfit" data-w="66.0" style="left:156.90mm;top:19.10mm;font-size:8.60pt;transform:translateX(-50%);max-width:66.0mm;">${f('f_office')}</div>
+<div class="av avg avfit" data-w="148.0" style="left:40.00mm;top:28.87mm;font-size:8.60pt;max-width:148.0mm;">${v_('f_officeAddr')?f('f_officeAddr'):f('f_coAddr')}</div>
+<div class="av avg" style="left:77.20mm;top:38.63mm;font-size:8.60pt;transform:translateX(-50%);">${f('f_coTel')}</div>
 <div class="av avg avwrap" style="left:12.83mm;top:183.95mm;font-size:8.60pt;width:182.0mm;height:24.0mm;">${f('f_tkPurpose')}</div>
 </div>
 <div class="doc docabs" id="docP4">
@@ -1556,9 +1556,19 @@ ${v('f_tkAct')?'<span class="av avm" style="left:24.15mm;top:166.86mm;font-size:
 <div class="page-num-label">P5</div>
 <div class="av avg avfit" data-w="120.0" style="left:33.77mm;top:16.55mm;font-size:9.00pt;max-width:120.0mm;">${f('f_name')}</div>
 <div class="av avg" style="left:43.77mm;top:22.67mm;font-size:9.00pt;">${f('f_card')}</div>
-${v('f_tkForm')==='雇用'?'<span class="av avm" style="left:13.21mm;top:31.04mm;font-size:9.8pt;">■</span>':''}
-${v('f_tkForm')==='委任'?'<span class="av avm" style="left:40.90mm;top:31.04mm;font-size:9.8pt;">■</span>':''}
-${v('f_tkForm')==='請負'?'<span class="av avm" style="left:68.59mm;top:31.04mm;font-size:9.8pt;">■</span>':''}
+<!-- ver.20261117.16: 契約の形態・申請人の活動内容は、書類の上の□をクリックして選べる（もう一度押すと外れる） -->
+<div class="pickhot cb-click" style="left:12.21mm;top:30.6mm;width:20mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkForm','雇用')" title="契約の形態：雇用"></div>
+<div class="pickhot cb-click" style="left:39.90mm;top:30.6mm;width:20mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkForm','委任')" title="契約の形態：委任"></div>
+<div class="pickhot cb-click" style="left:67.59mm;top:30.6mm;width:20mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkForm','請負')" title="契約の形態：請負"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:42.24mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','gaiko')" title="申請人の活動内容"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:47.64mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','other')" title="申請人の活動内容"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:64.84mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','epa')" title="申請人の活動内容"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:69.83mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','kaji')" title="申請人の活動内容"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:75.91mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','fuyo')" title="申請人の活動内容"></div>
+<div class="pickhot cb-click" style="left:12.2mm;top:80.79mm;width:6mm;height:5.2mm;border-radius:2px;" onclick="setPick('f_tkOrgAct','nikkei')" title="申請人の活動内容"></div>
+${v('f_tkForm')==='雇用'?'<span class="av avm" style="left:13.21mm;top:31.44mm;font-size:9.8pt;">■</span>':''}
+${v('f_tkForm')==='委任'?'<span class="av avm" style="left:40.90mm;top:31.44mm;font-size:9.8pt;">■</span>':''}
+${v('f_tkForm')==='請負'?'<span class="av avm" style="left:68.59mm;top:31.44mm;font-size:9.8pt;">■</span>':''}
 ${v('f_tkOrgAct')==='gaiko'?'<span class="av avm" style="left:13.21mm;top:42.64mm;font-size:9.8pt;">■</span>':''}
 ${v('f_tkOrgAct')==='other'?'<span class="av avm" style="left:13.21mm;top:48.04mm;font-size:9.8pt;">■</span>':''}
 ${v('f_tkOrgAct')==='epa'?'<span class="av avm" style="left:13.21mm;top:65.24mm;font-size:9.8pt;">■</span>':''}
