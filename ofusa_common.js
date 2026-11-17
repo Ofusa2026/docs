@@ -2645,8 +2645,11 @@ async function saveUserNotesOnly(){
   if(typeof sb !== 'function') return;
   var info = window._lastCaseInfo;
   if(!info || !info.companyId) return;
-  var idx = info.empSetIdx != null && info.empSetIdx !== '' ? parseInt(info.empSetIdx, 10) : 0;
-  if(isNaN(idx)) idx = 0;
+  // ver.20261117.25: セット番号がわからないとき0番（別の人のセットかもしれない）に保存しない
+  var idx = info.empSetIdx != null && info.empSetIdx !== '' ? parseInt(info.empSetIdx, 10) : NaN;
+  if(isNaN(idx) && typeof window._empLoadedIdx==='number' && window._empLoadedIdx>=0) idx = window._empLoadedIdx;
+  if(isNaN(idx)){ try{ var _sx=await _resolveSaveIdx(info, ''); if(_sx!=='') idx=parseInt(_sx,10); }catch(_e){} }
+  if(isNaN(idx)){ if(typeof showToast==='function') showToast('⚠️ 雇用条件セットが決まっていないので、注記を保存できませんでした'); return; }
   var notes = Array.isArray(window._userNotes) ? window._userNotes : [];
   try{
     // RPCがあれば優先
@@ -3741,7 +3744,11 @@ async function saveFormGeneric(docKey, opts){
               // ver.20260715: 書類側で自動補完した既定値は emp_sets に書き戻さない（実データ保護）
               if(el.dataset && el.dataset.autofill === '1') return;
               const val = (el.type === 'checkbox') ? el.checked : el.value;
-              if(val === '' || val == null) return;
+              if(val === '' || val == null){
+                // ver.20261117.25: 人が書類で消した欄は、案シスの雇用条件でも空にする（消した項目が呼び戻すとまた出ていたため）
+                if(window._userTouched && window._userTouched[f] && es[k]!=null && String(es[k]).trim()!==''){ es[k] = ''; nShared++; }
+                return;
+              }
               if(es[k] !== val){ es[k] = val; nShared++; }
             });
           });
@@ -6914,7 +6921,20 @@ function _structNoticeShow(){
     var KEYS=['calcMonthly','calcHourly','totalMonthly','deductTax','deductSocial','deductEmployment','deductTotal','netPay'];
     var LABEL={calcMonthly:'換算月給',calcHourly:'換算時給',totalMonthly:'支払概算総額',deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料',deductTotal:'控除合計',netPay:'手取り'};
     var busy=false;
-    async function sync(){
+    function _p16SyncAsk(msg){
+      var b=document.getElementById('_p16SyncBar'); if(b) b.remove();
+      b=document.createElement('div'); b.id='_p16SyncBar';
+      b.style.cssText='position:fixed;bottom:84px;left:50%;transform:translateX(-50%);z-index:100001;background:#ecfeff;border:1px solid #06b6d4;color:#164e63;border-radius:10px;padding:8px 12px;font:13px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;gap:10px;align-items:center;max-width:94vw;';
+      var esc=function(x){ return String(x).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+      b.innerHTML='<span>🔗 案シスの雇用条件の金額が、この1-6号の計算とちがいます（'+esc(msg.slice(0,3).join('、')+(msg.length>3?' ほか':''))+'）。案シスにも反映しますか？</span>'
+        +'<button type="button" id="_p16SyncYes" style="border:none;background:#0891b2;color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;cursor:pointer;white-space:nowrap;">反映する</button>'
+        +'<button type="button" id="_p16SyncNo" style="border:1px solid #67e8f9;background:#fff;color:#155e75;border-radius:7px;padding:5px 10px;cursor:pointer;white-space:nowrap;">今回はしない</button>';
+      document.body.appendChild(b);
+      if(!document.getElementById('_p16SyncCss')){ var st=document.createElement('style'); st.id='_p16SyncCss'; st.textContent='@media print{#_p16SyncBar{display:none!important}}'; document.head.appendChild(st); }
+      b.querySelector('#_p16SyncNo').onclick=function(){ b.remove(); };
+      b.querySelector('#_p16SyncYes').onclick=function(){ b.remove(); sync(true); };
+    }
+    async function sync(force){
       if(busy) return; busy=true;
       try{
         if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return;
@@ -6931,6 +6951,12 @@ function _structNoticeShow(){
           diff[k]=String(Math.round(nv)); msg.push(LABEL[k]+' '+(ov==null?'空欄':fmt(ov))+'→'+fmt(nv));
         });
         if(!Object.keys(diff).length) return;
+        // ver.20261117.25: 勝手に書き込まず、帯で聞いてから案シスに反映する（見えない枠では何もしない）
+        if(!force){
+          try{ if(typeof _empFrameHidden==='function' && _empFrameHidden()) return; }catch(_h){}
+          if(window._docCheckMode) return;
+          _p16SyncAsk(msg); return;
+        }
         var r=await sb('companies?select=id,emp_sets&id=eq.'+encodeURIComponent(ctx.companyId)); var co=r&&r[0]; if(!co) return;
         var sets=Array.isArray(co.emp_sets)?co.emp_sets:[]; if(!sets[idx]) return;
         Object.assign(sets[idx], diff);
@@ -7571,4 +7597,48 @@ function ofusaFmtZip(z){ var d=String(z==null?'':z).normalize('NFKC').replace(/[
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
   window.addEventListener('load', wrap);
   document.addEventListener('focusout', function(ev){ var t=ev.target; if(t && t.id && (TEL.test(t.id)||ZIP.test(t.id)) && fix() && typeof window.p==='function') window.p(); }, true);
+})();
+
+/* ver.20261117.25: 直接編集版で固まった書類を開いたとき、上に帯を出す。
+   直接編集で保存した書類は、そのときの中身で固定され、あとから案シスやSaysayを直しても変わらない。
+   画面では見分けがつかず「直したのに直らない」という問い合わせが続いていたため */
+(function(){
+  try{
+    if(window.self!==window.top && typeof _empFrameHidden==='function' && _empFrameHidden()) return;   // まとめPDF・全書類チェックの見えない枠では出さない
+  }catch(e){}
+  function discard(){
+    try{
+      if(typeof discardEditedFromDB==='function') return discardEditedFromDB();
+      if(typeof discardEditedGeneric==='function') return discardEditedGeneric();
+    }catch(e){}
+  }
+  window._edBannerDiscard=discard;
+  function tick(){
+    try{
+      var on=!!window._editedRestored && !((typeof _editMode!=='undefined') && _editMode) && !window._docCheckMode;
+      var b=document.getElementById('_edBanner');
+      if(on && !b){
+        b=document.createElement('div'); b.id='_edBanner'; b.className='no-print';
+        b.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99990;background:#fff7ed;border:1px solid #fb923c;color:#7c2d12;border-radius:10px;padding:8px 12px;font:13px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;gap:10px;align-items:center;max-width:94vw;';
+        b.innerHTML='<span>✏️ この書類は<b>直接編集版</b>です。保存したときの中身のままで、あとの修正（案シス・Saysay）は出ません。</span>'
+          +'<button type="button" style="border:none;background:#ea580c;color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;cursor:pointer;white-space:nowrap;" onclick="window._edBannerDiscard()">♻️ 編集版破棄で最新にする</button>'
+          +'<button type="button" title="閉じる" style="border:none;background:transparent;color:#9a3412;font-size:16px;cursor:pointer;" onclick="this.parentNode.style.display=\'none\';window._edBannerHidden=true;">×</button>';
+        document.body.appendChild(b);
+        if(!document.getElementById('_edBannerCss')){ var st=document.createElement('style'); st.id='_edBannerCss'; st.textContent='@media print{#_edBanner{display:none!important}}'; document.head.appendChild(st); }
+      }else if(b){
+        if(!on){ b.remove(); window._edBannerHidden=false; }
+        else if(!window._edBannerHidden) b.style.display='flex';
+      }
+    }catch(e){}
+  }
+  setInterval(tick, 1200);
+})();
+
+/* ver.20261117.25: 人が触った欄の記録（DB保存で、人が消した欄だけを「空」として案シスに書き戻すため）。案件を切り替えたら消す */
+window._userTouched={};
+(function(){
+  function rec(ev){ try{ if(!ev.isTrusted) return; var t=ev.target; if(t && t.id) window._userTouched[t.id]=true; }catch(e){} }
+  document.addEventListener('input', rec, true);
+  document.addEventListener('change', rec, true);
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') window._userTouched={}; }catch(_e){} });
 })();
