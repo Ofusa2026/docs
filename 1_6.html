@@ -508,7 +508,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1794990010"></script>
+<script src="ofusa_common.js?v=1794990011"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1471,6 +1471,25 @@ function collectFormValues(){
       data[dbKey] = el.value.trim();
     }
   });
+  // ver.20261117.18: 読み込んだときは値があったのに、消して空にした欄（手当の行など）も「空」として保存する。
+  //   これまでは値のある欄だけを保存していたので、消した項目が案シスに残り、呼び戻すとまた出ていた
+  try{
+    const _base=window._empBaseline||{};
+    document.querySelectorAll('[id^="es_"]').forEach(el=>{
+      if(el.type==='checkbox' || el.id.includes('${')) return;
+      if(String(el.value||'').trim()!=='') return;
+      if(String(_base[el.id]==null?'':_base[el.id]).trim()==='') return;   // 読み込んだときから空の欄はさわらない
+      const formKey=el.id.replace('es_','');
+      const am=formKey.match(/^a(\d)(Name|NameEn|Amt|AmtEn|Calc|CalcEn)$/);
+      if(am){ ({Name:['Name'],NameEn:['NameEn'],Amt:['Amt','Amount'],AmtEn:['AmtEn','AmountEn'],Calc:['Cond'],CalcEn:['CondEn']})[am[2]].forEach(sx=>{ data['allowance'+am[1]+sx]=''; }); return; }
+      data[formKeyToDb(formKey)]='';
+    });
+    // 手当の金額は案シスに2つの書き方（allowanceNAmt / allowanceNAmount）があるので、同じ値にそろえる（古いほうが呼び戻されないように）
+    for(let n=1;n<=6;n++){
+      if(data['allowance'+n+'Amt']!=null) data['allowance'+n+'Amount']=data['allowance'+n+'Amt'];
+      if(data['allowance'+n+'AmtEn']!=null) data['allowance'+n+'AmountEn']=data['allowance'+n+'AmtEn'];
+    }
+  }catch(_clr){ console.warn('[collectFormValues 空欄]', _clr); }
   const nameEl = document.getElementById('applicantName');
   if(nameEl && nameEl.value.trim()) data.applicantName = nameEl.value.trim();
   // プレビューの全チェック状態（cbState）をDBへ保存。
