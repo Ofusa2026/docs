@@ -3603,6 +3603,7 @@ async function saveFormGeneric(docKey, opts){
     return;
   }
   let {companyId, companyName, empSetIdx} = info;
+  empSetIdx = await _resolveSaveIdx(info, empSetIdx);   // ver.20261117.17
 
   // companyId が無ければ、name で探す（cas.companyにフォールバック）
   if(!companyId){
@@ -3807,9 +3808,18 @@ function _empTs(es){
 const _normEV = (x) => String(x == null ? '' : x).trim();
 
 // DBから書類別データを取得して入力欄に反映
+// ver.20261117.17: 雇用条件セットの番号が渡されていないとき、0番（別の人のセットかもしれない）として保存・読み戻しをしない。
+//   案件の emp_set_idx を取りに行き、それも無ければ、この画面で読み込んだセットの番号を使う
+async function _resolveSaveIdx(info, empSetIdx){
+  if(empSetIdx!=null && String(empSetIdx)!=='' && !isNaN(parseInt(empSetIdx,10))) return String(parseInt(empSetIdx,10));
+  try{ const r=await sb('cases?select=emp_set_idx&id=eq.'+encodeURIComponent(info.caseId)); const v=r&&r[0]&&r[0].emp_set_idx; if(v!=null && String(v)!=='' && !isNaN(parseInt(v,10))) return String(parseInt(v,10)); }catch(e){}
+  try{ if(typeof window._empLoadedIdx==='number' && window._empLoadedIdx>=0 && window._lastCaseInfo && String(window._lastCaseInfo.caseId)===String(info.caseId)) return String(window._empLoadedIdx); }catch(e){}
+  return '';
+}
 async function loadFormGenericFromDB(docKey, info){
   if(!info || !info.caseId) return;
   let {companyId, empSetIdx} = info;
+  empSetIdx = await _resolveSaveIdx(info, empSetIdx);
   if(!companyId){
     try {
       const cases = await sb('cases?select=company,company_id&id=eq.'+info.caseId);
@@ -3869,6 +3879,8 @@ async function loadFormGenericFromDB(docKey, info){
           }else{
             // 旧保存：雇用条件の更新日時と保存日時を比べる
             useEmp = _empNewer;
+            // ver.20261117.17: 旧保存で空欄の欄は、雇用条件セットに値があればそちらを使う（空のときに保存した書類が、あとで入れた給与などを消していたため）
+            if(!useEmp && !_normEV(data[id]) && _normEV(ev)) useEmp = true;
           }
           if(useEmp){
             if(_normEV(el.value) !== _normEV(ev)) el.value = ev;
