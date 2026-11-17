@@ -508,7 +508,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=1794990003"></script>
+<script src="ofusa_common.js?v=1794990004"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1733,6 +1733,8 @@ async function loadFromDB(passedInfo){
       _owDate('contractStart', cas.contract_start);
       _owDate('contractEnd',   cas.contract_end);
     }
+    /* ver.20261117.12: 認定（海外から呼ぶ人）で入国予定日が空なら、雇用開始日（契約期間の開始日）を入れる。変更・更新は上で空にしている */
+    try{ if(!(cas && /変更|更新/.test(String(cas.app_type||'')))){ var _ey=document.getElementById('es_entryY'); if(_ey && !String(_ey.value||'').trim()){ ['Y','M','D'].forEach(function(k){ var a=document.getElementById('es_contractStart'+k), b=document.getElementById('es_entry'+k); if(a&&b&&String(a.value||'').trim()&&!String(b.value||'').trim()) b.value=String(a.value).trim(); }); } } }catch(_ent2){}
     _jippiDefault();
     setTimeout(maybeApplyKensetsuFormat, 300);
     // 所定労働時間の「分」は未入力なら0扱い（週35時間0分 等）

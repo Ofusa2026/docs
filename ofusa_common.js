@@ -5346,6 +5346,15 @@ function _p16CalcHourlyValue(){
   for(var i=1;i<=6;i++){ var an=_mw16_val('es_a'+i+'Name'), aa=_mw16_num('es_a'+i+'Amt'); if(aa && !_P16_EXALLOW.test(an||'')) al+=aa; }
   return Math.floor((base+al)/mh);
 }
+function _p16CalcHourlyExact(){   // ver.20261117.12: 端数を丸める前の値（四捨五入で入っている値を、計算違いとみなさないため）
+  var mh=_p16MonthHours(); if(!mh) return 0;
+  var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
+  var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
+  var base=mo || (dy&&md ? dy*md : 0); if(!base) return 0;
+  var al=0;
+  for(var i=1;i<=6;i++){ var an=_mw16_val('es_a'+i+'Name'), aa=_mw16_num('es_a'+i+'Amt'); if(aa && !_P16_EXALLOW.test(an||'')) al+=aa; }
+  return (base+al)/mh;
+}
 function _p16AutoCalcHourly(force){
   try{
     var e=document.getElementById('es_calcHourly'); if(!e) return;
@@ -5358,6 +5367,24 @@ function _p16AutoCalcHourly(force){
   }catch(err){}
 }
 window._p16AutoCalcHourly=_p16AutoCalcHourly;
+/* ver.20261117.12: 書類を開いたとき、案シスに入っている換算時給が計算（〔月給＋割増の計算に入れる手当〕÷月の所定労働時間）と違えば、計算し直す。
+   これまでは案シスの値（古い月給や時間で出したもの）をそのまま使っていて、多くの書類で手で直していた。直したときは知らせる。この画面で手で入れたら変えない */
+function _p16HourlyOnLoad(){
+  try{
+    var e=document.getElementById('es_calcHourly'); if(!e) return;
+    if(e.dataset.manualCalc==='1' || (typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return;
+    if(!_mw16_num('es_salaryMonthly') && !_mw16_num('es_salaryDaily')) return;
+    var v=_p16CalcHourlyValue(); if(!v) return;
+    var cur=_mw16_num('es_calcHourly');
+    if(!cur){ _p16AutoCalcHourly(false); return; }
+    if(cur===v || Math.abs(cur-_p16CalcHourlyExact())<1) return;   // 1円未満の差（切り捨て・四捨五入のちがい）はそのまま
+    var s=v.toLocaleString('ja-JP'), was=e.value;
+    e.value=s; e.dataset.autofill='1'; e.dispatchEvent(new Event('input',{bubbles:true}));
+    e.style.background='#fef3c7'; e.title='案シスの値 '+was+' 円を、計算し直しました';
+    if(!window._docCheckMode && typeof showToast==='function') showToast('🧮 換算時給を計算し直しました：'+was+'円 → '+s+'円（月給＋手当 ÷ 月の所定労働時間）', 6000);
+  }catch(err){}
+}
+window._p16HourlyOnLoad=_p16HourlyOnLoad;
 // ver.20261109.09: 読み込んだあと、人が手で直した雇用条件の欄（案シスの値と違うもの）
 function _p16ChangedFields(){
   var out=[], base=window._empBaseline, touched=window._miV0||{};
@@ -5476,7 +5503,7 @@ function _p16PrintCheck(){
       if(e.textContent!==(_payCash()?'■':'□') || b.textContent!==(_payBank()?'■':'□')){ if(typeof p==='function') p(); }
     }catch(err){}
   }
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(function(){ _p16AutoCalcHourly(false); }, 3200); setTimeout(function(){ _p16AutoCalcHourly(false); }, 6200); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(function(){ _p16HourlyOnLoad(); }, 3200); setTimeout(function(){ _p16HourlyOnLoad(); }, 6200); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
 /* ===== ver.20261109.09: 🔍 空欄の参照先（案シスのどこが空か） =====
@@ -7469,3 +7496,50 @@ if(_SH_ON){
     window.addEventListener('load', wrapPick);
   })();
 }
+
+/* ver.20261117.12: 電話番号・郵便番号のハイフンを自動で入れる（1-6号・1-17号）
+   ・数字だけで入っている欄（0352698711 など）を、市外局番の桁数に合わせて 03-5269-8711 の形にする（手で付け間違えやすい 048-571-6488 なども正しく）
+   ・市外局番の区切りは電話番号の書式ライブラリ（libphonenumber）の日本の表から。ハイフンが入っている欄・入力中の欄はさわらない
+   ・郵便番号は 1600022 → 160-0022 */
+var _JP_TEL_FMT=[["(\\d{3})(\\d{3})(\\d{3})","$1-$2-$3","(?:12|57|99)0"],["(\\d{4})(\\d)(\\d{4})","$1-$2-$3","1(?:267|3(?:7[247]|9[278])|466|5(?:47|58|64)|6(?:3[245]|48|5[4-68]))|499[2468]|5(?:769|979[2-69])|7468|8(?:3(?:8[7-9]|96[2457-9])|477|51[2-9])|9(?:802|9(?:1[23]|69))|1(?:45|58)[67]"],["(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3","60"],["(\\d)(\\d{4})(\\d{4})","$1-$2-$3","3|4(?:2(?:0|9[02-69])|7(?:0[019]|1))|6[1-9]"],["(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3","1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2[127]|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|9(?:17|99))|6(?:2|4[016-9])|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|9[29])|5(?:2|3(?:[045]|9(?:[0-58]|6[4-9]|7[0-35689]))|4[0-369]|5[29]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9[0169])|3(?:[29]|60|7(?:[017-9]|6[6-8]))|49|51|6(?:[0-24]|36[2-57-9]|5(?:[0-389]|5[23])|6(?:[01]|9[178])|7(?:2[2-468]|3[78])|9[0145])|7[0-468]|8[68])|9(?:4[15]|5[138]|7[156]|8[189]|9(?:[1289]|3(?:31|4[357])|4[0178]))|(?:8294|96)[1-3]|2(?:57|93)[015-9]|(?:223|8699)[014-9]|(?:25[0468]|422|838)[01]|(?:48|8292|9[23])[1-9]|(?:47[59]|59[89]|8(?:68|9))[019]"],["(\\d{3})(\\d{2})(\\d{4})","$1-$2-$3","[14]|[289][2-9]|5[3-9]|7[2-4679]"],["(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3","800"],["(\\d{2})(\\d{4})(\\d{4})","$1-$2-$3","[25-9]"]];
+function ofusaFmtTelJP(t){
+  var d=String(t==null?'':t).normalize('NFKC').replace(/[^0-9]/g,'');
+  if(!/^0\d{9,10}$/.test(d)) return '';
+  var n=d.slice(1);
+  for(var i=0;i<_JP_TEL_FMT.length;i++){
+    var f=_JP_TEL_FMT[i];
+    if(f[2] && !new RegExp('^(?:'+f[2]+')').test(n)) continue;
+    if(!new RegExp('^(?:'+f[0]+')$').test(n)) continue;
+    return '0'+n.replace(new RegExp(f[0]), f[1]);
+  }
+  return '';
+}
+function ofusaFmtZip(z){ var d=String(z==null?'':z).normalize('NFKC').replace(/[^0-9]/g,''); return /^\d{7}$/.test(d)?d.slice(0,3)+'-'+d.slice(3):''; }
+(function(){
+  var pg=(location.pathname.split('/').pop()||'');
+  if(!/^1_(6|17)(_[a-z]{2})?\.html$/i.test(pg)) return;
+  var TEL=/^es_[A-Za-z]*(Tel|Fax)$/, ZIP=/^es_[A-Za-z]*Zip$/;
+  function fix(){
+    try{
+      if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return 0;
+      var n=0, act=document.activeElement;
+      document.querySelectorAll('input[id^="es_"],textarea[id^="es_"]').forEach(function(e){
+        if(e===act) return;
+        var v=String(e.value||'').trim(); if(!v || !/^[0-9０-９]+$/.test(v)) return;
+        var o=TEL.test(e.id)?ofusaFmtTelJP(v):(ZIP.test(e.id)?ofusaFmtZip(v):'');
+        if(o && o!==e.value){ e.value=o; n++; }
+      });
+      return n;
+    }catch(err){ return 0; }
+  }
+  window._ofusaTelZipFix=fix;
+  function wrap(){
+    if(typeof window.p!=='function' || window.p._telzip) return;
+    var orig=window.p;
+    var w=function(){ fix(); return orig.apply(this, arguments); };
+    w._telzip=true; window.p=w;
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
+  window.addEventListener('load', wrap);
+  document.addEventListener('focusout', function(ev){ var t=ev.target; if(t && t.id && (TEL.test(t.id)||ZIP.test(t.id)) && fix() && typeof window.p==='function') window.p(); }, true);
+})();

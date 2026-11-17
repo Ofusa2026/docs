@@ -191,7 +191,7 @@ input.chk-box:checked::after{content:'';position:absolute;left:3px;top:0px;width
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990003"></script>
+<script src="ofusa_common.js?v=1794990004"></script>
 <script>
 // 固定残業代の状態（左パネルセレクト or プレビュー上☑クリックで切替・双方向連動）
 let _fixedOTState = '無';
@@ -509,6 +509,16 @@ function _kenFmtStatusOk(st){
   if(/サイン書類送付|返送待ち|押印|書類待ち|スキャン|申請|審査|追完|許可|受取|交付|完了|他社/.test(st)) return false;
   return /未着手|ヒアリング|雇用条件|1-6|サイン書類作成/.test(st);
 }
+/* ver.20261117.12: 案シスの昇給条件（salaryRaiseCond の文）から昇給時期を取り出す。案シスには昇給時期の欄が無く、毎回手で入れていたため。
+   「年1回12月…」「4月、毎年…」→ 年1回N月　／「入社月」→ 年1回入社月（頃）　／「毎年」「一年毎」「年1回」だけ → 年1回　／ 分からないときは空（建設は昇給の確認画面で既定の文を出す） */
+function _jRaiseTimeFromCond(c){
+  var t=String(c||'').normalize('NFKC'); if(!t.trim()) return '';
+  var m=t.match(/(?:^|[^0-9,])([1-9]|1[0-2])\s*月(?!額|給|分|ごと|毎|以上|以内|後|間|目|経過|未満)/);
+  if(m) return '年1回'+m[1]+'月';
+  if(/入社月/.test(t)) return '年1回入社月'+(/入社月頃/.test(t)?'頃':'');
+  if(/毎年|[1一]年毎|[1一]年ごと|年\s*[1一]\s*回/.test(t)) return '年1回';
+  return '';
+}
 var _jmOrig={};   // ver.20261116.03: 開いたときに書類に入っていた値（そのままならOKで触らない）
 function _jKensetsuModal(){
   try{
@@ -621,6 +631,7 @@ async function loadFromDB(passedInfo){
     S('f_deductOther1Name', _es.deductOther1Name); S('f_deductOther1NameEn', _es.deductOther1NameEn);   // ver.20261116.06: (g)その他の名目と訳
     S('f_raiseCond', _es.salaryRaiseCond);
     S('f_raiseCondEn', _es.salaryRaiseCondEn);
+    S('f_raiseTime', _jRaiseTimeFromCond(_es.salaryRaiseCond));   // ver.20261117.12: 昇給時期は、案シスの昇給条件の文から取り出す（「年1回12月」「年1回入社月」など）
     S('f_salaryTotal', _es.totalMonthly);
     [1,2,3,4].forEach(function(n){ S('f_allowance'+n+'AmountEn', _es['allowance'+n+'AmtEn']||_es['allowance'+n+'AmountEn']); });   // ver.20261112.06: 金額（訳）
     S('f_allowance1Calc', _es.allowance1Cond); S('f_allowance1CalcEn', _es.allowance1CondEn);
