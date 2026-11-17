@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.08</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.09</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1370,6 +1370,15 @@ async function idxNameCheck(info){
     _idxNameCheckShow(info, p, ankenName, formName, extra);
   }catch(e){ console.warn('nameCheck err:',e); }
 }
+// ver.20261117.09: 申請書類一式を自動で作るときは、名前の確認が終わって（出たときは選ばれて）から作る
+//   （作成中の画面の下に隠れて、選ぶ前に前の名前で書類ができてしまうため）
+async function _idxWaitNameCheck(){
+  try{ if(window._idxNameCheckP) await window._idxNameCheckP; }catch(e){}
+  if(!document.getElementById('idxNameCheckModal')) return;
+  _isaTitle('✋ 申請人の名前を選んでください');
+  await new Promise(function(res){ var t=setInterval(function(){ if(!document.getElementById('idxNameCheckModal')){ clearInterval(t); res(); } }, 400); });
+  _isaTitle('');
+}
 function _idxNameCheckShow(info, p, ankenName, formName, extra){
   var old=document.getElementById('idxNameCheckModal'); if(old) old.remove();
   var esc=function(s){ return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
@@ -1454,7 +1463,7 @@ async function idxAutoSelectFromUrl(){
     // ver.20261116.16: 案シスの「スキャン書類作成」から ?caseId=..&scanset=1 で開かれたら、申請書類一式の確認画面まで進める
     //   ver.20261117.06: &scanset=auto なら確認画面で止まらずに作成まで進める（直しが要るときだけ確認画面で止める）
     var _ssq=(q.get('scanset')||'');
-    if(_ssq==='1' || _ssq==='auto'){ setTimeout(async function(){ try{ await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmState.isaAuto=(_ssq==='auto'); _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
+    if(_ssq==='1' || _ssq==='auto'){ setTimeout(async function(){ try{ window._isaFromUrl=true; await _idxWaitNameCheck(); await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmState.isaAuto=(_ssq==='auto'); _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
     var doc=(q.get('doc')||'').trim();
     // ver.20260724.06: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
     if((q.get('mode')||'')==='slot'){
@@ -1533,7 +1542,7 @@ async function idxJumpByPaste(){
     try{ var _dcb=document.getElementById('idx_docCheckBtn'); if(_dcb) _dcb.style.display='block'; }catch(_e){}   // ver.20261116.15
     try{ var _tfb=document.getElementById('idx_trFixBtn'); if(_tfb) _tfb.style.display='block'; }catch(_e){}   // ver.20261116.19
     // ver.20261106.11: ヒアリングフォームの名前が案件管理システムと違えば、どちらを使うか聞く（待たずに進める）
-    try{ idxNameCheck(info); }catch(_e){ console.warn('nameCheck err:',_e); }
+    try{ window._idxNameCheckP=idxNameCheck(info); }catch(_e){ console.warn('nameCheck err:',_e); }
     // ver.20261105.01: 1-17号を開いていれば、国籍に合った言語版へ入れ替える（手で選んだ言語はここで解除）
     try{ p17OnCaseChanged(); }catch(_e){ console.warn('p17 lang err:',_e); }
     // ver.20260820.16: 優先書類マップに従ってナビを並び替え
@@ -1856,6 +1865,18 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.09',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📑 申請書類一式を案シスのボタンから作るとき、申請人の名前がヒアリングフォームと違って「どちらを使いますか？」が出たら、選ぶまで待ってから作るようにしました（作成中の画面の下に隠れて、選ぶ前に前の名前で書類ができていました）。',
+      '🗂 作っている途中で別のタブ（案シスなど）に移っても止まらずに進むようにしました。タブの名前に進み具合と「✅ 申請書類一式ができました」が出ます。',
+      '🔁 入管の提出書類一覧表の〇付けに失敗したときは1回だけ自動でやり直します。それでも入らなかったときは結果の画面に赤で出し、［🔁 一覧表だけ作り直す］で一覧表だけ作り直せます。',
+      '📁 結果の画面に［📁 人材のドライブ］（印刷画面で保存したPDFの入れ先）を出しました。うっかり［閉じる］を押しても、右下の［📑 申請書類一式の結果を開く］から作り直さずに開き直せます。',
+      '🕘 印刷画面を開いたときに「いつ・だれが・何を綴じたか」を記録し、案シスのタスク「スキャン作成」に「前回の作成」として出るようにしました。雇用条件セットが選ばれていないときの案内も「案シスのボタンをもう一度押してください」に直しました。'
+    ]
+  },
   {
     version: 'ver.20261117.08',
     date: '2026-11-17',
@@ -3661,7 +3682,10 @@ async function printPriorityDocs(keepField, silentInfo){
       var _sets=(_co&&_co[0]&&_co[0].emp_sets)||[]; if(typeof _sets==='string'){ try{ _sets=JSON.parse(_sets); }catch(e){ _sets=[]; } }
       var _ok=(_ix!=null && String(_ix)!=='' && Array.isArray(_sets) && _sets[parseInt(_ix,10)]);
       if(Array.isArray(_sets) && _sets.length && !_ok && !silentInfo){
-        alert('この案件は、雇用条件セットが選ばれていません。\n\n先に「1-6号」などの書類を開くと、雇用条件セットを選ぶ画面が出ます。\nこの人のセットを選んでから、もう一度まとめ印刷をしてください。\n（選ばないまま印刷すると、雇用条件が空の書類になります）');
+        if(window._isaFromUrl) _isaTitle('✋ 雇用条件セットを選んでください', true);
+        alert('この案件は、雇用条件セットが選ばれていません。\n\n先に「1-6号」などの書類を開くと、雇用条件セットを選ぶ画面が出ます。\n'
+          +(window._isaFromUrl ? 'この人のセットを選んでから、案シスの［📑 申請書類一式を作る］をもう一度押してください。' : 'この人のセットを選んでから、もう一度まとめ印刷をしてください。')   // ver.20261117.09
+          +'\n（選ばないまま印刷すると、雇用条件が空の書類になります）');
         return;
       }
       if(_ok) c.empSetIdx=String(_ix);
@@ -4016,6 +4040,7 @@ async function _isaDriveFiles(c, p, co){
   var du=p&&p.drive_urls; if(typeof du==='string'){ try{ du=JSON.parse(du); }catch(e){ du=[du]; } }
   var pu=(p&&p.extra&&p.extra.driveUrl)||(Array.isArray(du)&&du[0])||c.drive_url||'';
   var pid=_isaFolderId(pu);
+  out.folder=pid ? ('https://drive.google.com/drive/folders/'+pid) : '';   // ver.20261117.09: できたPDFの保存先として結果の画面に出す
   if(pid){
     var t=await _isaGas('listDriveTree',{folderId:pid, maxDepth:4}, 90000);
     var all=(t&&t.status==='ok'&&Array.isArray(t.items))?t.items:[];
@@ -4056,7 +4081,7 @@ async function _isaPdfToImgs(lib, data){
   for(var i=1;i<=pdf.numPages;i++){
     var pg=await pdf.getPage(i), vp=pg.getViewport({scale:1.6});
     var cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
-    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp, intent:'print'}).promise;   // ver.20261117.09: 別のタブに移っても止まらない（display は画面の描画を待つ）
     imgs.push(cv.toDataURL('image/jpeg',0.85));
   }
   return imgs;
@@ -4141,10 +4166,12 @@ function _isaBuildTables(K, R, targets, files, coFiles, ctx){
 var _isaSt=null;
 async function _isaOpen(){ await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmRender(); } }
 async function _isaSetStart(targets){
-  var st=_pmState, info=st.info;
+  var st=_pmState, info=st.info, _isaT0=Date.now();
+  var _rc=document.getElementById('isaPcReopen'); if(_rc) _rc.remove();
   var ov=document.createElement('div'); ov.id='isaWait';
   ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font:700 14px sans-serif;';
   ov.textContent='📎 一覧表とドライブの書類を確認しています…（30秒〜1分ほど）'; document.body.appendChild(ov);
+  _isaTitle('⏳ 一覧表とドライブの書類を確認しています');
   try{
     var c=((await idxSb('cases?select=id,applicant,app_type,residence_status,applicant_field,accept_exp,person_order,company_id,drive_url,company&id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
     var co=c.company_id?(((await idxSb('companies?select=id,name,company_category,drive_url,drive_url2,drive_url3,drive_url4,drive_url5&id=eq.'+encodeURIComponent(c.company_id)))||[])[0]||{}):{};   // ver.20261116.23: 会社のドライブURL2〜5も見る
@@ -4157,7 +4184,7 @@ async function _isaSetStart(targets){
     // ver.20261116.20: 署名済みのサイン書類をページごとに様式へ振り分ける（一覧表の該当の行・該当のページに差し替える）
     //   ver.20261116.24: 更新も同じく（認定・変更・更新すべて）
     var SG=null;
-    if(drv.sign.length){ SG=await _isaSignPages(drv.sign, function(t){ ov.textContent='📎 '+t; }); drv.note=drv.note.concat(SG.note); }
+    if(drv.sign.length){ SG=await _isaSignPages(drv.sign, function(t){ ov.textContent='📎 '+t; _isaTitle('⏳ '+t); }); drv.note=drv.note.concat(SG.note); }
     var files=(SG?drv.sign.filter(function(f){ return !SG.used[f.id]; }):drv.sign).concat(drv.up);
     var ctx0={navHas:function(dk){ return !!document.getElementById('nav-'+dk); }, label:function(dk){ return _pmDocLabel(dk).name||''; }, field:K.field, personOrder:c.person_order, hyo2Need:/^hyo2_/.test(String(K.hyo2||''))};
     var B=_isaBuildTables(K, R, targets, files, drv.co, Object.assign({}, ctx0, {sg:SG}));
@@ -4165,7 +4192,7 @@ async function _isaSetStart(targets){
     var restDocs=targets.filter(function(dk){ return !docUsed[dk] && !(dk==='1_17' && docUsed['1_17_vi']); });
     var restFiles=drv.up.concat(drv.sign).filter(function(f){ return !used[f.id] && !(SG && SG.used[f.id]); });
     var restSign=SG ? Object.keys(SG.byKey).filter(function(k){ return !B.sgUsed[k]; }).map(function(k){ return {key:k, label:ISA_SIGN_LABEL[k]||k, pages:SG.byKey[k], on:false}; }).concat(SG.other.length?[{key:'other', label:'様式が分からないページ', pages:SG.other, on:false}]:[]) : [];
-    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note,
+    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', t0:_isaT0,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
@@ -4175,9 +4202,10 @@ async function _isaSetStart(targets){
       var _stop=_isaAutoStops(_isaSt);
       if(!_stop.length){ _isaSetRun(); return; }
       _isaSt.autoStop=_stop;
-    }
+      _isaTitle('✋ 確認が必要です（申請書類一式）', true);
+    } else _isaTitle('');
     _isaRender();
-  }catch(e){ ov.remove(); alert('申請書類一式の準備でエラーが発生しました：'+e.message); console.error(e); }
+  }catch(e){ ov.remove(); _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の準備でエラーが発生しました：'+e.message); console.error(e); }
 }
 // ver.20261116.23: 入管の一覧表の毎朝の自動取得が止まっていないか・最近改定されたかを知らせる
 async function _isaIchiranFresh(K, R){
@@ -4263,8 +4291,10 @@ async function _isaSetRun(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
   ov.innerHTML='<div style="text-align:center;min-width:300px;"><div style="font-size:15px;font-weight:700;margin-bottom:10px;">📎 申請書類一式を作っています…</div><div id="isaProg" style="font-size:12px;opacity:.9;"></div></div>';
   document.body.appendChild(ov);
-  var prog=function(t){ var e=document.getElementById('isaProg'); if(e) e.textContent=t; };
+  var prog=function(t){ var e=document.getElementById('isaProg'); if(e) e.textContent=t; _isaTitle('⏳ '+t); };
   var busterV=window.__DOCS_CACHE_BUSTER__||Date.now(), failed=[], collected=[], docHtml={}, fileHtml={};
+  S.ichiranStale=0;
+  _isaTitle('⏳ 申請書類一式を作っています');
   try{
     // ver.20261116.18: 1) Saysay の書類を先に作る → 2) 作れなかった書類の行は〇有を外す → 3) 一覧表に〇（サーバー）、待つ間にドライブの書類を読む
     //   〇有にした「Saysayで作れる」行（条件つきの書類）は、ここで作って綴じる
@@ -4286,7 +4316,7 @@ async function _isaSetRun(){
       L.val=''; unmarked.push(String(L.r.no||'')+'　'+String(L.name||'').split('\n')[0].slice(0,30));
     }); });
     prog('入管の提出書類一覧表に〇を付けています（1〜2分）…');
-    var fillP=_isaFill(S).catch(function(e){ failed.push('提出書類一覧表（〇付け）：'+e.message); return null; });
+    var fillP=_isaFill(S, prog).catch(function(e){ failed.push(ISA_FILL_NG+'（〇付け）：'+e.message); return null; });
     var allFiles=[]; S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val==='有') (L.files||[]).forEach(function(f){ allFiles.push(f); }); }); });
     S.restFiles.forEach(function(f){ if(S.restOn[f.id]) allFiles.push(f); });
     for(var j=0;j<allFiles.length;j++){
@@ -4298,9 +4328,12 @@ async function _isaSetRun(){
     prog('一覧表のPDFを待っています…');
     var fr=await fillP;
     if(fr && fr.url){
-      var lib=await _pmLoadPdfJs();
-      var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
-      collected.push({dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib, ab))});
+      S.ichiranPath=fr.path||'';
+      try{   // ver.20261117.09: 一覧表のPDFを読めなくても、ほかの書類はそのまま作る
+        var lib=await _pmLoadPdfJs();
+        var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
+        collected.push({dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib, ab))});
+      }catch(e){ failed.push(ISA_FILL_NG+'のPDFを読み込めませんでした：'+e.message); }
     }
     if(unmarked.length) failed.push('作れなかったため、一覧表の〇有を外した行：'+unmarked.join('、'));
     // 2) 一覧表の番号順に並べる
@@ -4325,18 +4358,36 @@ async function _isaSetRun(){
       if(chg.length){
         failed.push('AIの申請前チェックで要確認のため、一覧表の〇有を外した行：'+chg.join('、'));
         prog('AIチェックの結果で一覧表の〇を付け直しています（1〜2分）…');
-        var fr2=await _isaFill(S).catch(function(e){ failed.push('提出書類一覧表（〇の付け直し）：'+e.message); return null; });
-        if(fr2 && fr2.url){ try{ var lib2=await _pmLoadPdfJs(); var ab2=new Uint8Array(await (await fetch(fr2.url,{cache:'no-store'})).arrayBuffer()); var ix=collected.map(function(c){ return c.dk; }).indexOf('isa_ichiran'); var nd={dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib2, ab2))}; if(ix>=0) collected[ix]=nd; else collected.unshift(nd); }catch(e){ failed.push('提出書類一覧表（〇の付け直し）を読み込めませんでした'); } }
+        var fr2=await _isaFill(S, prog).catch(function(e){ failed.push(ISA_FILL_NG+'（〇の付け直し）：'+e.message+ISA_FILL_STALE); S.ichiranStale=1; return null; });
+        if(fr2 && fr2.url){ S.ichiranPath=fr2.path||S.ichiranPath; try{ var lib2=await _pmLoadPdfJs(); var ab2=new Uint8Array(await (await fetch(fr2.url,{cache:'no-store'})).arrayBuffer()); var ix=collected.map(function(c){ return c.dk; }).indexOf('isa_ichiran'); var nd={dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib2, ab2))}; if(ix>=0) collected[ix]=nd; else collected.unshift(nd); }catch(e){ failed.push(ISA_FILL_NG+'（〇の付け直し）を読み込めませんでした'+ISA_FILL_STALE); S.ichiranStale=1; } }
       }
     }
     ov.style.display='none';
+    _isaTitle(S.ichiranStale || !collected.some(function(c){ return c.dk==='isa_ichiran'; }) ? '⚠ できました（一覧表を確認）' : '✅ 申請書類一式ができました', true);
     // ver.20261116.19: AIチェックをしたとき・不足があるときは結果の画面へ（そこで不足書類のお知らせを付けるか選んで印刷）
     if(S.pcOn!==false || _isaMissingRows(S).length || S.auto){ _isaPcShow(S, pcRes, collected, failed); return; }   // ver.20261117.06: 自動で作ったときも結果の画面へ（印刷の窓はボタンで開く）
     if(failed.length) alert('次のものは入れられませんでした：\n・'+failed.join('\n・'));
     S.pc={res:_isaBasicResult(S), basic:true, items:[], attach:false, collected:collected, failed:[]};
     _isaPcPrint();
-  }catch(e){ alert('申請書類一式の作成でエラーが発生しました：'+e.message); console.error(e); }
+  }catch(e){ _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の作成でエラーが発生しました：'+e.message); console.error(e); }
   finally{ var o=document.getElementById('printMergeOverlay'); if(o) o.remove(); }
+}
+// ver.20261117.09: 進み具合をタブの名前に出す（別のタブにいても分かるように）。
+//   keep=true（できた・止まった）はこのタブに戻ってきてから少しして元に戻す。'' で元に戻す
+var ISA_FILL_NG='提出書類一覧表', ISA_FILL_STALE='　※綴じた一覧表は付け直す前のもの（AIで要確認になった行にも〇有が付いたまま）です';
+var _isaTitle0=null, _isaTitleT=null;
+function _isaTitle(t, keep){
+  try{
+    if(_isaTitle0===null) _isaTitle0=document.title;
+    clearTimeout(_isaTitleT); _isaTitleT=null;
+    if(!t){ document.title=_isaTitle0; return; }
+    document.title=t;
+    if(keep){
+      var back=function(){ _isaTitleT=setTimeout(function(){ if(document.title===t) document.title=_isaTitle0; }, 4000); };
+      if(document.visibilityState==='visible') back();
+      else document.addEventListener('visibilitychange', function f(){ if(document.visibilityState==='visible'){ document.removeEventListener('visibilitychange', f); back(); } });
+    }
+  }catch(e){}
 }
 // ===== ver.20261116.20: 署名済みのサイン書類を一覧表の該当の行・該当のページに差し替える（ver.20261116.24: 更新も） =====
 //   ・ドライブの「サイン済・押印済」のファイルを読み、ページごとに様式を判定（ファイル名で1つの様式と分かればそのまま、
@@ -4536,9 +4587,17 @@ function _isaShrink(u, max){
   });
 }
 // 一覧表に〇を付ける（サーバー）。画面の有・無をそのまま送る
-function _isaFill(S){
-  return _isaFn({action:'fill', caseId:S.info.caseId, name:S.info.applicant||'', org:(S.co&&S.co.name)||S.info.companyName||'',
-    files:S.tables.map(function(t){ return {key:t.key, marks:t.lines.filter(function(L){ return !L.sub && (L.val==='有'||L.val==='無'); }).map(function(L){ return {row:L.r.row, val:L.val}; })}; })});
+//   ver.20261117.09: サーバー側で1〜2分かかり、まれに失敗するので1回だけ自動でやり直す（設定の問題のときはやり直さない）
+async function _isaFill(S, prog){
+  var body={action:'fill', caseId:S.info.caseId, name:S.info.applicant||'', org:(S.co&&S.co.name)||S.info.companyName||'',
+    files:S.tables.map(function(t){ return {key:t.key, marks:t.lines.filter(function(L){ return !L.sub && (L.val==='有'||L.val==='無'); }).map(function(L){ return {row:L.r.row, val:L.val}; })}; })};
+  try{ return await _isaFn(body); }
+  catch(e){
+    if(/AIの設定がありません|一覧表がありません/.test(String(e&&e.message||''))) throw e;
+    console.warn('[一覧表] もう一度試します', e);
+    if(prog) prog('一覧表の〇付けをもう一度試しています（1〜2分）…');
+    return await _isaFn(body);
+  }
 }
 // ver.20261116.26: AIチェックの結果を一覧表の〇に反映。ドライブのファイル・署名済みのページで〇有にした行のうち、
 //   AIが「要確認（中身が違う・別人・古い・読めない）」「無し」とした行は空欄に戻す（Saysay で作った書類の行は変えない）
@@ -4644,6 +4703,7 @@ function _isaPcRender(){
     +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">🔍 申請前チェックの結果</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(P.res.meta.applicant||'')+'　'+E(P.res.meta.shinsei_type||'')+'</div></div>'
     +'<div style="padding:10px 18px 14px;overflow-y:auto;flex:1;">'
     +(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':'')
+    +_isaIchiranNgHtml(S, P)
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
     +(P.res.meta.note?'<div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">メモ：'+E(P.res.meta.note)+'</div>':'')
@@ -4653,11 +4713,47 @@ function _isaPcRender(){
     +'<div style="font-weight:800;font-size:13px;margin-top:14px;color:#4c1d95;">📎 不足書類のお知らせ</div>'+notice
     +'</div>'
     +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div style="flex:1;font-size:11px;color:#64748b;min-width:160px;">✅の中身とページ番号はExcelに入っています</div>'
-    +'<button onclick="document.getElementById(\'isaPcModal\').remove()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
+    +(S.folder?'<a href="'+E(S.folder)+'" target="_blank" rel="noopener" title="印刷画面で保存したPDFは、ここ（人材のドライブ）に入れてください" style="padding:9px 12px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">📁 人材のドライブ</a>':'')
+    +'<button onclick="_isaPcClose()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
     +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
     +'<button onclick="_isaPcPrint()" style="padding:10px 16px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;">🖨 印刷画面を開く</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
+}
+// ver.20261117.09: 一覧表が入っていない／〇を付け直せなかったときは赤で知らせ、一覧表だけ作り直せるようにする
+function _isaIchiranNgHtml(S, P){
+  var none=!P.collected.some(function(c){ return c.dk==='isa_ichiran'; });
+  if(!none && !S.ichiranStale) return '';
+  var msg=none ? '⛔ 先頭に綴じる「入管の提出書類一覧表」が入っていません（〇付けに失敗しました）'
+               : '⛔ 綴じた一覧表は〇を付け直す前のものです（AIで要確認になった行にも〇有が付いたまま）';
+  return '<div style="font-size:12.5px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+    +'<div style="flex:1;min-width:200px;font-weight:700;">'+msg+'</div>'
+    +'<button onclick="_isaRefill()" style="padding:7px 12px;background:#b91c1c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:800;">🔁 一覧表だけ作り直す（1〜2分）</button></div>';
+}
+async function _isaRefill(){
+  var S=_isaSt, P=S&&S.pc; if(!P) return;
+  var m=document.getElementById('isaPcModal'); if(m) m.style.display='none';
+  var ov=document.createElement('div'); ov.id='printMergeOverlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:100000;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;';
+  ov.innerHTML='<div style="text-align:center;min-width:300px;"><div style="font-size:15px;font-weight:700;margin-bottom:10px;">📎 一覧表を作り直しています…</div><div id="isaProg" style="font-size:12px;opacity:.9;">入管の提出書類一覧表に〇を付けています（1〜2分）…</div></div>';
+  document.body.appendChild(ov);
+  var prog=function(t){ var e=document.getElementById('isaProg'); if(e) e.textContent=t; _isaTitle('⏳ '+t); };
+  _isaTitle('⏳ 一覧表を作り直しています');
+  try{
+    var fr=await _isaFill(S, prog);
+    if(!fr || !fr.url) throw new Error('PDFを受け取れませんでした');
+    S.ichiranPath=fr.path||S.ichiranPath;
+    var lib=await _pmLoadPdfJs();
+    var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
+    var nd={dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib, ab))};
+    var ix=P.collected.map(function(c){ return c.dk; }).indexOf('isa_ichiran');
+    if(ix>=0) P.collected[ix]=nd; else P.collected.unshift(nd);
+    P.failed=P.failed.filter(function(x){ return String(x).indexOf(ISA_FILL_NG)!==0; });
+    S.ichiranStale=0;
+    _isaTitle('✅ 申請書類一式ができました', true);
+    try{ if(typeof showToast==='function') showToast('✅ 一覧表を作り直しました'); }catch(e){}
+  }catch(e){ _isaTitle('⚠ 一覧表を作れませんでした', true); alert('一覧表を作れませんでした：'+e.message+'\n少し待ってからもう一度押してください。'); }
+  finally{ ov.remove(); _isaPcRender(); }
 }
 // スキャンの最後に付ける「不足書類のお知らせ」（A4縦1枚）
 function _isaNoticeDoc(meta, items){
@@ -4684,12 +4780,41 @@ function _isaNoticeDoc(meta, items){
     +'<div class="ijou">以　上</div></div></div>';
   return {id:id, html:html, css:css, links:[], check:[], logBody:null};
 }
+// ver.20261117.09: 結果の画面を閉じても、作り直さずに開き直せる（右下の小さなボタン）
+function _isaPcClose(){
+  var m=document.getElementById('isaPcModal'); if(m) m.remove();
+  if(!(_isaSt && _isaSt.pc)) return;
+  var old=document.getElementById('isaPcReopen'); if(old) old.remove();
+  var b=document.createElement('div'); b.id='isaPcReopen';
+  b.style.cssText='position:fixed;right:16px;bottom:16px;z-index:99990;display:flex;gap:4px;align-items:center;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border-radius:999px;padding:8px 8px 8px 14px;box-shadow:0 6px 20px rgba(0,0,0,.25);font:700 12.5px sans-serif;';
+  b.innerHTML='<span style="cursor:pointer;" onclick="document.getElementById(\'isaPcReopen\').remove();_isaPcRender();">📑 申請書類一式の結果を開く</span>'
+    +'<span title="閉じる" style="cursor:pointer;padding:0 6px;opacity:.85;" onclick="document.getElementById(\'isaPcReopen\').remove()">✕</span>';
+  document.body.appendChild(b);
+}
+// ver.20261117.09: 作った記録（いつ・だれが・何を綴じたか）を saysay_logs に残す（案シスのタスク「スキャン作成」に「前回」として出る）
+//   event='isa_set'（作業時間の集計は print／load だけを見るので混ざらない）
+async function _isaPostSetLog(S, P){
+  try{
+    var em=''; try{ var ss=await _sbDocs.auth.getSession(); em=(ss&&ss.data&&ss.data.session&&ss.data.session.user&&ss.data.session.user.email)||''; }catch(e){}
+    var un=''; try{ un=String(localStorage.getItem('ofusa_currentUser')||''); }catch(e){}
+    var ch=(P.res&&P.res.checks)||[], cnt={out:0,warn:0,ok:0}; ch.forEach(function(c){ if(cnt[c.severity]!=null) cnt[c.severity]++; });
+    var docs=[]; P.collected.forEach(function(c){ var n=c.dk==='drive'?'drive':(c.dk==='isa_ichiran'?'一覧表':_bpShortDoc(c.dk)); docs.push(n); });
+    var row={event:'isa_set', doc_key:'isa_set', file:'index.html', user_email:em, user_name:un,
+      case_id:String(S.info.caseId||''), company_id:String((S.co&&S.co.id)||S.info.companyId||''), applicant:String(S.info.applicant||''),
+      session_id:'isa'+(S.t0||''), ms_since_load:S.t0?(Date.now()-S.t0):null,
+      meta:{auto:!!S.auto, ai:!P.basic, out:cnt.out, warn:cnt.warn, ok:cnt.ok, missing:P.items.length, attach:!!(P.attach&&P.items.length),
+        review:(P.review||[]).length, failed:(P.failed||[]).length, ichiran:S.ichiranPath||'', stale:!!S.ichiranStale,
+        noIchiran:!P.collected.some(function(c){ return c.dk==='isa_ichiran'; }), parts:P.collected.length, docs:docs.slice(0,80), keys:(S.K&&S.K.keys)||[]}};
+    await fetch(IDX_URL+'saysay_logs',{method:'POST',keepalive:true,headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
+  }catch(e){ console.warn('isa log', e); }
+}
 function _isaPcPrint(){
   var S=_isaSt, P=S&&S.pc; if(!P) return;
+  _isaTitle('');
   var col=P.collected.slice();
   if(P.attach && P.items.length) col.push({dk:'fusoku', html:_isaNoticeDoc(P.res.meta, P.items)});
   _openMergedPrintWindow(col, {applicant:S.info.applicant, _fullTitle:(S.info.applicant||'')+'_申請書類一式'});
-  if(!P.logged){ P.logged=1; try{ _bpPostLogs(P.collected.filter(function(x){ return x.dk!=='drive' && x.dk!=='isa_ichiran'; })); }catch(e){} }
+  if(!P.logged){ P.logged=1; try{ _bpPostLogs(P.collected.filter(function(x){ return x.dk!=='drive' && x.dk!=='isa_ichiran'; })); }catch(e){} _isaPostSetLog(S, P); }
 }
 // Excel（ExcelJS をその場で読み込む）
 var _isaXlP=null;
@@ -5731,7 +5856,7 @@ async function _pm13Pages(lang){
     for(var i=1;i<=pdf.numPages;i++){
       var pg=await pdf.getPage(i), vp=pg.getViewport({scale:2.2});
       var cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
-      await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+      await pg.render({canvasContext:cv.getContext('2d'), viewport:vp, intent:'print'}).promise;   // ver.20261117.09
       imgs.push(cv.toDataURL('image/png'));
     }
     var html='<div id="pageArea">'+imgs.map(function(u){ return '<div class="docabs pmpage pm13"><img src="'+u+'"></div>'; }).join('')+'</div>';
