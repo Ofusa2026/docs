@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -488,8 +488,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794970001';
-window.__DOCS_CACHE_BUSTER__ = '1794970001';
+window.__DOCS_CACHE_BUSTER__ = '1794980001';
+window.__DOCS_CACHE_BUSTER__ = '1794980001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1849,6 +1849,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.04',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📝 窓口申請書を、まとめPDF・全書類チェックでも案件に合った様式（特定技能／特定活動の変更・更新、認定、技人国）で出すようにしました。',
+      '📝 特定活動の申請書に文例を4種類用意しました（特定技能1号への移行準備・特定技能2号への移行準備・ミャンマー国籍者の緊急避難措置・継続就職活動）。サイドバーの「文例の種類」から入れられます。'
+    ]
+  },
   {
     version: 'ver.20261117.03',
     date: '2026-11-17',
@@ -3475,7 +3484,18 @@ async function reorderNavByPriority(info){
 var _PM_LANG_LABEL={id:'🇮🇩 インドネシア語',vi:'🇻🇳 ベトナム語',th:'🇹🇭 タイ語',ne:'🇳🇵 ネパール語',my:'🇲🇲 ミャンマー語',km:'🇰🇭 クメール語',en:'🇬🇧 英語',ko:'🇰🇷 韓国語',zh:'🇨🇳 中国語',si:'🇱🇰 シンハラ語',mn:'🇲🇳 モンゴル語',tl:'🇵🇭 タガログ語',ja:'🇯🇵 日本語'};
 var _PM_EXCLUDE=['1_17'];   // ver.20261111.10: 1-17号（言語版 1_17_vi）と1-3号もまとめてPDFで作れるように。Word版の1_17だけ除く
 // docKey → 実ファイルパス（指定言語の版）
-function _docFileForPrint(docKey, lang){
+// ver.20261117.04: 窓口申請書は、案件の在留資格・申請種別で様式が変わる（変更・更新・認定・技人国・特定活動）。
+//   まとめPDF・全書類チェックでは、裏で開く前にこの案件の様式を選ぶ（書類側の自動移動に頼らない）
+function _shinseiFormFor(cs){
+  if(!cs) return '';
+  var st=String(cs.residenceStatus||cs.residence_status||''), ap=String(cs.appType||cs.app_type||'');
+  if(/特定活動/.test(st)) return /変更/.test(ap)?'shinsei_tokkatsu_henkou':'shinsei_tokkatsu_koushin';
+  if(/技術・人文|技人国|人文知識/.test(st)) return 'shinsei_gjk';
+  if(/特定技能/.test(st)){ if(/変更/.test(ap)) return 'shinsei_henkou'; if(/認定/.test(ap)) return 'shinsei_nintei'; return 'shinsei_koushin'; }
+  return '';
+}
+function _docFileForPrint(docKey, lang, cs){
+  if(docKey==='shinsei_henkou'){ var _sf=_shinseiFormFor(cs||idxSelectedCase); if(_sf) return {file:_sf+'.html', lang:'ja'}; }
   var langMap = {
     '1_5': (typeof LANG_FILES_1_5!=='undefined')?LANG_FILES_1_5:null,
     '1_6': (typeof LANG_FILES!=='undefined')?LANG_FILES:null,
@@ -4691,7 +4711,7 @@ async function _mpDocCheck(){
     allDocs.filter(function(k){ return pd[x.id].indexOf(k)>=0 && _PM_EXCLUDE.indexOf(k)<0; }).forEach(function(dk){
       var l=x._lang;
       if(dk==='1_3'){ var rl=resolveLangForDoc('1_3', l)||'en'; jobs.push({dk:dk, lang:rl, want:l, pdf:'pdf/1_3_'+rl+'.pdf', info:info, who:x.applicant}); return; }
-      var f=_docFileForPrint(dk, l);
+      var f=_docFileForPrint(dk, l, x);
       if(!f) jobs.push({dk:dk, lang:l, want:l, nofile:true, info:info, who:x.applicant});
       else jobs.push({dk:dk, lang:f.lang, want:l, file:f.file, info:info, who:x.applicant});
     });
@@ -4725,7 +4745,7 @@ async function _mpExecute(){
   try{
     for(var i=0;i<jobs.length;i++){
       var j=jobs[i], x=j.x;
-      var f=_docFileForPrint(j.dk, x._lang); var lb=_pmDocLabel(j.dk);
+      var f=_docFileForPrint(j.dk, x._lang, x); var lb=_pmDocLabel(j.dk);
       document.getElementById('mpProg').textContent='('+(i+1)+'/'+jobs.length+') '+x.applicant+' ・ '+(lb&&lb.name||j.dk)+' を読み込み中…';
       document.getElementById('mpBar').style.width=Math.round(i/jobs.length*100)+'%';
       if(j.dk==='1_3'){   // ver.20261111.10: 1-3号は入管のPDF様式そのもの（記入欄なし）。言語のPDFをページの絵にして入れる

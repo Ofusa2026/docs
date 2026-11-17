@@ -186,7 +186,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.03</div>
+    <div class="ver">ver.20261117.04</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -235,6 +235,9 @@
       <div class="fs-title" style="color:#fff;font-size:12px;">📄 申請人1　<span style="font-weight:normal;font-size:9px;color:#94a3b8;">申請人等作成用1（項目1〜16）</span></div>
     </div>
     <div class="fs" style="border:2px solid #f59e0b;border-radius:6px;padding:4px 6px;"><div class="fs-title">特定活動（この様式だけの欄）</div>
+      <div class="fg"><label>文例の種類（特定活動の内容）</label>
+        <div style="display:flex;gap:4px;"><select id="f_tkTpl" style="flex:1;"><option value=""></option><option value="ikou1">特定技能1号への移行準備</option><option value="ikou2">特定技能2号への移行準備</option><option value="myanmar">ミャンマー国籍者の緊急避難措置</option><option value="shushoku">大学等卒業後の継続就職活動</option></select>
+        <button type="button" onclick="_tkApplyBtn()" style="font-size:11px;padding:2px 6px;">文例を入れる</button></div></div>
       <div class="fg"><label>17 活動内容 ⑪その他（ ）の中</label><input id="f_tkAct" oninput="p()" placeholder="例：特定技能1号への移行準備"></div>
       <div class="fg"><label>22 具体的な在留目的（滞在費支弁方法を含む）</label><textarea id="f_tkPurpose" oninput="p()" rows="4"></textarea></div>
       <div class="fg"><label>所属1 契約の形態</label><select id="f_tkForm" onchange="p()"><option value=""></option><option>雇用</option><option>委任</option><option>請負</option></select></div>
@@ -793,7 +796,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794970001"></script>
+<script src="ofusa_common.js?v=1794980001"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -962,6 +965,47 @@ const SP=[
 
 
 // ver.20261117.01: 特定活動の様式だけの欄
+
+// ver.20261117.04: 特定活動の種類ごとの文例（17 活動内容・22 在留目的・所属4 活動内容詳細・在留期間・理由）。案件に合わせて直して使う
+var TK_TPL={
+  ikou1:{label:'特定技能1号への移行準備', act:'特定技能1号への移行準備', org:'other', period:'6月',
+    purpose:function(c){ return '特定技能1号への在留資格変更に向けた準備（技能試験・日本語試験の受験や必要書類の準備）を行うため、引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。'; },
+    detail:function(c){ return '特定技能1号への移行準備期間中、'+c.job; },
+    reason:{'変更':'特定技能1号への移行準備のため','更新':'特定技能1号への移行準備を続けるため'}},
+  ikou2:{label:'特定技能2号への移行準備', act:'特定技能2号への移行準備', org:'other', period:'6月',
+    purpose:function(c){ return '特定技能2号への在留資格変更に必要な技能試験の受験や書類の準備を行うため、引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。'; },
+    detail:function(c){ return '特定技能2号への移行準備期間中、'+c.job; },
+    reason:{'変更':'特定技能2号への移行準備のため','更新':'特定技能2号への移行準備を続けるため'}},
+  myanmar:{label:'ミャンマー国籍者の緊急避難措置', act:'本国情勢を踏まえた緊急避難措置（ミャンマー）', org:'other', period:'',
+    purpose:function(c){ return '本国の情勢により帰国が困難であるため、本邦での在留を希望します。引き続き'+(c.co?c.co+'で':'現在の所属機関で')+'就労し、滞在費は所属機関から支払われる報酬により支弁します。'; },
+    detail:function(c){ return c.job; },
+    reason:{'変更':'本国の情勢により帰国が困難なため','更新':'本国の情勢により引き続き帰国が困難なため'}},
+  shushoku:{label:'大学等卒業後の継続就職活動', act:'継続就職活動', org:'', period:'6月',
+    purpose:function(c){ return '本邦の大学等を卒業後、引き続き本邦での就職を希望しており、就職活動を継続するため在留を希望します。滞在費は、本人の預貯金及び資格外活動による収入により支弁します。'; },
+    detail:function(c){ return ''; },
+    reason:{'変更':'就職活動を継続するため','更新':'就職活動を継続するため'}}
+};
+var TK_KIND=/tokkatsu_henkou/.test(location.pathname)?'変更':'更新';
+function _tkGuess(st){ st=String(st||''); if(/ミャンマー|緊急避難/.test(st)) return 'myanmar'; if(/2号/.test(st)&&/移行/.test(st)) return 'ikou2'; if(/移行準備|移行のための準備/.test(st)) return 'ikou1'; if(/就職活動|就活/.test(st)) return 'shushoku'; return ''; }
+function _tkCtx(){ var jd=String(window._tkJobDesc||'').trim(), fld=v_('f_field'), cat=v_('f_cat');
+  return {co:v_('f_o2coName'), job: jd ? jd.replace(/[。．]$/,'')+'。' : ((fld?fld+(cat?'（'+cat+'）':'')+'の':'')+'業務に従事する。')}; }
+// force=true のときは入っている文も置き換える（サイドバーの「文例を入れる」）
+function _tkApply(key, force){
+  var t=TK_TPL[key]; if(!t) return false; var c=_tkCtx(), ch=false;
+  var put=function(id,val){ var e=document.getElementById(id); if(!e||val==null) return; var cur=String(e.value||'').trim(); if(force || !cur || (id==='f_reason'&&cur==='就労のため')){ if(cur!==String(val)){ e.value=val; ch=true; } } };
+  put('f_tkAct', t.act); put('f_tkPurpose', t.purpose(c)); var d=t.detail(c); if(d) put('f_tkDetail', d);
+  if(t.org!=null && t.org!=='') put('f_tkOrgAct', t.org);
+  if(t.period) put('f_newPeriod', t.period);
+  put('f_reason', t.reason[TK_KIND]||'');
+  var sel=document.getElementById('f_tkTpl'); if(sel && sel.value!==key) sel.value=key;
+  return ch;
+}
+function _tkApplyBtn(){
+  var key=(document.getElementById('f_tkTpl')||{}).value; if(!key){ alert('文例の種類を選んでください。'); return; }
+  var has=['f_tkAct','f_tkPurpose','f_tkDetail'].some(function(id){ return v_(id); });
+  if(has && !confirm('17・22・所属4などに入っている文を、「'+TK_TPL[key].label+'」の文例で置き換えます。よろしいですか？')) return;
+  _tkApply(key, true); if(typeof p==='function') p();
+}
 function _dg(id,i){ const s=v_(id).replace(/[^0-9A-Za-z]/g,''); return s[i]||''; }
 (function(){
   let done='';
@@ -976,24 +1020,17 @@ function _dg(id,i){ const s=v_(id).replace(/[^0-9A-Za-z]/g,''); return s[i]||'';
     const set=(id,val)=>{ const e=document.getElementById(id); if(e && !String(e.value||'').trim() && val!=null && String(val).trim()){ e.value=String(val).trim(); return true; } return false; };
     const st=rs+' '+v_('f_newStatus')+' '+v_('f_curStatus');
     let ch=false;
-    const prep=/移行準備|移行のための準備/.test(st+' '+v_('f_tkAct'));
-    ch=set('f_tkAct', prep?'特定技能1号への移行準備':'')||ch;
+    window._tkJobDesc=String(es.foreignerJobDesc||'');
+    const key=_tkGuess(st+' '+v_('f_tkAct'));
     ch=set('f_tkForm','雇用')||ch;
-    ch=set('f_tkOrgAct','other')||ch;
     // 勤務先（事業所）・外国人職員数（案シスの会社・雇用条件セットから）
     if(co){
       ch=set('f_office', (es.officeName||es.orgName||co.name||''))||ch;
       ch=set('f_officeAddr', (es.officeAddr||es.orgAddress||((co.pref||'')+(co.city||'')+(co.address||''))))||ch;
       ch=set('f_staffFr', co.foreign_employees)||ch;
     }
-    if(prep || /移行準備/.test(v_('f_tkAct'))){
-      const coName=v_('f_o2coName');
-      ch=set('f_tkPurpose','特定技能1号への在留資格変更に向けた準備（技能試験・日本語試験の受験や必要書類の準備）を行うため、引き続き'+(coName?coName+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。')||ch;
-      const fld=v_('f_field'), cat=v_('f_cat'), jd=String(es.foreignerJobDesc||'').trim();
-      ch=set('f_tkDetail','特定技能1号への移行準備期間中、'+(jd?jd.replace(/[。．]$/,'')+'。':((fld?fld+(cat?'（'+cat+'）':'')+'の':'')+'業務に従事する。')))||ch;
-      ch=set('f_newPeriod','6月')||ch;   // 移行準備の特定活動は6月が通例（違うときは直してください）
-      { const e=document.getElementById('f_reason'); if(e && (!String(e.value||'').trim() || String(e.value).trim()==='就労のため')){ e.value='特定技能1号への移行準備を続けるため'; ch=true; } }   // 14 変更（更新）の理由
-    }
+    if(key){ if(_tkApply(key,false)) ch=true; }
+    else { ch=set('f_tkOrgAct','other')||ch; }
     ch=set('f_workPeriod', v_('f_newPeriod'))||ch;
     if(ch && typeof p==='function') p();
   }
@@ -2002,7 +2039,8 @@ window.addEventListener('message', async function(e){
         b.style.boxShadow=(b.dataset.fm===rec)?'0 0 0 2px #f59e0b':'none';
         b.title=(b.dataset.fm===rec)?('この案件の推奨様式（'+st+'／'+ap+'）'):'';
       });
-      if(rec&&rec!==CUR){
+      let _hid=false; try{ _hid=!!(window.frameElement&&window.frameElement.getAttribute('data-pm-fixed')); }catch(_h){}   // ver.20261117.04: まとめPDF・全書類チェックの裏の枠では移動しない
+      if(rec&&rec!==CUR&&!_hid){
         const key='fmAuto_'+info.caseId;
         if(!window._editedDirty && !sessionStorage.getItem(key)){
           sessionStorage.setItem(key,'1');
