@@ -6805,19 +6805,49 @@ function _structNoticeShow(){
     e.value=s; e.dispatchEvent(new Event('input',{bubbles:true}));   // 合計・手取りの計算（ページ側）を動かす
     return true;
   }
-  function recalc(){
+  /* ver.20261117.28: 手で入れた控除（会社からもらった金額など）も、給与・手当を変えたら「計算の差額」だけ増減する。
+     基準＝読み込んだとき／その欄を手で書き換えたときの「金額」と「その時点の計算結果」。
+     いまの金額 ＝ 基準の金額 ＋（いまの計算 − 基準の計算）。住民税なしなど会社の前提はそのまま残る */
+  var _manBase={}, _adjNote={}, _adjTimer=null, _baseSet=null;
+  function _n(x){ var t=String(x==null?'':x).normalize('NFKC').replace(/[,円\s]/g,''); return /^-?\d+$/.test(t)?parseInt(t,10):null; }
+  function setBase(k, r){
+    var e=el(MAP[k]); delete _manBase[k];
+    if(!e || e.dataset.taxAuto==='1' || _none(k)) return;
+    var m=_n(e.value), c=(r && r.ok && r.gross && r.values) ? _n(r.values[k]) : null;
+    if(m==null || c==null) return;
+    _manBase[k]={man:m, calc:c};
+  }
+  function recalc(opt){
     var r=compute(); if(!r.ok || !r.gross) return [];
-    var changed=[];
+    var changed=[], noMan=!!(opt&&opt.noManual) || _baseSet!==window._empLoadedSet;   // 別の案件・セットを読み込んだ直後（基準がまだ前のもの）は動かさない
     KEYS.forEach(function(k){
       var e=el(MAP[k]); if(!e) return;
       if(_none(k)){ e.dataset.taxAuto=''; return; }   // ver.20261113.02: 「不要（書類に記載しない）」は計算しない
-      if(e.dataset.taxAuto!=='1') return;
       if(r.values[k]==null) return;
+      if(e.dataset.taxAuto!=='1'){
+        var b=_manBase[k]; if(!b || noMan) return;
+        var c=_n(r.values[k]); if(c==null) return;
+        var nv=Math.max(0, b.man+(c-b.calc)), cur=_n(e.value);
+        if(cur===nv) return;
+        if(!_adjNote[k]) _adjNote[k]={from:(cur==null?String(e.value||''):cur)};
+        _adjNote[k].to=nv;
+        if(setVal(e, nv.toLocaleString('ja-JP'))) changed.push(MAP[k]);
+        return;
+      }
       if(setVal(e, String(r.values[k]))) changed.push(MAP[k]);
     });
+    if(Object.keys(_adjNote).length){
+      clearTimeout(_adjTimer);
+      _adjTimer=setTimeout(function(){
+        var L={deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料'}, parts=[];
+        Object.keys(_adjNote).forEach(function(k){ var a=_adjNote[k]; if(_n(a.from)!==a.to) parts.push(L[k]+' '+(typeof a.from==='number'?a.from.toLocaleString('ja-JP'):a.from)+'→'+a.to.toLocaleString('ja-JP')); });
+        _adjNote={};
+        if(parts.length && typeof showToast==='function') showToast('手入力の控除も給与の差額分だけ直しました：'+parts.join('、'), 6000);
+      }, 900);
+    }
     return changed;
   }
-  window._p16TaxRecalc=function(){ try{ return recalc(); }catch(e){ return []; } };
+  window._p16TaxRecalc=function(opt){ try{ return recalc(opt); }catch(e){ return []; } };
   window._p16TaxCompute=function(){ try{ return compute(); }catch(e){ return null; } };   // ver.20261116.06: 「賃金だけ変える」で差額を出すため   // ver.20261111.07: 時給から換算月給を入れ直したときにも呼ぶ
   function _none(k){ var est=el(MAP[k]+'Est'); return !!(est && /不要/.test(est.value||'')); }
   function same(a,b){   // 金額として同じか（「14,126」と「14126」は同じ）
@@ -6842,10 +6872,14 @@ function _structNoticeShow(){
         e.title='自動計算されます（手入力で上書き可・空にすると自動計算に戻ります）';
         e.addEventListener('input', function(ev){
           if(!ev.isTrusted) return;
-          if(String(this.value).trim()===''){ this.dataset.taxAuto='1'; recalc(); } else { this.dataset.taxAuto=''; }
+          var kk=this._taxKey;
+          if(String(this.value).trim()===''){ this.dataset.taxAuto='1'; delete _manBase[kk]; recalc(); } else { this.dataset.taxAuto=''; setBase(kk, compute()); }
         });
       }
+      e._taxKey=k;
     });
+    _adjNote={}; _baseSet=window._empLoadedSet;
+    KEYS.forEach(function(k){ setBase(k, r); });   // 手入力の欄の基準（読み込んだときの金額と計算）
     var changed=recalc();
     // 読み込み直後に埋めた分は「編集した」扱いにしない
     try{
@@ -7178,7 +7212,7 @@ function _structNoticeShow(){
           try{ if(typeof _p16AutoCalcMonthly==='function') _p16AutoCalcMonthly(true); }catch(e){}
           try{ if(typeof _p16AutoCalcHourly==='function') _p16AutoCalcHourly(true); }catch(e){}
         }
-        try{ if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc(); }catch(e){}   // 自動の欄
+        try{ if(typeof window._p16TaxRecalc==='function') window._p16TaxRecalc(reTax?null:{noManual:true}); }catch(e){}   // 自動の欄（「合わせる」を外したときは手入力の欄を動かさない）
         // 手で入れた欄：前の金額＋（新しい計算－前の計算）。住民税なしの人などの前提を崩さないため
         if(reTax && r0 && r0.ok && typeof window._p16TaxCompute==='function'){
           var r1=window._p16TaxCompute();
