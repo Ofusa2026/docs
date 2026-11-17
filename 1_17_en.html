@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（英語版・変更）</div>
-    <div class="ver">ver.20261117.17</div>
+    <div class="ver">ver.20261117.19</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -684,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990009"></script>
+<script src="ofusa_common.js?v=1794990010"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -2286,7 +2286,7 @@ async function loadFromDB(passedInfo){
   var info=passedInfo;
   if(!info){ var sel=document.getElementById('caseSelect'); if(!sel||!sel.value) return; try{info=JSON.parse(sel.value);}catch(e){return;} }
   if(!info||!info.caseId) return;
-  window._p17DefUsed = []; window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null; window._p17OfficeNote = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
+  window._p17DefUsed = []; window._p17HouseDef = []; window._p17Att = null; window._p17AttOrg = ''; window._p17ExInterp = []; window._p17MgrReal = null; window._p17OfficeNote = null;   // ver.20261105.11: 前の案件の名簿を持ち越さない
   var caseId=info.caseId, companyId=info.companyId, companyName=info.companyName;
   var _s=function(id,val){var e=document.getElementById(id); if(e&&val!=null&&val!=='') e.value=val;};
   /* ver.20261013.02: 住所文字列を 都道府県／市区町村／以降 に分割（1_17.html Word版 splitAddress と同一仕様） */
@@ -2427,7 +2427,9 @@ async function loadFromDB(passedInfo){
           var own   = String(_es.housingOwnership||'');
           var fee   = String(_es.deductHousing!=null ? _es.deductHousing : (_es.housingFee||'')).replace(/[,，円\s]/g,'');
           var hasInfo = /有/.test(prov) || /■/.test(own) || fee!=='' || String(_es.cohabitants||'')!=='';
-          if(!hasInfo) return;
+          /* ver.20261117.18: 雇用条件に住居の内容が無くても、標準の書き方で入れる（確保の時期・広さ7.5㎡以上・居住費 無・借上げ）。確認欄で知らせる */
+          window._p17HouseDef = [];
+          if(!hasInfo) window._p17HouseDef.push('住居の概要');
           var nintei = /認定/.test((cas&&cas.app_type)||'');
           C.f125 = !nintei; C.f126 = nintei;
           C.f129 = true;
@@ -2444,6 +2446,7 @@ async function loadFromDB(passedInfo){
           }
           if(/■\s*自己所有/.test(own)){ C.f139 = true; C.f140 = false; C.f141 = true; C.f142 = false; }
           else if(/■\s*借/.test(own)){ C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; }
+          else { C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; window._p17HouseDef.push('物件の種類（借上げ）'); }   // 未記入は借上げ（3-ア b と同じ扱い）
         })();
         /* ver.20261029.06: 英語の都道府県・市区町村は読込処理が無く常に空だった。
            英語住所「475-2 Okubo-machi, Ota-shi, Gunma」の末尾＝都道府県、その前＝市区町村。 */
@@ -3313,6 +3316,7 @@ function _p17TodoItems(){
   /* ver.20261117.01: 対応時間は機関ごとに違うので決めて入れない。空なら知らせる。標準の内容で入れた項目はお知らせに出す */
   if(!window._p17SelfWhy && g('es_soName') && !['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Hol'].some(function(d){ return g('es_h'+d+'F')||g('es_h'+d+'T'); }))
     items.push({t:'対応時間が空欄（登録支援機関の回答が無いため。O-Linkかヒアリングフォームで入れてもらうか、ここで入れてください）', go:"_p17GoField('es_hMonF')"});
+  if(window._p17HouseDef && window._p17HouseDef.length) items.push({t:'雇用条件に住居の情報が無いので標準の書き方で入れました：'+window._p17HouseDef.join('・')+'（社宅（自己所有）なら直してください）', go:"_p17Flash(document.getElementById('f139'))", info:1});
   if(window._p17DefUsed && window._p17DefUsed.length) items.push({t:'回答が無いので標準の内容で入れました：'+window._p17DefUsed.join('・'), go:"_p17Flash(document.getElementById('p17HearingNote'))", info:1});
   need.forEach(function(x){ var e=document.getElementById(x[0]); if(e && !g(x[0])) items.push({t:x[1]+'が空欄', go:"_p17GoField('"+x[0]+"')"}); });
   var ON=window._p17OfficeNote;
