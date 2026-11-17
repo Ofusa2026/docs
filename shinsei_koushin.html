@@ -201,6 +201,8 @@
   <button class="btn fmB" data-fm="shinsei_koushin" style="padding:2px 7px;font-size:10.5px;">特技･更新</button>
   <button class="btn fmB" data-fm="shinsei_nintei" style="padding:2px 7px;font-size:10.5px;">特技･認定</button>
   <button class="btn fmB" data-fm="shinsei_gjk" style="padding:2px 7px;font-size:10.5px;">技人国</button>
+  <button class="btn fmB" data-fm="shinsei_tokkatsu_henkou" style="padding:2px 7px;font-size:10.5px;">特活･変更</button>
+  <button class="btn fmB" data-fm="shinsei_tokkatsu_koushin" style="padding:2px 7px;font-size:10.5px;">特活･更新</button>
 </span>
     <button class="btn" id="adjModeBtn" onclick="toggleAdjMode()" style="background:#0e7490;color:white;">🔧 位置調整</button>
     <span id="adjPanel" style="display:none;gap:4px;align-items:center;background:#164e63;padding:2px 8px;border-radius:6px;">
@@ -787,7 +789,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794940001"></script>
+<script src="ofusa_common.js?v=1794950001"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -2278,7 +2280,8 @@ window.addEventListener('message', async function(e){
       detect._done=info.caseId;
       const st=(rs[0].residence_status||''); const ap=(rs[0].app_type||'');
       let rec='';
-      if(/技術・人文|技人国|人文知識/.test(st)) rec='shinsei_gjk';
+      if(/特定活動/.test(st)) rec=(/変更/.test(ap)?'shinsei_tokkatsu_henkou':'shinsei_tokkatsu_koushin');   // ver.20261117.01: 特定活動（その他）の申請書
+      else if(/技術・人文|技人国|人文知識/.test(st)) rec='shinsei_gjk';
       else if(/特定技能/.test(st)){
         if(/変更/.test(ap)) rec='shinsei_henkou';
         else if(/認定/.test(ap)) rec='shinsei_nintei';
@@ -2302,7 +2305,8 @@ window.addEventListener('message', async function(e){
       if(rec===CUR){
         const setIf=(id,v)=>{const e=document.getElementById(id); if(e&&!String(e.value||'').trim()&&v){e.value=v;return true;}return false;};
         let ch=false;
-        if(CUR==='shinsei_henkou'){ ch=setIf('f_newStatus',st)||ch; }
+        if(CUR==='shinsei_henkou'||CUR==='shinsei_tokkatsu_henkou'){ ch=setIf('f_newStatus',st)||ch; }
+        if(CUR==='shinsei_tokkatsu_koushin'){ ch=setIf('f_curStatus',st)||ch; }
         if(CUR==='shinsei_koushin'||CUR==='shinsei_gjk'){ ch=setIf('f_curStatus',st)||ch; }
         if(ch&&typeof p==='function')p();
       }

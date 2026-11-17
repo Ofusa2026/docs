@@ -42,6 +42,8 @@ window.addEventListener('beforeprint', function(){ /* @media print で様式は�
   <button class="btn fmB" data-fm="shinsei_koushin" style="padding:2px 7px;font-size:10.5px;">特技･更新</button>
   <button class="btn fmB" data-fm="shinsei_nintei" style="padding:2px 7px;font-size:10.5px;">特技･認定</button>
   <button class="btn fmB" data-fm="shinsei_gjk" style="padding:2px 7px;font-size:10.5px;">技人国</button>
+  <button class="btn fmB" data-fm="shinsei_tokkatsu_henkou" style="padding:2px 7px;font-size:10.5px;">特活･変更</button>
+  <button class="btn fmB" data-fm="shinsei_tokkatsu_koushin" style="padding:2px 7px;font-size:10.5px;">特活･更新</button>
 </span>
 
     <button class="btn" onclick="alert('この様式は作成中です。まだ使用できません。');" style="background:#9ca3af;color:white;cursor:not-allowed;">🚧 作成中（使用不可）</button>
@@ -99,7 +101,7 @@ window.addEventListener('beforeprint', function(){ /* @media print で様式は�
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794940001"></script>
+<script src="ofusa_common.js?v=1794950001"></script>
 <script>
 // 入国目的チェック（■=選択, □=非選択）
 function pk(val){ return (document.getElementById('f_purpose')||{}).value===val ? '■' : '□'; }

@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261116.21</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.01</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -330,7 +330,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
       <span class="item-icon">📝</span>
-      <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定を自動判別</span></div>
+      <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定・特定活動を自動判別</span></div>
     </div>
     <div class="divider"></div>
     <!-- ver.20261106.06: 受入れ誓約書と登録支援機関の誓約書を分けず、分野ごとに並べる -->
@@ -488,8 +488,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794940001';
-window.__DOCS_CACHE_BUSTER__ = '1794940001';
+window.__DOCS_CACHE_BUSTER__ = '1794950001';
+window.__DOCS_CACHE_BUSTER__ = '1794950001';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1849,6 +1849,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.01',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📝 窓口申請書に「特定活動」の在留資格変更許可申請書・在留期間更新許可申請書（全6ページ）を追加しました。在留資格が特定活動の案件を選ぶと、自動でこの様式に切り替わります（様式ボタン「特活･変更」「特活･更新」）。'
+    ]
+  },
   {
     version: 'ver.20261116.21',
     date: '2026-11-16',
