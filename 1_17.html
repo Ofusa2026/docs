@@ -140,7 +140,7 @@
 
 <header>
   <h1>📖 1-17号 支援計画書 生成</h1>
-  <span class="ver">ver.20261117.16</span>
+  <span class="ver">ver.20261117.17</span>
   <a href="./index.html" class="back">← docsトップへ</a>
 </header>
 
@@ -1511,7 +1511,7 @@ function doGenerateFromMapping(caseId, empSetIdx, mappingArr, bytesOverride, zip
         if(_cmEmpty(CM)) CM={f2f:true, tel:!!_so.tel, mail:false, telNo:_so.tel||''};
         if(_cmEmpty(EC)) EC=Object.assign({}, CM); }
         var SC0=_ex.symbiosisCheck||{};
-        var HP=_ex.housingPolicy||{}, SC=(_soOk && !SC0.hp && _em(SC0.other)) ? Object.assign({}, SC0, {hp:true}) : SC0, IP=_p17PickInterp(_ex.interpreters, c, !!(_langOverride && (_langOverride.translator_name||_langOverride.translator_org)));
+        var HP=_ex.housingPolicy||{}, SC={hp:true, other:''} /* ver.20261117.17: 共生施策は所属機関側の事柄。いつも「ホームページで確認」 */, IP=_p17PickInterp(_ex.interpreters, c, !!(_langOverride && (_langOverride.translator_name||_langOverride.translator_org)));
         // 対応時間（曜日別）
         var dayMap={hourMon:'mon',hourTue:'tue',hourWed:'wed',hourThu:'thu',hourFri:'fri',hourSat:'sat',hourSun:'sun',hourHol:'hol'};
         if(dayMap[k]) return _hourStr(H[dayMap[k]]);

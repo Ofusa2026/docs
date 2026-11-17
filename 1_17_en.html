@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（英語版・変更）</div>
-    <div class="ver">ver.20261117.16</div>
+    <div class="ver">ver.20261117.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -684,7 +684,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990007"></script>
+<script src="ofusa_common.js?v=1794990008"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -712,7 +712,7 @@ function _p17GuidChecks(C, nin){
   C.f052 = !!g.other;
   C.f051 = !!g.video || (!C.f050 && !C.f052);
 }
-function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true, f380s:true }; }
+function _p17DefaultChecks(){ return { f044:true, f051:true, f076:true, f082:true, f084:true, f368:true, f380s:true, f384:true }; }
 window._p17Check = window._p17Check || _p17DefaultChecks();
 document.addEventListener('change', function(e){
   var t=e.target;
@@ -2692,11 +2692,10 @@ async function _p17Hearing(so, _s){
       }
     }, true);
   }
-  if(SC.hp) C.f384 = true;
+  /* ver.20261117.17: 共生施策は所属機関の市区町村の施策で、登録支援機関の回答では決めない。いつも「ホームページで確認」 */
+  C.f384 = true; C.f385 = false;
   // ver.20261030.03: 日付の無い「その他」（例：市役所窓口）は、確認方法の「その他の方法（　）」へ
   var _scOther = String(SC.other||'').trim();
-  if(!dm && _scOther && _scOther.length<=20){ C.f385 = true; (window._p17Text = window._p17Text || {}).f386 = _scOther; }
-  if(SC.hp || (!dm && _scOther)) used.push('共生施策');
   // ver.20261030.01: 各支援の実施予定（extra.implSchedules）と住居確保の方針（extra.housingPolicy／言語別設定）
   var T = window._p17Text = window._p17Text || {};
   var review = [];
@@ -2782,7 +2781,6 @@ async function _p17Hearing(so, _s){
     if(!sched){ _s('es_meetSchedule', '3か月に1回以上'); C.f353 = true; C.f355 = false; _defUsed.push('定期面談の時期'); }
     if(!mk){ C.f360 = false; C.f361 = true; C.f362 = false; C.f408 = true; C.f409 = false; _defUsed.push('定期面談の方法'); }
     if(!ohm){ _s('es_orientHours', '8'); _defUsed.push('生活オリエンテーション8時間'); }
-    if(!SC.hp && !C.f385){ C.f384 = true; _defUsed.push('共生施策（ホームページで確認）'); }
     var _tel = String(so.tel||'').trim();
     if(!CM.f2f && !CM.tel && !CM.mail && !String(CM.other||'').trim()){
       C.f253 = true; C.f254 = !!_tel; C.f258 = false; C.f260 = false; if(_tel) _s('es_cmTel', _tel); _defUsed.push('相談方法（直接面談・電話）');
