@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.11</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.12</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1449,6 +1449,7 @@ async function idxAutoSelectFromUrl(){
     var cid=(q.get('caseId')||'').trim();
     // ver.20261109.08: ?group=<案シスのグループID> で開かれたら、そのグループの「まとめてPDF」を開く
     var _gq=(q.get('group')||'').trim();
+    if(_gq && (q.get('scanset')||'')==='auto'){ setTimeout(function(){ _isaGroupRun(_gq); }, 600); return; }   // ver.20261117.11: グループ全員分の申請書類一式
     if(_gq){ setTimeout(function(){ try{ openMultiPersonPdf({groupId:_gq}); }catch(e){ console.error('mp group',e); } }, 600); if(!cid) return; }
     if(!cid){
       if((q.get('mode')||'')==='slot'){
@@ -1865,6 +1866,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.12',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '⚡ スキャン用セット：一覧表の〇付けが<b>数秒で終わる</b>ようになりました（今までは1分ほどかかっていました）。入管の一覧表ごとに〇の位置を一度だけ調べて覚えておき、〇はこの画面で描きます。まだ調べていない一覧表のときは今までどおりの方法で作ります',
+      '👥 スキャン用セット：案シスの［👥 グループ全員］から開くと、グループの全員ぶんを1人ずつ続けて作り、最後に<b>全員の結果を一覧</b>で出すようになりました（人ごとに［結果を見る］［🖨 印刷］［確認画面を開く］）'
+    ]
+  },
   {
     version: 'ver.20261117.11',
     date: '2026-11-17',
@@ -4228,10 +4238,11 @@ async function _isaSetStart(targets){
       var _stop=_isaAutoStops(_isaSt);
       if(!_stop.length){ _isaSetRun(); return; }
       _isaSt.autoStop=_stop;
+      if(_isaGrpOn()){ _isaGrpNotify('stop', _isaSt, _stop.join('／')); return; }   // ver.20261117.11
       _isaTitle('✋ 確認が必要です（申請書類一式）', true);
     } else _isaTitle('');
     _isaRender();
-  }catch(e){ ov.remove(); _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の準備でエラーが発生しました：'+e.message); console.error(e); }
+  }catch(e){ ov.remove(); if(_isaGrpOn()){ _isaGrpNotify('err', null, e.message); return; } _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の準備でエラーが発生しました：'+e.message); console.error(e); }
 }
 // ver.20261116.23: 入管の一覧表の毎朝の自動取得が止まっていないか・最近改定されたかを知らせる
 async function _isaIchiranFresh(K, R){
@@ -4384,20 +4395,18 @@ async function _isaSetRun(){
       prog('一覧表の〇を付け直しています（1〜2分）…');
       var fr2P=_isaFill(S, prog).catch(function(e){ return {err:e}; });
       var fr1=await fillP, fr2=await fr2P;
-      if(fr2 && fr2.url) fr=fr2;
-      else if(fr1 && fr1.url){ fr=fr1; S.ichiranStale=1; failed.push(ISA_FILL_NG+'（〇の付け直し）：'+((fr2&&fr2.err&&fr2.err.message)||'')+ISA_FILL_STALE); }
+      if(fr2 && (fr2.url || fr2.imgs)) fr=fr2;
+      else if(fr1 && (fr1.url || fr1.imgs)){ fr=fr1; S.ichiranStale=1; failed.push(ISA_FILL_NG+'（〇の付け直し）：'+((fr2&&fr2.err&&fr2.err.message)||'')+ISA_FILL_STALE); }
       else failed.push(ISA_FILL_NG+'（〇付け）：'+((fr2&&fr2.err&&fr2.err.message)||(fillErr&&fillErr.message)||''));
     } else {
       prog('一覧表のPDFを待っています…');
       fr=await fillP;
       if(!fr && fillErr) failed.push(ISA_FILL_NG+'（〇付け）：'+fillErr.message);
     }
-    if(fr && fr.url){
+    if(fr && (fr.url || fr.imgs)){
       S.ichiranPath=fr.path||'';
       try{   // ver.20261117.09: 一覧表のPDFを読めなくても、ほかの書類はそのまま作る
-        var lib=await _pmLoadPdfJs();
-        var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
-        collected.unshift({dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib, ab))});
+        collected.unshift({dk:'isa_ichiran', html:_isaImgDoc(await _isaIchiranImgs(fr))});
       }catch(e){ failed.push(ISA_FILL_NG+'のPDFを読み込めませんでした：'+e.message+(S.ichiranStale?ISA_FILL_STALE:'')); S.ichiranStale=0; }
     }
     ov.style.display='none';
@@ -4407,7 +4416,7 @@ async function _isaSetRun(){
     if(failed.length) alert('次のものは入れられませんでした：\n・'+failed.join('\n・'));
     S.pc={res:_isaBasicResult(S), basic:true, items:[], attach:false, collected:collected, failed:[]};
     _isaPcPrint();
-  }catch(e){ _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の作成でエラーが発生しました：'+e.message); console.error(e); }
+  }catch(e){ if(_isaGrpOn()){ console.error(e); _isaGrpNotify('err', S, e.message); return; } _isaTitle('⚠ エラー（申請書類一式）', true); alert('申請書類一式の作成でエラーが発生しました：'+e.message); console.error(e); }
   finally{ var o=document.getElementById('printMergeOverlay'); if(o) o.remove(); }
 }
 // ver.20261117.09: 進み具合をタブの名前に出す（別のタブにいても分かるように）。
@@ -4634,9 +4643,60 @@ function _isaFillBody(S){
 function _isaMarksKey(S){ return JSON.stringify(_isaFillBody(S)); }
 //   ver.20261117.10: 同じ案件・同じ〇なら、さっき作った一覧表をそのまま使う（［↩ 確認画面で直す］で何も変えずに作り直したとき）
 var _isaFillCache={};
+// ver.20261117.12: 一覧表の〇をブラウザで付ける（数秒）。入管の一覧表は、サーバーで一度だけPDFにして〇の位置を覚えておく
+//   （isa-ichiran の layout）。位置が無い・足りないときは今までどおりサーバーで付ける（1分ほど）
+var ISA_LOCAL_FILL=true, _isaLayoutCache={};
+async function _isaLayouts(keys){
+  var need=keys.filter(function(k){ return !_isaLayoutCache[k]; });
+  if(need.length){
+    var r=await _isaFn({action:'layout', keys:need}), it=(r&&r.items)||{};
+    need.forEach(function(k){ var x=it[k]; if(x && x.pdf && x.layout && Array.isArray(x.layout.yes)) _isaLayoutCache[k]=x; });
+  }
+  var out={}; for(var i=0;i<keys.length;i++){ if(!_isaLayoutCache[keys[i]]) return null; out[keys[i]]=_isaLayoutCache[keys[i]]; }
+  return out;
+}
+function _isaFillOps(lay, f, name, org){
+  var rowsAll=lay.rowsAll||[], ops={};
+  if(lay.yes.length < rowsAll.length) return null;   // 〇の位置が行の数より少ない＝読み取りがずれている
+  for(var i=0;i<(f.marks||[]).length;i++){
+    var m=f.marks[i], k=rowsAll.indexOf(m.row); if(k<0 || k>=lay.yes.length) return null;
+    var Y=lay.yes[k], b=(m.val==='無' && Y.n) ? Y.n : Y.y;
+    (ops[Y.p]=ops[Y.p]||[]).push({t:'c', x:(b[0]+b[2])/2, y:(b[1]+b[3])/2, r:Math.max(b[2]-b[0], b[3]-b[1])/2+2.2});
+  }
+  [['name', name, 12], ['org', org, 11]].forEach(function(a){ var lb=lay.labels&&lay.labels[a[0]]; if(!a[1] || !lb) return; (ops[lb.p]=ops[lb.p]||[]).push({t:'t', x:lb.x, y:lb.y, s:String(a[1]), z:a[2], room:lb.room}); });
+  return ops;
+}
+async function _isaFillLocal(S, body){
+  if(!ISA_LOCAL_FILL) return null;
+  var L=await _isaLayouts(body.files.map(function(f){ return f.key; })); if(!L) return null;
+  var plan=[]; for(var i=0;i<body.files.length;i++){ var f=body.files[i], it=L[f.key], ops=_isaFillOps(it.layout, f, body.name, body.org); if(!ops) return null; plan.push({it:it, ops:ops}); }
+  var lib=await _pmLoadPdfJs(), imgs=[];
+  var FONT='"IPAGothic","Noto Sans CJK JP","Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif';
+  for(var j=0;j<plan.length;j++){
+    var ab=new Uint8Array(await (await fetch(plan[j].it.pdf, {cache:'force-cache'})).arrayBuffer());
+    var pdf=await lib.getDocument({data:ab}).promise, lay=plan[j].it.layout;
+    for(var pn=1; pn<=pdf.numPages; pn++){
+      var pg=await pdf.getPage(pn), vp=pg.getViewport({scale:1.6});
+      var cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
+      var ctx=cv.getContext('2d');
+      await pg.render({canvasContext:ctx, viewport:vp, intent:'print'}).promise;
+      var ph=(lay.pages&&lay.pages[pn-1]&&lay.pages[pn-1].h)||pg.view[3], sc=vp.scale;
+      (plan[j].ops[pn-1]||[]).forEach(function(o){
+        var pt=vp.convertToViewportPoint(o.x, ph-o.y);
+        ctx.strokeStyle='#000'; ctx.fillStyle='#000';
+        if(o.t==='c'){ ctx.lineWidth=0.9*sc; ctx.beginPath(); ctx.arc(pt[0], pt[1], o.r*sc, 0, Math.PI*2); ctx.stroke(); }
+        else { var z=o.z; ctx.font=(z*sc)+'px '+FONT; while(z>6 && ctx.measureText(o.s).width>o.room*sc){ z-=0.5; ctx.font=(z*sc)+'px '+FONT; } ctx.textBaseline='alphabetic'; ctx.fillText(o.s, pt[0], pt[1]); }
+      });
+      imgs.push(cv.toDataURL('image/jpeg',0.85));
+    }
+  }
+  return {imgs:imgs, local:true, path:'local:'+body.files.map(function(f){ return L[f.key].layout.contentId||f.key; }).join(',')};
+}
 async function _isaFill(S, prog){
   var body=_isaFillBody(S), ck=JSON.stringify(body);
   if(_isaFillCache[ck]) return _isaFillCache[ck];
+  try{ var loc=await _isaFillLocal(S, body); if(loc){ _isaFillCache[ck]=loc; return loc; } }
+  catch(e){ console.warn('[一覧表] ブラウザで〇を付けられなかったので、サーバーで付けます', e); }
   try{ var r=await _isaFn(body); if(r&&r.url) _isaFillCache[ck]=r; return r; }
   catch(e){
     if(/AIの設定がありません|一覧表がありません/.test(String(e&&e.message||''))) throw e;
@@ -4644,6 +4704,13 @@ async function _isaFill(S, prog){
     if(prog) prog('一覧表の〇付けをもう一度試しています（1〜2分）…');
     var r2=await _isaFn(body); if(r2&&r2.url) _isaFillCache[ck]=r2; return r2;
   }
+}
+// 一覧表の絵：ブラウザで付けたもの（imgs）か、サーバーで作ったPDF（url）
+async function _isaIchiranImgs(fr){
+  if(fr.imgs) return fr.imgs;
+  var lib=await _pmLoadPdfJs();
+  var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
+  return await _isaPdfToImgs(lib, ab);
 }
 // ver.20261117.10: 同時にいくつか進める（Saysay の書類・ドライブの読み込み。全書類チェックと同じく3つずつ）
 var ISA_PAR=3;
@@ -4734,6 +4801,8 @@ function _isaPcShow(S, res, collected, failed){
   var items=[], seen={};
   res.attachments.forEach(function(a){ if(a.status!=='missing') return; var nm=String(a.checklist_name||a.name||'').trim().replace(/^[（(][0-9０-９]+[)）]\s*/,''); if(!nm || seen[nm]) return; seen[nm]=1; items.push({hyou:String(a.hyou||'other'), name:nm, yotei:'', riyu:''}); });
   S.pc={res:res, basic:basic, items:items, attach:items.length>0, collected:collected, failed:failed||[], review:_isaReviewList(S)};
+  if(_isaGrpOn()){ _isaGrpNotify('done', S); return; }   // ver.20261117.11
+  if(_isaGrp) _isaGrp.list.forEach(function(it){ if(it.S===S){ it.st='done'; it.msg=''; } });
   _isaPcRender();
 }
 function _isaPcRender(){
@@ -4795,11 +4864,9 @@ async function _isaRefill(){
   _isaTitle('⏳ 一覧表を作り直しています');
   try{
     var fr=await _isaFill(S, prog);
-    if(!fr || !fr.url) throw new Error('PDFを受け取れませんでした');
+    if(!fr || !(fr.url || fr.imgs)) throw new Error('PDFを受け取れませんでした');
     S.ichiranPath=fr.path||S.ichiranPath;
-    var lib=await _pmLoadPdfJs();
-    var ab=new Uint8Array(await (await fetch(fr.url,{cache:'no-store'})).arrayBuffer());
-    var nd={dk:'isa_ichiran', html:_isaImgDoc(await _isaPdfToImgs(lib, ab))};
+    var nd={dk:'isa_ichiran', html:_isaImgDoc(await _isaIchiranImgs(fr))};
     var ix=P.collected.map(function(c){ return c.dk; }).indexOf('isa_ichiran');
     if(ix>=0) P.collected[ix]=nd; else P.collected.unshift(nd);
     P.failed=P.failed.filter(function(x){ return String(x).indexOf(ISA_FILL_NG)!==0; });
@@ -4841,10 +4908,107 @@ function _isaPcClose(){
   var old=document.getElementById('isaPcReopen'); if(old) old.remove();
   var b=document.createElement('div'); b.id='isaPcReopen';
   b.style.cssText='position:fixed;right:16px;bottom:16px;z-index:99990;display:flex;gap:4px;align-items:center;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border-radius:999px;padding:8px 8px 8px 14px;box-shadow:0 6px 20px rgba(0,0,0,.25);font:700 12.5px sans-serif;';
-  b.innerHTML='<span style="cursor:pointer;" onclick="document.getElementById(\'isaPcReopen\').remove();_isaPcRender();">📑 申請書類一式の結果を開く</span>'
+  b.innerHTML=(_isaGrp ? '<span style="cursor:pointer;" onclick="document.getElementById(\'isaPcReopen\').remove();_isaGrpRender();">👥 グループの一覧を開く</span><span style="opacity:.6;padding:0 4px;">|</span>' : '')
+    +'<span style="cursor:pointer;" onclick="document.getElementById(\'isaPcReopen\').remove();_isaPcRender();">📑 '+(_isaGrp?'この人の結果':'申請書類一式の結果を開く')+'</span>'
     +'<span title="閉じる" style="cursor:pointer;padding:0 6px;opacity:.85;" onclick="document.getElementById(\'isaPcReopen\').remove()">✕</span>';
   document.body.appendChild(b);
 }
+// ===== ver.20261117.11: 案件グループの全員分を1人ずつ順番に作る（案シスの［👥 グループ全員］から ?group=&scanset=auto） =====
+//   ・1人ずつ：案件を選ぶ → 名前の確認 → 雇用条件セット → 申請書類一式（自動）。止まった人・作れなかった人は飛ばして次へ
+//   ・最後に人ごとの一覧（結果を見る・印刷・確認画面で直す）。印刷の窓は1人ずつボタンで開く（ブラウザの決まり）
+var _isaGrp=null;
+function _isaGrpOn(){ return !!(_isaGrp && _isaGrp.running); }
+var ISA_GRP_LIMIT_MS=600000, _isaGrpSeq=0;   // 1人10分たっても終わらなければ次の人へ
+function _isaGrpNotify(kind, S, msg, id){ var w=_isaGrp && _isaGrp._wait; if(!w || (id && w.id!==id)) return; _isaGrp._wait=null; w.f({kind:kind, S:S, msg:msg||''}); }
+async function _isaEmpSetOk(caseId){
+  try{
+    var cr=await idxSb('cases?select=emp_set_idx,company_id&id=eq.'+encodeURIComponent(caseId)); var row=cr&&cr[0]; if(!row) return true;
+    if(!row.company_id) return true;
+    var co=await idxSb('companies?select=emp_sets&id=eq.'+encodeURIComponent(row.company_id));
+    var sets=(co&&co[0]&&co[0].emp_sets)||[]; if(typeof sets==='string'){ try{ sets=JSON.parse(sets); }catch(e){ sets=[]; } }
+    if(!Array.isArray(sets) || !sets.length) return true;
+    return row.emp_set_idx!=null && String(row.emp_set_idx)!=='' && !!sets[parseInt(row.emp_set_idx,10)];
+  }catch(e){ return true; }
+}
+var ISA_GRP_ST={wait:['⏸','待ち','#64748b'], run:['⏳','作成中','#1d4ed8'], done:['✅','できました','#047857'], stop:['✋','要確認','#b45309'], skip:['⏭','飛ばしました','#b45309'], err:['⛔','エラー','#b91c1c']};
+async function _isaGroupRun(gid){
+  _isaTitle('⏳ グループの申請書類一式');
+  var groups=[]; try{ groups=await _mpLoadGroups(); }catch(e){}
+  var g=groups.filter(function(x){ return x.id===gid; })[0];
+  if(!g){ alert('案件グループが見つかりませんでした（案シスでグループを確かめてください）'); _isaTitle(''); return; }
+  var ids=g.caseIds.slice(0,30), byId={};
+  try{ (await idxSb('cases?select=id,applicant,company&id=in.('+encodeURIComponent(ids.map(function(x){ return '"'+String(x).replace(/"/g,'')+'"'; }).join(','))+')')||[]).forEach(function(x){ byId[x.id]=x; }); }catch(e){}
+  _isaGrp={id:gid, name:g.name||'', running:true, t0:Date.now(), list:ids.filter(function(id){ return byId[id]; }).map(function(id){ return {caseId:id, applicant:byId[id].applicant||'', company:byId[id].company||'', st:'wait', msg:'', S:null}; })};
+  if(!_isaGrp.list.length){ _isaGrp.running=false; alert('グループの案件が見つかりませんでした'); return; }
+  _isaGrpBar();
+  for(var i=0;i<_isaGrp.list.length;i++){
+    var it=_isaGrp.list[i], t1=Date.now(); it.st='run'; _isaGrpBar();
+    try{
+      if(!(await _isaEmpSetOk(it.caseId))){ it.st='skip'; it.msg='雇用条件セットが選ばれていません（案シスで選んでください）'; continue; }
+      var inp=document.getElementById('idx_caseIdPaste'); if(inp) inp.value=it.caseId;
+      await idxJumpByPaste();
+      if(!idxSelectedCase || String(idxSelectedCase.caseId)!==String(it.caseId)){ it.st='err'; it.msg='案件を開けませんでした'; continue; }
+      await _idxWaitNameCheck();
+      _pmState=null; await printPriorityDocs();
+      if(!_pmState){ it.st='err'; it.msg='書類の一覧を作れませんでした'; continue; }
+      _pmState.isaSet=true; _pmState.isaAuto=true;
+      var wid=++_isaGrpSeq;
+      var r=await new Promise(function(res){ _isaGrp._wait={id:wid, f:res}; setTimeout(function(){ _isaGrpNotify('err', _isaSt, '時間切れ（10分たっても終わりませんでした）', wid); }, ISA_GRP_LIMIT_MS); _pmExecute(); });
+      it.S=r.S; it.pm=_pmState; it.st=r.kind; it.msg=r.msg;
+    }catch(e){ it.st='err'; it.msg=String(e&&e.message||e); }
+    finally{ it.sec=Math.round((Date.now()-t1)/1000); var _o=document.getElementById('printMergeOverlay'); if(_o) _o.remove(); _isaGrpBar(); }
+  }
+  _isaGrp.running=false; _isaGrp.sec=Math.round((Date.now()-_isaGrp.t0)/1000);
+  var bar=document.getElementById('isaGrpBar'); if(bar) bar.remove();
+  var nOk=_isaGrp.list.filter(function(x){ return x.st==='done'; }).length;
+  _isaTitle((nOk===_isaGrp.list.length?'✅':'⚠')+' グループの申請書類一式（'+nOk+'/'+_isaGrp.list.length+'名）', true);
+  _isaGrpRender();
+}
+// 作っている間の小さな一覧（右上）
+function _isaGrpBar(){
+  var G=_isaGrp; if(!G) return;
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); };
+  var b=document.getElementById('isaGrpBar');
+  if(!b){ b=document.createElement('div'); b.id='isaGrpBar'; b.style.cssText='position:fixed;top:12px;right:12px;z-index:100002;background:#0f172a;color:#fff;border-radius:12px;padding:10px 14px;font:12px sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:340px;'; document.body.appendChild(b); }
+  var n=G.list.filter(function(x){ return x.st!=='wait' && x.st!=='run'; }).length;
+  b.innerHTML='<div style="font-weight:800;margin-bottom:6px;">👥 グループ全員分を作っています（'+n+'/'+G.list.length+'）</div>'
+    +G.list.map(function(it){ var s=ISA_GRP_ST[it.st]||ISA_GRP_ST.wait; return '<div style="display:flex;gap:6px;align-items:center;padding:1px 0;opacity:'+(it.st==='wait'?'.6':'1')+';"><span>'+s[0]+'</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+E(it.applicant)+'</span>'+(it.sec!=null?'<span style="opacity:.7;">'+it.sec+'秒</span>':'')+'</div>'; }).join('');
+  if(G.running){ var cur=G.list.filter(function(x){ return x.st==='run'; })[0]; if(cur) _isaTitle('⏳ '+(n+1)+'/'+G.list.length+' '+cur.applicant); }
+}
+// 終わったあとの一覧
+function _isaGrpRender(){
+  var G=_isaGrp; if(!G) return;
+  var old=document.getElementById('isaGrpModal'); if(old) old.remove();
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var rows=G.list.map(function(it, i){
+    var s=ISA_GRP_ST[it.st]||ISA_GRP_ST.wait, P=it.S&&it.S.pc, cnt={out:0,warn:0}; ((P&&P.res&&P.res.checks)||[]).forEach(function(c){ if(cnt[c.severity]!=null) cnt[c.severity]++; });
+    var noI=P && !P.collected.some(function(c){ return c.dk==='isa_ichiran'; });
+    var info=it.st==='done' ? ('⛔'+cnt.out+' ⚡'+cnt.warn+(P.items.length?'・不足'+P.items.length:'')+(noI||it.S.ichiranStale?'・<b style="color:#b91c1c;">一覧表を確認</b>':'')) : E(it.msg);
+    var btns='';
+    if(it.st==='done') btns='<button onclick="_isaGrpOpen('+i+')" style="padding:6px 10px;border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">結果を見る</button>'
+      +'<button onclick="_isaGrpPrint('+i+')" style="padding:6px 10px;border:none;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">🖨 印刷</button>';
+    else if(it.st==='stop' && it.S) btns='<button onclick="_isaGrpEdit('+i+')" style="padding:6px 10px;border:1px solid #f59e0b;background:#fff;color:#b45309;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">確認画面を開く</button>';
+    else if(it.st!=='wait') btns='<a href="'+E(location.pathname+'?caseId='+encodeURIComponent(it.caseId)+'&scanset=auto')+'" target="_blank" rel="noopener" style="padding:6px 10px;border:1px solid #94a3b8;background:#fff;color:#334155;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;">この人だけ開く</a>';
+    return '<div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #f1f5f9;flex-wrap:wrap;">'
+      +'<div style="width:22px;text-align:center;">'+s[0]+'</div>'
+      +'<div style="flex:1;min-width:180px;"><div style="font-weight:800;font-size:13px;">'+E(it.applicant)+'</div><div style="font-size:11.5px;color:'+s[2]+';">'+s[1]+(it.sec!=null?'（'+it.sec+'秒）':'')+'　<span style="color:#475569;">'+info+'</span></div></div>'
+      +'<div style="display:flex;gap:6px;">'+btns+'</div></div>';
+  }).join('');
+  var nOk=G.list.filter(function(x){ return x.st==='done'; }).length;
+  var html='<div id="isaGrpModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:14px;font-family:sans-serif;">'
+    +'<div style="background:#fff;color:#0f172a;border-radius:14px;max-width:720px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">'
+    +'<div style="padding:12px 18px;background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;"><div style="font-weight:800;font-size:15px;">👥 グループの申請書類一式'+(G.name?'：'+E(G.name):'')+'</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+nOk+'/'+G.list.length+'名できました'+(G.sec?'（'+Math.floor(G.sec/60)+'分'+(G.sec%60)+'秒）':'')+'　印刷は1人ずつ［🖨 印刷］を押してください</div></div>'
+    +'<div style="padding:4px 18px 12px;overflow-y:auto;flex:1;">'+rows+'</div>'
+    +'<div style="padding:10px 18px;border-top:1px solid #eef2f7;text-align:right;"><button onclick="document.getElementById(\'isaGrpModal\').remove()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button></div>'
+    +'</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+//   人を切り替えるときは、その人の画面の状態（言語など＝_pmState）も戻す（作り直すときに別の人の言語で作らないように）
+function _isaGrpUse(i){ var it=_isaGrp&&_isaGrp.list[i]; if(!it||!it.S) return null; _isaSt=it.S; if(it.pm) _pmState=it.pm; return it; }
+function _isaGrpOpen(i){ if(!_isaGrpUse(i)) return; var m=document.getElementById('isaGrpModal'); if(m) m.remove(); _isaPcRender(); }
+function _isaGrpPrint(i){ if(!_isaGrpUse(i)) return; _isaPcPrint(); }
+function _isaGrpEdit(i){ var it=_isaGrpUse(i); if(!it) return; var m=document.getElementById('isaGrpModal'); if(m) m.remove(); it.S.auto=false; _isaRender(); }
+
 // ver.20261117.09: 作った記録（いつ・だれが・何を綴じたか）を saysay_logs に残す（案シスのタスク「スキャン作成」に「前回」として出る）
 //   event='isa_set'（作業時間の集計は print／load だけを見るので混ざらない）
 async function _isaPostSetLog(S, P){
