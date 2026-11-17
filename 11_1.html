@@ -27,7 +27,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 分野参考様式第１１－１号（農業 特定技能所属機関：直接雇用）　受入れに係る誓約書</div>
-    <div class="ver">ver.20261111.02</div>
+    <div class="ver">ver.20261117.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -211,8 +211,8 @@ async function loadFromDB(passedInfo){
   try{
     const [cases,cos]=await Promise.all([
       caseId?sb('cases?select=applicant,org&id=eq.'+caseId):Promise.resolve([]),
-      companyId?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&id=eq.${companyId}`)
-        :companyName?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title&name=eq.${encodeURIComponent(companyName)}&order=address.desc.nullslast,author_name.desc.nullslast&limit=5`):Promise.resolve([])
+      companyId?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title,nogyo_exp_type,nogyo_exp_from,nogyo_exp_to,nogyo_exp_name,nogyo_exp_org&id=eq.${companyId}`)
+        :companyName?sb(`companies?select=name,pref,city,address,detail_address,author_name,author_title,rep_name,rep_title,nogyo_exp_type,nogyo_exp_from,nogyo_exp_to,nogyo_exp_name,nogyo_exp_org&name=eq.${encodeURIComponent(companyName)}&order=address.desc.nullslast,author_name.desc.nullslast&limit=5`):Promise.resolve([])
     ]);
     const cas=cases&&cases[0]; 
     // ver.20260810.02: 同名会社が複数ある場合、空データを避けて実データが入ってる行を優先
@@ -224,6 +224,15 @@ async function loadFromDB(passedInfo){
       s('f_coName',co.name||'');
       s('f_coAddr',((co.pref||'')+(co.city||'')+(co.address||'')+(co.detail_address||''))||'');
       s('f_author',(typeof _authorJoin==='function')?_authorJoin(co.author_title,co.author_name):((co.author_title||'')+' '+(co.author_name||'')).trim());   // ver.20261109.03: 役職の二重を防ぐ
+    }
+    // ver.20261117.01: 誓約事項３（企業ヒアリング「農業分野の誓約書（11-1号）」→ 案シスの所属機関に保存された内容）
+    ['f_exp1aFrom','f_exp1aTo','f_exp1bName','f_exp1bFrom','f_exp1bTo','f_exp2Name','f_exp2From','f_exp2To','f_exp2Org'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    if(co && co.nogyo_exp_type){
+      const wk=(d)=>{d=(d||'').trim();const m=d.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(!m)return d;const y=+m[1],mo=+m[2],da=+m[3];const ry=y-2018;return `令和${ry===1?'元':ry}年${mo}月${da}日`;};
+      const t=co.nogyo_exp_type, fr=wk(co.nogyo_exp_from), to=wk(co.nogyo_exp_to);
+      if(t==='①ア'){ s('f_exp1aFrom',fr); s('f_exp1aTo',to); }
+      else if(t==='①イ'){ s('f_exp1bName',co.nogyo_exp_name||''); s('f_exp1bFrom',fr); s('f_exp1bTo',to); }
+      else if(t==='②'){ s('f_exp2Name',co.nogyo_exp_name||''); s('f_exp2From',fr); s('f_exp2To',to); s('f_exp2Org',co.nogyo_exp_org||''); }
     }
     if(cas){
       s('f_applicant',cas.applicant||'');
