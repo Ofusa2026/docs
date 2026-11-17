@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.27</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.28</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.28',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📑 申請書類一式：会社の書類（協議会の証明書・登記事項証明書など）は、会社のドライブの「0.参照」を先に使うようにしました。申請ごとのフォルダ（1.変更・1.更新・2.認定 など。ほかの方の申請の書類が入っています）は自動では使いません',
+      '📑 申請書類一式：見つからなかった書類（⚡不足）の行に［📁 使うファイルを選ぶ］を付けました。会社のドライブ（0.参照 → そのほか → 申請ごとのフォルダ）と人材のドライブのファイルから選べます。一覧に無いときはドライブのファイルのURLを貼っても選べます。見つかっている行も［📁 変える］で選び直せます'
+    ]
+  },
   {
     version: 'ver.20261117.27',
     date: '2026-11-17',
@@ -4313,12 +4322,33 @@ async function _isaDriveFiles(c, p, co){
   for(var ci=0; ci<cids.length; ci++){
     var t2=await _cP[ci];
     if(!(t2&&t2.status==='ok')) { out.note.push('会社のドライブ（'+(ci+1)+'つ目のURL）を読めませんでした'); continue; }
-    (t2.items||[]).filter(_isaIsDoc).forEach(function(f){ if(seenCo[f.id]) return; seenCo[f.id]=1; out.co.push(f); });
+    var _its=t2.items||[], _hasRef=_its.some(function(f){ return _isaCoDirs(f).concat(f.isFolder?[String(f.name||'')]:[]).some(function(x){ try{ x=x.normalize('NFKC'); }catch(e){} return ISA_CO_REF_RE.test(x); }); });
+    _its.filter(_isaIsDoc).forEach(function(f){ if(seenCo[f.id]) return; seenCo[f.id]=1; _isaCoTag(f, !_hasRef); out.co.push(f); });   // 中に 0.参照 が無い＝案シスのURLが 0.参照 そのもの
   }
   var byName=function(a,b){ return String(a.name||'').localeCompare(String(b.name||''),'ja',{numeric:true}); };
-  out.sign.sort(byName); out.up.sort(byName); out.co.sort(byName);
+  out.sign.sort(byName); out.up.sort(byName);
+  out.co.sort(function(a,b){ return (_isaCoRank(a)-_isaCoRank(b)) || byName(a,b); });   // ver.20261117.28: 0.参照 → ほかのフォルダ → 申請ごとのフォルダ
   return out;
 }
+// ver.20261117.28: 会社のドライブの書類は「0.参照」を先に使う。申請ごとのフォルダ（1.変更・1.更新・2.認定 など）は
+//   ほかの人の申請の書類が入っているので自動では使わず、確認画面の［📁 選ぶ］で選べるだけにする
+//   （案シスの会社のドライブURLは、0.参照 そのものを指していることが多い。そのときは全部が 0.参照 の書類）
+var ISA_CO_REF_RE=/参照|企業書類/;
+var ISA_CO_APP_RE=/^[0-9]*[\s.、。,_\-]*(変更|更新|認定)/;
+function _isaCoDirs(f){   // ファイルが入っているフォルダ（登録フォルダから下）。path にファイル名まで入っていても入っていなくてもよいように
+  var nf=function(x){ x=String(x||''); try{ x=x.normalize('NFKC'); }catch(e){} return x; };
+  var seg=nf(f&&f.path).split('/').map(function(x){ return x.trim(); }).filter(Boolean), nm=nf(f&&f.name).trim();
+  if(seg.length && seg[seg.length-1]===nm) seg.pop();
+  return seg;
+}
+function _isaCoTag(f, rootIsRef){   // rootIsRef: 読んだフォルダの中に「参照」のフォルダが無い（＝案シスの会社のドライブURLが 0.参照 そのもの）
+  var seg=_isaCoDirs(f);
+  f._co=1; f._coDir=seg.join('/');
+  f._coApp=!seg.some(function(x){ return ISA_CO_REF_RE.test(x); }) && seg.some(function(x){ return ISA_CO_APP_RE.test(x); });
+  f._coRef=!f._coApp && (rootIsRef || seg.some(function(x){ return ISA_CO_REF_RE.test(x); }));
+  return f;
+}
+function _isaCoRank(f){ return f._coRef ? 0 : (f._coApp ? 2 : 1); }
 // ドライブのファイル（PDF・画像）をページの絵にする
 async function _isaFilePages(f){   // ver.20261116.20: 読んだページは使い回す（署名済みの振り分けで読んだものも）
   var imgs=await _isaFileImgs(f);
@@ -4354,6 +4384,7 @@ var _ISA_SIGN={'1_3':1,'1_10':1,'1_16':1,'1_32':1,'1_17':1};   // ver.20261116.2
 //   ctx: { navHas(dk), label(dk), field, personOrder }
 function _isaBuildTables(K, R, targets, files, coFiles, ctx){
   var used={}, docUsed={}, tables=[], sgUsed={};
+  var coAuto=(coFiles||[]).filter(function(f){ return !f._coApp; });
   var findTarget=function(key){ return targets.filter(function(dk){ return dk===key || (dk.indexOf(key+'_')===0 && /^[a-z]{2}$/.test(dk.slice(key.length+1))); })[0]||''; };
   K.keys.forEach(function(k){
     var t=R[k]; if(!t || t.error){ K.warn.push(/_hyo3_/.test(k)?('この分野・号の第3表は入管の一覧表にありません（'+k.replace(/^.*_hyo3_/,'')+'）'):('一覧表が見つかりません：'+k)); return; }
@@ -4363,12 +4394,12 @@ function _isaBuildTables(K, R, targets, files, coFiles, ctx){
       if(r.name) parent=String(r.name).split('\n')[0];
       var text=r.doc||r.name||'';                 // 選択肢の行は、右の列の書類名で突き合わせる
       var L={r:r, name:text, opt:r.opt||'', group:!!(r.opt), val:'', src:'', docs:[], files:[]};
-      if(/提出書類一覧表/.test(r.name||'')){ L.val='有'; L.src='この一覧表'; lines.push(L); return; }
-      if(/返信用封筒/.test(r.name||'')){ L.src='郵送で申請するときの返信用封筒（現物）。オンライン申請なら空欄のまま'; lines.push(L); return; }
+      if(/提出書類一覧表/.test(r.name||'')){ L.val='有'; L.src='この一覧表'; L._noPick=1; lines.push(L); return; }
+      if(/返信用封筒/.test(r.name||'')){ L.src='郵送で申請するときの返信用封筒（現物）。オンライン申請なら空欄のまま'; L._noPick=1; lines.push(L); return; }
       if(/^申請人名簿$/.test(r.name||'')){
         if(/人目/.test(String(ctx.personOrder||''))){ if(ctx.navHas('meibo')){ L.docs.push('meibo'); docUsed.meibo=1; } L.val='有'; L.src=L.docs.length?'Saysay：名簿（同時申請）':'同時申請：名簿を入れてください'; }
         else { L.val='無'; L.src='同時申請でないため不要'; }
-        lines.push(L); return;
+        L._noPick=1; lines.push(L); return;
       }
       // Saysay の書類（様式番号から）
       var fk=_isaFormKey(r.form);
@@ -4385,7 +4416,9 @@ function _isaBuildTables(K, R, targets, files, coFiles, ctx){
       var sk=_isaSignKey(fk, text);
       if(sk && ctx.sg && (ctx.sg.byKey[sk]||[]).length && !sgUsed[sk]){ L.signPages=ctx.sg.byKey[sk]; sgUsed[sk]=1; if(L._signDoc) L.docs=[L._signDoc]; }
       L._sk=sk;
-      L._pool=(isHyo2||isHyo3) ? files.concat(coFiles) : files;
+      // ver.20261117.28: 会社の書類は 0.参照（とそのほかの会社のフォルダ）から。申請ごとのフォルダ（変更・更新・認定）は自動では使わない。
+      //   第3表（協議会の証明書など）は会社の 0.参照 を先に見る。見つからなければ確認画面の［📁 選ぶ］で選ぶ
+      L._pool=isHyo3 ? coAuto.concat(files) : (isHyo2 ? files.concat(coAuto) : files);
       lines.push(L);
     });
     // ドライブ：1段目（名前がほぼ同じ）→ 2段目（言葉の手がかり）の順に、まだ使っていないファイルを割り当てる
@@ -4399,7 +4432,7 @@ function _isaBuildTables(K, R, targets, files, coFiles, ctx){
       if(ctx.sg && L._sk==='1_6b' && (ctx.sg.byKey['1_6']||[]).length){ L.val='有'; L.src='✍ 1-6号（雇用条件書）の署名済みに含まれています'; return; }
       if(!L.docs.length && !L.files.length && /賃金の支払/.test(text)){ var f16=files.filter(function(f){ return /1[-_－]?6(?!\d)|雇用条件/.test(String(f.name||'').normalize('NFKC')); })[0]; if(f16) L.files=[f16]; }   // 賃金の支払（1-6号別紙）は1-6号と同じファイルのことが多い
       if(L._signDoc && !L.files.length){ L.docs=[L._signDoc]; L.val='有'; L.src='⚠ 署名済みがドライブに無いので、Saysay の書類（署名なし）を入れます。署名をもらってから提出：'+(ctx.label(L._signDoc)||L._signDoc); return; }
-      if(L.docs.length || L.files.length){ L.val='有'; L.src=L.docs.map(function(d){ return 'Saysay：'+(ctx.label(d)||d); }).concat(L.files.map(function(f){ return '📁 '+f.name; })).join(' ／ '); }
+      if(L.docs.length || L.files.length){ L.val='有'; L.src=L.docs.map(function(d){ return 'Saysay：'+(ctx.label(d)||d); }).concat(L.files.map(function(f){ return '📁 '+f.name+(f._co?(f._coRef?'（会社：0.参照）':'（会社のドライブ）'):''); })).join(' ／ '); }
       else if(/^在留(資格|期間).*申請書$/.test(String(text).split('\n')[0].trim())){ L.val='有'; L.src='オンライン申請として扱います（申請書は在留申請オンラインシステムで入力）。窓口で出すときは申請書を入れてください'; }   // ver.20261116.19
       else if(L.group){ L.val=''; L.src='どれか当てはまる選択肢の書類に〇（見つからないので手で選んでください）'; }
       else if(r.req==='○' || !r.req){ L.val=''; L.src='⚡ 不足'; }
@@ -4497,6 +4530,9 @@ function _isaReviewList(S){
     out.push('どれかを選ぶ行に〇が付いていません：'+(/_hyo1/.test(t.key)?'第1表':(/_hyo2_/.test(t.key)?'第2表':'第3表'))+' No.'+no+'　'+String(nm||_isaRowName(L)||L.name||'').split('\n')[0].slice(0,30));
   }); });
   (S.restSign||[]).forEach(function(g){ if(!g.on && g.key!=='other') out.push('署名済みのうち、一覧表の行に当てはまらず綴じていないページ：'+g.label+'（'+(g.pages||[]).length+'枚）'); });
+  // ver.20261117.28: 見つからなかった書類（⚡不足）は、確認画面の［📁 使うファイルを選ぶ］でドライブから選べる
+  var _ms=_isaMissingRows(S);
+  if(_ms.length) out.push('ドライブ（会社の 0.参照・人材のフォルダ）で見つからなかった書類が'+_ms.length+'件あります（'+_ms.slice(0,3).map(function(m){ return '第'+m.hyou+'表 No.'+m.no+' '+String(m.name).slice(0,20); }).join('、')+(_ms.length>3?' ほか':'')+'）。ドライブにあるときは［↩ 確認画面で直す］→ その行の［📁 使うファイルを選ぶ］で選べます');
   (S.K.warn||[]).forEach(function(w){ out.push(w); });
   return out;
 }
@@ -4515,7 +4551,11 @@ function _isaRender(){
         var sel=function(v,lab,col){ return '<button type="button" onclick="_isaSt.tables['+ti+'].lines['+li+'].val=\''+v+'\';_isaRender();" style="font-size:11.5px;padding:2px 8px;margin-left:3px;border-radius:6px;cursor:pointer;border:1px solid '+(L.val===v?col:'#cbd5e1')+';background:'+(L.val===v?col:'#fff')+';color:'+(L.val===v?'#fff':'#475569')+';font-weight:700;">'+lab+'</button>'; };
         return '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid #f1f5f9;">'
           +'<div style="flex:1;min-width:0;'+(L.group?'padding-left:14px;':'')+'"><div style="font-size:12.5px;color:#0f172a;">'+(L.group?'<span style="color:#7c3aed;">└ '+E(String(L.opt).slice(0,18))+'…</span> ':E(L.r.no)+'　')+E(String(L.name).replace(/^以下のいずれかの書類\n?/,'').split('\n')[0].replace(/^・/,''))+(L.r.req?'<span style="color:#94a3b8;font-size:11px;margin-left:4px;">['+E(L.r.req)+']</span>':'')+'</div>'
-          +'<div style="font-size:11px;color:'+(/不足/.test(L.src)?'#b45309':'#64748b')+';word-break:break-all;">'+E(L.src)+'</div></div>'
+          +'<div style="font-size:11px;color:'+(/不足/.test(L.src)?'#b45309':'#64748b')+';word-break:break-all;">'+E(L.src)
+          +(_isaCanPick(L)?(((L.files||[]).length||!/不足|手で選んで/.test(L.src||''))   // ver.20261117.28: ドライブのファイルを手で選ぶ
+            ? ' <button type="button" onclick="_isaPickOpen('+ti+','+li+')" title="会社・人材のドライブのファイルから選びます" style="font-size:10.5px;padding:0 6px;margin-left:2px;border-radius:5px;border:1px solid #cbd5e1;background:#fff;color:#6d28d9;cursor:pointer;font-weight:700;">📁 '+((L.files||[]).length?'変える':'選ぶ')+'</button>'
+            : '<div><button type="button" onclick="_isaPickOpen('+ti+','+li+')" title="会社の 0.参照 で見つかりませんでした。会社・人材のドライブのファイルから選びます（URLを貼っても選べます）" style="font-size:11px;padding:2px 9px;margin-top:3px;border-radius:6px;border:1px solid #f59e0b;background:#fffbeb;color:#b45309;cursor:pointer;font-weight:800;">📁 使うファイルを選ぶ</button></div>'):'')
+          +'</div></div>'
           +'<div style="flex:0 0 auto;white-space:nowrap;">'+sel('有','〇有','#059669')+sel('無','〇無','#64748b')+sel('','空欄','#b45309')+'</div></div>';
       }).join('');
   }).join('');
@@ -4794,6 +4834,115 @@ function _isaRebuild(){
   S.restDocs=X.targets.filter(function(dk){ return !B.docUsed[dk] && !(dk==='1_17' && B.docUsed['1_17_vi']); });
   var on=S.restOn||{}; S.restFiles=X.allFiles.filter(function(f){ return !B.used[f.id] && !(SG && SG.used[f.id]); }); S.restFiles.forEach(function(f){ if(on[f.id]==null) on[f.id]=true; }); S.restOn=on;
   S.restSign=SG ? Object.keys(SG.byKey).filter(function(k){ return !B.sgUsed[k]; }).map(function(k){ return {key:k, label:ISA_SIGN_LABEL[k]||k, pages:SG.byKey[k], on:false}; }).concat(SG.other.length?[{key:'other', label:'様式が分からないページ', pages:SG.other, on:false}]:[]) : [];
+  _isaApplyPicks(S);   // ver.20261117.28: ［📁 選ぶ］で選んだファイルは、作り直しても残す
+}
+// ===== ver.20261117.28: 一覧表の行に使うドライブのファイルを手で選ぶ（［📁 選ぶ］） =====
+//   会社の 0.参照 で見つからなかった書類（協議会の証明書など）は、会社・人材のドライブのファイルから選ぶ。ドライブのURLを貼ってもよい
+//   選んだものは S.picks（表のキー|行の番号 → ファイル）に覚え、一覧表を作り直したとき（署名済みの付け替え）も残す
+function _isaCanPick(L){ return !!L && !L._noPick && !(L.docs||[]).length && !(L.signPages||[]).length; }
+function _isaPickSrc(files){ return '📁 '+files.map(function(f){ return f.name+(f._co?(f._coRef?'（会社：0.参照）':'（会社のドライブ）'):''); }).join(' ／ ')+'（選んだファイル）'; }
+function _isaSetLineFiles(t, L, files){
+  L.files=files.slice(); L._picked=1;
+  if(files.length){ L.val='有'; L.src=_isaPickSrc(files); }
+  else if(L.group){ L.val=''; L.src='どれか当てはまる選択肢の書類に〇（見つからないので手で選んでください）'; }
+  else if(L.r.req==='○' || !L.r.req){ L.val=''; L.src='⚡ 不足'; }
+  else { L.val='無'; L.src='条件つきの書類（当てはまらなければ無）'; }
+  if(L.group){   // 選択肢のまとまり：1つでも〇有なら、ほかの選択肢は「ほかの選択肢で提出」
+    var no=L.r.no, any=t.lines.some(function(M){ return M.group && M.r.no===no && M.val==='有'; });
+    t.lines.forEach(function(M){ if(!M.group || M.r.no!==no || M.val==='有' || M.signPages || (M.docs||[]).length) return;
+      if(any) M.src='（ほかの選択肢で提出）';
+      else if(/ほかの選択肢/.test(M.src||'')) M.src='どれか当てはまる選択肢の書類に〇（見つからないので手で選んでください）'; });
+  }
+}
+function _isaRecalcRest(S){
+  var X=S.build||{}, SG=S.sg, usedId={};
+  (S.tables||[]).forEach(function(t){ t.lines.forEach(function(L){ (L.files||[]).forEach(function(f){ usedId[f.id]=1; }); }); });
+  var on=S.restOn||{};
+  S.restFiles=(X.allFiles||[]).filter(function(f){ return !usedId[f.id] && !(SG && SG.used[f.id]); });
+  S.restFiles.forEach(function(f){ if(on[f.id]==null) on[f.id]=true; }); S.restOn=on;
+}
+function _isaApplyPicks(S){
+  var P=S.picks||{};
+  (S.tables||[]).forEach(function(t){ t.lines.forEach(function(L, li){ var k=t.key+'|'+li; if(P[k] && _isaCanPick(L)) _isaSetLineFiles(t, L, P[k]); }); });
+  _isaRecalcRest(S);
+}
+// 選べるファイル（会社 0.参照 → 会社のほかのフォルダ → 会社の申請ごとのフォルダ → 人材のドライブ。第1表は人材を先に）
+function _isaPickCands(S, ti){
+  var X=S.build||{}, SG=S.sg, isH1=/_hyo1/.test(String((S.tables[ti]||{}).key||''));
+  var co=(X.coFiles||[]).slice(), per=(X.allFiles||[]).filter(function(f){ return !(SG && SG.used[f.id]); });
+  var g=[
+    {k:'ref', label:'🏢 会社のドライブ：0.参照（案シスに登録の会社のフォルダ）', files:co.filter(function(f){ return f._coRef; })},
+    {k:'co',  label:'🏢 会社のドライブ：そのほかのフォルダ', files:co.filter(function(f){ return !f._coRef && !f._coApp; })},
+    {k:'app', label:'🏢 会社のドライブ：申請ごとのフォルダ（変更・更新・認定。ほかの方の申請の書類のこともあります）', files:co.filter(function(f){ return f._coApp; })},
+    {k:'per', label:'👤 人材のドライブ', files:per}
+  ];
+  if(isH1) g=[g[3],g[0],g[1],g[2]];
+  if((S.pickExtra||[]).length) g.unshift({k:'url', label:'🔗 URLを貼ったファイル', files:S.pickExtra.slice()});
+  return g.filter(function(x){ return x.files.length; });
+}
+function _isaPickUsedBy(S, fid, ti, li){
+  var out=''; (S.tables||[]).forEach(function(t, a){ t.lines.forEach(function(L, b){ if(out || (a===ti && b===li)) return; if((L.files||[]).some(function(f){ return f.id===fid; })) out='第'+_isaHyou(t.key)+'表 No.'+String(L.r.no||''); }); });
+  return out;
+}
+function _isaPickOpen(ti, li){
+  var S=_isaSt; if(!S) return; var t=S.tables[ti], L=t&&t.lines[li]; if(!_isaCanPick(L)) return;
+  var old=document.getElementById('isaPickModal'); if(old) old.remove();
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var on={}; (L.files||[]).forEach(function(f){ on[f.id]=1; });
+  var G=_isaPickCands(S, ti); S._pickMap={}; G.forEach(function(g){ g.files.forEach(function(f){ S._pickMap[f.id]=f; }); });
+  (L.files||[]).forEach(function(f){ if(!S._pickMap[f.id]){ S._pickMap[f.id]=f; G.unshift({k:'now', label:'いま使っているファイル', files:[f]}); } });
+  var nm=String(L.name||'').replace(/^以下のいずれかの書類\n?/,'').split('\n')[0].replace(/^・/,'');
+  var list=G.map(function(g){
+    return '<div class="isaPkG" style="font-size:11.5px;font-weight:800;color:#4c1d95;margin:10px 0 3px;">'+E(g.label)+'（'+g.files.length+'）</div>'
+      + g.files.map(function(f){
+        var by=_isaPickUsedBy(S, f.id, ti, li), dir=f._url ? '' : (f._co ? (f._coDir||'（登録フォルダの直下）') : _isaCoDirs(f).join('/'));
+        return '<label class="isaPkRow" data-n="'+E(_isaN(f.name+' '+dir))+'" style="display:flex;gap:7px;align-items:flex-start;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;color:#0f172a;">'
+          +'<input type="checkbox" value="'+E(f.id)+'" '+(on[f.id]?'checked':'')+' style="margin-top:2px;">'
+          +'<span style="flex:1;min-width:0;word-break:break-all;">'+E(f.name)+(dir?'<span style="display:block;font-size:10.5px;color:#94a3b8;">'+E(dir)+'</span>':'')+(by?'<span style="display:block;font-size:10.5px;color:#b45309;">ほかの行で使っています：'+E(by)+'</span>':'')+'</span>'
+          +(f._noDrive?'':'<a href="https://drive.google.com/file/d/'+encodeURIComponent(f.id)+'/view" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="font-size:11px;color:#2563eb;white-space:nowrap;">開く↗</a>')+'</label>';
+      }).join('');
+  }).join('') || '<div style="font-size:12px;color:#94a3b8;padding:10px 0;">ドライブに選べるファイルがありません。下にドライブのファイルのURLを貼ってください</div>';
+  var html='<div id="isaPickModal" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100001;display:flex;align-items:center;justify-content:center;padding:14px;font-family:sans-serif;">'
+    +'<div style="background:#fff;border-radius:12px;max-width:620px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">'
+    +'<div style="padding:11px 16px;background:#f5f3ff;border-bottom:1px solid #ddd6fe;"><div style="font-weight:800;font-size:14px;color:#4c1d95;">📁 この行に使うファイルを選ぶ</div>'
+    +'<div style="font-size:12px;color:#334155;margin-top:2px;">'+'第'+E(_isaHyou(t.key))+'表 No.'+E(L.r.no||'')+'　'+E(nm)+'</div>'
+    +'<input id="isaPkQ" oninput="_isaPickFilter(this.value)" placeholder="🔍 ファイル名・フォルダ名でしぼる" style="margin-top:7px;width:100%;box-sizing:border-box;font-size:12px;padding:6px 9px;border:1px solid #cbd5e1;border-radius:7px;"></div>'
+    +'<div id="isaPkList" style="padding:2px 16px 10px;overflow-y:auto;flex:1;">'+list+'</div>'
+    +'<div style="padding:8px 16px;border-top:1px solid #eef2f7;background:#f8fafc;"><div style="font-size:11px;color:#475569;margin-bottom:4px;">一覧に無いときは、ドライブのファイルのURLを貼る（右クリック →［共有］→［リンクをコピー］）</div>'
+    +'<div style="display:flex;gap:6px;"><input id="isaPkUrl" placeholder="https://drive.google.com/file/d/…" style="flex:1;min-width:0;font-size:12px;padding:6px 9px;border:1px solid #cbd5e1;border-radius:7px;"><button type="button" onclick="_isaPickAddUrl('+ti+','+li+')" style="font-size:12px;padding:6px 12px;border-radius:7px;border:1px solid #a855f7;background:#fff;color:#6d28d9;font-weight:700;cursor:pointer;white-space:nowrap;">＋ 追加</button></div></div>'
+    +'<div style="padding:10px 16px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;">'
+    +((L.files||[]).length?'<button type="button" onclick="_isaPickApply('+ti+','+li+',true)" style="font-size:12px;padding:8px 12px;border-radius:9px;border:1px solid #fecaca;background:#fff;color:#b91c1c;font-weight:700;cursor:pointer;">外す</button>':'')
+    +'<div style="flex:1;"></div>'
+    +'<button type="button" onclick="document.getElementById(\'isaPickModal\').remove()" style="font-size:12.5px;padding:8px 14px;border-radius:9px;border:none;background:#f1f5f9;color:#475569;font-weight:600;cursor:pointer;">閉じる</button>'
+    +'<button type="button" onclick="_isaPickApply('+ti+','+li+')" style="font-size:12.5px;padding:8px 16px;border-radius:9px;border:none;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;font-weight:800;cursor:pointer;">チェックしたファイルを使う</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+function _isaPickFilter(q){
+  var n=_isaN(q);
+  document.querySelectorAll('#isaPkList .isaPkRow').forEach(function(el){ el.style.display=(!n || String(el.getAttribute('data-n')||'').indexOf(n)>=0) ? 'flex' : 'none'; });
+}
+function _isaPickAddUrl(ti, li){
+  var S=_isaSt, el=document.getElementById('isaPkUrl'); if(!S || !el) return;
+  var u=String(el.value||'').trim(), m=u.match(/\/d\/([a-zA-Z0-9_-]{10,})/)||u.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)||u.match(/^([a-zA-Z0-9_-]{20,})$/);
+  if(!m){ alert('ドライブのファイルのURLを貼ってください（https://drive.google.com/file/d/… の形）'); return; }
+  if(/\/folders\//.test(u)){ alert('フォルダのURLです。フォルダの中のファイルを開いて、そのファイルのURLを貼ってください'); return; }
+  var id=m[1], keep={}; document.querySelectorAll('#isaPkList input[type=checkbox]').forEach(function(c){ if(c.checked) keep[c.value]=1; });
+  S.pickExtra=S.pickExtra||[];
+  if(!S.pickExtra.some(function(f){ return f.id===id; }) && !(S._pickMap||{})[id]) S.pickExtra.push({id:id, name:'URLを貼ったファイル（'+id.slice(0,8)+'…）', path:'URL', mime:'', _url:1});
+  keep[id]=1;
+  var t=S.tables[ti], L=t.lines[li], cur=L.files;   // チェックの状態を残したまま開き直す
+  L.files=Object.keys(keep).map(function(k){ return (S._pickMap||{})[k] || S.pickExtra.filter(function(f){ return f.id===k; })[0]; }).filter(Boolean);
+  _isaPickOpen(ti, li); L.files=cur;
+}
+function _isaPickApply(ti, li, clear){
+  var S=_isaSt; if(!S) return; var t=S.tables[ti], L=t&&t.lines[li]; if(!_isaCanPick(L)) return;
+  var ids=[]; if(!clear) document.querySelectorAll('#isaPkList input[type=checkbox]').forEach(function(c){ if(c.checked) ids.push(c.value); });
+  var files=ids.map(function(id){ return (S._pickMap||{})[id]; }).filter(Boolean);
+  S.picks=S.picks||{}; S.picks[t.key+'|'+li]=files;
+  _isaSetLineFiles(t, L, files);
+  _isaRecalcRest(S);
+  var m=document.getElementById('isaPickModal'); if(m) m.remove();
+  _isaRender();
 }
 function _isaSignDesc(sp){
   var by={}, nn={}; sp.forEach(function(x){ (by[x.fname]=by[x.fname]||[]).push(x.p); nn[x.fname]=x.n; });
@@ -5081,7 +5230,7 @@ function _isaPcRender(){
     +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div id="isaSaveSt" style="flex:1 1 100%;font-size:11.5px;color:#64748b;line-height:1.6;">'+_isaSaveHtml(P)+'</div><div style="flex:1;"></div>'
     +(S.folder?'<a href="'+E(S.folder)+'" target="_blank" rel="noopener" title="人材のドライブを開きます（一式のPDFは［🖨 印刷画面を開く］を押すと「03 スキャン」に自動で保存します）" style="padding:9px 12px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">📁 人材のドライブ</a>':'')
     +'<button onclick="_isaPcClose()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
-    +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
+    +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します（見つからなかった書類は［📁 使うファイルを選ぶ］でドライブから選べます）" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
     +'<button onclick="_isaPcPrint()" style="padding:10px 16px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;">🖨 印刷画面を開く</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
