@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.11</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -491,8 +491,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794990002';
-window.__DOCS_CACHE_BUSTER__ = '1794990002';
+window.__DOCS_CACHE_BUSTER__ = '1794990003';
+window.__DOCS_CACHE_BUSTER__ = '1794990003';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1865,6 +1865,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.11',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '✏️ 窓口申請書のサイドバーで手で直した値を、案件ごとに覚えるようにしました。次に開いたときも、まとめPDFでも、その値で出ます（青い枠＝前に手で直した値）。記録はサイドバー上の「手で直した値の記録を消す」で消せます。',
+      '📝 手で入れた値のうち、案シスで空欄の欄（今の在留期間・通算在留期間・技能実習の職種／作業・会社の雇用保険番号・取次者）は、印刷のときに「案シスにも保存しますか？」と聞くようにしました。案シスに入っている値は書き換えません。',
+      '🙆 同等の日本人の月額報酬は、第2表が要らない案件（更新・受入経験あり・2人目以降）と、比べる日本人がいない会社では、空欄でも知らせないようにしました。'
+    ]
+  },
   {
     version: 'ver.20261117.10',
     date: '2026-11-17',

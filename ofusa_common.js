@@ -1761,6 +1761,7 @@ function doPrint(){
     if(_SH_ON && !window._docCheckMode){
       var _bl=_shinseiBlankList();
       if(_bl.length && !confirm('⚠️ 空欄のままの欄があります。\n\n・'+_bl.join('\n・')+'\n\nこのまま印刷しますか？')) return;
+      _shWbAsk();
     }
   }catch(_sb){}
   // ver.20261028.01: 書類の形が変わる変更が、直接編集した書類に出ていないまま印刷しようとしたら確認
@@ -7205,6 +7206,7 @@ function _shMark(id, why){
 function _shSet(id, val, why, done){
   var e=_shEl(id); if(!e||!val) return false;
   if(String(e.value||'').trim()) return false;
+  if(window._shMan && Object.prototype.hasOwnProperty.call(window._shMan,id)) return false;   // 手で空欄にした欄
   e.value=val; if(String(e.value)!==String(val)) return false;
   _shMark(id, why); if(done) done.push(why); return true;
 }
@@ -7221,15 +7223,125 @@ function _shKeepOption(sel, val){
   for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===val) return; }
   var o=document.createElement('option'); o.value=val; o.textContent=val; sel.appendChild(o);
 }
+/* ver.20261117.09: 手で直した値を案件ごとに覚える（次に開いたときも残る）
+   ・サイドバーで人が入れた・選んだ欄だけを、案件ごと・様式ごとに保存する（直接編集の保存先 company_edited_html に「<様式>__manual」として置く）
+   ・開いたときは、案シスの値を入れたあとで、その上に重ねる（青い枠＝前に手で直した値）。まとめPDFにも反映される
+   ・手で空欄にした欄には、標準回答を入れない */
+var _SH_MAN_DOC=_SH_PAGE+'__manual';
+window._shMan={}; window._shManCase=''; window._shManCo='';
+function _shManOk(){ return !!window._shManCase; }   // 読み込みを始めたら（resetForm）空にするので、読み込み中の入力は記録しない
+function _shManRec(id, val){
+  if(!_SH_ON || window._docCheckMode || !_shManOk()) return;
+  if(!id || !/^f_/.test(id) || id==='f__adjust') return;
+  window._shMan[id]=String(val==null?'':val);
+  clearTimeout(_shManRec._t); _shManRec._t=setTimeout(_shManSave, 1200);
+}
+async function _shManCoId(caseId){
+  if(window._shManCo) return window._shManCo;
+  var co='';
+  if(!co){ try{ var r=await sb('cases?select=company_id&id=eq.'+encodeURIComponent(caseId)); co=(r&&r[0]&&r[0].company_id)||''; }catch(e){} }
+  window._shManCo=co; return co;
+}
+async function _shManSave(cidX, coX, mapX){
+  try{
+    var flush=!!cidX;
+    if(!flush && !_shManOk()) return;
+    var cid=flush?cidX:window._shManCase, co=flush?coX:await _shManCoId(cid); if(!co) return;
+    var map=flush?mapX:window._shMan;
+    var who=''; try{ who=(typeof _currentUserId==='function')?(_currentUserId()||''):''; }catch(e){}
+    await sb('rpc/set_edited_html',{method:'POST', body:JSON.stringify({p_company_id:String(co), p_doc:_SH_MAN_DOC, p_case_id:String(cid), p_html:JSON.stringify({v:1, f:map}), p_saved_at:new Date().toISOString(), p_saved_by:who})});
+    _shManRec._t=null;
+    if(!flush) _shWbRefresh();
+  }catch(e){ console.warn('[手で直した値の保存]', e); }
+}
+async function _shManLoad(caseId, co){
+  try{
+    var r=await _getEditedHtml(co, _SH_MAN_DOC, caseId);
+    var x=r&&r[_SH_MAN_DOC]&&r[_SH_MAN_DOC][caseId];
+    var j=x&&x.html?JSON.parse(x.html):null;
+    return (j&&j.f&&typeof j.f==='object')?j.f:{};
+  }catch(e){ return {}; }
+}
+async function _shManClear(){
+  if(!confirm('この案件のこの申請書で、手で直した値の記録を消して、案シスの値で入れ直しますか？')) return;
+  try{
+    var co=await _shManCoId(window._shManCase);
+    await sb('rpc/del_edited_html',{method:'POST', body:JSON.stringify({p_company_id:String(co), p_doc:_SH_MAN_DOC, p_case_id:String(window._shManCase)})});
+    window._shMan={};
+    if(typeof loadFromDB==='function' && window._lastCaseInfo) loadFromDB(window._lastCaseInfo);
+  }catch(e){ alert('消せませんでした：'+e.message); }
+}
+function _shMarkMan(id){ var e=_shEl(id); if(!e) return; e.style.outline='2px solid #3b82f6'; e.style.outlineOffset='1px'; e.title='前に手で直した値（案件ごとに覚えています）'; }
+
+/* ver.20261117.09: 手で入れた値のうち、案シスで空欄になっている欄は、印刷のときに案シスにも保存できる（上書きはしない） */
+var _SH_WB=[
+  ['f_curPeriod','persons','stay_period','今の在留期間'],
+  ['f_totalY','persons','total_stay_year','特定技能1号での通算在留期間（年）'],
+  ['f_totalM','persons','total_stay_month','特定技能1号での通算在留期間（月）'],
+  ['f_ti1Occ','persons','gijutsu_type','技能実習の職種'],
+  ['f_ti1Ope','persons','gijutsu_work','技能実習の作業'],
+  ['f_coEi','companies','emp_ins_no','雇用保険適用事業所番号（会社）'],
+  ['f_agentName','cases','toritsugisha','取次者']
+];
+window._shWbCand=[];
+async function _shWbRefresh(){
+  window._shWbCand=[];
+  try{
+    if(!_shManOk()) return;
+    var cid=window._shManCase, m=window._shMan||{};
+    var want=_SH_WB.filter(function(w){ var v=String(m[w[0]]||'').trim(); if(!v) return false; if(w[0]==='f_agentName' && !/^(中林 俊介|田中 綾美)$/.test(v)) return false; return true; });
+    if(!want.length) return;
+    var co=await _shManCoId(cid), cur={persons:null, companies:null, cases:null};
+    if(want.some(function(w){ return w[1]==='persons'; })){ var r1=await sb('persons?select=id,stay_period,total_stay_year,total_stay_month,gijutsu_type,gijutsu_work&case_id=eq.'+encodeURIComponent(cid)); cur.persons=(r1&&r1.length===1)?r1[0]:null; }
+    if(co && want.some(function(w){ return w[1]==='companies'; })){ var r2=await sb('companies?select=id,emp_ins_no&id=eq.'+encodeURIComponent(co)); cur.companies=r2&&r2[0]||null; }
+    if(want.some(function(w){ return w[1]==='cases'; })){ var r3=await sb('cases?select=id,toritsugisha&id=eq.'+encodeURIComponent(cid)); cur.cases=r3&&r3[0]||null; }
+    if(!_shManOk() || window._shManCase!==cid) return;
+    window._shWbCand=want.filter(function(w){ var row=cur[w[1]]; return row && !String(row[w[2]]==null?'':row[w[2]]).trim(); })
+      .map(function(w){ return {fid:w[0], tb:w[1], col:w[2], label:w[3], val:String(m[w[0]]).trim(), rowId:cur[w[1]].id}; });
+  }catch(e){ console.warn('[案シスへの書き戻し候補]', e); }
+}
+function _shWbAsk(){
+  var c=(window._shWbCand||[]).slice(); if(!c.length || !_shManOk()) return;
+  var key='shwb_'+window._shManCase+'_'+c.map(function(x){ return x.fid+'='+x.val; }).join('|');
+  try{ if(sessionStorage.getItem(key)) return; }catch(e){}
+  var ok=confirm('📝 ここで入れた値のうち、案シスで空欄になっている欄があります。\n案シスにも保存しますか？（次の申請から自動で入ります。案シスに入っている値は書き換えません）\n\n・'+c.map(function(x){ return x.label+'：'+x.val; }).join('\n・')+'\n\nOK＝案シスにも保存する　／　キャンセル＝保存しない');
+  if(!ok){ try{ sessionStorage.setItem(key,'1'); }catch(e){} return; }
+  var groups={}; c.forEach(function(x){ var k=x.tb+'|'+x.rowId; (groups[k]=groups[k]||{tb:x.tb,id:x.rowId,body:{}}).body[x.col]=x.val; });
+  Promise.all(Object.keys(groups).map(function(k){ var g=groups[k]; return sb(g.tb+'?id=eq.'+encodeURIComponent(g.id),{method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(g.body)}); }))
+    .then(function(){ window._shWbCand=[]; if(typeof showToast==='function') showToast('✅ 案シスにも保存しました（'+c.length+'欄）'); try{ slog('shinsei_writeback',{fields:c.map(function(x){ return x.tb+'.'+x.col; })}); }catch(e){} })
+    .catch(function(e){ alert('案シスへの保存に失敗しました：'+e.message); });
+}
+
 async function _shinseiAssist(caseId){
   if(!_SH_ON||!caseId) return;
-  var done=[];
+  var done=[], nMan=0, seq=(_shinseiAssist._seq=(_shinseiAssist._seq||0)+1);
+  window._shManCase=''; window._shManCo=''; window._shMan={}; window._shWbCand=[];
+  var cas={};
+  try{ var rc=await sb('cases?select=company_id,toritsugisha,app_type,accept_exp,person_order&id=eq.'+encodeURIComponent(caseId)); cas=(rc&&rc[0])||{}; }catch(e){}
+  // 第2表（所属機関の書類）を出す案件か（申請書類一式と同じ考え方：更新・受入経験あり・2人目以降は不要）
+  window._shHyo2Need = !/更新/.test(String(cas.app_type||'')) && !/有|あり/.test(String(cas.accept_exp||'')) && !/2人目/.test(String(cas.person_order||''));
+  // 手で直した値を重ねる
+  try{
+    var co=cas.company_id||((window._lastCaseInfo&&String(window._lastCaseInfo.caseId)===String(caseId))?window._lastCaseInfo.companyId:'')||'';
+    window._shManCo=co;
+    if(co){
+      var man=await _shManLoad(String(caseId), co);
+      if(seq!==_shinseiAssist._seq) return;   // 読み込み中に別の案件に切り替わった
+      window._shMan=man;
+      Object.keys(man).forEach(function(id){
+        var e=_shEl(id); if(!e || !/^f_/.test(id) || id==='f__adjust') return;
+        var v=String(man[id]==null?'':man[id]);
+        if(e.tagName==='SELECT' && v) _shKeepOption(e, v);
+        e.value=v; _shMarkMan(id); nMan++;
+        if(id==='f_agentName' && typeof onAgentNameChange==='function') onAgentNameChange();
+      });
+    }
+  }catch(e){ console.warn('[shinseiAssist 手で直した値]', e); }
   // 取次者
   try{
     var ag=_shEl('f_agentName');
-    if(ag && !_shVal('f_agentName')){
-      var r=await sb('cases?select=toritsugisha&id=eq.'+encodeURIComponent(caseId));
-      var nm=_shAgentNorm(r&&r[0]&&r[0].toritsugisha);
+    if(ag && !_shVal('f_agentName') && !Object.prototype.hasOwnProperty.call(window._shMan,'f_agentName')){
+      var nm=_shAgentNorm(cas.toritsugisha);
       if(nm){
         _shKeepOption(ag, nm); ag.value=nm;
         if(ag.value===nm){ if(typeof onAgentNameChange==='function') onAgentNameChange(); _shMark('f_agentName','案シスの取次者'); done.push('取次者（案シスの取次者：'+nm+'）'); }
@@ -7255,7 +7367,10 @@ async function _shinseiAssist(caseId){
     }catch(e){ console.warn('[shinseiAssist 標準回答]', e); }
   }
   try{ if(typeof p==='function') p(); }catch(e){}
-  _shNotice(done);
+  if(seq!==_shinseiAssist._seq) return;
+  window._shManCase=String(caseId);
+  _shNotice(done, nMan);
+  _shWbRefresh();
 }
 var _SH_BLANK_DEF=[
   ['f_agentName','取次者の氏名',1],
@@ -7281,13 +7396,16 @@ function _shinseiBlankList(){
     if(lv>=3 && !_SH_TOKUGI) return;
     if(lv===4 && _shVal('f_sk')!=='jisshu') return;
     if(!_shEl(d[0])) return;
+    // 同等の日本人の報酬：第2表が要らない案件（更新・受入経験あり・2人目以降）と、比べる日本人がいない会社は空欄でよい
+    if(d[0]==='f_payJp'){ if(window._shHyo2Need===false) return; var _es=window._empLoadedSet||{}; if(/日本人.{0,8}(なし|無し|いない|居ない|おらず|不在)|該当(者)?(なし|無し|しない)/.test(String(_es.jpCompReason||''))) return; }
     if(d[0]==='f_totalY'){ if(_shVal('f_totalY')||_shVal('f_totalM')) return; }
     else if(_shVal(d[0])) return;
     out.push(d[1]);
   });
   return out;
 }
-function _shNotice(done){
+function _shNotice(done, nMan){
+  if(nMan===undefined) nMan=_shNotice._n||0; else _shNotice._n=nMan;
   try{
     var box=_shEl('_shNoticeBox');
     var inner=document.querySelector('.fp .fp-inner')||document.querySelector('.fp');
@@ -7295,6 +7413,7 @@ function _shNotice(done){
     if(!box){ box=document.createElement('div'); box.id='_shNoticeBox'; inner.insertBefore(box, inner.firstChild); }
     var bl=_shinseiBlankList(), h='';
     if(done&&done.length) h+='<div style="font-weight:700;color:#b45309;">🔶 自動で入れた欄（オレンジの枠）</div><div>・'+done.map(_shEsc).join('<br>・')+'</div><div style="color:#92400e;margin-top:2px;">違うときはサイドバーで選び直してください。</div>';
+    if(nMan) h+='<div style="font-weight:700;color:#1d4ed8;margin-top:'+(h?'6px':'0')+';">✏️ 前に手で直した値を入れました（青い枠：'+nMan+'欄）</div><div><a href="javascript:void(0)" onclick="_shManClear()" style="color:#1d4ed8;">手で直した値の記録を消す</a></div>';
     if(bl.length) h+='<div style="font-weight:700;color:#b91c1c;margin-top:'+(h?'6px':'0')+';">⚠️ 空欄のままの欄</div><div>・'+bl.map(_shEsc).join('<br>・')+'</div>';
     box.style.cssText=h?'background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 8px;margin:8px 0;font-size:11px;line-height:1.5;color:#1f2937;':'display:none';
     box.innerHTML=h;
@@ -7306,7 +7425,7 @@ function _shSigFill(mode){
   var y,m,d;
   if(mode==='org'){ y=_shVal('f_oSigY'); m=_shVal('f_oSigM'); d=_shVal('f_oSigD'); if(!y){ if(typeof showToast==='function') showToast('所属機関の作成日が空です'); return; } }
   else { var n=new Date(); y=String(n.getFullYear()); m=String(n.getMonth()+1); d=String(n.getDate()); }
-  [['f_aSigY',y],['f_aSigM',m],['f_aSigD',d]].forEach(function(a){ var e=_shEl(a[0]); if(e) e.value=a[1]; });
+  [['f_aSigY',y],['f_aSigM',m],['f_aSigD',d]].forEach(function(a){ var e=_shEl(a[0]); if(e){ e.value=a[1]; _shManRec(a[0], a[1]); } });
   try{ if(typeof p==='function') p(); }catch(e){}
 }
 if(_SH_ON){
@@ -7322,6 +7441,31 @@ if(_SH_ON){
         }
       }catch(e){}
     }
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+    function onEdit(ev){
+      try{
+        if(!ev.isTrusted) return;
+        var t=ev.target; if(!t||!t.id||!/^f_/.test(t.id)||t.type==='file') return;
+        if(!(t.closest&&t.closest('.fp'))) return;
+        _shManRec(t.id, t.value);
+      }catch(e){}
+    }
+    document.addEventListener('input', onEdit, true);
+    document.addEventListener('change', onEdit, true);
+    function wrapPick(){
+      try{
+        if(typeof window.setPick==='function' && !window.setPick._sh){
+          var orig=window.setPick;
+          var w=function(id, val){ var r=orig.apply(this, arguments); try{ var e=_shEl(id); if(e) _shManRec(id, e.value); }catch(_e){} return r; };
+          w._sh=true; window.setPick=w;
+        }
+        if(typeof window.resetForm==='function' && !window.resetForm._sh){
+          var origR=window.resetForm;
+          var wr=function(){ if(_shManRec._t){ clearTimeout(_shManRec._t); _shManRec._t=null; if(window._shManCase && window._shManCo) _shManSave(window._shManCase, window._shManCo, Object.assign({}, window._shMan)); } window._shManCase=''; window._shMan={}; window._shWbCand=[]; return origR.apply(this, arguments); };
+          wr._sh=true; window.resetForm=wr;
+        }
+      }catch(e){}
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ init(); wrapPick(); }); else { init(); wrapPick(); }
+    window.addEventListener('load', wrapPick);
   })();
 }
