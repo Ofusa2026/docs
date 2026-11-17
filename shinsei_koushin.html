@@ -192,7 +192,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留期間更新許可申請書　特定技能1号　<span style="font-size:11px;font-weight:normal;opacity:.8;">全7ページ（申請人1〜3・所属機関1〜4）</span></div>
-    <div class="ver">ver.20261117.04</div>
+    <div class="ver">ver.20261117.06</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -789,7 +789,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794980001"></script>
+<script src="ofusa_common.js?v=1794990001"></script>
 <script>
 // ===== 在留期間更新許可申請書 全7ページ統合版（ver.20260716.02） =====
 // 7ファイルに分かれていたものを1ファイルに統合。1-6号と同じくスクロールで全ページ閲覧できる。
@@ -2267,6 +2267,11 @@ window.addEventListener('message', async function(e){
     }
   }
   if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'shinsei_henkou'); }
+  // ver.20261117.05: この様式の保存データは、変更の申請書（shinsei_henkou）と分けて「shinsei_koushin」に保存する。
+  //   これまでは自動保存が変更の申請書の名前で保存されていて、位置調整や手で直した値が様式どうしで混ざっていた。
+  //   前の分は上で読み込んだまま使い、この様式で保存したもの（shinsei_koushin）があればそれを上に重ねる。
+  try{ if(typeof loadFormGenericFromDB==='function'){ await loadFormGenericFromDB('shinsei_koushin', info); if(typeof p==='function') p(); } }catch(_own){}
+  window._empDocKey='shinsei_koushin';
   if(typeof loadFromDB==='function') loadFromDB(info);
   // ver.20260810.11: 案件切替時に localStorage から顔写真を復元
   try{ if(typeof _restorePhotoForCurrentCase==='function') _restorePhotoForCurrentCase(); }catch(_e){}
