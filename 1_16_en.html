@@ -1201,18 +1201,42 @@ document.title=_T16.title;
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990004"></script>
+<script src="ofusa_common.js?v=1794990005"></script>
 <script>
 // 手数料として有効な値か判定する。
 // 数字が含まれ、かつステータス文言（申請済み/待ち/完了 等）や日付でないものを金額とみなす。
 // ver.20261116.06: 4 自国等の機関への支払。入力が1件も無ければ1行目に「該当なし」、空の欄には欄名を出さない（空のまま）
 function _p16Pay(id){ return v(id) ? f(id) : ''; }
 // ver.20261117.13: 費用の「名目」欄。「紹介料」のときは各言語の訳も出す（それ以外の名目は、日本語と「として」の訳だけ）
-var _P16_NOM_TR={en:'For payment of placement fee', id:'Sebagai biaya penempatan', vi:'với tư cách là phí giới thiệu việc làm', th:'ในฐานะค่าธรรมเนียมการจัดหางาน', km:'ជាថ្លៃសេវាណែនាំការងារ', my:'အလုပ်အကိုင်ရှာဖွေပေးခ အဖြစ်', ne:'रोजगार परिचय शुल्कको रूपमा', ko:'소개료로', zh:'作为介绍费', si:'රැකියා හඳුන්වාදීමේ ගාස්තුව ලෙස', mn:'зуучлалын хураамж болгож', tl:'Bilang placement fee'};
+// ver.20261117.14: 名目の既定を「人材紹介費」に（「紹介料」と入っている古いデータも同じ訳を出す）
+var _P16_NOM_TR={en:'For payment of personnel placement fee', id:'Sebagai biaya penempatan tenaga kerja', vi:'với tư cách là phí giới thiệu nhân lực', th:'ในฐานะค่าธรรมเนียมการจัดหาบุคลากร', km:'ជាថ្លៃសេវាណែនាំធនធានមនុស្ស', my:'ဝန်ထမ်းရှာဖွေပေးခ အဖြစ်', ne:'जनशक्ति परिचय शुल्कको रूपमा', ko:'인재소개비로', zh:'作为人才介绍费', si:'මානව සම්පත් හඳුන්වාදීමේ ගාස්තුව ලෙස', mn:'хүний нөөцийн зуучлалын төлбөр болгож', tl:'Bilang bayad sa paghahanap ng manggagawa (placement fee)'};
+// ver.20261117.14: 許可・届出の受理年月日（和暦）の下に、各言語の日付を出す
+var _P16_LOC={en:'en-GB', id:'id-ID', vi:'vi-VN', th:'th-TH-u-ca-gregory', km:'km-KH', my:'my-MM', ne:'ne-NP', ko:'ko-KR', zh:'zh-CN', si:'si-LK', mn:'mn-MN', tl:'fil-PH'};
+function _p16DateTr(w){
+  try{
+    var t=String(w||'').normalize('NFKC').trim(), y, mo, d, m;
+    if((m=t.match(/^(令和|平成|昭和)\s*(\d+|元)\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?$/))){ var ey=m[2]==='元'?1:+m[2]; y=(m[1]==='令和'?2018:m[1]==='平成'?1988:1925)+ey; mo=+m[3]; d=+m[4]; }
+    else if((m=t.match(/^(\d{4})[-\/年.]\s*(\d{1,2})[-\/月.]\s*(\d{1,2})日?$/))){ y=+m[1]; mo=+m[2]; d=+m[3]; }
+    else return '';
+    var dt=new Date(Date.UTC(y, mo-1, d)); if(isNaN(dt)) return '';
+    var MN={km:['មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'],
+            my:['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'],
+            ne:['जनवरी','फेब्रुअरी','मार्च','अप्रिल','मे','जुन','जुलाई','अगस्ट','सेप्टेम्बर','अक्टोबर','नोभेम्बर','डिसेम्बर'],
+            si:['ජනවාරි','පෙබරවාරි','මාර්තු','අප්‍රේල්','මැයි','ජූනි','ජූලි','අගෝස්තු','සැප්තැම්බර්','ඔක්තෝබර්','නොවැම්බර්','දෙසැම්බර්']};
+    var s2;   // この5言語は、ブラウザによって日付の言語データが無く英語になるため、月の名前を持たせる
+    if(_L16==='km') s2='ថ្ងៃទី'+d+' ខែ'+MN.km[mo-1]+' ឆ្នាំ'+y;
+    else if(_L16==='my') s2=y+' ခုနှစ် '+MN.my[mo-1]+'လ '+d+' ရက်';
+    else if(_L16==='ne') s2=y+' '+MN.ne[mo-1]+' '+d;
+    else if(_L16==='si') s2=y+' '+MN.si[mo-1]+' '+d;
+    else if(_L16==='mn') s2=y+' оны '+mo+'-р сарын '+d;
+    else s2=new Intl.DateTimeFormat(_P16_LOC[_L16]||'en-GB',{year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}).format(dt);
+    return '<br><span class="id">('+s2+')</span>';
+  }catch(e){ return ''; }
+}
 function _p16Nom(id, lang, asPhrase){
   var val=String(v(id)||'').trim();
   if(!val) return '　　　　　　　　　　　　として <span class="id">'+asPhrase+'</span>';
-  var tr=(val==='紹介料' && _P16_NOM_TR[lang]) ? _P16_NOM_TR[lang] : asPhrase;
+  var tr=((val==='人材紹介費'||val==='紹介料') && _P16_NOM_TR[lang]) ? _P16_NOM_TR[lang] : asPhrase;
   return f(id)+'　として <span class="id">'+tr+'</span>';
 }
 function _p16PayNone(){ for(var i=1;i<=5;i++){ if(['name','kind','date','amount'].some(function(k){ return String(v('f_p'+i+'_'+k)||'').trim(); })) return false; } return true; }
@@ -1271,7 +1295,7 @@ ${_T16.L215()}
   </tr>
   <tr>
 ${_T16.L219()}
-    <td colspan="3">${f('f_ag_license')}${v('f_ag_licenseDate') ? '（'+f('f_ag_licenseDate')+'）' : ''}</td>
+    <td colspan="3">${f('f_ag_license')}${v('f_ag_licenseDate') ? '（'+f('f_ag_licenseDate')+'）'+_p16DateTr(v('f_ag_licenseDate')) : ''}</td>
   </tr>
   <tr>
 ${_T16.L223()}
@@ -1642,22 +1666,22 @@ async function loadFromDB(passedInfo){
         var _payer = (_sp && !_sp.not_used) ? (_sp.payer||'') : (_omit ? '支払なし' : '');
         var _amt = (_sp && !_sp.not_used) ? String(_sp.amount||'') : '';
         if(_payer==='申請人'){
-          S('f_tt_fee_seeker', _amt); S('f_tt_nom_seeker', '紹介料');
+          S('f_tt_fee_seeker', _amt); S('f_tt_nom_seeker', '人材紹介費');
           S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
         } else if(_payer==='所属機関'){
-          S('f_tt_fee_employer', _amt); S('f_tt_nom_employer', '紹介料');
+          S('f_tt_fee_employer', _amt); S('f_tt_nom_employer', '人材紹介費');
           S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', '');
         } else if(_payer==='支払なし'){
           // 支払なし（または省略）のときは、費用の欄も名目も空にする
           S('f_tt_fee_seeker', ''); S('f_tt_nom_seeker', ''); S('f_tt_fee_employer', ''); S('f_tt_nom_employer', '');
         }
       }
-      // ver.20261117.13: 名目の既定は「紹介料」。取次機関あり→求人者（所属機関）側、職業紹介事業者は費用が入っている側に入れる（空のときだけ）
+      // ver.20261117.13: 名目の既定は「人材紹介費」（.14で「紹介料」から変更）。取次機関あり→求人者（所属機関）側、職業紹介事業者は費用が入っている側に入れる（空のときだけ）
       try{
         var _gv=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; };
-        if(_gv('es_toritsugi')==='有' && !_gv('f_tt_nom_seeker') && !_gv('f_tt_nom_employer') && _payer!=='申請人' && _payer!=='支払なし') S('f_tt_nom_employer','紹介料');
-        if(_gv('f_ag_fee_seeker') && !_gv('f_ag_nom_seeker')) S('f_ag_nom_seeker','紹介料');
-        if(_gv('f_ag_fee_employer') && !_gv('f_ag_nom_employer')) S('f_ag_nom_employer','紹介料');
+        if(_gv('es_toritsugi')==='有' && !_gv('f_tt_nom_seeker') && !_gv('f_tt_nom_employer') && _payer!=='申請人' && _payer!=='支払なし') S('f_tt_nom_employer','人材紹介費');
+        if(_gv('f_ag_fee_seeker') && !_gv('f_ag_nom_seeker')) S('f_ag_nom_seeker','人材紹介費');
+        if(_gv('f_ag_fee_employer') && !_gv('f_ag_nom_employer')) S('f_ag_nom_employer','人材紹介費');
       }catch(_nm){}
       window._ttDirty=false;   // ここまでは読み込み。これ以降に取次機関の欄を手で直したときだけ、DB保存で案件へ書き戻す
     }catch(e){ console.warn('[doc 1_16] senddashi reflect failed:', e); }
