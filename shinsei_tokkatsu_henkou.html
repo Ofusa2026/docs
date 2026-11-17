@@ -185,7 +185,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.01</div>
+    <div class="ver">ver.20261117.02</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -795,7 +795,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794950001"></script>
+<script src="ofusa_common.js?v=1794960001"></script>
 <script>
 // 業種番号: 入管省令様式「別紙 業種一覧」(2024年版) に基づく
 // 1=農林業, 2=漁業, 4=建設業, 5=食料品(製造), 11=輸送用機械器具,
@@ -983,20 +983,30 @@ function _dg(id,i){ const s=v_(id).replace(/[^0-9A-Za-z]/g,''); return s[i]||'';
     const info=window._lastCaseInfo; if(!info||!info.caseId||done===info.caseId) return;
     if(!v_('f_name')) return;   // 案件の読み込みが終わってから
     done=info.caseId;
-    let rs='';
-    try{ const r=await sb('cases?select=residence_status&id=eq.'+encodeURIComponent(info.caseId)); rs=(r&&r[0]&&r[0].residence_status)||''; }catch(e){}
-    const set=(id,val)=>{ const e=document.getElementById(id); if(e && !String(e.value||'').trim() && val){ e.value=val; return true; } return false; };
+    let rs='', cas=null, co=null, es={};
+    try{ const r=await sb('cases?select=residence_status,company_id,emp_set_idx,applicant_field,job_category&id=eq.'+encodeURIComponent(info.caseId)); cas=(r&&r[0])||null; rs=(cas&&cas.residence_status)||''; }catch(e){}
+    try{ const cid=(cas&&cas.company_id)||info.companyId; if(cid){ const r=await sb('companies?select=id,name,pref,city,address,foreign_employees,emp_sets&id=eq.'+encodeURIComponent(cid)); co=(r&&r[0])||null; } }catch(e){}
+    try{ if(co){ let sets=co.emp_sets; if(typeof sets==='string') sets=JSON.parse(sets); co.emp_sets=sets; const idx=(typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):parseInt((cas&&cas.emp_set_idx)||'0',10); if(Array.isArray(sets)&&idx>=0) es=sets[idx]||{}; } }catch(e){}
+    const set=(id,val)=>{ const e=document.getElementById(id); if(e && !String(e.value||'').trim() && val!=null && String(val).trim()){ e.value=String(val).trim(); return true; } return false; };
     const st=rs+' '+v_('f_newStatus')+' '+v_('f_curStatus');
     let ch=false;
     const prep=/移行準備|移行のための準備/.test(st+' '+v_('f_tkAct'));
     ch=set('f_tkAct', prep?'特定技能1号への移行準備':'')||ch;
     ch=set('f_tkForm','雇用')||ch;
     ch=set('f_tkOrgAct','other')||ch;
+    // 勤務先（事業所）・外国人職員数（案シスの会社・雇用条件セットから）
+    if(co){
+      ch=set('f_office', (es.officeName||es.orgName||co.name||''))||ch;
+      ch=set('f_officeAddr', (es.officeAddr||es.orgAddress||((co.pref||'')+(co.city||'')+(co.address||''))))||ch;
+      ch=set('f_staffFr', co.foreign_employees)||ch;
+    }
     if(prep || /移行準備/.test(v_('f_tkAct'))){
-      const co=v_('f_o2coName');
-      ch=set('f_tkPurpose','特定技能1号への在留資格変更に向けた準備（技能試験・日本語試験の受験や必要書類の準備）を行うため、引き続き'+(co?co+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。')||ch;
-      const fld=v_('f_field'), cat=v_('f_cat');
-      ch=set('f_tkDetail','特定技能1号への移行準備期間中、'+(fld?fld+(cat?'（'+cat+'）':'')+'の':'')+'業務に従事する。')||ch;
+      const coName=v_('f_o2coName');
+      ch=set('f_tkPurpose','特定技能1号への在留資格変更に向けた準備（技能試験・日本語試験の受験や必要書類の準備）を行うため、引き続き'+(coName?coName+'で':'現在の所属機関で')+'就労しながら在留することを希望します。滞在費は、所属機関から支払われる報酬により支弁します。')||ch;
+      const fld=v_('f_field'), cat=v_('f_cat'), jd=String(es.foreignerJobDesc||'').trim();
+      ch=set('f_tkDetail','特定技能1号への移行準備期間中、'+(jd?jd.replace(/[。．]$/,'')+'。':((fld?fld+(cat?'（'+cat+'）':'')+'の':'')+'業務に従事する。')))||ch;
+      ch=set('f_newPeriod','6月')||ch;   // 移行準備の特定活動は6月が通例（違うときは直してください）
+      { const e=document.getElementById('f_reason'); if(e && (!String(e.value||'').trim() || String(e.value).trim()==='就労のため')){ e.value='特定技能1号への移行準備のため'; ch=true; } }   // 14 変更（更新）の理由
     }
     ch=set('f_workPeriod', v_('f_newPeriod'))||ch;
     if(ch && typeof p==='function') p();
