@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.22</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.23</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.23',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '🔧 申請書類一式：案シスの電子署名で本人が署名した書類は、電子署名の記録から直接取り出して綴じるようにしました。ファイルの名前や置き場所が変わっていても入ります（押印済みは今までどおり押印済のフォルダから）。同じ書類を署名し直したときは、あとで署名したほうを使います',
+    ]
+  },
   {
     version: 'ver.20261117.22',
     date: '2026-11-17',
@@ -4185,6 +4193,46 @@ function _isaIsDoc(f){ return f && !f.isFolder && (/pdf|image\//i.test(String(f.
 //   前はフォルダ名しか見ていなかったので、人材フォルダに直に置いた「…雇用条件書_署名済_….pdf」が署名済みとして扱われず、一式に入っていなかった
 var ISA_SIGNED_RE=/企業押印済|押印済|サイン済|署名済/;
 function _isaSignedPath(f){ var t=String((f&&f.path)||'')+'/'+String((f&&f.name)||''); try{ t=t.normalize('NFKC'); }catch(e){} return ISA_SIGNED_RE.test(t); }
+// ver.20261117.23: 電子署名（案シスの署名依頼）で本人が署名した書類も、署名済みとして必ず綴じる。
+//   電子署名の書類は人材フォルダのいちばん上に入るので、フォルダ名（サイン済・押印済）だけでは拾えなかった。
+//   ドライブにあるものはそのファイルを使い（二重にしない）、ドライブに無いものは電子署名の記録に残っているPDFを使う。押印済みは今までどおりフォルダから
+var ISA_ESIGN_MAXDOC=6;
+function _isaFileIdOf(u){ var m=String(u||'').match(/\/file\/d\/([\w-]+)/)||String(u||'').match(/[?&]id=([\w-]+)/); return m?m[1]:''; }
+async function _isaESignFiles(caseId, drv){
+  if(!caseId) return 0;
+  var sel='id,doc_type,signed_at,signer_type,signed_pdf_url';
+  for(var i=0;i<ISA_ESIGN_MAXDOC;i++) sel+=',n'+i+':docs->'+i+'->>name,u'+i+':docs->'+i+'->>signed_pdf_url';
+  var rows=await idxSb('sign_requests?select='+sel+'&case_id=eq.'+encodeURIComponent(caseId)+'&status=eq.signed&order=signed_at.asc');
+  var byId={}; drv.sign.concat(drv.up).forEach(function(f){ byId[f.id]=f; });
+  var n=0;
+  (rows||[]).forEach(function(r){
+    if(String(r.signer_type||'')==='company') return;   // 企業の押印は今までどおりフォルダ（押印済）から
+    var ord=Date.parse(r.signed_at||'')||1, rid=r.id;
+    var docs=[]; for(var i=0;i<ISA_ESIGN_MAXDOC;i++){ if(r['n'+i]!=null || r['u'+i]!=null) docs.push({i:i, name:r['n'+i]||'', url:r['u'+i]||''}); }
+    var single=docs.length<=1; if(!docs.length) docs=[{i:-1, name:'', url:''}];
+    var md=String(r.signed_at||'').slice(5,10).replace('-','/');
+    docs.forEach(function(d){
+      var url=d.url || (single ? (r.signed_pdf_url||'') : '');
+      var fid=_isaFileIdOf(url), di=d.i;
+      var getB64=async function(){
+        var b='';
+        if(di>=0){ var a=await idxSb('sign_requests?select=b:docs->'+di+'->>signed_pdf_base64&id=eq.'+encodeURIComponent(rid)); b=(a[0]&&a[0].b)||''; }
+        if(!b && single){ var a2=await idxSb('sign_requests?select=b:signed_pdf_base64&id=eq.'+encodeURIComponent(rid)); b=(a2[0]&&a2[0].b)||''; }
+        return b;
+      };
+      var ex=fid && byId[fid];
+      if(ex){   // ドライブに同じファイルがある：そのファイルを署名済みとして使う
+        ex._ord=ord; ex._esign=1; ex._getB64=getB64;
+        var ui=drv.up.indexOf(ex); if(ui>=0){ drv.up.splice(ui,1); drv.sign.push(ex); }
+        return;
+      }
+      var nm=d.name||String(r.doc_type||'').replace(/\s+/g,' ').trim()||'電子署名の書類';
+      var f={id:fid||('esign_'+rid+'_'+Math.max(0,di)), name:nm+'（電子署名'+(md?' '+md:'')+'）.pdf', path:'電子署名', mime:'application/pdf', _ord:ord, _esign:1, _noDrive:!fid, _getB64:getB64};
+      byId[f.id]=f; drv.sign.push(f); n++;
+    });
+  });
+  return n;
+}
 async function _isaDriveFiles(c, p, co){
   var out={sign:[], up:[], co:[], note:[]};
   var du=p&&p.drive_urls; if(typeof du==='string'){ try{ du=JSON.parse(du); }catch(e){ du=[du]; } }
@@ -4341,6 +4389,7 @@ async function _isaSetStart(targets){
     var R=(await _isaFn({action:'rows', keys:K.keys})).items||{};
     try{ await _isaIchiranFresh(K, R); }catch(e){ console.warn(e); }   // ver.20261116.23: 毎朝の自動取得が止まっていないか・改定されたか
     var drv=await _drvP;
+    try{ await _isaESignFiles(info.caseId, drv); }catch(e){ console.warn(e); drv.note.push('電子署名の記録を読めませんでした'); }   // ver.20261117.23
     // ver.20261116.20: 署名済みのサイン書類をページごとに様式へ振り分ける（一覧表の該当の行・該当のページに差し替える）
     //   ver.20261116.24: 更新も同じく（認定・変更・更新すべて）
     var SG=null;
@@ -4593,7 +4642,9 @@ var _isaImgCache={};
 function _isaImgSize(u){ return new Promise(function(ok){ var im=new Image(); im.onload=function(){ ok({u:u, w:im.naturalWidth||1, h:im.naturalHeight||1}); }; im.onerror=function(){ ok({u:u, w:1, h:1.41}); }; im.src=u; }); }
 async function _isaFileImgs(f){
   if(_isaImgCache[f.id]) return _isaImgCache[f.id];
-  var d=await _isaGas('getDriveFileBase64',{fileId:f.id}, 90000);
+  var d=f._noDrive ? null : await _isaGas('getDriveFileBase64',{fileId:f.id}, 90000);
+  // ver.20261117.23: 電子署名の書類は、ドライブで読めなければ電子署名の記録に残っているPDFを使う
+  if(!(d&&d.status==='ok'&&d.base64) && f._getB64){ var _b=''; try{ _b=await f._getB64(); }catch(e){ console.warn(e); } if(_b) d={status:'ok', base64:_b, mime:'application/pdf'}; }
   if(!(d&&d.status==='ok'&&d.base64)) return null;
   var mime=String(d.mime||f.mime||''), imgs=[];
   if(/pdf/i.test(mime) || /\.pdf$/i.test(String(f.name||''))){
@@ -4618,7 +4669,7 @@ async function _isaSignPages(files, prog){
     //   それより多いページはページごとに見分け、見分けられなかったページだけファイル名の様式にする
     var k=(k0 && imgs.length<=ISA_SIGN_NAME_MAXP)?k0:'';
     var prio=/企業押印済/.test(fp)?3:(/押印済/.test(fp)?2:1);   // ver.20261116.22: 企業の押印が入ったものを優先
-    imgs.forEach(function(im, p){ var pg={u:im.u, w:im.w, h:im.h, fid:f.id, fname:f.name, p:p+1, n:imgs.length, part:'', prio:prio, key:k||'', hint:k0||'', _no:++seq, by:k?'name':''}; SG.pages.push(pg); if(!k) toAI.push(pg); });
+    imgs.forEach(function(im, p){ var pg={u:im.u, w:im.w, h:im.h, fid:f.id, fname:f.name, p:p+1, n:imgs.length, part:'', prio:prio, ord:f._ord||0, key:k||'', hint:k0||'', _no:++seq, by:k?'name':''}; SG.pages.push(pg); if(!k) toAI.push(pg); });
   }
   if(toAI.length){
     if(prog) prog('署名済みの書類のページを見分けています（'+toAI.length+'ページ）…');
@@ -4646,8 +4697,10 @@ function _isaSignBuild(SG){
     var runs={}, order=[];
     SG.byKey[k].forEach(function(pg){ if(!runs[pg.fid]){ runs[pg.fid]=[]; order.push(pg.fid); } runs[pg.fid].push(pg); });
     if(order.length<2) return;
-    var base=order.map(function(id){ return runs[id]; }).sort(function(a,b){ return (b.length-a.length) || (b[0].prio-a[0].prio); })[0].slice();
-    order.map(function(id){ return runs[id]; }).filter(function(r){ return r[0].fid!==base[0].fid && r[0].prio>base[0].prio; }).sort(function(a,b){ return a[0].prio-b[0].prio; }).forEach(function(r){
+    // ver.20261117.23: ページ数も押印も同じなら、あとで署名したもの（電子署名のやり直し）を土台にし、あとから署名し直したページで差し替える
+    var _od=function(r){ return r[0].ord||0; };
+    var base=order.map(function(id){ return runs[id]; }).sort(function(a,b){ return (b.length-a.length) || (b[0].prio-a[0].prio) || (_od(b)-_od(a)); })[0].slice();
+    order.map(function(id){ return runs[id]; }).filter(function(r){ return r[0].fid!==base[0].fid && (r[0].prio>base[0].prio || (r[0].prio===base[0].prio && _od(r)>_od(base))); }).sort(function(a,b){ return (a[0].prio-b[0].prio) || (_od(a)-_od(b)); }).forEach(function(r){
       if(r.length>=base.length){ base=r.slice(); return; }
       var idx=r.map(function(x){ var m=String(x.part||'').match(/(\d+)\s*[\/／]\s*(\d+)/); return (m && +m[2]===base.length) ? (+m[1]-1) : -1; });
       if(idx.some(function(i){ return i<0 || i>=base.length; })) idx=r.map(function(x,j){ return j; });
