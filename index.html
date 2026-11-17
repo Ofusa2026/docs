@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -491,8 +491,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '1794990001';
-window.__DOCS_CACHE_BUSTER__ = '1794990001';
+window.__DOCS_CACHE_BUSTER__ = '1794990002';
+window.__DOCS_CACHE_BUSTER__ = '1794990002';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1856,6 +1856,17 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.08',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '🙋 窓口申請書（特定技能の変更・更新／技人国／特定活動の変更・更新）の取次者を、すべての様式で中林／田中から選べるようにしました。案シスの案件に取次者が入っていれば、初めから選んであります。',
+      '🔶 毎回空欄で印刷されていた○の欄に、標準の答えを入れるようにしました（空のときだけ。オレンジの枠が自動で入れた欄）：労働時間・報酬が日本人と同等＝有、(6) 外国人を理由に異なった待遇＝無、社会保険・労働保険の適用事業所＝有（雇用条件セットの保険から）、25 定期的に負担する費用＝有（寮費・食費などの控除があるとき）、24 本国の手続＝有（ベトナム・フィリピン・カンボジア・ミャンマー・インドネシア・ネパール）。',
+      '📅 申請人の作成年月日の下に［今日］［＝所属機関の作成日］のボタンを付けました（本人が自署する欄なので、初めは空欄のままです）。',
+      '⚠️ 印刷の前とサイドバーの上に、空欄のままの欄（取次者・今の在留期間・雇用保険番号・通算在留期間・日本人の報酬・技能実習の職種など）を出すようにしました。'
+    ]
+  },
   {
     version: 'ver.20261117.07',
     date: '2026-11-17',

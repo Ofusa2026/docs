@@ -1756,6 +1756,13 @@ function _printDocLabel(){
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
+  // ver.20261117.08: 窓口申請書で空欄のままの欄があれば、印刷の前に知らせる
+  try{
+    if(_SH_ON && !window._docCheckMode){
+      var _bl=_shinseiBlankList();
+      if(_bl.length && !confirm('⚠️ 空欄のままの欄があります。\n\n・'+_bl.join('\n・')+'\n\nこのまま印刷しますか？')) return;
+    }
+  }catch(_sb){}
   // ver.20261028.01: 書類の形が変わる変更が、直接編集した書類に出ていないまま印刷しようとしたら確認
   try{
     if(window._tplStructChanged && document.getElementById('_structNotice')){
@@ -3868,6 +3875,7 @@ async function loadFormGenericFromDB(docKey, info){
             return;
           }
         }
+        if(id==='f_agentName' && data[id] && el.tagName==='SELECT') _shKeepOption(el, String(data[id]));   // ver.20261117.08: 選択肢に無い取次者名（別紙参照など）も消さない
         el.value = data[id] || '';
       });
       if(_nKeptEmp) console.log('[loadFormGenericFromDB] 雇用条件の方が新しい欄を採用:', _nKeptEmp, '件');
@@ -7169,3 +7177,151 @@ function _structNoticeShow(){
     }, 500);
   }, 800);
 })();
+
+/* ver.20261117.08: 窓口申請書（特定技能の変更・更新／技人国／特定活動の変更・更新）の手入力を減らす
+   ・取次者：案シスの案件の「取次者」を初めから選んでおく（空のときだけ。サイドバーで選び直せる）
+   ・標準回答：○を付けるだけの欄が毎回空欄で印刷されていたので、空のときだけ入れる（オレンジの枠＝自動で入れた欄）
+       労働時間が通常の労働者と同等 … 有
+       報酬が日本人と同等以上 …………… 有（日本人の報酬より低いときは入れない）
+       (6) 外国人を理由に異なった待遇 … 無
+       社会保険・労働保険の適用事業所 … 雇用条件セットの保険のチェックが入っていれば 有
+       25 定期的に負担する費用 ………… 雇用条件セットに寮費・食費・光熱費などの控除があれば 有（無ければ空欄＝記入不要）
+       24 本国の手続 …………………… 国籍が、本国の手続が決まっている国（ベトナム・フィリピン・カンボジア・ミャンマー・インドネシア・ネパール）なら 有
+   ・申請人の作成年月日：本人が自署する欄なので空欄のまま。［今日］［作成日と同じ］で1回で入れられる
+   ・印刷前に、空欄のままの欄（取次者・雇用保険番号・在留期間・日本人の報酬など）を知らせる */
+var _SH_PAGE=(function(){ try{ return (location.pathname.split('/').pop()||'').replace(/\.html.*$/,''); }catch(e){ return ''; } })();
+var _SH_TOKUGI=/^shinsei_(henkou|koushin)$/.test(_SH_PAGE);
+var _SH_ON=/^shinsei_(henkou|koushin|gjk|tokkatsu_henkou|tokkatsu_koushin)$/.test(_SH_PAGE);
+var _SH_A24_RE=/ベトナム|VIET|フィリピン|PHILIPP|カンボジア|CAMBOD|ミャンマー|MYANMAR|インドネシア|INDONES|ネパール|NEPAL/i;
+function _shEl(id){ return document.getElementById(id); }
+function _shVal(id){ var e=_shEl(id); return e?String(e.value||'').trim():''; }
+function _shNum(x){ var n=parseInt(String(x||'').replace(/[^0-9]/g,''),10); return isNaN(n)?0:n; }
+function _shChecked(x){ var s=String(x==null?'':x).trim(); if(/未加入|非加入|なし|適用外|対象外/.test(s)) return false; if(/^(☑|■|true|有|1|○|✓|✔|あり)$/i.test(s)||/加入|適用/.test(s)) return true; if(/^(□|false|無|0|)$/i.test(s)) return false; return null; }
+function _shMark(id, why){
+  var e=_shEl(id); if(!e) return;
+  e.style.outline='2px solid #f59e0b'; e.style.outlineOffset='1px'; e.title='自動で入れた標準回答：'+why+'（違うときは選び直してください）';
+  if(!e._shMarkOff){ e._shMarkOff=true; e.addEventListener('change',function(){ e.style.outline=''; e.title=''; }); }
+}
+function _shSet(id, val, why, done){
+  var e=_shEl(id); if(!e||!val) return false;
+  if(String(e.value||'').trim()) return false;
+  e.value=val; if(String(e.value)!==String(val)) return false;
+  _shMark(id, why); if(done) done.push(why); return true;
+}
+function _shAgentNorm(n){
+  var s=String(n||'').replace(/[\s　]/g,'');
+  if(!s) return '';
+  if(s==='中林俊介') return '中林 俊介';
+  if(s==='田中綾美') return '田中 綾美';
+  return String(n).trim();
+}
+// 保存してある値が、選択肢に無い名前（例：別紙参照）のときも消さない
+function _shKeepOption(sel, val){
+  if(!sel||sel.tagName!=='SELECT'||!val) return;
+  for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===val) return; }
+  var o=document.createElement('option'); o.value=val; o.textContent=val; sel.appendChild(o);
+}
+async function _shinseiAssist(caseId){
+  if(!_SH_ON||!caseId) return;
+  var done=[];
+  // 取次者
+  try{
+    var ag=_shEl('f_agentName');
+    if(ag && !_shVal('f_agentName')){
+      var r=await sb('cases?select=toritsugisha&id=eq.'+encodeURIComponent(caseId));
+      var nm=_shAgentNorm(r&&r[0]&&r[0].toritsugisha);
+      if(nm){
+        _shKeepOption(ag, nm); ag.value=nm;
+        if(ag.value===nm){ if(typeof onAgentNameChange==='function') onAgentNameChange(); _shMark('f_agentName','案シスの取次者'); done.push('取次者（案シスの取次者：'+nm+'）'); }
+      }
+    }
+  }catch(e){ console.warn('[shinseiAssist 取次者]', e); }
+  // 標準回答（特定技能の変更・更新の申請書だけ。ほかの様式にはこの欄が無い）
+  if(_SH_TOKUGI){
+    try{
+      var es=window._empLoadedSet||{};
+      _shSet('f_hoursEq','有','所定労働時間が通常の労働者と同等＝有',done);
+      var pay=_shNum(_shVal('f_pay')), jp=_shNum(_shVal('f_payJp'));
+      if(!(pay&&jp&&pay<jp)) _shSet('f_payEq','有','報酬が日本人と同等以上＝有',done);
+      _shSet('f_q6','無','(6) 外国人を理由に異なった待遇＝無',done);
+      var k1=_shChecked(es.insKenpo), k2=_shChecked(es.insPension);
+      if(k1===true||k2===true) _shSet('f_ins1','有','健康保険・厚生年金の適用事業所＝有（雇用条件セットの保険）',done);
+      var k3=_shChecked(es.insLabor), k4=_shChecked(es.insEmp);
+      if(k3===true||k4===true) _shSet('f_ins2','有','労災保険・雇用保険の適用事業所＝有（雇用条件セットの保険）',done);
+      var ded=['deductHousing','deductUtility','deductFood','deductOther1Amount'].some(function(k){ return _shNum(es[k])>0; });
+      if(ded) _shSet('f_a25','有','25 定期的に負担する費用（寮費・食費などの控除あり）＝有',done);
+      var nat=_shVal('f_nationality');
+      if(nat && _SH_A24_RE.test(nat)) _shSet('f_a24','有','24 本国の手続（'+nat+'）＝有',done);
+    }catch(e){ console.warn('[shinseiAssist 標準回答]', e); }
+  }
+  try{ if(typeof p==='function') p(); }catch(e){}
+  _shNotice(done);
+}
+var _SH_BLANK_DEF=[
+  ['f_agentName','取次者の氏名',1],
+  ['f_curPeriod','今の在留期間',1],
+  ['f_coEi','雇用保険適用事業所番号',2],
+  ['f_totalY','特定技能1号での通算在留期間',3],
+  ['f_payJp','同等の業務の日本人の月額報酬',3],
+  ['f_hoursEq','所定労働時間が通常の労働者と同等か（有・無）',3],
+  ['f_payEq','報酬が日本人と同等以上か（有・無）',3],
+  ['f_q6','(6) 外国人を理由に異なった待遇（有・無）',3],
+  ['f_ins1','健康保険・厚生年金の適用事業所（有・無）',3],
+  ['f_ins2','労災保険・雇用保険の適用事業所（有・無）',3],
+  ['f_ti1Occ','技能実習の職種',4],
+  ['f_ti1Ope','技能実習の作業',4]
+];
+// 1＝全様式　2＝特定技能・技人国　3＝特定技能だけ　4＝特定技能で技能実習2号修了のとき
+function _shinseiBlankList(){
+  if(!_SH_ON) return [];
+  var gjk=_SH_PAGE==='shinsei_gjk', out=[];
+  _SH_BLANK_DEF.forEach(function(d){
+    var lv=d[2];
+    if(lv===2 && !(_SH_TOKUGI||gjk)) return;
+    if(lv>=3 && !_SH_TOKUGI) return;
+    if(lv===4 && _shVal('f_sk')!=='jisshu') return;
+    if(!_shEl(d[0])) return;
+    if(d[0]==='f_totalY'){ if(_shVal('f_totalY')||_shVal('f_totalM')) return; }
+    else if(_shVal(d[0])) return;
+    out.push(d[1]);
+  });
+  return out;
+}
+function _shNotice(done){
+  try{
+    var box=_shEl('_shNoticeBox');
+    var inner=document.querySelector('.fp .fp-inner')||document.querySelector('.fp');
+    if(!inner) return;
+    if(!box){ box=document.createElement('div'); box.id='_shNoticeBox'; inner.insertBefore(box, inner.firstChild); }
+    var bl=_shinseiBlankList(), h='';
+    if(done&&done.length) h+='<div style="font-weight:700;color:#b45309;">🔶 自動で入れた欄（オレンジの枠）</div><div>・'+done.map(_shEsc).join('<br>・')+'</div><div style="color:#92400e;margin-top:2px;">違うときはサイドバーで選び直してください。</div>';
+    if(bl.length) h+='<div style="font-weight:700;color:#b91c1c;margin-top:'+(h?'6px':'0')+';">⚠️ 空欄のままの欄</div><div>・'+bl.map(_shEsc).join('<br>・')+'</div>';
+    box.style.cssText=h?'background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 8px;margin:8px 0;font-size:11px;line-height:1.5;color:#1f2937;':'display:none';
+    box.innerHTML=h;
+  }catch(e){}
+}
+function _shEsc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+// 申請人の作成年月日：［今日］［作成日と同じ］
+function _shSigFill(mode){
+  var y,m,d;
+  if(mode==='org'){ y=_shVal('f_oSigY'); m=_shVal('f_oSigM'); d=_shVal('f_oSigD'); if(!y){ if(typeof showToast==='function') showToast('所属機関の作成日が空です'); return; } }
+  else { var n=new Date(); y=String(n.getFullYear()); m=String(n.getMonth()+1); d=String(n.getDate()); }
+  [['f_aSigY',y],['f_aSigM',m],['f_aSigD',d]].forEach(function(a){ var e=_shEl(a[0]); if(e) e.value=a[1]; });
+  try{ if(typeof p==='function') p(); }catch(e){}
+}
+if(_SH_ON){
+  (function(){
+    function init(){
+      try{
+        var d=_shEl('f_aSigD');
+        if(d && !_shEl('_shSigBtns')){
+          var w=document.createElement('div'); w.id='_shSigBtns'; w.style.cssText='display:flex;gap:4px;margin-top:3px;';
+          var bs='font-size:10px;padding:2px 8px;border:1px solid #94a3b8;background:#f8fafc;border-radius:5px;cursor:pointer;';
+          w.innerHTML='<button type="button" style="'+bs+'" onclick="_shSigFill(\'today\')">📅 今日</button><button type="button" style="'+bs+'" onclick="_shSigFill(\'org\')" title="所属機関の作成年月日と同じ日にします">＝所属機関の作成日</button>';
+          (d.parentNode&&d.parentNode.parentNode||d.parentNode).appendChild(w);
+        }
+      }catch(e){}
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+  })();
+}

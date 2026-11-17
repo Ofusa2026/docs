@@ -185,7 +185,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">🪪 在留資格変更許可申請書　特定活動（その他）　<span style="font-size:11px;font-weight:normal;opacity:.8;">全6ページ（申請人等作成用1〜4・所属機関等作成用1〜2）</span></div>
-    <div class="ver">ver.20261117.06</div>
+    <div class="ver">ver.20261117.08</div>
   </div>
   <div class="bar-btns">
     <span id="fmSwitch" style="display:inline-flex;gap:4px;margin-right:10px;align-items:center;">
@@ -798,7 +798,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=1794990001"></script>
+<script src="ofusa_common.js?v=1794990002"></script>
 <script>
 // 業種番号: 入管省令様式「別紙 業種一覧」(2024年版) に基づく
 // 1=農林業, 2=漁業, 4=建設業, 5=食料品(製造), 11=輸送用機械器具,
@@ -2150,6 +2150,7 @@ async function loadFromDB(passedInfo){
     try{ await _fillKyoryoku32(caseId, companyId, companyName, info); }catch(_e){ console.warn('[32 協力確認書]', _e); }
     // ver.20260917.02: (23)は既定「有」（案件読込後も空なら有をセット。手動変更は可能）
     (function(){ var e=document.getElementById('f_a23'); if(e && !e.value){ e.value='有'; } })();
+    try{ if(typeof _shinseiAssist==='function') await _shinseiAssist(caseId); }catch(_sa){ console.warn('[shinseiAssist]',_sa); }   // ver.20261117.08: 取次者・標準回答・空欄のお知らせ
     p(); showToast('✅ 全7ページにデータを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
