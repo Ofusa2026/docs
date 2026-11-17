@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.21</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.22</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.22',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '🔧 申請書類一式（スキャン自動作成）：ファイル名に「署名済」と付いたドライブの書類（人材フォルダに直に置いたもの）も、署名済みの書類として綴じるようにしました。1つのファイルに1-5号・1-6号などをまとめてあっても、ページごとに見分けて一覧表の行に入れます',
+      '🔧 申請書類一式：農業・漁業の一覧表（第3表）で、使わない「派遣」の表のページまで綴じられていたのを直しました',
+    ]
+  },
   {
     version: 'ver.20261117.21',
     date: '2026-11-17',
@@ -4172,6 +4181,10 @@ function _isaRestPlace(S){
   return {at:at, tail:tail};
 }
 function _isaIsDoc(f){ return f && !f.isFolder && (/pdf|image\//i.test(String(f.mime||'')) || /\.(pdf|png|jpe?g)$/i.test(String(f.name||''))); }
+// ver.20261117.22: 署名済みのファイルかどうか（フォルダ名か、ファイル名に「押印済・サイン済・署名済」）。
+//   前はフォルダ名しか見ていなかったので、人材フォルダに直に置いた「…雇用条件書_署名済_….pdf」が署名済みとして扱われず、一式に入っていなかった
+var ISA_SIGNED_RE=/企業押印済|押印済|サイン済|署名済/;
+function _isaSignedPath(f){ var t=String((f&&f.path)||'')+'/'+String((f&&f.name)||''); try{ t=t.normalize('NFKC'); }catch(e){} return ISA_SIGNED_RE.test(t); }
 async function _isaDriveFiles(c, p, co){
   var out={sign:[], up:[], co:[], note:[]};
   var du=p&&p.drive_urls; if(typeof du==='string'){ try{ du=JSON.parse(du); }catch(e){ du=[du]; } }
@@ -4193,7 +4206,7 @@ async function _isaDriveFiles(c, p, co){
     var _sd=_isaScanDirOf(all); out.scan=_sd.scan; out.appDir=_sd.appDir;   // ver.20261117.18: 一式の保存先（★在留資格申請書類／03 スキャン）
     all.filter(_isaIsDoc).forEach(function(f){
       var path=String(f.path||''); try{ path=path.normalize('NFKC'); }catch(e){}
-      if(/企業押印済|押印済|サイン済/.test(path)) out.sign.push(f);
+      if(_isaSignedPath(f)) out.sign.push(f);
       else if(/収集資料|アップロード|人材資料/.test(path)) out.up.push(f);
     });
   } else out.note.push('人材のドライブフォルダが案シスに登録されていません');
@@ -4204,7 +4217,7 @@ async function _isaDriveFiles(c, p, co){
     var upItems=[];
     if(upId===pid){ upItems=(all||[]).filter(function(f){ return String(f.path||f.name||'').indexOf('/')<0; }); }   // 同じフォルダなら、すぐ下のファイルだけ
     else { var t3=await _uP; upItems=(t3&&t3.status==='ok'&&Array.isArray(t3.items))?t3.items:[]; }
-    upItems.filter(_isaIsDoc).forEach(function(f){ if(seenId[f.id]) return; seenId[f.id]=1; var path=String(f.path||''); try{ path=path.normalize('NFKC'); }catch(e){} if(/企業押印済|押印済|サイン済/.test(path)) out.sign.push(f); else out.up.push(f); });
+    upItems.filter(_isaIsDoc).forEach(function(f){ if(seenId[f.id]) return; seenId[f.id]=1; if(_isaSignedPath(f)) out.sign.push(f); else out.up.push(f); });
   }
   var cids=[], seenCo={};
   ['drive_url','drive_url2','drive_url3','drive_url4','drive_url5'].forEach(function(k){ var id=_isaFolderId(co&&co[k]); if(id && cids.indexOf(id)<0) cids.push(id); });   // ver.20261116.23: 会社のドライブURL2〜5も
@@ -4559,6 +4572,7 @@ function _isaTitle(t, keep){
 //   ・Saysay で作らない 1-5号・1-6号・賃金の支払は、署名済みのページをその行にそのまま綴じる
 var ISA_SIGN_NAME=[['1_6b',/1[-_－]?6号?別紙|賃金の支払/],['1_17',/1[-_－]?17(?!\d)|支援計画/],['1_32',/1[-_－]?32(?!\d)|業務内容/],['1_16',/1[-_－]?16(?!\d)|雇用の経緯|経緯/],
   ['1_10',/1[-_－]?10(?!\d)|技能移転/],['1_3',/1[-_－]?3(?![\d])|受診者|申告書/],['1_6',/1[-_－]?6(?!\d)|雇用条件/],['1_5',/1[-_－]?5(?!\d)|雇用契約/],['juuyou',/重要事項/]];
+var ISA_SIGN_NAME_MAXP=2;   // ver.20261117.22: ファイル名だけで様式を決めてよいページ数
 var ISA_SIGN_FORM={'1-5':'1_5','1-6':'1_6','1-6別紙':'1_6b','1-3別紙':'1_3','1-17':'1_17','1-10':'1_10','1-16':'1_16','1-32':'1_32','重要事項説明書':'juuyou'};
 var ISA_SIGN_LABEL={'1_5':'1-5号 雇用契約書','1_6':'1-6号 雇用条件書','1_6b':'賃金の支払（1-6号別紙）','1_3':'1-3号別紙 受診者の申告書','1_17':'1-17号 支援計画書','1_10':'1-10号 技能移転に係る申告書','1_16':'1-16号 雇用の経緯に係る説明書','1_32':'1-32号 業務内容に関する誓約書','juuyou':'重要事項事前説明書','other':'その他'};
 // 一覧表の行 → サイン書類のキー
@@ -4598,9 +4612,13 @@ async function _isaSignPages(files, prog){
     var imgs=null; try{ imgs=await _isaFileImgs(f); }catch(e){ console.warn(e); }
     if(!imgs || !imgs.length){ SG.note.push('署名済みのファイルを読めませんでした：'+f.name); continue; }
     SG.used[f.id]=1;
-    var k=_isaSignKeyByName(f.name), fp=String(f.path||''); try{ fp=fp.normalize('NFKC'); }catch(e){}
+    var k0=_isaSignKeyByName(f.name), fp=String(f.path||''); try{ fp=fp.normalize('NFKC'); }catch(e){}
+    // ver.20261117.22: ファイル名で様式を決めるのは ISA_SIGN_NAME_MAXP 枚までのファイルだけ。
+    //   「雇用条件書_署名済」という名前で 1-5号・1-6号・別紙…を1つにまとめたファイルがあり、全ページが1-6号になって1-5号が「不足」になっていた。
+    //   それより多いページはページごとに見分け、見分けられなかったページだけファイル名の様式にする
+    var k=(k0 && imgs.length<=ISA_SIGN_NAME_MAXP)?k0:'';
     var prio=/企業押印済/.test(fp)?3:(/押印済/.test(fp)?2:1);   // ver.20261116.22: 企業の押印が入ったものを優先
-    imgs.forEach(function(im, p){ var pg={u:im.u, w:im.w, h:im.h, fid:f.id, fname:f.name, p:p+1, n:imgs.length, part:'', prio:prio, key:k||'', _no:++seq, by:k?'name':''}; SG.pages.push(pg); if(!k) toAI.push(pg); });
+    imgs.forEach(function(im, p){ var pg={u:im.u, w:im.w, h:im.h, fid:f.id, fname:f.name, p:p+1, n:imgs.length, part:'', prio:prio, key:k||'', hint:k0||'', _no:++seq, by:k?'name':''}; SG.pages.push(pg); if(!k) toAI.push(pg); });
   }
   if(toAI.length){
     if(prog) prog('署名済みの書類のページを見分けています（'+toAI.length+'ページ）…');
@@ -4610,7 +4628,8 @@ async function _isaSignPages(files, prog){
       var arr=[]; for(var x=0;x<bt.length;x++){ var sm=await _isaShrink(bt[x].u, 1000); if(sm) arr.push({no:bt[x]._no, img:sm}); }
       var res=null; try{ res=await _isaFnAt('isa-precheck',{action:'classify', pages:arr}); }catch(e){ SG.note.push('署名済みのページを見分けられませんでした：'+e.message); }
       var by={}; ((res&&res.pages)||[]).forEach(function(r){ by[r.p]=r; });
-      bt.forEach(function(pg){ var r=by[pg._no]; pg.key=r?(ISA_SIGN_FORM[String(r.form||'').replace(/\s/g,'')]||''):''; pg.part=r?String(r.part||''):''; pg.sign=r?String(r.sign||''):''; pg.by='ai'; });
+      bt.forEach(function(pg){ var r=by[pg._no]; pg.key=r?(ISA_SIGN_FORM[String(r.form||'').replace(/\s/g,'')]||''):''; pg.part=r?String(r.part||''):''; pg.sign=r?String(r.sign||''):''; pg.by='ai';
+        if(!pg.key && pg.hint && !(r && String(r.form||'').trim())){ pg.key=pg.hint; pg.by='name'; } });   // ver.20261117.22: 見分けられなかったページはファイル名の様式
     };
     for(var w=0;w<3;w++) ws.push((async function(){ while(q.length){ await run(q.shift()); } })());
     await Promise.all(ws);
