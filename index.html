@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.06</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1452,7 +1452,9 @@ async function idxAutoSelectFromUrl(){
     await idxJumpByPaste();
     if(!idxSelectedCase) return;
     // ver.20261116.16: 案シスの「スキャン書類作成」から ?caseId=..&scanset=1 で開かれたら、申請書類一式の確認画面まで進める
-    if((q.get('scanset')||'')==='1'){ setTimeout(async function(){ try{ await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
+    //   ver.20261117.06: &scanset=auto なら確認画面で止まらずに作成まで進める（直しが要るときだけ確認画面で止める）
+    var _ssq=(q.get('scanset')||'');
+    if(_ssq==='1' || _ssq==='auto'){ setTimeout(async function(){ try{ await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmState.isaAuto=(_ssq==='auto'); _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
     var doc=(q.get('doc')||'').trim();
     // ver.20260724.06: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
     if((q.get('mode')||'')==='slot'){
@@ -1854,6 +1856,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.07',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📑 案シスのタスク「スキャン作成」の［📑 申請書類一式を作る］から開いたときは、確認画面で止まらずに作成まで進むようにしました。分野が分からない・一覧表を取れなかった・署名済みで様式が分からないページがある、のときだけ確認画面で止めて理由を出します。',
+      '↩ 申請前チェックの結果の画面に「🧐 確かめてほしいところ」（どれかを選ぶ行に〇が付いていない、など）と［↩ 確認画面で直す］を足しました。直してそのまま作り直せます。'
+    ]
+  },
   {
     version: 'ver.20261117.06',
     date: '2026-11-17',
@@ -4146,7 +4157,15 @@ async function _isaSetStart(targets){
     _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
-    ov.remove(); _isaRender();
+    // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
+    _isaSt.auto=!!st.isaAuto; st.isaAuto=false;
+    ov.remove();
+    if(_isaSt.auto){
+      var _stop=_isaAutoStops(_isaSt);
+      if(!_stop.length){ _isaSetRun(); return; }
+      _isaSt.autoStop=_stop;
+    }
+    _isaRender();
   }catch(e){ ov.remove(); alert('申請書類一式の準備でエラーが発生しました：'+e.message); console.error(e); }
 }
 // ver.20261116.23: 入管の一覧表の毎朝の自動取得が止まっていないか・最近改定されたかを知らせる
@@ -4163,6 +4182,35 @@ async function _isaIchiranFresh(K, R){
     var rd=new Date(2018+(+m[1]), +m[2]-1, +m[3]); if((Date.now()-rd.getTime())<30*86400000) fresh.push((/_hyo1/.test(k)?'第1表':(/_hyo2_/.test(k)?'第2表':'第3表'))+'（'+it.revised+'）'); });
   if(bad.length) K.warn.unshift('次の一覧表は最新を取れていません（前のものを使います）：'+bad.join('、'));
   if(fresh.length) K.warn.unshift('📢 入管の一覧表が最近改定されました：'+fresh.join('、'));
+}
+// ver.20261117.06: 自動で作るとき、作る前に止める理由（ここに当たると確認画面で止める）
+//   ・認定・変更で分野が分からない（第3表が付かない）　・一覧表が取れなかった表がある　・署名済みで様式が分からないページがある
+function _isaAutoStops(S){
+  var out=[];
+  if(S.K.app!=='koshin' && !S.K.field) out.push('分野が分からないので、第3表（分野別）が付きません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください');
+  if((S.tables||[]).length < (S.K.keys||[]).length) out.push('入管の一覧表を取れなかった表があります（下の⚠を見てください）');
+  if(S.sg && (S.sg.other||[]).length) out.push('署名済みのスキャンに、どの様式か分からないページが'+S.sg.other.length+'枚あります。［✍ 署名済みの付け替え］で行を選んでください');
+  return out;
+}
+// 作ったあとに確かめてほしいところ（結果の画面に出す。直すときは［↩ 確認画面で直す］）
+function _isaReviewList(S){
+  var out=[], seenG={};
+  (S.tables||[]).forEach(function(t){ t.lines.forEach(function(L){
+    if(!L.group || L.val==='有') return;
+    var no=String(L.r.no||''); if(seenG[t.key+'_'+no]) return;
+    var any=t.lines.some(function(M){ return M.group && String(M.r.no||'')===no && M.val==='有'; });
+    if(any) return; seenG[t.key+'_'+no]=1;
+    var head=t.lines.filter(function(M){ return M.group && String(M.r.no||'')===no && M.r.name; })[0];   // まとまりの見出し（「以下のいずれかの書類 日本語能力」など）
+    var nm=head ? String(head.r.name).replace(/^以下のいずれかの書類\n?/,'').split('\n')[0].trim() : '';
+    out.push('どれかを選ぶ行に〇が付いていません：'+(/_hyo1/.test(t.key)?'第1表':(/_hyo2_/.test(t.key)?'第2表':'第3表'))+' No.'+no+'　'+String(nm||_isaRowName(L)||L.name||'').split('\n')[0].slice(0,30));
+  }); });
+  (S.restSign||[]).forEach(function(g){ if(!g.on && g.key!=='other') out.push('署名済みのうち、一覧表の行に当てはまらず綴じていないページ：'+g.label+'（'+(g.pages||[]).length+'枚）'); });
+  (S.K.warn||[]).forEach(function(w){ out.push(w); });
+  return out;
+}
+function _isaBackToEdit(){
+  var m=document.getElementById('isaPcModal'); if(m) m.remove();
+  if(_isaSt){ _isaSt.autoStop=null; _isaRender(); }
 }
 function _isaRender(){
   var S=_isaSt; if(!S) return;
@@ -4188,6 +4236,7 @@ function _isaRender(){
     +'<div style="background:#fff;border-radius:14px;max-width:720px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">'
     +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">📎 申請書類一式（入管の提出書類一覧表つき）</div>'
     +'<div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(S.info.applicant||'')+'　第2表：'+E(S.K.hyo2)+'　分野：'+E(S.K.field||'未設定')+'</div></div>'
+    +((S.autoStop||[]).length?'<div style="padding:9px 18px;background:#fef2f2;color:#b91c1c;font-size:12.5px;font-weight:700;border-bottom:1px solid #fecaca;">✋ 自動で作る前に確かめてください<div style="font-weight:600;font-size:12px;margin-top:3px;">・'+S.autoStop.map(E).join('<br>・')+'</div><div style="font-weight:600;font-size:11.5px;color:#7f1d1d;margin-top:3px;">この画面で直せるものは直して、下の［作成して結合］を押してください（このまま作ることもできます）</div></div>':'')
     +(warn.length?'<div style="padding:8px 18px;background:#fffbeb;color:#92400e;font-size:12px;">⚠ '+warn.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="padding:0 18px 14px;overflow-y:auto;flex:1;">'+rows+rest+'</div>'
     +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:10px;align-items:center;"><div style="flex:1;font-size:11px;color:#64748b;">「作成して結合」で、一覧表に〇を付けたPDF（1〜2分）→ Saysayの書類 → ドライブの書類を番号順に1本にします'
@@ -4271,7 +4320,7 @@ async function _isaSetRun(){
     }
     ov.style.display='none';
     // ver.20261116.19: AIチェックをしたとき・不足があるときは結果の画面へ（そこで不足書類のお知らせを付けるか選んで印刷）
-    if(S.pcOn!==false || _isaMissingRows(S).length){ _isaPcShow(S, pcRes, collected, failed); return; }
+    if(S.pcOn!==false || _isaMissingRows(S).length || S.auto){ _isaPcShow(S, pcRes, collected, failed); return; }   // ver.20261117.06: 自動で作ったときも結果の画面へ（印刷の窓はボタンで開く）
     if(failed.length) alert('次のものは入れられませんでした：\n・'+failed.join('\n・'));
     S.pc={res:_isaBasicResult(S), basic:true, items:[], attach:false, collected:collected, failed:[]};
     _isaPcPrint();
@@ -4560,7 +4609,7 @@ function _isaPcShow(S, res, collected, failed){
   _isaPcMerge(S, res);
   var items=[], seen={};
   res.attachments.forEach(function(a){ if(a.status!=='missing') return; var nm=String(a.checklist_name||a.name||'').trim().replace(/^[（(][0-9０-９]+[)）]\s*/,''); if(!nm || seen[nm]) return; seen[nm]=1; items.push({hyou:String(a.hyou||'other'), name:nm, yotei:'', riyu:''}); });
-  S.pc={res:res, basic:basic, items:items, attach:items.length>0, collected:collected, failed:failed||[]};
+  S.pc={res:res, basic:basic, items:items, attach:items.length>0, collected:collected, failed:failed||[], review:_isaReviewList(S)};
   _isaPcRender();
 }
 function _isaPcRender(){
@@ -4587,12 +4636,14 @@ function _isaPcRender(){
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
     +(P.res.meta.note?'<div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">メモ：'+E(P.res.meta.note)+'</div>':'')
+    +((P.review||[]).length?'<div style="font-size:12px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:7px 10px;margin-bottom:8px;"><b>🧐 確かめてほしいところ</b>（直すときは下の［↩ 確認画面で直す］）<div style="margin-top:3px;">・'+P.review.map(E).join('<br>・')+'</div></div>':'')
     +(cnt.out?'<div style="font-weight:800;font-size:13px;margin-top:8px;color:#c62828;">⛔ 提出前に直すもの</div>'+list('out','#c62828'):'')
     +(cnt.warn?'<div style="font-weight:800;font-size:13px;margin-top:10px;color:#b26a00;">⚡ 目で確認するもの</div>'+list('warn','#b26a00'):'')
     +'<div style="font-weight:800;font-size:13px;margin-top:14px;color:#4c1d95;">📎 不足書類のお知らせ</div>'+notice
     +'</div>'
     +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div style="flex:1;font-size:11px;color:#64748b;min-width:160px;">✅の中身とページ番号はExcelに入っています</div>'
     +'<button onclick="document.getElementById(\'isaPcModal\').remove()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
+    +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
     +'<button onclick="_isaPcPrint()" style="padding:10px 16px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;">🖨 印刷画面を開く</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
