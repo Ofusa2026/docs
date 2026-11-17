@@ -494,7 +494,7 @@ function _aiCheck16Local(rules){
   var ch=_mw16_num('es_calcHourly');
   if(ch && monthly && th>0){
     var expH=(monthly+allowIn)/th;
-    if(Math.abs(expH-ch)>1) add('warn','時給換算','換算時給が計算と合いません','（月給 '+monthly+(allowIn?' ＋ 手当 '+allowIn+'［'+allowInNames.join('・')+'］':'')+'）÷ 月所定 '+th.toFixed(1)+'h ＝ '+expH.toFixed(1)+'円 に対し、換算時給欄は '+ch+'円。入れる手当の範囲を確認してください（固定残業・夜勤など割増の手当、通勤・家族・住宅・精皆勤などは除いて計算）。','P5');
+    if(Math.abs(expH-ch)>1) add('warn','時給換算','換算時給が計算と合いません','（月給 '+monthly+(allowIn?' ＋ 手当 '+allowIn+'［'+allowInNames.join('・')+'］':'')+'）÷ 月所定 '+th.toFixed(1)+'h ＝ '+expH.toFixed(1)+'円 に対し、換算時給欄は '+ch+'円。入れる手当の範囲を確認してください（固定残業・夜勤など割増の手当、通勤・家族・住宅・精皆勤などは除いて計算）。'+(window._docCheckMode?'（書類を開くと、計算どおりに直ります）':''),'P5');
     else add('ok','時給換算','換算時給は（月給＋手当）÷月所定と一致','換算時給 '+ch+'円。','P5');
   }
   var foA=_mw16_num('es_fixedOTAmount'), foH=_mw16_num('es_fixedOTHours');
@@ -5540,6 +5540,15 @@ function _srcBuildMap(){
 }
 function _srcIsEmpty(v){ return v==null || String(v).trim()===''; }
 function _srcLabel(g,k){ var L=_SRC_GRP[g]&&_SRC_GRP[g].lbl&&_SRC_LBL[_SRC_GRP[g].lbl]; return (L&&L[k])||k; }
+// ver.20261117.15: 名前の表に無い項目（emp_ins_no・shiftFlg など）は、項目名のかわりにサイドバーの欄の名前を出す
+var _SRC_LBL_EXTRA={emp_ins_no:'雇用保険適用事業所番号', labor_ins_no:'労働保険番号', corp_no:'法人番号', shiftFlg:'シフト制の有無', flexFlg:'変形労働時間制の有無', overtimeFlg:'時間外労働の有無', holidayType:'休日の種類', jj_emp_ins_no:'雇用保険適用事業所番号', job_permit_no:'職業紹介の許可番号', job_permit_date:'職業紹介の許可年月日'};
+function _srcLabelEl(g,k,el){
+  var L=_SRC_GRP[g]&&_SRC_GRP[g].lbl&&_SRC_LBL[_SRC_GRP[g].lbl];
+  if(L&&L[k]) return L[k];
+  if(_SRC_LBL_EXTRA[k]) return _SRC_LBL_EXTRA[k];
+  try{ var fg=el&&el.closest&&el.closest('.fg'), lb=fg&&fg.querySelector('label'); var t=lb?String(lb.childNodes[0]&&lb.childNodes[0].nodeType===3?lb.childNodes[0].textContent:lb.textContent).trim():''; if(t) return t; }catch(e){}
+  return k;
+}
 function _srcEmptyInfo(el){
   var map=_srcBuildMap(), list=(map[el.id]||[]).slice();
   var es=_srcEmpSet(), R=window._srcRows||{}, base=el.id.replace(/^(es_|f_)/,'');
@@ -5551,7 +5560,7 @@ function _srcEmptyInfo(el){
   var out=list.map(function(x){
     var row = x.g==='emp' ? es : (R[_SRC_GRP[x.g].tb]||null);
     var v = row ? row[x.k] : undefined;
-    return {g:x.g, k:x.k, label:_srcLabel(x.g,x.k), state: !row ? 'unknown' : (_srcIsEmpty(v) ? 'empty' : 'filled'), val:v};
+    return {g:x.g, k:x.k, label:_srcLabelEl(x.g,x.k,el), state: !row ? 'unknown' : (_srcIsEmpty(v) ? 'empty' : 'filled'), val:v};
   });
   return out;
 }
@@ -5612,6 +5621,7 @@ function _srcRedItems(){
     document.querySelectorAll('.fp input[id], .fp select[id], .fp textarea[id]').forEach(function(el){
       if(el.type==='hidden'||el.type==='checkbox'||el.type==='radio'||el.id==='caseSelect'||/Select$/.test(el.id)||/^sp_/.test(el.id)||el.offsetParent===null) return;
       if(!_srcIsEmpty(el.value) || /(En|Vi|Id|My|Ne|Km|Zh|Th|Ko|Tr)$/.test(el.id)) return;
+      if(el.id==='f_payJp' && typeof _SH_ON!=='undefined' && _SH_ON && _shPayJpBlankOk()) return;   // ver.20261117.15
       var info=_srcEmptyInfo(el); if(!info) return;
       var _hd=_srcHourlyOrDaily();
       var emp=info.filter(function(x){ return x.state==='empty' && !_SRC_OPT.test(x.k) && !(_hd && /^(salaryMonthly|calcHourly)$/.test(x.k)); }); if(!emp.length) return;   // 時給・日給の人は月給が空でふつう
@@ -5627,9 +5637,11 @@ window._batchCheck=function(){
   var out=[];
   try{
     if(typeof _p16AutoCalcMonthly==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) _p16AutoCalcMonthly();
+    if(!window._docCheckMode && typeof _p16HourlyOnLoad==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){ _p16HourlyOnLoad(); if(typeof p==='function') p(); }   // ver.20261117.15: まとめPDFでも、計算し直した換算時給で出す
     if(typeof _p16PrintCheck==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){
       var r=_p16PrintCheck(); r.probs.forEach(function(x){ out.push(x); }); if(r.miss.length) out.push('空欄：'+r.miss.join('、'));
     }
+    try{ if(typeof _SH_ON!=='undefined' && _SH_ON){ var _sbl=_shinseiBlankList(); if(_sbl.length) out.push('空欄：'+_sbl.join('、')); } }catch(_sbe){}   // ver.20261117.15: 窓口申請書の空欄
     if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname) && typeof window._wlSummary==='function'){ var _wls=window._wlSummary(); if(_wls) out.push('⛔ 訳が別の言語になっています（'+_wls+'）'); }
     if(typeof window._jyTotalsIssue==='function'){ window._jyTotalsIssue().forEach(function(x){ out.push(x); }); }
     if(typeof jyPrintCheck==='function'){
@@ -7414,6 +7426,11 @@ var _SH_BLANK_DEF=[
   ['f_ti1Ope','技能実習の作業',4]
 ];
 // 1＝全様式　2＝特定技能・技人国　3＝特定技能だけ　4＝特定技能で技能実習2号修了のとき
+function _shPayJpBlankOk(){   // ver.20261117.15: 同等の日本人の報酬は、第2表が要らない案件・比べる日本人がいない会社では空欄でよい
+  if(window._shHyo2Need===false) return true;
+  var _es=window._empLoadedSet||{};
+  return /日本人.{0,8}(なし|無し|いない|居ない|おらず|不在)|該当(者)?(なし|無し|しない)/.test(String(_es.jpCompReason||''));
+}
 function _shinseiBlankList(){
   if(!_SH_ON) return [];
   var gjk=_SH_PAGE==='shinsei_gjk', out=[];
@@ -7424,7 +7441,7 @@ function _shinseiBlankList(){
     if(lv===4 && _shVal('f_sk')!=='jisshu') return;
     if(!_shEl(d[0])) return;
     // 同等の日本人の報酬：第2表が要らない案件（更新・受入経験あり・2人目以降）と、比べる日本人がいない会社は空欄でよい
-    if(d[0]==='f_payJp'){ if(window._shHyo2Need===false) return; var _es=window._empLoadedSet||{}; if(/日本人.{0,8}(なし|無し|いない|居ない|おらず|不在)|該当(者)?(なし|無し|しない)/.test(String(_es.jpCompReason||''))) return; }
+    if(d[0]==='f_payJp' && _shPayJpBlankOk()) return;
     if(d[0]==='f_totalY'){ if(_shVal('f_totalY')||_shVal('f_totalM')) return; }
     else if(_shVal(d[0])) return;
     out.push(d[1]);
