@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.19</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.20</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.20',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '🔧 申請書類一式（スキャン用のまとめ）で、1-25号・1-11-1号などが空欄のまま入ることがあったのを直しました（書類のデータを読み終わるまで待ってから取り込みます）',
+      '🔧 入管の提出書類一覧表の文字が詰まって読みにくかったのを直しました（Excelと同じ幅の字体で作り直しました）',
+      '🔧 申請書類一式で、一覧表の行に入らなかったドライブの書類（2枚目以降の健康診断票・顔写真・在留カード・パスポートなど）がいちばん最後にまとめて綴じられていたのを直しました。健康診断票は健康診断個人票のうしろ、顔写真・在留カード・パスポートは申請書のうしろに並びます'
+    ]
+  },
   {
     version: 'ver.20261117.18',
     date: '2026-11-17',
@@ -4122,6 +4132,36 @@ function _isaMatchRegex(rowName, files, used){
   return [];
 }
 function _isaMatchFile(rowName, files, used){ var c=_isaMatchCore(rowName, files, used); return c.length?c:_isaMatchRegex(rowName, files, used); }
+// ver.20261117.20: 一覧表のどの行にも入らなかったドライブの書類の置き場所（前は全部いちばん最後に綴じていたので、順番がばらばらだった）
+//   ① 一覧表の行と名前・言葉の手がかりが合う → その行のうしろ（例：健康診断票_2〜4 → 健康診断個人票の行）
+//   ② 顔写真・在留カード・パスポート → 申請書の行のうしろ（写真は申請書に貼るもの）。写真 → 在留カード → パスポートの順
+//   ③ どれでもない → いちばん最後（今までどおり）。綴じるかどうかは変えない（並べる場所だけ）
+var ISA_ID_KINDS=[/写真|顔|photo/i, /在留カード|residence\s*card|zairyu/i, /パスポート|旅券|passport/i];
+function _isaRestPlace(S){
+  var at=new Map(), tail=[], lines=[], appL=null;
+  (S.tables||[]).forEach(function(t, ti){ (t.lines||[]).forEach(function(L){ lines.push(L);
+    if(!appL && ti===0 && /^在留(資格|期間).*申請書$/.test(String(L.name||'').split('\n')[0].trim())) appL=L; }); });
+  var nm=function(f){ var x=String((f&&f.name)||''); try{ x=x.normalize('NFKC'); }catch(e){} return x; };
+  var hits=function(L, f){
+    if(!L.name) return false;
+    if(_isaMatchCore(L.name, [f], {}).length) return true;
+    var head=String(L.name).split('\n')[0]; if(/^(以下のいずれか|・)/.test(head)) head=String(L.name).replace(/\n/g,' ');
+    for(var i=0;i<_ISA_ROW_FILE.length;i++){ if(_ISA_ROW_FILE[i][0].test(head) && _ISA_ROW_FILE[i][1].test(nm(f))) return true; }
+    return false;
+  };
+  var put=function(L, f, k){ if(!at.has(L)) at.set(L, []); at.get(L).push({f:f, k:k}); };
+  (S.restFiles||[]).forEach(function(f){
+    if(!(S.restOn||{})[f.id]) return;
+    var m=lines.filter(function(L){ return hits(L, f); }), L=m.filter(function(x){ return x.val==='有'; })[0]||m[0];
+    if(L){ put(L, f, 0); return; }
+    var kind=-1; ISA_ID_KINDS.forEach(function(re, i){ if(kind<0 && re.test(nm(f))) kind=i; });
+    if(kind>=0 && appL){ put(appL, f, kind); return; }
+    tail.push(f);
+  });
+  var sk=function(f){ return nm(f).replace(/\.[a-z0-9]{2,5}$/i,''); };   // 拡張子は見ない（パスポート → パスポート_2 の順）
+  at.forEach(function(a){ a.sort(function(x, y){ return (x.k-y.k) || sk(x.f).localeCompare(sk(y.f), 'ja', {numeric:true}); }); });
+  return {at:at, tail:tail};
+}
 function _isaIsDoc(f){ return f && !f.isFolder && (/pdf|image\//i.test(String(f.mime||'')) || /\.(pdf|png|jpe?g)$/i.test(String(f.name||''))); }
 async function _isaDriveFiles(c, p, co){
   var out={sign:[], up:[], co:[], note:[]};
@@ -4366,7 +4406,7 @@ function _isaRender(){
       }).join('');
   }).join('');
   var rest=(S.restDocs.length?'<div style="font-size:12px;margin-top:12px;color:#334155;">一覧表の行に当てはまらない Saysay の書類（最後に綴じます）：'+E(S.restDocs.map(function(d){ return _pmDocLabel(d).name||d; }).join('、'))+'</div>':'')
-    +(S.restFiles.length?'<div style="font-size:12px;margin-top:8px;color:#334155;">一覧表の行に当てはまらないドライブの書類（チェックしたものを最後に綴じます）：</div>'+S.restFiles.map(function(f){ return '<label style="display:block;font-size:11.5px;color:#475569;margin-left:8px;"><input type="checkbox" '+(S.restOn[f.id]?'checked':'')+' onchange="_isaSt.restOn[\''+f.id+'\']=this.checked"> '+E(f.name)+'</label>'; }).join(''):'');
+    +(S.restFiles.length?'<div style="font-size:12px;margin-top:8px;color:#334155;">一覧表の行に当てはまらないドライブの書類（チェックしたものを綴じます。近い行のうしろ・顔写真/在留カード/パスポートは申請書のうしろ、どれでもないものは最後）：</div>'+S.restFiles.map(function(f){ return '<label style="display:block;font-size:11.5px;color:#475569;margin-left:8px;"><input type="checkbox" '+(S.restOn[f.id]?'checked':'')+' onchange="_isaSt.restOn[\''+f.id+'\']=this.checked"> '+E(f.name)+'</label>'; }).join(''):'');
   rest+=((S.restSign||[]).length?'<div style="font-size:12px;margin-top:8px;color:#334155;">署名済みのうち一覧表の行に当てはまらないページ（チェックしたものを最後に綴じます）：</div>'+S.restSign.map(function(g,gi){ return '<label style="display:block;font-size:11.5px;color:#475569;margin-left:8px;"><input type="checkbox" '+(g.on?'checked':'')+' onchange="_isaSt.restSign['+gi+'].on=this.checked"> ✍ '+E(g.label)+'（'+E(_isaSignDesc(g.pages))+'）</label>'; }).join(''):'');
   if(S.sg && (S.sg.pages||[]).length) rest='<div style="margin-top:12px;"><button type="button" onclick="_isaSignEdit()" style="font-size:12px;padding:6px 12px;border-radius:8px;border:1px solid #a855f7;background:#faf5ff;color:#6d28d9;font-weight:700;cursor:pointer;">✍ 署名済みのページ（'+S.sg.pages.length+'枚）を確認・付け替え</button>'+(S.sg.pages.some(function(pg){ return !pg.key; })?'<span style="font-size:11px;color:#b45309;margin-left:6px;">様式が分からないページがあります</span>':'')+'</div>'+rest;
   var warn=S.K.warn.concat(S.note||[]);
@@ -4434,7 +4474,9 @@ async function _isaSetRun(){
     if(unmarked.length) failed.push('作れなかったため、一覧表の〇有を外した行：'+unmarked.join('、'));
     // 2) 一覧表の番号順に並べる（一覧表は最後に先頭へ入れる）
     var seen={};
-    S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val!=='有') return;
+    var RP=_isaRestPlace(S), putF=function(f){ if(fileHtml[f.id] && !seen['f'+f.id]){ seen['f'+f.id]=1; collected.push({dk:'drive', html:fileHtml[f.id]}); } };   // ver.20261117.20
+    S.tables.forEach(function(t){ t.lines.forEach(function(L){
+      (function(){ if(L.val!=='有') return;
       if((L.signPages||[]).length){   // ver.20261116.20: 署名済みのページ（Saysay の書類は該当ページを差し替え）
         var d0=(L.docs||[])[0];
         if(d0 && docHtml[d0] && !seen['d'+d0]){ seen['d'+d0]=1; collected.push({dk:d0, html:_isaReplacePages(docHtml[d0], L.signPages)}); }
@@ -4442,10 +4484,12 @@ async function _isaSetRun(){
         return;
       }
       (L.docs||[]).forEach(function(d){ if(docHtml[d] && !seen['d'+d]){ seen['d'+d]=1; collected.push({dk:d, html:docHtml[d]}); } });
-      (L.files||[]).forEach(function(f){ if(fileHtml[f.id] && !seen['f'+f.id]){ seen['f'+f.id]=1; collected.push({dk:'drive', html:fileHtml[f.id]}); } });
+      (L.files||[]).forEach(putF);
+      })();
+      (RP.at.get(L)||[]).forEach(function(x){ putF(x.f); });   // ver.20261117.20: 行に入らなかったドライブの書類も、近い行のうしろへ
     }); });
     S.restDocs.forEach(function(d){ if(docHtml[d] && !seen['d'+d]){ seen['d'+d]=1; collected.push({dk:d, html:docHtml[d]}); } });
-    S.restFiles.forEach(function(f){ if(S.restOn[f.id] && fileHtml[f.id] && !seen['f'+f.id]){ seen['f'+f.id]=1; collected.push({dk:'drive', html:fileHtml[f.id]}); } });
+    RP.tail.forEach(putF);   // どの行とも合わないものだけ、今までどおりいちばん最後
     (S.restSign||[]).forEach(function(g){ if(g.on) collected.push({dk:'drive', html:_isaSignDoc(g.pages)}); });
     var pcRes=null; if(pcP){ prog('申請前チェック（AI）の結果を待っています…'); pcRes=await pcP; }
     // ver.20261116.26: AIチェックで中身が違う・読めないと出たドライブの書類の行は〇有を外し、一覧表の〇を付け直す
@@ -5502,6 +5546,7 @@ function _pmScopeRules(rules, pre){
   }
   return out;
 }
+var PM_NET_QUIET_MS=900, PM_NET_MAX_TRIES=50;   // ver.20261117.20: 問い合わせが0.9秒止まったら写す（最長15秒）
 function _loadDocForPrint(src, info){
   return new Promise(function(resolve){
     var ifr=document.createElement('iframe');
@@ -5513,6 +5558,12 @@ function _loadDocForPrint(src, info){
     ifr.onload=function(){
       try{
         var win=ifr.contentWindow;
+        // ver.20261117.20: 書類のデータの読み込み（DBへの問い合わせ）が終わるまで待つ。
+        //   1-25号・1-11号などは共通の読み込み（_caseLoadDone）のあとに、書類ごとの読み込み（loadFromDB）が続くので、
+        //   共通の読み込みが終わった時点で写すと、登録支援機関・委託料・役員・決算などが空のまま綴じられていた
+        try{ if(!win.__pmNet && typeof win.fetch==='function'){ var _of=win.fetch, N=win.__pmNet={n:0,t:Date.now()};
+          win.fetch=function(){ N.n++; N.t=Date.now(); var pr; try{ pr=_of.apply(this, arguments); }catch(e){ N.n--; throw e; }
+            return Promise.resolve(pr).then(function(r){ N.n--; N.t=Date.now(); return r; }, function(e){ N.n--; N.t=Date.now(); throw e; }); }; } }catch(_nw){}
         try{ win.postMessage({type:'SELECT_CASE',info:{caseId:info.caseId,companyId:info.companyId,companyName:info.companyName,docDate:info.docDate||''}}, '*'); }catch(e){}
         var tries=0;
         var wantName=(info.companyName||'').replace(/\s/g,'').slice(0,4);
@@ -5523,7 +5574,9 @@ function _loadDocForPrint(src, info){
             if(area && area.querySelector('.doc,.docabs,[id^="docP"]')){
               var reflected = wantName ? ((area.innerText||'').replace(/\s/g,'').indexOf(wantName)>=0) : true;
               try{ if(typeof win._caseLoadDone==='string' && win._caseLoadDone!==String(info.caseId)) reflected=false; }catch(_ld){}   // ver.20261112.07: 書類の読み込みが終わるまで待つ
-              if((reflected && tries>=(info._minTries||5)) || tries>=Math.max(22,(info._minTries||0)+8)){
+              var _N=win.__pmNet, quiet=!_N || (_N.n<=0 && Date.now()-_N.t>=PM_NET_QUIET_MS);   // ver.20261117.20: 問い合わせが止まって少したったか
+              var _ldOk=false; try{ _ldOk=(typeof win._caseLoadDone==='string' && win._caseLoadDone===String(info.caseId)); }catch(_l2){}
+              if((reflected && quiet && tries>=(info._minTries||5)) || tries>=Math.max((_ldOk||reflected)?PM_NET_MAX_TRIES:22,(info._minTries||0)+8)){
                 clearInterval(timer);
                 var id='pm'+(++_pmSeq);
                 // ver.20261109.08: 印刷前チェックと同じ内容・印刷の記録の材料を、この書類からもらっておく
@@ -5782,6 +5835,10 @@ function _dcLoad(job, info){
     var fin=function(r){ if(done) return; done=true; if(tm) clearInterval(tm); try{ ifr.remove(); }catch(e){} resolve(r); };
     ifr.onload=function(){
       var win=ifr.contentWindow;
+      // ver.20261117.20: 書類ごとの読み込み（DBへの問い合わせ）が終わるまで待ってから見る（まとめPDFと同じ）
+      try{ if(!win.__pmNet && typeof win.fetch==='function'){ var _of=win.fetch, N=win.__pmNet={n:0,t:Date.now()};
+        win.fetch=function(){ N.n++; N.t=Date.now(); var pr; try{ pr=_of.apply(this, arguments); }catch(e){ N.n--; throw e; }
+          return Promise.resolve(pr).then(function(r){ N.n--; N.t=Date.now(); return r; }, function(e){ N.n--; N.t=Date.now(); throw e; }); }; } }catch(_nw){}
       try{ win.postMessage({type:'SELECT_CASE', info:info}, '*'); }catch(e){}
       tm=setInterval(function(){
         var el=Date.now()-t0;
@@ -5789,7 +5846,8 @@ function _dcLoad(job, info){
           var d=win.document, area=d.getElementById('pageArea');
           var ok=(typeof win._caseLoadDone==='string' && win._caseLoadDone===String(info.caseId)) || (area && el>9000);
           if(ok && !readyAt) readyAt=Date.now();
-          if(readyAt && Date.now()-readyAt>2500){ fin(_dcCollect(win, job, info, false)); return; }
+          var _N=win.__pmNet, quiet=!_N || (_N.n<=0 && Date.now()-_N.t>=PM_NET_QUIET_MS);
+          if(readyAt && Date.now()-readyAt>2500 && quiet){ fin(_dcCollect(win, job, info, false)); return; }
           if(el>22000){ fin(_dcCollect(win, job, info, true)); return; }
         }catch(e){ if(el>22000) fin({sev:2, items:['⛔ 書類を開けませんでした（'+e.message+'）']}); }
       }, 400);
