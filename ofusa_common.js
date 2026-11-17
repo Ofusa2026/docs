@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261117.27
+ * - fix: DB保存で、書類の契約期間を案件（cases.contract_start／contract_end）にも保存する（呼び戻すと元の期間に戻っていたため）
  * ver.20261116.21
  * - feat: まとめPDFで指定した作成日を、案件の書類作成日の代わりに使う（案シスは変えない）
  * ver.20261116.19
@@ -3722,6 +3724,8 @@ async function saveFormGeneric(docKey, opts){
       headers: {'Prefer':'return=minimal'},
       body: JSON.stringify({ extra })
     });
+    // ver.20261117.27: 契約期間は案件（cases.contract_start／contract_end）にも保存
+    try{ await window._syncCaseContract(info.caseId); }catch(_cc){}
     // ver.20261026.04: 編集HTMLを雇用条件に紐づけて受け皿へ保存
     try{ await _htmlStoreSave({companyId:companyId, caseId:info.caseId, empSetIdx:idx}); }catch(_hs){ console.warn('[htmlStore save]', _hs); }
 
@@ -4025,6 +4029,42 @@ document.addEventListener('click', function(e){
    - ②: 保存時に編集の有無を見て「新セット作成＋紐付け(B)／元セット上書き(C)」を選ばせる
    すべて追記のみ・#empSetSelectorSlot が無い書類では何もしない（既存挙動を変えない）
    ========================================================================= */
+
+/* ver.20261117.27: 書類で直した契約期間を、案件（cases.contract_start／contract_end）にも保存する。
+   書類は案件の契約期間を優先して表示するため、雇用条件セットだけ更新すると、呼び戻したとき元の期間に戻っていた
+   （例: case_1793092087596 で 2027/3/1～2030/2/28 に直して保存しても 2026/12/1～2029/11/30 に戻る）。
+   年・月・日がそろっていて、案件の値と違うときだけ書き込む。 */
+window._syncCaseContract=async function(caseId){
+  try{
+    if(!caseId) return 0;
+    var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').normalize('NFKC').trim():''; };
+    var pad=function(n){ n=parseInt(n,10); return (n<10?'0':'')+n; };
+    var ymd=function(p){
+      var y=g('es_'+p+'Y'), m=g('es_'+p+'M'), d=g('es_'+p+'D');
+      if(!y&&!m&&!d){ var mm=g('es_'+p).match(/(\d{4})[-\/年\.](\d{1,2})[-\/月\.](\d{1,2})/); if(!mm) return null; y=mm[1]; m=mm[2]; d=mm[3]; }
+      if(!/^\d{4}$/.test(y)||!/^\d{1,2}$/.test(m)||!/^\d{1,2}$/.test(d)) return null;
+      var mi=parseInt(m,10), di=parseInt(d,10); if(mi<1||mi>12||di<1||di>31) return null;
+      return y+'-'+pad(mi)+'-'+pad(di);
+    };
+    var norm=function(v){ var mm=String(v||'').match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/); return mm? mm[1]+'-'+pad(mm[2])+'-'+pad(mm[3]) : String(v||''); };
+    var st=ymd('contractStart'), en=ymd('contractEnd');
+    if(!st && !en) return 0;
+    var cur=await sb('cases?select=contract_start,contract_end&id=eq.'+encodeURIComponent(caseId));
+    var c=cur&&cur[0]; if(!c) return 0;
+    var body={};
+    if(st && norm(c.contract_start)!==st) body.contract_start=st;
+    if(en && norm(c.contract_end)!==en) body.contract_end=en;
+    var n=Object.keys(body).length; if(!n) return 0;
+    var r=await sb('cases?id=eq.'+encodeURIComponent(caseId)+'&select=id',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(body)});
+    if(!r||!r.length) throw new Error('案件が見つからないか、権限がありません');
+    return n;
+  }catch(e){
+    console.warn('[syncCaseContract]', e);
+    if(typeof showToast==='function') showToast('⚠️ 案件の契約期間（契約開始日・終了日）の保存に失敗しました');
+    return 0;
+  }
+};
+
 (function(){
   function _empSetLabel(set,i){
     var nm=(set&&set.setName)?String(set.setName):('条件セット'+(i+1));
@@ -4252,6 +4292,7 @@ document.addEventListener('click', function(e){
       if(!_rc||!_rc.length) throw new Error('案件への紐付け保存に失敗しました');
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(newSet)); window._empLoadedIdx=newIdx;
+      try{ await window._syncCaseContract(caseId); }catch(_cc){}   // ver.20261117.27: 契約期間は案件にも保存
       return {saved:true,mode:'new',newIdx:newIdx,setName:(nm||defName),empSets:empSets};
     }else{
       // ①: 楽観ロック（読み込み後にDB上のセットが変わっていたら競合として返す）
@@ -4272,6 +4313,7 @@ document.addEventListener('click', function(e){
       if(_empStableStr((_r2[0].emp_sets||[])[idx]||{})!==_empStableStr(empSets[idx])) throw new Error('保存後の確認で内容が一致しませんでした。もう一度お試しください');
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(empSets[idx])); window._empLoadedIdx=idx;
+      try{ await window._syncCaseContract(caseId); }catch(_cc){}   // ver.20261117.27: 契約期間は案件にも保存
       return {saved:true,mode:'overwrite',idx:idx,empSets:empSets};
     }
   };
