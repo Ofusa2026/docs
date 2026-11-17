@@ -82,7 +82,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.26</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261117.27</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1866,6 +1866,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261117.27',
+    date: '2026-11-17',
+    notify: false,
+    items: [
+      '📑 申請書類一式：更新で分野が空のとき、「第3表は付けていません」と出ていたのを直しました。更新の第3表（全分野の表）は付きますが、中は分野ごとの行なので、分野が無いとどの行に〇を付けるか決められません。その旨を出し、［📑 申請書類一式を作る］から自動で作るときは確認画面で止めるようにしました（Saysay の上の「分野」で選べばそのまま作れます）。'
+    ]
+  },
   {
     version: 'ver.20261117.26',
     date: '2026-11-17',
@@ -4150,7 +4158,10 @@ function _isaKeys(c, co, fieldRaw){
   } else hyo2='不要（更新）';
   if(app==='koshin') keys.push(app+'_'+go+'_hyo3_'+(field==='農業'?'農業':(field==='漁業'?'漁業':'全分野（農業・漁業除く）')));
   else if(field) keys.push(app+'_'+go+'_hyo3_'+field);
-  if(!field) warn.push('分野が分からないため、第3表は付けていません（案件に分野を入れてください）');
+  // ver.20261117.27: 更新の第3表（全分野の表）は付くが、中は分野ごとの行（16分野・46行）なので、分野が無いと〇を付ける行を決められない
+  if(!field) warn.push(app==='koshin'
+    ? '分野が分からないため、第3表（全分野の表）の中の、どの分野の行に〇を付けるか決められません（全部の分野の行が並びます）。案シスの案件に分野を入れてください（Saysay の上の「分野」で選んでも作れます）'
+    : '分野が分からないため、第3表は付けていません（案件に分野を入れてください）');
   return {keys:keys, app:app, go:go, field:field, hyo2:hyo2, warn:warn};
 }
 // 一覧表の行 → Saysayの書類（書類キーの先頭で判定）
@@ -4463,10 +4474,12 @@ async function _isaIchiranFresh(K, R){
   if(fresh.length) K.warn.unshift('📢 入管の一覧表が最近改定されました：'+fresh.join('、'));
 }
 // ver.20261117.06: 自動で作るとき、作る前に止める理由（ここに当たると確認画面で止める）
-//   ・認定・変更で分野が分からない（第3表が付かない）　・一覧表が取れなかった表がある　・署名済みで様式が分からないページがある
+//   ・分野が分からない（認定・変更＝第3表が付かない／更新＝全分野の表のどの行か決められない）　・一覧表が取れなかった表がある　・署名済みで様式が分からないページがある
 function _isaAutoStops(S){
   var out=[];
-  if(S.K.app!=='koshin' && !S.K.field) out.push('分野が分からないので、第3表（分野別）が付きません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください');
+  if(!S.K.field) out.push(S.K.app==='koshin'   // ver.20261117.27: 更新も止める（全分野の表の、どの分野の行か決められないため）
+    ? '分野が分からないので、第3表（全分野の表）の中の、どの分野の行に〇を付けるか決められません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください（Saysay の上の「分野」で選んでも作れます）'
+    : '分野が分からないので、第3表（分野別）が付きません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください');
   if((S.tables||[]).length < (S.K.keys||[]).length) out.push('入管の一覧表を取れなかった表があります（下の⚠を見てください）');
   if(S.sg && (S.sg.other||[]).length) out.push('署名済みのスキャンに、どの様式か分からないページが'+S.sg.other.length+'枚あります。［✍ 署名済みの付け替え］で行を選んでください');
   return out;
