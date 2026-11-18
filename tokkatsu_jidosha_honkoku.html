@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 本国において定められた遵守すべき手続がないことに係る説明書（「特定活動（特定自動車運送業準備）」用）。
+     文とレイアウトは入管のWord（001433498.docx）から（A4・上35mm 左右下30mm・ＭＳ ゴシック・1行18pt）。申請人が署名する書類。 -->
+<title>本国において定められた遵守すべき手続がないことに係る説明書（特定自動車運送業準備）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:35mm 30mm 30mm 30mm!important;min-height:1123px!important;}
+.doc .bd,.doc .bd *{font-family:'MS Gothic','ＭＳ ゴシック','Yu Gothic','Hiragino Kaku Gothic ProN','Noto Sans CJK JP',sans-serif!important;}
+.doc .bd{line-height:18pt;}
+.doc .bd div:empty{height:18pt;}
+.r{text-align:right;}
+.c{text-align:center;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:35mm 30mm 30mm 30mm!important;}
+  @page{size:A4;margin:0}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .doc{zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 本国において定められた遵守すべき手続がないことに係る説明書（特定自動車運送業準備）</div>
+    <div class="ver">ver.20261118.15</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('tokkatsu_jidosha_honkoku')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">申請人</div>
+      <div class="fg"><label>国籍・地域</label><input id="f_nationality" oninput="p()"></div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">作成年月日</div>
+      <div style="font-size:10px;color:#888;line-height:1.5;margin:2px 0 4px;">空欄のままなら、申請人が手で書けるように「年　月　日」の枠だけ印刷されます。署名は申請人が手で書きます。</div>
+      <div class="fg"><label>作成年月日</label><input id="f_docDate" oninput="p()" placeholder="2026/11/18"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5);p()" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0);_fontSize=12;p()" style="padding:2px 7px;" id="fontSizeLabel">12pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5);p()" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=2611181809"></script>
+<script>
+function _ymdP(s){
+  const t=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').trim();
+  let m=t.match(/^(\d{4})[-\/年.](\d{1,2})[-\/月.](\d{1,2})/); if(m) return [m[1],String(+m[2]),String(+m[3])];
+  m=t.match(/^(\d{4})(\d{2})(\d{2})$/); if(m) return [m[1],String(+m[2]),String(+m[3])];
+  return null;
+}
+function dateTxt(){
+  const raw=String(v('f_docDate')||'').trim();
+  if(!raw) return '　　　　　　年　　　月　　　日';
+  const r=_ymdP(raw);
+  if(!r) return f('f_docDate');
+  return `<span class="f" data-bind="f_docDate">　${r[0]}年${('　'+r[1]).slice(-2)}月${('　'+r[2]).slice(-2)}日</span>`;
+}
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="bd" style="font-size:12pt;">
+<div class="r" style="font-size:10pt;">〈「特定活動（特定自動車運送業準備）」用〉</div>
+<div style="font-size:10pt;"></div>
+<div class="c" style="font-size:14pt;line-height:36pt;">本国において定められた遵守すべき手続がないことに係る説明書</div>
+<div></div>
+<div style="padding-left:3.54em;">国籍・地域　　${f('f_nationality')}</div>
+<div></div>
+<div style="padding-left:3.54em;">氏　　　名　　${f('f_applicant')}</div>
+<div></div>
+<div>　出入国管理及び難民認定法第７条第１項第２号の規定に基づき同法別表第１の５の表の下欄に掲げる活動を定める件（平成２年法務省告示第１３１号）第５５号に定められた在留資格「特定活動」に係る在留諸申請について、本国において定められた遵守すべき手続がないことを確認しました。</div>
+<div style="font-size:14pt;"></div>
+<div class="r"><span style="text-decoration:underline;white-space:pre;">申請人の署名　　　　　　　　　　　　　　　</span></div>
+<div style="font-size:16pt;"></div>
+<div class="r" style="letter-spacing:1.5pt;white-space:pre;">作成年月日${dateTxt()}</div>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 12 : _fontSize;
+  _applyFontSize();
+  _applyHkFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applyHkFontSize(){
+  const st=document.getElementById('_hkFontStyle')||document.createElement('style');
+  st.id='_hkFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/12;
+  st.textContent=[16,14,12,10].map(z=>`.doc [style*="font-size:${z}pt"]{font-size:${(z*s).toFixed(2)}pt!important}`).join('');
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  const s=(id,val)=>{const e=document.getElementById(id); if(e&&val!=null&&String(val).trim()!=='') e.value=String(val).trim();};
+  try{
+    const [cases,persons]=await Promise.all([
+      sb('cases?select=applicant,doc_create_date&id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality&case_id=eq.'+caseId)
+    ]);
+    const cas=cases&&cases[0], pd=persons&&persons[0];
+    s('f_applicant',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||info.applicant||'');
+    s('f_nationality',(pd&&pd.nationality)||info.nationality||'');
+    // 作成年月日は案シスの「書類作成日」があるときだけ入れる（無ければ申請人が手で書く）
+    const de=document.getElementById('f_docDate');
+    if(de && !de.value && cas && cas.doc_create_date) de.value=cas.doc_create_date;
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+try{ document.fonts.ready.then(()=>p()); }catch(_e){}
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'); const area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom=(ppW<docW)?(ppW/docW):1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){ try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){} }
+    if(!found){ const opt=document.createElement('option'); opt.value=JSON.stringify(info); opt.textContent='（indexから選択）'; sel.appendChild(opt); sel.value=opt.value; }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tokkatsu_jidosha_honkoku'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
