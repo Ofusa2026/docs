@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.14</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.16</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -439,6 +439,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
     <div class="item" id="nav-15_9" onclick="open_doc('15_9')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 雇用の経緯に係る説明書<span class="item-sub"><span class="who who-ap">申請人</span>15-9号・特定自動車運送業準備</span></div></div>
     <div class="item" id="nav-15_10" onclick="open_doc('15_10')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 支援計画書<span class="item-sub"><span class="who who-ap">申請人</span>15-10号・特定自動車運送業準備</span></div></div>
     <div class="item" id="nav-tokkatsu_jidosha" onclick="open_doc('tokkatsu_jidosha')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 説明書（特定活動）<span class="item-sub"><span class="who who-co">所属機関</span>特定自動車運送業準備</span></div></div>
+    <div class="item" id="nav-tokkatsu_jidosha_honkoku" onclick="open_doc('tokkatsu_jidosha_honkoku')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 本国の手続がないことの説明書<span class="item-sub"><span class="who who-ap">申請人</span>特定自動車運送業準備</span></div></div>
     <div class="item" id="nav-15_3" onclick="open_doc('15_3')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>15-3号・特定自動車運送業準備</span></div></div>
     <div class="item" id="nav-15_4" onclick="open_doc('15_4')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>15-4号・特定自動車運送業準備</span></div></div>
     <div class="item" id="nav-15_5" onclick="open_doc('15_5')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>準備 報酬に関する説明書<span class="item-sub"><span class="who who-co">所属機関</span>15-5号・特定自動車運送業準備</span></div></div>
@@ -565,6 +566,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
     <iframe id="frame-15_9"></iframe>
     <iframe id="frame-15_10"></iframe>
     <iframe id="frame-tokkatsu_jidosha"></iframe>
+    <iframe id="frame-tokkatsu_jidosha_honkoku"></iframe>
     <iframe id="frame-15_3"></iframe>
     <iframe id="frame-15_4"></iframe>
     <iframe id="frame-15_5"></iframe>
@@ -588,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611181739';
-window.__DOCS_CACHE_BUSTER__ = '2611181739';
+window.__DOCS_CACHE_BUSTER__ = '2611181809';
+window.__DOCS_CACHE_BUSTER__ = '2611181809';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -744,6 +746,7 @@ const docs={
   '15_9':{navId:'nav-15_9',frameId:'frame-15_9',file:'15_9_id.html'},
   '15_10':{navId:'nav-15_10',frameId:'frame-15_10',file:'15_10_id.html'},
   'tokkatsu_jidosha':{navId:'nav-tokkatsu_jidosha',frameId:'frame-tokkatsu_jidosha',file:'tokkatsu_jidosha.html?v=1794393342'},
+  'tokkatsu_jidosha_honkoku':{navId:'nav-tokkatsu_jidosha_honkoku',frameId:'frame-tokkatsu_jidosha_honkoku',file:'tokkatsu_jidosha_honkoku.html?v=1794393342'},   // ver.20261118.16
   '15_3':{navId:'nav-15_3',frameId:'frame-15_3',file:'15_3.html?v=1794393342'},
   '15_4':{navId:'nav-15_4',frameId:'frame-15_4',file:'15_4.html?v=1794393342'},
   '15_5':{navId:'nav-15_5',frameId:'frame-15_5',file:'15_5.html?v=1794393342'},
@@ -2170,6 +2173,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.16',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '📄 左のメニュー（自動車運送業）に「準備 本国の手続がないことの説明書」（本国において定められた遵守すべき手続がないことに係る説明書・特定自動車運送業準備）を足しました。案件を選ぶと国籍・氏名が入ります。署名は申請人が手で書きます。'
+    ]
+  },
   {
     version: 'ver.20261118.14',
     date: '2026-11-18',
