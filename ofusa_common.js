@@ -7759,3 +7759,67 @@ window._userTouched={};
   document.addEventListener('change', rec, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') window._userTouched={}; }catch(_e){} });
 })();
+
+/* ver.20261118.09: 入力欄を触ると、書類の中でその値が出ている所を光らせる（書類の値を押すと入力欄へ飛ぶのは前からある）。
+   あわせて、どの欄を触っているかを Saysay 本体に知らせる（AI相談で「この欄」の話ができるように） */
+(function(){
+  if(window.__bindHlOn) return; window.__bindHlOn=true;
+  var st=null;
+  function styleEl(){ if(!st){ st=document.createElement('style'); st.id='_bindHl'; (document.head||document.documentElement).appendChild(st); } return st; }
+  function labelOf(inp){
+    try{
+      var l=inp.id && document.querySelector('label[for="'+inp.id+'"]'); if(l) return l.textContent.trim();
+      var p=inp.previousElementSibling; if(p && p.tagName==='LABEL') return p.textContent.trim();
+      var box=inp.parentElement; for(var i=0;i<3 && box;i++){ var q=box.querySelector('label'); if(q && !q.contains(inp)) return q.textContent.trim(); box=box.parentElement; }
+    }catch(e){}
+    return '';
+  }
+  document.addEventListener('focusin', function(ev){
+    var t=ev.target; if(!t || !t.id || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+    if(t.closest && t.closest('#pageArea')) return;
+    var id=t.id.replace(/(["\\])/g,'\\$1');
+    styleEl().textContent='@media screen{#pageArea .f[data-bind="'+id+'"]{outline:2px solid #f59e0b !important;background:rgba(245,158,11,.22) !important;border-radius:2px;}}';
+    try{
+      var el=document.querySelector('#pageArea .f[data-bind="'+id+'"]');
+      if(el){ var r=el.getBoundingClientRect(); if(r.bottom<0 || r.top>(window.innerHeight||800)) el.scrollIntoView({block:'center',behavior:'smooth'}); }
+    }catch(e){}
+    try{ if(window.parent && window.parent!==window) window.parent.postMessage({type:'SAYSAY_FIELD', id:t.id, label:labelOf(t).slice(0,80), value:String(t.value||'').slice(0,300), doc:(document.title||'')},'*'); }catch(e){}
+  }, true);
+  document.addEventListener('focusout', function(ev){
+    var t=ev.target; if(!t || !t.id || (t.closest && t.closest('#pageArea'))) return;
+    setTimeout(function(){ var a=document.activeElement; if(!a || !a.id || !/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) styleEl().textContent=''; }, 50);
+  }, true);
+})();
+
+/* ver.20261118.09: キーボードの近道（書類の中で）
+   Ctrl+P（Macは⌘P）＝印刷・PDF、Ctrl+S（⌘S）＝DB保存、Alt+←／→＝左のメニューの前／次の書類、/＝書類をさがす */
+(function(){
+  if(window.__kbShortOn) return; window.__kbShortOn=true;
+  function toParent(m){ try{ if(window.parent && window.parent!==window) window.parent.postMessage(m,'*'); }catch(e){} }
+  function saveBtn(){
+    var bs=[].slice.call(document.querySelectorAll('button[onclick]')).filter(function(b){ var oc=b.getAttribute('onclick')||''; return /saveForm(Generic)?\(/.test(oc) && b.offsetParent!==null; });
+    return bs[0]||null;
+  }
+  function toast(m){ try{ if(typeof showToast==='function') showToast(m); }catch(e){} }
+  document.addEventListener('keydown', function(ev){
+    var mod=ev.ctrlKey||ev.metaKey, k=(ev.key||'').toLowerCase();
+    if(mod && !ev.altKey && k==='p'){
+      if(typeof doPrint==='function'){ ev.preventDefault(); try{ doPrint(); }catch(e){ console.warn(e); } }
+      return;
+    }
+    if(mod && !ev.altKey && k==='s'){
+      ev.preventDefault();
+      if(typeof _editMode!=='undefined' && _editMode){ toast('直接編集中は［📥 編集保存］を押してください'); return; }
+      var b=saveBtn(); if(b) b.click(); else toast('この書類には DB保存 がありません');
+      return;
+    }
+    if(ev.altKey && !mod && (ev.key==='ArrowLeft' || ev.key==='ArrowRight')){
+      ev.preventDefault(); toParent({type:'SAYSAY_NAV', dir: ev.key==='ArrowRight'?1:-1}); return;
+    }
+    if(ev.key==='/' && !mod && !ev.altKey){
+      var t=ev.target, tag=(t&&t.tagName)||'';
+      if(/INPUT|TEXTAREA|SELECT/.test(tag) || (t&&t.isContentEditable)) return;
+      ev.preventDefault(); toParent({type:'SAYSAY_SEARCH'});
+    }
+  }, true);
+})();

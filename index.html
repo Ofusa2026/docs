@@ -77,6 +77,23 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .wn-section ul{list-style:none;padding:0;}
 .wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
 .wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#7c3aed;}
+/* ver.20261118.09: AI相談 */
+#aiaBtn{position:fixed;right:18px;bottom:18px;z-index:99990;padding:9px 14px;border:none;border-radius:22px;background:#1e40af;color:#fff;font-size:12.5px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
+#aiaBtn:hover{background:#1d4ed8;}
+#aiaPanel{position:fixed;right:18px;bottom:64px;z-index:99991;width:min(380px,92vw);height:min(520px,72vh);background:#fff;border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.28);flex-direction:column;overflow:hidden;font-size:12.5px;color:#1f2937;}
+#aiaPanel .aia-head{padding:9px 12px;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;}
+#aiaPanel .aia-x{margin-left:auto;background:none;border:none;color:#cbd5e1;font-size:18px;cursor:pointer;}
+#aiaPanel .aia-ctx{padding:6px 12px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;font-size:11px;color:#475569;line-height:1.5;}
+#aiaPanel .aia-log{flex:1;overflow-y:auto;padding:10px 12px;}
+#aiaPanel .aia-msg{padding:7px 10px;border-radius:9px;margin-bottom:8px;line-height:1.6;max-width:92%;word-break:break-word;}
+#aiaPanel .aia-ai{background:#f1f5f9;}
+#aiaPanel .aia-me{background:#dbeafe;margin-left:auto;}
+#aiaPanel .aia-err{background:#fee2e2;color:#991b1b;}
+#aiaPanel .aia-in{display:flex;gap:6px;padding:8px;border-top:1px solid #e2e8f0;}
+#aiaPanel textarea{flex:1;resize:none;border:1px solid #cbd5e1;border-radius:7px;padding:6px 8px;font-size:12.5px;font-family:inherit;}
+#aiaPanel .aia-in button{padding:0 14px;border:none;border-radius:7px;background:#1e40af;color:#fff;font-weight:700;cursor:pointer;}
+#aiaPanel .aia-in button:disabled{opacity:.5;}
+@media print{#aiaBtn,#aiaPanel{display:none !important;}}
 /* ver.20261118.08: 案件の情報カード */
 .cc-card{background:rgba(30,41,59,.85);border:1px solid #334155;border-radius:8px;padding:8px 10px;color:#cbd5e1;font-size:11px;line-height:1.5;}
 .cc-card .cc-name{font-size:13px;font-weight:700;color:#f1f5f9;}
@@ -127,7 +144,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.08</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.09</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -210,6 +227,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         <span id="navSearchCount" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#64748b;pointer-events:none;"></span>
       </div>
       <div id="navSearchNone" style="display:none;font-size:11px;color:#94a3b8;padding:8px 2px 2px;">見つかりませんでした</div>
+      <div style="font-size:9.5px;color:#64748b;padding:4px 2px 0;line-height:1.5;" title="書類を開いているときに使えます">⌨ Ctrl+P 印刷 ／ Ctrl+S DB保存 ／ Alt+←→ 前・次の書類 ／ / さがす</div>
     </div>
     <!-- 全書類（優先以外）を「その他の書類 ▼」で折りたためるように包む -->
     <div id="otherDocsToggle" style="display:none;padding:8px 12px;background:#f3f4f6;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;user-select:none;" onclick="toggleOtherDocs()">
@@ -538,8 +556,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611181528';
-window.__DOCS_CACHE_BUSTER__ = '2611181528';
+window.__DOCS_CACHE_BUSTER__ = '2611181548';
+window.__DOCS_CACHE_BUSTER__ = '2611181548';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1563,6 +1581,89 @@ function idxOnPasteInput(){
     st.style.color='#fbbf24';
   }
 }
+/* ver.20261118.09: キーボードの近道（Saysay本体側）と、書類からの合図の受け取り */
+function _curDocFrame(){
+  var fs=[].slice.call(document.querySelectorAll('iframe')).filter(function(f){ return f.offsetWidth>0 && f.offsetHeight>0 && !f.hasAttribute('data-pm-fixed') && !f.hasAttribute('data-doc-check') && f.id && /^frame-/.test(f.id); });
+  return fs[0]||null;
+}
+function _navStep(dir){
+  var box=document.getElementById('otherDocsContainer'); if(!box) return;
+  var its=[].slice.call(box.querySelectorAll('.item[id^="nav-"]')).filter(function(el){ return el.offsetParent!==null && !el.classList.contains('fav-clone'); });
+  if(!its.length) return;
+  var i=its.findIndex(function(el){ return el.classList.contains('active'); });
+  var j=i<0?0:Math.max(0,Math.min(its.length-1,i+dir));
+  if(j===i) return;
+  its[j].click(); try{ its[j].scrollIntoView({block:'nearest'}); }catch(e){}
+}
+function _focusNavSearch(){ var i=document.getElementById('navSearch'); if(i){ i.focus(); i.select(); } }
+window._saysayField=null;   // 書類で最後に触った欄（AI相談で使う）
+window.addEventListener('message', function(e){
+  var d=e.data; if(!d || typeof d!=='object') return;
+  if(d.type==='SAYSAY_NAV') _navStep(d.dir>0?1:-1);
+  else if(d.type==='SAYSAY_SEARCH') _focusNavSearch();
+  else if(d.type==='SAYSAY_FIELD'){ window._saysayField={id:d.id,label:d.label,value:d.value,doc:d.doc,at:Date.now(),src:e.source}; try{ _aiaRenderCtx(); }catch(_e){} }
+});
+document.addEventListener('keydown', function(ev){
+  var mod=ev.ctrlKey||ev.metaKey, k=(ev.key||'').toLowerCase();
+  var fr=_curDocFrame(), w=null; try{ w=fr&&fr.contentWindow; }catch(_e){}
+  if(mod && !ev.altKey && (k==='p'||k==='s') && w){
+    ev.preventDefault();
+    try{
+      if(k==='p'){ if(typeof w.doPrint==='function') w.doPrint(); }
+      else { var b=[].slice.call(w.document.querySelectorAll('button[onclick]')).filter(function(x){ return /saveForm(Generic)?\(/.test(x.getAttribute('onclick')||'') && x.offsetParent!==null; })[0]; if(b) b.click(); }
+    }catch(e){ console.warn('shortcut',e); }
+    return;
+  }
+  if(ev.altKey && !mod && (ev.key==='ArrowLeft' || ev.key==='ArrowRight')){
+    var t=ev.target, tag=(t&&t.tagName)||''; if(/INPUT|TEXTAREA/.test(tag)) return;
+    ev.preventDefault(); _navStep(ev.key==='ArrowRight'?1:-1);
+  }
+});
+
+/* ver.20261118.09: AI相談（書類の横で「この欄に何を書く？」を聞ける）。答えはサーバーのAI（saysay-ask）。ログイン中のスタッフだけ */
+var _aiaHist=[];
+function _aiaEsc(t){ return String(t==null?'':t).replace(/[&<>]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+function _aiaToggle(open){
+  var p=document.getElementById('aiaPanel'); if(!p) return;
+  var on=(open===undefined)?(p.style.display==='none'):open;
+  p.style.display=on?'flex':'none';
+  if(on){ _aiaRenderCtx(); setTimeout(function(){ var q=document.getElementById('aiaQ'); if(q) q.focus(); },50); }
+}
+function _aiaCtx(){
+  var c=idxSelectedCase||null, f=window._saysayField, nav=document.querySelector('#otherDocsContainer .item.active');
+  var docName=''; try{ if(nav){ var lb=_pmDocLabel(nav.id.replace(/^nav-/,'')); docName=(lb.name||'')+(lb.sub?('（'+lb.sub+'）'):''); } }catch(_e){}
+  return {case:c?{applicant:c.applicant,company:c.companyName,org:c.orgName,residenceStatus:c.residenceStatus,field:c.applicantField,appType:c.appType,nationality:c.nationality}:null,
+          doc:docName, field:(f && Date.now()-f.at<15*60*1000 && (function(){ var fr=_curDocFrame(); try{ return !f.src || (fr && fr.contentWindow===f.src); }catch(_e){ return true; } })())?{label:f.label,id:f.id,value:f.value}:null};   // ほかの書類に移ったら、前の書類の欄は使わない
+}
+function _aiaRenderCtx(){
+  var el=document.getElementById('aiaCtx'); if(!el) return;
+  var x=_aiaCtx(), parts=[];
+  if(x.doc) parts.push('📄 '+_aiaEsc(x.doc));
+  if(x.field && x.field.label) parts.push('✏️ '+_aiaEsc(x.field.label)+(x.field.value?('：'+_aiaEsc(String(x.field.value).slice(0,40))):'（空）'));
+  if(x.case) parts.push('👤 '+_aiaEsc(x.case.applicant||'')+(x.case.appType?(' ／ '+_aiaEsc(x.case.appType)):''));
+  el.innerHTML=parts.length?parts.join('<br>'):'書類を開いて欄を押すと、その欄について聞けます';
+}
+function _aiaAdd(role, text){
+  var log=document.getElementById('aiaLog'); if(!log) return null;
+  var d=document.createElement('div'); d.className='aia-msg aia-'+role;
+  d.innerHTML=_aiaEsc(text).replace(/\n/g,'<br>'); log.appendChild(d); log.scrollTop=log.scrollHeight; return d;
+}
+async function _aiaSend(){
+  var q=document.getElementById('aiaQ'); if(!q) return; var text=String(q.value||'').trim(); if(!text) return;
+  q.value=''; _aiaAdd('me', text);
+  var wait=_aiaAdd('ai','考えています…'); var btn=document.getElementById('aiaGo'); if(btn) btn.disabled=true;
+  try{
+    if(_sbDocs) await _idxFreshToken();
+    var r=await fetch(IDX_URL.replace(/\/rest\/v1\/?$/,'')+'/functions/v1/saysay-ask',{method:'POST',headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Content-Type':'application/json'},
+      body:JSON.stringify({question:text, context:_aiaCtx(), history:_aiaHist.slice(-6)})});
+    var j={}; try{ j=await r.json(); }catch(_e){}
+    if(!r.ok) throw new Error((j&&j.message)||('AI '+r.status));
+    var ans=String(j.answer||'（答えがありませんでした）');
+    wait.innerHTML=_aiaEsc(ans).replace(/\n/g,'<br>');
+    _aiaHist.push({role:'user',content:text},{role:'assistant',content:ans});
+  }catch(e){ wait.innerHTML='⚠ '+_aiaEsc(e.message||String(e)); wait.classList.add('aia-err'); }
+  if(btn) btn.disabled=false;
+}
 /* ver.20261118.08: 案件の情報カード（申請人・会社・申請の種類・担当・ステータス・在留期限・雇用条件セット）と［案シスで開く］ */
 var ANKEN_BASE='https://ofusa2026.github.io/anken/';
 function _ccEsc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -1960,6 +2061,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.09',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '🟧 左の入力欄を押すと、書類の中でその値が出ている所がオレンジに光ります（書類の値を押すと入力欄へ飛ぶのは今までどおり）。',
+      '⌨ キーボードの近道：Ctrl+P（Macは⌘P）で印刷・PDF、Ctrl+S で DB保存、Alt+← → で左のメニューの前・次の書類、/ で「書類をさがす」。',
+      '💬 右下の［AIに聞く］で、書類の書き方を AI に聞けます（例：「1-16号の名目は何と書く？」「この欄は空欄でいい？」）。いま開いている書類・触っている欄・案件の情報も一緒に伝わります。APIキーの設定はいりません（ログイン中のスタッフ）。答えは参考なので、最後は運用要領・担当の判断で確認してください。'
+    ]
+  },
   {
     version: 'ver.20261118.08',
     date: '2026-11-18',
@@ -7755,6 +7866,14 @@ async function savePriorityDocs(){
     </div>
     <div class="wn-modal-body" id="docsWnBody"></div>
   </div>
+</div>
+<!-- ver.20261118.09: AI相談 -->
+<button id="aiaBtn" onclick="_aiaToggle()" title="この書類・この欄について AI に聞けます（例：この欄に何を書く？）">💬 AIに聞く</button>
+<div id="aiaPanel" style="display:none;">
+  <div class="aia-head"><b>💬 AIに聞く</b><span style="font-size:10px;color:#94a3b8;margin-left:6px;">書類の書き方・運用のことなど</span><button onclick="_aiaToggle(false)" class="aia-x" title="閉じる">×</button></div>
+  <div id="aiaCtx" class="aia-ctx"></div>
+  <div id="aiaLog" class="aia-log"><div class="aia-msg aia-ai">例：「1-16号の名目は何と書く？」「この欄は空欄でいい？」「1-6号の昇給の書き方は？」<br><span style="color:#94a3b8;font-size:10px;">※ AIの答えは参考です。最後は運用要領・担当の判断で確認してください。</span></div></div>
+  <div class="aia-in"><textarea id="aiaQ" rows="2" placeholder="聞きたいことを入れて Enter（改行は Shift+Enter）" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&!event.isComposing){event.preventDefault();_aiaSend();}"></textarea><button id="aiaGo" onclick="_aiaSend()">送る</button></div>
 </div>
 </body>
 </html>
