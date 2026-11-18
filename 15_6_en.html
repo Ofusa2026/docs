@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ver.20261118.05: 分野参考様式第１５－６号（特定自動車運送業準備雇用契約書・英語）の入口です。
+     書類の本体は 1-5号と同じ 1_5.html を読み込み、15-6号で文が違うところ（題名・効力の条・署名欄の説明など）だけ差し替えて表示します。
+     そのため 1_5.html の様式の形・入力欄・DB読込を直すと、15-6号にもそのまま反映されます。訳の文言は下の J156 を直してください（訳は入管の分野参考様式15-6号のWordから）。 -->
+<script>
+var J156={"en": {"num": "Specified Field Reference Form 15-6", "title": "EMPLOYMENT CONTRACT FOR SPECIFIED MOTOR VEHICLE TRANSPORTATION BUSINESS PREPARATION", "org": "Organization of affiliation of the foreign national for specified motor vehicle transportation business preparation", "fgn": "Foreign national for specified motor vehicle transportation business preparation (including candidates)", "agree": "This Employment Contract is hereby entered into in accordance with the contents described in the attached Written Employment Conditions.", "effect": "This Employment Contract shall come into effect when the specified skilled worker entering Japan with the status of residence of “designated activities (specified motor vehicle transportation business preparation)” or changing his/her status of residence to the aforementioned status receives training and guidance (including receiving the training and guidance as provided for in Article 38, paragraph 1 and Article 39 of the Transportation Regulations on Passenger Motor Vehicle Transportation Business (Ordinance of the Ministry of Transport No. 44 of 1956); the special guidance as provided for in Article 38, paragraph 2 of the said Regulations; the guidance as provided for in Article 38, paragraph 5 of the said Regulations; and the aptitude assessment as provided for in Article 38, paragraph 2 of the said Regulations) or starts the activities of engaging in the work ancillary to the work requiring the skills for the motor vehicle transportation field or the activities of receiving driving lessons at a driving school to obtain a license as listed in Appendix No. 17 to Public Notice No. 55 for Designated Activities.", "period": "The period of the Employment Contract (beginning and end of the Employment Contract) stated in the Written Employment Conditions must be changed in accordance with the actual date of entry.", "end": "The Employment Contract shall be terminated when the period of the Employment Contract has expired without renewing the Employment Contract or when the specified skilled worker has lost his/her status of residence for any reason.", "copies": "The Employment Contract and Written Employment Conditions shall be prepared in duplicate, and one copy shall be retained by each party.", "noteA": "(Name of the organization of affiliation of the foreign national for specified motor vehicle transportation business preparation, and name, title and seal of its representative)", "noteB": "(Signature of foreign national for specified motor vehicle transportation business preparation)"}};
+var J156_JA={"jaEffect": "本雇用契約は、乙が、在留資格「特定活動（特定自動車運送業準備）」により本邦に入国して、又は同在留資格への変更等を受けて、講習及び指導（旅客自動車運送事業運輸規則（昭和３１年運輸省令第４４号）第３８条第１項及び第３９条に規定する指導監督、同規則第３８条第２項に規定する特別な指導並びに同規則第３８条第５項に規定する指導を受けること並びに同規則第３８条第２項に規定する適性診断を受けることを含む。）を受け、若しくは自動車運送業分野に属する技能を要する業務に付随する業務に従事する活動又は特定活動告示第５５号別表第１７に掲げる免許を受けるために自動車教習所において自動車の運転に関する教習を受ける活動を開始する時点をもって効力を生じるものとする。", "jaPeriod": "雇用条件書に記載の雇用契約期間（雇用契約の始期と終期）は，実際の入国日又は許可日に伴って変更されるものとする。"};
+var PAIR="<script>/* 15-6号と15-7号をまとめて印刷（1-5号・1-6号の仕組みをそのまま使い、相方のファイル名だけ15-6・15-7にする） */function _pairFile(){ var fn=(location.pathname.split('/').pop()||'').replace(/\\?.*$/,''); var m=fn.match(/^15_(6|7)(_[a-z]+)?\\.html$/i); if(!m) return null; var cur=m[1], suf=m[2]||'', oth=(cur==='6')?'7':'6'; return { self:'15_'+cur+suf+'.html', other:'15_'+oth+suf+'.html', selfNo:(cur==='6'?'5':'6'), otherNo:(cur==='6'?'6':'5') }; }<\/script>\n";
+// 1_5.html（1-5号の本体）を、分野参考様式第１５－６号（特定自動車運送業準備雇用契約書）に読み替える
+function _x156(t, D){
+  var miss=[];
+  function R(a,b){ if(t.indexOf(a)<0){ miss.push(a.slice(0,24)); return; } t=t.split(a).join(b); }
+  function RX(re,fn){ if(!re.test(t)){ miss.push(String(re).slice(1,25)); return; } t=t.replace(re,fn); }
+  R("/^1_5_([a-z]{2})\\.html$/i", "/^15_6_([a-z]{2})\\.html$/i");   // ファイル名で言語を決める
+  R('参考様式第１－５号　特定技能雇用契約書', '分野参考様式第１５－６号　特定自動車運送業準備雇用契約書');
+  R('参考様式第１－５号 特定技能雇用契約書', '分野参考様式第１５－６号 特定自動車運送業準備雇用契約書');
+  RX(/letter-spacing:0\.15em;([^"]*)">特　定　技　能　雇　用　契　約　書/, function(m,a){ return 'letter-spacing:0.05em;'+a+'">特定自動車運送業準備雇用契約書'; });
+  R("特定技能所属機関　${f('es_orgName')}", "特定自動車運送業準備所属機関　${f('es_orgName')}");
+  R('特定技能外国人（候補者を含む。）', '特定自動車運送業準備外国人（候補者を含む。）');
+  R('特定技能雇用契約を締結する。', '特定自動車運送業準備雇用契約を締結する。');
+  RX(/本雇用契約は、乙が、在留資格「特定技能１号」[^<]*<br>/, function(){ return '<span style="line-height:1.6;display:inline-block;">'+D.jaEffect+'</span><br>'; });
+  RX(/雇用条件書に記載の雇用契約期間（雇用契約の始期と終期）は、[^<]*<br>/, function(){ return D.jaPeriod+'<br>'; });
+  RX(/<div[^>]*>\s*甲乙双方は、乙の在留資格に係る審査結果[^<]*<br>\s*\$\{_T15\.L153\(\)\}\s*<\/div>\s*/, function(){ return ''; });   // 15-6号にはこの条がない
+  R('（特定技能所属機関名・代表者役職名・氏名・捺印）', '（特定自動車運送業準備所属機関名・代表者役職名・氏名・捺印）');
+  R('（特定技能外国人の署名）', '（特定自動車運送業準備外国人の署名）');
+  R('var _T15=T15[_L15];', 'var _T15=T15[_L15]; if(window.__j156) window.__j156(_T15,_L15);');
+  return {t:t, miss:miss};
+}
+// 言語の行（T15）のうち、15-6号で文が違う行だけを差し替える（日付・甲乙の行などは1-5号のまま）
+window.__j156=function(T,L){
+  var d=J156[L]||J156.id;
+  T.L120=function(){ return '<div style="font-size:8pt;margin-bottom:2px;">分野参考様式第１５－６号<br><span class="id">'+d.num+'</span></div>'; };
+  T.L123=function(){ return '<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:8px;" class="id">'+d.title+'</div>'; };
+  T.L127=function(){ return '  <span class="id" style="font-size:7.5pt;">'+d.org+'　'+f('es_orgNameEn')+'</span><br>'; };
+  T.L130=function(){ return '  <span class="id" style="font-size:7.5pt;">'+d.fgn+'　'+f('es_applicantNameEn')+'</span><br>'; };
+  T.L136=function(){ return '  <span class="id" style="font-size:7.5pt;">'+d.agree+'</span>'; };
+  T.L143=function(){ return '  <span class="id" style="font-size:'+(d.effect.length>1150?'6.5':'7')+'pt;line-height:'+(d.effect.length>1150?'1.35':'1.45')+';display:inline-block;">'+d.effect+'</span>'; };
+  T.L148=function(){ return '  <span class="id" style="font-size:7pt;line-height:1.45;display:inline-block;">'+d.period+'</span>'; };
+  T.L158=function(){ return '  <span class="id" style="font-size:7pt;line-height:1.45;display:inline-block;">'+d.end+'</span>'; };
+  T.L163=function(){ return '  <span class="id" style="font-size:7pt;line-height:1.45;display:inline-block;">'+d.copies+'</span>'; };
+  T.L185=function(){ return '    <div style="font-size:7pt;">'+d.noteA+'</div>'; };
+  T.L201=function(){ return '    <div style="font-size:7pt;">'+d.noteB+'</div>'; };
+};
+
+(function(){
+  var v='2611171651';   // 本体はいつも同じ番号で読む（1-5号・1-6号の入口と同じ。案シスの画面が先に読み込んでおいた本体を、そのまま使えるように）
+  function get(u){ var x=new XMLHttpRequest(); x.open('GET',u+'?v='+encodeURIComponent(v),false); try{ x.send(); }catch(e){} return x.status===200 ? x.responseText : null; }
+  function err(m){ document.write('<p style="font-family:sans-serif;padding:20px;">'+m+'画面を再読み込みしてください。</p>'); }
+  var src=get('1_5.html'); if(src===null){ err('書類を読み込めませんでした（1_5.html）。'); return; }
+  var r=_x156(src, J156_JA);
+  r.t=r.t.replace(/<\/body>(?![\s\S]*<\/body>)/, PAIR+'</body>');
+  if(r.miss.length){ window.__docErrs=window.__docErrs||[]; window.__docErrs.push('15-6号の文に差し替えられない所があります（'+r.miss.length+'か所：本体の1_5.htmlが変わったため）'); console.warn('[15-6号] 差し替えできなかった所', r.miss); }
+  document.write(r.t);
+})();
+</script>
+</head>
+<body></body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ver.20261118.05: 分野参考様式第１５－７号（雇用条件書・中国語）の入口です。
+     書類の本体は 1-6号と同じ 1_6.html（1_6.html＋1_6_zh.html の言語の行）を読み込み、15-7号で違うところ（様式番号・所属機関名・派遣雇用の欄なし・Ⅲ 従事すべき業務の内容）だけ差し替えて表示します。
+     そのため 1-6号の様式の形・計算・訳を直すと、15-7号にもそのまま反映されます。15-7号だけの訳は下の J157 を直してください（訳は入管の分野参考様式15-7号のWordから）。 -->
+<script>
+var LANG="zh";
+var J157={"num": "领域参考样式第15-7号", "numB": "领域参考样式第15-7号（附件1）", "org": "特定机动车运输业准备所属机构名称", "t1": "1．为成为驾驶员的准备业务", "t2": "2．业务区分（请选择以下的一项）", "opts": ["卡车", "出租车", "巴士"]};
+var PAIR="<script>/* 15-6号と15-7号をまとめて印刷（1-5号・1-6号の仕組みをそのまま使い、相方のファイル名だけ15-6・15-7にする） */function _pairFile(){ var fn=(location.pathname.split('/').pop()||'').replace(/\\?.*$/,''); var m=fn.match(/^15_(6|7)(_[a-z]+)?\\.html$/i); if(!m) return null; var cur=m[1], suf=m[2]||'', oth=(cur==='6')?'7':'6'; return { self:'15_'+cur+suf+'.html', other:'15_'+oth+suf+'.html', selfNo:(cur==='6'?'5':'6'), otherNo:(cur==='6'?'6':'5') }; }<\/script>\n";
+// 1_6.html（1-6号の本体）に言語の行（T6）を差し替えたものを、分野参考様式第１５－７号（雇用条件書）に読み替える
+function _t6apply(text, T6){
+  var L=text.split('\n'), miss=[], hits=[];
+  if(!T6) return {t:text, miss:miss};
+  var H=new Array(L.length);
+  for(var i=0;i<L.length;i++){ var s=L[i], h=0x811c9dc5; for(var j=0;j<s.length;j++){ h=Math.imul((h^s.charCodeAt(j))>>>0,0x01000193)>>>0; } H[i]=h; }
+  function bh(a,n){ var h=0x811c9dc5; for(var k=a;k<a+n;k++){ h=Math.imul((h^H[k])>>>0,0x01000193)>>>0; } return h; }
+  T6.forEach(function(pt,n){
+    var at=pt[0], len=pt[1], sig=pt[2];
+    if(at+len<=L.length && bh(at,len)===sig){ hits.push([at,len,pt[3]]); return; }
+    var f=[]; for(var i=0;i+len<=L.length;i++){ if(bh(i,len)===sig) f.push(i); }
+    if(f.length===pt[5]) hits.push([f[pt[4]],len,pt[3]]); else miss.push(n+1);
+  });
+  hits.sort(function(p,q){ return q[0]-p[0]; }).forEach(function(h){ L.splice.apply(L,[h[0],h[1]].concat(h[2])); });
+  return {t:L.join('\n'), miss:miss};
+}
+function _x157(t, E){
+  var miss=[];
+  function R(a,b){ if(t.indexOf(a)<0){ miss.push(a.slice(0,24)); return; } t=t.split(a).join(b); }
+  function RX(re,fn){ if(!re.test(t)){ miss.push(String(re).slice(1,25)); return; } t=t.replace(re,fn); }
+  R("/^1_6_([a-z]{2})\\.html$/i", "/^15_7_([a-z]{2})\\.html$/i");   // ファイル名で言語を決める
+  RX(/参考様式第１－６号<br>(<span class="id"[^>]*>)[^<]*<\/span>/, function(m,a){ return '分野参考様式第１５－７号<br>'+a+E.num+'</span>'; });
+  RX(/参考様式第１－６号　別紙<\/div>(\s*<div[^>]*>)[^<]*<\/div>/, function(m,a){ return '分野参考様式第１５－７号　別紙１</div>'+a+E.numB+'</div>'; });
+  RX(/特定技能所属機関名<\/td>/g, function(){ return '特定自動車運送業準備所属機関名</td>'; });
+  RX(/(<td class="id"[^>]*>)[^<]*(<\/td><td class="id"[^>]*>\$\{f\('es_orgNameEn'\)\})/, function(m,a,b){ return a+E.org+b; });
+  // 15-7号には派遣雇用の欄がない（直接雇用だけ）。高さはそのまま残して、右の「変更の範囲」の位置をそろえる
+  RX(/<div[^>]*><br><br>\$\{cb\(false,'hire_dispatch'\)\}[^\n]*/, function(){ return '        <div style="font-size:8.5pt;margin-bottom:2px;"><br><br><br><span class="id" style="font-size:7.5pt;">&nbsp;</span></div>'; });
+  // Ⅲ 従事すべき業務の内容：「運転者になるための準備業務」と業務区分（トラック・タクシー・バス）
+  var o=E.opts;
+  var ck=function(n,id){ return '${cb(_jbCat('+n+'),\''+id+'\')}'; };
+  RX(/<table style="width:100%;border-collapse:collapse;font-size:8pt;">\s*<tr>\s*<td style="padding:2px 4px;width:90px;vertical-align:top;">１．分　野[\s\S]*?<\/table>/, function(){
+    return '<table style="width:100%;border-collapse:collapse;font-size:8pt;">\n'
+      +'          <tr><td style="padding:2px 4px;vertical-align:top;">１．運転者になるための準備業務<br><span class="id">'+E.t1+'</span></td></tr>\n'
+      +'          <tr><td style="padding:2px 4px;vertical-align:top;">２．業務区分（以下のいずれかを選択）<br><span class="id">'+E.t2+'</span></td></tr>\n'
+      +'          <tr><td style="padding:2px 4px 2px 1.5em;vertical-align:top;">'+'<span style="white-space:nowrap;">'+ck(0,'jb_truck')+'&nbsp;トラック'+'</span>'+'&emsp;'+'<span style="white-space:nowrap;">'+ck(1,'jb_taxi')+'&nbsp;タクシー'+'</span>'+'&emsp;'+'<span style="white-space:nowrap;">'+ck(2,'jb_bus')+'&nbsp;バス'+'</span>'
+      +'<br><span class="id">'+'<span style="white-space:nowrap;">'+ck(0,'jb_truck_id')+'&nbsp;'+o[0]+'</span>'+'&emsp;'+'<span style="white-space:nowrap;">'+ck(1,'jb_taxi_id')+'&nbsp;'+o[1]+'</span>'+'&emsp;'+'<span style="white-space:nowrap;">'+ck(2,'jb_bus_id')+'&nbsp;'+o[2]+'</span>'+'</span></td></tr>\n'
+      +'        </table>';
+  });
+  RX(/<tr><td style="padding:2px 0;width:90px;vertical-align:top;">１．分　野<\/td>[\s\S]*?<\/table>/, function(){
+    var b='（&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;）';
+    return '<tr><td style="padding:2px 0;vertical-align:top;" colspan="2">１．運転者になるための準備業務</td></tr>\n'
+      +'          <tr><td style="padding:0 0 4px 0;vertical-align:top;" class="id" colspan="2">'+E.t1+'</td></tr>\n'
+      +'          <tr><td style="padding:2px 0;vertical-align:top;">２．業務区分</td><td style="padding:2px 4px;vertical-align:top;">'+b+'</td></tr>\n'
+      +'          <tr><td style="padding:0;vertical-align:top;" class="id">'+E.t2+'</td><td style="padding:0 4px;vertical-align:top;" class="id">'+b+'</td></tr>\n'
+      +'        </table>';
+  });
+  R('諸手当の額及び計算方法（時間外労働の割増賃金は除く。）', '諸手当の額及び計算方法等（時間外労働の割増賃金は除く。）');   // 15-7号 別紙１は「計算方法等」
+  R('参考様式第１－６号', '分野参考様式第１５－７号');   // 画面タイトルなど残り
+  // 業務区分のチェック（案シスの業務区分にトラック・タクシー・バスの字があれば■）
+  R('<script src="ofusa_common.js', '<script>function _jbCat(n){ var k=[["トラック","Truck","truck"],["タクシー","Taxi","taxi"],["バス","Bus","bus"]][n], s=""; try{ s=[v("es_category"),v("es_category2"),v("es_categoryEn"),v("es_category2En")].join(" "); }catch(e){} for(var i=0;i<k.length;i++){ if(s.indexOf(k[i])>=0) return true; } return false; }<\/script>\n<script src="ofusa_common.js');
+  return {t:t, miss:miss};
+}
+
+(function(){
+  var v='2611171651';   // 本体はいつも同じ番号で読む（1-5号・1-6号の入口と同じ。案シスの画面が先に読み込んでおいた本体を、そのまま使えるように）
+  function get(u){ var x=new XMLHttpRequest(); x.open('GET',u+'?v='+encodeURIComponent(v),false); try{ x.send(); }catch(e){} return x.status===200 ? x.responseText : null; }
+  function err(m){ document.write('<p style="font-family:sans-serif;padding:20px;">'+m+'画面を再読み込みしてください。</p>'); }
+  var src=get('1_6.html'); if(src===null){ err('書類を読み込めませんでした（1_6.html）。'); return; }
+  var T6=null, miss=[];
+  if(LANG!=='id'){
+    var w=get('1_6_'+LANG+'.html'); if(w===null){ err('書類を読み込めませんでした（1_6_'+LANG+'.html）。'); return; }
+    var m=/\nvar T6=(.*);\n/.exec(w); try{ T6=JSON.parse(m[1]); }catch(e){ err('言語の行を読み込めませんでした（1_6_'+LANG+'.html）。'); return; }
+  }
+  var a=_t6apply(src, T6), r=_x157(a.t, J157);
+  r.t=r.t.replace(/<\/body>(?![\s\S]*<\/body>)/, PAIR+'</body>');
+  if(a.miss.length){ window.__docErrs=window.__docErrs||[]; window.__docErrs.push('訳の差し替えができない行があります（'+a.miss.length+'か所：本体の1_6.htmlが変わったため）'); }
+  if(r.miss.length){ window.__docErrs=window.__docErrs||[]; window.__docErrs.push('15-7号の文に差し替えられない所があります（'+r.miss.length+'か所：本体の1_6.htmlが変わったため）'); console.warn('[15-7号] 差し替えできなかった所', r.miss); }
+  document.write(r.t);
+})();
+</script>
+</head>
+<body></body>
+</html>
