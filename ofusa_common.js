@@ -6946,13 +6946,17 @@ function _structNoticeShow(){
     var BASE=['f_salaryMonthly'], ALLOW=['f_allowance1Amount','f_allowance2Amount','f_allowance3Amount','f_allowance4Amount'];
     var DED=['f_deductTax','f_deductSocialIns','f_deductEmpIns','f_deductFood','f_deductHousing','f_deductUtility','f_deductOther1Amount'];
     var OUT={f_salaryTotal:'totalMonthly', f_deductTotal:'deductTotal', f_netPay:'netPay'};
+    var JIPBASE={f_deductFood:'es_deductFood',f_deductHousing:'es_deductHousing',f_deductUtility:'es_deductUtility',f_deductOther1Amount:'es_deductOther1Amount'};
+    function jip(id){ var b=JIPBASE[id]; if(!b) return false; var cb=el(b+'Jippi'), est=el(b+'Est'); return !!(cb&&cb.checked) || /実費/.test((est&&est.value)||'') || /実費/.test(String((el(id)||{}).value||'')); }
     function otOn(){ try{ return (typeof _fixedOTState!=='undefined' && _fixedOTState)==='有'; }catch(e){ return !!num((el('f_fixedOTAmount')||{}).value); } }
     function calc(){
       var b=num((el('f_salaryMonthly')||{}).value); if(!b) return null;
       var tot=b; ALLOW.forEach(function(id){ var n=num((el(id)||{}).value); if(n) tot+=n; });
       if(otOn()){ var o=num((el('f_fixedOTAmount')||{}).value); if(o) tot+=o; }
       var ded=0, ok=true;
-      DED.forEach(function(id){ var e=el(id); if(!e) return; var t=String(e.value||'').trim(); if(!t) return; var n=num(t); if(n==null){ ok=false; } else ded+=n; });   // 「実費」など文字があるときは控除合計は計算しない
+      DED.forEach(function(id){ var e=el(id); if(!e) return; var t=String(e.value||'').trim(); if(!t) return;
+        if(jip(id)) return;   // ver.20261118.01: 「実費（合計に含めない）」にした控除は、1-6号と同じく控除合計・手取りに入れない
+        var n=num(t); if(n==null){ ok=false; } else ded+=n; });   // 「実費」など文字があるときは控除合計は計算しない
       return {total:tot, ded:ok?ded:null, net:ok?tot-ded:null};
     }
     window._jyTotals=calc;
@@ -6984,6 +6988,7 @@ function _structNoticeShow(){
       if(OUT[id] && ev.isTrusted){ if(String(ev.target.value||'').trim()==='') delete ev.target.dataset.manualTot; else ev.target.dataset.manualTot='1'; return; }
       if(BASE.concat(ALLOW,DED,['f_fixedOTAmount']).indexOf(id)>=0) apply();
     }, true);
+    document.addEventListener('change', function(ev){ var id=ev.target&&ev.target.id||''; if(/^es_deduct\w+Jippi$/.test(id)) setTimeout(apply,0); }, true);   // 実費のチェックを付け外ししたら合計を計算し直す
     window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ _otUser=false; Object.keys(OUT).forEach(function(id){ var x=el(id); if(x) delete x.dataset.manualTot; }); setTimeout(apply, 2500); setTimeout(apply, 5000); } }catch(_e){} });
     // 手で入れた合計が内訳と合わないときの印刷前のお知らせ
     window._jyTotalsIssue=function(){

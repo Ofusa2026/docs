@@ -508,7 +508,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611172226"></script>
+<script src="ofusa_common.js?v=2611181051"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1348,6 +1348,8 @@ function getAllFormFields(){
 // フォームに値をセット
 function setFormValues(esData){
   if(!esData) return;
+  /* ver.20261118.01: 実費のチェックは保存した es_*Est='実費' から毎回復元する（前は最初の描画で初期化済みになり、DB保存した実費のチェックが呼び戻すと外れていた） */
+  try{ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount','es_deductOther3Amount','es_deductOther4Amount'].forEach(function(b){ var cb=document.getElementById(b+'Jippi'), est=document.getElementById(b+'Est'); if(cb){ cb.checked=false; delete cb.dataset.jippiInit; } if(est) est.value=''; }); }catch(_jr){}
   // ver.20261029: 「変形労働の種類」欄を削除したため、単位が空で種類（ヒアリングフォームの回答・旧データ）があれば「変形労働単位」に写して見える・直せるようにする
   if(!esData.flexUnit && esData.flexType){ const _fu=document.getElementById('es_flexUnit'); if(_fu && !_fu.value) _fu.value=String(esData.flexType); }
 
@@ -1443,6 +1445,7 @@ function setFormValues(esData){
   // 5. プレビューの全チェック状態を復元。p()描画前にcbStateへ入れると、cb()が
   //    cbState[id]を優先するため保存済みの手動チェックが再現される。保存されていない
   //    チェックはフォーム値から自動判定される。別案件の状態が残らないよう一旦全クリア。
+  try{ ['es_deductFood','es_deductHousing','es_deductUtility','es_deductOther1Amount','es_deductOther2Amount','es_deductOther3Amount','es_deductOther4Amount'].forEach(function(b){ var k=b.replace(/^es_/,''), on=/実費/.test(String(esData[k+'Est']||''))||/実費/.test(String(esData[k]||'')); var cb=document.getElementById(b+'Jippi'), est=document.getElementById(b+'Est'), am=document.getElementById(b); if(cb){ cb.checked=on; cb.dataset.jippiInit='1'; } if(est) est.value=on?'実費':''; if(on && am && /実費/.test(am.value||'')) am.value=am.value.replace(/実費/g,'').trim(); }); }catch(_jr2){}   // ver.20261118.01: 保存した実費のチェックを復元
   Object.keys(window.cbState||{}).forEach(k=>delete window.cbState[k]);
   if(esData.cbState && typeof esData.cbState==='object'){
     Object.keys(esData.cbState).forEach(k=>{ window.cbState[k]=esData.cbState[k]; });
