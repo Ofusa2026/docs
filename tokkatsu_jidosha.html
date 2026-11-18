@@ -38,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 説明書（特定活動（特定自動車運送業準備））</div>
-    <div class="ver">ver.20261118.12</div>
+    <div class="ver">ver.20261118.17</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -452,7 +452,8 @@ async function loadFromDB(passedInfo){
     s('f_ceFrom',(cas&&cas.contract_start)||es.contractStart||'');
     s('f_ceTo',(cas&&cas.contract_end)||es.contractEnd||'');
     s('f_hW',es.weeklyH); s('f_hM',es.monthlyH);
-    s('f_pay',es.salaryMonthly); s('f_payH',es.calcHourly||es.salaryHourly); s('f_payJp',es.jpCompSalary);
+    // 月額報酬：月給の人は月給、時給・日給の人は月額に直した額（1-6号の「月額換算」）、無ければ支払概算額
+    s('f_pay',es.salaryMonthly||es.calcMonthly||es.totalMonthly); s('f_payH',es.calcHourly||es.salaryHourly); s('f_payJp',es.jpCompSalary);
     if(es.payMethod) s('f_payWay',/口座|振込|bank/i.test(es.payMethod)?'口座振込み':'通貨払');
     if(co){
       const ad=(co.pref||'')+(co.city||'')+(co.address||'');
