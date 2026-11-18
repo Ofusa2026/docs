@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ver.20261118.12: 分野参考様式第１５－５号（特定自動車運送業準備外国人の報酬に関する説明書） の入口です。
+     書類の本体は 1_4.html を読み込み、特定自動車運送業準備で文が違うところだけ差し替えて表示します（文は入管の分野参考様式のWordから）。
+     1_4.html を直すとこの書類にもそのまま反映されます。差し替える文は下の JR（そのまま置き換え）・JX（段落ごと置き換え）を直してください。 -->
+<script>
+var BASE="1_4.html";
+var JR=[["saveFormGeneric('1_4')", "saveFormGeneric('15_5')"], ["loadCaseToForm(info, '1_4')", "loadCaseToForm(info, '15_5')"], ["参考様式第１－４号", "分野参考様式第１５－５号"], ["特定技能外国人の報酬に関する説明書", "特定自動車運送業準備外国人の報酬に関する説明書"], ["特定技能所属機関の氏名又は名称", "特定自動車運送業準備所属機関の氏名又は名称"], ["特定技能外国人と日本人従業員との報酬", "特定自動車運送業準備外国人と日本人従業員との報酬"]];
+var JX=[];
+
+function _xjp(t, R, X){
+  var miss=[];
+  R.forEach(function(p){ if(t.indexOf(p[0])<0){ miss.push(p[0].slice(0,20)); return; } t=t.split(p[0]).join(p[1]); });
+  X.forEach(function(p){ var re=new RegExp(p[0]); if(!re.test(t)){ miss.push(p[0].slice(0,24)); return; } t=t.replace(re, function(){ var a=arguments; return p[1].replace(/\\g<(\d)>/g, function(m,n){ return a[+n]; }); }); });
+  return {t:t, miss:miss};
+}
+(function(){
+  var v='2611171651';
+  var x=new XMLHttpRequest(); x.open('GET', BASE+'?v='+encodeURIComponent(v), false);
+  try{ x.send(); }catch(e){}
+  if(x.status!==200){ document.write('<p style="font-family:sans-serif;padding:20px;">書類を読み込めませんでした（'+BASE+'）。画面を再読み込みしてください。</p>'); return; }
+  var r=_xjp(x.responseText, JR, JX);
+  if(r.miss.length){ window.__docErrs=window.__docErrs||[]; window.__docErrs.push('文の差し替えができない所があります（'+r.miss.length+'か所：本体の'+BASE+'が変わったため）'); console.warn('[差し替えできなかった所]', r.miss); }
+  document.write(r.t);
+})();
+</script>
+</head>
+<body></body>
+</html>

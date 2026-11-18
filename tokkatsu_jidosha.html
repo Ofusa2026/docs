@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 説明書（「特定活動（特定自動車運送業準備）」用）。文は入管のWord（001459946.docx・令和7年7月版の提出書類一覧）から。
+     レイアウトもWordに合わせた（A4・上35mm 左右下30mm・11pt・1行18pt）。 -->
+<title>説明書（特定活動（特定自動車運送業準備））</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:35mm 30mm 30mm 30mm!important;min-height:1123px!important;}
+.doc .bd{line-height:1.636;}
+.doc .bd div:empty{height:1.636em;}
+.hg1{padding-left:1em;text-indent:-1em;}
+.hg2{padding-left:2em;text-indent:-2em;}
+.ind2{padding-left:2em;}
+.ind3{padding-left:3em;}
+.r{text-align:right;}
+.c{text-align:center;}
+.fl{display:flow-root;}
+.ans{float:right;margin-left:1em;text-indent:0;white-space:nowrap;}
+.bx{display:inline-table;border-collapse:collapse;vertical-align:middle;margin:1px 0;}
+.bx td{border:1px solid #000;width:5.6mm;height:5.6mm;text-align:center;padding:0;line-height:1;text-indent:0;}
+.bx td.dash{border:none;width:4mm;}
+.fp .fs .note{font-size:10px;color:#888;line-height:1.5;margin:2px 0 4px;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:35mm 30mm 30mm 30mm!important;height:297mm!important;}
+  @page{size:A4;margin:0}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .doc{zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 説明書（特定活動（特定自動車運送業準備））</div>
+    <div class="ver">ver.20261118.12</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('tokkatsu_jidosha')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner" id="fpInner"></div>
+</div>
+<div class="pp">
+  <div class="page-nav" id="pageNav">
+    <span class="page-nav-label">ページ:</span>
+    <span id="pnBtns"></span>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5);p()" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0);_fontSize=11;p()" style="padding:2px 7px;" id="fontSizeLabel">11pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5);p()" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=2611181732"></script>
+<script>
+const P='特定自動車運送業準備';
+// ---- 左の入力欄 ----------------------------------------------------------
+// [id, ラベル, 種類(t=文字 / ta=複数行 / yn=有無 / gai=該当 / pay=支払方法 / itaku / s26), 薄い文字の例]
+const YN=['','有','無'], GAI=['','該当','非該当'];
+const PANEL=[
+ ['基本情報',[['f_docDate','作成日','t','2026年11月18日']]],
+ ['外国人',[['f_nationality','国籍・地域','t'],['f_applicant','氏名','t']]],
+ ['１　活動の予定',[
+   ['f_a1Place','(1)運転免許の手続　場所','t'],['f_a1From','　期間（から）','t','2027/2/1'],['f_a1To','　期間（まで）','t','2027/4/30'],
+   ['f_a2Place','(2)第二種免許（タクシー・バスのみ）場所','t'],['f_a2From','　期間（から）','t'],['f_a2To','　期間（まで）','t'],
+   ['f_a3Place','(3)新任運転者研修（タクシー・バスのみ）場所','t'],['f_a3From','　期間（から）','t'],['f_a3To','　期間（まで）','t']],
+   'トラックの場合、(2)(3)は空欄のままにします。'],
+ ['２・３',[['f_q2','２ 特定技能１号へ変更予定','gai'],['f_kubun','　業務区分','t','トラック運転者'],['f_q3','３ 終了後すぐ変更・業務開始','gai']]],
+ ['４　雇用契約',[
+   ['f_q41','(1)労働の法令に適合','yn'],['f_ceFrom','(2)雇用契約期間（から）','t'],['f_ceTo','　（まで）','t'],
+   ['f_hW','(3)所定労働時間（週平均）','t'],['f_hM','　所定労働時間（月平均）','t'],['f_q43','　通常の労働者と同等','yn'],
+   ['f_pay','(4)月額報酬（円）','t'],['f_payH','　基本給の時間換算額（円）','t'],['f_payJp','　日本人の月額報酬（円）','t'],['f_q44','　日本人と同等以上','yn'],
+   ['f_payWay','(5)報酬の支払方法','pay'],
+   ['f_q46','(6)日本人と異なる待遇','yn'],['f_q46d','　内容','t'],
+   ['f_q47','(7)一時帰国の有給休暇','yn'],['f_q48','(8)帰国旅費の負担','yn'],['f_q49','(9)健康・生活の状況の把握','yn']]],
+ ['５　所属機関',[
+   ['f_coName','(1)氏名又は名称','t'],['f_coAddr','(2)住所（本店）','ta'],['f_coTel','(3)電話番号','t'],
+   ['f_office','(4)勤務させる事業所名','t'],['f_officeAddr','　所在地','ta'],['f_ins1','　健康保険・厚生年金の適用事業所','yn'],['f_ins2','　労災保険・雇用保険の適用事業所','yn'],
+   ['f_laborNo','　労働保険番号','t','01-3-13-101341-000'],
+   ['f_q55','(5)労働・社保・租税の法令違反','yn'],['f_q55d','　内容','t'],
+   ['f_q56','(6)非自発的離職','yn'],['f_q56d','　内容・理由','t'],
+   ['f_q57','(7)行方不明者の発生','yn'],['f_q57d','　内容','t'],
+   ['f_q58','(8)刑に処せられた','yn'],['f_q58d','　内容・該当者名','t'],
+   ['f_q59','(9)精神の機能の障害','yn'],['f_q59d','　内容・該当者名','t'],
+   ['f_q510','(10)破産・復権を得ない','yn'],['f_q510d','　内容・該当者名','t'],
+   ['f_q511','(11)実習認定の取消し','yn'],['f_q511d','　内容・該当者名','t'],
+   ['f_q512','(12)取消し法人の役員','yn'],['f_q512d','　内容・該当者名','t'],
+   ['f_q513','(13)不正・著しく不当な行為','yn'],['f_q513d','　内容・該当者名','t'],
+   ['f_q514','(14)暴力団員','yn'],['f_q514d','　内容・該当者名','t'],
+   ['f_q515','(15)法定代理人が(8)〜(14)に該当','yn'],['f_q515d','　内容・該当者名','t'],
+   ['f_q516','(16)暴力団員が事業を支配','yn'],['f_q516d','　内容','t'],
+   ['f_q517','(17)活動内容の文書を１年以上備え置く','yn'],
+   ['f_q518','(18)保証金等を知って契約','yn'],['f_q518d','　内容','t'],
+   ['f_q519','(19)違約金等の契約','yn'],['f_q519d','　内容','t'],
+   ['f_q520','(20)支援費用を外国人に負担させない','yn'],
+   ['f_q521','(21)労災保険加入等の措置','yn'],['f_q521d','　内容','t'],
+   ['f_q522','(22)契約を続けて履行する体制','yn'],['f_q523','(23)報酬の振込み等','yn']]],
+ ['５(24)〜(31)　自社で支援するとき',[
+   ['f_itaku','支援計画の実施','itaku'],
+   ['f_smName','(24)支援責任者名','t'],['f_smTitle','　所属・役職','t'],['f_q524','　役員・職員から選任','yn'],
+   ['f_ssName','(25)支援担当者名','t'],['f_ssTitle','　所属・役職','t'],['f_q525','　事業所ごとに１名以上','yn'],
+   ['f_q526','(26)次のいずれかに該当','yn'],['f_q526sel','　該当するもの','s26'],['f_q526d','　③の内容','t'],
+   ['f_q527','(27)理解できる言語で支援','yn'],['f_q528','(28)支援の文書を１年以上備え置く','yn'],['f_q529','(29)中立な立場','yn'],
+   ['f_q530','(30)支援を怠った','yn'],['f_q530d','　内容','t'],['f_q531','(31)定期的な面談の体制','yn']],
+   '登録支援機関に全部委託するときは、(24)〜(31)は空欄で印刷されます。'],
+ ['６　支援計画',[
+   ['f_q61','(1)交付申請前の情報提供','yn'],['f_q62','(2)対面・テレビ電話等で','yn'],['f_q63','(3)空港等への送迎','yn'],['f_q64','(4)住居の確保','yn'],
+   ['f_q65','(5)口座・携帯電話等の契約','yn'],['f_q66','(6)入国後の情報提供','yn'],['f_q67','(7)届出等への同行','yn'],['f_q68','(8)日本語学習の機会','yn'],
+   ['f_q69','(9)相談・苦情への対応','yn'],['f_q610','(10)日本人との交流','yn'],['f_q611','(11)転職支援','yn'],['f_q612','(12)定期的な面談・通報','yn'],
+   ['f_q613','(13)支援計画の写しの交付','yn'],['f_q614','(14)適正な在留に資する支援','yn']]],
+ ['７　登録支援機関（全部委託のとき）',[
+   ['f_roName','(1)氏名又は名称','t'],['f_roCorp','(2)法人番号（13桁）','t'],['f_roEi','(3)雇用保険適用事業所番号（11桁）','t'],
+   ['f_roAddr','(4)住所','ta'],['f_roTel','　電話番号','t'],['f_roRep','(5)代表者の氏名','t'],['f_roRegNo','(6)登録番号','t'],['f_roRegDate','(7)登録年月日','t'],
+   ['f_roOffice','(8)支援を行う事業所の名称','t'],['f_roOfficeAddr','　所在地','ta'],['f_roSm','(9)支援責任者名','t'],['f_roSs','(10)支援担当者名','t'],
+   ['f_roLang','(11)対応可能言語','t'],['f_roFee','(12)支援委託手数料（月額／人・円）','t']]],
+ ['最後の記名',[['f_signCo','所属機関名','t'],['f_signRo','登録支援機関名','t']]],
+];
+// ふつうの答え（空欄のときだけ入れる。違うところだけ直す）
+const DEF={f_q2:'該当',f_q3:'該当',f_q41:'有',f_q43:'有',f_q44:'有',f_q46:'無',f_q47:'有',f_q48:'有',f_q49:'有',f_ins1:'有',f_ins2:'有',
+ f_q55:'無',f_q56:'無',f_q57:'無',f_q58:'無',f_q59:'無',f_q510:'無',f_q511:'無',f_q512:'無',f_q513:'無',f_q514:'無',f_q515:'無',f_q516:'無',
+ f_q517:'有',f_q518:'無',f_q519:'無',f_q520:'有',f_q521:'有',f_q521d:'雇用開始後、すぐに労災保険へ加入',f_q522:'有',f_q523:'有',
+ f_q61:'有',f_q62:'有',f_q63:'有',f_q64:'有',f_q65:'有',f_q66:'有',f_q67:'有',f_q68:'有',f_q69:'有',f_q610:'有',f_q611:'有',f_q612:'有',f_q613:'有',f_q614:'有'};
+const DEF_SELF={f_q524:'有',f_q525:'有',f_q526:'有',f_q527:'有',f_q528:'有',f_q529:'有',f_q530:'無',f_q531:'有'};
+const SELF_ONLY=['f_smName','f_smTitle','f_q524','f_ssName','f_ssTitle','f_q525','f_q526','f_q526sel','f_q526d','f_q527','f_q528','f_q529','f_q530','f_q530d','f_q531'];
+(function(){
+  const opt=(arr,lab)=>arr.map((o,i)=>`<option value="${o}">${lab?lab[i]:o}</option>`).join('');
+  let h='';
+  PANEL.forEach(([title,items,note])=>{
+    h+=`<div class="fs"><div class="fs-title">${title}</div>`;
+    if(note) h+=`<div class="note">${note}</div>`;
+    items.forEach(([id,lab,ty,ph])=>{
+      let inp;
+      if(ty==='yn') inp=`<select id="${id}" onchange="p()">${opt(YN)}</select>`;
+      else if(ty==='gai') inp=`<select id="${id}" onchange="p()">${opt(GAI)}</select>`;
+      else if(ty==='pay') inp=`<select id="${id}" onchange="p()">${opt(['','通貨払','口座振込み'])}</select>`;
+      else if(ty==='itaku') inp=`<select id="${id}" onchange="_onItaku()">${opt(['','委託','自社'],['','登録支援機関に全部委託する','委託しない（自社で支援する）'])}</select>`;
+      else if(ty==='s26') inp=`<select id="${id}" onchange="p()">${opt(['','①','②','③'],['','①受入れ・管理の実績','②生活相談等の経験','③その他の事情'])}</select>`;
+      else if(ty==='ta') inp=`<textarea id="${id}" rows="2" oninput="p()"></textarea>`;
+      else inp=`<input id="${id}" oninput="p()"${ph?` placeholder="${ph}"`:''}>`;
+      h+=`<div class="fg"><label>${lab}</label>${inp}</div>`;
+    });
+    h+='</div>';
+  });
+  document.getElementById('fpInner').innerHTML=h;
+})();
+
+// ---- 書類の描画 ----------------------------------------------------------
+const B4='　　　　';
+const ck=on=>on?'■':'□';
+const isSelf=()=>v('f_itaku')==='自社';
+const vv=id=>(SELF_ONLY.indexOf(id)>=0 && !isSelf())?'':String(v(id)||'').trim();
+function fx(id, txt, blank){   // 値を整えて出す（空なら薄い文字の目印。印刷では消える）
+  const raw=vv(id);
+  if(!raw) return blank!=null?blank:`<span class="f" data-bind="${id}" style="color:#aaa;font-size:0.85em;font-family:monospace;">${id.replace(/^f_/,'')}</span>`;
+  return `<span class="f" data-bind="${id}">${esc(txt!=null?txt:raw).replace(/\n/g,'<br>')}</span>`;
+}
+const fb=id=>fx(id,null,B4+B4);
+function yn(id){ const a=vv(id); return `${ck(a==='有')}　有　　${ck(a==='無')}　無`; }
+function ynd(id, lab){   // □有（内容：　）□無
+  const a=vv(id), d=vv(id+'d');
+  const body=(a==='有'&&d)?fx(id+'d'):'　　　　　　　　　　　　　　　　　';
+  return `${ck(a==='有')}　有（${lab||'内容'}：${body}　）　${ck(a==='無')}　無`;
+}
+function gai(id){ const a=vv(id); return `${ck(a==='該当')}　該当　${ck(a==='非該当')}　非該当`; }
+function _ymdP(s){
+  const t=String((typeof ofusaToISO==='function'?ofusaToISO(s):s)||'').trim();
+  let m=t.match(/^(\d{4})[-\/年.](\d{1,2})[-\/月.](\d{1,2})/); if(m) return [m[1],String(+m[2]),String(+m[3])];
+  m=t.match(/^(\d{4})(\d{2})(\d{2})$/); if(m) return [m[1],String(+m[2]),String(+m[3])];
+  return null;
+}
+function ymdTxt(id){
+  const r=_ymdP(vv(id));
+  if(!vv(id)) return '　　　　年　　　月　　　日';
+  if(!r) return fx(id);
+  return `<span class="f" data-bind="${id}">${r[0]}年${('　'+r[1]).slice(-2)}月${('　'+r[2]).slice(-2)}日</span>`;
+}
+const per=(a,b)=>`${ymdTxt(a)}から${ymdTxt(b)}まで`;
+const num=(id,unit)=>{ const raw=vv(id); if(!raw) return B4+B4; let t=raw.replace(new RegExp(unit+'$'),'').trim(); if(/^\d+$/.test(t)) t=Number(t).toLocaleString('ja-JP'); return fx(id,t); };
+function kubunTxt(){ const raw=vv('f_kubun'); if(!raw) return fx('f_kubun'); return fx('f_kubun', raw.replace(/[（(][^）)]*(分野|特定技能)[^）)]*[）)]\s*$/,'').trim()); }
+// 番号の枠（労働保険番号 2-1-2-6-3-4／法人番号13桁／雇用保険適用事業所番号11桁）
+function boxes(groups, id){
+  const raw=vv(id);
+  let parts=null;
+  if(raw){
+    const g=raw.normalize('NFKC').split(/[-‐－ー―\s]+/).filter(Boolean);
+    if(g.length>1 && g.every((x,i)=>/^\d+$/.test(x) && i<groups.length && x.length===groups[i])) parts=g;
+    else { const dg=raw.normalize('NFKC').replace(/\D/g,''); let s=0;
+      for(let k=1;k<=groups.length && !parts;k++){ const L=groups.slice(0,k).reduce((a,b)=>a+b,0); if(dg.length===L){ parts=[]; s=0; groups.slice(0,k).forEach(n=>{ parts.push(dg.substr(s,n)); s+=n; }); } }
+    }
+  }
+  if(raw && !parts) return fx(id);   // 枠に合わない番号は、そのまま文字で出す
+  let h='<table class="bx"><tr>';
+  groups.forEach((n,gi)=>{ if(gi) h+='<td class="dash">－</td>'; for(let i=0;i<n;i++) h+=`<td>${parts&&parts[gi]?parts[gi][i]||'':''}</td>`; });
+  return h+'</tr></table>';
+}
+function blocks(){
+  const coSig=vv('f_signCo'), roSig=vv('f_signRo');
+  const S=isSelf();
+  return [
+  `<div class="r" style="font-size:10pt;">〈「特定活動（${P}）」用〉</div>`,
+  `<div style="font-size:10pt;"></div>`,
+  `<div class="c" style="font-size:18pt;">説明書</div>`,
+  `<div></div>`,
+  `<div style="font-size:12pt;padding-left:3.5em;">国籍・地域　　${f('f_nationality')}</div>`,
+  `<div></div>`,
+  `<div style="font-size:12pt;padding-left:3.5em;">氏　　　名　　${f('f_applicant')}</div>`,
+  `<div style="font-size:12pt;"></div>`,
+  `<div style="text-indent:1.8em;">上記の者を受け入れるにあたって、下記のとおりの事実に相違ありません。</div>`,
+  `<div class="c">記</div>`,
+  `<div>１　次の予定に基づいて本邦で活動を行うこと</div>`,
+  `<div>（１）運転免許の取得に係る諸手続</div>`,
+  '+'+`<div class="ind2">場所：${fb('f_a1Place')}</div>`,
+  '+'+`<div class="ind2">期間：${per('f_a1From','f_a1To')}</div>`,
+  `<div>（２）第二種免許取得（タクシー運転者又はバス運転者の場合のみ）</div>`,
+  '+'+`<div class="ind2">場所：${fb('f_a2Place')}</div>`,
+  '+'+`<div class="ind2">期間：${per('f_a2From','f_a2To')}</div>`,
+  `<div>（３）新任運転者研修（タクシー運転者又はバス運転者の場合のみ）</div>`,
+  '+'+`<div class="ind2">場所：${fb('f_a3Place')}</div>`,
+  '+'+`<div class="ind2">期間：${per('f_a3From','f_a3To')}</div>`,
+  `<div></div>`,
+  `<div class="hg1">２　今次の受入れ機関において特定技能外国人として在留資格「特定技能１号」に該当する業務に従事するために同在留資格への在留資格変更許可申請を予定していること</div>`,
+  '+'+`<div class="ind2">${gai('f_q2')}</div>`,
+  '+'+`<div class="ind2">※　業務区分：${kubunTxt()}</div>`,
+  `<div></div>`,
+  `<div class="hg1">３　上記１で予定している活動の終了後、在留資格「特定技能」への在留資格変更許可申請を速やかに行い、変更許可後に上記２の業務区分に基づく業務（運行業務、荷役業務、接遇業務）を開始すること</div>`,
+  '+'+`<div class="ind2">${gai('f_q3')}</div>`,
+  `<div></div>`,
+  `<div class="hg1">４　${P}雇用契約</div>`,
+  '+'+`<div class="hg1">（１）労働基準法その他の労働に関する法令の規定に適合していることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q41')}</div>`,
+  `<div class="hg1">（２）雇用契約期間</div>`,
+  '+'+`<div class="ind3">${per('f_ceFrom','f_ceTo')}</div>`,
+  `<div class="hg1">（３）所定労働時間（週平均）${num('f_hW','時間')}時間／　所定労働時間（月平均）${num('f_hM','時間')}時間</div>`,
+  '+'+`<div class="ind3 fl">所定労働時間が通常の労働者と同等であることの有無<span class="ans">${yn('f_q43')}</span></div>`,
+  `<div class="hg1">（４）月額報酬${num('f_pay','円')}円／基本給の時間換算額${num('f_payH','円')}円</div>`,
+  '+'+`<div class="ind3">同等の業務に従事する日本人の月額報酬${num('f_payJp','円')}円</div>`,
+  '+'+`<div class="ind3">報酬の額が日本人が従事する場合の報酬の額と同等以上であることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q44')}</div>`,
+  `<div class="hg1 fl">（５）報酬の支払方法<span class="ans">${ck(vv('f_payWay')==='通貨払')}　通貨払　　　　${ck(vv('f_payWay')==='口座振込み')}　口座振込み</span></div>`,
+  `<div class="hg1">（６）外国人であることを理由として日本人と異なった待遇としている事項の有無</div>`,
+  '+'+`<div class="ind2">${ynd('f_q46')}</div>`,
+  `<div class="hg2 fl">（７）外国人が一時帰国を希望した場合には、必要な有給休暇を取得させるものとしていることの有無<span class="ans">${yn('f_q47')}</span></div>`,
+  `<div class="hg2 fl">（８）外国人が${P}雇用契約終了後の帰国に要する旅費を負担することができないときは、当該旅費を負担するとともに，出国が円滑になされるよう必要な措置を講ずることとしていることの有無<span class="ans">${yn('f_q48')}</span></div>`,
+  `<div class="hg2 fl">（９）外国人の健康の状況その他の生活の状況を把握するために必要な措置を講ずることとしていることの有無<span class="ans">${yn('f_q49')}</span></div>`,
+  `<div></div>`,
+  `<div class="hg1">５　${P}所属機関</div>`,
+  '+'+`<div class="hg1">（１）氏名又は名称　${f('f_coName')}</div>`,
+  `<div class="hg1">（２）住所（所在地）　※本店又は主たる事務所のものを記入</div>`,
+  '+'+`<div class="ind3">${f('f_coAddr')}</div>`,
+  `<div class="hg1">（３）電話番号　${f('f_coTel')}</div>`,
+  `<div class="hg1">（４）勤務させる事業所名　${f('f_office')}　／所在地　${f('f_officeAddr')}</div>`,
+  '+'+`<div class="ind2 fl">健康保険及び厚生年金保険の適用事業所であることの有無<span class="ans">${yn('f_ins1')}</span></div>`,
+  '+'+`<div class="ind2 fl">労災保険及び雇用保険の適用事業所であることの有無<span class="ans">${yn('f_ins2')}</span></div>`,
+  '+'+`<div class="ind3">労働保険番号　${boxes([2,1,2,6,3,4],'f_laborNo')}</div>`,
+  '+'+`<div class="r">（末尾４桁は割り振られている場合のみ記入）</div>`,
+  `<div class="hg1">（５）労働、社会保険及び租税に関する法令の規定に違反したことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q55')}</div>`,
+  `<div class="hg2">（６）${P}雇用契約の締結の日前1年以内又は締結の日以後に、外国人が従事する業務と同種の業務に従事していた労働者を非自発的に離職させたことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q56','内容・理由')}</div>`,
+  `<div class="hg2">（７）${P}雇用契約の締結の日前1年以内又は締結の日以後に、${P}所属機関の責めに帰すべき事由により外国人の行方不明者を発生させたことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q57')}</div>`,
+  `<div class="hg2">（８）${P}所属機関・その役員・支援責任者・支援担当者が法令に違反して刑に処せられたことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q58','内容・該当者名')}</div>`,
+  `<div class="hg2">（９）${P}所属機関・その役員・支援責任者・支援担当者が${P}雇用契約の適正な履行に影響する精神の機能の障害を有することの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q59','内容・該当者名')}</div>`,
+  `<div class="hg2">（１０）${P}所属機関・その役員・支援責任者・支援担当者が破産手続開始の決定を受けて復権を得ないことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q510','内容・該当者名')}</div>`,
+  `<div class="hg2">（１１）${P}所属機関・その役員・支援責任者・支援担当者が技能実習法第１６条第１項の規定により実習認定を取り消されたことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q511','内容・該当者名')}</div>`,
+  `<div class="hg2">（１２）${P}所属機関・その役員・支援責任者・支援担当者が技能実習法第１６条第１項の規定により実習認定を取り消された法人の役員であったことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q512','内容・該当者名')}</div>`,
+  `<div class="hg2">（１３）${P}所属機関・その役員・支援責任者・支援担当者が${P}雇用契約の締結の日前５年以内又は締結の日以後に、出入国又は労働に関する法令に関し不正又は著しく不当な行為をしたことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q513','内容・該当者名')}</div>`,
+  `<div class="hg2">（１４）${P}所属機関・その役員・支援責任者・支援担当者が暴力団員であること又は５年以内に暴力団員であったことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q514','内容・該当者名')}</div>`,
+  `<div class="hg2">（１５）${P}所属機関・その役員・支援責任者・支援担当者の法定代理人（法人である場合はその役員）が（８）から（１４）に該当することの有無（${P}所属機関・その役員・支援責任者・支援担当者が営業に関し成年者と同一の行為能力を有しない未成年者である場合に記入）</div>`,
+  '+'+`<div class="ind3">${ynd('f_q515','内容・該当者名')}</div>`,
+  `<div class="hg2">（１６）暴力団員又は５年以内に暴力団員であった者がその事業活動を支配する者であることの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q516')}</div>`,
+  `<div class="hg2">（１７）外国人の活動内容に関する文書を作成し、活動をさせる事務所に${P}雇用契約終了の日から１年以上備えて置くこととしていることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q517')}</div>`,
+  `<div class="hg2">（１８）${P}雇用契約に係る保証金の徴収その他財産管理又は違約金等の支払契約があることを認識して${P}雇用契約を締結していることの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q518')}</div>`,
+  `<div class="hg2">（１９）${P}雇用契約の不履行について違約金等の支払契約を締結していることの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q519')}</div>`,
+  `<div class="hg2 fl">（２０）${P}外国人支援に要する費用について、直接又は間接に外国人に負担させないこととしていることの有無<span class="ans">${yn('f_q520')}</span></div>`,
+  `<div class="hg2">（２１）労災保険加入等の措置の有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q521')}</div>`,
+  `<div class="hg2 fl">（２２）${P}雇用契約を継続して履行する体制が適切に整備されていることの有無<span class="ans">${yn('f_q522')}</span></div>`,
+  `<div class="hg2 fl">（２３）外国人の報酬を、当該外国人の指定する銀行その他の金融機関に対する振込み又は現実に支払われた額を確認できる方法によって支払われることとしており、かつ、後者の場合には、出入国在留管理庁長官に報酬の支払を裏付ける客観的な資料を提出し、その確認を受けることとしていることの有無<span class="ans">${yn('f_q523')}</span></div>`,
+  `<div style="font-size:9pt;padding-left:0.6em;text-indent:-0.6em;">（以下（２４）から（３１）は、契約により登録支援機関に${P}外国人支援計画の全部の実施を委託しない場合に記入）</div>`,
+  '+'+`<div>（２４）支援責任者名　${S?fb('f_smName'):B4+B4}　所属・役職　${S?fb('f_smTitle'):''}</div>`,
+  '+'+`<div class="ind3 fl">役員又は職員の中から支援責任者を選任していることの有無<span class="ans">${yn('f_q524')}</span></div>`,
+  `<div>（２５）支援担当者名　${S?fb('f_ssName'):B4+B4}　所属・役職　${S?fb('f_ssTitle'):''}</div>`,
+  '+'+`<div class="ind3 fl">役員又は職員の中から、業務に従事させる事業所ごとに１名以上の支援担当者を選任していることの有無<span class="ans">${yn('f_q525')}</span></div>`,
+  `<div class="hg2 fl">（２６）次のいずれかに該当することの有無<span class="ans">${yn('f_q526')}</span></div>`,
+  '+'+`<div class="ind2">（有の場合は該当するものを選択）</div>`,
+  '+'+`<div style="padding-left:5.2em;text-indent:-2.2em;">${ck(vv('f_q526')==='有'&&vv('f_q526sel')==='①')}　①過去２年間において法別表第１の１の表、２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る）をもって在留する中長期在留者の受入れ又は管理を適正に行った実績を有すること</div>`,
+  '+'+`<div style="padding-left:5.2em;text-indent:-2.2em;">${ck(vv('f_q526')==='有'&&vv('f_q526sel')==='②')}　②支援責任者及び支援担当者が過去２年以内に法別表第１の１の表、２の表及び５の表の上欄の在留資格（収入を伴う事業を運営する活動又は報酬を受ける活動を行うことができる在留資格に限る）をもって在留する中長期在留者の生活相談等に従事した経験を有すること</div>`,
+  '+'+`<div style="padding-left:5.2em;text-indent:-2.2em;">${ck(vv('f_q526')==='有'&&vv('f_q526sel')==='③')}　③その他支援業務を適正に実施できる事情を有すること</div>`,
+  '+'+`<div style="padding-left:5.2em;">（内容：${(vv('f_q526sel')==='③'&&vv('f_q526d'))?fx('f_q526d'):'　　　　　　　　　　　　　　　　　　　　'}　）</div>`,
+  `<div class="hg2">（２７）${P}外国人支援計画に基づく支援を、外国人が十分に理解することができる言語によって行うことができる体制を有していることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q527')}</div>`,
+  `<div class="hg2 fl">（２８）${P}外国人支援の状況に関する文書を作成し、${P}外国人支援を行う事務所に${P}雇用契約終了の日から１年以上備えて置くこととしていることの有無<span class="ans">${yn('f_q528')}</span></div>`,
+  `<div class="hg2 fl">（２９）支援責任者及び支援担当者が、${P}外国人支援計画の中立な実施を行うことができる立場の者であることの有無<span class="ans">${yn('f_q529')}</span></div>`,
+  `<div class="hg2">（３０）${P}雇用契約締結の日前５年以内又は契約締結の日以後に適合${P}外国人支援計画に基づく${P}外国人支援を怠ったことの有無</div>`,
+  '+'+`<div class="ind3">${ynd('f_q530')}</div>`,
+  `<div class="hg2 fl">（３１）支援責任者又は支援担当者が外国人及びその監督をする立場にある者と定期的な面談を実施できる体制を有していることの有無<span class="ans">${yn('f_q531')}</span></div>`,
+  `<div></div>`,
+  `<div class="hg2">６　${P}外国人支援計画</div>`,
+  '+'+`<div class="hg2 fl">（１）在留資格認定証明書の交付申請前の、${P}雇用契約の内容、本邦において行うことができる活動の内容、上陸及び在留のための条件その他の本邦に上陸し在留するに当たって留意すべき事項に関する、外国人が十分に理解することができる言語による情報提供の実施の有無<span class="ans">${yn('f_q61')}</span></div>`,
+  `<div class="hg2 fl">（２）上記（１）について、対面により、又はテレビ電話装置その他の方法により行うこととしていることの有無<span class="ans">${yn('f_q62')}</span></div>`,
+  `<div class="hg2">（３）出入国時に港又は飛行場への送迎をすることとしていることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q63')}</div>`,
+  `<div class="hg2">（４）適切な住居の確保に係る支援をすることとしていることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q64')}</div>`,
+  `<div class="hg2 fl">（５）金融機関における預金口座等の開設及び携帯電話の利用に関する契約その他の生活に必要な契約に係る支援をすることとしていることの有無<span class="ans">${yn('f_q65')}</span></div>`,
+  `<div class="hg2 fl">（６）本邦入国後に、本邦での生活一般に関する事項、国又は地方公共団体の機関への届出その他の手続、相談又は苦情の申出に関する連絡先、十分に理解することができる言語で医療を受けることができる医療機関に関する事項、防災・防犯に関する事項、緊急時における対応に必要な事項及び外国人の法的保護に必要な事項に関する情報の提供を外国人が十分に理解することができる言語により実施することとしていることの有無<span class="ans">${yn('f_q66')}</span></div>`,
+  `<div class="hg2 fl">（７）外国人が国又は地方公共団体の機関への届出その他の手続を履行するに当たり、必要に応じ、関係機関への同行その他の必要な措置を講ずることとしていることの有無<span class="ans">${yn('f_q67')}</span></div>`,
+  `<div class="hg2 fl">（８）日本語を学習する機会を提供することとしていることの有無<span class="ans">${yn('f_q68')}</span></div>`,
+  `<div class="hg2 fl">（９）外国人が十分に理解することができる言語により、相談又は苦情の申出に対して、遅滞なく、適切に応じるとともに、必要な措置を講ずることとしていることの有無<span class="ans">${yn('f_q69')}</span></div>`,
+  `<div class="hg2">（１０）外国人と日本人の交流の促進に係る支援をすることとしていることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q610')}</div>`,
+  `<div class="hg2">（１１）外国人が、その責めに帰すべき事由によらずに${P}雇用契約を解除される場合は、転職支援をすることとしていることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q611')}</div>`,
+  `<div class="hg2 fl">（１２）支援責任者又は支援担当者が外国人及びその監督をする立場にある者と定期的な面談（外国人と行う場合には当該外国人が十分に理解することができる言語による面談）を実施し、問題の発生を知ったときは，その旨を関係行政機関に通報することとしていることの有無<span class="ans">${yn('f_q612')}</span></div>`,
+  `<div class="hg2 fl">（１３）${P}外国人支援計画を日本語及び外国人が十分に理解することができる言語により作成し、当該外国人にその写しを交付することとしていることの有無<span class="ans">${yn('f_q613')}</span></div>`,
+  `<div class="hg2">（１４）支援の内容が外国人の適正な在留に資するものであって、かつ、支援を実施する者において適切に実施することができるものであることの有無</div>`,
+  '+'+`<div class="r">${yn('f_q614')}</div>`,
+  `<div></div>`,
+  `<div style="padding-left:1.3em;text-indent:-1.3em;">７　登録支援機関（契約により登録支援機関に${P}外国人支援計画の全部の実施を委託する場合に記入）</div>`,
+  '+'+`<div style="padding-left:1.3em;">（１）氏名又は名称　${S?'':f('f_roName')}</div>`,
+  `<div style="padding-left:1.3em;">（２）法人番号（１３桁）　${boxes([13], S?'':'f_roCorp')}</div>`,
+  `<div style="padding-left:1.3em;">（３）雇用保険適用事業所番号（１１桁）　${boxes([11], S?'':'f_roEi')}</div>`,
+  `<div style="padding-left:1.3em;">（４）住所（所在地）　${S?'':f('f_roAddr')}</div>`,
+  '+'+`<div style="padding-left:4.3em;">電話番号　${S?'':f('f_roTel')}</div>`,
+  `<div style="padding-left:1.3em;">（５）代表者の氏名　${S?'':f('f_roRep')}</div>`,
+  `<div style="padding-left:1.3em;">（６）登録番号　${S?'':f('f_roRegNo')}</div>`,
+  `<div style="padding-left:1.3em;">（７）登録年月日　${S?'':roRegTxt()}</div>`,
+  `<div style="padding-left:1.3em;">（８）支援を行う事業所の名称　${S?'':f('f_roOffice')}</div>`,
+  '+'+`<div style="padding-left:4.3em;">所在地　${S?'':f('f_roOfficeAddr')}</div>`,
+  `<div style="padding-left:1.3em;">（９）支援責任者名　${S?'':f('f_roSm')}</div>`,
+  `<div style="padding-left:1.3em;">（１０）支援担当者名　${S?'':f('f_roSs')}</div>`,
+  `<div style="padding-left:1.3em;">（１１）対応可能言語　${S?'':f('f_roLang')}</div>`,
+  `<div style="padding-left:1.3em;">（１２）支援委託手数料（月額／人）　${S?'':(vv('f_roFee')?num('f_roFee','円')+'円':fx('f_roFee'))}</div>`,
+  `<div></div>`,
+  `<div style="font-size:10pt;padding-left:1.2em;text-indent:-1.2em;">（注）上記について該当するものにチェックマークを付し、必要な記入をしてください。</div>`,
+  '+'+`<div style="font-size:10pt;"></div>`,
+  '+'+`<div class="r">${ymdTxt('f_docDate')}</div>`,
+  '+'+`<div class="r">${P}所属機関名　${coSig?fx('f_signCo'):B4+B4+B4}</div>`,
+  '+'+`<div></div>`,
+  '+'+`<div class="r">※７において支援を登録支援機関に全部委託する場合のみ次の記載が必要</div>`,
+  '+'+`<div class="r">登録支援機関名　${(!S&&roSig)?fx('f_signRo'):B4+B4+B4}</div>`,
+  ];
+}
+function roRegTxt(){ const r=_ymdP(vv('f_roRegDate')); if(!vv('f_roRegDate')) return fx('f_roRegDate'); return r?`<span class="f" data-bind="f_roRegDate">${r[0]}年${r[1]}月${r[2]}日</span>`:fx('f_roRegDate'); }
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  _fontSize = (_fontSize === 8.5) ? 11 : _fontSize;
+  _applyFontSize();
+  _applyJdFontSize();
+  // ページ分けは自動（質問と答えの行は同じページに置く。行の頭に + が付いた行は前の行とひとまとまり）
+  const units=[];
+  blocks().forEach(b=>{
+    if(b==='<<PB>>'){ units.push({pb:true}); return; }
+    if(b.charAt(0)==='+' && units.length && !units[units.length-1].pb) units[units.length-1].h.push(b.slice(1));
+    else units.push({h:[b.replace(/^\+/,'')]});
+  });
+  const m=document.createElement('div'); m.className='doc'; m.style.cssText='position:absolute;left:-10000px;top:0;visibility:hidden;zoom:1;';
+  m.innerHTML='<div class="bd" style="font-size:11pt;">'+units.map((u,i)=>u.pb?'':`<div data-u="${i}">${u.h.join('')}</div>`).join('')+'</div>';
+  document.body.appendChild(m);
+  const cs=getComputedStyle(m);
+  const cap=1123-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-2;
+  const pages=[[]]; let used=0;
+  const isSp=h=>h.length===1 && /^<div[^>]*><\/div>$/.test(h[0]);
+  units.forEach((u,i)=>{
+    const cur=pages[pages.length-1];
+    if(u.pb){ if(cur.length){ pages.push([]); used=0; } return; }
+    const hh=m.querySelector('[data-u="'+i+'"]').getBoundingClientRect().height;
+    if(isSp(u.h) && !cur.length) return;   // ページの頭の空行は入れない
+    if(used+hh>cap && cur.length){ pages.push([]); used=0; if(isSp(u.h)) return; }
+    pages[pages.length-1].push('<div>'+u.h.join('\n')+'</div>'); used+=hh;
+  });
+  m.remove();
+  w.innerHTML=pages.map((pg,i)=>`<div class="doc"><div class="page-num-label">P${i+1}</div><div class="bd" style="font-size:11pt;">${pg.join('\n')}</div></div>`).join('\n');
+  const nb=document.getElementById('pnBtns');
+  if(nb && nb.childElementCount!==pages.length) nb.innerHTML=pages.map((_,i)=>`<button class="pn-btn pn-btn-page${i?'':' active'}" onclick="scrollToPage(${i+1})">P${i+1}</button>`).join('');
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+function _applyJdFontSize(){
+  const st=document.getElementById('_jdFontStyle')||document.createElement('style');
+  st.id='_jdFontStyle'; document.head.appendChild(st);
+  const s=_fontSize/11;
+  st.textContent=[18,12,11,10,9].map(z=>`.doc [style*="font-size:${z}pt"]{font-size:${(z*s).toFixed(2)}pt!important}`).join('');
+}
+// 「自社で支援する」に切り替えたら、(24)〜(31)の空欄にふつうの答えを入れる
+function _onItaku(){ if(v('f_itaku')==='自社') Object.keys(DEF_SELF).forEach(k=>{ const e=document.getElementById(k); if(e&&!e.value) e.value=DEF_SELF[k]; }); p(); }
+function _today(){ const n=new Date(); return n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日'; }
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId,companyId,companyName}=info;
+  const s=(id,val)=>{const e=document.getElementById(id); if(e&&val!=null&&String(val).trim()!=='') e.value=String(val).trim();};
+  const d=(id,val)=>{const e=document.getElementById(id); if(e&&!String(e.value||'').trim()&&val) e.value=val;};   // 空欄のときだけ入れる（保存した答えは消さない）
+  try{
+    const [cases,persons]=await Promise.all([
+      sb('cases?select=applicant,company,company_id,org,emp_set_idx,job_category,contract_start,contract_end,support_fee,so_office_idx,doc_create_date&id=eq.'+caseId),
+      sb('persons?select=applicant_name_en,nationality&case_id=eq.'+caseId)
+    ]);
+    const cas=cases&&cases[0], pd=persons&&persons[0];
+    // ver.20260715 と同じ：実在する列だけを指定する（無い列を混ぜると全部止まる）
+    const cs='name,pref,city,address,tel,labor_ins_no,emp_sets';
+    let co=null; const cid=companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb('companies?select='+cs+'&id=eq.'+cid); co=r&&r[0]; }
+    if(!co){ const nm=companyName||(cas&&cas.company); if(nm){ const r=await sb('companies?select='+cs+'&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; } }
+    s('f_applicant',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||'');
+    s('f_nationality',(pd&&pd.nationality)||info.nationality||'');
+    // 雇用条件セット（1-6号と同じセット）
+    let es={};
+    const idx=(co&&typeof window.resolveEmpSetIdx==='function')?await window.resolveEmpSetIdx(co,cas,info):-1;
+    if(co&&Array.isArray(co.emp_sets)&&idx>=0) es=co.emp_sets[idx]||{};
+    s('f_kubun',es.category||(cas&&cas.job_category)||'');
+    s('f_ceFrom',(cas&&cas.contract_start)||es.contractStart||'');
+    s('f_ceTo',(cas&&cas.contract_end)||es.contractEnd||'');
+    s('f_hW',es.weeklyH); s('f_hM',es.monthlyH);
+    s('f_pay',es.salaryMonthly); s('f_payH',es.calcHourly||es.salaryHourly); s('f_payJp',es.jpCompSalary);
+    if(es.payMethod) s('f_payWay',/口座|振込|bank/i.test(es.payMethod)?'口座振込み':'通貨払');
+    if(co){
+      const ad=(co.pref||'')+(co.city||'')+(co.address||'');
+      s('f_coName',co.name); s('f_coAddr',ad);
+      s('f_coTel',(typeof ofusaFmtTelJP==='function'&&ofusaFmtTelJP(co.tel))||co.tel);
+      s('f_office',String(es.officeName||es.orgName||'').trim()||co.name);
+      s('f_officeAddr',String(es.officeAddr||es.orgAddress||'').trim()||ad);
+      if(co.labor_ins_no && !/^[―ー\-\s]+$/.test(String(co.labor_ins_no))) s('f_laborNo',co.labor_ins_no);
+      s('f_signCo',co.name);
+    }
+    // 登録支援機関（案件の登録支援機関が入っていれば「全部委託」）
+    const orgName=String((cas&&cas.org)||info.orgName||'').trim();
+    d('f_itaku',(orgName&&!/自社/.test(orgName))?'委託':'自社');
+    if(v('f_itaku')==='委託' && orgName && typeof findSupportOrg==='function'){
+      const org=await findSupportOrg(orgName,'name,corp_no,emp_ins_no,pref,city,address,address_detail,tel,rep_name,reg_no,reg_date,support_manager,languages,offices,support_staff_list');
+      if(org){
+        s('f_roName',org.name); s('f_roCorp',org.corp_no); s('f_roEi',org.emp_ins_no);
+        // support_orgs.address は都道府県から始まる住所（pref+city を足すと二重になる）
+        s('f_roAddr',org.address||((org.pref||'')+(org.city||'')+(org.address_detail||'')));
+        s('f_roTel',(typeof ofusaFmtTelJP==='function'&&ofusaFmtTelJP(org.tel))||org.tel);
+        s('f_roRep',org.rep_name); s('f_roRegNo',org.reg_no); s('f_roRegDate',org.reg_date);
+        s('f_roSm',org.support_manager); s('f_roLang',org.languages);
+        try{
+          const o=(typeof org.offices==='string')?JSON.parse(org.offices):org.offices; const oi=parseInt(cas&&cas.so_office_idx||0)||0;
+          const t=(Array.isArray(o)&&o.length)?(o[oi]||o[0]):null;
+          // 事業所の住所は「都道府県＋市区町村＋番地」を優先（officeAddress に「東京都千代田区東京都千代田区…」と二重のものがあるため）
+          const oa=t?(((t.officePref||'')+(t.officeCity||'')+(t.officeAddressDetail||'')) || t.officeAddress || ''):'';
+          s('f_roOffice',(t&&t.officeName)||org.name); s('f_roOfficeAddr',oa||org.address);
+        }catch(_e){ s('f_roOffice',org.name); }
+        try{ const l=(typeof org.support_staff_list==='string')?JSON.parse(org.support_staff_list):org.support_staff_list; const ss=(Array.isArray(l)&&l.length)?(l[0].name||l[0]||''):''; s('f_roSs',ss||'支援計画書のとおり'); }catch(_e){ s('f_roSs','支援計画書のとおり'); }
+        s('f_signRo',org.name);
+      }
+      s('f_roFee',(cas&&cas.support_fee)||es.supportFee||'');
+    }
+    // ふつうの答え（空欄のときだけ）
+    Object.keys(DEF).forEach(k=>d(k,DEF[k]));
+    if(v('f_itaku')==='自社') Object.keys(DEF_SELF).forEach(k=>d(k,DEF_SELF[k]));
+    d('f_docDate',(cas&&cas.doc_create_date)||_today());
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+try{ document.fonts.ready.then(()=>p()); }catch(_e){}
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'); const area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom=(ppW<docW)?(ppW/docW):1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){ try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){} }
+    if(!found){ const opt=document.createElement('option'); opt.value=JSON.stringify(info); opt.textContent='（indexから選択）'; sel.appendChild(opt); sel.value=opt.value; }
+  }
+  // まず共通関数で全入力欄を埋める（保存した答えもここで戻る）
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'tokkatsu_jidosha'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
