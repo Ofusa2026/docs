@@ -77,12 +77,29 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .wn-section ul{list-style:none;padding:0;}
 .wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
 .wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#7c3aed;}
+/* ver.20261118.06: 書類の検索 */
+#otherDocsContainer.ns-on .section,#otherDocsContainer.ns-on .divider,#otherDocsContainer.ns-on .fld-head,#otherDocsContainer.ns-on #fldOtherToggle{display:none !important;}
+#otherDocsContainer.ns-on .item.ns-hide{display:none !important;}
+#otherDocsContainer.ns-on #fldDocs .item:not(.ns-hide){display:flex !important;padding-left:16px;}
+#otherDocsContainer.ns-on .item[data-fld] > div::before{content:attr(data-f);display:block;font-size:9.5px;color:#64748b;}
+#otherDocsContainer.ns-on .item.ns-first{background:rgba(59,130,246,.10);}
+#navSearch:focus{border-color:#3b82f6 !important;}
+/* ver.20261118.05: 分野別誓約書の絞り込み */
+#fldDocs.fld-filtered:not(.fld-all) .item.fld-off{display:none;}
+#fldDocs.fld-filtered:not(.fld-all) .fld-off{display:none;}
+.who{display:inline-block;font-size:9px;font-weight:600;line-height:1.4;padding:0 5px;border-radius:4px;margin:1px 5px 1px 0;vertical-align:0;letter-spacing:.02em;border:1px solid transparent;}
+.who-co{background:rgba(96,165,250,.14);color:#93c5fd;border-color:rgba(96,165,250,.32);}
+.who-so{background:rgba(52,211,153,.12);color:#6ee7b7;border-color:rgba(52,211,153,.30);}
+.who-ap{background:rgba(167,139,250,.14);color:#c4b5fd;border-color:rgba(167,139,250,.32);}
+#fldDocs .fld-head{padding:9px 14px 2px;font-size:11.5px;font-weight:700;color:#cbd5e1;border-top:1px solid rgba(148,163,184,.18);}
+#fldDocs .fld-head:first-child{border-top:0;}
+#fldDocs .item{padding-left:22px;}
 </style>
 </head>
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -136,6 +153,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <!-- ver.20261116.15: この案件の書類をまとめてチェック（エラー・ページのはみ出し・訳の言語ちがい・訳が空の欄） -->
       <button id="idx_docCheckBtn" onclick="openDocCheck()" title="この案件の書類を裏で1つずつ開いて、エラー・ページのはみ出し・訳の言語ちがい・訳が空の欄がないかを調べます（書類は書き換えません）" style="display:none;width:100%;margin-top:6px;padding:6px;background:#1e40af;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;">🩺 全書類チェック</button>
       <button id="idx_trFixBtn" onclick="openTrBulkFix()" title="雇用条件セットの訳の欄に、その人の言語と違う言語が入っているところを探して、まとめて訳し直します（調べるだけもできます）" style="display:none;width:100%;margin-top:4px;padding:5px;background:transparent;color:#93c5fd;border:1px solid #1e40af;border-radius:5px;cursor:pointer;font-size:11px;">🌐 言語ちがいの訳をまとめて直す</button>
+      <!-- ver.20261118.05: 「申請書類一式をまとめてPDF」「会社・グループの複数人をまとめてPDF」のボタンは外した（処理は残してある） -->
       <!-- ver.20260810.01: 「🔍 案件検索」ブロック撤去（案件選択は case ID 貼り付け or URL遷移に一本化）。
            idx_filterText / idx_filterCompany / idx_caseCount / idx_caseSelect / RLS注記 の5要素を削除。 -->
       <label style="margin-top:10px;">🌐 言語（書類全体に適用）</label>
@@ -155,26 +173,23 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
         <button class="glbtn" data-lang="tl" onclick="setGlobalLang('tl')" title="タガログ語（フィリピン）">🇵🇭</button>
       </div>
     </div>
-    <!-- ver.20260820.16: 優先書類プレースホルダ（案件を開いた時にJSでここへnav-*を移動） -->
-    <div id="priorityDocsSection" style="display:none;">
-      <div class="section" style="color:#a855f7;background:linear-gradient(180deg,#faf5ff,#f3e8ff);border-left:3px solid #a855f7;">📌 この案件の必要書類</div>
-      <div style="padding:6px 10px;background:#faf5ff;border-bottom:1px solid #f3e8ff;">
-        <!-- ver.20261109.11: 「スキャン必要書類をまとめてPDF」ボタンは、下の「まとめてPDF」と重なるため削除（必要書類の自動選択は、まとめてPDFの「📌 スキャン必要書類を選ぶ」に移した） -->
-        <!-- ver.20261116.16: 申請書類一式（入管の提出書類一覧表に〇を付けて先頭に綴じ、Saysayの書類とドライブの書類を番号順に1本のPDFに） -->
-        <button onclick="_isaOpen()" style="width:100%;margin-top:0;margin-bottom:6px;padding:7px;background:#6d28d9;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">📎 申請書類一式を<wbr>まとめてPDF</button>
-        <div style="font-size:9px;color:#7c3aed;margin:-3px 0 6px;line-height:1.4;">入管の最新の提出書類一覧表に〇を付けて先頭に綴じ、Saysayの書類とドライブ（署名押印済み・アップロード書類）を一覧表の番号順に1つのPDFにします。</div>
-        <!-- ver.20261106.05: 同じ会社の複数人の書類をまとめてPDF -->
-        <button onclick="openMultiPersonPdf()" style="width:100%;margin-top:0;padding:7px;background:#0f766e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11.5px;font-weight:700;word-break:keep-all;line-height:1.35;">👥 会社・グループの複数人を<wbr>まとめてPDF</button>
-        <div style="font-size:9px;color:#5eead4;margin-top:3px;line-height:1.4;">この会社の人や、案シスでグループにした案件の人を選び、1-5号・1-6号などを人数分まとめて1つのPDFにします（言語は人ごとに国籍から自動）。</div>
+    <!-- ver.20261118.05: 「まとめて作る」の欄は外した（ボタンは上の案件の欄へ）。下の2つは古い処理が参照するので空で残す -->
+    <div id="priorityDocsSection" style="display:none;"><div id="priorityDocsList"></div></div>
+    <!-- ver.20261118.06: 書類の検索（名前・様式番号・分野で絞り込み、Enter で一番上を開く） -->
+    <div id="navSearchWrap" style="padding:8px 12px 6px;border-bottom:1px solid rgba(148,163,184,.15);">
+      <div style="position:relative;">
+        <input id="navSearch" type="search" autocomplete="off" placeholder="🔍 書類をさがす（例：1-6、誓約書、じゅうせつ、gaishoku）" oninput="_navSearch(this.value)" onkeydown="_navSearchKey(event)" style="width:100%;box-sizing:border-box;padding:6px 26px 6px 9px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:12px;outline:none;">
+        <span id="navSearchCount" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#64748b;pointer-events:none;"></span>
       </div>
-      <div id="priorityDocsList"></div>
+      <div id="navSearchNone" style="display:none;font-size:11px;color:#94a3b8;padding:8px 2px 2px;">見つかりませんでした</div>
     </div>
     <!-- 全書類（優先以外）を「その他の書類 ▼」で折りたためるように包む -->
     <div id="otherDocsToggle" style="display:none;padding:8px 12px;background:#f3f4f6;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;user-select:none;" onclick="toggleOtherDocs()">
       <span id="otherDocsToggleIcon">▶</span> その他の書類（全表示）
     </div>
     <div id="otherDocsContainer">
-    <div class="section">特定技能</div>
+    <!-- ver.20261118.05: 分類ごとに並べ直した（申請人ごと／会社・支援機関／場合によって／特定活動／入管に出す書類／分野別誓約書／その他／設定） -->
+    <div class="section">申請人ごとの書類</div>
     <div class="item" id="nav-1_3" onclick="open_doc('1_3')">
       <span class="item-icon">🩺</span>
       <div>参考様式第１－３号別紙<span class="item-sub">受診者の申告書</span></div>
@@ -191,30 +206,21 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📋</span>
       <div>参考様式第１－６号<span class="item-sub">雇用条件書</span></div>
     </div>
-    <div class="item" id="nav-1_10" onclick="open_doc('1_10')">
-      <span class="item-icon">📄</span>
-      <div>参考様式第１－１０号<span class="item-sub">技能移転に係る申告書（2号建設用）</span></div>
-    </div>
-    <div class="item" id="nav-1_11_2" onclick="open_doc('1_11_2')">
-      <span class="item-icon">📋</span>
-      <div>参考様式第１－１１－２号<span class="item-sub">受け入れた中長期在留者リスト</span></div>
-    </div>
-    <div class="item" id="nav-1_11_3" onclick="open_doc('1_11_3')">
-      <span class="item-icon">📋</span>
-      <div>参考様式第１－１１－３号<span class="item-sub">生活相談業務を行った中長期在留者リスト</span></div>
-    </div>
     <div class="item" id="nav-1_16" onclick="open_1_16()">
       <span class="item-icon">💼</span>
       <div>参考様式第１－１６号<span class="item-sub">雇用の経緯に係る説明書</span></div>
-    </div>
-    <div class="item" id="nav-1_17" onclick="open_doc('1_17')">
-      <span class="item-icon">📖</span>
-      <div>参考様式第１－１７号<span class="item-sub" style="color:#f59e0b;">🚧 改修中（利用不可）</span></div>
     </div>
     <div class="item" id="nav-1_17_vi" onclick="open_doc('1_17_vi')">
       <span class="item-icon">📝</span>
       <div>参考様式第１－１７号<span class="item-sub">支援計画書 入力・印刷（多言語）</span></div>
     </div>
+    <div class="item" id="nav-1_25" onclick="open_doc('1_25')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－２５号<span class="item-sub">支援委託契約に関する説明書</span></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section">所属機関（会社）・登録支援機関の書類</div>
+    <div class="item" id="nav-1_11" onclick="open_doc('1_11')"><span class="item-icon">📊</span><div>参考様式第１－１１号<span class="item-sub">1-11号 所属機関概要書</span></div></div>
     <div class="item" id="nav-1_20" onclick="open_doc('1_20')">
       <span class="item-icon">👤</span>
       <div>参考様式第１－２０号<span class="item-sub">支援責任者の履歴書</span></div>
@@ -227,10 +233,6 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>参考様式第１－２３号<span class="item-sub">役員に関する誓約書</span></div>
     </div>
-    <div class="item" id="nav-1_25" onclick="open_doc('1_25')">
-      <span class="item-icon">📄</span>
-      <div>参考様式第１－２５号<span class="item-sub">支援委託契約に関する説明書</span></div>
-    </div>
     <div class="item" id="nav-1_27" onclick="open_doc('1_27')">
       <span class="item-icon">📄</span>
       <div>参考様式第１－２７号<span class="item-sub">公的義務履行に関する説明書</span></div>
@@ -238,6 +240,24 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-1_29" onclick="open_doc('1_29')">
       <span class="item-icon">📄</span>
       <div>参考様式第１－２９号<span class="item-sub">書類省略に当たっての誓約書</span></div>
+    </div>
+    <div class="item" id="nav-shozoku_daihyou" onclick="open_doc('shozoku_daihyou')">
+      <span class="item-icon">📄</span>
+      <div>所属機関の代表者に関する申告書<span class="item-sub">代表者区分・氏名・在留カード</span></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section">場合によって使う書類</div>
+    <div class="item" id="nav-1_10" onclick="open_doc('1_10')">
+      <span class="item-icon">📄</span>
+      <div>参考様式第１－１０号<span class="item-sub">技能移転に係る申告書（2号建設用）</span></div>
+    </div>
+    <div class="item" id="nav-1_11_2" onclick="open_doc('1_11_2')">
+      <span class="item-icon">📋</span>
+      <div>参考様式第１－１１－２号<span class="item-sub">受け入れた中長期在留者リスト</span></div>
+    </div>
+    <div class="item" id="nav-1_11_3" onclick="open_doc('1_11_3')">
+      <span class="item-icon">📋</span>
+      <div>参考様式第１－１１－３号<span class="item-sub">生活相談業務を行った中長期在留者リスト</span></div>
     </div>
     <div class="item" id="nav-1_30" onclick="open_doc('1_30')">
       <span class="item-icon">📄</span>
@@ -250,10 +270,6 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <div class="item" id="nav-1_32" onclick="open_doc('1_32')">
       <span class="item-icon">📄</span>
       <div>参考様式第１－３２号<span class="item-sub">２号特定技能外国人の業務内容に関する誓約書</span></div>
-    </div>
-    <div class="item" id="nav-shozoku_daihyou" onclick="open_doc('shozoku_daihyou')">
-      <span class="item-icon">📄</span>
-      <div>所属機関の代表者に関する申告書<span class="item-sub">代表者区分・氏名・在留カード</span></div>
     </div>
     <div class="divider"></div>
     <div class="section">特定活動</div>
@@ -270,28 +286,14 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <div>理由書（ミャンマー）<span class="item-sub">ミャンマー国籍者等の特定活動</span></div>
     </div>
     <div class="divider"></div>
-    <div class="section">国交省</div>
-    <div class="item" id="nav-juuyou" onclick="open_juuyou()">
-      <span class="item-icon">📑</span>
-      <div>様式第２（第３条関係）<span class="item-sub">重要事項事前説明書</span></div>
-    </div>
-    <div class="divider"></div>
-    <div class="section">その他</div>
-    <div class="item" id="nav-henkou" onclick="open_doc('henkou')">
-      <span class="item-icon">📄</span>
-      <div>申請内容変更申出書</div>
-    </div>
-    <div class="item" id="nav-ininjou" onclick="open_doc('ininjou')">
-      <span class="item-icon">📄</span>
-      <div>委任状（変更）</div>
+    <div class="section">入管に出す書類</div>
+    <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
+      <span class="item-icon">📝</span>
+      <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定・特定活動を自動判別</span></div>
     </div>
     <div class="item" id="nav-irai" onclick="open_doc('irai')">
       <span class="item-icon">📄</span>
       <div>依頼書<span class="item-sub">在留カードの受領（取次者：中林／田中）</span></div>
-    </div>
-    <div class="item" id="nav-torisage" onclick="open_doc('torisage')">
-      <span class="item-icon">📄</span>
-      <div>申請取下書<span class="item-sub">参考様式11</span></div>
     </div>
     <div class="item" id="nav-tesuryo" onclick="open_doc('tesuryo')">
       <span class="item-icon">📄</span>
@@ -305,6 +307,81 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">📄</span>
       <div>理由書<span class="item-sub">レター形式8種＋旅券未取得の理由書（日英併記）</span></div>
     </div>
+    <div class="item" id="nav-torisage" onclick="open_doc('torisage')">
+      <span class="item-icon">📄</span>
+      <div>申請取下書<span class="item-sub">参考様式11</span></div>
+    </div>
+    <div class="item" id="nav-henkou" onclick="open_doc('henkou')">
+      <span class="item-icon">📄</span>
+      <div>申請内容変更申出書</div>
+    </div>
+    <div class="item" id="nav-ininjou" onclick="open_doc('ininjou')">
+      <span class="item-icon">📄</span>
+      <div>委任状（変更）</div>
+    </div>
+    <div class="item" id="nav-zairyu_teisei" onclick="open_doc('zairyu_teisei')">
+      <span class="item-icon">🪪</span>
+      <div>在留カード記載事項訂正願出書（参考様式５）<span class="item-sub">案件IDで氏名・住居地・在留カード番号などを自動入力</span></div>
+    </div>
+    <div class="item" id="nav-shashin_teishutsu" onclick="open_doc('shashin_teishutsu')">
+      <span class="item-icon">📷</span>
+      <div>写真提出用紙<span class="item-sub">案件IDで自動入力・顔写真をドラッグ&amp;ドロップ</span></div>
+    </div>
+    <div class="divider"></div>
+    <div class="section">分野別の書類（誓約書など）</div>
+    <div id="fldDocs">
+    <div class="fld-head" data-fld="介護">🤝 介護</div>
+    <div class="item" id="nav-1_1" onclick="open_doc('1_1')" data-fld="介護"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>1-1号</span></div></div>
+    <div class="fld-head" data-fld="ビルクリーニング">🧹 ビルクリーニング</div>
+    <div class="item" id="nav-2_1" onclick="open_doc('2_1')" data-fld="ビルクリーニング"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>2-1号</span></div></div>
+    <div class="fld-head" data-fld="工業製品製造業">🏭 工業製品製造業</div>
+    <div class="item" id="nav-3_1" onclick="open_doc('3_1')" data-fld="工業製品製造業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>3-1号</span></div></div>
+    <div class="fld-head" data-fld="建設">🏗️ 建設</div>
+    <div class="item" id="nav-6_1" onclick="open_doc('6_1')" data-fld="建設"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>6-1号</span></div></div>
+    <div class="item" id="nav-6_2" onclick="open_doc('6_2')" data-fld="建設"><span class="item-icon">📄</span><div>2号の受入れ基準の誓約書<span class="item-sub"><span class="who who-co">所属機関</span>6-2号・2号のとき</span></div></div>
+    <div class="item" id="nav-6_3" onclick="open_doc('6_3')" data-fld="建設"><span class="item-icon">📄</span><div>実務経験申告書＋経歴証明書<span class="item-sub"><span class="who who-ap">申請人</span>6-3号・2号のとき</span></div></div>
+    <div class="item" id="nav-juuyou" onclick="open_juuyou()" data-fld="建設"><span class="item-icon">📑</span><div>重要事項事前説明書<span class="item-sub"><span class="who who-ap">申請人</span>様式第２（国交省）</span></div></div>
+    <div class="fld-head" data-fld="造船・舶用工業">🚢 造船・舶用工業</div>
+    <div class="item" id="nav-7_1" onclick="open_doc('7_1')" data-fld="造船・舶用工業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>7-1号</span></div></div>
+    <div class="item" id="nav-7_2" onclick="open_doc('7_2')" data-fld="造船・舶用工業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>7-2号</span></div></div>
+    <div class="fld-head" data-fld="自動車整備">🔧 自動車整備</div>
+    <div class="item" id="nav-8_1" onclick="open_doc('8_1')" data-fld="自動車整備"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>8-1号</span></div></div>
+    <div class="item" id="nav-8_2" onclick="open_doc('8_2')" data-fld="自動車整備"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>8-2号</span></div></div>
+    <div class="fld-head" data-fld="航空">✈️ 航空</div>
+    <div class="item" id="nav-9_1" onclick="open_doc('9_1')" data-fld="航空"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>9-1号</span></div></div>
+    <div class="item" id="nav-9_2" onclick="open_doc('9_2')" data-fld="航空"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>9-2号</span></div></div>
+    <div class="fld-head" data-fld="宿泊">🏨 宿泊</div>
+    <div class="item" id="nav-10_1" onclick="open_doc('10_1')" data-fld="宿泊"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>10-1号</span></div></div>
+    <div class="item" id="nav-10_2" onclick="open_doc('10_2')" data-fld="宿泊"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>10-2号</span></div></div>
+    <div class="fld-head" data-fld="農業">🌾 農業</div>
+    <div class="item" id="nav-11_1" onclick="open_doc('11_1')" data-fld="農業"><span class="item-icon">📄</span><div>受入れ誓約書（直接雇用）<span class="item-sub"><span class="who who-co">所属機関</span>11-1号</span></div></div>
+    <div class="item" id="nav-11_3" onclick="open_doc('11_3')" data-fld="農業"><span class="item-icon">📄</span><div>受入れ誓約書（派遣形態）<span class="item-sub"><span class="who who-co">所属機関</span>11-3号</span></div></div>
+    <div class="item" id="nav-11_4" onclick="open_doc('11_4')" data-fld="農業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>11-4号</span></div></div>
+    <div class="fld-head" data-fld="漁業">🐟 漁業</div>
+    <div class="item" id="nav-12_1" onclick="open_doc('12_1')" data-fld="漁業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>12-1号</span></div></div>
+    <div class="item" id="nav-12_2" onclick="open_doc('12_2')" data-fld="漁業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>12-2号</span></div></div>
+    <div class="fld-head" data-fld="飲食料品製造業">🍱 飲食料品製造業</div>
+    <div class="item" id="nav-13_1" onclick="open_doc('13_1')" data-fld="飲食料品製造業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>13-1号</span></div></div>
+    <div class="item" id="nav-13_2" onclick="open_doc('13_2')" data-fld="飲食料品製造業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>13-2号</span></div></div>
+    <div class="fld-head" data-fld="外食業">🍽️ 外食業</div>
+    <div class="item" id="nav-14_1" onclick="open_doc('14_1')" data-fld="外食業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>14-1号</span></div></div>
+    <div class="item" id="nav-14_2" onclick="open_doc('14_2')" data-fld="外食業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>14-2号</span></div></div>
+    <div class="fld-head" data-fld="自動車運送業">🚚 自動車運送業</div>
+    <div class="item" id="nav-15_1" onclick="open_doc('15_1')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>15-1号</span></div></div>
+    <div class="item" id="nav-15_2" onclick="open_doc('15_2')" data-fld="自動車運送業"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>15-2号</span></div></div>
+    <div class="item" id="nav-15_6" onclick="open_doc('15_6')" data-fld="自動車運送業"><span class="item-icon">📝</span><div>準備 雇用契約書<span class="item-sub"><span class="who who-ap">申請人</span>15-6号・特定自動車運送業準備</span></div></div>
+    <div class="item" id="nav-15_7" onclick="open_doc('15_7')" data-fld="自動車運送業"><span class="item-icon">📋</span><div>準備 雇用条件書<span class="item-sub"><span class="who who-ap">申請人</span>15-7号・特定自動車運送業準備</span></div></div>
+    <div class="fld-head" data-fld="鉄道">🚃 鉄道</div>
+    <div class="item" id="nav-16_1" onclick="open_doc('16_1')" data-fld="鉄道"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>16-1号</span></div></div>
+    <div class="item" id="nav-16_2" onclick="open_doc('16_2')" data-fld="鉄道"><span class="item-icon">📄</span><div>登録支援機関の誓約書<span class="item-sub"><span class="who who-so">支援機関</span>16-2号</span></div></div>
+    <div class="fld-head" data-fld="林業">🌲 林業</div>
+    <div class="item" id="nav-17_1" onclick="open_doc('17_1')" data-fld="林業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>17-1号</span></div></div>
+    <div class="fld-head" data-fld="木材産業">🪵 木材産業</div>
+    <div class="item" id="nav-18_1" onclick="open_doc('18_1')" data-fld="木材産業"><span class="item-icon">📄</span><div>受入れ誓約書<span class="item-sub"><span class="who who-co">所属機関</span>18-1号</span></div></div>
+    </div>
+    <div id="fldOtherToggle" onclick="_fldToggleAll()" style="display:none;padding:6px 14px;font-size:11px;color:#94a3b8;cursor:pointer;user-select:none;"><span id="fldOtherIcon">▶</span> ほかの分野も出す</div>
+    <div class="divider"></div>
+    <div class="section">その他</div>
     <div class="item" id="nav-soufujou" onclick="open_doc('soufujou')">
       <span class="item-icon">📨</span>
       <div>書類送付状<span class="item-sub">サイン書類・押印書類・在留カード等 5種</span></div>
@@ -313,80 +390,13 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span class="item-icon">👥</span>
       <div>名簿（複数人）<span class="item-sub">支援計画書 対象者名簿／申請人名簿・案件をまとめて選んで作成</span></div>
     </div>
-    <div class="item" id="nav-shashin_teishutsu" onclick="open_doc('shashin_teishutsu')">
-      <span class="item-icon">📷</span>
-      <div>写真提出用紙<span class="item-sub">案件IDで自動入力・顔写真をドラッグ&amp;ドロップ</span></div>
-    </div>
-    <div class="item" id="nav-zairyu_teisei" onclick="open_doc('zairyu_teisei')">
-      <span class="item-icon">🪪</span>
-      <div>在留カード記載事項訂正願出書（参考様式５）<span class="item-sub">案件IDで氏名・住居地・在留カード番号などを自動入力</span></div>
-    </div>
     <div class="item" id="nav-suisenhyo" onclick="open_doc('suisenhyo')">
       <span class="item-icon">🇻🇳</span>
       <div>特定技能外国人表<span class="item-sub">交付申請書 + 推薦状 添付2（ベトナム労働管理部宛）</span></div>
     </div>
     <div class="divider"></div>
-    <div class="section">窓口受付</div>
-    <div class="item" id="nav-madoguchi" onclick="open_doc('madoguchi')">
-      <span class="item-icon">🪪</span>
-      <div>オンライン申請（窓口受領用）<span class="item-sub">案件ID貼り付けで申請受付番号を自動反映</span></div>
-    </div>
-    <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
-      <span class="item-icon">📝</span>
-      <div>窓口申請書（全種別）<span class="item-sub">案件を選ぶと変更・更新・技人国・認定・特定活動を自動判別</span></div>
-    </div>
-    <div class="divider"></div>
-    <!-- ver.20261106.06: 受入れ誓約書と登録支援機関の誓約書を分けず、分野ごとに並べる -->
-    <div class="section">分野別誓約書（受入れ・登録支援機関）</div>
-    <div class="item" id="nav-1_1" onclick="open_doc('1_1')"><span class="item-icon">📄</span><div>介護<span class="item-sub">1-1号 受入れ誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-2_1" onclick="open_doc('2_1')"><span class="item-icon">📄</span><div>ビルクリーニング<span class="item-sub">2-1号 受入れ誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-3_1" onclick="open_doc('3_1')"><span class="item-icon">📄</span><div>工業製品製造業<span class="item-sub">3-1号 受入れ誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-6_1" onclick="open_doc('6_1')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-6_2" onclick="open_doc('6_2')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-2号 2号機関 基準誓約書</span></div></div>
-    <div class="item" id="nav-6_3" onclick="open_doc('6_3')"><span class="item-icon">📄</span><div>建設<span class="item-sub">6-3号 2号 実務経験申告書＋別紙 経歴証明書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-7_1" onclick="open_doc('7_1')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">7-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-7_2" onclick="open_doc('7_2')"><span class="item-icon">📄</span><div>造船・舶用工業<span class="item-sub">7-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-8_1" onclick="open_doc('8_1')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">8-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-8_2" onclick="open_doc('8_2')"><span class="item-icon">📄</span><div>自動車整備<span class="item-sub">8-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-9_1" onclick="open_doc('9_1')"><span class="item-icon">📄</span><div>航空<span class="item-sub">9-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-9_2" onclick="open_doc('9_2')"><span class="item-icon">📄</span><div>航空<span class="item-sub">9-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-10_1" onclick="open_doc('10_1')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">10-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-10_2" onclick="open_doc('10_2')"><span class="item-icon">📄</span><div>宿泊<span class="item-sub">10-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-11_1" onclick="open_doc('11_1')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-1号 受入れ誓約書（直接雇用）</span></div></div>
-    <div class="item" id="nav-11_3" onclick="open_doc('11_3')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-3号 受入れ誓約書（派遣形態）</span></div></div>
-    <div class="item" id="nav-11_4" onclick="open_doc('11_4')"><span class="item-icon">📄</span><div>農業<span class="item-sub">11-4号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-12_1" onclick="open_doc('12_1')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">12-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-12_2" onclick="open_doc('12_2')"><span class="item-icon">📄</span><div>漁業<span class="item-sub">12-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-13_1" onclick="open_doc('13_1')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">13-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-13_2" onclick="open_doc('13_2')"><span class="item-icon">📄</span><div>飲食料品製造業<span class="item-sub">13-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-14_1" onclick="open_doc('14_1')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">14-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-14_2" onclick="open_doc('14_2')"><span class="item-icon">📄</span><div>外食業<span class="item-sub">14-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-15_1" onclick="open_doc('15_1')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-15_2" onclick="open_doc('15_2')"><span class="item-icon">📄</span><div>自動車運送業<span class="item-sub">15-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-16_1" onclick="open_doc('16_1')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-1号 受入れ誓約書</span></div></div>
-    <div class="item" id="nav-16_2" onclick="open_doc('16_2')"><span class="item-icon">📄</span><div>鉄道<span class="item-sub">16-2号 登録支援機関 誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-17_1" onclick="open_doc('17_1')"><span class="item-icon">📄</span><div>林業<span class="item-sub">17-1号 受入れ誓約書</span></div></div>
-    <div class="fld-gap" style="height:1px;margin:3px 12px;background:rgba(148,163,184,.25);"></div>
-    <div class="item" id="nav-18_1" onclick="open_doc('18_1')"><span class="item-icon">📄</span><div>木材産業<span class="item-sub">18-1号 受入れ誓約書</span></div></div>
-    <div class="divider"></div>
     <div class="section">設定</div>
     <div class="item" id="nav-signslot" onclick="openSignSlotEditor()"><span class="item-icon">🖊</span><div>署名欄設定<span class="item-sub">電子署名の位置を書類ごとに決める</span></div></div>
-    <div class="section">準備中</div>
-    <div class="item" id="nav-1_11" onclick="open_doc('1_11')"><span class="item-icon">📊</span><div>参考様式第１－１１号<span class="item-sub">1-11号 所属機関概要書</span></div></div>
     </div><!-- /otherDocsContainer (ver.20260820.16) -->
   </div>
   <div class="content" id="content">
@@ -473,6 +483,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     <iframe id="frame-13_1"></iframe>
     <iframe id="frame-14_1"></iframe>
     <iframe id="frame-15_1"></iframe>
+    <iframe id="frame-15_6"></iframe>
+    <iframe id="frame-15_7"></iframe>
     <iframe id="frame-16_1"></iframe>
     <iframe id="frame-17_1"></iframe>
     <iframe id="frame-18_1"></iframe>
@@ -491,8 +503,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611171651';
-window.__DOCS_CACHE_BUSTER__ = '2611171651';
+window.__DOCS_CACHE_BUSTER__ = '2611181516';
+window.__DOCS_CACHE_BUSTER__ = '2611181516';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -640,6 +652,9 @@ const docs={
   '14_2':{navId:'nav-14_2',frameId:'frame-14_2',file:'14_2.html?v=1794393342'},
   '15_2':{navId:'nav-15_2',frameId:'frame-15_2',file:'15_2.html?v=1794393342'},
   '16_2':{navId:'nav-16_2',frameId:'frame-16_2',file:'16_2.html?v=1794393342'},
+  // ver.20261118.06: 分野参考様式15-6・15-7（特定自動車運送業準備）。言語版は開くときに _LANGDOC で選ぶ
+  '15_6':{navId:'nav-15_6',frameId:'frame-15_6',file:'15_6_id.html'},
+  '15_7':{navId:'nav-15_7',frameId:'frame-15_7',file:'15_7_id.html'},
 };
 
 /* ========== グローバル言語管理 ========== */
@@ -652,10 +667,14 @@ const DOC_LANG_SUPPORT = {
   '1_5':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn','tl'],   // ver.20261113.01: シンハラ語(si)は1-5・1-6のみ
   '1_6':  ['id','vi','th','ne','my','km','en','ko','zh','si','mn','tl'],
   '1_16': ['id','vi','th','ne','my','km','en','ko','zh','si','mn','tl'],   // ver.20261113.03: シンハラ語を追加
-  'juuyou':['id','vi','km','my','ko','ne','en','si','mn','tl','zh','th'],   // ver.20261116.18: タイ語版を追加   // ver.20261116.15: 中国語版を追加   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
+  'juuyou':['id','vi','km','my','ko','ne','en','si','mn','tl','zh','th'],
+  '15_6': ['id','vi','th','ne','my','km','en','zh','tl','mn'],   // ver.20261118.06
+  '15_7': ['id','vi','th','ne','my','km','en','zh','tl','mn'],   // ver.20261116.18: タイ語版を追加   // ver.20261116.15: 中国語版を追加   // ver.20261113.02: 英語版を追加（フィリピン・スリランカ・インドなど対応版の無い国籍は英語に）
 };
 // 日本語(ja) は多くの書類でデフォルト版（ID版）を流用表示する扱い
 // → resolveLangForDoc で 'ja' → その書類の先頭言語 にフォールバック
+// ver.20261118.06: 言語ごとにファイルが分かれている書類（ファイル名の頭）。開くときに案件の言語の版を選ぶ
+const _LANGDOC={'15_6':'15_6_','15_7':'15_7_'};
 function resolveLangForDoc(docKey, lang){
   const supported = DOC_LANG_SUPPORT[docKey] || [];
   if(supported.includes(lang)) return lang;
@@ -677,6 +696,7 @@ function setGlobalLang(lang){
   else if(cur==='1_6') open_1_6();
   else if(cur==='1_16') open_1_16();
   else if(cur==='juuyou') open_juuyou();
+  else if(_LANGDOC[cur]) open_doc(cur);   // ver.20261118.06: 15-6・15-7
   // ver.20261105.14: 国旗ボタンでも1-17号の言語版を切り替える（韓国語の1-17号は無いので英語。日本語版は無いので何もしない）
   //   国籍どおりの言語を押したとき（案件ジャンプで自動で呼ばれたときも）は「手で選択中」にせず、自動のままにする
   else if(cur==='1_17_vi'){
@@ -1068,6 +1088,10 @@ function open_doc(key){
       if(k==='1_17_vi'){
         const _pl=p17LangNow();
         if(fr.dataset.lang!==_pl || !fr.src || fr.src===window.location.href){ fr.dataset.lang=_pl; fr.src=LANG_FILES_1_17[_pl]+'?v='+(window.__DOCS_CACHE_BUSTER__||Date.now()); _p17Swap=true; }
+      }
+      else if(_LANGDOC[k]){
+        const _rl=resolveLangForDoc(k, currentLang);
+        if(fr.dataset.lang!==_rl || !fr.src || fr.src===window.location.href){ fr.dataset.lang=_rl; fr.src=_LANGDOC[k]+_rl+'.html?v='+(window.__DOCS_CACHE_BUSTER__||Date.now()); _p17Swap=true; }
       }
       else if(!fr.src || fr.src===window.location.href) fr.src=docs[k].file;
       fr.style.display='block';
@@ -1866,6 +1890,21 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.07',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '🚚 分野参考様式15-6号（特定自動車運送業準備 雇用契約書）・15-7号（雇用条件書）を、左のメニューの「分野別の書類」の自動車運送業に追加しました（10言語。案件の言語の版が開きます）。',
+      '🧹 左のメニューを分類ごとに並べ直しました：「申請人ごとの書類」「会社・支援機関の書類」「場合によって使う書類」「特定活動」「入管に出す書類」「分野別の書類」「その他」「設定」。重要事項説明書は分野別の書類の建設に、1-11号は会社・支援機関の書類に入れました。',
+      '🧹 分野別の書類は、案件の分野のものだけを出すようにしました（ほかの分野は「▶ ほかの分野も出す」で開けます。分野が分からない案件は全部出ます）。',
+      '🔍 左のメニューのいちばん上に「書類をさがす」を付けました。様式番号（1-6、14-2 など）・書類名・分野・よく使う呼び方（重説、条件書、印紙 など）で絞り込みます。ひらがな・カタカナ・ローマ字でもさがせます（じゅうせつ、せいやくしょ、gaishoku など）。Enter で一番上の書類を開きます。Esc で元に戻ります。',
+      '🏷️ 分野別の書類に、誰が出す書類かの色の印を付けました（青＝所属機関、緑＝登録支援機関、紫＝申請人）。分野ごとの見出しの下に分野ごとの見出しの下に「受入れ誓約書」「登録支援機関の誓約書」など書類名で並びます。',
+      '🧹 案件を選んだときに「この案件の必要書類」だけを上に集める動きと、「まとめて作る」の欄（申請書類一式・複数人のまとめてPDF）はやめました。',
+      '🧹 左のメニューから「参考様式第１－１７号（改修中・利用不可）」を外しました。1-17号は言語版を使ってください。',
+      '🧹 左のメニューから「オンライン申請（窓口受領用）」を外しました。案シスの「窓口」画面（受取タブ →［📄 窓口用の紙を作成］）で、まとめて作れます。'
+    ]
+  },
   {
     version: 'ver.20261118.04',
     date: '2026-11-18',
@@ -3716,45 +3755,109 @@ async function _judgeUkeire(info){
   }
 }
 
+/* ver.20261118.06: 書類の検索。名前・小さい字・分野・よく使う呼び方で探す（全角・半角、ハイフンのちがいは気にしない） */
+var _NS_KW={'1_4':'報酬','1_5':'契約書 雇用契約','1_6':'条件書 雇用条件','1_16':'経緯 あっせん 紹介','1_17_vi':'支援計画','1_25':'支援委託','juuyou':'重説 重要事項 国交省','tesuryo':'印紙 手数料','shinsei_henkou':'窓口 申請書 変更 更新 認定 技人国 特定活動','irai':'在留カード 受領 受け取り','tsuika_shiryo':'追完 追加','torisage':'取下げ 取り下げ','zairyu_teisei':'訂正','shashin_teishutsu':'写真','soufujou':'送付状 郵送','meibo':'名簿','iko':'移行 特定活動','tk2go':'移行 2号','myanmar':'ミャンマー 理由書','riyu_sho':'理由書 レター','1_3':'健康診断 受診','signslot':'署名 サイン'};
+var _NS_YOMI={"1_3":["さんこうようしきだい1-3ごうべっし じゅしんもののしんこくしょ けんこうしんだん じゅしん","sankouyoushikidai1-3goubesshi jushinmononoshinkokusho kenkoushindan jushin"],"1_4":["さんこうようしきだい1-4ごう ほうしゅうにかんするせつめいしょ ほうしゅう","sankouyoushikidai1-4gou houshuunikansurusetsumeisho houshuu"],"1_5":["さんこうようしきだい1-5ごう こようけいやくしょ けいやくしょ こようけいやく","sankouyoushikidai1-5gou koyoukeiyakusho keiyakusho koyoukeiyaku"],"1_6":["さんこうようしきだい1-6ごう こようじょうけんしょ じょうけんしょ こようじょうけん","sankouyoushikidai1-6gou koyoujoukensho joukensho koyoujouken"],"1_16":["さんこうようしきだい1-16ごう こようのけいいにかかるせつめいしょ けいい あっせん しょうかい","sankouyoushikidai1-16gou koyounokeiinikakarusetsumeisho keii assen shoukai"],"1_17_vi":["さんこうようしきだい1-17ごう しえんけいかくしょにゅうりょく・いんさつ(たげんご) しえんけいかく","sankouyoushikidai1-17gou shienkeikakushonyuuryoku・insatsu(tagengo) shienkeikaku"],"1_25":["さんこうようしきだい1-25ごう しえんいたくけいやくにかんするせつめいしょ しえんいたく","sankouyoushikidai1-25gou shienitakukeiyakunikansurusetsumeisho shienitaku"],"1_11":["さんこうようしきだい1-11ごう 1-11ごうしょぞくきかんがいようしょ","sankouyoushikidai1-11gou 1-11goushozokukikangaiyousho"],"1_20":["さんこうようしきだい1-20ごう しえんせきにんしゃのりれきしょ","sankouyoushikidai1-20gou shiensekininshanorirekisho"],"1_22":["さんこうようしきだい1-22ごう しえんたんとうしゃのりれきしょ","sankouyoushikidai1-22gou shientantoushanorirekisho"],"1_23":["さんこうようしきだい1-23ごう やくいんにかんするせいやくしょ","sankouyoushikidai1-23gou yakuinnikansuruseiyakusho"],"1_27":["さんこうようしきだい1-27ごう こうてきぎむりこうにかんするせつめいしょ","sankouyoushikidai1-27gou koutekigimurikounikansurusetsumeisho"],"1_29":["さんこうようしきだい1-29ごう しょるいしょうりゃくにあたってのせいやくしょ","sankouyoushikidai1-29gou shoruishouryakuniatattenoseiyakusho"],"shozoku_daihyou":["しょぞくきかんのだいひょうしゃにかんするしんこくしょ だいひょうしゃくぶん・しめい・ざいりゅうかーど","shozokukikannodaihyoushanikansurushinkokusho daihyoushakubun・shimei・zairyuukaado"],"1_10":["さんこうようしきだい1-10ごう ぎのういてんにかかるしんこくしょ(2ごうけんせつよう)","sankouyoushikidai1-10gou ginouitennikakarushinkokusho(2goukensetsuyou)"],"1_11_2":["さんこうようしきだい1-11-2ごう うけいれたちゅうちょうきざいりゅうものりすと","sankouyoushikidai1-11-2gou ukeiretachuuchoukizairyuumonorisuto"],"1_11_3":["さんこうようしきだい1-11-3ごう せいかつそうだんぎょうむをいったちゅうちょうきざいりゅうものりすと","sankouyoushikidai1-11-3gou seikatsusoudangyoumuwoittachuuchoukizairyuumonorisuto"],"1_30":["さんこうようしきだい1-30ごう きゅうぎょうきかんにかんするもうしたてしょ","sankouyoushikidai1-30gou kyuugyoukikannikansurumoushitatesho"],"1_31":["さんこうようしきだい1-31ごう つうさんざいりゅうきかんをこえるざいりゅうにかんするもうしたてしょ","sankouyoushikidai1-31gou tsuusanzairyuukikanwokoeruzairyuunikansurumoushitatesho"],"1_32":["さんこうようしきだい1-32ごう 2ごうとくていぎのうがいこくじんのぎょうむないようにかんするせいやくしょ","sankouyoushikidai1-32gou 2goutokuteiginougaikokujinnogyoumunaiyounikansuruseiyakusho"],"iko":["いこうじゅんびせつめいしょ とくていかつどう→とくていぎのう1ごう いこう とくていかつどう","ikoujunbisetsumeisho tokuteikatsudou→tokuteiginou1gou ikou tokuteikatsudou"],"tk2go":["いこうじゅんびせつめいしょ(2ごう) とくていかつどう→とくていぎのう2ごう いこう 2ごう","ikoujunbisetsumeisho(2gou) tokuteikatsudou→tokuteiginou2gou ikou 2gou"],"myanmar":["りゆうしょ(みゃんまー) みゃんまーこくせきものなどのとくていかつどう みゃんまー りゆうしょ","riyuusho(myanmaa) myanmaakokusekimononadonotokuteikatsudou myanmaa riyuusho"],"shinsei_henkou":["まどぐちしんせいしょ(ぜんしゅべつ) あんけんをえらぶとへんこう・こうしん・わざじんこく・にんてい・とくていかつどうをじどうはんべつ まどぐち しんせいしょ へんこう こうしん にんてい わざじんこく とくていかつどう","madoguchishinseisho(zenshubetsu) ankenwoerabutohenkou・koushin・wazajinkoku・nintei・tokuteikatsudouwojidouhanbetsu madoguchi shinseisho henkou koushin nintei wazajinkoku tokuteikatsudou"],"irai":["いらいしょ ざいりゅうかーどのじゅりょう(とりつぎもの:なかばやし/たなか) ざいりゅうかーど じゅりょう うけとり","iraisho zairyuukaadonojuryou(toritsugimono:nakabayashi/tanaka) zairyuukaado juryou uketori"],"tesuryo":["てすうりょうのうふしょ べっきだい84ごうようしき(ゆうそうこうふのまえに) いんし てすうりょう","tesuuryounoufusho bekkidai84gouyoushiki(yuusoukoufunomaeni) inshi tesuuryou"],"tsuika_shiryo":["ついかしりょうていしゅつ うけつけばんごうからていしゅつさきのにゅうかんきょくをじどうはんてい ついかん ついか","tsuikashiryouteishutsu uketsukebangoukarateishutsusakinonyuukankyokuwojidouhantei tsuikan tsuika"],"riyu_sho":["りゆうしょ れたーけいしき8たね+りょけんひつじしゅとくのりゆうしょ(にちえいへいき) りゆうしょ れたー","riyuusho retaakeishiki8tane+ryokenhitsujishutokunoriyuusho(nichieiheiki) riyuusho retaa"],"torisage":["しんせいとりさげしょ さんこうようしき11 とりさげげ とりさげ","shinseitorisagesho sankouyoushiki11 torisagege torisage"],"henkou":["しんせいないようへんこうもうしでしょ","shinseinaiyouhenkoumoushidesho"],"ininjou":["いにんじょう(へんこう)","ininjou(henkou)"],"zairyu_teisei":["ざいりゅうかーどきさいじこうていせいがんしゅつしょ(さんこうようしき5) あんけんIDでしめい・じゅうきょち・ざいりゅうかーどばんごうなどをじどうにゅうりょく ていせい","zairyuukaadokisaijikouteiseiganshutsusho(sankouyoushiki5) ankenIDdeshimei・juukyochi・zairyuukaadobangounadowojidounyuuryoku teisei"],"shashin_teishutsu":["しゃしんていしゅつようし あんけんIDでじどうにゅうりょく・かおじゃしんをどらっぐ&amp;どろっぷ しゃしん","shashinteishutsuyoushi ankenIDdejidounyuuryoku・kaojashinwodoraggu&amp;doroppu shashin"],"1_1":["うけいれせいやくしょ 1-1ごう かいご","ukeireseiyakusho 1-1gou kaigo"],"2_1":["うけいれせいやくしょ 2-1ごう びるくりーにんぐ","ukeireseiyakusho 2-1gou birukuriiningu"],"3_1":["うけいれせいやくしょ 3-1ごう こうぎょうせいひんせいぞうぎょう","ukeireseiyakusho 3-1gou kougyouseihinseizougyou"],"6_1":["うけいれせいやくしょ 6-1ごう けんせつ","ukeireseiyakusho 6-1gou kensetsu"],"6_2":["2ごうのうけいれきじゅんのせいやくしょ 6-2ごう・2ごうのとき けんせつ","2gounoukeirekijunnoseiyakusho 6-2gou・2gounotoki kensetsu"],"6_3":["じつむけいけんしんこくしょ+けいれきしょうめいしょ 6-3ごう・2ごうのとき けんせつ","jitsumukeikenshinkokusho+keirekishoumeisho 6-3gou・2gounotoki kensetsu"],"juuyou":["じゅうようじこうじぜんせつめいしょ ようしきだい2(こっこうしょう) けんせつ じゅうせつ じゅうようじこう こっこうしょう","juuyoujikoujizensetsumeisho youshikidai2(kokkoushou) kensetsu juusetsu juuyoujikou kokkoushou"],"7_1":["うけいれせいやくしょ 7-1ごう ぞうせん・はくようこうぎょう","ukeireseiyakusho 7-1gou zousen・hakuyoukougyou"],"7_2":["とうろくしえんきかんのせいやくしょ 7-2ごう ぞうせん・はくようこうぎょう","tourokushienkikannoseiyakusho 7-2gou zousen・hakuyoukougyou"],"8_1":["うけいれせいやくしょ 8-1ごう じどうしゃせいび","ukeireseiyakusho 8-1gou jidoushaseibi"],"8_2":["とうろくしえんきかんのせいやくしょ 8-2ごう じどうしゃせいび","tourokushienkikannoseiyakusho 8-2gou jidoushaseibi"],"9_1":["うけいれせいやくしょ 9-1ごう こうくう","ukeireseiyakusho 9-1gou koukuu"],"9_2":["とうろくしえんきかんのせいやくしょ 9-2ごう こうくう","tourokushienkikannoseiyakusho 9-2gou koukuu"],"10_1":["うけいれせいやくしょ 10-1ごう しゅくはく","ukeireseiyakusho 10-1gou shukuhaku"],"10_2":["とうろくしえんきかんのせいやくしょ 10-2ごう しゅくはく","tourokushienkikannoseiyakusho 10-2gou shukuhaku"],"11_1":["うけいれせいやくしょ(ちょくせつこよう) 11-1ごう のうぎょう","ukeireseiyakusho(chokusetsukoyou) 11-1gou nougyou"],"11_3":["うけいれせいやくしょ(はけんけいたい) 11-3ごう のうぎょう","ukeireseiyakusho(hakenkeitai) 11-3gou nougyou"],"11_4":["とうろくしえんきかんのせいやくしょ 11-4ごう のうぎょう","tourokushienkikannoseiyakusho 11-4gou nougyou"],"12_1":["うけいれせいやくしょ 12-1ごう ぎょぎょう","ukeireseiyakusho 12-1gou gyogyou"],"12_2":["とうろくしえんきかんのせいやくしょ 12-2ごう ぎょぎょう","tourokushienkikannoseiyakusho 12-2gou gyogyou"],"13_1":["うけいれせいやくしょ 13-1ごう いんしょくりょうひんせいぞうぎょう","ukeireseiyakusho 13-1gou inshokuryouhinseizougyou"],"13_2":["とうろくしえんきかんのせいやくしょ 13-2ごう いんしょくりょうひんせいぞうぎょう","tourokushienkikannoseiyakusho 13-2gou inshokuryouhinseizougyou"],"14_1":["うけいれせいやくしょ 14-1ごう がいしょくぎょう","ukeireseiyakusho 14-1gou gaishokugyou"],"14_2":["とうろくしえんきかんのせいやくしょ 14-2ごう がいしょくぎょう","tourokushienkikannoseiyakusho 14-2gou gaishokugyou"],"15_1":["うけいれせいやくしょ 15-1ごう じどうしゃうんそうぎょう","ukeireseiyakusho 15-1gou jidoushaunsougyou"],"15_2":["とうろくしえんきかんのせいやくしょ 15-2ごう じどうしゃうんそうぎょう","tourokushienkikannoseiyakusho 15-2gou jidoushaunsougyou"],"15_6":["じゅんびこようけいやくしょ 15-6ごう・とくていじどうしゃうんそうぎょうじゅんび じどうしゃうんそうぎょう","junbikoyoukeiyakusho 15-6gou・tokuteijidoushaunsougyoujunbi jidoushaunsougyou"],"15_7":["じゅんびこようじょうけんしょ 15-7ごう・とくていじどうしゃうんそうぎょうじゅんび じどうしゃうんそうぎょう","junbikoyoujoukensho 15-7gou・tokuteijidoushaunsougyoujunbi jidoushaunsougyou"],"16_1":["うけいれせいやくしょ 16-1ごう てつどう","ukeireseiyakusho 16-1gou tetsudou"],"16_2":["とうろくしえんきかんのせいやくしょ 16-2ごう てつどう","tourokushienkikannoseiyakusho 16-2gou tetsudou"],"17_1":["うけいれせいやくしょ 17-1ごう りんぎょう","ukeireseiyakusho 17-1gou ringyou"],"18_1":["うけいれせいやくしょ 18-1ごう もくざいさんぎょう","ukeireseiyakusho 18-1gou mokuzaisangyou"],"soufujou":["しょるいそうふじょう さいんしょるい・おういんしょるい・ざいりゅうかーどなど5たね そうふじょう ゆうそう","shoruisoufujou sainshorui・ouinshorui・zairyuukaadonado5tane soufujou yuusou"],"meibo":["めいぼ(ふくすうにん) しえんけいかくしょたいしょうしゃめいぼ/しんせいじんめいぼ・あんけんをまとめてえらんでさくせい めいぼ","meibo(fukusuunin) shienkeikakushotaishoushameibo/shinseijinmeibo・ankenwomatometeerandesakusei meibo"],"suisenhyo":["とくていぎのうがいこくじんおもて こうふしんせいしょ+すいせんじょうてんぷ2(べとなむろうどうかんりぶあて)","tokuteiginougaikokujinomote koufushinseisho+suisenjoutenpu2(betonamuroudoukanribuate)"],"signslot":["しょめいらんせってい でんししょめいのいちをしょるいごとにきめる しょめい さいん","shomeiransettei denshishomeinoichiwoshoruigotonikimeru shomei sain"]};   // ver.20261118.06: 検索用のよみ（ひらがな／ローマ字）。左のメニューに書類を足したときは作り直す
+// カタカナ→ひらがな
+function _nsHira(t){ return String(t||'').replace(/[ァ-ヶ]/g,function(c){ return String.fromCharCode(c.charCodeAt(0)-0x60); }); }
+// ローマ字のゆれをそろえる（shi/si・tsu/tu・ji/zi、のばす音、ん の n' など）
+function _nsLoose(t){
+  t=String(t||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  [['sha','sya'],['shu','syu'],['sho','syo'],['shi','si'],['cha','tya'],['chu','tyu'],['cho','tyo'],['chi','ti'],['tsu','tu'],['fu','hu'],['ja','zya'],['ju','zyu'],['jo','zyo'],['ji','zi'],['nn','n'],['oo','o'],['ou','o'],['uu','u'],['aa','a'],['ii','i'],['ee','e'],['ei','e']].forEach(function(p){ t=t.split(p[0]).join(p[1]); });
+  return t;
+}
+// ローマ字→ひらがな（ローマ字でさがしたとき、よみの ひらがな でも比べる）
+var _NS_R2K=(function(){ var m={}, b='a,i,u,e,o|ka,ki,ku,ke,ko|sa,shi,su,se,so|ta,chi,tsu,te,to|na,ni,nu,ne,no|ha,hi,fu,he,ho|ma,mi,mu,me,mo|ya,,yu,,yo|ra,ri,ru,re,ro|wa,,,,wo|ga,gi,gu,ge,go|za,ji,zu,ze,zo|da,di,du,de,do|ba,bi,bu,be,bo|pa,pi,pu,pe,po'.split('|'), k='あいうえお|かきくけこ|さしすせそ|たちつてと|なにぬねの|はひふへほ|まみむめも|や ゆ よ|らりるれろ|わ   を|がぎぐげご|ざじずぜぞ|だぢづでど|ばびぶべぼ|ぱぴぷぺぽ'.split('|');
+  b.forEach(function(row,i){ row.split(',').forEach(function(r,j){ if(r) m[r]=k[i].charAt(j); }); });
+  Object.assign(m,{si:'し',ti:'ち',tu:'つ',hu:'ふ',zi:'じ',n:'ん',nn:'ん',xtu:'っ',ltu:'っ',wo:'を'});
+  ['k','s','t','n','h','m','r','g','z','d','b','p'].forEach(function(c){ ['a','u','o'].forEach(function(v,j){ var base=m[c+'i']; if(base) m[c+'y'+v]=base+'ゃゅょ'.charAt(j); }); });
+  Object.assign(m,{sha:'しゃ',shu:'しゅ',sho:'しょ',cha:'ちゃ',chu:'ちゅ',cho:'ちょ',ja:'じゃ',ju:'じゅ',jo:'じょ',jya:'じゃ',jyu:'じゅ',jyo:'じょ'});
+  return m; })();
+function _nsRoma2Kana(t){
+  t=String(t||'').toLowerCase(); var out='', i=0;
+  while(i<t.length){
+    var c=t.charAt(i);
+    if(/[^a-z]/.test(c)){ out+=c; i++; continue; }
+    if(c===t.charAt(i+1) && c!=='n' && /[bcdfghjkmprstwyz]/.test(c)){ out+='っ'; i++; continue; }
+    var hit=false;
+    for(var L=3;L>=1;L--){ var seg=t.substr(i,L); if(_NS_R2K[seg]!==undefined){ if(seg==='n' && /[aiueoy]/.test(t.charAt(i+1)||'')) continue; out+=_NS_R2K[seg]; i+=L; hit=true; break; } }
+    if(!hit){ out+=c; i++; }
+  }
+  return out;
+}
+function _nsNorm(t){ return String(t||'').normalize('NFKC').toLowerCase().replace(/[‐‑‒–—―ー－−]/g,'-').replace(/[\s　・,、（）()「」]/g,''); }
+function _navSearch(q){
+  var box=document.getElementById('otherDocsContainer'); if(!box) return;
+  var its=[].slice.call(box.querySelectorAll('.item')), cnt=document.getElementById('navSearchCount'), none=document.getElementById('navSearchNone');
+  its.forEach(function(el){ el.classList.remove('ns-hide','ns-first'); if(el.dataset.fld){ var d=el.querySelector('div'); if(d && !d.dataset.f) d.dataset.f=el.dataset.fld; } });
+  var words=String(q||'').split(/[\s　]+/).map(_nsNorm).filter(Boolean);
+  if(!words.length){ box.classList.remove('ns-on'); if(cnt) cnt.textContent=''; if(none) none.style.display='none'; return; }
+  box.classList.add('ns-on'); var hits=0, first=null;
+  its.forEach(function(el){
+    var k=(el.id||'').replace(/^nav-/,'');
+    var hay=_nsNorm(el.textContent+' '+(el.dataset.fld||'')+' '+(_NS_KW[k]||'')+' '+k.replace(/_/g,'-'));
+    var Y=_NS_YOMI[k]||['',''], yh=_nsNorm(_nsHira(Y[0]+' '+el.textContent)), yr=_nsLoose(Y[1]+' '+k);
+    var ok=words.every(function(w){
+      if(hay.indexOf(w)>=0) return true;
+      var wh=_nsHira(w); if(yh.indexOf(wh)>=0) return true;   // ひらがな・カタカナ
+      if(/[a-z]/.test(w)){ if(yr.indexOf(_nsLoose(w))>=0) return true; var wk=_nsNorm(_nsRoma2Kana(w)); if(wk && !/[a-z]/.test(wk) && yh.indexOf(wk)>=0) return true; }   // ローマ字
+      return false;
+    });
+    el.classList.toggle('ns-hide', !ok); if(ok){ hits++; if(!first) first=el; }
+  });
+  if(first) first.classList.add('ns-first');
+  if(cnt) cnt.textContent=hits?hits+'件':'';
+  if(none) none.style.display=hits?'none':'block';
+}
+function _navSearchKey(ev){
+  var inp=ev.target;
+  if(ev.key==='Escape'){ inp.value=''; _navSearch(''); return; }
+  if(ev.key==='Enter'){ ev.preventDefault(); var f=document.querySelector('#otherDocsContainer .item.ns-first'); if(f){ f.click(); inp.blur(); } }
+}
+// 「/」で検索欄へ（入力中でないとき）
+document.addEventListener('keydown', function(ev){
+  if(ev.key!=='/' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  var t=ev.target, tag=(t&&t.tagName)||''; if(/INPUT|TEXTAREA|SELECT/.test(tag) || (t&&t.isContentEditable)) return;
+  var i=document.getElementById('navSearch'); if(i){ ev.preventDefault(); i.focus(); i.select(); }
+});
+/* ver.20261118.05: 分野別誓約書は、案件の分野のものだけ出す（ほかの分野は「ほかの分野も出す」で開く）。分野が分からない案件は全部出す */
+var _FLD_ALIAS={'工業製品製造業':/工業製品|素形材|産業機械|電気・?電子|電子情報/,'造船・舶用工業':/造船|舶用/,'自動車運送業':/自動車運送|運送/,'飲食料品製造業':/飲食料品/,'ビルクリーニング':/ビルクリ/};
+function _fldFilter(field){
+  var box=document.getElementById('fldDocs'), tg=document.getElementById('fldOtherToggle'); if(!box) return;
+  var f=String(field||'').replace(/分野/g,'').trim(), hit=0;
+  var its=box.querySelectorAll('[data-fld]');
+  its.forEach(function(el){
+    var d=el.querySelector('div'); var name=el.dataset.fld || (d?String(d.childNodes[0].textContent||'').trim():'');
+    var re=_FLD_ALIAS[name]; var on=!!f && (re ? re.test(f) : (f.indexOf(name)>=0 || name.indexOf(f)>=0));
+    el.classList.toggle('fld-off', !!f && !on); if(on) hit++;
+  });
+  if(!hit){ its.forEach(function(el){ el.classList.remove('fld-off'); }); }
+  box.classList.toggle('fld-filtered', !!hit); box.classList.remove('fld-all');
+  if(tg){ tg.style.display=hit?'block':'none'; var ic=document.getElementById('fldOtherIcon'); if(ic) ic.textContent='▶'; tg.lastChild.textContent=' ほかの分野も出す'; }
+}
+function _fldToggleAll(){
+  var box=document.getElementById('fldDocs'), tg=document.getElementById('fldOtherToggle'); if(!box) return;
+  var all=!box.classList.contains('fld-all'); box.classList.toggle('fld-all', all);
+  var ic=document.getElementById('fldOtherIcon'); if(ic) ic.textContent=all?'▼':'▶';
+  if(tg) tg.lastChild.textContent=all?' ほかの分野を畳む':' ほかの分野も出す';
+}
 async function reorderNavByPriority(info){
+  /* ver.20261118.05: 左のメニューで「この案件の必要書類」だけを上に集める機能はやめた（書類はいつもの並びのまま）。
+     必要書類の一覧は、全書類チェックの「この案件の必要書類」で使うので覚えておく。上の「まとめて作る」ボタンは案件を選んだら出す */
   await loadPriorityDocs();
   var ukeire = await _judgeUkeire(info);
-  console.log('[priorityDocs] ukeire=' + ukeire + ' (companyId=' + (info.companyId||'') + ')');
-  var priorityDocs = matchPriorityDocs(info.residenceStatus, info.applicantField, info.appType, ukeire);
+  var priorityDocs = matchPriorityDocs(info.residenceStatus, info.applicantField, info.appType, ukeire) || [];
+  window._prioDocKeys = priorityDocs.filter(function(k){ return !!document.getElementById('nav-'+k); });
   var prioListEl = document.getElementById('priorityDocsList');
   var prioSecEl = document.getElementById('priorityDocsSection');
   var otherToggleEl = document.getElementById('otherDocsToggle');
   var otherContEl = document.getElementById('otherDocsContainer');
-  if(!prioListEl || !otherContEl) return;
-  Array.from(prioListEl.querySelectorAll('.item')).forEach(function(el){
-    otherContEl.appendChild(el);
-  });
-  if(!priorityDocs.length){
-    console.log('[priorityDocs] no rule matched: residence='+info.residenceStatus+' field='+info.applicantField+' appType='+info.appType+' → show all');
-    prioSecEl.style.display = 'none';
-    otherToggleEl.style.display = 'none';
-    otherContEl.style.display = 'block';
-    return;
-  }
-  console.log('[priorityDocs] matched:', priorityDocs);
-  priorityDocs.forEach(function(docKey){
-    var el = document.getElementById('nav-' + docKey);
-    if(el) prioListEl.appendChild(el);
-  });
-  // 受入区分バッジをセクションタイトルに表示
-  try{
-    var secTitle = prioSecEl.querySelector('.section');
-    if(secTitle){
-      var badge = ukeire === 'exist' ? '<span style="font-size:9px;background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:8px;margin-left:6px;">♻️ 既受入</span>' : '<span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:8px;margin-left:6px;">🆕 初回受入</span>';
-      secTitle.innerHTML = '📌 この案件の必要書類' + badge;
-    }
-  }catch(_e){}
-  prioSecEl.style.display = 'block';
-  otherToggleEl.style.display = 'block';
-  // ver.20261030: 必要書類以外も畳まずに開いた状態で表示（見出しを押すと畳める）
+  if(!otherContEl) return;
+  if(prioListEl) Array.from(prioListEl.querySelectorAll('.item')).forEach(function(el){ otherContEl.appendChild(el); });
+  if(prioSecEl) prioSecEl.style.display = 'none';
+  try{ _fldFilter(info.applicantField||''); }catch(_fe){ console.warn('fldFilter',_fe); }
+  if(otherToggleEl) otherToggleEl.style.display = 'none';
   otherContEl.style.display = 'block';
-  var icon = document.getElementById('otherDocsToggleIcon');
-  if(icon) icon.textContent = '▼';
 }
 
 // ver.20260925.02: 必要書類（優先書類）をまとめて1つのPDFに
@@ -3794,9 +3897,13 @@ function _docFileForPrint(docKey, lang, cs){
 function _pmDocLabel(dk){
   var el=document.getElementById('nav-'+dk);
   if(!el) return dk;
-  var main=el.querySelector('div'); var t=(main?main.childNodes[0].textContent:el.textContent)||dk;
-  var sub=el.querySelector('.item-sub');
-  return {name:String(t).trim(), sub:sub?sub.textContent.trim():''};
+  var main=el.querySelector('div'); var t='';
+  if(main){ var cl=main.cloneNode(true); cl.querySelectorAll('.who,.item-sub').forEach(function(x){ x.remove(); }); t=cl.textContent; } else t=el.textContent;
+  t=t||dk;   // ver.20261118.06: 「所属機関」「支援機関」の印は書類名に入れない
+  if(el.dataset && el.dataset.fld) t=el.dataset.fld+' '+String(t).trim();   // ver.20261118.06: 分野別の書類は見出しに分野があるので、書類名だけでは分からないところ用に分野を付ける
+  var sub=el.querySelector('.item-sub'); var subT='';
+  if(sub){ var cs=sub.cloneNode(true); cs.querySelectorAll('.who').forEach(function(x){ x.remove(); }); subT=cs.textContent.trim(); }
+  return {name:String(t).trim(), sub:subT};
 }
 // ver.20260925.02: 分野別書類の提案（受入れ誓約書 / 登録支援機関誓約書）
 var _PM_FIELD_DOCS=[
@@ -6070,7 +6177,7 @@ var _dcRun=null;
 function _dcEsc(v){ return String(v==null?'':v).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function _dcLangName(l){ if(!l||l==='ja') return '日本語'; return (typeof _PM_LANG_LABEL!=='undefined' && _PM_LANG_LABEL[l]) || l; }
 function _dcDocName(dk){ var lb=_pmDocLabel(dk); return (lb && lb.name) ? (lb.name+(lb.sub?(' '+lb.sub):'')) : dk; }
-function _dcPrioKeys(){ return [].slice.call(document.querySelectorAll('#priorityDocsList [id^="nav-"]')).map(function(el){ return el.id.replace(/^nav-/,''); }); }
+function _dcPrioKeys(){ return (window._prioDocKeys||[]).slice(); }   // ver.20261118.05: 左のメニューは並べ替えないので、覚えておいた必要書類の一覧を使う
 function _dcJobs(scope, allLang){
   var c=idxSelectedCase||{};
   var lang=idxLangFromNationality(c.nationality)||(currentLang&&currentLang!=='ja'?currentLang:'en');
