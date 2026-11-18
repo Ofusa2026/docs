@@ -230,7 +230,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
       <div class="fg"><label>変形労働の適用<span class="fid">es.flexFlg</span></label><select id="es_flexFlg" onchange="p()"><option value="">（未設定）</option><option value="適用あり">適用あり</option><option value="適用なし">適用なし</option></select></div>
       <div class="fg"><label>変形労働単位（日）<span class="fid">es.flexUnit</span></label><input id="es_flexUnit" placeholder="例：1ヶ月" oninput="p()"></div>
       <div class="fg"><label>変形労働単位（ID）<span class="fid">es.flexUnitEn</span></label><input id="es_flexUnitEn" placeholder="例：1 bulan" oninput="p()"></div>
-      <div class="fs-title" style="margin-top:8px;">交代制シフト（最大5パターン）</div>
+      <div class="fs-title" style="margin-top:8px;">交代制シフト（最大10パターン・5つ目からは別紙に載せます）</div>
       <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
         <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト1</label>
         <div class="fg3">
@@ -295,6 +295,71 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
           <div class="fg"><label>適用日（日）<span class="fid">es.shift5Days</span></label><input id="es_shift5Days" placeholder="月〜金" oninput="p()"></div>
         </div>
         <div class="fg"><label>適用日（ID）<span class="fid">es.shift5DaysEn</span></label><input id="es_shift5DaysEn" placeholder="Senin-Jumat" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト6</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift6Start</span></label><input id="es_shift6Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift6End</span></label><input id="es_shift6End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift6H</span></label><input id="es_shift6H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift6Min</span></label><input id="es_shift6Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift6Days</span></label><input id="es_shift6Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（訳）<span class="fid">es.shift6DaysEn</span></label><input id="es_shift6DaysEn" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト7</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift7Start</span></label><input id="es_shift7Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift7End</span></label><input id="es_shift7End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift7H</span></label><input id="es_shift7H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift7Min</span></label><input id="es_shift7Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift7Days</span></label><input id="es_shift7Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（訳）<span class="fid">es.shift7DaysEn</span></label><input id="es_shift7DaysEn" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト8</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift8Start</span></label><input id="es_shift8Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift8End</span></label><input id="es_shift8End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift8H</span></label><input id="es_shift8H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift8Min</span></label><input id="es_shift8Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift8Days</span></label><input id="es_shift8Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（訳）<span class="fid">es.shift8DaysEn</span></label><input id="es_shift8DaysEn" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト9</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift9Start</span></label><input id="es_shift9Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift9End</span></label><input id="es_shift9End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift9H</span></label><input id="es_shift9H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift9Min</span></label><input id="es_shift9Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift9Days</span></label><input id="es_shift9Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（訳）<span class="fid">es.shift9DaysEn</span></label><input id="es_shift9DaysEn" oninput="p()"></div>
+      </div>
+      <div class="fg" style="background:#f8fafc;border-radius:4px;padding:4px 6px;margin-bottom:2px;">
+        <label style="font-size:8.5px;font-weight:700;color:#374151;">シフト10</label>
+        <div class="fg3">
+          <div class="fg"><label>始業<span class="fid">es.shift10Start</span></label><input id="es_shift10Start" placeholder="09:00" oninput="p()"></div>
+          <div class="fg"><label>終業<span class="fid">es.shift10End</span></label><input id="es_shift10End" placeholder="18:00" oninput="p()"></div>
+          <div class="fg"><label>所定(H)<span class="fid">es.shift10H</span></label><input id="es_shift10H" placeholder="8" oninput="p()"></div>
+        </div>
+        <div class="fg2">
+          <div class="fg"><label>所定(分)<span class="fid">es.shift10Min</span></label><input id="es_shift10Min" placeholder="0" oninput="p()"></div>
+          <div class="fg"><label>適用日（日）<span class="fid">es.shift10Days</span></label><input id="es_shift10Days" placeholder="月〜金" oninput="p()"></div>
+        </div>
+        <div class="fg"><label>適用日（訳）<span class="fid">es.shift10DaysEn</span></label><input id="es_shift10DaysEn" oninput="p()"></div>
       </div>
     </div>
     <div class="fs"><div class="fs-title">Ⅴ 休日</div>
@@ -508,7 +573,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611181051"></script>
+<script src="ofusa_common.js?v=2611181159"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -641,7 +706,7 @@ function p(){
   const rn=v('es_renewal');
   // シフトパターン（最大5）
   const shifts=[];
-  for(let i=1;i<=5;i++){
+  for(let i=1;i<=10;i++){   // ver.20261118.02: 10パターンまで（5つ目からは別紙）
     const s=v('es_shift'+i+'Start'),e=v('es_shift'+i+'End');
     if(s||e){
       shifts.push({
@@ -1286,6 +1351,7 @@ function p(){
 `;
   // フォントサイズを再適用（p()でDOMが再生成されるため）
   if(_fontSize !== 8.5) _applyFontSize();
+  try{ _shiftOverflow(); }catch(_so){ console.warn('[交代制の別紙]',_so); }
   // ver.20260820.05: p()の後に注記を再描画（DOM書換で消えるため）
   try{ if(typeof renderAllUserNotes === 'function') renderAllUserNotes(); }catch(_e){}
 }
@@ -1335,6 +1401,64 @@ const _FORM_TO_DB = {
 const _DB_TO_FORM = {};
 Object.keys(_FORM_TO_DB).forEach(k=>{ _DB_TO_FORM[_FORM_TO_DB[k]] = k; });
 
+/* ver.20261118.02: 交代制のシフトが多いとき、2ページ目には4つまで載せ、5つ目から（とシフト詳細）は最後に「別紙　交代制の勤務時間」を付けて載せる。
+   2ページ目の見出しの後ろに「（記載しきれない分は，別紙のとおり）」を付ける。描画したあとの書類の中で行を動かすので、どの言語版でも同じに動く */
+const _SO_KEEP=4;
+const _SO_TR={
+  id:{n:'(Bagian yang tidak dapat dicantumkan di sini: lihat lampiran)',t:'Lampiran: Jam Kerja Shift',c:'(Lanjutan dari "Shift kerja" pada IV. Jam kerja, dll.)'},
+  en:{n:'(Anything that cannot be listed here: see the attachment)',t:'Attachment: Shift Work Hours',c:'(Continued from "Shift work" in IV. Working hours, etc.)'},
+  vi:{n:'(Phần không ghi hết được ở đây: xem phụ lục)',t:'Phụ lục: Thời gian làm việc theo ca',c:'(Tiếp theo mục "Làm việc theo ca" tại IV. Thời gian làm việc, v.v.)'},
+  km:{n:'(ផ្នែកដែលមិនអាចសរសេរនៅទីនេះបាន៖ សូមមើលឯកសារភ្ជាប់)',t:'ឯកសារភ្ជាប់៖ ម៉ោងធ្វើការតាមវេន',c:'(តពីផ្នែក «ការងារតាមវេន» ក្នុង IV. ម៉ោងធ្វើការ ។ល។)'},
+  ko:{n:'(여기에 다 기재하지 못한 부분은 별지 참조)',t:'별지: 교대제 근무시간',c:'(Ⅳ. 근로시간 등 「교대제」에서 계속)'},
+  mn:{n:'(Энд бичиж багтаагүй хэсгийг хавсралтаас харна уу)',t:'Хавсралт: Ээлжийн ажлын цаг',c:'(IV. Ажлын цаг гэх мэт хэсгийн «Ээлжийн ажил»-ын үргэлжлэл)'},
+  my:{n:'(ဤနေရာတွင် ဖော်ပြ၍မကုန်သော အပိုင်းများကို ပူးတွဲစာရွက်တွင် ကြည့်ပါ)',t:'ပူးတွဲစာရွက် - အလှည့်ကျ အလုပ်ချိန်',c:'(IV. အလုပ်ချိန် စသည်တို့ရှိ «အလှည့်ကျစနစ်» ၏ အဆက်)'},
+  ne:{n:'(यहाँ लेख्न नसकिएको भाग संलग्न पानामा हेर्नुहोस्)',t:'संलग्न: पालो प्रणालीको कार्य समय',c:'(IV. काम गर्ने समय आदिको «पालो प्रणाली» को निरन्तरता)'},
+  si:{n:'(මෙහි සඳහන් කළ නොහැකි කොටස් සඳහා ඇමුණුම බලන්න)',t:'ඇමුණුම: මාරු ක්‍රමයේ වැඩ කරන වේලාවන්',c:'(IV. වැඩ කරන වේලාවන් ආදියෙහි «මාරු ක්‍රමය» හි ඉතිරි කොටස)'},
+  th:{n:'(ส่วนที่ระบุไว้ที่นี่ไม่หมด โปรดดูเอกสารแนบ)',t:'เอกสารแนบ: เวลาทำงานแบบกะ',c:'(ต่อจาก "ระบบกะ" ในหัวข้อ IV. เวลาทำงาน ฯลฯ)'},
+  tl:{n:'(Ang hindi maisulat dito: tingnan ang kalakip)',t:'Kalakip: Oras ng Trabaho sa Shift',c:'(Karugtong ng "Shift work" sa IV. Oras ng trabaho, atbp.)'},
+  zh:{n:'（未能在此列出的部分，详见附页）',t:'附页：轮班制工作时间',c:'（接 IV. 劳动时间等「轮班制」）'}
+};
+function _shiftOverflow(){
+  const area=document.getElementById('pageArea'); if(!area) return;
+  const hb=area.querySelector('[data-cbid="shift_work"]'); if(!hb) return;
+  const head=hb.closest('div'); if(!head) return;
+  let n=0; for(let i=1;i<=10;i++){ if(v('es_shift'+i+'Start')||v('es_shift'+i+'End')) n++; }
+  if(!n) return;
+  const lang=((location.pathname.split('/').pop()||'').match(/^1_6_([a-z]{2})\.html$/i)||[0,'id'])[1].toLowerCase();
+  const T=_SO_TR[lang]||_SO_TR.en;
+  const rows=[]; let el=head.nextElementSibling;
+  for(let i=0;i<n && el;i++){ rows.push(el); el=el.nextElementSibling; }
+  const tail=[];
+  if(v('es_shiftDetail')){ while(el){ tail.push(el); el=el.nextElementSibling; } }
+  // 2ページ目に入りきるまで、詳細→後ろのシフトの順に別紙へ回す（4つより多い分は最初から別紙）
+  const page=head.closest('.doc'), H=1124;
+  let k=Math.min(rows.length,_SO_KEEP), tailOut=false;
+  const tooTall=function(){ return page && page.offsetHeight>H; };
+  if(k<rows.length){ tailOut=true; }
+  rows.slice(k).forEach(function(x){ x.remove(); }); if(tailOut) tail.forEach(function(x){ x.remove(); });
+  let guard=0;
+  while(tooTall() && guard++<20){
+    if(!tailOut && tail.length){ tailOut=true; tail.forEach(function(x){ x.remove(); }); continue; }
+    if(k>1){ k--; rows[k].remove(); tailOut=true; tail.forEach(function(x){ x.remove(); }); continue; }
+    break;
+  }
+  const rest=rows.slice(k);
+  if(!rest.length && !(tailOut && tail.length)) return;
+  const idSpan=head.querySelector('.id');
+  const walk=document.createTreeWalker(head, NodeFilter.SHOW_TEXT); let tn, done=false;
+  while((tn=walk.nextNode())){ if(!done && tn.nodeValue.indexOf('組合せによる。')>=0 && !(idSpan && idSpan.contains(tn))){ tn.nodeValue=tn.nodeValue.replace('組合せによる。','組合せによる。（記載しきれない分は，別紙のとおり）'); done=true; } }
+  if(idSpan) idSpan.appendChild(document.createTextNode(' '+T.n));
+  const docs=area.querySelectorAll('.doc'); const last=docs[docs.length-1]; if(!last) return;
+  const pg=document.createElement('div'); pg.className='doc'; pg.id='docShiftAnnex';
+  const nm=v('applicantName')||'';
+  pg.innerHTML='<div class="page-num-label">P'+(docs.length+1)+'</div><div style="font-size:9pt;font-weight:bold;">別紙　交代制の勤務時間<br><span class="id" style="font-size:8pt;font-weight:normal;">'+esc(T.t)+'</span></div>'
+    +'<div style="font-size:7.5pt;margin-top:2px;">（雇用条件書　Ⅳ．労働時間等「交代制」の続き）<br><span class="id" style="font-size:7pt;">'+esc(T.c)+'</span></div>'
+    +(nm?'<div style="font-size:8.5pt;margin-top:6px;">'+esc(nm)+'</div>':'')
+    +'<div class="_soBox" style="border:1px solid #000;padding:4px 8px;margin-top:6px;font-size:8pt;"></div>';
+  const box=pg.querySelector('._soBox');
+  rest.concat(tailOut?tail:[]).forEach(function(x){ box.appendChild(x); });
+  last.parentNode.insertBefore(pg, last.nextSibling);
+}
 function formKeyToDb(formKey){ return _FORM_TO_DB[formKey] || formKey; }
 function dbKeyToForm(dbKey){ return _DB_TO_FORM[dbKey] || dbKey; }
 
