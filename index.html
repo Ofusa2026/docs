@@ -77,6 +77,34 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .wn-section ul{list-style:none;padding:0;}
 .wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
 .wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#7c3aed;}
+/* ver.20261118.08: 案件の情報カード */
+.cc-card{background:rgba(30,41,59,.85);border:1px solid #334155;border-radius:8px;padding:8px 10px;color:#cbd5e1;font-size:11px;line-height:1.5;}
+.cc-card .cc-name{font-size:13px;font-weight:700;color:#f1f5f9;}
+.cc-card .cc-nat{font-size:10px;font-weight:400;color:#94a3b8;margin-left:6px;}
+.cc-card .cc-co{color:#cbd5e1;}
+.cc-card .cc-org{color:#94a3b8;}
+.cc-card .cc-chips{margin:4px 0 2px;}
+.cc-card .cc-chip{display:inline-block;font-size:9.5px;padding:0 6px;margin:0 3px 3px 0;border-radius:9px;background:rgba(148,163,184,.14);color:#cbd5e1;border:1px solid rgba(148,163,184,.25);}
+.cc-card .cc-t{width:100%;border-collapse:collapse;margin-top:2px;}
+.cc-card .cc-t th{text-align:left;font-weight:400;color:#64748b;white-space:nowrap;padding:1px 8px 1px 0;vertical-align:top;width:1%;}
+.cc-card .cc-t td{color:#e2e8f0;padding:1px 0;word-break:break-all;}
+.cc-card .cc-sub{color:#94a3b8;}
+.cc-card .cc-warn{color:#fbbf24 !important;}
+.cc-card .cc-bad{color:#fca5a5 !important;font-weight:700;}
+.cc-card .cc-open{display:block;margin-top:6px;text-align:center;padding:4px;border-radius:5px;border:1px solid #334155;color:#93c5fd;text-decoration:none;font-size:11px;font-weight:600;}
+.cc-card .cc-open:hover{background:rgba(59,130,246,.12);}
+/* ver.20261118.08: よく使う書類 */
+.item{position:relative;}
+.item .fav-star{margin-left:auto;padding:0 2px 0 6px;font-size:13px;color:#475569;opacity:0;cursor:pointer;flex:none;}
+.item:hover .fav-star,.item .fav-star.on{opacity:1;}
+.item .fav-star.on{color:#fbbf24;}
+.item .fav-move{display:none;flex:none;margin-left:auto;font-size:9px;color:#64748b;}
+.item .fav-move b{cursor:pointer;padding:0 2px;font-weight:400;}
+.item .fav-move b:hover{color:#e2e8f0;}
+.fav-clone:hover .fav-move{display:inline-block;}
+.fav-clone .fav-move + .fav-star{margin-left:0;}
+.fav-clone[data-fld] > div::before{content:attr(data-f);display:block;font-size:9.5px;color:#64748b;}
+#otherDocsContainer.ns-on #favDocsSec,#otherDocsContainer.ns-on #favDocsSec + .divider{display:none !important;}
 /* ver.20261118.06: 書類の検索 */
 #otherDocsContainer.ns-on .section,#otherDocsContainer.ns-on .divider,#otherDocsContainer.ns-on .fld-head,#otherDocsContainer.ns-on #fldOtherToggle{display:none !important;}
 #otherDocsContainer.ns-on .item.ns-hide{display:none !important;}
@@ -99,7 +127,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -188,6 +216,13 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
       <span id="otherDocsToggleIcon">▶</span> その他の書類（全表示）
     </div>
     <div id="otherDocsContainer">
+    <!-- ver.20261118.08: よく使う書類（人ごと。書類の右の ☆ で入れたり外したりする） -->
+    <div id="favDocsSec">
+      <div class="section">⭐ よく使う書類</div>
+      <div id="favDocsList"></div>
+      <div id="favDocsHint" style="padding:2px 16px 8px;font-size:10px;color:#64748b;line-height:1.5;">書類の右の ☆ を押すと、ここに出せます（自分だけの設定）</div>
+    </div>
+    <div class="divider"></div>
     <!-- ver.20261118.05: 分類ごとに並べ直した（申請人ごと／会社・支援機関／場合によって／特定活動／入管に出す書類／分野別誓約書／その他／設定） -->
     <div class="section">申請人ごとの書類</div>
     <div class="item" id="nav-1_3" onclick="open_doc('1_3')">
@@ -503,8 +538,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611181516';
-window.__DOCS_CACHE_BUSTER__ = '2611181516';
+window.__DOCS_CACHE_BUSTER__ = '2611181528';
+window.__DOCS_CACHE_BUSTER__ = '2611181528';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1463,6 +1498,7 @@ async function idxInit(){
     idxAllCases=cases||[];
     // ver.20260810.01: 「🔍 案件検索」ブロック撤去に伴い、以下2つの呼び出しを削除
     //   （idxBuildCompanyFilter / idxFilterCases。参照要素が消えたため）
+    try{ _favRender(); _favLoad(); }catch(_fe){ console.warn('fav',_fe); }   // ver.20261118.08: よく使う書類
     await idxAutoSelectFromUrl(); // ver.20260714.07: ?caseId= / ?doc= で自動選択
   }catch(e){console.error('idxInit',e);}
 }
@@ -1527,6 +1563,39 @@ function idxOnPasteInput(){
     st.style.color='#fbbf24';
   }
 }
+/* ver.20261118.08: 案件の情報カード（申請人・会社・申請の種類・担当・ステータス・在留期限・雇用条件セット）と［案シスで開く］ */
+var ANKEN_BASE='https://ofusa2026.github.io/anken/';
+function _ccEsc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+async function idxRenderCaseCard(row){
+  var el=document.getElementById('idx_jumpedInfo'); if(!el || !row) return;
+  var cid=row.id;
+  var c=row;
+  try{ var r=await idxSb('cases?select=id,applicant,name,nationality,org,company,company_id,app_type,residence_status,applicant_field,status,staff,team,expire,emp_set_idx,receipt_no&id=eq.'+encodeURIComponent(cid)); if(r&&r[0]) c=r[0]; }catch(_e){}
+  if(!idxSelectedCase || idxSelectedCase.caseId!==cid) return;   // 途中で別の案件を選んだ
+  var setName='', idx=(c.emp_set_idx==null?'':String(c.emp_set_idx));
+  if(idx!=='' && c.company_id){
+    try{ var q=await idxSb('companies?select=nm:emp_sets->'+encodeURIComponent(idx)+'->>setName&id=eq.'+encodeURIComponent(c.company_id)); setName=(q&&q[0]&&q[0].nm)||''; }catch(_e){}
+  }
+  if(!idxSelectedCase || idxSelectedCase.caseId!==cid) return;
+  var chip=function(t){ return t?'<span class="cc-chip">'+_ccEsc(t)+'</span>':''; };
+  var exp='', expCls='';
+  if(c.expire){ var d=new Date(String(c.expire).replace(/\//g,'-')); if(!isNaN(d)){ var days=Math.ceil((d-new Date())/86400000); exp=String(c.expire).slice(0,10)+'（'+(days>=0?'あと'+days+'日':(-days)+'日過ぎ')+'）'; expCls=days<0?'cc-bad':(days<=30?'cc-warn':''); } else exp=String(c.expire); }
+  var setHtml = idx===''
+    ? '<span class="cc-bad">⚠ 未選択（案シスで選んでください）</span>'
+    : _ccEsc(setName||('セット'+(Number(idx)+1)));
+  var h='<div class="cc-name">'+_ccEsc(c.applicant||c.name||'(名前なし)')+(c.nationality?'<span class="cc-nat">'+_ccEsc(c.nationality)+'</span>':'')+'</div>'
+    +'<div class="cc-co">'+_ccEsc(c.company||'')+(c.org?'<span class="cc-org"> ／ '+_ccEsc(c.org)+'</span>':'')+'</div>'
+    +'<div class="cc-chips">'+chip(c.app_type)+chip(c.residence_status)+chip(String(c.applicant_field||'').replace(/（特定技能[１２12]号）/,''))+'</div>'
+    +'<table class="cc-t">'
+    +'<tr><th>担当</th><td>'+_ccEsc(c.staff||'—')+(c.team?'<span class="cc-sub">（'+_ccEsc(c.team)+'）</span>':'')+'</td></tr>'
+    +'<tr><th>ステータス</th><td>'+_ccEsc(c.status||'—')+'</td></tr>'
+    +(exp?'<tr><th>在留期限</th><td class="'+expCls+'">'+_ccEsc(exp)+'</td></tr>':'')
+    +(c.receipt_no?'<tr><th>受付番号</th><td>'+_ccEsc(c.receipt_no)+'</td></tr>':'')
+    +'<tr><th>雇用条件</th><td>'+setHtml+'</td></tr>'
+    +'</table>'
+    +'<a class="cc-open" href="'+ANKEN_BASE+'?case='+encodeURIComponent(cid)+'" target="_blank" rel="noopener" title="案件管理システムでこの案件を開きます（新しいタブ）">📂 案シスで開く ↗</a>';
+  el.className='cc-card'; el.style.cssText='display:block;margin-top:6px;'; el.innerHTML=h;
+}
 async function idxJumpByPaste(){
   const inp=document.getElementById('idx_caseIdPaste');
   const st=document.getElementById('idx_jumpStatus');
@@ -1586,6 +1655,7 @@ async function idxJumpByPaste(){
     if(info_el){
       info_el.style.display='block';
       info_el.innerHTML=`<strong>${row.applicant||row.name||'(名前なし)'}</strong><br>${row.org||''}${row.org&&row.company?' / ':''}${row.company||''}`;
+      try{ idxRenderCaseCard(row); }catch(_cc){ console.warn('caseCard',_cc); }   // ver.20261118.08: 案件の情報カード
     }
   }catch(e){
     if(st){ st.textContent='⚠️ エラー: '+e.message; st.style.color='#fca5a5'; }
@@ -1890,6 +1960,17 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.08',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '🪪 案件を選ぶと、左上に案件の情報カードが出ます（申請人・国籍・会社・登録支援機関・申請の種類・在留資格・分野・担当・ステータス・在留期限・選ばれている雇用条件セット）。在留期限が30日以内はオレンジ、過ぎていれば赤、雇用条件セットが未選択なら赤で出ます。',
+      '📂 案件の情報カードの［案シスで開く］で、案件管理システムのこの案件を新しいタブで開けます。',
+      '⭐ よく使う書類：書類の右の ☆ を押すと、左のメニューのいちばん上「よく使う書類」に出ます。人ごとの設定で、ほかのパソコンでも同じです。▲▼で並べ替え、★をもう一度押すと外れます。',
+      '🔍 書類をさがす：↑↓ キーで選んで Enter で開けるようにしました。'
+    ]
+  },
   {
     version: 'ver.20261118.07',
     date: '2026-11-18',
@@ -3755,6 +3836,58 @@ async function _judgeUkeire(info){
   }
 }
 
+/* ver.20261118.08: よく使う書類（人ごと）。保存先は settings の saysay_fav_<メール>（ほかのパソコンでも同じ）。読めないときはこのブラウザに覚える */
+var _favKeys=[], _favUser='';
+async function _favWho(){ if(_favUser) return _favUser; try{ var s=await _sbDocs.auth.getSession(); _favUser=(s&&s.data&&s.data.session&&s.data.session.user&&s.data.session.user.email)||''; }catch(_e){} return _favUser; }
+async function _favLoad(){
+  var u=await _favWho(), v=null;
+  if(u){ try{ var r=await idxSb('settings?select=value&key=eq.'+encodeURIComponent('saysay_fav_'+u)); if(r&&r[0]&&r[0].value) v=JSON.parse(r[0].value); }catch(_e){} }
+  if(!Array.isArray(v)){ try{ v=JSON.parse(localStorage.getItem('saysay_fav')||'[]'); }catch(_e){ v=[]; } }
+  _favKeys=(v||[]).filter(function(k){ return !!document.getElementById('nav-'+k); });
+  _favRender();
+}
+async function _favSave(){
+  try{ localStorage.setItem('saysay_fav', JSON.stringify(_favKeys)); }catch(_e){}
+  var u=await _favWho(); if(!u) return;
+  try{
+    if(_sbDocs) await _idxFreshToken();
+    await fetch(IDX_URL+'settings?on_conflict=key',{method:'POST',headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{key:'saysay_fav_'+u, value:JSON.stringify(_favKeys), updated_at:new Date().toISOString()}])});
+  }catch(e){ console.warn('fav save',e); }
+}
+function _favToggle(k, ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  var i=_favKeys.indexOf(k); if(i>=0) _favKeys.splice(i,1); else _favKeys.push(k);
+  _favRender(); _favSave();
+}
+function _favMove(k, d, ev){
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+  var i=_favKeys.indexOf(k), j=i+d; if(i<0||j<0||j>=_favKeys.length) return;
+  _favKeys.splice(i,1); _favKeys.splice(j,0,k); _favRender(); _favSave();
+}
+function _favRender(){
+  var box=document.getElementById('otherDocsContainer'), list=document.getElementById('favDocsList'), hint=document.getElementById('favDocsHint'); if(!box||!list) return;
+  // 各書類に ☆ を付ける
+  box.querySelectorAll('.item[id^="nav-"]').forEach(function(el){
+    if(el.closest('#favDocsList')) return;
+    var k=el.id.replace(/^nav-/,''), st=el.querySelector('.fav-star');
+    if(!st){ st=document.createElement('span'); st.className='fav-star'; st.title='よく使う書類に入れる／外す'; st.onclick=function(ev){ _favToggle(k, ev); }; el.appendChild(st); }
+    var on=_favKeys.indexOf(k)>=0; st.textContent=on?'★':'☆'; st.classList.toggle('on', on);
+  });
+  list.innerHTML='';
+  _favKeys.forEach(function(k,i){
+    var src=document.getElementById('nav-'+k); if(!src) return;
+    var c=src.cloneNode(true); c.removeAttribute('id'); c.classList.add('fav-clone'); c.classList.remove('active','ns-hide','ns-first','fld-off'); c.removeAttribute('onclick'); c.dataset.ref=k;
+    c.onclick=function(){ var o=document.getElementById('nav-'+k); if(o) o.click(); };
+    if(src.dataset.fld){ var dd=c.querySelector('div'); if(dd) dd.dataset.f=src.dataset.fld; }   // 分野別の書類は分野名も出す
+    var st=c.querySelector('.fav-star'); if(st){ st.textContent='★'; st.classList.add('on'); st.onclick=function(ev){ _favToggle(k, ev); }; }
+    var mv=document.createElement('span'); mv.className='fav-move';
+    mv.innerHTML='<b title="上へ">▲</b><b title="下へ">▼</b>';
+    mv.children[0].onclick=function(ev){ _favMove(k,-1,ev); }; mv.children[1].onclick=function(ev){ _favMove(k,1,ev); };
+    c.insertBefore(mv, st||null);
+    list.appendChild(c);
+  });
+  if(hint) hint.style.display=_favKeys.length?'none':'block';
+}
 /* ver.20261118.06: 書類の検索。名前・小さい字・分野・よく使う呼び方で探す（全角・半角、ハイフンのちがいは気にしない） */
 var _NS_KW={'1_4':'報酬','1_5':'契約書 雇用契約','1_6':'条件書 雇用条件','1_16':'経緯 あっせん 紹介','1_17_vi':'支援計画','1_25':'支援委託','juuyou':'重説 重要事項 国交省','tesuryo':'印紙 手数料','shinsei_henkou':'窓口 申請書 変更 更新 認定 技人国 特定活動','irai':'在留カード 受領 受け取り','tsuika_shiryo':'追完 追加','torisage':'取下げ 取り下げ','zairyu_teisei':'訂正','shashin_teishutsu':'写真','soufujou':'送付状 郵送','meibo':'名簿','iko':'移行 特定活動','tk2go':'移行 2号','myanmar':'ミャンマー 理由書','riyu_sho':'理由書 レター','1_3':'健康診断 受診','signslot':'署名 サイン'};
 var _NS_YOMI={"1_3":["さんこうようしきだい1-3ごうべっし じゅしんもののしんこくしょ けんこうしんだん じゅしん","sankouyoushikidai1-3goubesshi jushinmononoshinkokusho kenkoushindan jushin"],"1_4":["さんこうようしきだい1-4ごう ほうしゅうにかんするせつめいしょ ほうしゅう","sankouyoushikidai1-4gou houshuunikansurusetsumeisho houshuu"],"1_5":["さんこうようしきだい1-5ごう こようけいやくしょ けいやくしょ こようけいやく","sankouyoushikidai1-5gou koyoukeiyakusho keiyakusho koyoukeiyaku"],"1_6":["さんこうようしきだい1-6ごう こようじょうけんしょ じょうけんしょ こようじょうけん","sankouyoushikidai1-6gou koyoujoukensho joukensho koyoujouken"],"1_16":["さんこうようしきだい1-16ごう こようのけいいにかかるせつめいしょ けいい あっせん しょうかい","sankouyoushikidai1-16gou koyounokeiinikakarusetsumeisho keii assen shoukai"],"1_17_vi":["さんこうようしきだい1-17ごう しえんけいかくしょにゅうりょく・いんさつ(たげんご) しえんけいかく","sankouyoushikidai1-17gou shienkeikakushonyuuryoku・insatsu(tagengo) shienkeikaku"],"1_25":["さんこうようしきだい1-25ごう しえんいたくけいやくにかんするせつめいしょ しえんいたく","sankouyoushikidai1-25gou shienitakukeiyakunikansurusetsumeisho shienitaku"],"1_11":["さんこうようしきだい1-11ごう 1-11ごうしょぞくきかんがいようしょ","sankouyoushikidai1-11gou 1-11goushozokukikangaiyousho"],"1_20":["さんこうようしきだい1-20ごう しえんせきにんしゃのりれきしょ","sankouyoushikidai1-20gou shiensekininshanorirekisho"],"1_22":["さんこうようしきだい1-22ごう しえんたんとうしゃのりれきしょ","sankouyoushikidai1-22gou shientantoushanorirekisho"],"1_23":["さんこうようしきだい1-23ごう やくいんにかんするせいやくしょ","sankouyoushikidai1-23gou yakuinnikansuruseiyakusho"],"1_27":["さんこうようしきだい1-27ごう こうてきぎむりこうにかんするせつめいしょ","sankouyoushikidai1-27gou koutekigimurikounikansurusetsumeisho"],"1_29":["さんこうようしきだい1-29ごう しょるいしょうりゃくにあたってのせいやくしょ","sankouyoushikidai1-29gou shoruishouryakuniatattenoseiyakusho"],"shozoku_daihyou":["しょぞくきかんのだいひょうしゃにかんするしんこくしょ だいひょうしゃくぶん・しめい・ざいりゅうかーど","shozokukikannodaihyoushanikansurushinkokusho daihyoushakubun・shimei・zairyuukaado"],"1_10":["さんこうようしきだい1-10ごう ぎのういてんにかかるしんこくしょ(2ごうけんせつよう)","sankouyoushikidai1-10gou ginouitennikakarushinkokusho(2goukensetsuyou)"],"1_11_2":["さんこうようしきだい1-11-2ごう うけいれたちゅうちょうきざいりゅうものりすと","sankouyoushikidai1-11-2gou ukeiretachuuchoukizairyuumonorisuto"],"1_11_3":["さんこうようしきだい1-11-3ごう せいかつそうだんぎょうむをいったちゅうちょうきざいりゅうものりすと","sankouyoushikidai1-11-3gou seikatsusoudangyoumuwoittachuuchoukizairyuumonorisuto"],"1_30":["さんこうようしきだい1-30ごう きゅうぎょうきかんにかんするもうしたてしょ","sankouyoushikidai1-30gou kyuugyoukikannikansurumoushitatesho"],"1_31":["さんこうようしきだい1-31ごう つうさんざいりゅうきかんをこえるざいりゅうにかんするもうしたてしょ","sankouyoushikidai1-31gou tsuusanzairyuukikanwokoeruzairyuunikansurumoushitatesho"],"1_32":["さんこうようしきだい1-32ごう 2ごうとくていぎのうがいこくじんのぎょうむないようにかんするせいやくしょ","sankouyoushikidai1-32gou 2goutokuteiginougaikokujinnogyoumunaiyounikansuruseiyakusho"],"iko":["いこうじゅんびせつめいしょ とくていかつどう→とくていぎのう1ごう いこう とくていかつどう","ikoujunbisetsumeisho tokuteikatsudou→tokuteiginou1gou ikou tokuteikatsudou"],"tk2go":["いこうじゅんびせつめいしょ(2ごう) とくていかつどう→とくていぎのう2ごう いこう 2ごう","ikoujunbisetsumeisho(2gou) tokuteikatsudou→tokuteiginou2gou ikou 2gou"],"myanmar":["りゆうしょ(みゃんまー) みゃんまーこくせきものなどのとくていかつどう みゃんまー りゆうしょ","riyuusho(myanmaa) myanmaakokusekimononadonotokuteikatsudou myanmaa riyuusho"],"shinsei_henkou":["まどぐちしんせいしょ(ぜんしゅべつ) あんけんをえらぶとへんこう・こうしん・わざじんこく・にんてい・とくていかつどうをじどうはんべつ まどぐち しんせいしょ へんこう こうしん にんてい わざじんこく とくていかつどう","madoguchishinseisho(zenshubetsu) ankenwoerabutohenkou・koushin・wazajinkoku・nintei・tokuteikatsudouwojidouhanbetsu madoguchi shinseisho henkou koushin nintei wazajinkoku tokuteikatsudou"],"irai":["いらいしょ ざいりゅうかーどのじゅりょう(とりつぎもの:なかばやし/たなか) ざいりゅうかーど じゅりょう うけとり","iraisho zairyuukaadonojuryou(toritsugimono:nakabayashi/tanaka) zairyuukaado juryou uketori"],"tesuryo":["てすうりょうのうふしょ べっきだい84ごうようしき(ゆうそうこうふのまえに) いんし てすうりょう","tesuuryounoufusho bekkidai84gouyoushiki(yuusoukoufunomaeni) inshi tesuuryou"],"tsuika_shiryo":["ついかしりょうていしゅつ うけつけばんごうからていしゅつさきのにゅうかんきょくをじどうはんてい ついかん ついか","tsuikashiryouteishutsu uketsukebangoukarateishutsusakinonyuukankyokuwojidouhantei tsuikan tsuika"],"riyu_sho":["りゆうしょ れたーけいしき8たね+りょけんひつじしゅとくのりゆうしょ(にちえいへいき) りゆうしょ れたー","riyuusho retaakeishiki8tane+ryokenhitsujishutokunoriyuusho(nichieiheiki) riyuusho retaa"],"torisage":["しんせいとりさげしょ さんこうようしき11 とりさげげ とりさげ","shinseitorisagesho sankouyoushiki11 torisagege torisage"],"henkou":["しんせいないようへんこうもうしでしょ","shinseinaiyouhenkoumoushidesho"],"ininjou":["いにんじょう(へんこう)","ininjou(henkou)"],"zairyu_teisei":["ざいりゅうかーどきさいじこうていせいがんしゅつしょ(さんこうようしき5) あんけんIDでしめい・じゅうきょち・ざいりゅうかーどばんごうなどをじどうにゅうりょく ていせい","zairyuukaadokisaijikouteiseiganshutsusho(sankouyoushiki5) ankenIDdeshimei・juukyochi・zairyuukaadobangounadowojidounyuuryoku teisei"],"shashin_teishutsu":["しゃしんていしゅつようし あんけんIDでじどうにゅうりょく・かおじゃしんをどらっぐ&amp;どろっぷ しゃしん","shashinteishutsuyoushi ankenIDdejidounyuuryoku・kaojashinwodoraggu&amp;doroppu shashin"],"1_1":["うけいれせいやくしょ 1-1ごう かいご","ukeireseiyakusho 1-1gou kaigo"],"2_1":["うけいれせいやくしょ 2-1ごう びるくりーにんぐ","ukeireseiyakusho 2-1gou birukuriiningu"],"3_1":["うけいれせいやくしょ 3-1ごう こうぎょうせいひんせいぞうぎょう","ukeireseiyakusho 3-1gou kougyouseihinseizougyou"],"6_1":["うけいれせいやくしょ 6-1ごう けんせつ","ukeireseiyakusho 6-1gou kensetsu"],"6_2":["2ごうのうけいれきじゅんのせいやくしょ 6-2ごう・2ごうのとき けんせつ","2gounoukeirekijunnoseiyakusho 6-2gou・2gounotoki kensetsu"],"6_3":["じつむけいけんしんこくしょ+けいれきしょうめいしょ 6-3ごう・2ごうのとき けんせつ","jitsumukeikenshinkokusho+keirekishoumeisho 6-3gou・2gounotoki kensetsu"],"juuyou":["じゅうようじこうじぜんせつめいしょ ようしきだい2(こっこうしょう) けんせつ じゅうせつ じゅうようじこう こっこうしょう","juuyoujikoujizensetsumeisho youshikidai2(kokkoushou) kensetsu juusetsu juuyoujikou kokkoushou"],"7_1":["うけいれせいやくしょ 7-1ごう ぞうせん・はくようこうぎょう","ukeireseiyakusho 7-1gou zousen・hakuyoukougyou"],"7_2":["とうろくしえんきかんのせいやくしょ 7-2ごう ぞうせん・はくようこうぎょう","tourokushienkikannoseiyakusho 7-2gou zousen・hakuyoukougyou"],"8_1":["うけいれせいやくしょ 8-1ごう じどうしゃせいび","ukeireseiyakusho 8-1gou jidoushaseibi"],"8_2":["とうろくしえんきかんのせいやくしょ 8-2ごう じどうしゃせいび","tourokushienkikannoseiyakusho 8-2gou jidoushaseibi"],"9_1":["うけいれせいやくしょ 9-1ごう こうくう","ukeireseiyakusho 9-1gou koukuu"],"9_2":["とうろくしえんきかんのせいやくしょ 9-2ごう こうくう","tourokushienkikannoseiyakusho 9-2gou koukuu"],"10_1":["うけいれせいやくしょ 10-1ごう しゅくはく","ukeireseiyakusho 10-1gou shukuhaku"],"10_2":["とうろくしえんきかんのせいやくしょ 10-2ごう しゅくはく","tourokushienkikannoseiyakusho 10-2gou shukuhaku"],"11_1":["うけいれせいやくしょ(ちょくせつこよう) 11-1ごう のうぎょう","ukeireseiyakusho(chokusetsukoyou) 11-1gou nougyou"],"11_3":["うけいれせいやくしょ(はけんけいたい) 11-3ごう のうぎょう","ukeireseiyakusho(hakenkeitai) 11-3gou nougyou"],"11_4":["とうろくしえんきかんのせいやくしょ 11-4ごう のうぎょう","tourokushienkikannoseiyakusho 11-4gou nougyou"],"12_1":["うけいれせいやくしょ 12-1ごう ぎょぎょう","ukeireseiyakusho 12-1gou gyogyou"],"12_2":["とうろくしえんきかんのせいやくしょ 12-2ごう ぎょぎょう","tourokushienkikannoseiyakusho 12-2gou gyogyou"],"13_1":["うけいれせいやくしょ 13-1ごう いんしょくりょうひんせいぞうぎょう","ukeireseiyakusho 13-1gou inshokuryouhinseizougyou"],"13_2":["とうろくしえんきかんのせいやくしょ 13-2ごう いんしょくりょうひんせいぞうぎょう","tourokushienkikannoseiyakusho 13-2gou inshokuryouhinseizougyou"],"14_1":["うけいれせいやくしょ 14-1ごう がいしょくぎょう","ukeireseiyakusho 14-1gou gaishokugyou"],"14_2":["とうろくしえんきかんのせいやくしょ 14-2ごう がいしょくぎょう","tourokushienkikannoseiyakusho 14-2gou gaishokugyou"],"15_1":["うけいれせいやくしょ 15-1ごう じどうしゃうんそうぎょう","ukeireseiyakusho 15-1gou jidoushaunsougyou"],"15_2":["とうろくしえんきかんのせいやくしょ 15-2ごう じどうしゃうんそうぎょう","tourokushienkikannoseiyakusho 15-2gou jidoushaunsougyou"],"15_6":["じゅんびこようけいやくしょ 15-6ごう・とくていじどうしゃうんそうぎょうじゅんび じどうしゃうんそうぎょう","junbikoyoukeiyakusho 15-6gou・tokuteijidoushaunsougyoujunbi jidoushaunsougyou"],"15_7":["じゅんびこようじょうけんしょ 15-7ごう・とくていじどうしゃうんそうぎょうじゅんび じどうしゃうんそうぎょう","junbikoyoujoukensho 15-7gou・tokuteijidoushaunsougyoujunbi jidoushaunsougyou"],"16_1":["うけいれせいやくしょ 16-1ごう てつどう","ukeireseiyakusho 16-1gou tetsudou"],"16_2":["とうろくしえんきかんのせいやくしょ 16-2ごう てつどう","tourokushienkikannoseiyakusho 16-2gou tetsudou"],"17_1":["うけいれせいやくしょ 17-1ごう りんぎょう","ukeireseiyakusho 17-1gou ringyou"],"18_1":["うけいれせいやくしょ 18-1ごう もくざいさんぎょう","ukeireseiyakusho 18-1gou mokuzaisangyou"],"soufujou":["しょるいそうふじょう さいんしょるい・おういんしょるい・ざいりゅうかーどなど5たね そうふじょう ゆうそう","shoruisoufujou sainshorui・ouinshorui・zairyuukaadonado5tane soufujou yuusou"],"meibo":["めいぼ(ふくすうにん) しえんけいかくしょたいしょうしゃめいぼ/しんせいじんめいぼ・あんけんをまとめてえらんでさくせい めいぼ","meibo(fukusuunin) shienkeikakushotaishoushameibo/shinseijinmeibo・ankenwomatometeerandesakusei meibo"],"suisenhyo":["とくていぎのうがいこくじんおもて こうふしんせいしょ+すいせんじょうてんぷ2(べとなむろうどうかんりぶあて)","tokuteiginougaikokujinomote koufushinseisho+suisenjoutenpu2(betonamuroudoukanribuate)"],"signslot":["しょめいらんせってい でんししょめいのいちをしょるいごとにきめる しょめい さいん","shomeiransettei denshishomeinoichiwoshoruigotonikimeru shomei sain"]};   // ver.20261118.06: 検索用のよみ（ひらがな／ローマ字）。左のメニューに書類を足したときは作り直す
@@ -3788,7 +3921,7 @@ function _nsRoma2Kana(t){
 function _nsNorm(t){ return String(t||'').normalize('NFKC').toLowerCase().replace(/[‐‑‒–—―ー－−]/g,'-').replace(/[\s　・,、（）()「」]/g,''); }
 function _navSearch(q){
   var box=document.getElementById('otherDocsContainer'); if(!box) return;
-  var its=[].slice.call(box.querySelectorAll('.item')), cnt=document.getElementById('navSearchCount'), none=document.getElementById('navSearchNone');
+  var its=[].slice.call(box.querySelectorAll('.item:not(.fav-clone)')), cnt=document.getElementById('navSearchCount'), none=document.getElementById('navSearchNone');
   its.forEach(function(el){ el.classList.remove('ns-hide','ns-first'); if(el.dataset.fld){ var d=el.querySelector('div'); if(d && !d.dataset.f) d.dataset.f=el.dataset.fld; } });
   var words=String(q||'').split(/[\s　]+/).map(_nsNorm).filter(Boolean);
   if(!words.length){ box.classList.remove('ns-on'); if(cnt) cnt.textContent=''; if(none) none.style.display='none'; return; }
@@ -3813,6 +3946,14 @@ function _navSearchKey(ev){
   var inp=ev.target;
   if(ev.key==='Escape'){ inp.value=''; _navSearch(''); return; }
   if(ev.key==='Enter'){ ev.preventDefault(); var f=document.querySelector('#otherDocsContainer .item.ns-first'); if(f){ f.click(); inp.blur(); } }
+  if(ev.key==='ArrowDown' || ev.key==='ArrowUp'){   // ver.20261118.08: ↑↓ で選ぶ
+    var vis=[].slice.call(document.querySelectorAll('#otherDocsContainer.ns-on .item:not(.fav-clone):not(.ns-hide)')); if(!vis.length) return;
+    ev.preventDefault();
+    var cur=vis.findIndex(function(x){ return x.classList.contains('ns-first'); });
+    var nx=ev.key==='ArrowDown' ? Math.min(vis.length-1, cur+1) : Math.max(0, cur-1);
+    vis.forEach(function(x){ x.classList.remove('ns-first'); }); vis[nx].classList.add('ns-first');
+    try{ vis[nx].scrollIntoView({block:'nearest'}); }catch(_e){}
+  }
 }
 // 「/」で検索欄へ（入力中でないとき）
 document.addEventListener('keydown', function(ev){
@@ -3898,7 +4039,7 @@ function _pmDocLabel(dk){
   var el=document.getElementById('nav-'+dk);
   if(!el) return dk;
   var main=el.querySelector('div'); var t='';
-  if(main){ var cl=main.cloneNode(true); cl.querySelectorAll('.who,.item-sub').forEach(function(x){ x.remove(); }); t=cl.textContent; } else t=el.textContent;
+  if(main){ var cl=main.cloneNode(true); cl.querySelectorAll('.who,.item-sub,.fav-star,.fav-move').forEach(function(x){ x.remove(); }); t=cl.textContent; } else t=el.textContent;
   t=t||dk;   // ver.20261118.06: 「所属機関」「支援機関」の印は書類名に入れない
   if(el.dataset && el.dataset.fld) t=el.dataset.fld+' '+String(t).trim();   // ver.20261118.06: 分野別の書類は見出しに分野があるので、書類名だけでは分からないところ用に分野を付ける
   var sub=el.querySelector('.item-sub'); var subT='';
