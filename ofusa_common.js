@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261119.01
+ * - fix: スタイル編集で位置をmm指定の欄（申請書の対応可能言語など）を動かすと、ページの上へ飛ぶ不具合を修正
  * ver.20261118.15
  * - feat: 本国において定められた遵守すべき手続がないことに係る説明書（特定自動車運送業準備）の書類名を追加
  * ver.20261118.12
@@ -2738,13 +2740,22 @@ function spFont(d){
   _styleTarget.style.fontSize=(cur+d*(96/72)).toFixed(1)+'px';
   window._styleDirty=true;
 }
+// ver.20261119.01: 位置をpxで読む。「left:51.5mm」のようにmmで置いてある欄を、51.5pxと読み違えて
+// ページの上へ飛んでいた不具合を修正（申請書の対応可能言語など）
+function _spPos(el,prop){
+  var v=String(el.style[prop]||'').trim();
+  if(!v) return 0;
+  if(/^-?[\d.]+px$/.test(v)) return parseFloat(v);
+  var c=parseFloat(getComputedStyle(el)[prop]);
+  return isNaN(c)?0:c;
+}
 function spMove(dx,dy){
   if(!_styleTarget) return;
   var el=_styleTarget;
   if(getComputedStyle(el).position==='static'){ el.style.position='relative'; }
   var mm=96/25.4;
-  el.style.left=((parseFloat(el.style.left)||0)+dx*mm).toFixed(1)+'px';
-  el.style.top=((parseFloat(el.style.top)||0)+dy*mm).toFixed(1)+'px';
+  el.style.left=(_spPos(el,'left')+dx*mm).toFixed(1)+'px';
+  el.style.top=(_spPos(el,'top')+dy*mm).toFixed(1)+'px';
   window._styleDirty=true;
 }
 // スタイル編集モード中は選択要素をドラッグで移動
@@ -2755,7 +2766,7 @@ function spMove(dx,dy){
     if(!e.target.closest('#stylePanel') && (e.target===_styleTarget || _styleTarget.contains(e.target))){
       e.preventDefault();
       if(getComputedStyle(_styleTarget).position==='static'){ _styleTarget.style.position='relative'; }
-      drag={sx:e.clientX, sy:e.clientY, l:parseFloat(_styleTarget.style.left)||0, t:parseFloat(_styleTarget.style.top)||0};
+      drag={sx:e.clientX, sy:e.clientY, l:_spPos(_styleTarget,'left'), t:_spPos(_styleTarget,'top')};
     }
   }, true);
   document.addEventListener('mousemove', function(e){
