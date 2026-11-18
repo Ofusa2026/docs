@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.21</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.22</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2175,6 +2175,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.22',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '📁 ［🗂 一覧表＋Saysayで作る］の結果の画面に「手で足す書類」を付けました。👤人材・📤アップロード・🏢企業・🔏押印済みのフォルダをボタン1つで開けます。ドライブのファイルで〇有にした行は、一覧表の番号・書類名・ファイルを開くリンクつきで並べます（PDFには入っていないので、その番号の位置に足してください）。'
+    ]
+  },
   {
     version: 'ver.20261118.21',
     date: '2026-11-18',
@@ -4889,7 +4897,12 @@ async function _isaDriveFiles(c, p, co){
     var all=(t&&t.status==='ok'&&Array.isArray(t.items))?t.items:[];
     if(!all.length) out.note.push('人材のドライブを読めませんでした');
     out.treeOk=!!all.length;
-    var _sd=_isaScanDirOf(all); out.scan=_sd.scan; out.appDir=_sd.appDir;   // ver.20261117.18: 一式の保存先（★在留資格申請書類／03 スキャン）
+    var _sd=_isaScanDirOf(all); out.scan=_sd.scan; out.appDir=_sd.appDir;
+    try{   // ver.20261118.22: 押印済み（署名済み）のフォルダ。企業押印済 を先に
+      var _sf=all.filter(function(f){ if(!f.isFolder) return false; var n=String(f.name||''); try{ n=n.normalize('NFKC'); }catch(e){} return ISA_SIGNED_RE.test(n); });
+      _sf.sort(function(a,b){ return (/企業押印/.test(b.name)?1:0)-(/企業押印/.test(a.name)?1:0); });
+      if(_sf[0]) out.signFolder=_sf[0].url||('https://drive.google.com/drive/folders/'+_sf[0].id);
+    }catch(e){}   // ver.20261117.18: 一式の保存先（★在留資格申請書類／03 スキャン）
     all.filter(_isaIsDoc).forEach(function(f){
       var path=String(f.path||''); try{ path=path.normalize('NFKC'); }catch(e){}
       if(_isaSignedPath(f)) out.sign.push(f);
@@ -4898,6 +4911,7 @@ async function _isaDriveFiles(c, p, co){
   } else out.note.push('人材のドライブフォルダが案シスに登録されていません');
   // ver.20261116.21: 人材のアップロードページ（zinzai_dataup）が入れるフォルダ（drive_urls の1つ目）も必ず見る。そこにあるファイルは全部「アップロード」扱い
   var upId=_isaFolderId(Array.isArray(du)&&du[0]);
+  if(upId && upId!==pid) out.upFolder='https://drive.google.com/drive/folders/'+upId;   // ver.20261118.22
   if(upId){
     var seenId={}; out.sign.concat(out.up).forEach(function(f){ seenId[f.id]=1; });
     var upItems=[];
@@ -4907,6 +4921,7 @@ async function _isaDriveFiles(c, p, co){
   }
   var cids=[], seenCo={};
   ['drive_url','drive_url2','drive_url3','drive_url4','drive_url5'].forEach(function(k){ var id=_isaFolderId(co&&co[k]); if(id && cids.indexOf(id)<0) cids.push(id); });   // ver.20261116.23: 会社のドライブURL2〜5も
+  out.coFolders=cids.map(function(id){ return 'https://drive.google.com/drive/folders/'+id; });   // ver.20261118.22
   for(var ci=0; ci<cids.length; ci++){
     var t2=await _cP[ci];
     if(!(t2&&t2.status==='ok')) { out.note.push('会社のドライブ（'+(ci+1)+'つ目のURL）を読めませんでした'); continue; }
@@ -5067,7 +5082,7 @@ async function _isaSetStart(targets){
     var restDocs=targets.filter(function(dk){ return !docUsed[dk] && !(dk==='1_17' && docUsed['1_17_vi']); });
     var restFiles=_lite ? [] : drv.up.concat(drv.sign).filter(function(f){ return !used[f.id] && !(SG && SG.used[f.id]); });
     var restSign=SG ? Object.keys(SG.byKey).filter(function(k){ return !B.sgUsed[k]; }).map(function(k){ return {key:k, label:ISA_SIGN_LABEL[k]||k, pages:SG.byKey[k], on:false}; }).concat(SG.other.length?[{key:'other', label:'様式が分からないページ', pages:SG.other, on:false}]:[]) : [];
-    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', pid:drv.pid||'', scanDir:drv.scan||null, appDir:drv.appDir||null, treeOk:!!drv.treeOk, t0:_isaT0,
+    _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', links:{up:drv.upFolder||'', co:drv.coFolders||[], sign:drv.signFolder||''}, pid:drv.pid||'', scanDir:drv.scan||null, appDir:drv.appDir||null, treeOk:!!drv.treeOk, t0:_isaT0,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
     try{ (await _isaESignStale(_isaSt)).reverse().forEach(function(w){ K.warn.unshift(w); }); }catch(e){ console.warn('[esignStale]', e); }   // ver.20261118.20
@@ -5871,6 +5886,7 @@ function _isaPcRender(){
     +'<div style="padding:10px 18px 14px;overflow-y:auto;flex:1;">'
     +(S.lite?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">入管の一覧表と Saysay の書類だけを1本にしました（ドライブの署名済み・アップロード書類はPDFに入れていません。一覧表の〇はドライブのファイル名も見て付けています。電子署名がある書類は署名済みのものを入れています／申請前チェックはしていません）。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':''))
     +_isaIchiranNgHtml(S, P)
+    +_isaManualHtml(S)
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
     +(P.res.meta.note?'<div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">メモ：'+E(P.res.meta.note)+'</div>':'')
@@ -5887,6 +5903,41 @@ function _isaPcRender(){
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
     +'<button onclick="_isaPcPrint()" style="padding:10px 16px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;">🖨 印刷画面を開く</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
+}
+// ver.20261118.22: ［🗂 一覧表＋Saysay］の結果の画面に「📁 手で足す書類」。人材・アップロード・会社・押印済みのフォルダをすぐ開けるボタンと、
+//   ドライブのファイルで〇有にした行（PDFには入っていない）を一覧表の番号・ファイル名・開くリンクつきで出す
+function _isaManualHtml(S){
+  if(!S || !S.lite) return '';
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var L0=S.links||{}, btn=function(u, lab, col, tip){ return u ? '<a href="'+E(u)+'" target="_blank" rel="noopener" title="'+E(tip)+'" style="padding:6px 10px;border-radius:8px;border:1px solid '+col+';color:'+col+';background:#fff;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap;">'+lab+'</a>'
+    : '<span title="'+E(tip)+'（案シスに登録がないか、見つかりませんでした）" style="padding:6px 10px;border-radius:8px;border:1px dashed #cbd5e1;color:#94a3b8;font-size:12px;font-weight:800;white-space:nowrap;">'+lab+'（なし）</span>'; };
+  var co=(L0.co||[]);
+  var h='<div style="border:1.5px solid #0f766e;border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#f0fdfa;">'
+    +'<div style="font-size:13px;font-weight:800;color:#0f766e;margin-bottom:6px;">📁 手で足す書類（ドライブの書類はPDFに入っていません）</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">'
+    +btn(S.folder, '👤 人材', '#2563eb', '人材のドライブフォルダを開きます')
+    +(L0.up ? btn(L0.up, '📤 アップロード', '#7c3aed', '人材のアップロードページが入れるフォルダを開きます') : '')
+    +(co.length ? co.map(function(u, i){ return btn(u, '🏢 企業'+(co.length>1?(i+1):''), '#b45309', '会社のドライブフォルダを開きます'); }).join('') : btn('', '🏢 企業', '#b45309', '会社のドライブフォルダ'))
+    +btn(L0.sign, '🔏 押印済み', '#be123c', '人材のドライブの押印済み（署名済み）のフォルダを開きます')
+    +'</div>';
+  var rows=[];
+  (S.tables||[]).forEach(function(t){ (t.lines||[]).forEach(function(L){
+    if(L.sub || L.val!=='有') return;
+    var fs=(L.files||[]).filter(function(f){ return f && !f._noDrive && (f.url || f.id); });
+    if(!fs.length || (L.signPages&&L.signPages.length)) return;
+    rows.push({hy:_isaHyou(t.key), no:String((L.r&&L.r.no)||''), nm:_isaRowName(L), fs:fs, saysay:!!(L.docs&&L.docs.length)});
+  }); });
+  if(rows.length){
+    h+='<div style="font-size:11.5px;color:#334155;margin-bottom:4px;">一覧表の番号の位置に、次のファイルを足してください（'+rows.length+'件）</div>';
+    rows.forEach(function(r){
+      h+='<div style="display:flex;gap:6px;align-items:flex-start;padding:5px 0;border-top:1px solid #ccfbf1;font-size:12px;">'
+        +'<span style="flex:none;color:#0f766e;font-weight:800;white-space:nowrap;">第'+E(r.hy)+'表'+(r.no?' '+E(r.no):'')+'</span>'
+        +'<div style="flex:1;min-width:0;"><div style="font-weight:700;color:#0f172a;">'+E(r.nm)+(r.saysay?' <span style="font-size:10.5px;color:#b45309;font-weight:700;">（Saysay の署名なしを綴じています。押印済みがあれば差し替え）</span>':'')+'</div>'
+        +r.fs.map(function(f){ var u=f.url||('https://drive.google.com/file/d/'+f.id+'/view'); return '<a href="'+E(u)+'" target="_blank" rel="noopener" style="display:inline-block;margin:2px 8px 0 0;color:#2563eb;font-size:11.5px;">📄 '+E(f.name||'ファイル')+'</a>'; }).join('')
+        +'</div></div>';
+    });
+  } else h+='<div style="font-size:11.5px;color:#64748b;">ドライブのファイルで〇有にした行はありません（足す書類があれば上のボタンからフォルダを開いてください）</div>';
+  return h+'</div>';
 }
 // ver.20261117.09: 一覧表が入っていない／〇を付け直せなかったときは赤で知らせ、一覧表だけ作り直せるようにする
 function _isaIchiranNgHtml(S, P){
