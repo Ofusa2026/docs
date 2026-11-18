@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.20</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.21</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2175,6 +2175,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.21',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '✅ 案シスから開いた申請書類一式（［🗂 一覧表＋Saysayで作る］など）の結果の画面に［✅ 案シスに戻る］を付けました。押すとこのタブを閉じて案シスのタブに戻ります。ドライブに保存している途中なら、保存が終わってから閉じます（保存できなかったときは閉じずにそのまま知らせます）。'
+    ]
+  },
   {
     version: 'ver.20261118.20',
     date: '2026-11-18',
@@ -5873,6 +5881,7 @@ function _isaPcRender(){
     +'</div>'
     +'<div style="padding:12px 18px;border-top:1px solid #eef2f7;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><div id="isaSaveSt" style="flex:1 1 100%;font-size:11.5px;color:#64748b;line-height:1.6;">'+_isaSaveHtml(P)+'</div><div style="flex:1;"></div>'
     +(S.folder?'<a href="'+E(S.folder)+'" target="_blank" rel="noopener" title="人材のドライブを開きます（一式のPDFは［🖨 印刷画面を開く］を押すと「03 スキャン」に自動で保存します）" style="padding:9px 12px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none;">📁 人材のドライブ</a>':'')
+    +(window._isaFromUrl?'<button onclick="_isaBackToAnshis()" title="このタブを閉じて、案シスのタブに戻ります（ドライブへの保存中は終わるまで待ちます）" style="padding:9px 14px;background:#0f766e;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">✅ 案シスに戻る</button>':'')   // ver.20261118.21
     +'<button onclick="_isaPcClose()" style="padding:9px 14px;background:#f1f5f9;color:#475569;border:none;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:600;">閉じる</button>'
     +'<button onclick="_isaBackToEdit()" title="一覧表の〇有／〇無や、綴じる書類を直して作り直します（見つからなかった書類は［📁 使うファイルを選ぶ］でドライブから選べます）" style="padding:9px 14px;background:#fff;color:#6d28d9;border:1px solid #a855f7;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">↩ 確認画面で直す</button>'
     +'<button id="isaPcXl" onclick="_isaPcExcel()" style="padding:9px 14px;background:#fff;color:#047857;border:1px solid #10b981;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:800;">📊 Excelを保存</button>'
@@ -5938,6 +5947,19 @@ function _isaNoticeDoc(meta, items){
   return {id:id, html:html, css:css, links:[], check:[], logBody:null};
 }
 // ver.20261117.09: 結果の画面を閉じても、作り直さずに開き直せる（右下の小さなボタン）
+// ver.20261118.21: ［✅ 案シスに戻る］案シスから開いたタブを閉じて、案シスのタブに戻る。ドライブに保存している途中なら、終わってから閉じる
+function _isaBackToAnshis(){
+  var P=_isaSt&&_isaSt.pc, v=P&&P.save;
+  if(v && v.st==='run'){
+    if(window._isaBackWait) return; window._isaBackWait=1;
+    var el=document.getElementById('isaSaveSt'); if(el) el.innerHTML+='<br><b style="color:#0f766e;">保存が終わったら、このタブを閉じて案シスに戻ります…</b>';
+    var t=setInterval(function(){ var w=_isaSt&&_isaSt.pc&&_isaSt.pc.save; if(!w || w.st!=='run'){ clearInterval(t); window._isaBackWait=0; if(w && w.st!=='ok'){ _isaSaveShow(_isaSt, _isaSt.pc); return; } _isaBackToAnshis(); } }, 1000);
+    return;
+  }
+  try{ if(window.opener && !window.opener.closed) window.opener.focus(); }catch(e){}
+  window.close();
+  setTimeout(function(){ if(!window.closed) alert('このタブは自動で閉じられませんでした。タブを閉じて案シスに戻ってください'); }, 400);
+}
 function _isaPcClose(){
   var m=document.getElementById('isaPcModal'); if(m) m.remove();
   if(!(_isaSt && _isaSt.pc)) return;
