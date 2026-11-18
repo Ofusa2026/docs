@@ -3146,7 +3146,7 @@ async function loadCaseToForm(info, docKey, opts){
     setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || co.rep_name_en);
     setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || co.rep_title_en);
     // ver.20260729.02: 代表者が複数登録されている場合はプルダウンで選択（rep2/rep3対応。1人なら非表示）
-    try{ renderRepSelect(co, es); }catch(e){ console.warn('repSelect', e); }
+    try{ renderRepSelect(co, es, { docKey:docKey, ctx:[es.setName, cas && cas.name].join(' ') }); }catch(e){ console.warn('repSelect', e); }   // ver.20261118.03: 1-5号は事業所で署名者を自動で選ぶ
 
     // 作成責任者（ver.20260729: 書類別の個別設定(extra.docAuthors)があればそちらを優先。空欄は既定author_*）
     var _docKey = window.OFUSA_DOC_KEY || docKey || '';
@@ -4453,6 +4453,18 @@ function getRepList(co){
   });
   return list;
 }
+// ver.20261118.03: 書類によっては「事業所ごとの署名者」を自動で選ぶ（いまは 1-5号＝雇用契約書だけ。1-6号などは今までどおり代表者①）
+//   代表者②③の役職が「三郷事業所　所長」のように場所＋事業所/営業所/支店/工場…で始まっていれば、その場所（三郷）が
+//   雇用条件セット名・案件名に入っている案件ではその人を出す。どれにも入っていなければ代表者①
+var REP_PLACE_DOCS=['1_5'];
+var REP_PLACE_RE=/^[\s　]*(.+?)(事業所|営業所|支店|支社|工場|センター|店)/;
+function _repNz(x){ return String(x==null?'':x).replace(/[\s　]/g,''); }
+function _repPlaceOf(title){ var m=REP_PLACE_RE.exec(String(title||'')); return m ? _repNz(m[1]) : ''; }
+function _repAutoPick(co, ctx){   // 戻り値：'' ＝事業所の署名者が登録されていない（今までどおり）／それ以外＝選ぶ代表者の番号
+  var list=getRepList(co), hasPlace=false, hit=null, c=_repNz(ctx);
+  list.forEach(function(r){ if(r.no==='1') return; var pl=_repPlaceOf(r.title); if(!pl) return; hasPlace=true; if(!hit && c.indexOf(pl)!==-1) hit=r; });
+  return hasPlace ? (hit ? hit.no : '1') : '';
+}
 function applyRepSelect(no){
   var co=window._ofusaRepCo, es=window._ofusaRepEs||{};
   if(!co) return;
@@ -4461,12 +4473,15 @@ function applyRepSelect(no){
   for(var i=0;i<list.length;i++){ if(list[i].no===String(no)){ pick=list[i]; break; } }
   if(!pick) pick=list[0]||{name:co.rep_name||'',title:co.rep_title||'',nameEn:co.rep_name_en||'',titleEn:co.rep_title_en||''};
   // ✏️直接編集(es)で手動上書きされている項目は尊重する
+  //   ver.20261118.03: ただし雇用条件セットの代表者名が代表者①の写しのときは、②③を選んだら②③を出す（①の写しは手直しではないため）
+  if(pick.no && pick.no!=='1' && es.repName && _repNz(es.repName)===_repNz(co.rep_name)) es={};
   setValMulti(['es_repName','f_repName'], es.repName || pick.name);
   setValMulti(['es_repTitle','f_repTitle'], es.repTitle || pick.title);
   setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || pick.nameEn);
   setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || pick.titleEn);
 }
-function renderRepSelect(co, es){
+function renderRepSelect(co, es, opt){
+  opt=opt||{};
   window._ofusaRepCo=co; window._ofusaRepEs=es||{};
   var list=getRepList(co);
   var docKey=window.OFUSA_DOC_KEY || location.pathname.split('/').pop().replace(/\.html.*$/,'');
@@ -4475,6 +4490,9 @@ function renderRepSelect(co, es){
   if(list.length<2){ if(old) old.remove(); return; } // 1人以下 → プルダウン非表示（①が自動適用済み）
   var saved=localStorage.getItem(lsKey)||'1';
   if(!list.some(function(x){return x.no===saved;})) saved='1';
+  // ver.20261118.03: 1-5号は事業所で自動（覚えている選択より先）。事業所の署名者が無い会社は今までどおり
+  var _auto=''; try{ if(REP_PLACE_DOCS.indexOf(String(opt.docKey||docKey).replace(/_(en|km|ko|mn|my|ne|si|th|tl|vi|zh|id)$/,''))!==-1) _auto=_repAutoPick(co, opt.ctx||''); }catch(_ra){}
+  if(_auto) saved=_auto;
   applyRepSelect(saved);
   var bar=old;
   if(!bar){
@@ -4488,7 +4506,8 @@ function renderRepSelect(co, es){
   }
   bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
     + list.map(function(x){ return '<option value="'+x.no+'"'+(x.no===saved?' selected':'')+'>'+x.label.replace(/</g,'&lt;')+'</option>'; }).join('')
-    + '</select>';
+    + '</select>'
+    + (_auto?'<span style="margin-left:6px;font-size:11px;" title="代表者②③の役職の場所（例：三郷事業所）が、雇用条件セット名・案件名に入っているかで選んでいます">（事業所から自動）</span>':'');
 }
 // ===== /代表者プルダウン =====
 
