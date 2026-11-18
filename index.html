@@ -77,6 +77,18 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 .wn-section ul{list-style:none;padding:0;}
 .wn-section li{font-size:12px;color:#cbd5e1;padding:3px 0 3px 14px;position:relative;line-height:1.55;}
 .wn-section li::before{content:'';position:absolute;left:4px;top:9px;width:4px;height:4px;border-radius:99px;background:#7c3aed;}
+/* ver.20261118.10: 保存し忘れの印・文字の大きさ・表示の濃さ */
+.item.nav-dirty > div::after{content:'● 未保存';display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#fbbf24;vertical-align:1px;}
+.uip b{display:inline-block;padding:1px 7px;margin:0 2px;border:1px solid #334155;border-radius:5px;color:#cbd5e1;font-weight:400;cursor:pointer;}
+.uip b.on{background:#1e40af;border-color:#1e40af;color:#fff;}
+html[data-uifs="s"] .sidebar{zoom:.92;}
+html[data-uifs="l"] .sidebar{zoom:1.1;}
+html[data-uifs="xl"] .sidebar{zoom:1.22;}
+html[data-uihc="1"] .sidebar .item{color:#f8fafc;}
+html[data-uihc="1"] .sidebar .item-sub{color:#cbd5e1 !important;}
+html[data-uihc="1"] .sidebar .section{color:#e2e8f0 !important;}
+html[data-uihc="1"] .sidebar .fld-head{color:#f1f5f9 !important;}
+html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 /* ver.20261118.09: AI相談 */
 #aiaBtn{position:fixed;right:18px;bottom:18px;z-index:99990;padding:9px 14px;border:none;border-radius:22px;background:#1e40af;color:#fff;font-size:12.5px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
 #aiaBtn:hover{background:#1d4ed8;}
@@ -144,7 +156,7 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.11</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.13</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -451,6 +463,10 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
     </div>
     <div class="divider"></div>
     <div class="section">設定</div>
+    <div id="uiPrefRow" style="padding:6px 14px 8px;font-size:11px;color:#94a3b8;">
+      <div style="margin-bottom:4px;">🔠 文字の大きさ <span class="uip"><b class="uip-fs" data-v="s" onclick="_uiSet('fs','s')">小</b><b class="uip-fs" data-v="m" onclick="_uiSet('fs','m')">中</b><b class="uip-fs" data-v="l" onclick="_uiSet('fs','l')">大</b><b class="uip-fs" data-v="xl" onclick="_uiSet('fs','xl')">特大</b></span></div>
+      <div>🌓 表示の濃さ <span class="uip"><b class="uip-hc" data-v="0" onclick="_uiSet('hc',false)">ふつう</b><b class="uip-hc" data-v="1" onclick="_uiSet('hc',true)">くっきり</b></span></div>
+    </div>
     <div class="item" id="nav-signslot" onclick="openSignSlotEditor()"><span class="item-icon">🖊</span><div>署名欄設定<span class="item-sub">電子署名の位置を書類ごとに決める</span></div></div>
     </div><!-- /otherDocsContainer (ver.20260820.16) -->
   </div>
@@ -560,8 +576,8 @@ body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;displa
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611181614';
-window.__DOCS_CACHE_BUSTER__ = '2611181614';
+window.__DOCS_CACHE_BUSTER__ = '2611181739';
+window.__DOCS_CACHE_BUSTER__ = '2611181739';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1526,6 +1542,7 @@ async function idxInit(){
     // ver.20260810.01: 「🔍 案件検索」ブロック撤去に伴い、以下2つの呼び出しを削除
     //   （idxBuildCompanyFilter / idxFilterCases。参照要素が消えたため）
     try{ _favRender(); _favLoad(); }catch(_fe){ console.warn('fav',_fe); }   // ver.20261118.08: よく使う書類
+    try{ _uiLoad(); }catch(_ue){}   // ver.20261118.10: 文字の大きさ・表示の濃さ
     await idxAutoSelectFromUrl(); // ver.20260714.07: ?caseId= / ?doc= で自動選択
   }catch(e){console.error('idxInit',e);}
 }
@@ -1590,6 +1607,69 @@ function idxOnPasteInput(){
     st.style.color='#fbbf24';
   }
 }
+/* ver.20261118.10: 保存し忘れの警告（書類から「未保存」の合図を受けて、左のメニューに印・案件の切り替え前に確認） */
+var _dirtyFrames=new Map();   // iframe要素 → true
+function _frameNavId(fr){
+  try{ for(var k in docs){ if(docs[k] && docs[k].frameId===fr.id) return docs[k].navId; } }catch(e){}
+  var m=(fr.id||'').match(/^frame-(.+)$/); return m?('nav-'+m[1]):'';
+}
+function _dirtyRender(){
+  document.querySelectorAll('#otherDocsContainer .item.nav-dirty').forEach(function(el){ el.classList.remove('nav-dirty'); });
+  _dirtyFrames.forEach(function(v,fr){ if(!v) return; var nid=_frameNavId(fr); var el=nid&&document.getElementById(nid); if(el) el.classList.add('nav-dirty'); });
+  try{ _favRender(); }catch(e){}
+}
+function _dirtyList(){
+  var out=[]; _dirtyFrames.forEach(function(v,fr){ if(!v) return; var nid=_frameNavId(fr), k=nid.replace(/^nav-/,''), nm=k; try{ var lb=_pmDocLabel(k); nm=(lb.name||k)+(lb.sub?('（'+lb.sub+'）'):''); }catch(e){} out.push({frame:fr,navId:nid,name:nm}); });
+  return out;
+}
+window.addEventListener('message', function(e){
+  var d=e.data; if(!d || d.type!=='SAYSAY_DIRTY') return;
+  var fr=[].slice.call(document.querySelectorAll('iframe')).find(function(f){ try{ return f.contentWindow===e.source; }catch(_e){ return false; } });
+  if(!fr) return;
+  if(fr.hasAttribute('data-pm-fixed') || fr.hasAttribute('data-doc-check')) return;
+  if(d.dirty) _dirtyFrames.set(fr,true); else _dirtyFrames.delete(fr);
+  _dirtyRender();
+});
+window.addEventListener('beforeunload', function(e){ if(_dirtyList().length){ e.preventDefault(); e.returnValue=''; return ''; } });
+// 案件を切り替える前に確認。true＝切り替えてよい
+function _dirtyConfirm(){
+  var L=_dirtyList(); if(!L.length) return Promise.resolve(true);
+  return new Promise(function(res){
+    var ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100100;display:flex;align-items:center;justify-content:center;';
+    ov.innerHTML='<div style="background:#fff;border-radius:10px;padding:16px 18px;width:min(440px,92vw);font-size:13px;color:#1f2937;box-shadow:0 12px 40px rgba(0,0,0,.3);">'
+      +'<div style="font-weight:800;font-size:14px;margin-bottom:6px;">💾 まだDB保存していない書類があります</div>'
+      +'<div style="font-size:12px;color:#475569;margin-bottom:8px;">このまま別の案件にすると、直した内容は消えます。</div>'
+      +'<ul style="margin:0 0 12px 18px;padding:0;font-size:12.5px;">'+L.map(function(x){ return '<li>'+String(x.name).replace(/[&<>]/g,'')+'</li>'; }).join('')+'</ul>'
+      +'<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;"><button id="_dcBack" style="padding:7px 14px;border:none;border-radius:7px;background:#1e40af;color:#fff;font-weight:700;cursor:pointer;">戻って保存する</button><button id="_dcGo" style="padding:7px 14px;border:1px solid #cbd5e1;border-radius:7px;background:#fff;color:#b91c1c;cursor:pointer;">保存せずに切り替える</button></div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#_dcBack').onclick=function(){ ov.remove(); try{ var el=document.getElementById(L[0].navId); if(el) el.click(); }catch(e){} res(false); };
+    ov.querySelector('#_dcGo').onclick=function(){ ov.remove(); _dirtyFrames.clear(); _dirtyRender(); res(true); };
+  });
+}
+
+/* ver.20261118.10: 文字の大きさ・表示の濃さ（人ごと。このブラウザと settings の saysay_ui_<メール> に保存。書類の入力欄にも効く） */
+var _uiPref={fs:'m',hc:false};
+function _uiApply(){
+  var r=document.documentElement; r.dataset.uifs=_uiPref.fs||'m'; r.dataset.uihc=_uiPref.hc?'1':'0';
+  document.querySelectorAll('.uip-fs').forEach(function(b){ b.classList.toggle('on', b.dataset.v===(_uiPref.fs||'m')); });
+  document.querySelectorAll('.uip-hc').forEach(function(b){ b.classList.toggle('on', (b.dataset.v==='1')===!!_uiPref.hc); });
+  try{ localStorage.setItem('saysay_ui', JSON.stringify(_uiPref)); }catch(e){}
+  document.querySelectorAll('iframe').forEach(function(f){ try{ f.contentWindow.postMessage({type:'SAYSAY_UI', pref:_uiPref},'*'); }catch(e){} });
+}
+async function _uiSave(){
+  var u=await _favWho(); if(!u) return;
+  try{ if(_sbDocs) await _idxFreshToken();
+    await fetch(IDX_URL+'settings?on_conflict=key',{method:'POST',headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{key:'saysay_ui_'+u, value:JSON.stringify(_uiPref), updated_at:new Date().toISOString()}])});
+  }catch(e){ console.warn('ui save',e); }
+}
+function _uiSet(k,v){ _uiPref[k]=v; _uiApply(); _uiSave(); }
+async function _uiLoad(){
+  try{ _uiPref=Object.assign({fs:'m',hc:false}, JSON.parse(localStorage.getItem('saysay_ui')||'{}')); }catch(e){}
+  _uiApply();
+  var u=await _favWho(); if(!u) return;
+  try{ var r=await idxSb('settings?select=value&key=eq.'+encodeURIComponent('saysay_ui_'+u)); if(r&&r[0]&&r[0].value){ _uiPref=Object.assign({fs:'m',hc:false}, JSON.parse(r[0].value)); _uiApply(); } }catch(e){}
+}
 /* ver.20261118.09: キーボードの近道（Saysay本体側）と、書類からの合図の受け取り */
 function _curDocFrame(){
   var fs=[].slice.call(document.querySelectorAll('iframe')).filter(function(f){ return f.offsetWidth>0 && f.offsetHeight>0 && !f.hasAttribute('data-pm-fixed') && !f.hasAttribute('data-doc-check') && f.id && /^frame-/.test(f.id); });
@@ -1606,6 +1686,7 @@ function _navStep(dir){
 }
 function _focusNavSearch(){ var i=document.getElementById('navSearch'); if(i){ i.focus(); i.select(); } }
 window._saysayField=null;   // 書類で最後に触った欄（AI相談で使う）
+document.addEventListener('load', function(e){ try{ if(e.target && e.target.tagName==='IFRAME') e.target.contentWindow.postMessage({type:'SAYSAY_UI', pref:_uiPref},'*'); }catch(_e){} }, true);
 window.addEventListener('message', function(e){
   var d=e.data; if(!d || typeof d!=='object') return;
   if(d.type==='SAYSAY_NAV') _navStep(d.dir>0?1:-1);
@@ -1707,6 +1788,7 @@ async function idxRenderCaseCard(row){
   el.className='cc-card'; el.style.cssText='display:block;margin-top:6px;'; el.innerHTML=h;
 }
 async function idxJumpByPaste(){
+  try{ if(!(await _dirtyConfirm())) return; }catch(_dc){}   // ver.20261118.10: 保存し忘れの確認
   const inp=document.getElementById('idx_caseIdPaste');
   const st=document.getElementById('idx_jumpStatus');
   const info_el=document.getElementById('idx_jumpedInfo');
@@ -2070,6 +2152,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.13',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '💾 保存し忘れの警告をそろえました：どの書類でも、入力欄を直してDB保存していないと、左のメニューの書類名に「● 未保存」が出ます。そのまま別の案件にしようとすると「まだDB保存していない書類があります［戻って保存する］［保存せずに切り替える］」と聞きます。画面を閉じるときも知らせます。',
+      '🕘 保存の履歴と元に戻す：書類の上の［🕘 履歴］で、DB保存したときに変わった欄（いつ・誰が・前→後）が見られます。［保存する前の値に戻す］で入力欄を前の値に戻せます（DBは［DB保存］を押すまで変わりません）。1-6号は雇用条件セットの履歴です。この版からの保存が残ります。',
+      '🔠 文字の大きさ・表示の濃さ：左のメニューのいちばん下「設定」で、文字の大きさ（小・中・大・特大）と表示の濃さ（ふつう・くっきり）を選べます。左のメニューと書類の入力欄に効きます。人ごとの設定で、ほかのパソコンでも同じです。'
+    ]
+  },
   {
     version: 'ver.20261118.11',
     date: '2026-11-18',

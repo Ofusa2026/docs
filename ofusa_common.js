@@ -3737,6 +3737,9 @@ async function saveFormGeneric(docKey, opts){
       headers: {'Prefer':'return=minimal'},
       body: JSON.stringify({ extra })
     });
+    // ver.20261118.10: 保存の履歴（変わった欄だけ）と、保存し忘れの印を消す
+    try{ window._histRecord({target:'extra', idx:idx, companyId:companyId, caseId:info.caseId, docKey:docKey, before:(co.extra&&co.extra[docKey]&&co.extra[docKey][String(idx)])||{}, after:extra[docKey][String(idx)]}); }catch(_h){}
+    try{ window._markSaved && window._markSaved(); }catch(_ms){}
     // ver.20261117.27: 契約期間は案件（cases.contract_start／contract_end）にも保存
     try{ await window._syncCaseContract(info.caseId); }catch(_cc){}
     // ver.20261026.04: 編集HTMLを雇用条件に紐づけて受け皿へ保存
@@ -4306,6 +4309,8 @@ window._syncCaseContract=async function(caseId){
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(newSet)); window._empLoadedIdx=newIdx;
       try{ await window._syncCaseContract(caseId); }catch(_cc){}   // ver.20261117.27: 契約期間は案件にも保存
+      try{ window._histRecord({target:'emp_set', idx:newIdx, companyId:companyId, caseId:caseId, docKey:'1_6', before:{}, after:newSet, note:'新しいセット'}); }catch(_h){}   // ver.20261118.10
+      try{ window._markSaved && window._markSaved({edited:false}); }catch(_ms){}
       return {saved:true,mode:'new',newIdx:newIdx,setName:(nm||defName),empSets:empSets};
     }else{
       // ①: 楽観ロック（読み込み後にDB上のセットが変わっていたら競合として返す）
@@ -4319,6 +4324,7 @@ window._syncCaseContract=async function(caseId){
       }
       while(empSets.length<=idx) empSets.push({setName:'条件'+(empSets.length+1)});
       var keepName=(empSets[idx]&&empSets[idx].setName)||'ヒアリング取込';
+      var _histBefore=JSON.parse(JSON.stringify(empSets[idx]||{}));   // ver.20261118.10: 保存の履歴用
       Object.assign(empSets[idx],_trSplit(values, empSets[idx]),{setName:keepName,_savedAt:new Date().toISOString(),_savedBy:_currentUserId()});
       var _r2=await sb('companies?id=eq.'+companyId+'&select=emp_sets',{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify({emp_sets:empSets})});
       // ②: 読み戻し確認（0行更新やサイレント失敗・内容不一致を検知）
@@ -4327,6 +4333,8 @@ window._syncCaseContract=async function(caseId){
       if(window._empCtx) window._empCtx.empSets=empSets;
       window._empLoadedSet=JSON.parse(JSON.stringify(empSets[idx])); window._empLoadedIdx=idx;
       try{ await window._syncCaseContract(caseId); }catch(_cc){}   // ver.20261117.27: 契約期間は案件にも保存
+      try{ window._histRecord({target:'emp_set', idx:idx, companyId:companyId, caseId:caseId, docKey:'1_6', before:_histBefore, after:empSets[idx]}); }catch(_h){}   // ver.20261118.10
+      try{ window._markSaved && window._markSaved({edited:false}); }catch(_ms){}
       return {saved:true,mode:'overwrite',idx:idx,empSets:empSets};
     }
   };
@@ -7832,4 +7840,177 @@ window._userTouched={};
       ev.preventDefault(); toParent({type:'SAYSAY_SEARCH'});
     }
   }, true);
+})();
+
+/* ============================================================
+   ver.20261118.10: 保存し忘れの警告（全書類でそろえる）・保存の履歴と元に戻す・文字の大きさ／表示の濃さ
+   ============================================================ */
+
+/* --- 保存し忘れ：入力欄を手で変えたら「未保存」。DB保存できたら消える。本体（Saysay）に知らせて、案件の切り替え前などに確認する --- */
+(function(){
+  if(window.__sDirtyOn) return; window.__sDirtyOn=true;
+  window._sDirty=false;
+  function cur(){ return !!(window._sDirty || window._editedDirty); }
+  var last=null;
+  function notify(force){
+    var d=cur(); if(!force && d===last) return; last=d;
+    try{ if(window.parent && window.parent!==window) window.parent.postMessage({type:'SAYSAY_DIRTY', dirty:d},'*'); }catch(e){}
+  }
+  window._sDirtyNotify=notify;
+  window._markSaved=function(opt){ window._sDirty=false; if(!opt || opt.edited!==false){ window._editedDirty=false; } notify(); };
+  function isForm(t){
+    if(!t || !t.id || !/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return false;
+    if(t.closest && t.closest('#pageArea')) return false;
+    if(/^(filterOrg|filterCompany|filterText|caseSelect|caseCount|fontSizeLabel)$/.test(t.id)) return false;
+    if(t.closest && t.closest('.fp')) return true;
+    return /^(es_|f_)/.test(t.id);
+  }
+  ['input','change'].forEach(function(ev){
+    document.addEventListener(ev, function(e){ if(!e.isTrusted || !isForm(e.target)) return; window._sDirty=true; notify(); }, true);
+  });
+  // 直接編集の未保存も同じ扱い
+  try{
+    if(typeof markEditedDirty==='function'){ var _m=markEditedDirty; markEditedDirty=function(){ _m.apply(this,arguments); notify(); }; window.markEditedDirty=markEditedDirty; }
+    if(typeof clearEditedDirty==='function'){ var _c=clearEditedDirty; clearEditedDirty=function(){ _c.apply(this,arguments); notify(); }; window.clearEditedDirty=clearEditedDirty; }
+  }catch(e){}
+  // 別の案件を読み込んだら、前の案件の未保存は消える（画面の値が入れ替わる）
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ window._sDirty=false; window._editedDirty=false; notify(true); } }catch(_e){} });
+  // 本体からの問い合わせ
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SAYSAY_DIRTY_Q') notify(true); }catch(_e){} });
+})();
+
+/* --- 保存の履歴：DB保存のたびに、変わった欄の「前」と「後」を saysay_save_history に残す --- */
+window._histRecord=async function(o){
+  try{
+    var b=o.before||{}, a=o.after||{}, keys={}, ch=[], bv={}, av={};
+    var norm=function(x){ if(x===undefined||x===null||x===false) return ''; return (typeof x==='object')?JSON.stringify(x):String(x); };
+    Object.keys(b).concat(Object.keys(a)).forEach(function(k){ keys[k]=1; });
+    Object.keys(keys).forEach(function(k){
+      if(/^_/.test(k) || /^(cbState|deductAutoVals)$/.test(k) || /^sp_/.test(k)) return;   // _savedAt・_empVals・_tr_xx・チェックの内部状態・書式パネルなど、内部の値は残さない
+      if(norm(b[k])===norm(a[k])) return;
+      ch.push(k); bv[k]=(b[k]===undefined?null:b[k]); av[k]=(a[k]===undefined?null:a[k]);
+    });
+    if(!ch.length) return;
+    var row={ user_email:(typeof _slogUser==='function'?_slogUser():'')||null, user_name:(typeof _slogUserName==='function'?_slogUserName():'')||null,
+      case_id:o.caseId||null, company_id:o.companyId||null, doc_key:o.docKey||null, target:o.target, target_idx:(o.idx==null?null:Number(o.idx)),
+      file:(location.pathname.split('/').pop()||'').replace(/\?.*$/,''), before_vals:bv, after_vals:av, changed:ch, note:o.note||null };
+    await sb('saysay_save_history',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+  }catch(e){ console.warn('[保存の履歴]', e); }
+};
+
+/* --- 保存の履歴の画面と「元に戻す」 --- */
+(function(){
+  if(window.__histUiOn) return; window.__histUiOn=true;
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function is16(){ return /(^|\/)1_6(_[a-z]{2})?\.html/.test(location.pathname) && typeof window.saveEmpSetWithMode==='function'; }
+  function genericKey(){
+    var b=[].slice.call(document.querySelectorAll('button[onclick]')).map(function(x){ return x.getAttribute('onclick')||''; }).find(function(oc){ return /saveFormGeneric\(\s*['"]/.test(oc); });
+    var m=b && b.match(/saveFormGeneric\(\s*['"]([^'"]+)['"]/); return m?m[1]:'';
+  }
+  function labelFor(id){
+    var el=document.getElementById(id); if(!el) return '';
+    try{
+      var l=document.querySelector('label[for="'+id+'"]'); if(l) return l.textContent.trim();
+      var p=el.previousElementSibling; if(p && p.tagName==='LABEL') return p.textContent.trim();
+      var box=el.parentElement; for(var i=0;i<3 && box;i++){ var q=box.querySelector('label'); if(q && !q.contains(el)) return q.textContent.trim(); box=box.parentElement; }
+    }catch(e){}
+    return '';
+  }
+  function cleanLb(t){ return String(t||'').replace(/\s*\b(es|f)\.[A-Za-z0-9_]+/g,'').replace(/\s*\b(es_|f_)[A-Za-z0-9_]+/g,'').trim(); }
+  function fieldId(k){ if(is16()){ var fk=(typeof dbKeyToForm==='function')?dbKeyToForm(k):k; return 'es_'+fk; } return k; }
+  function showVal(v){ if(v===null||v===undefined||v===''||v===false) return '<span style="color:#9ca3af;">（空）</span>'; if(v===true) return '✓'; if(typeof v==='object') return esc(JSON.stringify(v)).slice(0,120); return esc(String(v)).slice(0,160); }
+  async function ctx(){
+    var info=window._lastCaseInfo||null; if(!info || !info.caseId) return null;
+    var idx=info.empSetIdx;
+    try{ if(typeof _resolveSaveIdx==='function') idx=await _resolveSaveIdx(info, info.empSetIdx); }catch(e){}
+    if(is16()) idx=(window._empLoadedIdx!=null?window._empLoadedIdx:idx);
+    var n=parseInt(idx,10); if(isNaN(n)) n=0;
+    return {info:info, companyId:info.companyId, idx:n, target:is16()?'emp_set':'extra', docKey:is16()?'1_6':genericKey()};
+  }
+  function apply(vals){
+    if(is16()){
+      var cur=(typeof collectFormValues==='function')?collectFormValues():{};
+      Object.keys(vals).forEach(function(k){ cur[k]=(vals[k]==null?'':vals[k]); });
+      try{ setFormValues(cur); }catch(e){ console.warn(e); }
+    }else{
+      Object.keys(vals).forEach(function(k){
+        var el=document.getElementById(k); if(!el) return; var v=vals[k];
+        if(el.type==='checkbox'||el.type==='radio') el.checked=!!v; else el.value=(v==null?'':v);
+      });
+    }
+    try{ if(typeof p==='function') p(); }catch(e){}
+    window._sDirty=true; try{ window._sDirtyNotify && window._sDirtyNotify(); }catch(e){}
+    try{ if(typeof showToast==='function') showToast('値を戻しました。よければ［DB保存］を押してください（押すまでDBは変わりません）'); }catch(e){}
+  }
+  window._histOpen=async function(){
+    var c=await ctx();
+    var ov=document.getElementById('_histOv'); if(ov) ov.remove();
+    ov=document.createElement('div'); ov.id='_histOv';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100050;display:flex;align-items:flex-start;justify-content:center;padding-top:60px;';
+    ov.innerHTML='<div style="background:#fff;width:min(720px,94vw);max-height:80vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden;font-size:12.5px;color:#1f2937;">'
+      +'<div style="padding:10px 14px;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;"><b>🕘 保存の履歴</b><span style="font-size:10.5px;color:#94a3b8;margin-left:8px;">DB保存したときに変わった欄。押すと中身が出ます</span><button id="_histX" style="margin-left:auto;background:none;border:none;color:#cbd5e1;font-size:18px;cursor:pointer;">×</button></div>'
+      +'<div id="_histBody" style="overflow-y:auto;padding:10px 14px;">読み込み中…</div></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#_histX').onclick=function(){ ov.remove(); };
+    ov.addEventListener('click',function(e){ if(e.target===ov) ov.remove(); });
+    var body=ov.querySelector('#_histBody');
+    if(!c || !c.companyId){ body.innerHTML='案件を選んでから開いてください。'; return; }
+    var q='saysay_save_history?select=*&company_id=eq.'+encodeURIComponent(c.companyId)+'&target=eq.'+c.target+'&target_idx=eq.'+c.idx+(c.target==='extra'&&c.docKey?('&doc_key=eq.'+encodeURIComponent(c.docKey)):'')+'&order=ts.desc&limit=40';
+    var rows=[]; try{ rows=await sb(q)||[]; }catch(e){ body.innerHTML='履歴を読めませんでした：'+esc(e.message||e); return; }
+    if(!rows.length){ body.innerHTML='<div style="color:#64748b;padding:10px 0;">まだ履歴がありません（この画面ができてからのDB保存が残ります）。</div>'; return; }
+    var h=(c.target==='emp_set')?'<div style="font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 8px;margin-bottom:8px;">1-6号は雇用条件セットの履歴です。同じセットを使うほかの案件の保存も出ます。</div>':'';
+    rows.forEach(function(r,i){
+      var d=new Date(r.ts), when=(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      var who=r.user_name||(r.user_email?String(r.user_email).split('@')[0]:'');
+      var firstSave=Object.keys(r.before_vals||{}).every(function(k){ var v=r.before_vals[k]; return v===null||v===''||v===false; });
+      var tr=(r.changed||[]).map(function(k){ var lb=cleanLb(labelFor(fieldId(k)))||k; return '<tr><td style="padding:3px 6px;border-bottom:1px solid #f1f5f9;color:#475569;">'+esc(lb)+'</td><td style="padding:3px 6px;border-bottom:1px solid #f1f5f9;">'+showVal((r.before_vals||{})[k])+'</td><td style="padding:3px 6px;border-bottom:1px solid #f1f5f9;">'+showVal((r.after_vals||{})[k])+'</td></tr>'; }).join('');
+      h+='<details style="border:1px solid #e2e8f0;border-radius:7px;margin-bottom:6px;"'+(i===0?' open':'')+'><summary style="padding:7px 10px;cursor:pointer;"><b>'+esc(when)+'</b>　'+esc(who)+'　<span style="color:#64748b;">'+(r.changed||[]).length+'か所</span>'+(r.case_id&&c.info&&r.case_id!==c.info.caseId?'　<span style="color:#b45309;font-size:10.5px;">（ほかの案件で保存）</span>':'')+'</summary>'
+        +'<div style="padding:0 10px 8px;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;"><tr style="background:#f8fafc;"><th style="text-align:left;padding:3px 6px;">欄</th><th style="text-align:left;padding:3px 6px;">保存する前</th><th style="text-align:left;padding:3px 6px;">保存した後</th></tr>'+tr+'</table>'
+        +'<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">'+(firstSave?'<span style="font-size:11px;color:#64748b;align-self:center;">はじめての保存なので、前の値はありません</span>':'<button data-i="'+i+'" data-w="before" class="_histApply" style="padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;">↩ 保存する前の値に戻す</button>')+'<button data-i="'+i+'" data-w="after" class="_histApply" style="padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;">この保存の値にする</button></div></div></details>';
+    });
+    body.innerHTML=h;
+    body.querySelectorAll('._histApply').forEach(function(btn){
+      btn.onclick=function(){
+        var r=rows[+btn.dataset.i]; var vals=btn.dataset.w==='before'?(r.before_vals||{}):(r.after_vals||{});
+        if(!window.confirm('この'+Object.keys(vals).length+'か所を画面の入力欄に戻します。\nDBは［DB保存］を押すまで変わりません。よろしいですか？')) return;
+        apply(vals); ov.remove();
+      };
+    });
+  };
+  // 書類の上のボタン列に［🕘 履歴］を付ける（DB保存がある書類だけ）
+  function addBtn(){
+    if(document.getElementById('_histBtn')) return;
+    var save=[].slice.call(document.querySelectorAll('.bar-btns button[onclick]')).find(function(x){ return /saveForm(Generic)?\(/.test(x.getAttribute('onclick')||''); });
+    if(!save || !(is16() || genericKey())) return;
+    var b=document.createElement('button'); b.id='_histBtn'; b.className='btn'; b.type='button'; b.textContent='🕘 履歴'; b.title='DB保存の履歴を見て、前の値に戻せます';
+    b.style.cssText='background:#475569;color:#fff;'; b.onclick=function(){ window._histOpen(); };
+    save.parentNode.insertBefore(b, save.nextSibling);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', addBtn); else addBtn();
+  setTimeout(addBtn, 1500);
+})();
+
+/* --- 文字の大きさ・表示の濃さ（人ごと。Saysay本体で選ぶ。左の入力欄に効く） --- */
+(function(){
+  if(window.__uiPrefOn) return; window.__uiPrefOn=true;
+  var st=document.createElement('style');
+  st.textContent='html[data-uifs="s"] .fp{zoom:.9;}html[data-uifs="l"] .fp{zoom:1.12;}html[data-uifs="xl"] .fp{zoom:1.25;}'
+    +'html[data-uihc="1"] .fp label{color:#111827 !important;font-weight:600;}html[data-uihc="1"] .fp input,html[data-uihc="1"] .fp select,html[data-uihc="1"] .fp textarea{border-color:#6b7280 !important;color:#111827 !important;}'
+    +'@media print{.fp{zoom:1 !important;}}';
+  (document.head||document.documentElement).appendChild(st);
+  function apply(p){ p=p||{}; var r=document.documentElement; r.dataset.uifs=p.fs||'m'; r.dataset.uihc=p.hc?'1':'0'; }
+  function load(){ try{ apply(JSON.parse(localStorage.getItem('saysay_ui')||'{}')); }catch(e){ apply({}); } }
+  load();
+  window.addEventListener('storage', function(e){ if(e.key==='saysay_ui') load(); });
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SAYSAY_UI') apply(e.data.pref); }catch(_e){} });
+})();
+
+/* 書類ごとに保存のしかたが違うので、「保存しました」のお知らせが出たときも保存済みにする */
+(function(){
+  function wrap(){
+    if(typeof showToast!=='function' || showToast.__sw) return false;
+    var o=showToast; var w=function(msg){ try{ var m=String(msg||''); if(/保存しました|保存完了/.test(m) && !/失敗|できません|エラー/.test(m) && window._markSaved) window._markSaved(); }catch(e){} return o.apply(this,arguments); };
+    w.__sw=true; showToast=w; window.showToast=w; return true;
+  }
+  if(!wrap()){ var n=0, t=setInterval(function(){ if(wrap() || ++n>20) clearInterval(t); },300); }
 })();
