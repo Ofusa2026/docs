@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261118.06
+ * - feat: 分野参考様式15-6号・15-7号（自動車運送業準備）を1-5号・1-6号と同じ扱いにする（税金・社保の自動計算、訳の自動補完、事業所英語名の自動入力、電話・郵便番号の整形、印刷前チェック、人ごとのセット、書類ジャーナルの書類名）
  * ver.20261117.27
  * - fix: DB保存で、書類の契約期間を案件（cases.contract_start／contract_end）にも保存する（呼び戻すと元の期間に戻っていたため）
  * ver.20261116.21
@@ -1858,13 +1860,14 @@ var DGJ_DOC_LABELS_JS = {
   '10_1':'10-1号','10_2':'10-2号','11_1':'11-1号','11_3':'11-3号','11_4':'11-4号',
   '12_1':'12-1号','12_2':'12-2号','13_1':'13-1号','13_2':'13-2号',
   '14_1':'14-1号','14_2':'14-2号','15_1':'15-1号','15_2':'15-2号',
-  '16_1':'16-1号','16_2':'16-2号','17_1':'17-1号','18_1':'18-1号'
+  '16_1':'16-1号','16_2':'16-2号','17_1':'17-1号','18_1':'18-1号',
+  '15_6':'15-6号 雇用契約書（自動車運送業準備）','15_7':'15-7号 雇用条件書（自動車運送業準備）'   // ver.20261118.06
 };
 function _dgjInferDocKey(){
   try{
     var fn = (location.pathname.split('/').pop()||'').replace(/\?.*$/,'').replace(/\.html$/i,'');
     // 言語サフィックス除去（1_16_id → 1_16）
-    var m = fn.match(/^(1_\d+|[a-z_]+?)(_(id|vi|my|ne|zh|en|th|km|ko))?$/i);
+    var m = fn.match(/^(1_\d+|15_[67]|[a-z_]+?)(_(id|vi|my|ne|zh|en|th|km|ko|tl|mn|si))?$/i);
     if(m) return m[1];
     return fn || null;
   }catch(_){ return null; }
@@ -1872,7 +1875,7 @@ function _dgjInferDocKey(){
 function _dgjInferLang(){
   try{
     var fn = (location.pathname.split('/').pop()||'').replace(/\?.*$/,'').replace(/\.html$/i,'');
-    var m = fn.match(/_(id|vi|my|ne|zh|en|th|km|ko)$/i);
+    var m = fn.match(/_(id|vi|my|ne|zh|en|th|km|ko|tl|mn|si)$/i);
     return m ? m[1].toLowerCase() : null;
   }catch(_){ return null; }
 }
@@ -4786,7 +4789,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   //   ・分野・業務区分はこの書類の言語に翻訳
   //   どれも訳の欄が空のときだけ。翻訳はAPIキーがあるときだけ（無ければ従来どおり🌐で手動）。入れた欄は黄色で知らせる。
   var _P6_EN_IDS=['es_officeNameEn','es_officeAddressEn'], _P6_LANG_IDS=['es_applicantFieldEn','es_categoryEn','es_category2En'];
-  function _p6Is16(){ return /^1_6(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
+  function _p6Is16(){ return /^(1_6|15_7)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
   function _p6Norm(x){ return String(x||'').normalize('NFKC').replace(/[\s　\-－ー‐]/g,''); }
   async function _p6AutoFill(info){
     if(!_p6Is16()) return;
@@ -4961,7 +4964,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   //   順番：前に確認した訳（共有の訳）→ 用語集 → AI翻訳（APIキーが無くてもログイン中ならサーバーで訳す）。
   //   入れた訳は、その雇用条件セットの「この言語用の訳」（_tr_<言語>）に保存し、次からはそのまま入る。人の名前・住所・電話などは訳さない。
   var _EF_SKIP=/(applicant|Applicant|rep|Rep|Mgr|mgr|Author|author|interp|Interp|staff|Staff|person|Person|resp|Resp|manager|Manager|contact|Contact|family|Family|kin|Kin)[A-Za-z0-9]*Name\d*En$|(Addr|addr|Address|address|Kana|kana|Mail|mail|Tel|tel)\d*En$/;
-  function _efIsLangDoc(){ return /^(1_5|1_6|1_16|juuyou)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
+  function _efIsLangDoc(){ return /^(1_5|1_6|15_6|15_7|1_16|juuyou)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
   function _efPairs(){ return _emptyPairs().filter(function(pr){ return !_EF_SKIP.test(pr.en.id) && !/^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(pr.en.id); }); }
   window._efPairs=_efPairs;
   async function _efAutoFill(){
@@ -5019,7 +5022,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   // 印刷の前にも確認（1-6号は印刷前チェックの中で出すので除く）
   setTimeout(function(){
     try{
-      if(typeof window.doPrint!=='function' || window.doPrint.__wl || /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
+      if(typeof window.doPrint!=='function' || window.doPrint.__wl || /(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname)) return;
       var _o=window.doPrint;
       var w=function(){
         if(!window._skipOverflowCheck){
@@ -5562,7 +5565,7 @@ function _p16PrintCheck(){
   return {miss:miss, probs:probs};
 }
 (function(){
-  if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
+  if(!/(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname)) return;
   function wrap(){
     var _orig=window.doPrint; if(typeof _orig!=='function' || _orig.__p16) return;
     var w=function(){
@@ -5730,13 +5733,13 @@ window._srcRedItems=_srcRedItems;
 window._batchCheck=function(){
   var out=[];
   try{
-    if(typeof _p16AutoCalcMonthly==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) _p16AutoCalcMonthly();
-    if(!window._docCheckMode && typeof _p16HourlyOnLoad==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){ _p16HourlyOnLoad(); if(typeof p==='function') p(); }   // ver.20261117.15: まとめPDFでも、計算し直した換算時給で出す
-    if(typeof _p16PrintCheck==='function' && /(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)){
+    if(typeof _p16AutoCalcMonthly==='function' && /(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname)) _p16AutoCalcMonthly();
+    if(!window._docCheckMode && typeof _p16HourlyOnLoad==='function' && /(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname)){ _p16HourlyOnLoad(); if(typeof p==='function') p(); }   // ver.20261117.15: まとめPDFでも、計算し直した換算時給で出す
+    if(typeof _p16PrintCheck==='function' && /(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname)){
       var r=_p16PrintCheck(); r.probs.forEach(function(x){ out.push(x); }); if(r.miss.length) out.push('空欄：'+r.miss.join('、'));
     }
     try{ if(typeof _SH_ON!=='undefined' && _SH_ON){ var _sbl=_shinseiBlankList(); if(_sbl.length) out.push('空欄：'+_sbl.join('、')); } }catch(_sbe){}   // ver.20261117.15: 窓口申請書の空欄
-    if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname) && typeof window._wlSummary==='function'){ var _wls=window._wlSummary(); if(_wls) out.push('⛔ 訳が別の言語になっています（'+_wls+'）'); }
+    if(!/(^|\/)(1_6|15_7)(_[a-z]+)?\.html/.test(location.pathname) && typeof window._wlSummary==='function'){ var _wls=window._wlSummary(); if(_wls) out.push('⛔ 訳が別の言語になっています（'+_wls+'）'); }
     if(typeof window._jyTotalsIssue==='function'){ window._jyTotalsIssue().forEach(function(x){ out.push(x); }); }
     if(typeof jyPrintCheck==='function'){
       var j=jyPrintCheck(); (j.diff||[]).forEach(function(x){ out.push('⚠ 雇用条件と違う：'+x); });
@@ -6807,7 +6810,7 @@ function _structNoticeShow(){
 (function(){
   if(typeof window==='undefined' || !window.OFUSA_TAXCALC) return;
   var path=String(location.pathname||'');
-  if(!/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)) return;
+  if(!/(^|\/)(1_6|15_7)(_[a-z]{2})?\.html$/.test(path)) return;
   var T=window.OFUSA_TAXCALC;
   var MAP={deductTax:'es_deductTax', deductSocial:'es_deductSocialIns', deductEmployment:'es_deductEmpIns'};
   var KEYS=Object.keys(MAP);
@@ -7031,7 +7034,7 @@ function _structNoticeShow(){
   }
 
   // --- 1-6号 → 案シス ---
-  if(/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)){
+  if(/(^|\/)(1_6|15_7)(_[a-z]{2})?\.html$/.test(path)){
     var KEYS=['calcMonthly','calcHourly','totalMonthly','deductTax','deductSocial','deductEmployment','deductTotal','netPay'];
     var LABEL={calcMonthly:'換算月給',calcHourly:'換算時給',totalMonthly:'支払概算総額',deductTax:'税金',deductSocial:'社会保険料',deductEmployment:'雇用保険料',deductTotal:'控除合計',netPay:'手取り'};
     var busy=false;
@@ -7146,7 +7149,7 @@ function _structNoticeShow(){
    金額を変えると、換算時給・換算月給・税金・社会保険料・雇用保険料・控除合計・手取りはいつもの自動計算で計算し直してから保存する。 */
 (function(){
   var path=String(location.pathname||'');
-  if(!/(^|\/)1_6(_[a-z]{2})?\.html$/.test(path)) return;
+  if(!/(^|\/)(1_6|15_7)(_[a-z]{2})?\.html$/.test(path)) return;
   function el(id){ return document.getElementById(id); }
   function val(id){ var e=el(id); return e?String(e.value||'').trim():''; }
   function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -7686,7 +7689,7 @@ function ofusaFmtTelJP(t){
 function ofusaFmtZip(z){ var d=String(z==null?'':z).normalize('NFKC').replace(/[^0-9]/g,''); return /^\d{7}$/.test(d)?d.slice(0,3)+'-'+d.slice(3):''; }
 (function(){
   var pg=(location.pathname.split('/').pop()||'');
-  if(!/^1_(6|17)(_[a-z]{2})?\.html$/i.test(pg)) return;
+  if(!/^(1_6|1_17|15_7)(_[a-z]{2})?\.html$/i.test(pg)) return;
   var TEL=/^es_[A-Za-z]*(Tel|Fax)$/, ZIP=/^es_[A-Za-z]*Zip$/;
   function fix(){
     try{
