@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.19</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.20</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2175,6 +2175,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.20',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '⚠ 申請書類一式（一覧表＋Saysay も）で電子署名した1-5／1-6を綴じるとき、署名した日より後にその案件の雇用条件セットが変わっている・選び直されていると「⚠ 電子署名の後に…」と知らせるようにしました。署名済みのページと中身が違うまま提出するのを防ぎます。'
+    ]
+  },
   {
     version: 'ver.20261118.19',
     date: '2026-11-18',
@@ -5027,7 +5035,7 @@ async function _isaSetStart(targets){
   ov.textContent='📎 一覧表とドライブの書類を確認しています…（30秒〜1分ほど）'; document.body.appendChild(ov);
   _isaTitle('⏳ 一覧表とドライブの書類を確認しています');
   try{
-    var c=((await idxSb('cases?select=id,applicant,app_type,residence_status,applicant_field,accept_exp,person_order,company_id,drive_url,company&id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
+    var c=((await idxSb('cases?select=id,applicant,app_type,residence_status,applicant_field,accept_exp,person_order,company_id,drive_url,company,emp_set_idx&id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
     var co=c.company_id?(((await idxSb('companies?select=id,name,company_category,drive_url,drive_url2,drive_url3,drive_url4,drive_url5&id=eq.'+encodeURIComponent(c.company_id)))||[])[0]||{}):{};   // ver.20261116.23: 会社のドライブURL2〜5も見る
     var p=((await idxSb('persons?select=extra,drive_urls,name_en:applicant_name_en&case_id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
     var K=_isaKeys(c, co, info.applicantField||c.applicant_field);
@@ -5054,6 +5062,7 @@ async function _isaSetStart(targets){
     _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', pid:drv.pid||'', scanDir:drv.scan||null, appDir:drv.appDir||null, treeOk:!!drv.treeOk, t0:_isaT0,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
+    try{ (await _isaESignStale(_isaSt)).reverse().forEach(function(w){ K.warn.unshift(w); }); }catch(e){ console.warn('[esignStale]', e); }   // ver.20261118.20
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
     _isaSt.auto=!!st.isaAuto; st.isaAuto=false;
     if(_lite){ _isaSt.lite=true; _isaSt.pcOn=false; }   // ver.20261118.18
@@ -5316,6 +5325,43 @@ async function _isaLiteESign(files, prog){
   if(!SG.pages.length) return SG;
   _isaSignBuild(SG);
   return SG;
+}
+// ver.20261118.20: 電子署名した 1-5／1-6 を綴じるとき、署名した後に雇用条件が変わっていないかを見る（変わっていれば⚠）
+//   ・案件の雇用条件セット（会社の emp_sets の emp_set_idx 番目）の中身が、署名した日より後に変わった
+//   ・案件で選ぶ雇用条件セット（emp_set_idx）を、署名した日より後に選び直した
+//   どちらも audit_log（保存の記録）で見る。updatedAt など中身でない項目の変化は数えない
+var ISA_STALE_KEYS=['1_5','1_6','1_6b'], ISA_STALE_SKIP=/^(updatedAt|_.*)$/;
+async function _isaESignStale(S){
+  var SG=S&&S.sg; if(!SG || !SG.byKey) return [];
+  var ord=0, forms=[];
+  ISA_STALE_KEYS.forEach(function(k){ var used=(SG.byKey[k]||[]).filter(function(pg){ return (pg.ord||0)>1; }); if(!used.length) return;
+    var o=Math.min.apply(null, used.map(function(pg){ return pg.ord; })); if(!ord || o<ord) ord=o; forms.push(ISA_SIGN_LABEL[k]||k); });
+  if(!ord) return [];
+  var iso=new Date(ord).toISOString(), d=new Date(ord), md=(d.getMonth()+1)+'/'+d.getDate();
+  var who=function(u){ try{ return decodeURIComponent(String(u||'')); }catch(e){ return String(u||''); } };
+  var day=function(t){ var x=new Date(t); return (x.getMonth()+1)+'/'+x.getDate(); };
+  var out=[], ix=parseInt(S.c&&S.c.emp_set_idx, 10), coId=(S.c&&S.c.company_id)||(S.co&&S.co.id)||'';
+  var head='⚠ 電子署名（'+forms.join('・')+'・'+md+'）の後に';
+  var tail='。署名済みのページと Saysay の書類の中身が違うかもしれません。案シスで確かめ、変わっていたら電子署名をやり直してください';
+  if(coId && ix>=0){
+    var rows=await idxSb('audit_log?select=created_at,user_name,o:changed_fields->emp_sets->old->'+ix+',n:changed_fields->emp_sets->new->'+ix+'&table_name=eq.companies&record_id=eq.'+encodeURIComponent(coId)+'&created_at=gt.'+encodeURIComponent(iso)+'&order=created_at.asc&limit=500');
+    var made=false, last=null, n=0;
+    (rows||[]).forEach(function(r){
+      var o=r.o, nw=r.n; if(o==null && nw==null) return;
+      if((o==null || typeof o!=='object') && nw && typeof nw==='object'){ made=true; last=r; n++; return; }
+      if(!o || !nw || typeof o!=='object' || typeof nw!=='object') return;
+      var ks={}; Object.keys(o).concat(Object.keys(nw)).forEach(function(k){ ks[k]=1; });
+      if(Object.keys(ks).some(function(k){ return !ISA_STALE_SKIP.test(k) && JSON.stringify(o[k])!==JSON.stringify(nw[k]); })){ last=r; n++; }
+    });
+    if(made) out.push(head+'、この案件の雇用条件セットが新しく作られています（'+day(last.created_at)+(last.user_name?' '+who(last.user_name):'')+'）'+tail);
+    else if(n) out.push(head+'、この案件の雇用条件セットが'+n+'回変わっています（最後：'+day(last.created_at)+(last.user_name?' '+who(last.user_name):'')+'）'+tail);
+  }
+  if(S.c && S.c.id){
+    var cr=await idxSb('audit_log?select=created_at,user_name,ch:changed_fields->emp_set_idx&table_name=eq.cases&record_id=eq.'+encodeURIComponent(S.c.id)+'&created_at=gt.'+encodeURIComponent(iso)+'&order=created_at.asc&limit=500');
+    var sw=(cr||[]).filter(function(r){ return r.ch!=null; });
+    if(sw.length){ var l=sw[sw.length-1]; out.push(head+'、案件で選ぶ雇用条件セットが選び直されています（'+day(l.created_at)+(l.user_name?' '+who(l.user_name):'')+'）'+tail); }
+  }
+  return out;
 }
 // ドライブのファイルをページの絵（大きさつき）にする
 var _isaImgCache={};
