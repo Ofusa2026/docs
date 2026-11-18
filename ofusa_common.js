@@ -1,5 +1,7 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261118.10
+ * - feat: 分野参考様式15-9号は1-16号、15-10号は1-17号と同じ扱いにする（訳の自動補完・1-17号専用の訳と確認項目・電話/郵便番号の整形・書類ジャーナルの書類名）
  * ver.20261118.06
  * - feat: 分野参考様式15-6号・15-7号（自動車運送業準備）を1-5号・1-6号と同じ扱いにする（税金・社保の自動計算、訳の自動補完、事業所英語名の自動入力、電話・郵便番号の整形、印刷前チェック、人ごとのセット、書類ジャーナルの書類名）
  * ver.20261117.27
@@ -1861,13 +1863,14 @@ var DGJ_DOC_LABELS_JS = {
   '12_1':'12-1号','12_2':'12-2号','13_1':'13-1号','13_2':'13-2号',
   '14_1':'14-1号','14_2':'14-2号','15_1':'15-1号','15_2':'15-2号',
   '16_1':'16-1号','16_2':'16-2号','17_1':'17-1号','18_1':'18-1号',
-  '15_6':'15-6号 雇用契約書（自動車運送業準備）','15_7':'15-7号 雇用条件書（自動車運送業準備）'   // ver.20261118.06
+  '15_6':'15-6号 雇用契約書（自動車運送業準備）','15_7':'15-7号 雇用条件書（自動車運送業準備）',   // ver.20261118.06
+  '15_9':'15-9号 雇用の経緯に係る説明書（自動車運送業準備）','15_10':'15-10号 支援計画書（自動車運送業準備）'   // ver.20261118.10
 };
 function _dgjInferDocKey(){
   try{
     var fn = (location.pathname.split('/').pop()||'').replace(/\?.*$/,'').replace(/\.html$/i,'');
     // 言語サフィックス除去（1_16_id → 1_16）
-    var m = fn.match(/^(1_\d+|15_[67]|[a-z_]+?)(_(id|vi|my|ne|zh|en|th|km|ko|tl|mn|si))?$/i);
+    var m = fn.match(/^(1_\d+|15_(?:6|7|9|10)|[a-z_]+?)(_(id|vi|my|ne|zh|en|th|km|ko|tl|mn|si))?$/i);
     if(m) return m[1];
     return fn || null;
   }catch(_){ return null; }
@@ -4964,7 +4967,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   //   順番：前に確認した訳（共有の訳）→ 用語集 → AI翻訳（APIキーが無くてもログイン中ならサーバーで訳す）。
   //   入れた訳は、その雇用条件セットの「この言語用の訳」（_tr_<言語>）に保存し、次からはそのまま入る。人の名前・住所・電話などは訳さない。
   var _EF_SKIP=/(applicant|Applicant|rep|Rep|Mgr|mgr|Author|author|interp|Interp|staff|Staff|person|Person|resp|Resp|manager|Manager|contact|Contact|family|Family|kin|Kin)[A-Za-z0-9]*Name\d*En$|(Addr|addr|Address|address|Kana|kana|Mail|mail|Tel|tel)\d*En$/;
-  function _efIsLangDoc(){ return /^(1_5|1_6|15_6|15_7|1_16|juuyou)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
+  function _efIsLangDoc(){ return /^(1_5|1_6|15_6|15_7|1_16|15_9|juuyou)(_[a-z]{2})?\.html$/i.test(location.pathname.split('/').pop()||''); }
   function _efPairs(){ return _emptyPairs().filter(function(pr){ return !_EF_SKIP.test(pr.en.id) && !/^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(pr.en.id); }); }
   window._efPairs=_efPairs;
   async function _efAutoFill(){
@@ -5061,7 +5064,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
   }
   window._trdApplyOnLoad = async function(){
     try{
-      if(/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)) return;   // 1-17は専用の共有訳あり
+      if(/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)) return;   // 1-17は専用の共有訳あり
       var lang=_docLang(); if(!lang || lang==='ja') return;
       var pairs=_emptyPairs(); if(!pairs.length) return;
       var d=await _trdLoad(lang), n=0;
@@ -5746,7 +5749,7 @@ window._batchCheck=function(){
       if((j.miss||[]).length) out.push('空欄：'+j.miss.join('、'));
       if((j.tr||[]).length) out.push('🌐 訳がない欄 '+j.tr.length+'か所');
     }
-    if(!/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)){
+    if(!/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)){
       var R=_srcRedItems(); if(R.n) out.push('⬜ 案シスで埋めてください（'+R.n+'欄）：'+R.items.slice(0,4).join('、')+(R.items.length>4?' ほか':''));
     }
   }catch(e){ console.warn('[まとめPDFのチェック]', e); }
@@ -5754,7 +5757,7 @@ window._batchCheck=function(){
 };
 function _srcAutoSummary(){
   try{
-    if(/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)) return;
+    if(/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)) return;
     var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host || !document.getElementById('pageArea')) return;
     var old=document.getElementById('srcAuto'); if(old) old.remove();
     if(document.querySelector('.src-badge')) return;   // 詳しい表示中は出さない
@@ -5772,7 +5775,7 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   function inj(){
     try{
       if(document.getElementById('_srcBtn')) return;
-      if(/(^|\/)1_17(_[a-z]+)?\.html/.test(location.pathname)) return;   // 1-17号は独自の「確認が必要な項目」があるので出さない
+      if(/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)) return;   // 1-17号は独自の「確認が必要な項目」があるので出さない
       var host=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(!host || !document.getElementById('pageArea')) return;
       var b=document.createElement('button'); b.type='button'; b.id='_srcBtn'; b.textContent='🔍 空欄チェック（案シスのどこが空か）';
       b.title='空欄の欄ごとに、案シスのどこ（雇用条件・会社・案件・人材など）が空なのかを表示します';
@@ -7689,7 +7692,7 @@ function ofusaFmtTelJP(t){
 function ofusaFmtZip(z){ var d=String(z==null?'':z).normalize('NFKC').replace(/[^0-9]/g,''); return /^\d{7}$/.test(d)?d.slice(0,3)+'-'+d.slice(3):''; }
 (function(){
   var pg=(location.pathname.split('/').pop()||'');
-  if(!/^(1_6|1_17|15_7)(_[a-z]{2})?\.html$/i.test(pg)) return;
+  if(!/^(1_6|1_17|15_7|15_10)(_[a-z]{2})?\.html$/i.test(pg)) return;
   var TEL=/^es_[A-Za-z]*(Tel|Fax)$/, ZIP=/^es_[A-Za-z]*Zip$/;
   function fix(){
     try{
