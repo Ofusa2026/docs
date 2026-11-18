@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.16</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.17</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611181809';
-window.__DOCS_CACHE_BUSTER__ = '2611181809';
+window.__DOCS_CACHE_BUSTER__ = '2611182308';
+window.__DOCS_CACHE_BUSTER__ = '2611182308';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -746,7 +746,7 @@ const docs={
   '15_9':{navId:'nav-15_9',frameId:'frame-15_9',file:'15_9_id.html'},
   '15_10':{navId:'nav-15_10',frameId:'frame-15_10',file:'15_10_id.html'},
   'tokkatsu_jidosha':{navId:'nav-tokkatsu_jidosha',frameId:'frame-tokkatsu_jidosha',file:'tokkatsu_jidosha.html?v=1794393342'},
-  'tokkatsu_jidosha_honkoku':{navId:'nav-tokkatsu_jidosha_honkoku',frameId:'frame-tokkatsu_jidosha_honkoku',file:'tokkatsu_jidosha_honkoku.html?v=1794393342'},   // ver.20261118.16
+  'tokkatsu_jidosha_honkoku':{navId:'nav-tokkatsu_jidosha_honkoku',frameId:'frame-tokkatsu_jidosha_honkoku',file:'tokkatsu_jidosha_honkoku.html?v=2611182308'},   // ver.20261118.16
   '15_3':{navId:'nav-15_3',frameId:'frame-15_3',file:'15_3.html?v=1794393342'},
   '15_4':{navId:'nav-15_4',frameId:'frame-15_4',file:'15_4.html?v=1794393342'},
   '15_5':{navId:'nav-15_5',frameId:'frame-15_5',file:'15_5.html?v=1794393342'},
@@ -785,6 +785,7 @@ function resolveLangForDoc(docKey, lang){
 // グローバル言語を変更し、現在開いている書類に即時反映
 function setGlobalLang(lang){
   currentLang = lang;
+  try{ document.querySelectorAll('iframe').forEach(function(f){ try{ f.contentWindow.postMessage({type:'SAYSAY_LANG', lang:lang},'*'); }catch(_e){} }); }catch(_e){}   // ver.20261118.17: 1ファイルで訳を切り替える書類（本国の手続がないことの説明書など）
   // ボタンのアクティブ状態更新
   document.querySelectorAll('#globalLangBtns .glbtn').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang===lang);
@@ -2173,6 +2174,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.17',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '🌐 本国において定められた遵守すべき手続がないことに係る説明書（特定自動車運送業準備）：日本語の下に申請人の言語の訳が入るようにしました（12言語。国籍から自動で選び、Saysayの国旗や左の「訳の言語」でも切り替えられます。「訳なし」にもできます）。'
+    ]
+  },
   {
     version: 'ver.20261118.16',
     date: '2026-11-18',
