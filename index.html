@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.17</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.18</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -1590,7 +1590,8 @@ async function idxAutoSelectFromUrl(){
     // ver.20261116.16: 案シスの「スキャン書類作成」から ?caseId=..&scanset=1 で開かれたら、申請書類一式の確認画面まで進める
     //   ver.20261117.06: &scanset=auto なら確認画面で止まらずに作成まで進める（直しが要るときだけ確認画面で止める）
     var _ssq=(q.get('scanset')||'');
-    if(_ssq==='1' || _ssq==='auto'){ setTimeout(async function(){ try{ window._isaFromUrl=true; await _idxWaitNameCheck(); await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmState.isaAuto=(_ssq==='auto'); _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
+    //   ver.20261118.18: &scanset=lite＝一覧表＋Saysay の書類だけ（ドライブの署名済み・アップロード書類は入れない・申請前チェックなし）で作り、03 スキャンに自動で保存
+    if(_ssq==='1' || _ssq==='auto' || _ssq==='lite'){ setTimeout(async function(){ try{ window._isaFromUrl=true; await _idxWaitNameCheck(); await printPriorityDocs(); if(_pmState){ _pmState.isaSet=true; _pmState.isaAuto=(_ssq==='auto' || _ssq==='lite'); _pmState.isaLite=(_ssq==='lite'); _pmExecute(); } }catch(e){ console.error('scanset',e); } }, 600); return; }
     var doc=(q.get('doc')||'').trim();
     // ver.20260724.06: anken の「✏️ 署名欄設置」から ?doc=xxx&mode=slot で開かれたら設置エディタへ
     if((q.get('mode')||'')==='slot'){
@@ -2174,6 +2175,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261118.18',
+    date: '2026-11-18',
+    notify: false,
+    items: [
+      '🗂 案シスのタスク「スキャン作成」の［🗂 一覧表＋Saysayで作る］から開くと、入管の提出書類一覧表と Saysay の書類だけを1本のPDFにして、人材のドライブ「★在留資格申請書類／03 スキャン／日付」に自動で保存するようにしました（申請前チェックはしません・ドライブの署名済み／アップロード書類は入れません）。'
+    ]
+  },
   {
     version: 'ver.20261118.17',
     date: '2026-11-18',
@@ -5018,7 +5027,9 @@ async function _isaSetStart(targets){
     var R=(await _isaFn({action:'rows', keys:K.keys})).items||{};
     try{ await _isaIchiranFresh(K, R); }catch(e){ console.warn(e); }   // ver.20261116.23: 毎朝の自動取得が止まっていないか・改定されたか
     var drv=await _drvP;
-    try{ await _isaESignFiles(info.caseId, drv); }catch(e){ console.warn(e); drv.note.push('電子署名の記録を読めませんでした'); }   // ver.20261117.23
+    var _lite=!!st.isaLite; st.isaLite=false;
+    if(_lite){ drv.sign=[]; drv.up=[]; drv.co=[]; }   // ver.20261118.18: 一覧表＋Saysay の書類だけ（ドライブは 03 スキャンの保存先を探すためだけに読む）
+    else try{ await _isaESignFiles(info.caseId, drv); }catch(e){ console.warn(e); drv.note.push('電子署名の記録を読めませんでした'); }   // ver.20261117.23
     // ver.20261116.20: 署名済みのサイン書類をページごとに様式へ振り分ける（一覧表の該当の行・該当のページに差し替える）
     //   ver.20261116.24: 更新も同じく（認定・変更・更新すべて）
     var SG=null;
@@ -5035,6 +5046,7 @@ async function _isaSetStart(targets){
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
     _isaSt.auto=!!st.isaAuto; st.isaAuto=false;
+    if(_lite){ _isaSt.lite=true; _isaSt.pcOn=false; }   // ver.20261118.18
     ov.remove();
     if(_isaSt.auto){
       var _stop=_isaAutoStops(_isaSt);
@@ -5751,6 +5763,7 @@ function _isaPcShow(S, res, collected, failed){
   if(_isaGrpOn()){ _isaGrpNotify('done', S); return; }   // ver.20261117.11
   if(_isaGrp) _isaGrp.list.forEach(function(it){ if(it.S===S){ it.st='done'; it.msg=''; } });
   _isaPcRender();
+  if(S.lite){ S.pc.attach=false; S.pc.logged=1; try{ _bpPostLogs(collected.filter(function(x){ return x.dk!=='drive' && x.dk!=='isa_ichiran'; })); }catch(e){} _isaPostSetLog(S, S.pc); _isaPcSave(null); }   // ver.20261118.18: 印刷を待たずに 03 スキャンへ保存
 }
 function _isaPcRender(){
   var S=_isaSt, P=S&&S.pc; if(!P) return;
@@ -5770,9 +5783,9 @@ function _isaPcRender(){
     : '<div style="font-size:12px;color:#64748b;">📎 不足書類は0件のため、「不足書類のお知らせ」は作りません。</div>';
   var html='<div id="isaPcModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px;font-family:sans-serif;">'
     +'<div style="background:#fff;border-radius:14px;max-width:720px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">'
-    +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">🔍 申請前チェックの結果</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(P.res.meta.applicant||'')+'　'+E(P.res.meta.shinsei_type||'')+'</div></div>'
+    +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">'+(S.lite?'🗂 一覧表＋Saysay の書類（03 スキャンに保存）':'🔍 申請前チェックの結果')+'</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(P.res.meta.applicant||'')+'　'+E(P.res.meta.shinsei_type||'')+'</div></div>'
     +'<div style="padding:10px 18px 14px;overflow-y:auto;flex:1;">'
-    +(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':'')
+    +(S.lite?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">入管の一覧表と Saysay の書類だけを1本にしました（ドライブの署名済み・アップロード書類は入れていません／申請前チェックはしていません）。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':''))
     +_isaIchiranNgHtml(S, P)
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
@@ -5968,7 +5981,7 @@ async function _isaPostSetLog(S, P){
     var row={event:'isa_set', doc_key:'isa_set', file:'index.html', user_email:em, user_name:un,
       case_id:String(S.info.caseId||''), company_id:String((S.co&&S.co.id)||S.info.companyId||''), applicant:String(S.info.applicant||''),
       session_id:'isa'+(S.t0||''), ms_since_load:S.t0?(Date.now()-S.t0):null,
-      meta:{auto:!!S.auto, ai:!P.basic, out:cnt.out, warn:cnt.warn, ok:cnt.ok, missing:P.items.length, attach:!!(P.attach&&P.items.length),
+      meta:{auto:!!S.auto, lite:!!S.lite, ai:!P.basic, out:cnt.out, warn:cnt.warn, ok:cnt.ok, missing:P.items.length, attach:!!(P.attach&&P.items.length),
         review:(P.review||[]).length, failed:(P.failed||[]).length, ichiran:S.ichiranPath||'', stale:!!S.ichiranStale,
         noIchiran:!P.collected.some(function(c){ return c.dk==='isa_ichiran'; }), parts:P.collected.length, docs:docs.slice(0,80), keys:(S.K&&S.K.keys)||[]}};
     await fetch(IDX_URL+'saysay_logs',{method:'POST',keepalive:true,headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
@@ -6212,7 +6225,7 @@ async function _isaPcSave(col){
     var pdf=await _isaSetPdf(col, function(t){ v.msg=t; show(); });
     v.msg='ドライブに送っています…（'+(pdf.bytes/1048576).toFixed(1)+'MB）'; show();
     var dir=await _isaScanDayDir(S, ymd);
-    var base=(_isaFnSafe(S.info.applicant)||String(S.info.caseId||'申請人'))+'_申請書類一式_'+ymd+'_'+hm, name=base+'.pdf', kk=2;
+    var base=(_isaFnSafe(S.info.applicant)||String(S.info.caseId||'申請人'))+(S.lite?'_一覧表とSaysay書類_':'_申請書類一式_')+ymd+'_'+hm, name=base+'.pdf', kk=2;
     while(dir.names.indexOf(name)>=0 || (P.savedNames||[]).indexOf(name)>=0) name=base+'_'+(kk++)+'.pdf';
     (P.savedNames=P.savedNames||[]).push(name);
     var r=await _isaGasPost('uploadFileToDrive', {folderId:dir.id, fileName:name, base64:pdf.b64, mimeType:'application/pdf'});
