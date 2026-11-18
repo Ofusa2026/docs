@@ -4465,6 +4465,17 @@ function _repAutoPick(co, ctx){   // 戻り値：'' ＝事業所の署名者が�
   list.forEach(function(r){ if(r.no==='1') return; var pl=_repPlaceOf(r.title); if(!pl) return; hasPlace=true; if(!hit && c.indexOf(pl)!==-1) hit=r; });
   return hasPlace ? (hit ? hit.no : '1') : '';
 }
+// ver.20261118.04: 代表者の欄に入れる。以前は loadCaseToForm の中だけにある setValMulti を呼んでいて
+//   「setValMulti is not defined」で止まり、代表者②③を選んでも何も変わらなかった（プルダウンも出ていなかった）
+function _repSetVal(ids, val){
+  var list=Array.isArray(ids)?ids:[ids], isEmpty=(val===undefined||val===null||String(val)===''), done=false;
+  for(var i=0;i<list.length;i++){
+    try{ if(!isEmpty && window._fieldData) window._fieldData[list[i]]=val; }catch(_e){}
+    if(done) continue;
+    var el=document.getElementById(list[i]);
+    if(el){ el.value=isEmpty?'':val; done=true; }
+  }
+}
 function applyRepSelect(no){
   var co=window._ofusaRepCo, es=window._ofusaRepEs||{};
   if(!co) return;
@@ -4475,10 +4486,10 @@ function applyRepSelect(no){
   // ✏️直接編集(es)で手動上書きされている項目は尊重する
   //   ver.20261118.03: ただし雇用条件セットの代表者名が代表者①の写しのときは、②③を選んだら②③を出す（①の写しは手直しではないため）
   if(pick.no && pick.no!=='1' && es.repName && _repNz(es.repName)===_repNz(co.rep_name)) es={};
-  setValMulti(['es_repName','f_repName'], es.repName || pick.name);
-  setValMulti(['es_repTitle','f_repTitle'], es.repTitle || pick.title);
-  setValMulti(['es_repNameEn','f_repNameEn'], es.repNameEn || pick.nameEn);
-  setValMulti(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || pick.titleEn);
+  _repSetVal(['es_repName','f_repName'], es.repName || pick.name);
+  _repSetVal(['es_repTitle','f_repTitle'], es.repTitle || pick.title);
+  _repSetVal(['es_repNameEn','f_repNameEn'], es.repNameEn || pick.nameEn);
+  _repSetVal(['es_repTitleEn','f_repTitleEn'], es.repTitleEn || pick.titleEn);
 }
 function renderRepSelect(co, es, opt){
   opt=opt||{};
@@ -4504,7 +4515,7 @@ function renderRepSelect(co, es, opt){
     st.textContent='@media print{#ofusaRepSelectBar{display:none!important;}}';
     document.head.appendChild(st);
   }
-  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
+  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);if(typeof p===\'function\')p();" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
     + list.map(function(x){ return '<option value="'+x.no+'"'+(x.no===saved?' selected':'')+'>'+x.label.replace(/</g,'&lt;')+'</option>'; }).join('')
     + '</select>'
     + (_auto?'<span style="margin-left:6px;font-size:11px;" title="代表者②③の役職の場所（例：三郷事業所）が、雇用条件セット名・案件名に入っているかで選んでいます">（事業所から自動）</span>':'');
