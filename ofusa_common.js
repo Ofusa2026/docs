@@ -8408,3 +8408,65 @@ window._rcpJa=_rcpJa; window._rcpTr=_rcpTr;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', setup); else setup();
 })();
+
+/* ver.20261119.15: 1-6号「休日 1．定例日」を、案シスの曜日の欄（fixedHolidayMon〜Sun・Hol と その訳）から作る。
+   ・祝日の欄に「日本の国民の祝日」など「休み」以外の文を書くと、祝日が書類から消えていた → 「出勤」など以外は休みとして、その文を出す
+   ・訳（定例休日の訳）が作られず空だった → 「休み」の曜日・祝日は書類の言語の曜日名、文を書いた欄はその訳の欄で作る
+   ・前に自動で作った文（「毎週火・祝日」など）のまま保存されているときも、案シスの曜日から作り直す（手で書いた文はそのまま） */
+var _FH_TR={
+  id:{ev:'Setiap ',d:['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'],hol:'hari libur nasional',sep:', '},
+  en:{ev:'Every ',d:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],hol:'national holidays',sep:', '},
+  vi:{ev:'Hằng tuần ',d:['Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy','Chủ Nhật'],hol:'ngày lễ quốc gia',sep:', '},
+  th:{ev:'ทุกวัน',d:['จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์','อาทิตย์'],hol:'วันหยุดนักขัตฤกษ์',sep:', '},
+  ne:{ev:'हरेक ',d:['सोमबार','मंगलबार','बुधबार','बिहीबार','शुक्रबार','शनिबार','आइतबार'],hol:'सार्वजनिक बिदा',sep:', '},
+  my:{ev:'အပတ်စဉ် ',d:['တနင်္လာ','အင်္ဂါ','ဗုဒ္ဓဟူး','ကြာသပတေး','သောကြာ','စနေ','တနင်္ဂနွေ'],hol:'ပြည်သူ့အားလပ်ရက်',sep:'၊ '},
+  km:{ev:'រៀងរាល់ថ្ងៃ',d:['ច័ន្ទ','អង្គារ','ពុធ','ព្រហស្បតិ៍','សុក្រ','សៅរ៍','អាទិត្យ'],hol:'ថ្ងៃបុណ្យជាតិ',sep:', '},
+  ko:{ev:'매주 ',d:['월요일','화요일','수요일','목요일','금요일','토요일','일요일'],hol:'공휴일',sep:', '},
+  zh:{ev:'每周',d:['一','二','三','四','五','六','日'],hol:'法定节假日',sep:'、'},
+  si:{ev:'සෑම ',d:['සඳුදා','අඟහරුවාදා','බදාදා','බ්‍රහස්පතින්දා','සිකුරාදා','සෙනසුරාදා','ඉරිදා'],hol:'රජයේ නිවාඩු දින',sep:', '},
+  mn:{ev:'Долоо хоног бүрийн ',d:['Даваа','Мягмар','Лхагва','Пүрэв','Баасан','Бямба','Ням'],hol:'улсын баярын өдөр',sep:', '},
+  tl:{ev:'Tuwing ',d:['Lunes','Martes','Miyerkules','Huwebes','Biyernes','Sabado','Linggo'],hol:'pambansang pista opisyal',sep:', '}
+};
+var _FH_KEYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], _FH_JA=['月','火','水','木','金','土','日'];
+var _FH_KOKUMIN={id:'hari libur nasional Jepang',en:'Japanese national holidays',vi:'ngày lễ quốc gia của Nhật Bản',th:'วันหยุดราชการของญี่ปุ่น',ne:'जापानको राष्ट्रिय बिदा',my:'ဂျပန်နိုင်ငံ၏ အမျိုးသားအားလပ်ရက်',km:'ថ្ងៃបុណ្យជាតិរបស់ជប៉ុន',ko:'일본의 국경일',zh:'日本法定节假日',si:'ජපානයේ ජාතික නිවාඩු දින',mn:'Японы үндэсний баярын өдөр',tl:'pambansang pista opisyal ng Japan'};   // 「日本の国民の祝日」などよく使う書き方は決まった訳
+function _fhFlag(x){ x=String(x==null?'':x).trim(); return /^(休み|休|true|1|●|○|〇|✓|☑|レ|◯)$/.test(x); }
+function _fhOff(x){ x=String(x==null?'':x).trim(); return !!x && !/^(出勤|勤務|なし|無し|-|－|—|―|false|0|×|✕)$/.test(x); }
+function _fhBuild(es){
+  var L=_FH_TR[_rcpLang()]||_FH_TR.id, ja=[], jaTxt=[], tr=[], any=false;
+  _FH_KEYS.forEach(function(k,i){
+    var x=es['fixedHoliday'+k]; if(!_fhOff(x)) return; any=true;
+    var en=String(es['fixedHoliday'+k+'En']||'').trim();
+    if(_fhFlag(x)){ ja.push(_FH_JA[i]+'曜日'); tr.push(L.ev+L.d[i]); }   // 「休み」の曜日は書類の言語の曜日名（訳の欄は別の言語のことがあるため使わない）
+    else { jaTxt.push(_FH_JA[i]+'曜日（'+String(x).trim()+'）'); tr.push(en || (L.ev+L.d[i])); }
+  });
+  var h=es.fixedHolidayHol, hj='', ht='';
+  if(_fhOff(h)){ any=true; if(_fhFlag(h)){ hj='祝日'; ht=L.hol; } else { hj=String(h).trim(); ht=(/国民の祝日|国民の休日|祝祭日|国民の祝祭日/.test(hj) && _FH_KOKUMIN[_rcpLang()]) || String(es.fixedHolidayHolEn||'').trim() || L.hol; } }   // 「日本の国民の祝日」など文を書いたときは、その文と訳の欄
+  if(!any) return null;
+  var jp=(ja.length?'毎週'+ja.join('・'):'');
+  jp=[jp].concat(jaTxt).concat(hj?[hj]:[]).filter(Boolean).join('、');   // 例：毎週火曜日、日本の国民の祝日
+  if(ht) tr.push(ht);
+  return {ja:jp, tr:tr.join(L.sep)};
+}
+(function(){
+  if(!/(^|\/)1_6(_[a-z]{2,})?\.html$/.test(location.pathname)) return;
+  var AUTO=/^(毎週[月火水木金土日曜・]*)?([・、]?祝日)?$/;   // 前に自動で作った形（毎週火・祝日／毎週火曜日、祝日）
+  function apply(es){
+    try{
+      if(!es) return;
+      var r=_fhBuild(es); if(!r) return;
+      var a=document.getElementById('es_fixedDay1'), b=document.getElementById('es_fixedDay1En'); if(!a) return;
+      var cur=String(a.value||'').trim(), stored=String(es.fixedDay1||'').trim();
+      var auto=!cur || AUTO.test(cur.replace(/\s/g,'')) || (stored && cur===stored && AUTO.test(stored.replace(/\s/g,'')));
+      if(auto){ a.value=r.ja; if(b && (!String(b.value||'').trim() || !String(es.fixedDay1En||'').trim() || cur!==r.ja)) b.value=r.tr; }
+      else if(b && !String(b.value||'').trim()) b.value=r.tr;
+    }catch(e){ console.warn('[定例日]', e); }
+  }
+  function wrap(){
+    if(typeof window.setFormValues!=='function' || window.setFormValues._fh) return;
+    var o=window.setFormValues;
+    window.setFormValues=function(es){ var ret=o.apply(this, arguments); apply(es); try{ if(typeof p==='function') p(); }catch(e){} return ret; };
+    window.setFormValues._fh=true;
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
+  window.addEventListener('load', wrap);
+})();
