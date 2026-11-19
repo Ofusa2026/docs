@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611190954';
-window.__DOCS_CACHE_BUSTER__ = '2611190954';
+window.__DOCS_CACHE_BUSTER__ = '2611191156';
+window.__DOCS_CACHE_BUSTER__ = '2611191156';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -1082,7 +1082,65 @@ const LANG_FILES_1_16={
   'mn':'1_16_mn.html',
   'tl':'1_16_tl.html',   // ver.20261116.14: タガログ語版
 };
+/* ver.20261119.08: 1-16号は「受入経験あり」の会社ではいらない。作ろうとしたら知らせる（インドネシアの方だけ、個別に作れる） */
+var _g116Ok={};   // 案件ID → この画面を開いている間は確認しない（受入経験なし／作ると選んだ）
+var _g116Busy=false;
+async function _g116Info(caseId){
+  try{
+    var r=await idxSb('cases?select=accept_exp,nationality,company_id,applicant,name,need_1_16,app_type&id=eq.'+encodeURIComponent(caseId)); var c=r&&r[0]; if(!c) return null;
+    if(c.need_1_16===true) return {acc:false, need:true};   // 案シスのタスク依頼で「1-16号も作る」に☑済み
+    var a=String(c.accept_exp||'').trim(), from='案件';
+    if(!a && c.company_id){ var co=await idxSb('companies?select=foreigner_accept_exp&id=eq.'+encodeURIComponent(c.company_id)); a=String((co&&co[0]&&co[0].foreigner_accept_exp)||'').trim(); from='会社'; }
+    return {acc:/有|あり/.test(a), from:from, nat:String(c.nationality||''), name:String(c.applicant||c.name||'')};
+  }catch(e){ console.warn('1-16 gate',e); return null; }
+}
+function _g116Modal(g){
+  var isId=/インドネシア|indonesia/i.test(g.nat);
+  return new Promise(function(res){
+    var ov=document.createElement('div'); ov.id='_g116ov';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100100;display:flex;align-items:center;justify-content:center;';
+    var B='padding:7px 14px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;';
+    ov.innerHTML='<div style="background:#fff;border-radius:10px;padding:16px 18px;width:min(460px,92vw);font-size:13px;color:#1f2937;box-shadow:0 12px 40px rgba(0,0,0,.3);line-height:1.7;">'
+      +'<div style="font-weight:800;font-size:14px;margin-bottom:6px;">⚠️ 1-16号（雇用の経緯に係る説明書）はいりません</div>'
+      +'<div style="font-size:12.5px;margin-bottom:8px;"><b>'+_ccEsc(g.name||'この案件')+'</b>'+(g.nat?'（'+_ccEsc(g.nat)+'）':'')+' は、'+(g.from==='会社'?'会社の情報で':'')+'<b style="color:#b91c1c;">受入経験あり</b>になっています。<br>受入経験ありの会社では、1-16号は出しません。</div>'
+      +(isId?'<div style="font-size:12px;color:#475569;background:#f1f5f9;border-radius:7px;padding:7px 10px;margin-bottom:12px;">インドネシアの方で、個別に作る場合だけ［それでも作る］を押してください。</div>'
+            :'<div style="font-size:12px;color:#475569;margin-bottom:12px;">認定などで1-16号が必要なときは、案シスの<b>タスク依頼（サイン書類作成）で「1-16号も作る」に☑</b>を入れてから開き直してください。<br>受入経験が違っているときは、案シスで直してください。</div>')
+      +'<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">'
+      +(isId?'<button id="_g116Go" style="'+B+'border:1px solid #cbd5e1;background:#fff;color:#1f2937;">それでも作る</button>':'')
+      +'<button id="_g116No" style="'+B+'border:none;background:#1e40af;color:#fff;">'+(isId?'やめる':'閉じる')+'</button></div></div>';
+    document.body.appendChild(ov);
+    var done=function(v){ ov.remove(); res(v); };
+    ov.querySelector('#_g116No').onclick=function(){ done(false); };
+    var go=ov.querySelector('#_g116Go'); if(go) go.onclick=function(){ done(true); };
+  });
+}
+// true＝開いてよい
+async function _g116Gate(caseId){
+  if(!caseId || _g116Ok[caseId]) return true;
+  var g=await _g116Info(caseId);
+  if(!g || !g.acc){ if(g) _g116Ok[caseId]=true; return true; }   // 調べられないときは止めない
+  var ok=await _g116Modal(g);
+  if(ok) _g116Ok[caseId]=true;
+  return ok;
+}
 function open_1_16(lang){
+  var cid=idxSelectedCase&&idxSelectedCase.caseId;
+  if(!cid || _g116Ok[cid]) return _open_1_16(lang);
+  if(_g116Busy) return; _g116Busy=true;
+  _g116Gate(cid).then(function(ok){
+    _g116Busy=false;
+    if(ok) _open_1_16(lang);
+    else if(cur==='1_16') open_doc('home');
+  });
+}
+// 1-16号を開いたまま別の案件にしたとき
+function _g116OnCase(){
+  if(cur!=='1_16') return;
+  var fr=document.getElementById('frame-1_16'); if(!fr || fr.style.display==='none') return;
+  var cid=idxSelectedCase&&idxSelectedCase.caseId; if(!cid || _g116Ok[cid]) return;
+  _g116Gate(cid).then(function(ok){ if(!ok && cur==='1_16') open_doc('home'); });
+}
+function _open_1_16(lang){
   lang = lang || currentLang;
   const resolvedLang = resolveLangForDoc('1_16', lang);
   cur1_16Lang=resolvedLang;
@@ -1854,6 +1912,7 @@ async function idxJumpByPaste(){
     try{ window._idxNameCheckP=idxNameCheck(info); }catch(_e){ console.warn('nameCheck err:',_e); }
     // ver.20261105.01: 1-17号を開いていれば、国籍に合った言語版へ入れ替える（手で選んだ言語はここで解除）
     try{ p17OnCaseChanged(); }catch(_e){ console.warn('p17 lang err:',_e); }
+    try{ _g116OnCase(); }catch(_e){ console.warn('1-16 gate err:',_e); }   // ver.20261119.08
     // ver.20260820.16: 優先書類マップに従ってナビを並び替え
     try{ if(typeof reorderNavByPriority==='function') reorderNavByPriority(info); }catch(_e){ console.warn('reorderNav err:',_e); }
     // ver.20260731: 国籍に合わせて初期言語を選択（対応言語版がある場合のみ切替）
@@ -2175,6 +2234,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.08',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '💼 <b>1-16号（雇用の経緯に係る説明書）</b>：「受入経験あり」の案件で開こうとすると、<b>「1-16号はいりません」とお知らせ</b>が出て開きません（案件に受入経験が入っていないときは会社の情報で見ます）。<b>インドネシアの方だけ</b>は、個別に作るときのために［それでも作る］で開けます。<b>認定などで1-16号がいるとき</b>は、案シスのタスク依頼で「1-16号も作る」に☑を入れておけば、お知らせなしで開けます。1-16号を開いたまま受入経験ありの案件に切り替えたときも同じです。'
+    ]
+  },
   {
     version: 'ver.20261119.07',
     date: '2026-11-19',
