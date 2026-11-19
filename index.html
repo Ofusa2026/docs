@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.06</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.07</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2175,6 +2175,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.07',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🎓 スキャン（特定活動）で使う<b>合格証の見分け方を広げました</b>：書類アップロードの項目名が「技能検定合格証（基礎級）」「宿泊分野 合格通知書」「基礎級 合格証」「2号 合格証」なども技能の合格証として、「介護日本語評価と介護技能」のように2つ入っているものは「中身はファイルで確認」として拾います。「日本語合格証」「専門級合格証」は日本語・専門級のまま。「不合格」は拾いません（案シスの新しい画面の合格証チェックと同じ見方です）。'
+    ]
+  },
   {
     version: 'ver.20261119.06',
     date: '2026-11-19',
@@ -5985,8 +5993,12 @@ var ISA_UP_KINDS=[['skill',/合格証（技能）|技能試験|技能測定|2号
 function _isaUpKind(label, fname){
   var nf=function(x){ x=String(x||''); try{ x=x.normalize('NFKC').replace(/\(/g,'（').replace(/\)/g,'）'); }catch(e){} return x; };
   var lb=nf(label), fn=nf(fname).replace(/\.[a-z0-9]+$/i,'').replace(/_\d+$/,'');
-  var by=function(t){ for(var i=0;i<ISA_UP_KINDS.length;i++){ if(ISA_UP_KINDS[i][1].test(t)) return ISA_UP_KINDS[i][0]; } return ''; };
-  if(/技能.*日本語|専門級.*合格|合格.*専門級/.test(lb) || /\//.test(lb)){ var k=by(fn); return (k && !/技能.*日本語|／/.test(fn)) ? k : 'mix'; }   // 「合格証（技能・日本語）／専門級」は中身が分からない
+  if(/不合格/.test(lb)) return '';
+  // ver.20261119: 日本語 → 専門級 → 技能 の順に見る（「日本語合格証」「専門級合格証」を技能にしない）。技能は「技能検定」「合格通知」「基礎級 合格証」「2号 合格証」なども拾う
+  var by=function(t){ if(/日本語|JFT|JLPT/i.test(t)) return 'jp'; if(/専門級/.test(t)) return 'senmon'; if(/技能|合格証|合格書|合格通知|評価試験|2号.*合格/.test(t)) return 'skill'; return ''; };
+  var cnt=function(t){ return (/日本語|JFT|JLPT/i.test(t)?1:0)+(/専門級/.test(t)?1:0)+(/技能/.test(t)?1:0); };
+  // 1つの欄に2種類以上（「合格証（技能・日本語）／専門級」「介護日本語評価と介護技能」など）→ ファイル名で1種類に決まるときだけそれ、決まらなければ mix（中身はファイルで確認）
+  if(cnt(lb)>=2 || /[\/／]/.test(lb)){ if(cnt(fn)===1 && !/[\/／]/.test(fn)){ return /日本語|JFT|JLPT/i.test(fn)?'jp':(/専門級/.test(fn)?'senmon':'skill'); } return 'mix'; }
   return by(lb) || by(fn);
 }
 async function _isaUploadPass(caseId){
