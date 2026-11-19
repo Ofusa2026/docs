@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.11</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.12</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611191632';
-window.__DOCS_CACHE_BUSTER__ = '2611191632';
+window.__DOCS_CACHE_BUSTER__ = '2611191700';
+window.__DOCS_CACHE_BUSTER__ = '2611191700';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -838,6 +838,7 @@ async function idxCaseNotices(row, lang){
   var natN=nat.normalize('NFKC').toUpperCase().replace(/\s/g,'');
   if(!nat || /確認中|その他/.test(nat)) L.push('国籍が「'+(nat||'空欄')+'」のため、言語は今のまま（'+(LN[currentLang]||currentLang)+'）です。案シスの国籍を確認してください');
   else if(lang==='en' && !_IDX_EN_OK.test(natN)) L.push('国籍「'+nat+'」から言語を判定できないため、英語版で開きます。案シスの国籍の書き方を確認してください');
+  if(nat && row._natFromPerson) L.push('案件の国籍が空なので、人材情報の国籍（'+nat+'）で'+(LN[lang]||lang||'')+'版を開きました。案シスの案件の国籍も入れてください');   // ver.20261119.12
   var rs=String(row.residence_status||'');
   if(/特定技能/.test(rs)){
     var idx=String(row.emp_set_idx==null?'':row.emp_set_idx).trim(), es=null;
@@ -1890,6 +1891,10 @@ async function idxJumpByPaste(){
       if(info_el){ info_el.style.display='none'; }
       return;
     }
+    // ver.20261119.12: 案件の国籍が空のときは、人材情報の国籍を使う（案件の国籍が空だと言語が切り替わらず、前の言語＝インドネシア語のまま開いていた）
+    if(!String(row.nationality||'').trim()){
+      try{ const _pp=await idxSb('persons?select=nationality&case_id=eq.'+encodeURIComponent(row.id)+'&limit=1'); const _pn=_pp&&_pp[0]&&String(_pp[0].nationality||'').trim(); if(_pn){ row=Object.assign({},row,{nationality:_pn, _natFromPerson:true}); } }catch(_e){ console.warn('persons nationality',_e); }
+    }
     const info={
       caseId:row.id,
       companyId:row.company_id,
@@ -2234,6 +2239,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.12',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🌐 <b>案件の国籍が空のとき、人材情報の国籍で書類の言語を選ぶ</b>ようにしました：これまでは案件の国籍が空だと言語が切り替わらず、前に使っていた言語（インドネシア語など）のまま開いていました。人材情報の国籍を使ったときは、画面下に「案シスの案件の国籍も入れてください」と出ます。'
+    ]
+  },
   {
     version: 'ver.20261119.11',
     date: '2026-11-19',
