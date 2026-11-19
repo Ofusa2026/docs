@@ -8367,3 +8367,44 @@ window._histRecord=async function(o){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
   window.addEventListener('load', wrap);
 })();
+
+/* ver.20261119.14: 1-6号「就業規則を確認できる場所や方法」を、案シスの雇用条件セットの欄（ruleConfirmPlace／ruleConfirmPlaceEn）から入れる。
+   これまでは「本社もしくは各事業所にて確認可能」と書類に決め打ちで、案シスで「本社にて確認可能」「就業規則無し」などにしても変わらなかった。
+   ・日本語：欄に値があればその値。空なら今までの「本社もしくは各事業所にて確認可能」
+   ・訳：よく使う言い方（本社にて／本社もしくは各事業所にて／就業規則無し）は、書類の言語の決まった訳を使う（訳の欄が別の言語でもずれない）。
+         それ以外は訳の欄（ruleConfirmPlaceEn）。日本語の欄が空なら今までの訳 */
+var _RCP_TR={
+  honsha:{id:'Dapat dikonfirmasi di kantor pusat',en:'Can be confirmed at the head office',vi:'Có thể xác nhận tại trụ sở chính',th:'สามารถตรวจสอบได้ที่สำนักงานใหญ่',ne:'मुख्य कार्यालयमा हेर्न सकिन्छ',my:'ရုံးချုပ်တွင် အတည်ပြုနိုင်သည်။',km:'អាចពិនិត្យបាននៅការិយាល័យកណ្តាល',ko:'본사에서 확인 가능',zh:'可在总公司确认',si:'ප්‍රධාන කාර්යාලයේදී තහවුරු කළ හැක',mn:'Төв оффист танилцаж болно',tl:'Makikita sa punong tanggapan'},
+  kaku:{id:'Dapat dikonfirmasi di kantor pusat atau kantor masing-masing',en:'Can be confirmed at the head office or each office',vi:'Có thể xác nhận tại trụ sở chính hoặc từng văn phòng',th:'สามารถตรวจสอบได้ที่สำนักงานใหญ่หรือสาขา',ne:'मुख्य कार्यालय वा प्रत्येक शाखामा हेर्न सकिन्छ',my:'ရုံးချုပ် သို့မဟုတ် ရုံးတိုင်းတွင် အတည်ပြုနိုင်သည်။',km:'អាចពិនិត្យបាននៅការិយាល័យកណ្តាល ឬការិយាល័យនីមួយៗ',ko:'본사 또는 각 사업소에서 확인 가능',zh:'可在总公司或各营业所确认',si:'ප්‍රධාන කාර්යාලයේදී හෝ එක් එක් කාර්යාලයේදී තහවුරු කළ හැක',mn:'Төв оффис эсвэл салбар бүрт танилцаж болно',tl:'Makikita sa punong tanggapan o sa bawat sangay'},
+  nashi:{id:'Tidak ada peraturan kerja',en:'There are no Rules of Employment',vi:'Không có nội quy lao động',th:'ไม่มีข้อบังคับการปฏิบัติงาน',ne:'कामको नियम छैन',my:'လုပ်ငန်းခွင် စည်းမျဥ်းစည်းကမ်း မရှိပါ',km:'មិនមានបទបញ្ជាការងារ',ko:'취업규칙 없음',zh:'无就业规则',si:'රැකියා රෙගුලාසි නොමැත',mn:'Хөдөлмөрийн дотоод журам байхгүй',tl:'Walang regulasyon sa pagtatrabaho'}
+};
+function _rcpKind(ja){
+  var n=String(ja||'').normalize('NFKC').replace(/[\s　、。.]/g,'').replace(/で確認/,'にて確認');
+  if(/^本社にて確認可能$|^本社にて閲覧可能$/.test(n)) return 'honsha';
+  if(/^本社(もしくは|または|又は|若しくは|及び|および|・)各事業所にて確認可能$/.test(n)) return 'kaku';
+  if(/^就業規則(無し|なし|がない|はない|はありません)$/.test(n)) return 'nashi';
+  return '';
+}
+function _rcpLang(){ var m=(location.pathname.split('/').pop()||'').match(/_(en|vi|th|ne|my|km|ko|zh|id|si|mn|tl)\.html$/i); return m?m[1].toLowerCase():'id'; }
+function _rcpJa(def){ return String(v('es_ruleConfirmPlace')||'').trim() ? f('es_ruleConfirmPlace') : def; }
+function _rcpTr(def){
+  var ja=String(v('es_ruleConfirmPlace')||'').trim(); if(!ja) return def;
+  var k=_rcpKind(ja), t=k && _RCP_TR[k][_rcpLang()];
+  if(t) return esc(t);
+  return f('es_ruleConfirmPlaceEn');
+}
+window._rcpJa=_rcpJa; window._rcpTr=_rcpTr;
+// 入力欄（Ⅸ その他）に「就業規則を確認できる場所や方法」を足す（案シスの雇用条件セットと同じ欄。保存すると案シスにも入る）
+(function(){
+  if(!/(^|\/)1_6(_[a-z]{2,})?\.html$/.test(location.pathname)) return;
+  function setup(){
+    if(document.getElementById('es_ruleConfirmPlace')) return;
+    var t=[].slice.call(document.querySelectorAll('.fs-title')).filter(function(x){ return /Ⅸ\s*その他/.test(x.textContent); })[0];
+    var fs=t&&t.parentNode; if(!fs) return;
+    var d=document.createElement('div');
+    d.innerHTML='<div class="fg"><label>就業規則を確認できる場所や方法（日）<span class="fid">es.ruleConfirmPlace</span></label><input id="es_ruleConfirmPlace" oninput="p()" placeholder="空なら「本社もしくは各事業所にて確認可能」"></div>'
+      +'<div class="fg"><label>就業規則を確認できる場所や方法（訳）<span class="fid">es.ruleConfirmPlaceEn</span></label><input id="es_ruleConfirmPlaceEn" oninput="p()" placeholder="「本社にて確認可能」「就業規則無し」などは決まった訳を使います"></div>';
+    while(d.firstChild) fs.appendChild(d.firstChild);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', setup); else setup();
+})();
