@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.08</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.09</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2234,6 +2234,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.09',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🖨 <b>申請書類一式（一覧表＋Saysay の書類）をドライブに保存するPDF</b>から、<b>入力欄の黄色などの背景を消しました</b>（紙に印刷したときと同じ見た目）。申請書の様式の下絵はそのまま残ります',
+    ]
+  },
   {
     version: 'ver.20261119.08',
     date: '2026-11-19',
@@ -6467,6 +6475,18 @@ async function _isaSvgToJpeg(svg, pw, ph){
   var g=cv.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,pw,ph); g.drawImage(img,0,0,pw,ph);
   return cv;
 }
+// ver.20261119.09: 保存するPDFから背景（色・画像）を消す＝ブラウザで印刷したときと同じ見た目。print-color-adjust:exact の所だけ残す
+function _isaNoBgForPdf(root, w){
+  var els=[root].concat([].slice.call(root.querySelectorAll('*')));
+  for(var i=0;i<els.length;i++){
+    var el=els[i], cs=null; try{ cs=w.getComputedStyle(el); }catch(e){} if(!cs) continue;
+    var pca=String(cs.getPropertyValue('print-color-adjust')||cs.getPropertyValue('-webkit-print-color-adjust')||'').trim();
+    if(pca==='exact') continue;
+    var bc=String(cs.backgroundColor||''), bi=String(cs.backgroundImage||'');
+    if(bc && bc!=='transparent' && !/rgba\([^)]*,\s*0\)$/.test(bc)) el.style.setProperty('background-color','transparent','important');
+    if(bi && bi!=='none') el.style.setProperty('background-image','none','important');
+  }
+}
 // 一式をPDFにする → {b64, pages, bytes}
 async function _isaSetPdf(col, prog){
   var L=await _isaLoadPdfLib();
@@ -6525,6 +6545,10 @@ async function _isaSetPdf(col, prog){
         var p1=out.addPage([B.w*PT, B.h*PT]); p1.drawImage(emb, {x:bx*PT, y:(B.h-by-ih)*PT, width:iw*PT, height:ih*PT}); n++;
         continue;
       }
+      // ver.20261119.09: 紙に印刷したときと同じく、背景の色・背景の画像は消す（ブラウザの印刷は「背景のグラフィック」を印刷しない）。
+      //   入力欄の黄色・直接編集で付いた黄色などがPDFにだけ残っていた。消さないのは print-color-adjust:exact の所だけ
+      //   （申請書の様式の下絵など、紙にも出すと決めてある所）。print-color-adjust は親から受け継ぐので、子の要素もそのまま残る
+      _isaNoBgForPdf(host, w);
       // Saysay の書類：ブラウザでそのまま描いて画像にする（画像として描くときは外のファイルを読めないので、背景・画像は中に入れる）
       await _isaInlineImgs(host, ucache);
       host.style.position='static';
