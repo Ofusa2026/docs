@@ -8029,3 +8029,164 @@ window._histRecord=async function(o){
   }
   if(!wrap()){ var n=0, t=setInterval(function(){ if(wrap() || ++n>20) clearInterval(t); },300); }
 })();
+
+/* ============================================================
+   ver.20261119.01: 書類の上のボタン列を整理（全書類共通）
+   ・いつも使う［💾 DB保存］［🖨 印刷・PDF］を右に大きく
+   ・直接編集まわりは［✏️ 編集 ▾］、AI判定・赤字・空欄チェックは［🔍 チェック ▾］、ほかは［⋯ その他 ▾］にまとめる
+   ・メニューの中には、それぞれ何をするボタンかを1行で出す
+   ・直接編集中・赤字指定中など「〜中」のボタンは、メニューから出して目立たせる
+   ============================================================ */
+(function(){
+  if(window.__tbOn) return; window.__tbOn=true;
+  var DESC={
+    editModeBtn:'書類の文字をその場で書き換えます。終わったら「完了して保存」',
+    styleModeBtn:'文字の大きさ・位置・太さなどを調整します',
+    saveEditedHTML:'直接編集した書類を保存します（次に開いたときもこの形で出ます）',
+    loadEditedHTML:'保存してある直接編集の書類を呼び出します',
+    discard:'直接編集した版を捨てて、もとの書類（入力欄どおり）に戻します',
+    editHowtoBtn:'直接編集の正しい手順と、やってはいけないこと',
+    ai:'AIが書類の中身（金額・日付・整合）をチェックします',
+    red:'押した文字を赤字にします（直してほしい所の指示用）',
+    blank:'空欄の所に色を付けて、書き忘れを探します',
+    printx:'',
+    hist:'DB保存したときに変わった欄を見て、前の値に戻せます'
+  };
+  function kind(b){
+    var oc=b.getAttribute('onclick')||'', id=b.id||'', t=(b.textContent||'').trim();
+    if(id==='_histBtn') return 'hist';
+    if(/saveForm(Generic)?\(/.test(oc)) return 'save';
+    if(/(^|[^a-zA-Z_])doPrint\(/.test(oc)) return 'print';
+    if(id==='editModeBtn') return 'edit:editModeBtn';
+    if(id==='styleModeBtn') return 'edit:styleModeBtn';
+    if(id==='editHowtoBtn') return 'edit:editHowtoBtn';
+    if(id==='discardEditedBtn' || /discardEdited/.test(oc) || /編集版破棄/.test(t)) return 'edit:discard';
+    if(/saveEditedHTML\(/.test(oc)) return 'edit:saveEditedHTML';
+    if(/loadEditedHTML\(/.test(oc)) return 'edit:loadEditedHTML';
+    if(/aiCheck|AI判定/.test(oc+t)) return 'check:ai';
+    if(id==='redModeBtn' || /toggleRedMode/.test(oc)) return 'check:red';
+    if(id==='blankModeBtn' || /toggleBlankMode/.test(oc)) return 'check:blank';
+    if(/print/i.test(oc) || /印刷/.test(t) || b.classList.contains('btn-print')) return 'printx';
+    return 'other';
+  }
+  function isActive(b){ var t=(b.textContent||'').trim(); return b.classList.contains('edit-mode-on') || /中$/.test(t) || /完了して保存/.test(t); }
+  var css=document.createElement('style'); css.id='_tbCss';
+  css.textContent=[
+    '.app-bar{gap:10px;}',
+    '.app-bar > div:first-child{min-width:0;flex:1 1 auto;}',
+    '.app-bar-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px !important;font-weight:700;}',
+    '.bar-btns{align-items:center;gap:6px !important;flex:none;}',
+    '.bar-btns .tb-sec,.bar-btns .tb-mbtn{background:rgba(255,255,255,.08) !important;color:#e2e8f0 !important;border:1px solid rgba(255,255,255,.22) !important;border-radius:6px !important;padding:5px 10px !important;font-size:11.5px !important;font-weight:600 !important;cursor:pointer;font-family:sans-serif;white-space:nowrap;}',
+    '.bar-btns .tb-sec:hover,.bar-btns .tb-mbtn:hover,.tb-menu.open > .tb-mbtn{background:rgba(255,255,255,.18) !important;}',
+    '.bar-btns .tb-pri{border-radius:6px !important;padding:6px 14px !important;font-size:12px !important;font-weight:700 !important;white-space:nowrap;box-shadow:0 1px 0 rgba(0,0,0,.2);}',
+    '.bar-btns .tb-pri.tb-save{background:#16a34a !important;color:#fff !important;}',
+    '.bar-btns .tb-pri.tb-print{background:#7c3aed !important;color:#fff !important;}',
+    '.bar-btns .tb-split{display:inline-flex;}',
+    '.bar-btns .tb-split .tb-print{border-top-right-radius:0 !important;border-bottom-right-radius:0 !important;}',
+    '.bar-btns .tb-split .tb-mbtn{border-top-left-radius:0 !important;border-bottom-left-radius:0 !important;background:#6d28d9 !important;border-color:#6d28d9 !important;padding:6px 8px !important;}',
+    '.tb-menu{position:relative;display:inline-block;}',
+    '.tb-pop{display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:290px;max-width:360px;background:#fff;color:#1f2937;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.28);padding:6px;z-index:3000;text-align:left;}',
+    '.tb-menu.open > .tb-pop{display:block;}',
+    '.tb-item{display:block;padding:6px 8px;border-radius:7px;cursor:pointer;}',
+    '.tb-item:hover{background:#f1f5f9;}',
+    '.tb-pop .tb-item > button{all:unset;display:block;font-family:sans-serif;font-size:12.5px !important;font-weight:700 !important;color:#1f2937 !important;background:none !important;border:none !important;padding:0 !important;margin:0 !important;box-shadow:none !important;cursor:pointer;}',
+    '.tb-item .tb-desc{font-family:sans-serif;font-size:10.5px;color:#64748b;line-height:1.45;margin-top:1px;}',
+    '.tb-pop .tb-sep{height:1px;background:#e2e8f0;margin:4px 6px;}',
+    '.bar-btns .tb-act{border-radius:6px !important;padding:6px 12px !important;font-size:12px !important;font-weight:800 !important;box-shadow:0 0 0 2px #fde68a;}'
+  ].join('\n');
+  (document.head||document.documentElement).appendChild(css);
+
+  var bar=null, built=false, busy=false;
+  function mkMenu(label, cls){
+    var m=document.createElement('div'); m.className='tb-menu'+(cls?(' '+cls):'');
+    var b=document.createElement('button'); b.type='button'; b.className='tb-mbtn'; b.innerHTML=label;
+    var p=document.createElement('div'); p.className='tb-pop';
+    b.onclick=function(e){ e.stopPropagation(); var o=m.classList.contains('open'); closeAll(); if(!o) m.classList.add('open'); };
+    m.appendChild(b); m.appendChild(p); return m;
+  }
+  function closeAll(){ document.querySelectorAll('.tb-menu.open').forEach(function(x){ x.classList.remove('open'); }); }
+  document.addEventListener('click', function(e){ if(!(e.target.closest && e.target.closest('.tb-pop'))) closeAll(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeAll(); });
+  function item(btn, desc){
+    var w=document.createElement('div'); w.className='tb-item';
+    w.appendChild(btn);
+    if(desc){ var d=document.createElement('div'); d.className='tb-desc'; d.textContent=desc; w.appendChild(d); }
+    w.addEventListener('click', function(e){ if(e.target!==btn && !btn.contains(e.target)){ btn.click(); } setTimeout(closeAll,0); });
+    btn._tbHome=w; return w;
+  }
+  function organize(){
+    if(busy) return; busy=true;
+    try{
+      bar=document.querySelector('.app-bar .bar-btns'); if(!bar){ busy=false; return; }
+      // 並べ直すのは、ボタン列に直接置かれたボタンと、ここで作ったメニューの中のボタンだけ（様式の切替などのまとまりはそのまま）
+      var own=function(){ return [].slice.call(bar.children).reduce(function(acc,n){
+        if(n.tagName==='BUTTON') acc.push(n);
+        else if(n.classList && (n.classList.contains('tb-menu')||n.classList.contains('tb-split')||n.classList.contains('tb-actslot'))) [].slice.call(n.querySelectorAll('button')).forEach(function(x){ if(!x.classList.contains('tb-mbtn')) acc.push(x); });
+        return acc; },[]); };
+      var btns=own().filter(function(b){ return !b._tbDone; });
+      if(!btns.length && built){ busy=false; return; }
+      var G={save:[],print:[],printx:[],hist:[],edit:[],check:[],other:[]};
+      own().forEach(function(b){
+        if(b.classList.contains('tb-mbtn')) return;
+        var k=kind(b), g=k.split(':')[0], sub=k.split(':')[1]||''; b._tbKind=k;
+        (G[g]||G.other).push({b:b,sub:sub});
+      });
+      // いったん全部はずして並べ直す
+      var keep=[].slice.call(bar.childNodes).filter(function(n){ return n.nodeType===1 && n.tagName!=='BUTTON' && !n.classList.contains('tb-menu') && !n.classList.contains('tb-split') && !n.classList.contains('tb-actslot'); });
+      bar.innerHTML='';
+      keep.forEach(function(n){ bar.appendChild(n); });
+      var act=document.createElement('span'); act.className='tb-actslot'; act.style.cssText='display:inline-flex;gap:6px;'; bar.appendChild(act);
+      function menuOf(list, label, descKey){
+        if(!list.length) return null;
+        if(list.length===1 && label.indexOf('編集')<0){ var b0=list[0].b; b0.classList.add('tb-sec'); b0.title=b0.title||DESC[list[0].sub]||''; bar.appendChild(b0); b0._tbDone=true; return null; }
+        var m=mkMenu(label); var pop=m.querySelector('.tb-pop');
+        list.forEach(function(x){ x.b._tbDone=true; pop.appendChild(item(x.b, DESC[x.sub] || x.b.title || '')); });
+        bar.appendChild(m); return m;
+      }
+      menuOf(G.check,'🔍 チェック ▾');
+      if(G.edit.length){
+        var order=['editModeBtn','styleModeBtn','saveEditedHTML','loadEditedHTML','discard','editHowtoBtn'];
+        G.edit.sort(function(a,b){ return order.indexOf(a.sub)-order.indexOf(b.sub); });
+        menuOf(G.edit,'✏️ 編集 ▾');
+      }
+      menuOf(G.other,'⋯ その他 ▾');
+      G.hist.forEach(function(x){ x.b.classList.add('tb-sec'); x.b.style.background=''; x.b.title=DESC.hist; x.b._tbDone=true; bar.appendChild(x.b); });
+      G.save.forEach(function(x){ x.b.classList.add('tb-pri','tb-save'); x.b.title=x.b.title||'入力欄の内容を案シス（DB）に保存します（Ctrl+S）'; x.b._tbDone=true; bar.appendChild(x.b); });
+      if(G.print.length){
+        var pb=G.print[0].b; pb.classList.add('tb-pri','tb-print'); pb.title=pb.title||'印刷・PDFにします（Ctrl+P）'; pb._tbDone=true;
+        if(G.printx.length){
+          var sp=document.createElement('span'); sp.className='tb-split'; sp.appendChild(pb);
+          var m=mkMenu('▾'); var pop=m.querySelector('.tb-pop');
+          G.printx.forEach(function(x){ x.b._tbDone=true; pop.appendChild(item(x.b, x.b.title||'')); });
+          sp.appendChild(m); bar.appendChild(sp);
+        }else bar.appendChild(pb);
+        G.print.slice(1).forEach(function(x){ x.b.classList.add('tb-sec'); x.b._tbDone=true; bar.appendChild(x.b); });
+      }else G.printx.forEach(function(x){ x.b.classList.add('tb-sec'); x.b._tbDone=true; bar.appendChild(x.b); });
+      built=true; hoist();
+    }catch(e){ console.warn('[ボタン整理]', e); }
+    busy=false;
+  }
+  // 「〜中」のボタンはメニューの外に出す
+  function hoist(){
+    if(!bar) return; var slot=bar.querySelector('.tb-actslot'); if(!slot) return;
+    [].slice.call(document.querySelectorAll('.app-bar .bar-btns button')).forEach(function(b){
+      if(!b._tbHome) return;
+      var a=isActive(b);
+      if(a && b.parentNode!==slot){ b.classList.add('tb-act'); slot.appendChild(b); }
+      else if(!a && b.parentNode===slot){ b.classList.remove('tb-act'); b._tbHome.insertBefore(b, b._tbHome.firstChild); }
+    });
+  }
+  var mo=new MutationObserver(function(ms){
+    if(busy) return;
+    var added=ms.some(function(m){ return [].slice.call(m.addedNodes).some(function(n){ if(!(n.nodeType===1 && n.tagName==='BUTTON' && !n._tbDone && !n.classList.contains('tb-mbtn'))) return false; var p=n.parentNode; return p===bar || (p && p.closest && !!p.closest('.tb-menu,.tb-split,.tb-actslot')); }); });
+    if(added){ setTimeout(organize,0); return; }
+    hoist();
+  });
+  function start(){
+    organize();
+    var b=document.querySelector('.app-bar .bar-btns');
+    if(b) mo.observe(b,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(start,0); }); else setTimeout(start,0);
+  window.addEventListener('load', function(){ setTimeout(organize,50); });
+})();
