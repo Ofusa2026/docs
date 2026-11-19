@@ -8336,3 +8336,34 @@ window._histRecord=async function(o){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(start,0); }); else setTimeout(start,0);
   window.addEventListener('load', function(){ setTimeout(organize,50); });
 })();
+
+/* ver.20261119.11: 1-6号で雇用条件セットを保存すると、分野・業務区分が「（特定技能１号）」などを外した短い名前で保存され、
+   案シスの雇用条件セットの選択肢（「宿泊分野（特定技能１号）」など）と合わなくなって、案シスでは空欄に見えていた
+   （そのまま案シスで保存すると本当に消える）。書類に出すために外しているだけなので、保存するときは元の正式な名前に戻す。
+   元の名前：読み込んだ雇用条件セットの値 → 無ければ案件の分野。カッコの中を外して同じなら、元の名前で保存する。 */
+(function(){
+  if(!/(^|\/)1_6(_[a-z]{2,})?\.html$/.test(location.pathname)) return;
+  var KEYS=['applicantField','applicantField2','category','category2','applicantFieldEn','applicantField2En','categoryEn','category2En'];
+  var core=function(x){ return String(x||'').replace(/[（(][^（()）]*[）)]/g,'').replace(/[（(][^（()）]*[）)]/g,'').replace(/\s+/g,'').trim(); };
+  function orig(k){
+    var c=window._empCtx, sel=document.getElementById('empSetSelect'), idx=sel?(parseInt(sel.value,10)||0):0;
+    var es=c&&c.empSets&&c.empSets[idx]; var v=es&&es[k];
+    if(!v && k==='applicantField'){ var inf=window._lastCaseInfo||{}; v=inf.applicantField||inf.applicant_field||''; }
+    return v||'';
+  }
+  function fix(d){
+    try{ KEYS.forEach(function(k){
+      if(d==null || d[k]==null || d[k]==='') return;
+      var o=orig(k); if(o && o!==d[k] && core(o)===core(d[k])) d[k]=o;
+    }); }catch(e){ console.warn('[分野の名前を戻す]', e); }
+    return d;
+  }
+  function wrap(){
+    if(typeof window.collectFormValues!=='function' || window.collectFormValues._fieldFix) return;
+    var f=window.collectFormValues;
+    window.collectFormValues=function(){ return fix(f.apply(this, arguments)); };
+    window.collectFormValues._fieldFix=true;
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
+  window.addEventListener('load', wrap);
+})();

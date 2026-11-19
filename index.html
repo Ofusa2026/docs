@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.10</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.11</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611191428';
-window.__DOCS_CACHE_BUSTER__ = '2611191428';
+window.__DOCS_CACHE_BUSTER__ = '2611191632';
+window.__DOCS_CACHE_BUSTER__ = '2611191632';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2234,6 +2234,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.11',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '✏️ <b>申請書類一式（一覧表＋Saysay）の結果の画面で、一覧表の〇を直せる・動かせる</b>ようにしました：「✏️ 一覧表の〇を直す・動かす」を開くと、行ごとに［〇有］［〇無］［空欄］を押してすぐ直せます。違う行に付いた〇は［↕ 動かす］→ 正しい行の［← ここへ動かす］で付け替えられます（元の行は〇無）。直したら［🔁 一覧表だけ作り直す］で一覧表のPDFに反映し、［🖨 印刷画面を開く］でドライブに保存し直してください。確認画面に戻らなくても直せます。',
+      '🛠 <b>1-6号で雇用条件セットを保存すると、案シスの「申請人分野」「カテゴリー」が空欄に見えていた</b>のを直しました：1-6号では「（特定技能１号）」などを外した名前で書類に出していて、そのまま保存していたため、案シスの選択肢と合わなくなっていました。保存するときは元の正式な名前に戻します。',
+      '🌐 <b>1-6号の署名の下「就業規則を確認できる場所や方法」</b>：ベトナム語・中国語・クメール語に「（本社もしくは各事業所にて確認可能）」の訳が入っていなかったのを足しました。ミャンマー語の文字くずれも直しました。これで全言語そろっています。'
+    ]
+  },
   {
     version: 'ver.20261119.10',
     date: '2026-11-19',
@@ -6037,6 +6047,7 @@ function _isaPcRender(){
     +(S.lite&&!S.tk?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">入管の一覧表と Saysay の書類だけを1本にしました（ドライブの署名済み・アップロード書類はPDFに入れていません。一覧表の〇はドライブのファイル名も見て付けています。電子署名がある書類は署名済みのものを入れています／申請前チェックはしていません）。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':''))
     +_isaIchiranNgHtml(S, P)
     +_isaManualHtml(S)
+    +_isaMarksHtml(S)   // ver.20261119.11: 作ったあとに一覧表の〇を直す・別の行に動かす
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
     +(P.res.meta.note?'<div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">メモ：'+E(P.res.meta.note)+'</div>':'')
@@ -6193,12 +6204,59 @@ function _isaManualHtml(S){
 function _isaIchiranNgHtml(S, P){
   if(S && S.tk) return '';   // ver.20261119.02: 特定活動は一覧表なし
   var none=!P.collected.some(function(c){ return c.dk==='isa_ichiran'; });
-  if(!none && !S.ichiranStale) return '';
+  if(!none && !S.ichiranStale && !S.marksEdited) return '';
   var msg=none ? '⛔ 先頭に綴じる「入管の提出書類一覧表」が入っていません（〇付けに失敗しました）'
+             : S.marksEdited ? '✏️ 一覧表の〇を直しました。PDFの一覧表に反映するには、ここを押してください'
                : '⛔ 綴じた一覧表は〇を付け直す前のものです（AIで要確認になった行にも〇有が付いたまま）';
   return '<div style="font-size:12.5px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
     +'<div style="flex:1;min-width:200px;font-weight:700;">'+msg+'</div>'
     +'<button onclick="_isaRefill()" style="padding:7px 12px;background:#b91c1c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:800;">🔁 一覧表だけ作り直す（1〜2分）</button></div>';
+}
+// ===== ver.20261119.11: 作ったあとに、一覧表の〇有／〇無をその場で直す・〇を別の行に動かす =====
+//   直したら［🔁 一覧表だけ作り直す］で、一覧表のPDFだけ作り直す（綴じる書類や順番は変わらない。書類を入れ替えるときは［↩ 確認画面で直す］）
+function _isaMarksHtml(S){
+  if(!S || S.tk || !(S.tables||[]).length) return '';
+  var E=function(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
+  var nY=0; S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val==='有') nY++; }); });
+  var mv=S._mkMv, open=!!(S._mkOpen||mv);
+  var B=function(on,col){ return 'font-size:11px;padding:1px 7px;margin-left:2px;border-radius:5px;cursor:pointer;border:1px solid '+(on?col:'#cbd5e1')+';background:'+(on?col:'#fff')+';color:'+(on?'#fff':'#475569')+';font-weight:'+(on?'800':'600')+';'; };
+  var body=S.tables.map(function(t,ti){
+    return '<div style="font-weight:800;font-size:12px;margin:8px 0 2px;color:#4c1d95;">'+E(t.label)+'</div>'+t.lines.map(function(L,li){
+      var isSrc=mv && mv.ti===ti && mv.li===li;
+      var nm=(L.group?'<span style="color:#7c3aed;">└ </span>'+E(String(L.opt||_isaRowName(L)||'').split('\n')[0].slice(0,40)):'<b>'+E(L.r&&L.r.no)+'</b>　'+E(String(_isaRowName(L)||L.name||'').split('\n')[0].slice(0,40)));
+      var ctl;
+      if(mv){
+        ctl=isSrc ? '<button type="button" onclick="_isaMkMove(-1)" style="'+B(true,'#f59e0b')+'">動かすのをやめる</button>'
+                  : (L.val==='有' ? '<span style="font-size:10.5px;color:#059669;font-weight:800;">〇有</span>' : '<button type="button" onclick="_isaMkMove('+ti+','+li+')" style="'+B(true,'#7c3aed')+'">← ここへ動かす</button>');
+      } else {
+        ctl=['有','無',''].map(function(v){ return '<button type="button" onclick="_isaMkSet('+ti+','+li+',\''+v+'\')" style="'+B(L.val===v, v==='有'?'#059669':(v==='無'?'#64748b':'#b45309'))+'">'+(v==='有'?'〇有':(v==='無'?'〇無':'空欄'))+'</button>'; }).join('')
+          +(L.val==='有' ? '<button type="button" onclick="_isaMkMv('+ti+','+li+')" title="この〇を別の行に付け替えます（この行は〇無になります）" style="'+B(false)+'">↕ 動かす</button>' : '');
+      }
+      return '<div style="display:flex;gap:6px;align-items:center;padding:3px 0;border-top:1px solid #f1f5f9;'+(isSrc?'background:#fffbeb;':'')+(L.group?'padding-left:12px;':'')+'"><div style="flex:1;min-width:0;font-size:11.5px;color:#0f172a;">'+nm+'</div><div style="flex:0 0 auto;white-space:nowrap;">'+ctl+'</div></div>';
+    }).join('');
+  }).join('');
+  return '<details '+(open?'open ':'')+'ontoggle="_isaSt._mkOpen=this.open" style="border:1px solid #ddd6fe;border-radius:8px;padding:6px 10px;margin-bottom:8px;background:#faf5ff;">'
+    +'<summary style="cursor:pointer;font-size:12.5px;font-weight:800;color:#5b21b6;">✏️ 一覧表の〇を直す・動かす <span style="font-weight:600;color:#64748b;font-size:11px;">（今の〇有 '+nY+'行）</span></summary>'
+    +(mv?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:6px;padding:4px 8px;margin-top:6px;">〇を付け替える行の［← ここへ動かす］を押してください（元の行は〇無になります）</div>'
+        :'<div style="font-size:11px;color:#64748b;margin-top:4px;">押すとすぐ変わります。直したら上の［🔁 一覧表だけ作り直す］で一覧表のPDFに反映し、［🖨 印刷画面を開く］でドライブに保存し直してください（綴じる書類や順番は変わりません。書類を入れ替えるときは［↩ 確認画面で直す］）。</div>')
+    +'<div style="margin-top:4px;">'+body+'</div></details>';
+}
+function _isaMkRe(){
+  var sc=document.querySelector('#isaPcModal div[style*="overflow-y:auto"]'), top=sc?sc.scrollTop:0;
+  _isaPcRender();
+  var sc2=document.querySelector('#isaPcModal div[style*="overflow-y:auto"]'); if(sc2) sc2.scrollTop=top;
+}
+function _isaMkSet(ti, li, v){
+  var S=_isaSt, L=S&&S.tables[ti]&&S.tables[ti].lines[li]; if(!L || L.val===v) return;
+  L.val=v; S.marksEdited=1; S._mkOpen=true; _isaMkRe();
+}
+function _isaMkMv(ti, li){ var S=_isaSt; if(!S) return; S._mkMv={ti:ti, li:li}; S._mkOpen=true; _isaMkRe(); }
+function _isaMkMove(ti, li){
+  var S=_isaSt, mv=S&&S._mkMv; if(!S) return;
+  if(ti===-1 || !mv){ S._mkMv=null; _isaMkRe(); return; }
+  var A=S.tables[mv.ti]&&S.tables[mv.ti].lines[mv.li], Bl=S.tables[ti]&&S.tables[ti].lines[li];
+  if(A && Bl){ A.val='無'; Bl.val='有'; S.marksEdited=1; }
+  S._mkMv=null; S._mkOpen=true; _isaMkRe();
 }
 async function _isaRefill(){
   var S=_isaSt, P=S&&S.pc; if(!P) return;
@@ -6217,7 +6275,7 @@ async function _isaRefill(){
     var ix=P.collected.map(function(c){ return c.dk; }).indexOf('isa_ichiran');
     if(ix>=0) P.collected[ix]=nd; else P.collected.unshift(nd);
     P.failed=P.failed.filter(function(x){ return String(x).indexOf(ISA_FILL_NG)!==0; });
-    S.ichiranStale=0;
+    S.ichiranStale=0; S.marksEdited=0;
     _isaTitle('✅ 申請書類一式ができました', true);
     try{ if(typeof showToast==='function') showToast('✅ 一覧表を作り直しました'); }catch(e){}
   }catch(e){ _isaTitle('⚠ 一覧表を作れませんでした', true); alert('一覧表を作れませんでした：'+e.message+'\n少し待ってからもう一度押してください。'); }
