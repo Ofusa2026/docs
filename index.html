@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261118.22</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -2175,6 +2175,38 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.05',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '✍ ［🗂 一覧表＋Saysay］（特定活動も）で、電子署名の「サイン書類」（1-5・1-6などがまとまったもの）や「雇用契約書・雇用条件書」も、ページごとに様式を見分けて署名済みのページを綴じるようにしました（前は「_1-5」「_1-6」のように名前で1つに決まるものだけでした）。見分けられないページがあっても止めません。作った記録に人材・押印済み・03 スキャンのフォルダを残し、案シスのタスクからすぐ開けるようにしました。'
+    ]
+  },
+  {
+    version: 'ver.20261119.04',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🗂 特定活動のスキャン：説明書はおすすめ（理由つき）を入れたうえで、結果の画面で［移行準備説明書（1号）／（2号）／特定自動車運送業準備／理由書（ミャンマー）］から選び直して作り直せるようにしました。合格証は「技能＋日本語の両方」か「専門級だけ」のどちらかになっているかを見て、片方しか無いときは⚡で知らせます。'
+    ]
+  },
+  {
+    version: 'ver.20261119.03',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '📤 申請書類一式（一覧表＋Saysay・特定活動のスキャンも）で、書類アップロードで上げた合格証（合格証（技能）・合格証（日本語）・専門級）を先に使うようにしました。アップロードの記録からファイルを直接たどるので、ドライブのフォルダで見つからなくても拾えます。同じ書類を上げ直していたら、最後に上げたものを使います。特定技能では一覧表の〇の手がかりに、特定活動ではスキャンに綴じます（技能 → 日本語 → 専門級 の順）。'
+    ]
+  },
+  {
+    version: 'ver.20261119.02',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🗂 ［🗂 一覧表＋Saysayで作る］が特定活動（移行準備など）の案件でも使えるようになりました。入管の一覧表は付けず、1-5号 → 1-6号 → 説明書 → 合格証 の順に1本にして「03 スキャン」に保存します。1-5／1-6は電子署名があれば署名済みのページ、合格証は人材のドライブのファイル名（技能測定・合格証・JFT・JLPT・日本語 など）から探して、技能試験 → 日本語試験の順に綴じます。説明書は在留資格・分野で選びます（移行準備説明書／2号／特定自動車運送業準備／ミャンマー）。インターン・55号はまだ対象外です。'
+    ]
+  },
   {
     version: 'ver.20261118.22',
     date: '2026-11-19',
@@ -5061,12 +5093,20 @@ async function _isaSetStart(targets){
     var c=((await idxSb('cases?select=id,applicant,app_type,residence_status,applicant_field,accept_exp,person_order,company_id,drive_url,company,emp_set_idx&id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
     var co=c.company_id?(((await idxSb('companies?select=id,name,company_category,drive_url,drive_url2,drive_url3,drive_url4,drive_url5&id=eq.'+encodeURIComponent(c.company_id)))||[])[0]||{}):{};   // ver.20261116.23: 会社のドライブURL2〜5も見る
     var p=((await idxSb('persons?select=extra,drive_urls,name_en:applicant_name_en&case_id=eq.'+encodeURIComponent(info.caseId)))||[])[0]||{};
-    var K=_isaKeys(c, co, info.applicantField||c.applicant_field);
+    // ver.20261119.02: ［🗂 一覧表＋Saysay］で在留資格が「特定活動」（移行準備など）のときは、入管の一覧表を付けず
+    //   1-5号 → 1-6号 → 説明書 → 合格証 の順に綴じる（_isaTkTables）。インターン・55号などは対象外
+    var _isTk=!!st.isaLite && /特定活動/.test(String(c.residence_status||''));
+    if(_isTk && /インターン|55/.test(String(c.residence_status||''))) throw new Error('この在留資格（'+c.residence_status+'）のスキャンはまだ作れません。特定活動は、移行準備（特定技能への移行）などだけ作れます');
+    var K=_isTk ? {keys:['tokkatsu'], app:'tk', go:'', field:'特定活動', hyo2:'不要（特定活動）', warn:[]} : _isaKeys(c, co, info.applicantField||c.applicant_field);
     if(!K.keys.length) throw new Error(K.warn.join('\n'));
     var _drvP=_isaDriveFiles(c, p, co);   // ver.20261117.10: ドライブのフォルダの一覧は、一覧表の行を読むのと同時に
-    var R=(await _isaFn({action:'rows', keys:K.keys})).items||{};
-    try{ await _isaIchiranFresh(K, R); }catch(e){ console.warn(e); }   // ver.20261116.23: 毎朝の自動取得が止まっていないか・改定されたか
+    var R=_isTk ? {} : ((await _isaFn({action:'rows', keys:K.keys})).items||{});
+    if(!_isTk) try{ await _isaIchiranFresh(K, R); }catch(e){ console.warn(e); }   // ver.20261116.23: 毎朝の自動取得が止まっていないか・改定されたか
     var drv=await _drvP;
+    // ver.20261119.02: 書類アップロード（人材のアップロードページ）で上げた合格証を先に使う（名前が決まっていて確かなので）。
+    //   アップロードの記録（upload_notifications）からファイルを直接たどる＝ドライブの一覧で見つからなくても拾える
+    var UP=[]; try{ UP=await _isaUploadPass(info.caseId); }catch(e){ console.warn('[uploadPass]', e); }
+    if(UP.length){ var _seenUp={}; drv.up.concat(drv.sign).forEach(function(f){ _seenUp[f.id]=1; }); drv.up=UP.filter(function(f){ return !_seenUp[f.id]; }).concat(drv.up); }
     var _lite=!!st.isaLite; st.isaLite=false;
     // ver.20261118.19: 一覧表＋Saysay の書類だけ。ドライブの書類はPDFに入れないが、一覧表の〇はファイル名で付ける（読み込み・署名の振り分け・AIはしない＝速い）
     try{ await _isaESignFiles(info.caseId, drv); }catch(e){ console.warn(e); drv.note.push('電子署名の記録を読めませんでした'); }   // ver.20261117.23
@@ -5077,7 +5117,8 @@ async function _isaSetStart(targets){
     else if(drv.sign.length){ SG=await _isaSignPages(drv.sign, function(t){ ov.textContent='📎 '+t; _isaTitle('⏳ '+t); }); drv.note=drv.note.concat(SG.note); }
     var files=(SG?drv.sign.filter(function(f){ return !SG.used[f.id]; }):drv.sign).concat(drv.up);
     var ctx0={lite:_lite, navHas:function(dk){ return !!document.getElementById('nav-'+dk); }, label:function(dk){ return _pmDocLabel(dk).name||''; }, field:K.field, personOrder:c.person_order, hyo2Need:/^hyo2_/.test(String(K.hyo2||''))};
-    var B=_isaBuildTables(K, R, targets, files, drv.co, Object.assign({}, ctx0, {sg:SG}));
+    var B=_isTk ? _isaTkTables(c, info, SG, files, UP) : _isaBuildTables(K, R, targets, files, drv.co, Object.assign({}, ctx0, {sg:SG}));
+    if(_isTk) targets=[];   // 特定活動は決まった4つだけ（ほかの Saysay の書類は綴じない）
     var tables=B.tables, used=B.used, docUsed=B.docUsed;
     var restDocs=targets.filter(function(dk){ return !docUsed[dk] && !(dk==='1_17' && docUsed['1_17_vi']); });
     var restFiles=_lite ? [] : drv.up.concat(drv.sign).filter(function(f){ return !used[f.id] && !(SG && SG.used[f.id]); });
@@ -5089,6 +5130,7 @@ async function _isaSetStart(targets){
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
     _isaSt.auto=!!st.isaAuto; st.isaAuto=false;
     if(_lite){ _isaSt.lite=true; _isaSt.pcOn=false; }   // ver.20261118.18
+    if(_isTk) _isaSt.tk=true;   // ver.20261119.02
     ov.remove();
     if(_isaSt.auto){
       var _stop=_isaAutoStops(_isaSt);
@@ -5119,11 +5161,12 @@ async function _isaIchiranFresh(K, R){
 //   ・分野が分からない（認定・変更＝第3表が付かない／更新＝全分野の表のどの行か決められない）　・一覧表が取れなかった表がある　・署名済みで様式が分からないページがある
 function _isaAutoStops(S){
   var out=[];
+  if(S.tk) return out;   // ver.20261119.02: 特定活動は一覧表も分野も使わない
   if(!S.K.field) out.push(S.K.app==='koshin'   // ver.20261117.27: 更新も止める（全分野の表の、どの分野の行か決められないため）
     ? '分野が分からないので、第3表（全分野の表）の中の、どの分野の行に〇を付けるか決められません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください（Saysay の上の「分野」で選んでも作れます）'
     : '分野が分からないので、第3表（分野別）が付きません。案シスの案件に分野を入れてから、もう一度［📑 申請書類一式を作る］を押してください');
   if((S.tables||[]).length < (S.K.keys||[]).length) out.push('入管の一覧表を取れなかった表があります（下の⚠を見てください）');
-  if(S.sg && (S.sg.other||[]).length) out.push('署名済みのスキャンに、どの様式か分からないページが'+S.sg.other.length+'枚あります。［✍ 署名済みの付け替え］で行を選んでください');
+  if(S.sg && (S.sg.other||[]).length && !S.lite) out.push('署名済みのスキャンに、どの様式か分からないページが'+S.sg.other.length+'枚あります。［✍ 署名済みの付け替え］で行を選んでください');
   return out;
 }
 // 作ったあとに確かめてほしいところ（結果の画面に出す。直すときは［↩ 確認画面で直す］）
@@ -5207,10 +5250,10 @@ async function _isaSetRun(){
     S.restDocs.forEach(function(d){ if(allDocs.indexOf(d)<0) allDocs.push(d); });
     var allFiles=[]; S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val==='有') (L.files||[]).forEach(function(f){ allFiles.push(f); }); }); });   // 作れなかった書類で〇有を外すのはファイルの無い行だけなので、ここで決めてよい
     S.restFiles.forEach(function(f){ if(S.restOn[f.id]) allFiles.push(f); });
-    if(S.lite) allFiles=[];   // ver.20261118.19: ドライブの書類は読まない・綴じない（一覧表の〇だけ）
+    if(S.lite && !S.tk) allFiles=[];   // ver.20261118.19（特定活動は合格証を綴じる：ver.20261119.02）: ドライブの書類は読まない・綴じない（一覧表の〇だけ）
     var uFiles=[], _uf={}; allFiles.forEach(function(f){ if(!_uf[f.id]){ _uf[f.id]=1; uFiles.push(f); } });
     var marks0=_isaMarksKey(S), fillErr=null;
-    var fillP=_isaFill(S, prog).catch(function(e){ fillErr=e; return null; });
+    var fillP=S.tk ? Promise.resolve(null) : _isaFill(S, prog).catch(function(e){ fillErr=e; return null; });   // ver.20261119.02: 特定活動は一覧表なし
     var nDoc=0, nFile=0, stat=function(){ prog('Saysay の書類 '+nDoc+'/'+allDocs.length+'・ドライブの書類 '+nFile+'/'+uFiles.length+'（一覧表の〇付けも同時に進めています）'); };
     stat();
     var unmarked=[];
@@ -5260,7 +5303,7 @@ async function _isaSetRun(){
     var chg=pcRes?_isaPcApplyMarks(S, pcRes):[];
     if(chg.length) failed.push('AIの申請前チェックで要確認のため、一覧表の〇有を外した行：'+chg.join('、'));
     var fr=null;
-    if(_isaMarksKey(S)!==marks0){
+    if(!S.tk && _isaMarksKey(S)!==marks0){
       // 〇が変わった：すぐ付け直しを始める（最初の〇付けは、付け直しに失敗したときの控え）
       prog('一覧表の〇を付け直しています（1〜2分）…');
       var fr2P=_isaFill(S, prog).catch(function(e){ return {err:e}; });
@@ -5280,7 +5323,7 @@ async function _isaSetRun(){
       }catch(e){ failed.push(ISA_FILL_NG+'のPDFを読み込めませんでした：'+e.message+(S.ichiranStale?ISA_FILL_STALE:'')); S.ichiranStale=0; }
     }
     ov.style.display='none';
-    _isaTitle(S.ichiranStale || !collected.some(function(c){ return c.dk==='isa_ichiran'; }) ? '⚠ できました（一覧表を確認）' : '✅ 申請書類一式ができました', true);
+    _isaTitle(!S.tk && (S.ichiranStale || !collected.some(function(c){ return c.dk==='isa_ichiran'; })) ? '⚠ できました（一覧表を確認）' : '✅ 申請書類一式ができました', true);
     // ver.20261116.19: AIチェックをしたとき・不足があるときは結果の画面へ（そこで不足書類のお知らせを付けるか選んで印刷）
     if(S.pcOn!==false || _isaMissingRows(S).length || S.auto){ _isaPcShow(S, pcRes, collected, failed); return; }   // ver.20261117.06: 自動で作ったときも結果の画面へ（印刷の窓はボタンで開く）
     if(failed.length) alert('次のものは入れられませんでした：\n・'+failed.join('\n・'));
@@ -5334,8 +5377,11 @@ function _isaSignKeyByName(name){
 //   AIのページの見分けをせずにその様式の署名済みページとして使う（Saysay の署名なしの書類の該当ページと差し替わる）。
 //   名前で決まらないもの・ドライブの署名済みファイル（電子署名でないもの）は使わない（一覧表の〇の手がかりにだけなる）
 async function _isaLiteESign(files, prog){
-  var es=(files||[]).filter(function(f){ return f && f._esign && _isaSignKeyByName(f.name); });
-  if(!es.length) return null;
+  // ver.20261119.05: 名前で様式が1つに決まるもの（_1-5・_1-6 など）は名前で、
+  //   「サイン書類」のように何枚もの様式がまとまったもの・「雇用契約書・雇用条件書」のように2つ以上のものは、ページごとに見分ける（_isaSignPages）
+  var all=(files||[]).filter(function(f){ return f && f._esign; });
+  if(!all.length) return null;
+  var es=all.filter(function(f){ return _isaSignKeyByName(f.name); }), multi=all.filter(function(f){ return !_isaSignKeyByName(f.name); });
   var SG={byKey:{}, used:{}, other:[], note:[], pages:[]}, seq=0, nr=0;
   await _isaPool(es, ISA_PAR, async function(f){ try{ await _isaFileImgs(f); }catch(e){} nr++; if(prog) prog('電子署名の書類を読んでいます（'+nr+'/'+es.length+'）…'); });
   for(var i=0;i<es.length;i++){
@@ -5344,6 +5390,10 @@ async function _isaLiteESign(files, prog){
     SG.used[f.id]=1;
     var k=_isaSignKeyByName(f.name);
     imgs.forEach(function(im, p){ SG.pages.push({u:im.u, w:im.w, h:im.h, fid:f.id, fname:f.name, p:p+1, n:imgs.length, part:'', prio:1, ord:f._ord||0, key:k, hint:k, _no:++seq, by:'name'}); });
+  }
+  if(multi.length){
+    var G=null; try{ G=await _isaSignPages(multi, prog); }catch(e){ console.warn('[liteSign]', e); SG.note.push('電子署名の「サイン書類」をページごとに見分けられませんでした'); }
+    if(G){ (G.pages||[]).forEach(function(pg){ pg._no=++seq; SG.pages.push(pg); }); Object.keys(G.used||{}).forEach(function(id){ SG.used[id]=1; }); SG.note=SG.note.concat(G.note||[]); }
   }
   if(!SG.pages.length) return SG;
   _isaSignBuild(SG);
@@ -5882,9 +5932,10 @@ function _isaPcRender(){
     : '<div style="font-size:12px;color:#64748b;">📎 不足書類は0件のため、「不足書類のお知らせ」は作りません。</div>';
   var html='<div id="isaPcModal" style="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px;font-family:sans-serif;">'
     +'<div style="background:#fff;border-radius:14px;max-width:720px;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">'
-    +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">'+(S.lite?'🗂 一覧表＋Saysay の書類（03 スキャンに保存）':'🔍 申請前チェックの結果')+'</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(P.res.meta.applicant||'')+'　'+E(P.res.meta.shinsei_type||'')+'</div></div>'
+    +'<div style="padding:12px 18px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;"><div style="font-weight:800;font-size:15px;">'+(S.tk?'🗂 特定活動のスキャン（03 スキャンに保存）':S.lite?'🗂 一覧表＋Saysay の書類（03 スキャンに保存）':'🔍 申請前チェックの結果')+'</div><div style="font-size:11.5px;opacity:.9;margin-top:2px;">'+E(P.res.meta.applicant||'')+'　'+E(P.res.meta.shinsei_type||'')+'</div></div>'
     +'<div style="padding:10px 18px 14px;overflow-y:auto;flex:1;">'
-    +(S.lite?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">入管の一覧表と Saysay の書類だけを1本にしました（ドライブの署名済み・アップロード書類はPDFに入れていません。一覧表の〇はドライブのファイル名も見て付けています。電子署名がある書類は署名済みのものを入れています／申請前チェックはしていません）。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':''))
+    +(S.tk?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">特定活動なので入管の一覧表は付けず、1-5号 → 1-6号 → 説明書 → 合格証 の順に1本にしました（電子署名があれば署名済みのページ）。申請前チェックはしていません。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':'')
+    +(S.lite&&!S.tk?'<div style="font-size:12px;color:#0f766e;background:#f0fdfa;border-radius:8px;padding:6px 10px;margin-bottom:8px;">入管の一覧表と Saysay の書類だけを1本にしました（ドライブの署名済み・アップロード書類はPDFに入れていません。一覧表の〇はドライブのファイル名も見て付けています。電子署名がある書類は署名済みのものを入れています／申請前チェックはしていません）。できたPDFは人材のドライブ「03 スキャン／日付」に自動で保存します</div>':(P.basic?'<div style="font-size:12px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">AIの申請前チェックはしていません（一覧表の判定だけです）</div>':''))
     +_isaIchiranNgHtml(S, P)
     +_isaManualHtml(S)
     +(P.failed.length?'<div style="font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:6px 10px;margin-bottom:8px;">⚠ '+P.failed.map(E).join('<br>⚠ ')+'</div>':'')
@@ -5904,6 +5955,88 @@ function _isaPcRender(){
     +'<button onclick="_isaPcPrint()" style="padding:10px 16px;background:linear-gradient(135deg,#6d28d9,#a855f7);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;">🖨 印刷画面を開く</button></div></div></div>';
   document.body.insertAdjacentHTML('beforeend', html);
 }
+// ver.20261119.02: 特定活動（移行準備など）のスキャン。入管の一覧表は無いので、決まった順に並べる
+//   1-5号 雇用契約書 → 1-6号 雇用条件書（別紙も） → 説明書 → 合格証（技能試験・日本語試験。人材のドライブから）
+//   1-5／1-6 は電子署名があれば署名済みのページ、無ければ Saysay の書類。説明書は在留資格・分野で選ぶ
+var ISA_TK_SKILL=/技能測定|技能試験|技能評価|評価試験|合格証|合格書|合格通知|技能検定|skill/i, ISA_TK_JP=/JFT|JLPT|日本語|N[1-5](?![0-9])|Japanese/i;
+// ver.20261119.04: 説明書の選択肢（おすすめは _isaTkExpl。結果の画面で選び直せる）
+var ISA_TK_EXPLS=[['iko','移行準備説明書（特定技能1号へ）'],['tk2go','移行準備説明書（特定技能2号へ）'],['tokkatsu_jidosha','説明書（特定自動車運送業準備）'],['myanmar','理由書（ミャンマー国籍者等）']];
+function _isaTkExplWhy(c, info, dk){
+  return {myanmar:'在留資格が特定活動（ミャンマー）のため', tokkatsu_jidosha:'分野が自動車運送業のため', tk2go:'在留資格・分野が2号のため', iko:'特定技能1号への移行準備のため（ふつうはこれ）'}[dk]||'';
+}
+function _isaTkExpl(c, info){
+  var rs=String(c.residence_status||''), f=String(info.applicantField||c.applicant_field||''), has=function(dk){ return !!document.getElementById('nav-'+dk); };
+  if(/ミ[ャヤ]ンマ/.test(rs) && has('myanmar')) return 'myanmar';
+  if(/自動車運送/.test(f) && has('tokkatsu_jidosha')) return 'tokkatsu_jidosha';
+  if(/[2２]号/.test(rs+' '+f) && has('tk2go')) return 'tk2go';
+  return 'iko';
+}
+// ver.20261119.02: 書類アップロードの合格証（3つ：合格証（技能）・合格証（日本語）・専門級。技能＋日本語の2つか、専門級の1つ）
+//   アップロードの記録の書類名で分け、同じ書類を何度か上げていたら最後に上げたもの（10分以内にまとめて上げた分）だけ使う
+var ISA_UP_KINDS=[['skill',/合格証（技能）|技能試験|技能測定|2号合格証/],['jp',/日本語/],['senmon',/専門級/]];
+function _isaUpKind(label, fname){
+  var nf=function(x){ x=String(x||''); try{ x=x.normalize('NFKC').replace(/\(/g,'（').replace(/\)/g,'）'); }catch(e){} return x; };
+  var lb=nf(label), fn=nf(fname).replace(/\.[a-z0-9]+$/i,'').replace(/_\d+$/,'');
+  var by=function(t){ for(var i=0;i<ISA_UP_KINDS.length;i++){ if(ISA_UP_KINDS[i][1].test(t)) return ISA_UP_KINDS[i][0]; } return ''; };
+  if(/技能.*日本語|専門級.*合格|合格.*専門級/.test(lb) || /\//.test(lb)){ var k=by(fn); return (k && !/技能.*日本語|／/.test(fn)) ? k : 'mix'; }   // 「合格証（技能・日本語）／専門級」は中身が分からない
+  return by(lb) || by(fn);
+}
+async function _isaUploadPass(caseId){
+  var rows=await idxSb('upload_notifications?select=doc_label,file_names,drive_url,created_at&case_id=eq.'+encodeURIComponent(caseId)+'&order=created_at.desc&limit=300');
+  var last={}, out=[], seen={};
+  (rows||[]).forEach(function(r){
+    if(!/合格|専門級|日本語|技能試験|技能測定/.test(String(r.doc_label||''))) return;
+    var id=_isaFileIdOf(r.drive_url); if(!id || seen[id]) return;
+    var nm=String(r.file_names||'').split(/[\n,、]/)[0].trim() || (r.doc_label+'.pdf');
+    if(/顔写真|在留カード|パスポート|旅券|住民票|課税|納税|源泉/.test(nm)) return;   // 書類名と違うファイルを上げていたもの
+    var k=_isaUpKind(r.doc_label, nm); if(!k) return;
+    var t=Date.parse(r.created_at)||0; if(last[k]==null) last[k]=t;
+    if(last[k]-t > 10*60000) return;   // 前に上げ直す前のもの
+    seen[id]=1; out.push({id:id, name:nm, url:r.drive_url, _up:1, _upKind:k, _upLabel:r.doc_label, _t:t});
+  });
+  var ord={skill:0, jp:1, senmon:2, mix:3};
+  out.sort(function(a,b){ return (ord[a._upKind]-ord[b._upKind]) || String(a.name).localeCompare(String(b.name),'ja',{numeric:true}); });
+  return out;
+}
+function _isaTkTables(c, info, SG, files, UP){
+  var used={}, docUsed={}, sgUsed={}, n=0, mk=function(name, extra){ n++; return Object.assign({r:{no:String(n), row:-n}, name:name, val:'', docs:[], files:[], src:''}, extra||{}); };
+  var lab=function(dk){ return (typeof _pmDocLabel==='function' && _pmDocLabel(dk).name) || dk; };
+  var pages=function(k){ return (SG && SG.byKey && SG.byKey[k]) || []; };
+  var L5=mk('雇用契約書（1-5号）', {docs:['1_5'], val:'有', src:'Saysay'});
+  if(pages('1_5').length){ L5.signPages=pages('1_5'); L5.src='✍ 電子署名'; sgUsed['1_5']=1; }
+  var L6=mk('雇用条件書（1-6号）', {docs:['1_6'], val:'有', src:'Saysay'});
+  var p6=pages('1_6').concat(pages('1_6b'));
+  if(p6.length){ L6.signPages=p6; L6.src='✍ 電子署名'; sgUsed['1_6']=1; sgUsed['1_6b']=1; }
+  var ex=_isaTkExpl(c, info), LE=mk(lab(ex)||'説明書', {docs:[ex], val:'有', src:'Saysay（おすすめ：'+_isaTkExplWhy(c, info, ex)+'）', _tkExpl:ex, _tkRec:ex});
+  // 合格証：書類アップロードで上げたもの（技能 → 日本語 → 専門級）を先に。無ければ人材のドライブのファイル名で探す
+  var pass=(UP||[]).slice(), viaUp=pass.length>0;
+  if(!pass.length){
+    pass=(files||[]).filter(function(f){ var t=String(f.name||''); try{ t=t.normalize('NFKC'); }catch(e){} return ISA_TK_SKILL.test(t) || ISA_TK_JP.test(t) || /専門級/.test(t); });
+    var rank=function(f){ var t=String(f.name||''); try{ t=t.normalize('NFKC'); }catch(e){} return /専門級/.test(t) ? 2 : (ISA_TK_JP.test(t) && !/技能/.test(t) ? 1 : 0); };
+    pass.sort(function(a,b){ return rank(a)-rank(b) || String(a.name||'').localeCompare(String(b.name||''),'ja',{numeric:true}); });
+  }
+  // 合格証は「技能＋日本語の両方」か「専門級だけ」のどちらか（ver.20261119.04）
+  var kinds={}; pass.forEach(function(f){ var k=f._upKind; if(!k){ var t=String(f.name||''); try{ t=t.normalize('NFKC'); }catch(e){} k=/専門級/.test(t)?'senmon':(ISA_TK_JP.test(t)&&!/技能/.test(t)?'jp':'skill'); } kinds[k]=1; });
+  var patA=kinds.skill && kinds.jp, patB=kinds.senmon, lack='';
+  if(pass.length && !patA && !patB && !kinds.mix) lack='⚡ 合格証（'+(kinds.skill?'日本語':'技能')+'）がありません（技能と日本語は両方要ります。専門級なら専門級だけでよい）';
+  var pat=patA&&patB ? '技能＋日本語と専門級' : (patA ? '技能＋日本語' : (patB ? '専門級' : (kinds.mix ? '中身はファイルで確認' : '')));
+  var LP=mk('合格証（技能＋日本語 または 専門級）', {files:pass, val:pass.length?'有':'', _tkLack:!!lack,
+    src:pass.length?((lack?lack+'　':'')+(viaUp?'📤 書類アップロード':'📁 人材のドライブ')+(pat?'（'+pat+'）':'')+'：'+pass.map(function(f){ return f.name; }).join('、')):'⚡ 不足（書類アップロードにも人材のドライブにも合格証が見つかりません）'});
+  pass.forEach(function(f){ used[f.id]=1; });
+  ['1_5','1_6',ex].forEach(function(d){ docUsed[d]=1; });
+  return {tables:[{key:'tokkatsu', label:'特定活動（1-5号・1-6号・説明書・合格証）', lines:[L5, L6, LE, LP]}], used:used, docUsed:docUsed, sgUsed:sgUsed};
+}
+// ver.20261119.04: 特定活動のスキャンで説明書を選び直して作り直す（作り直したPDFも 03 スキャンに保存）
+function _isaTkSwapExpl(dk){
+  var S=_isaSt; if(!S || !S.tk || !dk) return;
+  var L=null; (S.tables||[]).forEach(function(t){ (t.lines||[]).forEach(function(x){ if(x._tkExpl) L=x; }); }); if(!L) return;
+  if(dk===L._tkExpl && !confirm('同じ説明書でもう一度作り直しますか？')) return;
+  var nm=(typeof _pmDocLabel==='function' && _pmDocLabel(dk).name) || dk;
+  L._tkExpl=dk; L.docs=[dk]; L.name=nm; L.val='有';
+  L.src='Saysay'+(dk===L._tkRec?'（おすすめ：'+_isaTkExplWhy(S.c, S.info, dk)+'）':'（選び直し）');
+  var m=document.getElementById('isaPcModal'); if(m) m.remove();
+  S.pc=null; _isaSetRun();
+}
 // ver.20261118.22: ［🗂 一覧表＋Saysay］の結果の画面に「📁 手で足す書類」。人材・アップロード・会社・押印済みのフォルダをすぐ開けるボタンと、
 //   ドライブのファイルで〇有にした行（PDFには入っていない）を一覧表の番号・ファイル名・開くリンクつきで出す
 function _isaManualHtml(S){
@@ -5920,6 +6053,20 @@ function _isaManualHtml(S){
     +(co.length ? co.map(function(u, i){ return btn(u, '🏢 企業'+(co.length>1?(i+1):''), '#b45309', '会社のドライブフォルダを開きます'); }).join('') : btn('', '🏢 企業', '#b45309', '会社のドライブフォルダ'))
     +btn(L0.sign, '🔏 押印済み', '#be123c', '人材のドライブの押印済み（署名済み）のフォルダを開きます')
     +'</div>';
+  if(S.tk){   // ver.20261119.02: 特定活動は合格証も綴じているので、並びと抜けだけ出す
+    (S.tables||[]).forEach(function(t){ (t.lines||[]).forEach(function(L, li){
+      var sel='';
+      if(L._tkExpl){   // ver.20261119.04: 説明書はおすすめを入れたうえで選び直せる
+        sel='<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;"><select id="isaTkExplSel" style="font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid #99f6e4;">'
+          +ISA_TK_EXPLS.filter(function(x){ return !!document.getElementById('nav-'+x[0]); }).map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===L._tkExpl?' selected':'')+'>'+E(x[1])+(x[0]===L._tkRec?'（おすすめ）':'')+'</option>'; }).join('')
+          +'</select><button onclick="_isaTkSwapExpl(document.getElementById(\'isaTkExplSel\').value)" style="padding:5px 10px;border-radius:7px;border:none;background:#0f766e;color:#fff;font-size:11.5px;font-weight:800;cursor:pointer;">この説明書で作り直す</button>'
+          +'<span style="font-size:10.5px;color:#64748b;">作り直すと、03 スキャンに新しいPDFが保存されます</span></div>';
+      }
+      var bad=L.val!=='有' || L._tkLack;
+      h+='<div style="display:flex;gap:6px;padding:4px 0;border-top:1px solid #ccfbf1;font-size:12px;"><span style="flex:none;color:#0f766e;font-weight:800;">'+E(L.r.no)+'.</span><div style="flex:1;min-width:0;"><b>'+E(L.name)+'</b> <span style="font-size:11px;color:'+(bad?'#b45309':'#64748b')+';'+(bad?'font-weight:700;':'')+'">'+E(L.src||'')+'</span>'+sel+'</div></div>';
+    }); });
+    return h.replace('📁 手で足す書類（ドライブの書類はPDFに入っていません）','📁 特定活動のスキャン（この順に綴じました）')+'</div>';
+  }
   var rows=[];
   (S.tables||[]).forEach(function(t){ (t.lines||[]).forEach(function(L){
     if(L.sub || L.val!=='有') return;
@@ -5941,6 +6088,7 @@ function _isaManualHtml(S){
 }
 // ver.20261117.09: 一覧表が入っていない／〇を付け直せなかったときは赤で知らせ、一覧表だけ作り直せるようにする
 function _isaIchiranNgHtml(S, P){
+  if(S && S.tk) return '';   // ver.20261119.02: 特定活動は一覧表なし
   var none=!P.collected.some(function(c){ return c.dk==='isa_ichiran'; });
   if(!none && !S.ichiranStale) return '';
   var msg=none ? '⛔ 先頭に綴じる「入管の提出書類一覧表」が入っていません（〇付けに失敗しました）'
@@ -6132,7 +6280,8 @@ async function _isaPostSetLog(S, P){
       session_id:'isa'+(S.t0||''), ms_since_load:S.t0?(Date.now()-S.t0):null,
       meta:{auto:!!S.auto, lite:!!S.lite, ai:!P.basic, out:cnt.out, warn:cnt.warn, ok:cnt.ok, missing:P.items.length, attach:!!(P.attach&&P.items.length),
         review:(P.review||[]).length, failed:(P.failed||[]).length, ichiran:S.ichiranPath||'', stale:!!S.ichiranStale,
-        noIchiran:!P.collected.some(function(c){ return c.dk==='isa_ichiran'; }), parts:P.collected.length, docs:docs.slice(0,80), keys:(S.K&&S.K.keys)||[]}};
+        noIchiran:!S.tk && !P.collected.some(function(c){ return c.dk==='isa_ichiran'; }), tk:!!S.tk,
+        links:{person:S.folder||'', sign:(S.links&&S.links.sign)||'', up:(S.links&&S.links.up)||'', scan:(S.scanDir&&S.scanDir.id)?('https://drive.google.com/drive/folders/'+S.scanDir.id):''},   /* ver.20261119.05: 案シスのタスクからすぐ開けるように */ parts:P.collected.length, docs:docs.slice(0,80), keys:(S.K&&S.K.keys)||[]}};
     await fetch(IDX_URL+'saysay_logs',{method:'POST',keepalive:true,headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});
   }catch(e){ console.warn('isa log', e); }
 }
