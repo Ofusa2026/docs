@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.12</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.13</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611191700';
-window.__DOCS_CACHE_BUSTER__ = '2611191700';
+window.__DOCS_CACHE_BUSTER__ = '2611191810';
+window.__DOCS_CACHE_BUSTER__ = '2611191810';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2239,6 +2239,15 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.13',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🔍 <b>申請書類一式・一覧表＋Saysay のPDFを、前より細かい画像（約200dpi）で保存</b>するようにしました：一覧表・1-17号などの小さい字が読みづらかったため。PDFは前の1.5倍ほどの大きさになります。',
+      '🎓 <b>一覧表の「技能検定・評価試験（専門級）」の行に、「合格証（技能）」のファイルで〇が付いていた</b>のを直しました：専門級・技能検定の行は、ファイル名に専門級・検定があるときだけ〇を付けます。技能測定試験の行は、専門級・検定のファイルを使いません。'
+    ]
+  },
   {
     version: 'ver.20261119.12',
     date: '2026-11-19',
@@ -4929,7 +4938,7 @@ var _ISA_ROW_DOC=[[/報酬に関する説明書/,/^1_4/],[/雇用の経緯/,/^1_
   [/支援責任者の履歴書/,/^1_20/],[/支援担当者の履歴書/,/^1_22/],[/役員に関する誓約書/,/^1_23/],[/申請人名簿/,/^meibo/]];
 // 一覧表の行 → ドライブのファイル名（よくある書き方）
 var _ISA_ROW_FILE=[[/技能移転に係る申告書/,/1[-_－]?10(?!\d)|技能移転/],[/受診者の申告書/,/1[-_－]?3(?![\d])|受診者/],[/雇用の経緯/,/1[-_－]?16(?!\d)|経緯/],
-  [/業務内容に関する誓約書/,/1[-_－]?32(?!\d)|業務内容/],[/支援計画書/,/1[-_－]?17(?!\d)|支援計画/],[/日本語能力試験|日本語基礎テスト|日本語評価試験/,/日本語|JLPT|JFT|N[1-5](?![0-9])/i],[/技能測定試験|技能評価試験|評価試験（専門級）|技能検定|特定技能[１２12]号評価試験/,/技能|測定|評価試験|検定|専門級|実技/],
+  [/業務内容に関する誓約書/,/1[-_－]?32(?!\d)|業務内容/],[/支援計画書/,/1[-_－]?17(?!\d)|支援計画/],[/日本語能力試験|日本語基礎テスト|日本語評価試験/,/日本語|JLPT|JFT|N[1-5](?![0-9])/i],[/評価試験（専門級）|専門級|技能検定/,/専門級|技能検定|検定/],[/技能測定試験|技能評価試験|特定技能[１２12]号評価試験/,/^(?!.*(専門級|検定)).*(技能|測定|評価試験|実技)/]   /* ver.20261119.13: 専門級・技能検定の行は、専門級・検定のファイルだけ（「合格証（技能）」で専門級の行に〇が付いていた）*/,
   [/卒業証明書/,/卒業/],[/国家試験の結果通知書/,/結果通知|国家試験/],[/建設業法第３条第１項の許可/,/建設業許可|許可通知|許可証|許可書/],[/建設キャリアアップシステムにおける技能者情報/,/技能者情報|技能者.*画面/],[/ハガキ又はメール/,/ハガキ|はがき|事業者登録|登録完了/],
   [/JACの会員証|建設業者団体/,/JAC|会員証/i],[/JAIM/,/JAIM/i],[/営業許可証/,/営業許可/],[/確認通知書/,/確認通知/],[/経歴証明書/,/経歴/],[/実務経験に係る申告書/,/実務経験/],
   [/四季報|上場していること/,/四季報|上場/],[/法定調書合計表/,/法定調書/],
@@ -5114,7 +5123,7 @@ async function _isaFilePages(f){   // ver.20261116.20: 読んだページは使�
 async function _isaPdfToImgs(lib, data){
   var pdf=await lib.getDocument({data:data}).promise, imgs=[];
   for(var i=1;i<=pdf.numPages;i++){
-    var pg=await pdf.getPage(i), vp=pg.getViewport({scale:1.6});
+    var pg=await pdf.getPage(i), vp=pg.getViewport({scale:2.8});   // ver.20261119.13: 約200dpi（前は1.6＝約115dpiで、一覧表の字が読みづらかった）
     var cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
     await pg.render({canvasContext:cv.getContext('2d'), viewport:vp, intent:'print'}).promise;   // ver.20261117.09: 別のタブに移っても止まらない（display は画面の描画を待つ）
     imgs.push(cv.toDataURL('image/jpeg',0.85));
@@ -6473,7 +6482,7 @@ function _isaPcPrint(){
 //   ・ファイル名は「氏名_申請書類一式_YYYYMMDD_HHMM.pdf」＝作り直しても上書きしない（日付つきで残す）
 //   ・置き場所は案シスの［📎 スキャン書類作成］と同じ（03 スキャン／日付のフォルダ）。無ければ作る
 //   ・ブラウザの「PDFに保存」は自動で押せないので、ページごとに画像にしてPDFにする（ドライブの書類・一覧表は元の画像をそのまま綴じる）
-var ISA_SAVE_SCALE=1.7, ISA_SAVE_JPG=0.82;   // 約160dpi（文字は十分読める・37ページで8MBほど）
+var ISA_SAVE_SCALE=2.1, ISA_SAVE_JPG=0.82;   // ver.20261119.13: 約200dpi（前は約160dpiで、一覧表・1-17号などの小さい字が読みづらかった。PDFは前の1.5倍ほど）
 function _isaScanNorm(s){ var x=String(s||''); try{ x=x.normalize('NFKC'); }catch(e){} return x.trim().replace(/^[0-9]+[.、,]?\s*/,'').replace(/\s+/g,''); }
 function _isaScanDirOf(items){
   var dirs=(items||[]).filter(function(f){ return f && f.isFolder; });
