@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.09</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261119.10</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611191156';
-window.__DOCS_CACHE_BUSTER__ = '2611191156';
+window.__DOCS_CACHE_BUSTER__ = '2611191428';
+window.__DOCS_CACHE_BUSTER__ = '2611191428';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2234,6 +2234,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261119.10',
+    date: '2026-11-19',
+    notify: false,
+    items: [
+      '🧮 <b>1-6号の換算時給（月給・日給の場合の1時間当たりの金額）に入れる手当を、法令どおりに決めるようにしました</b>（労働基準法37条5項・施行規則21条）。左の「換算時給」の下に手当の一覧が出ます。<br>・除けるのは ①家族 ②通勤 ③別居 ④子女教育 ⑤住宅手当 ⑥臨時のもの ⑦1か月を超えるごとのもの（賞与など）と、割増賃金（固定残業・時間外・深夜・休日）だけ。<b>それ以外の手当は全部入れます</b>（精皆勤・処遇改善・資格・役職など）。<br>・手当ごとに<b>中身（種類）</b>を選びます（はじめは名前から推測）。①〜⑤は名前ではなく払い方で決まるので、<b>「人数・距離・費用などに応じて額が変わる（→入れない）」か「関係なく決まった額（→入れる）」</b>を選んでください。<b>通勤・住宅手当は、はじめは「決まった額（入れる）」</b>になっています（額が変わる払い方なら選び直す）。家族・別居・子女教育手当は、選んでいないと⚠️が出て、印刷前のチェックでも知らせます。<br>・<b>割る時間は1か月平均の所定労働時間</b>（労働基準法施行規則19条）：年間の所定労働時間があれば<b>（月給＋手当）×12÷年間の所定労働時間</b>で出します（空なら月の時間）。日給の人は「日給÷1日の所定労働時間＋手当÷1か月平均」。<br>※ これまで精皆勤手当を入れていませんでしたが、法律どおり入れるようにしました（最低賃金の判定では今までどおり除きます）。選んだ内容は雇用条件セットに保存されます。'
+    ]
+  },
   {
     version: 'ver.20261119.09',
     date: '2026-11-19',

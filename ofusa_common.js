@@ -394,7 +394,7 @@ function _aiCheck16Local(rules){
   function add(sev,cat,title,detail,page){ checks.push({severity:sev,category:cat,title:title,detail:detail,src:'計算',page:page||''}); }
   // D/E. 最低賃金（基本給ベース）
   var pref=_mw16_pref();
-  var th=_mw16_num('es_monthlyH')+_mw16_num('es_monthlyMin')/60;
+  var th=(typeof _p16AvgMonthHours==='function') ? _p16AvgMonthHours().h : (_mw16_num('es_monthlyH')+_mw16_num('es_monthlyMin')/60);   // ver.20261119.10: 年間の所定労働時間があれば ÷12 の1か月平均（労基則19条・最賃則2条）
   var hourly=_mw16_num('es_salaryHourly');
   var monthly=_mw16_num('es_salaryMonthly');
   // ver.20261109.09: 最低賃金は基本給だけでなく、算入される手当も足して判定（精皆勤・通勤・家族・固定残業や夜勤などの割増・臨時・賞与は除く＝最低賃金法の除外賃金）
@@ -501,13 +501,15 @@ function _aiCheck16Local(rules){
     var an=_mw16_val('es_a'+ai+'Name'), aa=_mw16_num('es_a'+ai+'Amt');
     if(!an && !aa) continue;
     if(/固定残業|みなし/.test(an)) fixedInAllow.push(an||('手当'+ai));
-    if(aa && !_exAllow.test(an)){ allowIn+=aa; allowInNames.push((an||('手当'+ai))+aa); }
+    if(aa && (typeof _p16AllowIn==='function' ? _p16AllowIn(ai) : !_exAllow.test(an))){ allowIn+=aa; allowInNames.push((an||('手当'+ai))+aa); }   // ver.20261119.10: 選んだ手当
   }
+  try{ if(typeof _p16AllowInfo==='function'){ var _hn=[]; for(var _hi=1;_hi<=6;_hi++){ var _hnm=_mw16_val('es_a'+_hi+'Name'); if(_hnm && _mw16_num('es_a'+_hi+'Amt') && _p16AllowInfo(_hi).need) _hn.push(_hnm); }
+    if(_hn.length) add('warn','時給換算','手当の払い方が選ばれていません（'+_hn.join('・')+'）','家族・通勤・別居・子女教育・住宅手当は、人数・距離・費用などに応じて額が変わるなら換算時給に入れず、全員同じ額なら入れます（労働基準法施行規則21条）。左の「換算時給」の下で選んでください。','P5'); } }catch(_he){}   // ver.20261119.10
   var ch=_mw16_num('es_calcHourly');
   if(ch && monthly && th>0){
     var expH=(monthly+allowIn)/th;
-    if(Math.abs(expH-ch)>1) add('warn','時給換算','換算時給が計算と合いません','（月給 '+monthly+(allowIn?' ＋ 手当 '+allowIn+'［'+allowInNames.join('・')+'］':'')+'）÷ 月所定 '+th.toFixed(1)+'h ＝ '+expH.toFixed(1)+'円 に対し、換算時給欄は '+ch+'円。入れる手当の範囲を確認してください（固定残業・夜勤など割増の手当、通勤・家族・住宅・精皆勤などは除いて計算）。'+(window._docCheckMode?'（書類を開くと、計算どおりに直ります）':''),'P5');
-    else add('ok','時給換算','換算時給は（月給＋手当）÷月所定と一致','換算時給 '+ch+'円。','P5');
+    if(Math.abs(expH-ch)>1) add('warn','時給換算','換算時給が計算と合いません','（月給 '+monthly+(allowIn?' ＋ 手当 '+allowIn+'［'+allowInNames.join('・')+'］':'')+'）÷ 1か月平均の所定 '+th.toFixed(1)+'h ＝ '+expH.toFixed(1)+'円 に対し、換算時給欄は '+ch+'円。入れる手当の範囲を確認してください（固定残業・夜勤など割増の手当、通勤・家族・住宅・精皆勤などは除いて計算）。'+(window._docCheckMode?'（書類を開くと、計算どおりに直ります）':''),'P5');
+    else add('ok','時給換算','換算時給は（月給＋手当）÷1か月平均の所定労働時間と一致','換算時給 '+ch+'円。','P5');
   }
   var foA=_mw16_num('es_fixedOTAmount'), foH=_mw16_num('es_fixedOTHours');
   if(foA && fixedInAllow.length) add('out','固定残業代','固定残業代が手当欄にも入っています','手当欄の「'+fixedInAllow.join('・')+'」と固定残業代欄（'+foA+'円）の両方にあります。固定残業代欄だけに書き、手当からは外してください。','P5');
@@ -5435,6 +5437,28 @@ function _p16MonthHours(){
   var h=_mw16_num('es_monthlyH'), m=_mw16_num('es_monthlyMin');
   return h ? Math.round((h+(m||0)/60)*100)/100 : 0;
 }
+/* ver.20261119.10: 換算時給の割る数＝1か月平均の所定労働時間（労働基準法施行規則19条1項4号・最低賃金法施行規則2条）。
+   月によって所定労働時間が違うときは「1年間の所定労働時間÷12」。年間の欄があればそれを使い、なければ月の欄。
+   → （月給＋手当）×12 ÷ 年間所定労働時間 と同じ */
+function _p16AvgMonthHours(){
+  var yh=_mw16_num('es_yearlyH'), ym=_mw16_num('es_yearlyMin');
+  if(yh){ var y=yh+(ym||0)/60; return {h:y/12, year:y}; }
+  var h=_p16MonthHours(); return {h:h, year:0};
+}
+function _p16DayHours(){ var h=_mw16_num('es_dailyHours'), m=_mw16_num('es_dailyMins'); return h ? h+(m||0)/60 : 0; }
+// 換算時給（端数を丸める前）。月給：（月給＋手当）÷1か月平均。日給：日給÷1日の所定労働時間 ＋ 手当÷1か月平均（労基則19条1項3号・4号）
+function _p16HourlyExactCore(){
+  var A=_p16AvgMonthHours(), mh=A.h; if(!mh) return 0;
+  var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
+  var al=0; for(var i=1;i<=6;i++){ var aa=_mw16_num('es_a'+i+'Amt'); if(aa && _p16AllowIn(i)) al+=aa; }
+  if(mo) return (mo+al)/mh;
+  if(dy){
+    var dh=_p16DayHours(); if(dh) return dy/dh + al/mh;
+    var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
+    return md ? (dy*md+al)/mh : 0;
+  }
+  return 0;
+}
 // ver.20261109.08: 時給・日給のとき、換算月給を自動で入れる（月給のときは何もしない）
 // ver.20261112.03: 式を年間で割る形に変更。時給×年間所定労働時間÷12／日給×年間所定労働日数÷12
 //   （年間の欄が空のときだけ、これまでどおり月の時間・日数で出す）。
@@ -5467,24 +5491,146 @@ function _p16AutoCalcMonthly(force){
 //   入れるのは ① 空欄のとき ② この画面で月給・時間・手当を直したとき。案シスに入っている値は、読み込んだだけでは変えない（印刷前チェックで食い違いを知らせる）。
 //   換算時給をこの画面で手で入れたら、それ以降は変えない。
 var _P16_EXALLOW=/固定残業|みなし|残業|時間外|深夜|夜勤|休日出勤|通勤|家族|扶養|住宅|別居|子女|精勤|皆勤|臨時|賞与/;
-function _p16CalcHourlyValue(){
-  var mh=_p16MonthHours(); if(!mh) return 0;
-  var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
-  var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
-  var base=mo || (dy&&md ? dy*md : 0); if(!base) return 0;
-  var al=0;
-  for(var i=1;i<=6;i++){ var an=_mw16_val('es_a'+i+'Name'), aa=_mw16_num('es_a'+i+'Amt'); if(aa && !_P16_EXALLOW.test(an||'')) al+=aa; }
-  return Math.floor((base+al)/mh);
+/* ver.20261119.10: 換算時給（1時間当たりの金額）に入れる手当を、法令どおりに決める（労働基準法37条5項・施行規則21条）。
+   割増賃金の基礎から除けるのは、次の7つだけ（限定列挙）。これ以外の手当は全部入れる：
+     ①家族手当 ②通勤手当 ③別居手当 ④子女教育手当 ⑤住宅手当 ⑥臨時に支払われた賃金 ⑦1か月を超える期間ごとに支払われる賃金
+   ①〜⑤は名前ではなく中身で決まる：人数・距離・費用などに応じて額が変わるものだけ除ける。全員同じ額（一律）なら入れる。
+   固定残業代・時間外・深夜・休日の割増賃金は、割増賃金そのものなので入れない。
+   → 手当ごとに「中身（種類）」と、①〜⑤なら「払い方」を選ぶ。入れる／入れないはそこから決まる（自由に切り替えない）。
+   はじめは名前から種類を推測。通勤・住宅手当は、はじめは「決まった額（入れる）」。家族・別居・子女教育で払い方が未選択のときは「入れない」で計算し、⚠️確認してもらう。
+   選んだものは雇用条件セットの hourlyAllowSel（「手当名=種類:払い方;…」）に保存。
+   ※ 最低賃金の判定は別のきまり（最低賃金法：精皆勤・通勤・家族手当、割増賃金などを除く）で、ここでは変えない。 */
+var _P16_HKIND={
+  reg:   {l:'毎月決まって払う手当', inc:1, why:'法律で除く7つに当たらないので、入れます（精皆勤・処遇改善・資格・役職なども同じ）'},
+  kazoku:{l:'①家族手当', q:1, why:'扶養家族の人数に応じて額が変わるものだけ除けます'},
+  tsukin:{l:'②通勤手当', q:1, why:'通勤の距離や費用に応じて額が変わるものだけ除けます'},
+  bekkyo:{l:'③別居手当', q:1, why:'別居の事情に応じて払うものだけ除けます'},
+  shijo: {l:'④子女教育手当', q:1, why:'子どもの人数などに応じて額が変わるものだけ除けます'},
+  jutaku:{l:'⑤住宅手当', q:1, why:'家賃・ローンなど住宅の費用に応じて額が変わるものだけ除けます（住宅の形態ごとに同じ額・全員同じ額は入れる）'},
+  rinji: {l:'⑥臨時に払うもの', inc:0, why:'結婚手当など臨時に払うものは法律で除きます'},
+  over1m:{l:'⑦1か月を超えるごとに払うもの', inc:0, why:'賞与など1か月を超えるごとに払うものは法律で除きます'},
+  wari:  {l:'割増賃金（固定残業・時間外・深夜・休日）', inc:0, why:'割増賃金そのものなので入れません（深夜の時間に関係なく毎月同じ額の夜勤手当なら「毎月決まって払う手当」）'}
+};
+var _P16_HKORD=['reg','kazoku','tsukin','bekkyo','shijo','jutaku','rinji','over1m','wari'];
+function _p16GuessKind(name){
+  name=String(name||'');
+  if(/固定残業|みなし|残業|時間外|深夜|夜勤|休日出勤|休日労働|休出/.test(name)) return 'wari';
+  if(/家族|扶養|配偶者/.test(name)) return 'kazoku';
+  if(/通勤|交通/.test(name)) return 'tsukin';
+  if(/別居|単身赴任/.test(name)) return 'bekkyo';
+  if(/子女|子ども|子供|教育/.test(name)) return 'shijo';
+  if(/住宅|家賃|住居/.test(name)) return 'jutaku';
+  if(/臨時|祝金|祝い金|見舞|結婚/.test(name)) return 'rinji';
+  if(/賞与|ボーナス|一時金|期末|年末|決算/.test(name)) return 'over1m';
+  return 'reg';
 }
-function _p16CalcHourlyExact(){   // ver.20261117.12: 端数を丸める前の値（四捨五入で入っている値を、計算違いとみなさないため）
-  var mh=_p16MonthHours(); if(!mh) return 0;
-  var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
-  var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0;
-  var base=mo || (dy&&md ? dy*md : 0); if(!base) return 0;
-  var al=0;
-  for(var i=1;i<=6;i++){ var an=_mw16_val('es_a'+i+'Name'), aa=_mw16_num('es_a'+i+'Amt'); if(aa && !_P16_EXALLOW.test(an||'')) al+=aa; }
-  return (base+al)/mh;
+function _p16SelGet(){
+  var o={}, e=document.getElementById('es_hourlyAllowSel'); if(!e) return o;
+  String(e.value||'').split(/[;；\n]/).forEach(function(t){ var m=t.match(/^\s*(.+?)\s*=\s*([a-z0-9]+)(?::([a-z]*))?\s*$/); if(m && _P16_HKIND[m[2]]) o[m[1]]={k:m[2], h:m[3]||''}; });
+  return o;
 }
+function _p16SelSet(o){
+  var e=document.getElementById('es_hourlyAllowSel'); if(!e) return;
+  e.value=Object.keys(o).map(function(k){ return k+'='+o[k].k+(o[k].h?':'+o[k].h:''); }).join(';');
+  try{ e.dispatchEvent(new Event('input',{bubbles:true})); }catch(_e){}
+}
+// 手当1つの判定 {kind, how, inc, need(払い方が未選択), guessed, why}
+function _p16AllowInfo(i){
+  var nm=String(_mw16_val('es_a'+i+'Name')||'').trim(), o=_p16SelGet(), s=nm&&o[nm];
+  var kind=s?s.k:_p16GuessKind(nm), how=s?s.h:'', K=_P16_HKIND[kind]||_P16_HKIND.reg;
+  if(!how && (kind==='tsukin'||kind==='jutaku')) how='ichiritsu';   // 通勤・住宅手当は、はじめは「決まった額（入れる）」。額が変わる払い方なら選び直す
+  var inc, need=false, why=K.why;
+  if(K.q){
+    if(how==='oujite'){ inc=false; why=K.l.replace(/^[①-⑤]/,'')+'：人数・距離・費用などに応じて額が変わる → 法律で除きます'; }
+    else if(how==='ichiritsu'){ inc=true; why=K.l.replace(/^[①-⑤]/,'')+'：人数・距離・費用に関係なく決まった額 → 除けないので入れます'; }
+    else { inc=false; need=true; }
+  } else inc=!!K.inc;
+  return {kind:kind, how:how, inc:inc, need:need, guessed:!s, why:why};
+}
+function _p16AllowIn(i){ return _p16AllowInfo(i).inc; }
+window._p16AllowIn=_p16AllowIn; window._p16AllowInfo=_p16AllowInfo;
+(function(){
+  if(!/(^|\/)(1_6|15_7)(_[a-z]{2,})?\.html$/.test(location.pathname)) return;
+  function g(id){ return document.getElementById(id); }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function yen(n){ return Number(n||0).toLocaleString('ja-JP'); }
+  function setup(){
+    var ch=g('es_calcHourly'); if(!ch || g('_hasPanel')) return;
+    if(!g('es_hourlyAllowSel')){ var h=document.createElement('input'); h.type='hidden'; h.id='es_hourlyAllowSel'; ch.parentNode.appendChild(h); }
+    var st=document.createElement('style'); st.textContent='#_hasPanel{margin:4px 0 8px;border:1px solid #c7d2fe;background:#f5f7ff;border-radius:8px;padding:7px 8px;font-size:11px;color:#1f2937;line-height:1.5}'
+      +'#_hasPanel .ht{font-weight:800;color:#3730a3;font-size:11.5px}#_hasPanel .hs{font-size:10px;color:#64748b;margin-bottom:4px}#_hasPanel .hr{padding:5px 0;border-top:1px dashed #dbe3ff}'
+      +'#_hasPanel .h1{display:flex;align-items:center;gap:6px}#_hasPanel .h1 b{flex:1;min-width:0;font-size:11.5px}#_hasPanel .hw{font-size:10px;color:#64748b}'
+      +'#_hasPanel .hb{flex-shrink:0;font-size:10.5px;font-weight:800;border-radius:5px;padding:1px 8px}#_hasPanel .hb.in{background:#4f46e5;color:#fff}#_hasPanel .hb.out{background:#64748b;color:#fff}#_hasPanel .hb.need{background:#f59e0b;color:#fff}'
+      +'#_hasPanel select{font-size:10.5px;padding:2px 3px;border:1px solid #c7d2fe;border-radius:5px;background:#fff;max-width:100%;margin-top:3px}#_hasPanel .h2{display:flex;flex-wrap:wrap;gap:4px;align-items:center}'
+      +'#_hasPanel .hg{font-size:9.5px;color:#6366f1}#_hasPanel .hq{margin-top:3px;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:4px 6px}#_hasPanel .hq label{display:block;font-size:10.5px;cursor:pointer}'
+      +'#_hasPanel .hf{margin-top:5px;padding-top:5px;border-top:1px solid #c7d2fe;font-weight:700;color:#0f2040}#_hasPanel a{color:#2563eb;cursor:pointer;font-size:10px;text-decoration:underline}#_hasPanel .hx{color:#b45309;font-size:10px;margin-top:3px}';
+    document.head.appendChild(st);
+    var pn=document.createElement('div'); pn.id='_hasPanel';
+    (ch.closest('.fg')||ch).insertAdjacentElement('afterend', pn);
+    pn.addEventListener('change', function(ev){
+      var t=ev.target, i=+(t.getAttribute('data-hi')||0); if(!i) return;
+      var nm=String(_mw16_val('es_a'+i+'Name')||'').trim(); if(!nm) return;
+      var o=_p16SelGet(), cur=_p16AllowInfo(i);
+      if(t.hasAttribute('data-hk')){ var k=t.value; o[nm]={k:k, h:(_P16_HKIND[k]&&_P16_HKIND[k].q&&k===cur.kind)?cur.how:''}; }
+      else if(t.hasAttribute('data-hh')){ o[nm]={k:cur.kind, h:t.value}; }
+      _p16SelSet(o); recalc();
+    });
+    pn.addEventListener('click', function(ev){ if(ev.target.closest('[data-hauto]')){ var e=g('es_calcHourly'); if(e) delete e.dataset.manualCalc; recalc(); } });
+    render(); setInterval(render, 1500);
+  }
+  function recalc(){ try{ if(typeof _p16AutoCalcHourly==='function') _p16AutoCalcHourly(true); }catch(e){} try{ if(typeof p==='function') p(); }catch(e){} render(true); }
+  var _sig='';
+  function render(force){
+    var pn=g('_hasPanel'); if(!pn) return;
+    var mo=_mw16_num('es_salaryMonthly'), dy=_mw16_num('es_salaryDaily');
+    var rows=[], sum=0, nNeed=0;
+    for(var i=1;i<=6;i++){ var nm=String(_mw16_val('es_a'+i+'Name')||'').trim(), am=_mw16_num('es_a'+i+'Amt'); if(!nm && !am) continue; rows.push({i:i,nm:nm,am:am}); }
+    var A=_p16AvgMonthHours(), mh=A.h, dh=_p16DayHours(), ch=g('es_calcHourly'), man=!!(ch&&ch.dataset.manualCalc==='1');
+    var sig=JSON.stringify([mo,dy,rows,mh,dh,_mw16_val('es_hourlyAllowSel'),man,ch&&ch.value,_mw16_val('es_monthlyDays')]);
+    if(!force && sig===_sig) return; _sig=sig;
+    if(!mo && !dy){ pn.style.display='none'; return; }   // 時給の人は使わない
+    pn.style.display='';
+    var h='<div class="ht">🧮 換算時給に入れる手当（労働基準法37条5項・施行規則21条）</div>'
+      +'<div class="hs">除けるのは ①家族 ②通勤 ③別居 ④子女教育 ⑤住宅手当 ⑥臨時のもの ⑦1か月を超えるごとのもの と割増賃金だけ。それ以外は全部入れます。①〜⑤は払い方で決まります。</div>';
+    if(!rows.length) h+='<div class="hw">手当はありません（'+(mo?'月給':'日給')+'だけで計算します）</div>';
+    rows.forEach(function(r){
+      var f=_p16AllowInfo(r.i), K=_P16_HKIND[f.kind];
+      if(f.inc && r.am) sum+=r.am; if(f.need) nNeed++;
+      var badge=f.need?'<span class="hb need">払い方を選ぶ</span>':(f.inc?'<span class="hb in">入れる</span>':'<span class="hb out">入れない</span>');
+      h+='<div class="hr"><div class="h1"><b>'+esc(r.nm||('手当'+r.i))+' <span style="font-weight:600;">'+(r.am?yen(r.am)+'円':'（金額なし）')+'</span></b>'+badge+'</div>';
+      if(r.nm){
+        h+='<div class="h2"><select data-hi="'+r.i+'" data-hk="1" title="この手当の中身（名前ではなく、払う理由で選ぶ）">'+_P16_HKORD.map(function(k){ return '<option value="'+k+'"'+(k===f.kind?' selected':'')+'>'+esc(_P16_HKIND[k].l)+'</option>'; }).join('')+'</select>'
+          +(f.guessed?'<span class="hg">名前から推測</span>':'')+'</div>';
+        if(K.q){
+          h+='<div class="hq"><div class="hw" style="color:#92400e;font-weight:700;">'+esc(K.why)+'。この会社の払い方は？</div>'
+            +'<label><input type="radio" name="_hh'+r.i+'" data-hi="'+r.i+'" data-hh="1" value="oujite"'+(f.how==='oujite'?' checked':'')+'> 人数・距離・費用などに応じて額が変わる（→ 入れない）</label>'
+            +'<label><input type="radio" name="_hh'+r.i+'" data-hi="'+r.i+'" data-hh="1" value="ichiritsu"'+(f.how==='ichiritsu'?' checked':'')+'> 人数・距離・費用に関係なく決まった額（全員同じ額など）（→ 入れる）</label></div>';
+          if(f.how) h+='<div class="hw">'+esc(f.why)+'</div>';
+        } else h+='<div class="hw">'+esc(f.why)+'</div>';
+      }
+      h+='</div>';
+    });
+    var v=_p16CalcHourlyValue();
+    if(v){
+      var hh=function(x){ return String(Math.round(x*100)/100); };
+      var div=A.year ? ' × 12 ÷ 年間の所定 '+hh(A.year)+'時間' : ' ÷ 月の所定 '+hh(mh)+'時間';
+      var f;
+      if(mo) f='（月給 '+yen(mo)+(sum?' ＋ 手当 '+yen(sum):'')+'）'+div;
+      else if(dh) f='日給 '+yen(dy)+' ÷ 1日の所定 '+hh(dh)+'時間'+(sum?' ＋ 手当 '+yen(sum)+div:'');
+      else { var md=String(_mw16_val('es_monthlyDays')).normalize('NFKC'); md=/^\d+(\.\d+)?$/.test(md)?Number(md):0; f='（日給 '+yen(dy)+'×'+md+'日'+(sum?' ＋ 手当 '+yen(sum):'')+'）'+div; }
+      h+='<div class="hf">'+f+' ＝ <span style="color:#4338ca;">'+yen(v)+'円</span>（1円未満切り捨て）</div>'
+        +'<div class="hw">割る時間は1か月平均の所定労働時間（労働基準法施行規則19条）。'+(A.year?'年間の所定労働時間 ÷ 12 で出しています。':'<b style="color:#b45309;">年間の所定労働時間が空なので、月の時間で割っています。</b>')+'</div>';
+      if(nNeed) h+='<div class="hx">⚠️ 払い方を選んでいない手当が '+nNeed+'件あります（今は入れずに計算しています）。雇用条件書・賃金規程などで確かめて選んでください。</div>';
+      if(man && _mw16_num('es_calcHourly')!==v) h+='<div class="hx">換算時給を手で入れているので、自動では変わりません。<a data-hauto="1">計算した値にする</a></div>';
+    } else h+='<div class="hw" style="margin-top:4px;">所定労働時間（年間または月）が入ると、ここに計算が出ます。</div>';
+    pn.innerHTML=h;
+  }
+  window._p16HasRender=render;
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var h=g('es_hourlyAllowSel'); if(h) h.value=''; _sig=''; } }catch(_e){} });   // 前の案件の選び方を持ち越さない（読み込みは後から非同期）
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', setup); else setup();
+})();
+function _p16CalcHourlyValue(){ var x=_p16HourlyExactCore(); return x ? Math.floor(x+1e-9) : 0; }   // ver.20261119.10: 1か月平均の所定労働時間で割る（年間÷12）
+function _p16CalcHourlyExact(){ return _p16HourlyExactCore(); }   // ver.20261117.12: 端数を丸める前の値（四捨五入で入っている値を、計算違いとみなさないため）
 function _p16AutoCalcHourly(force){
   try{
     var e=document.getElementById('es_calcHourly'); if(!e) return;
@@ -5623,7 +5769,7 @@ function _p16PrintCheck(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
-  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(ev.isTrusted && /^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|yearlyDays)$/.test(id||'')) _p16AutoCalcMonthly(true); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
+  document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(ev.isTrusted && /^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|yearlyDays)$/.test(id||'')) _p16AutoCalcMonthly(true); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|dailyHours|dailyMins|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; var c2=document.getElementById('es_calcHourly'); if(c2) delete c2.dataset.manualCalc; } }catch(_e){} });
   // ver.20261109.12: 支払方法（口座振込／通貨払）は雇用条件セットを読んだあとに決まるので、表示が合っていなければ描き直す
   function _payRefresh(){
