@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -350,6 +350,10 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
       <span class="item-icon">📄</span>
       <div>理由書（ミャンマー）<span class="item-sub">ミャンマー国籍者等の特定活動</span></div>
     </div>
+    <div class="item" id="nav-thai_furoku" onclick="open_doc('thai_furoku')">
+      <span class="item-icon">📄</span>
+      <div>雇用契約書の付録（タイ大使館）<span class="item-sub">タイ国籍者・大使館に出す書類</span></div>
+    </div>
     <div class="divider"></div>
     <div class="section">入管に出す書類</div>
     <div class="item" id="nav-shinsei_henkou" onclick="open_doc('shinsei_henkou')">
@@ -493,6 +497,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
     <iframe id="frame-iko"></iframe>
     <iframe id="frame-tk2go"></iframe>
     <iframe id="frame-myanmar"></iframe>
+    <iframe id="frame-thai_furoku"></iframe>
     <iframe id="frame-1_23"></iframe>
     <iframe id="frame-1_25"></iframe>
     <iframe id="frame-1_27"></iframe>
@@ -605,6 +610,7 @@ const docs={
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794393342'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1794393342'},
   'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1794393342'},
+  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795177104'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1794393342'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1794393342'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1794393342'},
@@ -676,6 +682,7 @@ const docs={
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794393342'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1794393342'},
   'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1794393342'},
+  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795177104'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1794393342'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1794393342'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1794393342'},
@@ -2239,6 +2246,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261120.05',
+    date: '2026-11-20',
+    notify: true,
+    items: [
+      '📄 <b>「雇用契約書の付録（タイ大使館）」をメニューに追加</b>しました（「理由書（ミャンマー）」のすぐ下）：タイ国籍の方の、タイ大使館に出す書類です（タイ語・日本語、A4 1枚）。案件を選ぶと、所属機関名・代表者の役職と氏名・外国人の氏名が自動で入ります。証人の氏名は手で入れてください（空欄なら空いたまま印刷されます）。'
+    ]
+  },
   {
     version: 'ver.20261120.03',
     date: '2026-11-20',
