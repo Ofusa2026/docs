@@ -8733,7 +8733,7 @@ function _fhBuild(es){
       var ck=s+'\u0001'+CF[i].ctx, cnth=(ccnt[ck]=(ccnt[ck]||0)); ccnt[ck]++;
       var e=LE[i];
       if(e.tagName!==f.tagName) { patches=null; return; }
-      if(patches && flat(e.outerHTML)!==flat(f.outerHTML)) patches.push({sig:s, nth:nth, ctx:CF[i].ctx, cnth:cnth, html:e.innerHTML, style:e.getAttribute('style'), cls:e.getAttribute('class'), txt:String(e.textContent||'').replace(/\s+/g,' ').trim().slice(0,80), was:String(f.textContent||'').replace(/\s+/g,' ').trim().slice(0,80)});
+      if(patches && flat(e.outerHTML)!==flat(f.outerHTML)) patches.push({sig:s, nth:nth, ctx:CF[i].ctx, cnth:cnth, html:e.innerHTML, style:e.getAttribute('style'), cls:e.getAttribute('class'), txt:String(e.textContent||'').replace(/\s+/g,' ').trim().slice(0,400), was:String(f.textContent||'').replace(/\s+/g,' ').trim().slice(0,400)});
     });
     if(!patches) return {ok:false, why:'行の種類が違う'};
     var chk=nF.cloneNode(true), bad=applyTo(chk, patches, false);
@@ -8798,6 +8798,14 @@ function _fhBuild(es){
   function ovOff(){ window._ovlActive=false; window._ovl=null; document.body.classList.remove('ov-show'); var b=document.getElementById('_ovBar'); if(b) b.remove(); document.querySelectorAll('.ov-ed').forEach(function(x){ x.classList.remove('ov-ed'); x.removeAttribute('data-ov'); }); }
   window._ovOff=ovOff;
   function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  // どこを直したかだけを出す（同じ前後を外す）
+  function dif(a, b){
+    a=String(a||''); b=String(b||''); var p=0; while(p<a.length && p<b.length && a[p]===b[p]) p++;
+    var q=0; while(q<a.length-p && q<b.length-p && a[a.length-1-q]===b[b.length-1-q]) q++;
+    var del=a.slice(p, a.length-q), add=b.slice(p, b.length-q), ctx=a.slice(Math.max(0,p-14), p).trim()||a.slice(0,14);
+    if(del.length>60) del=del.slice(0,60)+'…'; if(add.length>80) add=add.slice(0,80)+'…';
+    return {del:del.trim(), add:add.trim(), ctx:(p>14?'…':'')+ctx};
+  }
   function bar(){
     var area=document.getElementById('pageArea'); if(!area || !window._ovlActive || !window._ovl) return;
     var P=window._ovl.patches||[], bad=window._ovBad||[], b=document.getElementById('_ovBar');
@@ -8809,7 +8817,9 @@ function _fhBuild(es){
     if(open){
       h+='<div style="margin-top:6px;background:#fff;border:1px solid #ddd6fe;border-radius:6px;">'+P.map(function(pt,i){
         var ng=bad.indexOf(i)>=0;
-        return '<div style="display:flex;gap:6px;align-items:center;padding:4px 8px;border-top:'+(i?'1px dashed #ede9fe':'0')+';'+(ng?'background:#fef2f2;':'')+'"><span>'+(ng?'⚠️':'✅')+'</span><div style="flex:1;min-width:0;font-size:11.5px;">'+(i+1)+'. <span style="color:#94a3b8;text-decoration:line-through;">'+esc(pt.was)+'</span> → <b style="color:#5b21b6;">'+esc(pt.txt)+'</b>'+(ng?'<br><span style="color:#b91c1c;">元の文が変わったので当てはまりませんでした（必要なら直接編集で入れ直してください）</span>':'')+'</div>'
+        var D=dif(pt.was, pt.txt);
+        return '<div style="display:flex;gap:6px;align-items:center;padding:4px 8px;border-top:'+(i?'1px dashed #ede9fe':'0')+';'+(ng?'background:#fef2f2;':'')+'"><span>'+(ng?'⚠️':'✅')+'</span><div style="flex:1;min-width:0;font-size:11.5px;">'+(i+1)+'. <span style="color:#64748b;">「'+esc(D.ctx)+'」のところ：</span>'
+          +(D.del?'<span style="color:#94a3b8;text-decoration:line-through;">'+esc(D.del)+'</span>'+(D.add?' → ':'（消した）'):'')+(D.add?'<b style="color:#5b21b6;">'+esc(D.add)+'</b>'+(D.del?'':'（足した）'):'')+(!D.del&&!D.add?'<span style="color:#64748b;">文字の形・余白などを変えた</span>':'')+(ng?'<br><span style="color:#b91c1c;">元の文が変わったので当てはまりませんでした（必要なら直接編集で入れ直してください）</span>':'')+'</div>'
           +(ng?'':'<button type="button" data-ov-a="see" data-i="'+i+'">見る</button>')+'<button type="button" data-ov-a="del" data-i="'+i+'">消す</button></div>';
       }).join('')+'</div>';
     }
