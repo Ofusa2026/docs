@@ -1,5 +1,9 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261120.04
+ * - fix(直接編集が消える対策): 「♻️ 編集版破棄」の確認を「書類に直接打った文字は全部消えます／入力欄の値は残ります」とはっきり書く（これまでは何が消えるか分からず押されていた）
+ * - feat: 破棄したあとに「↩️ 元に戻す」を出し、破棄する前の直接編集版に戻せるようにした
+ * - change: 上の帯の「編集版破棄で最新にする」に「直接打った文字は消えます」と書き足した
  * ver.20261120.02
  * - fix(保存されない対策): 自動で訳や金額を直す処理が、手で直した欄（契約期間など）まで「直していない」扱いにしていたため、
  *   印刷前の「保存しますか？」や離れるときの警告が出ず、保存されないまま消えていた → 手で直した欄はそのまま「未保存」として残す
@@ -6214,6 +6218,7 @@ async function _htmlStoreDiscard(o){
   var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
   await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},
     body:JSON.stringify({company_id:cid, emp_set_uid:st.uid, emp_set_idx:idx, set_name:st.setName, doc_file:doc, case_id:caseId, html:'', discarded:true, saved_by:by})});
+  try{ if(!window._docCheckMode) _discardUndoBanner({cid:cid, uid:st.uid, idx:idx, setName:st.setName, doc:doc, caseId:caseId}); }catch(_ub){}   // ver.20261120.04
   delete window._htmlStoreLast[cid+'|'+idx+'|'+doc];
   window._htmlStoreDraft=null;
   return true;
@@ -6318,6 +6323,51 @@ async function _verifyEmpSaved(expect){
   try{ window._sDirty=true; if(typeof window._sDirtyNotify==='function') window._sDirtyNotify(true); }catch(_d){}
   try{ if(window._empBaseline){ bad.forEach(function(b){ var fk=(typeof dbKeyToForm==='function')?(dbKeyToForm(b.k)||b.k):b.k; var id='es_'+fk; if(document.getElementById(id)){ window._empBaseline[id]='\u0000'; } }); } }catch(_b){}
   alert('⛔ 保存できていない項目があります（DBを読み直して確認しました）\n\n'+lines.join('\n')+(bad.length>12?'\nほか '+(bad.length-12)+' か所':'')+'\n\nもう一度「💾 DB保存」を押してください。直らないときは、この画面のまま管理部に知らせてください。');
+}
+
+/* ver.20261120.04: 「♻️ 編集版破棄」で直接打った文字が黙って消えていた対策。
+   ・破棄の確認で、書類に直接打った文字が消えることをはっきり見せる
+   ・破棄したあとも「↩️ 元に戻す」で、破棄する前の直接編集版に戻せる（受け皿の履歴から） */
+(function(){
+  if(window.__discardConfirmOn) return; window.__discardConfirmOn=true;
+  var DISCARD_MSG='保存済みの直接編集版を破棄して、初期表示に戻します。よろしいですか？';
+  var _oc=window.confirm.bind(window);
+  window.confirm=function(msg){
+    try{
+      if(String(msg)===DISCARD_MSG){
+        try{ if(typeof _reconcileBindEdits==='function') _reconcileBindEdits(); }catch(_rb){}   // 変数欄に打った値は入力欄へ移して残す
+        // 破棄する前の版は受け皿（saysay_html_store）に残っているので、破棄のあと「↩️ 元に戻す」で戻せる
+        return _oc('⚠️ 編集版を破棄すると、書類に直接打った文字（書き足した行・言い回しの直しなど）は全部消えて、最新の案シス・Saysayの内容で作り直します。\n入力欄の値（契約期間・金額・名前など）は残ります。\n\n破棄しますか？\n（間違えたときは、すぐ下に出る「↩️ 元に戻す」で戻せます）');
+      }
+    }catch(e){}
+    return _oc(msg);
+  };
+})();
+function _discardUndoBanner(o){
+  try{
+    var old=document.getElementById('_undoDiscard'); if(old) old.remove();
+    var b=document.createElement('div'); b.id='_undoDiscard'; b.className='no-print';
+    b.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99995;background:#1e293b;color:#fff;border-radius:10px;padding:10px 14px;font:13px/1.5 sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.35);display:flex;gap:12px;align-items:center;';
+    b.innerHTML='<span>♻️ 編集版を破棄しました</span><button type="button" style="border:none;background:#f59e0b;color:#1e293b;font-weight:800;border-radius:7px;padding:5px 12px;cursor:pointer;">↩️ 元に戻す</button><button type="button" title="閉じる" style="border:none;background:transparent;color:#cbd5e1;font-size:16px;cursor:pointer;">×</button>';
+    document.body.appendChild(b);
+    var bs=b.querySelectorAll('button');
+    bs[1].onclick=function(){ b.remove(); };
+    bs[0].onclick=async function(){
+      bs[0].disabled=true; bs[0].textContent='戻しています…';
+      try{
+        var rows=await sb('saysay_html_store?select=html,font_size,case_id&company_id=eq.'+encodeURIComponent(o.cid)+'&emp_set_uid=eq.'+encodeURIComponent(o.uid)+'&doc_file=eq.'+encodeURIComponent(o.doc)+'&discarded=eq.false&html=neq.&order=saved_at.desc&limit=1');
+        var r=rows&&rows[0]; if(!r || !r.html){ alert('戻せる直接編集版が見つかりませんでした。'); b.remove(); return; }
+        var by=''; try{ by=(typeof _slogUser==='function')?_slogUser():''; }catch(_u){}
+        await sb('saysay_html_store',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({company_id:o.cid, emp_set_uid:o.uid, emp_set_idx:o.idx, set_name:o.setName, doc_file:o.doc, case_id:o.caseId||r.case_id, html:r.html, font_size:r.font_size, saved_by:by})});
+        window._editedRestoredAt=0;
+        var ok=await _htmlStoreRestore(window._lastCaseInfo||{caseId:o.caseId, companyId:o.cid});
+        try{ if(typeof slog==='function') slog('discard_undo',{meta:{ok:!!ok}}); }catch(_l){}
+        if(typeof showToast==='function') showToast(ok?'↩️ 破棄する前の直接編集版に戻しました':'↩️ 戻しました。書類を開き直してください');
+      }catch(e){ console.warn('[破棄の取り消し]', e); alert('元に戻せませんでした: '+(e&&e.message||e)); }
+      b.remove();
+    };
+    setTimeout(function(){ try{ b.remove(); }catch(_e){} }, 60000);
+  }catch(e){}
 }
 
 // 書類独自の保存（1-6号の saveForm 等）・破棄にも受け皿の保存／破棄を付ける
@@ -8027,7 +8077,7 @@ function ofusaFmtZip(z){ var d=String(z==null?'':z).normalize('NFKC').replace(/[
         b=document.createElement('div'); b.id='_edBanner'; b.className='no-print';
         b.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99990;background:#fff7ed;border:1px solid #fb923c;color:#7c2d12;border-radius:10px;padding:8px 12px;font:13px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;gap:10px;align-items:center;max-width:94vw;';
         b.innerHTML='<span>✏️ この書類は<b>直接編集版</b>です。保存したときの中身のままで、あとの修正（案シス・Saysay）は出ません。</span>'
-          +'<button type="button" style="border:none;background:#ea580c;color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;cursor:pointer;white-space:nowrap;" onclick="window._edBannerDiscard()">♻️ 編集版破棄で最新にする</button>'
+          +'<button type="button" style="border:none;background:#ea580c;color:#fff;border-radius:7px;padding:5px 10px;font-weight:700;cursor:pointer;white-space:nowrap;" onclick="window._edBannerDiscard()" title="書類に直接打った文字は消えます（破棄のあと「↩️ 元に戻す」で戻せます）">♻️ 編集版破棄で最新にする（直接打った文字は消えます）</button>'
           +'<button type="button" title="閉じる" style="border:none;background:transparent;color:#9a3412;font-size:16px;cursor:pointer;" onclick="this.parentNode.style.display=\'none\';window._edBannerHidden=true;">×</button>';
         document.body.appendChild(b);
         if(!document.getElementById('_edBannerCss')){ var st=document.createElement('style'); st.id='_edBannerCss'; st.textContent='@media print{#_edBanner{display:none!important}}'; document.head.appendChild(st); }
