@@ -8633,3 +8633,276 @@ function _fhBuild(es){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
   window.addEventListener('load', wrap);
 })();
+
+/* ===== ver.20261120.07: 1-6号の直接編集を「手直しの上書き」にする（まずは1-6号だけ・全言語） =====
+   これまで：直接編集で保存すると、その時点の書類が丸ごと固まり、案シスやSaysayのあとの修正（文・書類の形）が出なかった。
+   これから：書類は毎回最新のデータとひな形から作り、そのうえに「手で直した行」だけを重ねる。
+   しくみ：
+   ・直接編集版を保存したとき（今までどおり固まった版も保存する＝古い画面・失敗したときの控え）、
+     同じデータで作り直した最新の書類と比べて、違う行だけを「手直し」として「<書類>__ovl」に保存する。
+     手直しを重ねると保存した書類とぴったり同じになるときだけ使う（違うとき＝表の形を変えた等は今までどおり固まった版）
+   ・開いたとき、固まった版と同じときに保存した手直しがあれば、最新の書類＋手直しで出す
+   ・元の行が変わって当てはまらない手直しは ⚠️ で知らせる（黙って消さない）。［固まった版で開く］でいつでも今までの表示に戻せる */
+(function(){
+  if(!/(^|\/)1_6(_[a-z]{2})?\.html$/.test(location.pathname)) return;
+  var BLK={DIV:1,P:1,TD:1,TH:1,LI:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,TR:1,TABLE:1,TBODY:1,THEAD:1,UL:1,OL:1};
+  var SUFFIX='__ovl';
+  function edKey(){ return ((location.pathname.split('/').pop()||'1_6').replace(/\.html.*$/,'')) || '1_6'; }
+  function cleanClass(el){
+    var c=el.getAttribute('class'); if(c==null) return;
+    var t=c.split(/\s+/).filter(function(x){ return x && !/^(doc-editable|wl-mark|ov-ed|ov-flash|edit-mode)$/.test(x) && !/^__/.test(x); });
+    if(t.length) el.setAttribute('class', t.join(' ')); else el.removeAttribute('class');
+  }
+  var _sd=document.createElement('div');
+  function cleanStyle(el){
+    var s=el.getAttribute('style'); if(s==null) return;
+    // 書き方の違い（#333 と rgb(51,51,51) など）をそろえ、画面だけの印・あとから自動で足す指定（改ページ・折り返し）は比べない
+    _sd.style.cssText=s; var out=[];
+    for(var i=0;i<_sd.style.length;i++){ var k=_sd.style[i]; if(/^(outline|outline-|zoom|break-inside|page-break-inside|white-space|transition)/.test(k)) continue; out.push(k+':'+_sd.style.getPropertyValue(k)); }
+    out.sort();
+    if(out.length) el.setAttribute('style', out.join(';')); else el.removeAttribute('style');
+  }
+  // 比べるための形：変数欄（data-bind）の中身と、画面だけの印（編集中・ハイライトなど）を外す
+  function norm(root){
+    var c=root.cloneNode(true);
+    c.querySelectorAll('[data-bind]').forEach(function(sp){ sp.innerHTML=''; sp.removeAttribute('style'); });
+    c.querySelectorAll('#_ovBar').forEach(function(x){ x.remove(); });
+    [c].concat([].slice.call(c.querySelectorAll('*'))).forEach(function(el){
+      ['contenteditable','spellcheck','data-ov'].forEach(function(a){ el.removeAttribute(a); });
+      cleanClass(el); cleanStyle(el);
+    });
+    return c;
+  }
+  function flat(h){ return String(h||'').replace(/>\s+</g,'><').replace(/\s+/g,' ').trim(); }
+  function isLeaf(el){ if(!BLK[el.tagName]) return false; var d=el.querySelectorAll('*'); for(var i=0;i<d.length;i++){ if(BLK[d[i].tagName]) return false; } return true; }
+  function leaves(root){ return [].slice.call(root.querySelectorAll('.doc *')).filter(isLeaf); }
+  function sigOf(el){
+    var c=el.cloneNode(true);
+    c.querySelectorAll('[data-bind]').forEach(function(sp){ sp.replaceWith(document.createTextNode('{'+sp.getAttribute('data-bind')+'}')); });
+    return el.tagName+':'+String(c.textContent||'').replace(/\s+/g,' ').trim();
+  }
+  function attrsOf(el){ return {style:el.getAttribute('style'), cls:el.getAttribute('class')}; }
+  // 手直しを当てる。返り値：当てはまらなかった手直し
+  // 行の前の「文のある行」（空の行・短い行でも場所を取り違えないための目印）
+  function ctxList(L, live){
+    var out=[], last='';
+    L.forEach(function(el){ var s=sigOf(live?norm(el):el); out.push({el:el, sig:s, ctx:last}); if(s.replace(/^[A-Z0-9]+:/,'').length>=4) last=s; });
+    return out;
+  }
+  function applyTo(root, patches, live){
+    var C=ctxList(leaves(root), live), bad=[];
+    patches.forEach(function(pt, i){
+      var arr=C.filter(function(x){ return x.sig===pt.sig; }), el=null;
+      if(pt.ctx!=null){
+        var withCtx=arr.filter(function(x){ return x.ctx===pt.ctx; });
+        if(withCtx.length) el=(withCtx[pt.cnth||0]||withCtx[0]).el;
+        else if(arr.length===1) el=arr[0].el;
+      } else { el=(arr[pt.nth]||(arr.length===1?arr[0]:null)||{}).el||null; }
+      if(!el){ bad.push(i); return; }
+      el.innerHTML=pt.html;
+      if(pt.style==null) el.removeAttribute('style'); else el.setAttribute('style', pt.style);
+      if(!live){ if(pt.cls==null) el.removeAttribute('class'); else el.setAttribute('class', pt.cls); }
+      else { if(pt.cls!=null){ var keep=(el.getAttribute('class')||''); el.setAttribute('class', pt.cls); } el.classList.add('ov-ed'); el.setAttribute('data-ov', String(i)); }
+    });
+    return bad;
+  }
+  // 同じデータで、最新の書類を画面の外に作る（本物の書類はさわらない）
+  function renderFresh(){
+    var real=document.getElementById('pageArea'); if(!real || typeof window._ovOrigP!=='function') return null;
+    var tmp=document.createElement('div'); tmp.className=(real.className||'').replace(/\bedit-mode\b/g,'');
+    tmp.style.cssText='position:absolute;left:-30000px;top:0;width:'+(real.offsetWidth||900)+'px;visibility:hidden;pointer-events:none;';
+    var fr=window._htmlFrozen, out=null;
+    real.id='pageArea__ovReal'; tmp.id='pageArea'; (real.parentNode||document.body).appendChild(tmp);
+    try{
+      window._htmlFrozen=false; window._ovRendering=true;
+      window._ovOrigP();
+      out=tmp.cloneNode(true);
+    }catch(e){ console.warn('[手直し] 作り直しに失敗', e); out=null; }
+    finally{ window._ovRendering=false; window._htmlFrozen=fr; tmp.remove(); real.id='pageArea'; }
+    return out;
+  }
+  // 保存した直接編集版から、手直しを取り出す（重ねるとぴったり同じになるときだけ返す）
+  function buildOverlay(){
+    var area=document.getElementById('pageArea'); if(!area) return null;
+    var F=renderFresh(); if(!F) return null;
+    var nE=norm(area), nF=norm(F), LE=leaves(nE), LF=leaves(nF);
+    if(LE.length!==LF.length) return {ok:false, why:'行の数が違う（表や行を足した・消した）'};
+    var cnt={}, ccnt={}, patches=[], CF=ctxList(LF, false);
+    LF.forEach(function(f, i){
+      var s=CF[i].sig, nth=(cnt[s]=(cnt[s]||0)); cnt[s]++;
+      var ck=s+'\u0001'+CF[i].ctx, cnth=(ccnt[ck]=(ccnt[ck]||0)); ccnt[ck]++;
+      var e=LE[i];
+      if(e.tagName!==f.tagName) { patches=null; return; }
+      if(patches && flat(e.outerHTML)!==flat(f.outerHTML)) patches.push({sig:s, nth:nth, ctx:CF[i].ctx, cnth:cnth, html:e.innerHTML, style:e.getAttribute('style'), cls:e.getAttribute('class'), txt:String(e.textContent||'').replace(/\s+/g,' ').trim().slice(0,80), was:String(f.textContent||'').replace(/\s+/g,' ').trim().slice(0,80)});
+    });
+    if(!patches) return {ok:false, why:'行の種類が違う'};
+    var chk=nF.cloneNode(true), bad=applyTo(chk, patches, false);
+    if(bad.length) return {ok:false, why:'当てはまらない手直しがある'};
+    if(flat(chk.innerHTML)!==flat(nE.innerHTML)) return {ok:false, why:'行の外（表の形・余白など）も変わっている'};
+    return {ok:true, patches:patches};
+  }
+  window._ovBuild=buildOverlay;
+  function ctx(){ var i=window._lastCaseInfo||{}; return {caseId:i.caseId||'', companyId:i.companyId||''}; }
+  async function coId(c){ if(c.companyId) return c.companyId; try{ var q=await _ovOrigSb('cases?select=company_id&id=eq.'+encodeURIComponent(c.caseId)); return q&&q[0]&&q[0].company_id||''; }catch(e){ return ''; } }
+  async function saveOv(doc, caseId, companyId, legacyAt){
+    var r=buildOverlay(); var key=doc+SUFFIX;
+    if(!r || !r.ok){
+      try{ await _ovOrigSb('rpc/del_edited_html',{method:'POST',body:JSON.stringify({p_company_id:String(companyId),p_doc:key,p_case_id:String(caseId)})}); }catch(_d){}
+      console.log('[手直し] 固まった版のまま', r&&r.why); return;
+    }
+    var body={v:1, legacyAt:legacyAt, patches:r.patches};
+    await _ovOrigSb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:String(companyId),p_doc:key,p_case_id:String(caseId),p_html:JSON.stringify(body),p_saved_at:legacyAt,p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
+    console.log('[手直し] 保存', r.patches.length, 'か所');
+  }
+  // 直接編集版の保存・破棄に合わせて、手直しも保存・破棄する
+  if(typeof sb==='function' && !window._ovOrigSb){
+    window._ovOrigSb=sb;
+    window.sb=sb=async function(path, opts){
+      var res=await window._ovOrigSb(path, opts);
+      try{
+        if(path==='rpc/set_edited_html' || path==='rpc/del_edited_html'){
+          var b=JSON.parse((opts&&opts.body)||'{}'), d=String(b.p_doc||'');
+          if(/^1_6(_[a-z]{2})?$/.test(d)){
+            if(path==='rpc/del_edited_html'){ window._ovOrigSb('rpc/del_edited_html',{method:'POST',body:JSON.stringify({p_company_id:b.p_company_id,p_doc:d+SUFFIX,p_case_id:b.p_case_id})}).catch(function(){}); ovOff(); }
+            else if(!(typeof _editMode!=='undefined' && _editMode) && !window._autosaving){
+              setTimeout(function(){ saveOv(d, b.p_case_id, b.p_company_id, b.p_saved_at).catch(function(e){ console.warn('[手直し] 保存に失敗', e); }); }, 0);
+            }
+          }
+        }
+      }catch(_e){ console.warn('[手直し]', _e); }
+      return res;
+    };
+  }
+  var _ovOrigSb=function(){ return window._ovOrigSb.apply(this, arguments); };
+  // 書類を作るたびに手直しを重ねる
+  function hookP(){
+    if(typeof window.p!=='function' || window._ovPDone) return;
+    window._ovPDone=true;
+    var origP=window.p; window._ovOrigP=origP;   // 手直しを重ねる前の作り方（画面の外で最新の書類を作るときに使う）
+    var w=function(){
+      var r=origP.apply(this, arguments);
+      try{ if(window._ovlActive && !window._ovRendering && !(typeof _editMode!=='undefined'&&_editMode) && !window._htmlFrozen) ovApply(); }catch(e){ console.warn('[手直し] 重ねるのに失敗', e); }
+      return r;
+    };
+    w._ov=true; window.p=w;
+  }
+  function ovApply(){
+    var area=document.getElementById('pageArea'); if(!area || !window._ovl) return;
+    var bad=applyTo(area, window._ovl.patches||[], true);
+    window._ovBad=bad;
+    try{ if(typeof applyBindings==='function') applyBindings(); }catch(_a){}
+    try{ if(typeof applyMoneyFormatting==='function') applyMoneyFormatting(); }catch(_m){}
+    try{ if(typeof _applyFontSize==='function') _applyFontSize(); }catch(_f){}
+    bar();
+  }
+  function ovOff(){ window._ovlActive=false; window._ovl=null; document.body.classList.remove('ov-show'); var b=document.getElementById('_ovBar'); if(b) b.remove(); document.querySelectorAll('.ov-ed').forEach(function(x){ x.classList.remove('ov-ed'); x.removeAttribute('data-ov'); }); }
+  window._ovOff=ovOff;
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function bar(){
+    var area=document.getElementById('pageArea'); if(!area || !window._ovlActive || !window._ovl) return;
+    var P=window._ovl.patches||[], bad=window._ovBad||[], b=document.getElementById('_ovBar');
+    if(!b){ b=document.createElement('div'); b.id='_ovBar'; area.parentNode.insertBefore(b, area); }
+    var open=b.getAttribute('data-open')==='1';
+    var h='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">✏️ <b>最新の書類</b>に、手で直した<b>'+P.length+'か所</b>を重ねています。案シス・Saysayの修正もそのまま出ます。'
+      +(bad.length?'<span style="color:#b91c1c;font-weight:800;">⚠️ '+bad.length+'か所は当てはまりませんでした</span>':'')
+      +'<button type="button" data-ov-a="list">'+(open?'▲ 閉じる':'▼ 手直しを見る')+'</button><button type="button" data-ov-a="legacy" title="今までどおり、保存したときの書類のまま出します">固まった版で開く</button></div>';
+    if(open){
+      h+='<div style="margin-top:6px;background:#fff;border:1px solid #ddd6fe;border-radius:6px;">'+P.map(function(pt,i){
+        var ng=bad.indexOf(i)>=0;
+        return '<div style="display:flex;gap:6px;align-items:center;padding:4px 8px;border-top:'+(i?'1px dashed #ede9fe':'0')+';'+(ng?'background:#fef2f2;':'')+'"><span>'+(ng?'⚠️':'✅')+'</span><div style="flex:1;min-width:0;font-size:11.5px;">'+(i+1)+'. <span style="color:#94a3b8;text-decoration:line-through;">'+esc(pt.was)+'</span> → <b style="color:#5b21b6;">'+esc(pt.txt)+'</b>'+(ng?'<br><span style="color:#b91c1c;">元の文が変わったので当てはまりませんでした（必要なら直接編集で入れ直してください）</span>':'')+'</div>'
+          +(ng?'':'<button type="button" data-ov-a="see" data-i="'+i+'">見る</button>')+'<button type="button" data-ov-a="del" data-i="'+i+'">消す</button></div>';
+      }).join('')+'</div>';
+    }
+    b.innerHTML=h;
+    b.style.cssText='margin:6px 10px;padding:7px 10px;border:1px solid #c4b5fd;background:#f5f3ff;color:#4c1d95;border-radius:8px;font-size:12px;line-height:1.6;font-family:sans-serif;';
+    b.querySelectorAll('button').forEach(function(x){ x.style.cssText='font-size:11px;padding:2px 8px;border:1px solid #c4b5fd;background:#fff;color:#5b21b6;border-radius:5px;cursor:pointer;font-weight:700;'; });
+    if(!b._wired){ b._wired=true; b.addEventListener('click', onBar); }
+  }
+  async function persist(){
+    var c=ctx(); if(!c.caseId) return;
+    var cid=await coId(c); if(!cid) return;
+    var area=document.getElementById('pageArea'); var at=new Date().toISOString(), d=edKey();
+    var html=(typeof getBindResetHtml==='function'?getBindResetHtml():area.innerHTML);
+    await window._ovOrigSb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:cid,p_doc:d,p_case_id:c.caseId,p_html:html,p_saved_at:at,p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
+    var body={v:1, legacyAt:at, patches:window._ovl.patches};
+    await window._ovOrigSb('rpc/set_edited_html',{method:'POST',body:JSON.stringify({p_company_id:cid,p_doc:d+SUFFIX,p_case_id:c.caseId,p_html:JSON.stringify(body),p_saved_at:at,p_saved_by:(typeof _currentUserId==='function'?_currentUserId():'')})});
+  }
+  async function onBar(ev){
+    var t=ev.target.closest('[data-ov-a]'); if(!t) return; var a=t.getAttribute('data-ov-a'), b=document.getElementById('_ovBar');
+    if(a==='list'){ var op=b.getAttribute('data-open')!=='1'; b.setAttribute('data-open', op?'1':'0'); document.body.classList.toggle('ov-show', op); bar(); return; }
+    if(a==='see'){ var el=document.querySelector('#pageArea [data-ov="'+t.getAttribute('data-i')+'"]'); if(el){ el.scrollIntoView({block:'center',behavior:'smooth'}); el.classList.add('ov-flash'); setTimeout(function(){ el.classList.remove('ov-flash'); }, 1600); } return; }
+    if(a==='del'){
+      var i=+t.getAttribute('data-i'); if(!confirm('この手直しを消して、最新の書類の文に戻します。よろしいですか？')) return;
+      window._ovl.patches.splice(i,1);
+      if(typeof p==='function') p();
+      try{ await persist(); if(typeof showToast==='function') showToast('✅ 手直しを消して保存しました'); }catch(e){ console.warn(e); if(typeof showToast==='function') showToast('⚠️ 保存に失敗しました。もう一度お試しください'); }
+      if(!window._ovl.patches.length) ovOff();
+      return;
+    }
+    if(a==='legacy'){
+      if(!window._ovLegacyHtml) return;
+      var area=document.getElementById('pageArea'); ovOff();
+      area.innerHTML=window._ovLegacyHtml; window._htmlFrozen=true; window._editedRestored=true;
+      try{ if(typeof applyBindings==='function') applyBindings(); }catch(_a){}
+      try{ if(typeof _staleEditedCheck==='function') _staleEditedCheck(); }catch(_s){}
+      if(typeof showToast==='function') showToast('📝 保存したときの書類（固まった版）で開きました');
+    }
+  }
+  // 開いたとき：固まった版を呼び戻したあと、同じときに保存した手直しがあれば、最新の書類＋手直しに切り替える
+  function hookRestore(){
+    if(typeof window._htmlStoreRestore!=='function' || window._ovRDone) return;
+    window._ovRDone=true;
+    var orig=window._htmlStoreRestore;
+    var w=async function(info){
+      var r=await orig.apply(this, arguments);
+      try{
+        if(window._editedRestored && window._htmlFrozen){
+          var c=ctx(); info=info||{}; c.caseId=info.caseId||c.caseId; c.companyId=info.companyId||c.companyId;
+          var cid=await coId(c), d=edKey();
+          if(cid && c.caseId){
+            var m=await _getEditedHtml(cid, d+SUFFIX, c.caseId), row=m&&m[d+SUFFIX]&&m[d+SUFFIX][c.caseId];
+            var ov=null; try{ ov=row&&row.html?JSON.parse(row.html):null; }catch(_j){ ov=null; }
+            var same=false;
+            if(ov && ov.v===1 && Array.isArray(ov.patches)){
+              if(r!==true) same=(Date.parse(ov.legacyAt)||-1)===window._editedRestoredAt;
+              else {
+                // 雇用条件の受け皿から呼び戻したとき：同じときに保存した固まった版と中身が同じなら使う
+                var lg=await _getEditedHtml(cid, d, c.caseId), lr=lg&&lg[d]&&lg[d][c.caseId];
+                if(lr && lr.html && (Date.parse(lr._savedAt)||-1)===(Date.parse(ov.legacyAt)||-2)){
+                  var tmp=document.createElement('div'); tmp.innerHTML=lr.html;
+                  var cur=document.createElement('div'); cur.innerHTML=(typeof getBindResetHtml==='function'?getBindResetHtml():document.getElementById('pageArea').innerHTML);
+                  same=flat(norm(tmp).innerHTML)===flat(norm(cur).innerHTML);
+                }
+              }
+            }
+            if(same){
+              var area=document.getElementById('pageArea');
+              window._ovLegacyHtml=area.innerHTML;
+              window._ovl=ov; window._ovlActive=true; window._htmlFrozen=false; window._editedRestored=false;
+              try{ if(typeof _structNoticeHide==='function') _structNoticeHide(); }catch(_s){}
+              if(typeof p==='function') p();
+              if(typeof showToast==='function') showToast('✏️ 最新の書類に、手直し'+ov.patches.length+'か所を重ねました');
+            }
+          }
+        }
+      }catch(e){ console.warn('[手直し] 読み込みに失敗（固まった版のまま）', e); }
+      return r;
+    };
+    w._ov=true; window._htmlStoreRestore=w;
+  }
+  function hookEdit(){
+    if(typeof window.toggleEditMode!=='function' || window._ovEDone) return;
+    window._ovEDone=true;
+    var orig=window.toggleEditMode;
+    var w=function(){ if(!(typeof _editMode!=='undefined'&&_editMode) && window._ovlActive){ ovOff(); } return orig.apply(this, arguments); };
+    w._ov=true; window.toggleEditMode=w;
+  }
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') ovOff(); }catch(_e){} });
+  var st=document.createElement('style');
+  // 手直しの点線は「手直しを見る」を開いているときだけ（まとめPDFなどの画像に点線が写らないように）
+  st.textContent='body.ov-show #pageArea .ov-ed{outline:1.5px dashed #a78bfa;outline-offset:1px;}#pageArea .ov-flash{background:#ede9fe !important;outline:2px solid #7c3aed !important;transition:background .3s;}@media print{#pageArea .ov-ed{outline:none !important;}#_ovBar{display:none !important;}}';
+  (document.head||document.documentElement).appendChild(st);
+  function hookAll(){ hookP(); hookRestore(); hookEdit(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', hookAll); else hookAll();
+  window.addEventListener('load', hookAll);
+})();
