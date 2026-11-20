@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 雇用契約書の付録（บันทึกแนบท้ายสัญญาจ้าง）タイ王国大使館 労働担当事務所の様式。
+     文はタイ大使館のWord（タイ語・日本語併記・1ページ）から。所属機関・外国人・証人が署名する。 -->
+<title>雇用契約書の付録（タイ大使館）</title>
+<style>.fp-case{display:none!important;}</style>
+<link rel="stylesheet" href="ofusa_common.css?v=1784720412">
+<style>
+.doc{padding:20mm 22mm 15mm 22mm!important;min-height:1123px!important;}
+.doc .bd,.doc .bd *{font-family:'MS Mincho','ＭＳ 明朝','Yu Mincho','Hiragino Mincho ProN','Noto Serif CJK JP',serif!important;}
+.doc .bd{line-height:1.5;}
+.doc .bd .th,.doc .bd .th *{font-family:'Noto Sans Thai','Noto Serif Thai','Angsana New','Cordia New',Tahoma,sans-serif!important;}
+.doc .bd .th{font-size:13pt;line-height:1.75;}
+.doc .bd .jp{font-size:10.5pt;line-height:1.6;}
+.doc .bd .gap{height:10pt;}
+.doc .bd .ul{display:inline-block;min-width:50mm;border-bottom:1px solid #000;padding:0 2mm;}
+.doc .bd .sg{display:grid;grid-template-columns:64mm 1fr 8mm;column-gap:3mm;align-items:end;margin-top:12pt;}
+.doc .bd .sg .ln{border-bottom:1px solid #000;height:18pt;}
+.doc .bd .sg .pr{text-align:center;font-size:11pt;}
+.c{text-align:center;}
+@media print{
+  .app-bar,.fp{display:none!important}
+  .main{display:block!important}
+  .doc{box-shadow:none!important;margin:0!important;padding:20mm 22mm 15mm 22mm!important;}
+  @page{size:A4;margin:0}
+  .f[style*="color:#aaa"]{visibility:hidden}
+  .doc{zoom:1!important}
+}
+</style>
+</head>
+<body>
+<div class="app-bar">
+  <div>
+    <div class="app-bar-title">📄 雇用契約書の付録（タイ大使館）</div>
+    <div class="ver">ver.20261120.01</div>
+  </div>
+  <div class="bar-btns">
+    <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
+    <button class="btn" id="styleModeBtn" onclick="toggleStyleMode()" style="background:#0f766e;color:white;">🎨 スタイル編集</button>
+    <button class="btn" onclick="saveFormGeneric('thai_furoku')" style="background:#16a34a;color:white;">🛢 DB保存</button>
+    <button class="btn" onclick="saveEditedHTML()" style="background:#0369a1;color:white;">📥 編集保存</button>
+    <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button>
+    <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
+  </div>
+</div>
+<div class="main">
+<div class="fp">
+  <div class="fp-case">
+    <label>登録支援機関</label><select id="filterOrg" onchange="filterCases()"></select>
+    <label>所属機関</label><select id="filterCompany" onchange="filterCases()"></select>
+    <label>検索</label><input id="filterText" oninput="filterCases()" placeholder="名前で絞り込み">
+    <label>案件選択 <span id="caseCount" style="color:#888;font-weight:normal;font-size:9px;"></span></label>
+    <select id="caseSelect" onchange="loadFromDB()"></select>
+  </div>
+  <div class="fp-inner">
+    <div class="fs"><div class="fs-title">特定技能所属機関</div>
+      <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
+      <div class="fg"><label>代表者の役職</label><input id="f_repTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者の氏名</label><input id="f_repName" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">外国人特定技能</div>
+      <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
+    </div>
+    <div class="fs"><div class="fs-title">証人</div>
+      <div style="font-size:10px;color:#888;line-height:1.5;margin:2px 0 4px;">空欄のままなら、かっこの中は空いたまま印刷されます。署名・押印は手で書きます。</div>
+      <div class="fg"><label>証人の氏名</label><input id="f_witness" oninput="p()"></div>
+    </div>
+  </div>
+</div>
+<div class="pp">
+  <div class="page-nav">
+    <span class="page-nav-label">ページ:</span>
+    <button class="pn-btn pn-btn-page active" onclick="scrollToPage(1)">P1</button>
+    <span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5);p()" style="padding:2px 7px;">A-</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0);_fontSize=12;p()" style="padding:2px 7px;" id="fontSizeLabel">12pt</button>
+    <button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5);p()" style="padding:2px 7px;">A+</button>
+  </div>
+  <div id="pageArea"></div>
+</div>
+</div>
+<script src="ofusa_common.js?v=2611201650"></script>
+<script>
+function _rep(){
+  const t=String(v('f_repTitle')||'').trim(), n=String(v('f_repName')||'').trim();
+  return [String(v('f_company')||'').trim(), [t,n].filter(Boolean).join('　')].filter(Boolean).join('　');
+}
+function _par(txt){ return txt?`（　${txt}　）`:'（　　　　　　　　　　　　　　　　　　）'; }
+function p(){
+  if(_editMode) return;
+  const w=document.getElementById('pageArea'); if(!w) return;
+  w.innerHTML=`
+<div class="doc">
+<div class="page-num-label">P1</div>
+<div class="bd" style="font-size:12pt;">
+<div class="c th" style="font-size:16pt;">บันทึกแนบท้ายสัญญาจ้าง</div>
+<div class="c" style="font-size:16pt;">雇用契約書の付録</div>
+<div class="gap"></div><div class="gap"></div>
+<div class="th">องค์กรที่แรงงานที่มีทักษะเฉพาะสังกัด　<span class="ul">${f('f_company')}</span></div>
+<div class="jp">特定技能所属機関は、</div>
+<div class="th">มีหน้าที่รับผิดชอบแรงงานต่างชาติที่มีทักษะเฉพาะ　<span class="ul">${f('f_applicant')}</span></div>
+<div class="th">ดังหัวข้อระบุต่อไปนี้</div>
+<div class="jp">外国人特定技能に対して下記に関する責任を持つ。</div>
+<div class="gap"></div>
+<div class="th">1. ในกรณีที่มีภัยพิบัติทางธรรมชาติองค์กรที่แรงงานที่มีทักษะเฉพาะจะต้องจัดการอพยพแรงงานต่างชาติไปอยู่ในสถานที่ที่ปลอดภัย และหากอยู่ในสภาวะที่ไม่สามารถทำงานได้อีกต่อไป ให้องค์กรที่แรงงานที่มีทักษะเฉพาะจัดการจัดส่งแรงงานต่างชาติกลับประเทศไทยโดยออกค่าใช้จ่ายให้ด้วย</div>
+<div class="jp">1. 天災があった場合、特定技能所属機関は外国人特定技能を安全な場所に避難させなければならない。就労を継続できない状況、特定技能所属機関は外国人特定技能をタイへ帰国させる手続きをし、その費用を支払わねばならない。</div>
+<div class="gap"></div>
+<div class="th">2. กรณีแรงงานต่างชาติถึงแก่ความตาย องค์กรที่แรงงานที่มีทักษะเฉพาะต้องรับผิดชอบค่าใช้จ่ายในการจัดการศพ จัดส่งอัฐิและทรัพย์สิน ของแรงงานต่างชาติกลับภูมิลำเนา</div>
+<div class="jp">2. 外国人特定技能が死亡した場合、特定技能所属機関は外国人特定技能の葬儀を行い、遺骨、遺留品をタイ国本籍地まで送る費用を負担しなければならない。</div>
+<div class="gap"></div><div class="gap"></div>
+<div class="sg"><div>特定技能所属機関<br><span class="th" style="font-size:11.5pt;">องค์กรที่แรงงานที่มีทักษะเฉพาะสังกัด</span></div><div class="ln"></div><div>㊞</div></div>
+<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(_rep())}</div><div></div></div>
+<div class="sg"><div>外国人特定技能<br><span class="th" style="font-size:11.5pt;">แรงงานต่างชาติ</span></div><div class="ln"></div><div></div></div>
+<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(String(v('f_applicant')||'').trim())}</div><div></div></div>
+<div class="sg"><div>証人<br><span class="th" style="font-size:11.5pt;">พยาน</span></div><div class="ln"></div><div>㊞</div></div>
+<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(String(v('f_witness')||'').trim())}</div><div></div></div>
+</div>
+</div>`;
+  _fontSize = (_fontSize === 8.5) ? 12 : _fontSize;
+  _applyFontSize();
+  const lbl=document.getElementById('fontSizeLabel');if(lbl)lbl.textContent=_fontSize+'pt';
+  setupPageTracker();
+  fitDocToPreview();
+}
+async function loadFromDB(passedInfo){
+  let info = passedInfo;
+  if(!info){
+    const sel=document.getElementById('caseSelect');
+    if(!sel.value) return;
+    try{info=JSON.parse(sel.value);}catch(e){return;}
+  }
+  if(!info || !info.caseId) return;
+  const {caseId}=info;
+  const s=(id,val)=>{const e=document.getElementById(id); if(e&&val!=null&&String(val).trim()!=='') e.value=String(val).trim();};
+  try{
+    const [cases,persons]=await Promise.all([
+      sb('cases?select=applicant,company,company_id&id=eq.'+caseId),
+      sb('persons?select=applicant_name_en&case_id=eq.'+caseId)
+    ]);
+    const cas=cases&&cases[0], pd=persons&&persons[0];
+    // 実在する列だけを指定する（無い列を混ぜると全部止まる）
+    const cs='name,rep_title,rep_name';
+    let co=null; const cid=info.companyId||(cas&&cas.company_id);
+    if(cid){ const r=await sb('companies?select='+cs+'&id=eq.'+cid); co=r&&r[0]; }
+    if(!co){ const nm=info.company||(cas&&cas.company); if(nm){ const r=await sb('companies?select='+cs+'&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; } }
+    s('f_applicant',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||info.applicant||'');
+    s('f_company',(co&&co.name)||(cas&&cas.company)||info.company||'');
+    if(co){ s('f_repTitle',co.rep_title); s('f_repName',co.rep_name); }
+    p(); showToast('✅ データを読み込みました');
+  }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
+}
+initCaseSelect(); p();
+try{ document.fonts.ready.then(()=>p()); }catch(_e){}
+
+function fitDocToPreview(){
+  requestAnimationFrame(()=>{
+    const pp=document.querySelector('.pp'); const area=document.getElementById('pageArea');
+    if(!pp||!area) return;
+    const ppW=pp.clientWidth-40, docW=794;
+    area.querySelectorAll('.doc').forEach(d=>{ d.style.zoom=(ppW<docW)?(ppW/docW):1; });
+  });
+}
+window.addEventListener('resize', fitDocToPreview);
+
+// index.htmlからの案件選択を受信
+window.addEventListener('message', async function(e){
+  if(!e.data||e.data.type!=='SELECT_CASE') return;
+  const info=e.data.info;
+  if(!info||!info.caseId) return;
+  const sel=document.getElementById('caseSelect');
+  if(sel){
+    let found=false;
+    for(let o of sel.options){ try{ const d=JSON.parse(o.value); if(d.caseId===info.caseId){sel.value=o.value;found=true;break;} }catch(e2){} }
+    if(!found){ const opt=document.createElement('option'); opt.value=JSON.stringify(info); opt.textContent='（indexから選択）'; sel.appendChild(opt); sel.value=opt.value; }
+  }
+  if(typeof loadCaseToForm==='function'){ await loadCaseToForm(info, 'thai_furoku'); }
+  if(typeof loadFromDB==='function') loadFromDB(info);
+});
+</script>
+</body>
+</html>
