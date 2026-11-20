@@ -573,7 +573,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611201245"></script>
+<script src="ofusa_common.js?v=2611201627"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1430,16 +1430,16 @@ function _shiftOverflow(){
   for(let i=0;i<n && el;i++){ rows.push(el); el=el.nextElementSibling; }
   const tail=[];
   if(v('es_shiftDetail')){ while(el){ tail.push(el); el=el.nextElementSibling; } }
-  // 2ページ目に入りきるまで、詳細→後ろのシフトの順に別紙へ回す（4つより多い分は最初から別紙）
+  // ver.20261120.03: 5つ以上なら全部別紙。4つまでで2ページ目に入りきらないときは、詳細→全部のシフトの順に別紙へ回す（一部だけ別紙にすると分かりにくいため）
   const page=head.closest('.doc'), H=1124;
-  let k=Math.min(rows.length,_SO_KEEP), tailOut=false;
+  let k=(rows.length>_SO_KEEP)?0:rows.length, tailOut=false;
   const tooTall=function(){ return page && page.offsetHeight>H; };
   if(k<rows.length){ tailOut=true; }
   rows.slice(k).forEach(function(x){ x.remove(); }); if(tailOut) tail.forEach(function(x){ x.remove(); });
   let guard=0;
   while(tooTall() && guard++<20){
     if(!tailOut && tail.length){ tailOut=true; tail.forEach(function(x){ x.remove(); }); continue; }
-    if(k>1){ k--; rows[k].remove(); tailOut=true; tail.forEach(function(x){ x.remove(); }); continue; }
+    if(k>0){ rows.slice(0,k).forEach(function(x){ x.remove(); }); k=0; tailOut=true; tail.forEach(function(x){ x.remove(); }); continue; }
     break;
   }
   const rest=rows.slice(k);

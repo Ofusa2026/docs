@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.01</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.03</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -590,8 +590,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611201159';
-window.__DOCS_CACHE_BUSTER__ = '2611201159';
+window.__DOCS_CACHE_BUSTER__ = '2611201627';
+window.__DOCS_CACHE_BUSTER__ = '2611201627';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2239,6 +2239,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261120.03',
+    date: '2026-11-20',
+    notify: false,
+    items: [
+      '🕘 <b>1-6号の交代制：勤務時間の組合せが5つ以上あるときは、全部を別紙「交代制の勤務時間」に出す</b>ようにしました（全言語）：前は4つ目までが2ページ目、5つ目からが別紙に分かれていて分かりにくかったため。4つまでのときは今までどおり2ページ目に出ます（2ページ目に入りきらないときは、詳細→全部のシフトの順で別紙に回し、一部だけ別紙にはしません）。'
+    ]
+  },
   {
     version: 'ver.20261120.01',
     date: '2026-11-20',
