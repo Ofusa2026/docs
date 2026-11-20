@@ -4547,16 +4547,23 @@ function renderRepSelect(co, es, opt){
   if(!bar){
     bar=document.createElement('div');
     bar.id='ofusaRepSelectBar';
-    bar.style.cssText='position:fixed;top:8px;right:8px;z-index:9999;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:6px 10px;font-size:12px;color:#1e40af;box-shadow:0 4px 12px rgba(0,0,0,.15);';
-    document.body.appendChild(bar);
+    // ver.20261120.01: 上のバー（ボタンの左）に入れる。前は画面の右上に浮かせていて、［印刷・PDF］の▾（1-5＋1-6まとめ印刷など）を隠していた
+    var _ab=document.querySelector('.app-bar'), _bb=_ab&&_ab.querySelector('.bar-btns');
+    if(_ab && _bb){
+      bar.style.cssText='flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden;background:#eff6ff;border:1px solid #93c5fd;border-radius:7px;padding:3px 8px;font-size:11.5px;color:#1e40af;margin:0 6px 0 auto;';
+      _ab.insertBefore(bar, _bb);
+    } else {
+      bar.style.cssText='position:fixed;bottom:8px;left:8px;z-index:9999;background:#eff6ff;border:1.5px solid #93c5fd;border-radius:8px;padding:6px 10px;font-size:12px;color:#1e40af;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+      document.body.appendChild(bar);
+    }
     var st=document.createElement('style');
     st.textContent='@media print{#ofusaRepSelectBar{display:none!important;}}';
     document.head.appendChild(st);
   }
-  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);if(typeof p===\'function\')p();" style="font-size:12px;padding:2px 6px;border:1px solid #93c5fd;border-radius:5px;background:white;">'
+  bar.innerHTML='👤 代表者: <select onchange="localStorage.setItem(\''+lsKey+'\',this.value);applyRepSelect(this.value);if(typeof p===\'function\')p();" style="font-size:11.5px;padding:1px 4px;border:1px solid #93c5fd;border-radius:5px;background:white;max-width:170px;">'
     + list.map(function(x){ return '<option value="'+x.no+'"'+(x.no===saved?' selected':'')+'>'+x.label.replace(/</g,'&lt;')+'</option>'; }).join('')
     + '</select>'
-    + (_auto?'<span style="margin-left:6px;font-size:11px;" title="代表者②③の役職の場所（例：三郷事業所）が、雇用条件セット名・案件名に入っているかで選んでいます">（事業所から自動）</span>':'');
+    + (_auto?'<span style="margin-left:4px;font-size:10.5px;" title="代表者②③の役職の場所（例：三郷事業所）が、雇用条件セット名・案件名に入っているかで選んでいます">（事業所から自動）</span>':'');
 }
 // ===== /代表者プルダウン =====
 
