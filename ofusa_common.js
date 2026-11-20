@@ -1,5 +1,11 @@
 /**
  * ofusa_common.js - OFUSA書類作成システム 共通モジュール
+ * ver.20261120.02
+ * - fix(保存されない対策): 自動で訳や金額を直す処理が、手で直した欄（契約期間など）まで「直していない」扱いにしていたため、
+ *   印刷前の「保存しますか？」や離れるときの警告が出ず、保存されないまま消えていた → 手で直した欄はそのまま「未保存」として残す
+ * - feat: 1-6号のDB保存のあと、契約期間が雇用条件セットと案件（cases）に本当に入ったかDBを読み直して確かめ、違えばその場で知らせる
+ * - feat: 書類に直接打った内容（直接編集）が未保存のまま印刷しようとしたら、保存してから印刷するか聞く
+ * - fix: 「♻️ 編集版破棄」の前に、書類の変数欄（契約期間などの数字）に打った値を入力欄へ移す（破棄でいっしょに消えていた）
  * ver.20261119.01
  * - fix: スタイル編集で位置をmm指定の欄（申請書の対応可能言語など）を動かすと、ページの上へ飛ぶ不具合を修正
  * ver.20261118.15
@@ -1774,6 +1780,24 @@ function _printDocLabel(){
   return t.replace(/[\\\/:*?"<>|]/g,'').slice(0,40);
 }
 function doPrint(){
+  // ver.20261120.02: 書類に直接打った内容（直接編集）がまだDB保存されていないまま印刷すると、
+  //   紙（PDF）だけ直って、案シスには残らない（呼び戻すと元に戻る）。印刷の前に保存するか聞く。
+  try{
+    if(window._editedDirty && !window._docCheckMode && !window._printDirtyAsked){
+      if(confirm('✏️ 書類に直接打った内容が、まだDB保存されていません。\n保存しないで印刷すると、次に開いたときは元の内容に戻ります。\n\n［OK］保存してから印刷する（おすすめ）\n［キャンセル］保存しないで印刷する')){
+        (async function(){
+          try{
+            if(typeof saveForm==='function'){ await saveForm(); }
+            else if(typeof saveFormGeneric==='function'){ var _dk=window._empDocKey || (typeof _dgjInferDocKey==='function'?_dgjInferDocKey():''); if(_dk) await saveFormGeneric(_dk); }
+          }catch(_se){ console.warn('[印刷前の保存]', _se); }
+          if(window._editedDirty){ alert('保存されませんでした。「💾 DB保存」を押してから、もう一度印刷してください。'); return; }
+          window._printDirtyAsked=true; try{ doPrint(); }finally{ window._printDirtyAsked=false; }
+        })();
+        return;
+      }
+      try{ if(typeof slog==='function') slog('print_unsaved_edit',{}); }catch(_l){}
+    }
+  }catch(_pd){}
   // ver.20261117.08: 窓口申請書で空欄のままの欄があれば、印刷の前に知らせる
   try{
     if(_SH_ON && !window._docCheckMode){
@@ -4183,6 +4207,26 @@ window._syncCaseContract=async function(caseId){
     var snap={};
     document.querySelectorAll('[id^="es_"]').forEach(function(el){ snap[el.id]=el.value; });
     window._empBaseline=snap;
+    window._empUserTouched={};   // ver.20261120.02: 読込・保存のときだけ「手で直した欄」の記録を消す
+  };
+  // ver.20261120.02: 自動で直す処理（訳の自動修正・空の訳の自動入力・言語ごとの訳・金額合わせ）が
+  //   基準値を丸ごと取り直していたため、それより前に手で直した欄（契約期間など）まで「直していない」扱いになり、
+  //   印刷前の「保存しますか？」や、離れるときの警告が出ず、保存されないまま消えていた。
+  //   自動の処理では、手で直した欄の基準値は残す。
+  window._empUserTouched=window._empUserTouched||{};
+  ['input','change'].forEach(function(ev){
+    document.addEventListener(ev, function(e){
+      try{
+        var t=e.target; if(!e.isTrusted || !t || !t.id || !/^es_/.test(t.id)) return;
+        if(t.closest && t.closest('#pageArea')) return;
+        window._empUserTouched[t.id]=1;
+      }catch(_e){}
+    }, true);
+  });
+  window.snapshotEmpBaselineAuto=function(){
+    var old=window._empBaseline; if(!old) return window.snapshotEmpBaseline();
+    var touched=window._empUserTouched||{};
+    document.querySelectorAll('[id^="es_"]').forEach(function(el){ if(touched[el.id]) return; old[el.id]=el.value; });
   };
   // ② 基準値との差分（ユーザーが読込後に触ったか）
   window.isEmpDirtyByForm=function(){
@@ -4294,7 +4338,7 @@ window._syncCaseContract=async function(caseId){
         if(cur!=='' && cur!==base) return;   // 手で直した欄は変えない
         el.value=v; n++;
       });
-      if(n){ if(typeof p==='function'){ try{ p(); }catch(e){} } try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){} }
+      if(n){ if(typeof p==='function'){ try{ p(); }catch(e){} } try{ if(typeof window.snapshotEmpBaselineAuto==='function') window.snapshotEmpBaselineAuto(); else if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){} }
     }catch(e){ console.warn('[言語ごとの訳]', e); }
   }
   window._trOverlay=_trOverlay;
@@ -4978,7 +5022,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       var fixes={};
       prs.forEach(function(pr){ if(String(pr.en.value||'').trim()){ pr.en.dataset.autofill='1'; pr.en.style.background='#ecfdf5'; fixes[_wlDbKey(pr.en)]=pr.en.value; } });
       if(typeof p==='function'){ try{ p(); }catch(e){} }
-      try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+      try{ if(typeof window.snapshotEmpBaselineAuto==='function') window.snapshotEmpBaselineAuto(); else if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
       var saved=await _wlSaveTr(lang, fixes);
       try{ if(typeof slog==='function') slog('wl_autofix',{meta:{n:list.length, mem:mem, ai:ai, saved:saved, lang:lang}}); }catch(e){}
       // 結果を出す
@@ -5038,7 +5082,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
       if(!filled.length && !err && !need.length) return;
       if(need.length && !_aiAvail(key) && !err) err='ログインが切れているためAI翻訳できません';
       if(typeof p==='function'){ try{ p(); }catch(e){} }
-      try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+      try{ if(typeof window.snapshotEmpBaselineAuto==='function') window.snapshotEmpBaselineAuto(); else if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
       var saved=filled.length ? await _wlSaveTr(lang, fixes) : false;
       try{ if(typeof slog==='function') slog('ef_autofill',{meta:{n:prs.length, mem:mem, ai:ai, saved:saved, lang:lang, err:err}}); }catch(e){}
       var left=prs.length-filled.length;
@@ -6226,6 +6270,56 @@ async function _htmlStoreRestore(info){
   }
   return true;
 }
+/* ver.20261120.02: DB保存のあとの確認。
+   「保存したはずなのに、呼び戻すと元の値（契約期間など）に戻っている」を防ぐため、
+   保存したつもりの値と、DBの雇用条件セットを読み直した値を比べ、違えばその場で知らせる。
+   ・保存をやめた（保存方法の選択でキャンセル等）ときは比べない
+   ・数字のカンマ・空白・全角半角の違いは同じとみなす */
+async function _verifyEmpSaved(expect){
+  if(!expect || typeof expect!=='object') return;
+  if(typeof isEmpDirtyByForm==='function' && isEmpDirtyByForm()) return;   // 保存しなかった
+  var ctx=window._empCtx||{}, info=window._lastCaseInfo||{};
+  var cid=ctx.companyId||info.companyId; if(!cid) return;
+  var idx=parseInt(window._empLoadedIdx,10); if(isNaN(idx)||idx<0) idx=parseInt(info.empSetIdx,10);
+  if(isNaN(idx)||idx<0) return;
+  var r=await sb('companies?select=emp_sets&id=eq.'+encodeURIComponent(cid));
+  var sets=(r&&r[0]&&Array.isArray(r[0].emp_sets))?r[0].emp_sets:null; if(!sets) return;
+  var set=sets[idx]; if(!set||typeof set!=='object'){ alert('⚠️ 保存の確認ができませんでした（雇用条件セット['+idx+']が見つかりません）。\nもう一度「💾 DB保存」を押してください。'); return; }
+  var norm=function(x){ return String(x==null?'':x).normalize('NFKC').replace(/[\s,，、]/g,''); };
+  var bad=[];
+  // 雇用条件セット本体は saveEmpSetWithMode が読み戻しで確かめているので、ここでは
+  //   「書類に出る大事な日付」（契約期間）と、案件側への反映だけを確かめる（訳の欄は保存時に形が変わるため比べない）
+  ['contractStartY','contractStartM','contractStartD','contractEndY','contractEndM','contractEndD'].forEach(function(k){
+    if(!(k in expect)) return;
+    var ev=expect[k]; if(ev!==null && typeof ev==='object') return;
+    if(norm(ev)===norm(set[k])) return;
+    var lb=k;
+    try{ var fk=(typeof dbKeyToForm==='function')?(dbKeyToForm(k)||k):k; var el=document.getElementById('es_'+fk)||document.getElementById('es_'+k); if(el && typeof _miLabel==='function') lb=_miLabel(el)||k; }catch(_l){}
+    bad.push({k:k, label:lb, want:ev, got:set[k]});
+  });
+  // 契約期間は案件（cases）にも入っているか
+  try{
+    var caseId=ctx.caseId||info.caseId;
+    var pad=function(n){ n=parseInt(n,10); return (n<10?'0':'')+n; };
+    var ymd=function(p){ var y=expect[p+'Y'], m=expect[p+'M'], d=expect[p+'D']; if(!y||!m||!d) return null; return norm(y)+'-'+pad(norm(m))+'-'+pad(norm(d)); };
+    var st=ymd('contractStart'), en=ymd('contractEnd');
+    if(caseId && (st||en)){
+      var c=await sb('cases?select=contract_start,contract_end&id=eq.'+encodeURIComponent(caseId)); c=c&&c[0];
+      if(c){
+        if(st && String(c.contract_start||'').slice(0,10)!==st) bad.push({k:'cases.contract_start', label:'案件の契約開始日', want:st, got:c.contract_start});
+        if(en && String(c.contract_end||'').slice(0,10)!==en) bad.push({k:'cases.contract_end', label:'案件の契約終了日', want:en, got:c.contract_end});
+      }
+    }
+  }catch(_cc){}
+  if(!bad.length){ window._lastSaveVerified=Date.now(); return; }
+  try{ if(typeof slog==='function') slog('save_verify_ng',{meta:{n:bad.length, keys:bad.slice(0,20).map(function(b){ return b.k; })}}); }catch(_s){}
+  var lines=bad.slice(0,12).map(function(b){ return '・'+b.label+'：画面「'+(b.want===''?'（空欄）':b.want)+'」／DB「'+((b.got==null||b.got==='')?'（空欄）':b.got)+'」'; });
+  // 未保存の印を戻して、離れるとき・印刷するときに警告が出るようにする
+  try{ window._sDirty=true; if(typeof window._sDirtyNotify==='function') window._sDirtyNotify(true); }catch(_d){}
+  try{ if(window._empBaseline){ bad.forEach(function(b){ var fk=(typeof dbKeyToForm==='function')?(dbKeyToForm(b.k)||b.k):b.k; var id='es_'+fk; if(document.getElementById(id)){ window._empBaseline[id]='\u0000'; } }); } }catch(_b){}
+  alert('⛔ 保存できていない項目があります（DBを読み直して確認しました）\n\n'+lines.join('\n')+(bad.length>12?'\nほか '+(bad.length-12)+' か所':'')+'\n\nもう一度「💾 DB保存」を押してください。直らないときは、この画面のまま管理部に知らせてください。');
+}
+
 // 書類独自の保存（1-6号の saveForm 等）・破棄にも受け皿の保存／破棄を付ける
 window.addEventListener('load', function(){
   // ver.20261027.01: 直接編集を終えた書類（フリーズ中）でサイドバーを変えると、p() が書類を作り直して
@@ -6256,13 +6350,22 @@ window.addEventListener('load', function(){
         // ver.20261027.01: 変数欄の中に打った文字を、入力欄の値を集める前に整える／利用ログ（1-6号のDB保存）
         try{ if(!window._autosaving) _reconcileBindEdits(); }catch(_rc){}
         try{ if(!window._autosaving) slog('save', {doc_key:String(window._empDocKey||'1_6')}); }catch(_sl){}
+        // ver.20261120.02: 保存したつもりの値を覚えておき、保存のあとDBを読み直して本当に入ったか確かめる
+        var _expect=null;
+        try{ if(!window._autosaving && typeof collectFormValues==='function') _expect=collectFormValues(); }catch(_ce){}
         var r=await _origSave.apply(this, arguments);
-        try{ await _htmlStoreSave({}); }catch(_e){ console.warn('[htmlStore save]', _e); } return r; };
+        try{ await _htmlStoreSave({}); }catch(_e){ console.warn('[htmlStore save]', _e); }
+        try{ if(_expect) await _verifyEmpSaved(_expect); }catch(_ve){ console.warn('[保存の確認]', _ve); }
+        return r; };
       w.__htmlStoreWrapped=true; window.saveForm=w;
     }
     if(typeof window.discardEditedFromDB==='function' && !window.discardEditedFromDB.__htmlStoreWrapped){
       var _origDis=window.discardEditedFromDB;
-      var d=async function(){ var before=window._htmlFrozen; var r=await _origDis.apply(this, arguments);
+      var d=async function(){
+        // ver.20261120.02: 破棄の前に、書類の中の変数欄（契約期間などの数字）に打った値を入力欄へ移す。
+        //   これをしないと、書類に直接打った値が破棄でいっしょに消え、保存もされていなかった
+        try{ if(typeof _reconcileBindEdits==='function') _reconcileBindEdits(); }catch(_rb){}
+        var before=window._htmlFrozen; var r=await _origDis.apply(this, arguments);
         try{ if(before && !window._htmlFrozen) await _htmlStoreDiscard({}); }catch(_e){} return r; };
       d.__htmlStoreWrapped=true; window.discardEditedFromDB=d;
     }
@@ -7270,7 +7373,7 @@ function _structNoticeShow(){
         var ns=(w[0].emp_sets||[])[idx]||sets[idx];
         try{ window._empLoadedSet=JSON.parse(JSON.stringify(ns)); }catch(e){}
         if(window._empCtx) window._empCtx.empSets=w[0].emp_sets||sets;
-        try{ if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
+        try{ if(typeof window.snapshotEmpBaselineAuto==='function') window.snapshotEmpBaselineAuto(); else if(typeof window.snapshotEmpBaseline==='function') window.snapshotEmpBaseline(); }catch(e){}
         try{ if(typeof slog==='function') slog('p16_sync',{meta:{keys:Object.keys(diff)}}); }catch(e){}
         if(typeof showToast==='function') showToast('🔗 案シスの雇用条件の金額を、この1-6号の計算に合わせました（'+msg.slice(0,3).join('、')+(msg.length>3?' ほか':'')+'）');
       }catch(e){ console.warn('[1-6→案シス 金額]', e); }
