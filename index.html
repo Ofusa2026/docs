@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.05</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261120.06</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -610,7 +610,7 @@ const docs={
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794393342'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1794393342'},
   'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1794393342'},
-  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795177104'},
+  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795179539'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1794393342'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1794393342'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1794393342'},
@@ -682,7 +682,7 @@ const docs={
   'iko':{navId:'nav-iko',frameId:'frame-iko',file:'iko_junbi.html?v=1794393342'},
   'tk2go':{navId:'nav-tk2go',frameId:'frame-tk2go',file:'tokkatsu_2gou.html?v=1794393342'},
   'myanmar':{navId:'nav-myanmar',frameId:'frame-myanmar',file:'myanmar_riyusho.html?v=1794393342'},
-  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795177104'},
+  'thai_furoku':{navId:'nav-thai_furoku',frameId:'frame-thai_furoku',file:'thai_furoku.html?v=1795179539'},
   '1_23':{navId:'nav-1_23',frameId:'frame-1_23',file:'1_23.html?v=1794393342'},
   '1_25':{navId:'nav-1_25',frameId:'frame-1_25',file:'1_25.html?v=1794393342'},
   '1_27':{navId:'nav-1_27',frameId:'frame-1_27',file:'1_27.html?v=1794393342'},
@@ -2246,6 +2246,14 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261120.06',
+    date: '2026-11-20',
+    notify: true,
+    items: [
+      'タイ大使館の雇用契約書の付録：署名欄を線の上＝日本語／かっこ＝英語にし、証人に登録支援機関を自動で入れるようにしました。空欄があると左側に赤で知らせます。'
+    ]
+  },
   {
     version: 'ver.20261120.05',
     date: '2026-11-20',
