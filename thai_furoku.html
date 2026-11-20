@@ -13,13 +13,16 @@
 .doc .bd,.doc .bd *{font-family:'MS Mincho','ＭＳ 明朝','Yu Mincho','Hiragino Mincho ProN','Noto Serif CJK JP',serif!important;}
 .doc .bd{line-height:1.5;}
 .doc .bd .th,.doc .bd .th *{font-family:'Noto Sans Thai','Noto Serif Thai','Angsana New','Cordia New',Tahoma,sans-serif!important;}
-.doc .bd .th{font-size:13pt;line-height:1.75;}
+.doc .bd .th{font-size:13pt;line-height:1.6;}
 .doc .bd .jp{font-size:10.5pt;line-height:1.6;}
 .doc .bd .gap{height:10pt;}
 .doc .bd .ul{display:inline-block;min-width:50mm;border-bottom:1px solid #000;padding:0 2mm;}
-.doc .bd .sg{display:grid;grid-template-columns:64mm 1fr 8mm;column-gap:3mm;align-items:end;margin-top:12pt;}
-.doc .bd .sg .ln{border-bottom:1px solid #000;height:18pt;}
-.doc .bd .sg .pr{text-align:center;font-size:11pt;}
+.doc .bd .sg{display:grid;grid-template-columns:58mm 1fr 8mm;column-gap:3mm;align-items:end;margin-top:9pt;}
+.doc .bd .sg .ln{border-bottom:1px solid #000;min-height:18pt;display:flex;align-items:flex-end;justify-content:center;white-space:nowrap;font-size:10.5pt;line-height:1.3;padding-bottom:1pt;}
+.doc .bd .sg .pr{grid-column:2 / 3;min-width:0;display:flex;align-items:center;justify-content:center;font-size:10pt;line-height:1.4;white-space:nowrap;}
+.doc .bd .sg .pr .in{text-align:center;padding:0 2mm;}
+.doc .bd .sg .pr .en{font-family:Arial,'Helvetica Neue',sans-serif!important;font-size:10pt;}
+.doc .bd .sg .pr .bk{font-size:18pt;line-height:1;}
 .c{text-align:center;}
 @media print{
   .app-bar,.fp{display:none!important}
@@ -35,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 雇用契約書の付録（タイ大使館）</div>
-    <div class="ver">ver.20261120.01</div>
+    <div class="ver">ver.20261120.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -56,17 +59,26 @@
     <select id="caseSelect" onchange="loadFromDB()"></select>
   </div>
   <div class="fp-inner">
+    <div id="tfWarn" style="display:none;margin:4px 0 8px;padding:8px 10px;border:1px solid #fca5a5;background:#fef2f2;color:#b91c1c;font-size:11px;line-height:1.6;border-radius:6px;"></div>
     <div class="fs"><div class="fs-title">特定技能所属機関</div>
       <div class="fg"><label>所属機関名</label><input id="f_company" oninput="p()"></div>
       <div class="fg"><label>代表者の役職</label><input id="f_repTitle" oninput="p()"></div>
       <div class="fg"><label>代表者の氏名</label><input id="f_repName" oninput="p()"></div>
+      <div class="fg"><label>所属機関名（英語）</label><input id="f_companyEn" oninput="p()"></div>
+      <div class="fg"><label>代表者の役職（英語）</label><input id="f_repTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者の氏名（英語）</label><input id="f_repNameEn" oninput="p()"></div>
     </div>
     <div class="fs"><div class="fs-title">外国人特定技能</div>
       <div class="fg"><label>氏名（ローマ字）</label><input id="f_applicant" oninput="p()"></div>
     </div>
-    <div class="fs"><div class="fs-title">証人</div>
-      <div style="font-size:10px;color:#888;line-height:1.5;margin:2px 0 4px;">空欄のままなら、かっこの中は空いたまま印刷されます。署名・押印は手で書きます。</div>
-      <div class="fg"><label>証人の氏名</label><input id="f_witness" oninput="p()"></div>
+    <div class="fs"><div class="fs-title">証人（登録支援機関）</div>
+      <div style="font-size:10px;color:#888;line-height:1.5;margin:2px 0 4px;">案件の登録支援機関が入ります。自社支援などで空欄のままなら、かっこの中は空いたまま印刷されます。署名・押印は手で書きます。</div>
+      <div class="fg"><label>登録支援機関名</label><input id="f_soName" oninput="p()"></div>
+      <div class="fg"><label>代表者の役職</label><input id="f_soTitle" oninput="p()"></div>
+      <div class="fg"><label>代表者の氏名</label><input id="f_soRep" oninput="p()"></div>
+      <div class="fg"><label>登録支援機関名（英語）</label><input id="f_soNameEn" oninput="p()"></div>
+      <div class="fg"><label>代表者の役職（英語）</label><input id="f_soTitleEn" oninput="p()"></div>
+      <div class="fg"><label>代表者の氏名（英語）</label><input id="f_soRepEn" oninput="p()"></div>
     </div>
   </div>
 </div>
@@ -84,13 +96,74 @@
 </div>
 <script src="ofusa_common.js?v=2611202125"></script>
 <script>
-function _rep(){
-  const t=String(v('f_repTitle')||'').trim(), n=String(v('f_repName')||'').trim();
-  return [String(v('f_company')||'').trim(), [t,n].filter(Boolean).join('　')].filter(Boolean).join('　');
+function _esc(t){ return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _join(ids){ return ids.map(i=>String(v(i)||'').trim()).filter(Boolean).join('　'); }
+function _joinEn(ids){ return ids.map(i=>String(v(i)||'').trim()).filter(Boolean).join('  '); }
+// 線の上は日本語、かっこの中は英語だけ
+function _par(en){
+  if(!en) return '（　　　　　　　　　　　　　　　　　　）';
+  return `<span class="bk">（</span><span class="in"><div class="en">${_esc(en)}</div></span><span class="bk">）</span>`;
 }
-function _par(txt){ return txt?`（　${txt}　）`:'（　　　　　　　　　　　　　　　　　　）'; }
+function _ln(jp){ return `<div class="ln">${jp?_esc(jp):''}</div>`; }
+// 役職の英訳（案シスに英語が無いときに使う）
+const _TITLE_EN=[[/^代表取締役(社長)?$/,'CEO'],[/^代表取締役会長$/,'Chairman and CEO'],[/^代表取締役副社長$/,'Executive Vice President'],[/^取締役社長$/,'President'],[/^社長$/,'President'],[/^(取締役)?会長$/,'Chairman'],[/^取締役$/,'Director'],[/^代表理事(長)?$/,'Representative Director'],[/^理事長$/,'Chairman'],[/^組合長$/,'Chairman'],[/^代表社員$/,'Representative Partner'],[/^業務執行社員$/,'Executive Partner'],[/^院長$/,'Director'],[/^園長$/,'Director'],[/^施設長$/,'Facility Director'],[/^(個人)?事業主$/,'Owner'],[/^代表(者)?$/,'Representative']];
+function _titleEn(jp){
+  const t=String(jp||'').replace(/[\s　]+/g,''); if(!t) return '';
+  for(const [re,en] of _TITLE_EN){ if(re.test(t)) return en; }
+  // 決まった形でないとき（「取締役CEO社長」など）は、含まれる言葉で訳す
+  if(/CEO/i.test(t)) return 'CEO';
+  if(/代表取締役/.test(t)) return 'CEO';
+  if(/会長/.test(t)) return 'Chairman';
+  if(/社長/.test(t)) return 'President';
+  if(/理事長|組合長/.test(t)) return 'Chairman';
+  if(/代表/.test(t)) return 'Representative';
+  if(/取締役/.test(t)) return 'Director';
+  return '';
+}
+// ふりがな → ローマ字（ヘボン式・大文字）
+function _kanaRoma(k){
+  // ひらがなのふりがなだけをローマ字にする（カタカナの外国人名は読みが合わないので使わない）
+  let t=String(k||'').trim();
+  if(!t || /[^\u3041-\u3096ー\s　・]/.test(t)) return '';
+  const Y={'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo','りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo'};
+  const M={'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'o','ん':'n','が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo','ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','ぁ':'a','ぃ':'i','ぅ':'u','ぇ':'e','ぉ':'o','ゔ':'vu'};
+  const words=t.split(/[\s　・]+/).filter(Boolean).map(w=>{
+    let o='',i=0;
+    while(i<w.length){
+      const two=w.substr(i,2), c=w[i];
+      if(c==='っ'){ const nx=Y[w.substr(i+1,2)]||M[w[i+1]]||''; o+=nx.startsWith('ch')?'t':(nx[0]||''); i++; continue; }
+      if(c==='ー'){ i++; continue; }
+      if(Y[two]){ o+=Y[two]; i+=2; continue; }
+      if(M[c]!=null){ o+=M[c]; i++; continue; }
+      i++;
+    }
+    return o.replace(/ou/g,'o').replace(/uu/g,'u');
+  });
+  return words.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+}
+// 外国人の氏名：あだ名・番号・カタカナを外してパスポートのローマ字だけにする
+function _cleanApp(t){
+  let x=String(t||'').replace(/[\r\n]+/g,' ');
+  const m=x.match(/[（(]\s*([A-Za-z][A-Za-z\s　.\-']+?)\s*[)）]/);   // カタカナ(ROMAN) の形
+  if(m && /[\u30a0-\u30ff]/.test(x.replace(m[0],''))) x=m[1];
+  x=x.replace(/[（(][^）)]*[）)]/g,' ');                    // (あだ名)・(2) を外す
+  x=x.replace(/[\s　]+/g,' ').trim();
+  return /^[A-Za-z][A-Za-z .\-']*$/.test(x)?x.toUpperCase():'';
+}
+function _sp(t){ return String(t||'').replace(/[\s　]+/g,' ').trim(); }
+// 印刷前の空欄チェック
+function _tfCheck(){
+  const box=document.getElementById('tfWarn'); if(!box) return;
+  const need=[['f_company','所属機関名'],['f_repTitle','所属機関 代表者の役職'],['f_repName','所属機関 代表者の氏名'],['f_companyEn','所属機関名（英語）'],['f_repTitleEn','所属機関 代表者の役職（英語）'],['f_repNameEn','所属機関 代表者の氏名（英語）'],['f_applicant','外国人の氏名（ローマ字）'],['f_soName','登録支援機関名'],['f_soTitle','登録支援機関 代表者の役職'],['f_soRep','登録支援機関 代表者の氏名'],['f_soNameEn','登録支援機関名（英語）'],['f_soTitleEn','登録支援機関 代表者の役職（英語）'],['f_soRepEn','登録支援機関 代表者の氏名（英語）']];
+  const miss=need.filter(([id])=>!String(v(id)||'').trim()).map(x=>x[1]);
+  const nick=/[（(]|[^A-Za-z .\-']/.test(String(v('f_applicant')||'').trim());
+  if(!miss.length && !nick){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  box.innerHTML='⚠️ <b>印刷前に入れてください</b><br>'+(miss.length?('空欄：'+miss.join('、')):'')+(nick?((miss.length?'<br>':'')+'外国人の氏名にローマ字以外（あだ名・カタカナなど）が入っています。パスポートのとおりに直してください'):'');
+}
 function p(){
   if(_editMode) return;
+  _tfCheck();
   const w=document.getElementById('pageArea'); if(!w) return;
   w.innerHTML=`
 <div class="doc">
@@ -111,12 +184,12 @@ function p(){
 <div class="th">2. กรณีแรงงานต่างชาติถึงแก่ความตาย องค์กรที่แรงงานที่มีทักษะเฉพาะต้องรับผิดชอบค่าใช้จ่ายในการจัดการศพ จัดส่งอัฐิและทรัพย์สิน ของแรงงานต่างชาติกลับภูมิลำเนา</div>
 <div class="jp">2. 外国人特定技能が死亡した場合、特定技能所属機関は外国人特定技能の葬儀を行い、遺骨、遺留品をタイ国本籍地まで送る費用を負担しなければならない。</div>
 <div class="gap"></div><div class="gap"></div>
-<div class="sg"><div>特定技能所属機関<br><span class="th" style="font-size:11.5pt;">องค์กรที่แรงงานที่มีทักษะเฉพาะสังกัด</span></div><div class="ln"></div><div>㊞</div></div>
-<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(_rep())}</div><div></div></div>
-<div class="sg"><div>外国人特定技能<br><span class="th" style="font-size:11.5pt;">แรงงานต่างชาติ</span></div><div class="ln"></div><div></div></div>
-<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(String(v('f_applicant')||'').trim())}</div><div></div></div>
-<div class="sg"><div>証人<br><span class="th" style="font-size:11.5pt;">พยาน</span></div><div class="ln"></div><div>㊞</div></div>
-<div class="sg" style="margin-top:4pt;"><div></div><div class="pr">${_par(String(v('f_witness')||'').trim())}</div><div></div></div>
+<div class="sg"><div>特定技能所属機関<br><span class="th" style="font-size:11.5pt;">องค์กรที่แรงงานที่มีทักษะเฉพาะสังกัด</span></div>${_ln(_join(['f_company','f_repTitle','f_repName']))}<div>㊞</div></div>
+<div class="sg" style="margin-top:3pt;"><div class="pr">${_par(_joinEn(['f_companyEn','f_repTitleEn','f_repNameEn']))}</div></div>
+<div class="sg"><div>外国人特定技能<br><span class="th" style="font-size:11.5pt;">แรงงานต่างชาติ</span></div>${_ln('')}<div></div></div>
+<div class="sg" style="margin-top:3pt;"><div class="pr">${_par(String(v('f_applicant')||'').trim())}</div></div>
+<div class="sg"><div>証人<br><span class="th" style="font-size:11.5pt;">พยาน</span></div>${_ln(_join(['f_soName','f_soTitle','f_soRep']))}<div>㊞</div></div>
+<div class="sg" style="margin-top:3pt;"><div class="pr">${_par(_joinEn(['f_soNameEn','f_soTitleEn','f_soRepEn']))}</div></div>
 </div>
 </div>`;
   _fontSize = (_fontSize === 8.5) ? 12 : _fontSize;
@@ -135,20 +208,36 @@ async function loadFromDB(passedInfo){
   if(!info || !info.caseId) return;
   const {caseId}=info;
   const s=(id,val)=>{const e=document.getElementById(id); if(e&&val!=null&&String(val).trim()!=='') e.value=String(val).trim();};
+  // 案件を選び直したとき、前の案件の値を残さない
+  ['f_company','f_repTitle','f_repName','f_companyEn','f_repTitleEn','f_repNameEn','f_applicant','f_soName','f_soTitle','f_soRep','f_soNameEn','f_soTitleEn','f_soRepEn'].forEach(i=>{const e=document.getElementById(i); if(e) e.value='';});
   try{
     const [cases,persons]=await Promise.all([
-      sb('cases?select=applicant,company,company_id&id=eq.'+caseId),
+      sb('cases?select=applicant,company,company_id,org&id=eq.'+caseId),
       sb('persons?select=applicant_name_en&case_id=eq.'+caseId)
     ]);
     const cas=cases&&cases[0], pd=persons&&persons[0];
     // 実在する列だけを指定する（無い列を混ぜると全部止まる）
-    const cs='name,rep_title,rep_name';
+    const cs='name,rep_title,rep_name,name_en,rep_title_en,rep_name_en';
     let co=null; const cid=info.companyId||(cas&&cas.company_id);
     if(cid){ const r=await sb('companies?select='+cs+'&id=eq.'+cid); co=r&&r[0]; }
-    if(!co){ const nm=info.company||(cas&&cas.company); if(nm){ const r=await sb('companies?select='+cs+'&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; } }
-    s('f_applicant',(pd&&pd.applicant_name_en)||(cas&&cas.applicant)||info.applicant||'');
-    s('f_company',(co&&co.name)||(cas&&cas.company)||info.company||'');
-    if(co){ s('f_repTitle',co.rep_title); s('f_repName',co.rep_name); }
+    if(!co){ const nm=info.companyName||info.company||(cas&&cas.company); if(nm){ const r=await sb('companies?select='+cs+'&name=eq.'+encodeURIComponent(nm)); co=r&&r[0]; } }
+    s('f_applicant',_cleanApp(pd&&pd.applicant_name_en)||_cleanApp(cas&&cas.applicant)||_cleanApp(info.applicant)||_sp((pd&&pd.applicant_name_en)||(cas&&cas.applicant)||''));
+    s('f_company',(co&&co.name)||(cas&&cas.company)||info.companyName||info.company||'');
+    if(co){
+      s('f_repTitle',_sp(co.rep_title)); s('f_repName',_sp(co.rep_name).replace(/ /g,'　'));
+      s('f_companyEn',_sp(co.name_en));
+      s('f_repTitleEn',_sp(co.rep_title_en).replace(/^Directors$/i,'Director')||_titleEn(co.rep_title)||(co.rep_name?'Representative':''));
+      s('f_repNameEn',_sp(co.rep_name_en));
+      // 役職が案シスに無いときは「代表者」
+      if(!String(v('f_repTitle')||'').trim() && co.rep_name) s('f_repTitle','代表者');
+    }
+    // 証人＝案件の登録支援機関（自社支援のときは入れない）
+    const orgName=String((cas&&cas.org)||info.orgName||'').trim();
+    if(orgName && !/自社/.test(orgName) && typeof findSupportOrg==='function'){
+      const so=await findSupportOrg(orgName,'name,name_en,rep_name,rep_name_en,rep_name_kana');
+      s('f_soName',(so&&so.name)||orgName);
+      if(so){ s('f_soNameEn',_sp(so.name_en)); s('f_soRep',_sp(so.rep_name).replace(/ /g,'　')); s('f_soRepEn',_sp(so.rep_name_en)||_kanaRoma(so.rep_name_kana)); if(so.rep_name){ const t=document.getElementById('f_soTitle'); if(t&&!t.value) t.value='代表者'; const te=document.getElementById('f_soTitleEn'); if(te&&!te.value) te.value='Representative'; } }
+    }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
 }
