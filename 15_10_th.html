@@ -97,7 +97,7 @@ function _x1510(t, E){
 
 (function(){
   var v='2611171651';   // 本体はいつも同じ番号で読む（1-17号の入口と同じ）
-  function get(u){ var x=new XMLHttpRequest(); x.open('GET',u+'?v='+encodeURIComponent(v),false); try{ x.send(); }catch(e){} return x.status===200 ? x.responseText : null; }
+  function get(u){ var x=new XMLHttpRequest(); x.open('GET',u+'?v='+encodeURIComponent(v),false); try{ x.setRequestHeader('Cache-Control','no-cache'); }catch(e){}   /* ver.20261120.01: 本体が新しくなっていないかを毎回サーバーに確かめる（プッシュ後すぐ反映。変わっていなければ手元のを使う） */ try{ x.send(); }catch(e){} return x.status===200 ? x.responseText : null; }
   function err(m){ document.write('<p style="font-family:sans-serif;padding:20px;">'+m+'画面を再読み込みしてください。</p>'); }
   var src=get('1_17_en.html'); if(src===null){ err('書類を読み込めませんでした（1_17_en.html）。'); return; }
   var T17=null;

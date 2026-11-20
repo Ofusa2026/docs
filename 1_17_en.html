@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（英語版・変更）</div>
-    <div class="ver">ver.20261117.19</div>
+    <div class="ver">ver.20261120.03</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -667,6 +667,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="fg"><label>同居人数<span class="fid">es.cohabitants</span></label><input id="es_cohabitants" oninput="p()"></div>
 <div class="fg"><label>居住費(円/月)<span class="fid">es.housingFee</span></label><input id="es_housingFee" oninput="p()"></div>
 <div class="fg"><label>実費相当の説明<span class="fid">es.actualCostDesc</span></label><textarea id="es_actualCostDesc" oninput="p()" rows="2"></textarea></div>
+<div id="hcbWrap17"></div><!-- ver.20261120.02: 実費相当の説明のテンプレート（中身は読み込み後に入れる） -->
 <div class="fg3"><div class="fg"><label>事業所 都道府県<span class="fid">es.officePref</span></label><input id="es_officePref" oninput="p()"></div><div class="fg"><label>市区町村<span class="fid">es.officeCity</span></label><input id="es_officeCity" oninput="p()"></div></div>
 <div class="fg3"><div class="fg"><label>事業所 都道府県(英)<span class="fid">es.officePrefEn</span></label><input id="es_officePrefEn" oninput="p()"></div><div class="fg"><label>市区町村(英)<span class="fid">es.officeCityEn</span></label><input id="es_officeCityEn" oninput="p()"></div></div>
 </div>
@@ -1286,6 +1287,242 @@ function _p17FxLine(id){
   var h=_p17Look(x); var t = h ? h : (_p17NeedTr(x) ? (window._p17Untr[x]=true, '\u0001'+x+'\u0002') : x);   // 文ごと訳す
   return '<p class="vi">'+_p17EscMark(t)+'</p>';
 }
+/* ver.20261120.01: 実費相当の説明を案シス／ヒアリングフォームの「テンプレートで作る」で作った文なら、言語ごとの決まった訳にする
+   （日本語の文の形は anken/index.html・form/form.html の _hcBuild と同じ。文言を変えるときは3か所そろえる） */
+var P17_HC_TR = {
+ en:{own2:'The housing is owned by the company; the monthly cost, obtained by dividing the construction/purchase cost of {C} yen by its useful life of {Y} years, is {R} yen.', rent:'The housing is leased at a monthly rent of {R} yen.', own:'The housing is owned by the company, and the monthly cost calculated from the construction/purchase cost and its useful life is {R} yen.', eq:'With {N} occupants, {P} yen per person is appropriate.', lt:'With {N} occupants, the cost is {P} yen per person, of which {F} yen is collected; the difference is borne by the company, so the amount is appropriate.'},
+ id:{own2:'Tempat tinggal merupakan milik perusahaan; biaya bulanan yang diperoleh dengan membagi biaya pembangunan/pembelian sebesar {C} yen dengan masa pakai {Y} tahun adalah {R} yen.', rent:'Tempat tinggal disewa dengan biaya sewa {R} yen per bulan.', own:'Tempat tinggal merupakan milik perusahaan, dan biaya bulanan yang dihitung dari biaya pembangunan/pembelian serta masa pakainya adalah {R} yen.', eq:'Dengan {N} penghuni, biaya per orang sebesar {P} yen adalah wajar.', lt:'Dengan {N} penghuni, biaya per orang adalah {P} yen, dan yang dipungut sebesar {F} yen; selisihnya ditanggung oleh perusahaan, sehingga jumlah tersebut wajar.'},
+ vi:{own2:'Nhà ở thuộc sở hữu của công ty; chi phí hàng tháng tính bằng cách chia chi phí xây dựng/mua {C} yên cho thời gian sử dụng {Y} năm là {R} yên.', rent:'Nhà ở được thuê với tiền thuê hàng tháng là {R} yên.', own:'Nhà ở thuộc sở hữu của công ty, chi phí hàng tháng được tính từ chi phí xây dựng/mua và thời gian sử dụng là {R} yên.', eq:'Có {N} người ở nên mức {P} yên mỗi người là hợp lý.', lt:'Có {N} người ở, chi phí mỗi người là {P} yên, trong đó thu {F} yên; phần chênh lệch do công ty chịu nên mức thu là hợp lý.'},
+ th:{own2:'ที่พักเป็นกรรมสิทธิ์ของบริษัท ค่าใช้จ่ายรายเดือนที่คำนวณจากค่าก่อสร้าง/ค่าซื้อ {C} เยน หารด้วยอายุการใช้งาน {Y} ปี คือ {R} เยน', rent:'ที่พักเป็นที่พักเช่า ค่าเช่าเดือนละ {R} เยน', own:'ที่พักเป็นกรรมสิทธิ์ของบริษัท ค่าใช้จ่ายรายเดือนที่คำนวณจากค่าก่อสร้าง/ค่าซื้อและอายุการใช้งานคือ {R} เยน', eq:'มีผู้พักอาศัย {N} คน ค่าใช้จ่ายต่อคน {P} เยน จึงเหมาะสม', lt:'มีผู้พักอาศัย {N} คน ค่าใช้จ่ายต่อคน {P} เยน โดยเรียกเก็บ {F} เยน ส่วนต่างบริษัทเป็นผู้รับผิดชอบ จึงเหมาะสม'},
+ ne:{own2:'आवास कम्पनीको स्वामित्वमा छ; निर्माण/खरिद लागत {C} येनलाई उपयोग अवधि {Y} वर्षले भाग गरी निकालिएको मासिक लागत {R} येन हो।', rent:'आवास मासिक {R} येन भाडामा लिइएको हो।', own:'आवास कम्पनीको स्वामित्वमा छ, र निर्माण/खरिद लागत तथा उपयोग अवधिबाट गणना गरिएको मासिक लागत {R} येन हो।', eq:'{N} जना बस्ने भएकाले प्रति व्यक्ति {P} येन उचित छ।', lt:'{N} जना बस्ने भएकाले प्रति व्यक्ति लागत {P} येन हुन्छ, जसमध्ये {F} येन असुल गरिन्छ; बाँकी फरक रकम कम्पनीले व्यहोर्ने भएकाले यो रकम उचित छ।'},
+ my:{own2:'နေထိုင်ရာနေရာသည် ကုမ္ပဏီပိုင်ဖြစ်ပြီး ဆောက်လုပ်/ဝယ်ယူစရိတ် {C} ယန်းကို အသုံးပြုနိုင်သက်တမ်း {Y} နှစ်ဖြင့် စား၍ ရသော လစဉ်စရိတ်မှာ {R} ယန်း ဖြစ်ပါသည်။', rent:'နေထိုင်ရာနေရာကို လစဉ်အိမ်ငှားခ {R} ယန်းဖြင့် ငှားရမ်းထားပါသည်။', own:'နေထိုင်ရာနေရာသည် ကုမ္ပဏီပိုင်ဖြစ်ပြီး ဆောက်လုပ်/ဝယ်ယူစရိတ်နှင့် အသုံးပြုနိုင်သက်တမ်းမှ တွက်ချက်ထားသော လစဉ်စရိတ်မှာ {R} ယန်း ဖြစ်ပါသည်။', eq:'{N} ဦး နေထိုင်သဖြင့် တစ်ဦးလျှင် {P} ယန်းသည် သင့်လျော်ပါသည်။', lt:'{N} ဦး နေထိုင်သဖြင့် တစ်ဦးလျှင် {P} ယန်း ကျသင့်ပြီး {F} ယန်းကို ကောက်ခံကာ ကွာခြားငွေကို ကုမ္ပဏီက ကျခံသဖြင့် သင့်လျော်ပါသည်။'},
+ km:{own2:'លំនៅដ្ឋានជាកម្មសិទ្ធិរបស់ក្រុមហ៊ុន ហើយថ្លៃប្រចាំខែដែលគណនាដោយចែកថ្លៃសាងសង់/ទិញ {C} យ៉េន នឹងរយៈពេលប្រើប្រាស់ {Y} ឆ្នាំ គឺ {R} យ៉េន។', rent:'លំនៅដ្ឋានត្រូវបានជួលក្នុងតម្លៃជួលប្រចាំខែ {R} យ៉េន។', own:'លំនៅដ្ឋានជាកម្មសិទ្ធិរបស់ក្រុមហ៊ុន ហើយថ្លៃប្រចាំខែដែលគណនាពីថ្លៃសាងសង់/ទិញ និងរយៈពេលប្រើប្រាស់ គឺ {R} យ៉េន។', eq:'មានអ្នកស្នាក់នៅ {N} នាក់ ដូច្នេះ {P} យ៉េនក្នុងម្នាក់ គឺសមរម្យ។', lt:'មានអ្នកស្នាក់នៅ {N} នាក់ ថ្លៃក្នុងម្នាក់គឺ {P} យ៉េន ដែលក្នុងនោះប្រមូល {F} យ៉េន ហើយចំនួនខុសគ្នាក្រុមហ៊ុនជាអ្នកទទួលបន្ទុក ដូច្នេះចំនួននេះសមរម្យ។'},
+ zh:{own2:'住房为公司自有房屋，将建造/购买费用{C}日元除以使用年限{Y}年计算出的每月费用为{R}日元。', rent:'住房为租赁房屋，月租金为{R}日元。', own:'住房为公司自有房屋，根据建造/购买费用及使用年限计算的每月费用为{R}日元。', eq:'共{N}人入住，每人{P}日元是合理的。', lt:'共{N}人入住，每人费用为{P}日元，其中收取{F}日元，差额由公司承担，因此金额合理。'},
+ tl:{own2:'Ang tirahan ay pag-aari ng kumpanya, at ang buwanang gastos na nakuha sa paghahati ng gastos sa pagpapatayo/pagbili na {C} yen sa tagal ng paggamit na {Y} taon ay {R} yen.', rent:'Ang tirahan ay inuupahan sa buwanang upa na {R} yen.', own:'Ang tirahan ay pag-aari ng kumpanya, at ang buwanang gastos na kinuwenta mula sa gastos sa pagpapatayo/pagbili at sa tagal ng paggamit nito ay {R} yen.', eq:'Dahil {N} ang nakatira, makatwiran ang {P} yen bawat tao.', lt:'Dahil {N} ang nakatira, ang gastos bawat tao ay {P} yen, at {F} yen ang sinisingil; ang diperensya ay sinasagot ng kumpanya, kaya makatwiran ang halaga.'},
+ mn:{own2:'Орон байр нь компанийн өмч бөгөөд барилга/худалдан авалтын зардал {C} иенийг ашиглалтын хугацаа {Y} жилд хувааж тооцсон сарын зардал нь {R} иен.', rent:'Орон байрыг сарын {R} иенийн түрээсээр түрээсэлсэн.', own:'Орон байр нь компанийн өмч бөгөөд барилга/худалдан авалтын зардал болон ашиглалтын хугацаанаас тооцсон сарын зардал нь {R} иен.', eq:'{N} хүн амьдардаг тул нэг хүнд ногдох {P} иен нь зохистой.', lt:'{N} хүн амьдардаг тул нэг хүнд ногдох зардал {P} иен бөгөөд үүнээс {F} иенийг авч, зөрүүг компани хариуцдаг тул зохистой.'},
+ si:{own2:'නවාතැන සමාගමට අයත් වන අතර, ඉදිකිරීම්/මිලදී ගැනීමේ වියදම යෙන් {C} භාවිත කාලය අවුරුදු {Y} න් බෙදා ගණනය කළ මාසික වියදම යෙන් {R} කි.', rent:'නවාතැන මාසික කුලිය යෙන් {R} ක් සඳහා කුලියට ගෙන ඇත.', own:'නවාතැන සමාගමට අයත් වන අතර, ඉදිකිරීම්/මිලදී ගැනීමේ වියදම සහ භාවිත කාලය අනුව ගණනය කළ මාසික වියදම යෙන් {R} කි.', eq:'පදිංචිකරුවන් {N} දෙනෙකු සිටින බැවින්, එක් අයෙකුට යෙන් {P} ක් සාධාරණ වේ.', lt:'පදිංචිකරුවන් {N} දෙනෙකු සිටින බැවින් එක් අයෙකුට වියදම යෙන් {P} ක් වන අතර, ඉන් යෙන් {F} ක් අය කරනු ලැබේ; වෙනස සමාගම විසින් දරන බැවින් මෙම මුදල සාධාරණ වේ.'},
+ ko:{own2:'주거는 회사 소유 물건이며, 건축·구입 비용 {C}엔을 내용연수 {Y}년으로 나누어 산출한 월 비용은 {R}엔입니다.', rent:'주거는 월 임대료 {R}엔으로 임차한 물건입니다.', own:'주거는 회사 소유 물건이며, 건축·구입 비용과 내용연수로 산출한 월 비용은 {R}엔입니다.', eq:'{N}명이 입주하므로 1인당 {P}엔은 적정합니다.', lt:'{N}명이 입주하므로 1인당 비용은 {P}엔이며, 그중 {F}엔을 징수하고 차액은 회사가 부담하므로 적정합니다.'}
+};
+function _p17HousingTr(x){
+  var L=(typeof P17_LANG!=='undefined' && P17_HC_TR[P17_LANG]) ? P17_HC_TR[P17_LANG] : null; if(!L || typeof _hcParse!=='function') return '';
+  var q=_hcParse(x); if(!q) return '';   // 日本語の文の形は案シス・フォームと同じ部品（_hcParse）で読む
+  var f=function(n){ return Number(n||0).toLocaleString('en-US'); };
+  var o={R:f(q.rent), C:f(q.cost), Y:String(q.years||''), N:String(q.n), P:f(q.per), F:f(q.fee)};
+  var sep=(P17_LANG==='zh')?'':' ';
+  var out=((q.kind==='rent'?L.rent:(q.kind==='own2'?L.own2:L.own))+sep+(q.lt?L.lt:L.eq)).replace(/\{(R|C|Y|N|P|F)\}/g,function(_,k){ return o[k]; });
+  /* ver.20261120.02: 決まった文のあとに書き足した部分（補足）は、いつもの訳し方（辞書・AIで覚えた訳）で訳す。訳せなければ赤字の目印 */
+  var rest=String(q.note||'').trim();
+  if(rest){ var h=_p17Look(rest)||(typeof _p17Subst==='function'?_p17Subst(rest):''); out += sep + (h ? h : (_p17NeedTr(rest) ? (window._p17Untr[rest]=true, '\u0001'+rest+'\u0002') : rest)); }
+  return out;
+}
+/* ver.20261120.02: 入力欄に「テンプレートで作る」（案シス・ヒアリングフォームと同じ部品） */
+/* ===== 実費相当の説明（支援計画書1-17号）のテンプレート ===== */
+/* 住居形態・月額（家賃／自己所有は算出した月額費用）・入居人数・徴収額から文章を作る。1人当たり＝月額÷人数（円未満切り捨て）。
+   文の形はSaysayの1-17（1_17_en.html の _p17HousingTr）で各言語に自動で訳すので、文言を変えるときは両方そろえること。 */
+function _hcYenJa(n){ n=Math.floor(+n||0); var m=Math.floor(n/10000), r=n%10000, s='';
+  if(m) s+=m+'万';
+  if(r) s+=(r%1000===0) ? (r/1000)+'千' : r.toLocaleString('ja-JP');
+  return (s||'0')+'円'; }
+function _hcNum(x){ x=String(x==null?'':x).replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[,，\s円]/g,''); return /^\d+$/.test(x)?parseInt(x,10):0; }
+function _hcBuild(o){
+  var type=String(o.type||''), R=_hcNum(o.rent), N=_hcNum(o.n), F=_hcNum(o.fee), C=_hcNum(o.cost), Yr=_hcNum(o.years);
+  if(/借上/.test(type)) type='借上'; else if(/自己所有/.test(type)) type='自己所有'; else return {err:'住居形態（借上／自己所有）を選んでください'};
+  if(type==='自己所有'){   // 自己所有は、建築・購入費用を耐用年数で割って月額を出す（耐用年数などを考えた額にするため）
+    if(!C) return {err:'建築・購入費用を入れてください（概算で大丈夫です）'};
+    if(!Yr) return {err:'耐用年数を選ぶか入れてください'};
+    R=Math.floor(C/(Yr*12));
+    if(!R) return {err:'月額費用が0円になります。建築・購入費用と耐用年数を見直してください'};
+  }
+  if(!R) return {err:'月額家賃を入れてください（予定・概算で大丈夫です）'};
+  if(!N) return {err:'入居人数を入れてください（予定で大丈夫です）'};
+  if(!F) return {rent:R, err:'徴収する額（居住費控除の月額。予定・概算で大丈夫です）を入れてください。居住費を控除しない場合は、この説明は要りません（1-17は「居住費の徴収 無」になります）'};
+  var P=Math.floor(R/N);
+  if(F===Math.ceil(R/N)) P=F;
+  if(F>P) return {rent:R, per:P, err:'徴収額 '+_hcYenJa(F)+' が1人当たり '+_hcYenJa(P)+' を超えています（実費を超える徴収は適正と言えません）。概算で大丈夫なので、徴収額か'+(type==='自己所有'?'費用・耐用年数':'月額')+'を見直してください'};
+  var s1 = type==='自己所有' ? '自己所有の物件で、建築・購入費用'+_hcYenJa(C)+'を耐用年数'+Yr+'年で割った月額費用は'+_hcYenJa(R)+'。' : '月額'+_hcYenJa(R)+'の家賃で借上げの物件。';
+  var s2 = (F===P) ? N+'名入居のため、1人当たり'+_hcYenJa(P)+'は適正。' : N+'名入居で1人当たり'+_hcYenJa(P)+'のところ、'+_hcYenJa(F)+'を徴収し、差額は会社負担のため適正。';
+  var note=String(o.note||'').trim();   // 補足（任意）：文の最後に付ける
+  return {text:s1+s2+note, per:P, type:type, rent:R, n:N, fee:F, cost:C, years:Yr, note:note};
+}
+/* 既にテンプレートで作った文なら、値を読み戻す（作り直し用） */
+function _hcJaYen(s){ s=String(s||'').replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);}).replace(/[,，円\s]/g,'');
+  var m=s.match(/^(?:(\d+)万)?(?:(\d+)千)?(\d+)?$/); if(!m||!(m[1]||m[2]||m[3])) return 0;
+  return (+(m[1]||0))*10000+(+(m[2]||0))*1000+(+(m[3]||0)); }
+function _hcParse(t){
+  /* 戻り値 kind：rent（借上）／own2（自己所有・費用と耐用年数つき）／own（自己所有・前の書き方） */
+  t=String(t||'').trim(); var Y='([0-9０-９万千,，]+円)', o=null, rest='';
+  var heads=[['rent','^月額'+Y+'の家賃で借上げの物件。'],['own2','^自己所有の物件で、建築・購入費用'+Y+'を耐用年数(\\d+)年で割った月額費用は'+Y+'。'],['own','^自己所有の物件で、建築・購入費用と耐用年数から算出した月額費用は'+Y+'。']];
+  for(var i=0;i<heads.length && !o;i++){ var m=t.match(new RegExp(heads[i][1])); if(!m) continue;
+    o={kind:heads[i][0], type:heads[i][0]==='rent'?'借上':'自己所有'};
+    if(o.kind==='own2'){ o.cost=_hcJaYen(m[1]); o.years=+m[2]; o.rent=_hcJaYen(m[3]); } else o.rent=_hcJaYen(m[1]);
+    rest=t.slice(m[0].length); }
+  if(!o) return null;
+  var m2=rest.match(new RegExp('^(\\d+)名入居(?:のため、1人当たり'+Y+'は適正|で1人当たり'+Y+'のところ、'+Y+'を徴収し、差額は会社負担のため適正)。'));
+  if(!m2) return null;
+  o.n=+m2[1]; o.per=_hcJaYen(m2[2]||m2[3]); o.lt=!!m2[4]; o.fee=m2[4]?_hcJaYen(m2[4]):o.per; o.note=rest.slice(m2[0].length);
+  return o;
+}
+/* 画面部品：<details>を開くと、今の入力（住居形態・同居人数・居住費控除・今の説明文）から値を読み込む */
+var _HC_CFG = {};
+function _hcBuilderHtml(key, cfg){
+  _HC_CFG[key]=cfg;
+  var ip='padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;box-sizing:border-box;width:100%;background:#fff;';
+  var lb='display:block;font-size:10px;font-weight:700;color:#6b7280;margin-bottom:2px;';
+  var on=' oninput="_hcPreview(\''+key+'\')" onchange="_hcPreview(\''+key+'\')"';
+  return '<details id="hcb_'+key+'" ontoggle="if(this.open)_hcFill(\''+key+'\')" style="margin-top:6px;border:1px dashed #93c5fd;border-radius:8px;background:#eff6ff;padding:6px 10px;">'+
+    '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:#1d4ed8;">🧩 テンプレートで作る（金額と人数を入れると文章を自動で作ります）</summary><div style="font-size:10px;color:#6b7280;margin-top:4px;">※ 居住費を給与から控除する（徴収する）場合だけ使います。<b>金額・人数は予定・概算で大丈夫です</b>（決まっていなければ見込みの金額を入れてください）。</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:8px;">'+
+      '<div><label style="'+lb+'">住居形態</label><select id="hcb_'+key+'_type" style="'+ip+'"'+on+'><option value="借上">借上</option><option value="自己所有">自己所有</option></select></div>'+
+      '<div id="hcb_'+key+'_rentW"><label style="'+lb+'">月額家賃（円）</label><input id="hcb_'+key+'_rent" type="number" min="0" placeholder="例: 92000" style="'+ip+'"'+on+'></div>'+
+      '<div id="hcb_'+key+'_costW" style="display:none;"><label style="'+lb+'">建築・購入費用（円）</label><input id="hcb_'+key+'_cost" type="number" min="0" placeholder="例: 15000000" style="'+ip+'"'+on+'></div>'+
+      '<div id="hcb_'+key+'_yrsW" style="display:none;"><label style="'+lb+'">耐用年数（年）</label><select id="hcb_'+key+'_struct" style="'+ip+'margin-bottom:4px;" onchange="var y=document.getElementById(\'hcb_'+key+'_years\');if(this.value)y.value=this.value;_hcPreview(\''+key+'\')"><option value="">構造から選ぶ（法定耐用年数）</option><option value="22">木造（22年）</option><option value="19">軽量鉄骨・骨格材3mm以下（19年）</option><option value="27">軽量鉄骨・骨格材3mm超4mm以下（27年）</option><option value="34">鉄骨造・骨格材4mm超（34年）</option><option value="47">鉄筋コンクリート造（47年）</option></select><input id="hcb_'+key+'_years" type="number" min="1" placeholder="例: 22（中古は残りの年数）" style="'+ip+'"'+on+'></div>'+
+      '<div><label style="'+lb+'">入居人数（同居人数計）</label><input id="hcb_'+key+'_n" type="number" min="1" value="1" placeholder="例: 4" style="'+ip+'"'+on+'></div>'+
+      '<div><label style="'+lb+'">徴収する額（円/月・1人）</label><input id="hcb_'+key+'_fee" type="number" min="0" placeholder="例: 13000" style="'+ip+'"'+on+'></div>'+
+    '</div>'+
+    '<div style="margin-top:6px;"><label style="'+lb+'">補足（任意・文の最後に付けます。例：光熱費は別途実費。）</label><input id="hcb_'+key+'_note" type="text" placeholder="なければ空欄" style="'+ip+'"'+on+'></div>'+
+    '<div id="hcb_'+key+'_pv" style="margin-top:6px;font-size:12px;line-height:1.6;color:#374151;"></div>'+
+    '<button type="button" onclick="_hcApply(\''+key+'\')" style="margin-top:6px;padding:6px 12px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">↑ 説明文に入れる</button>'+
+    '<span style="font-size:10px;color:#6b7280;margin-left:8px;">住居形態・同居人数も一緒にそろえます。直すときは、ここで直して入れ直すと各言語の訳も合ったままになります</span>'+
+  '</details>';
+}
+/* 住居形態の値（「□自己所有物件　■借り上げ物件」形式／「自己所有」「借上」）→ 借上／自己所有 */
+function _hcOwnOf(v){ v=String(v||''); if(/■/.test(v)) return /■\s*自己所有/.test(v)?'自己所有':'借上'; return /自己所有/.test(v)?'自己所有':'借上'; }
+function _hcEl(id){ return id ? document.getElementById(id) : null; }
+function _hcFill(key){
+  var c=_HC_CFG[key]; if(!c) return; var g=function(s){ return document.getElementById('hcb_'+key+'_'+s); };
+  var d=_hcEl(c.desc), p=_hcParse(d&&d.value), t=_hcEl(c.type), n=_hcEl(c.n), f=_hcEl(c.fee);
+  var tv = c.getType ? c.getType() : ((t&&t.value)||''); g('type').value = p ? p.type : _hcOwnOf(tv);
+  if(p){ g('rent').value=p.rent||''; g('n').value=p.n||''; g('fee').value=p.fee||''; g('note').value=p.note||''; if(p.cost) g('cost').value=p.cost; if(p.years) g('years').value=p.years; }
+  else { g('n').value = (n && _hcNum(n.value)) || _hcNum(g('n').value) || 1; }   // 人数の初期値は1名（住居形態の初期値は借上）
+  if(!g('fee').value && f && _hcNum(f.value)) g('fee').value=_hcNum(f.value);
+  _hcPreview(key);
+  if(f && !_hcNum(f.value)){ var pv=document.getElementById('hcb_'+key+'_pv'); if(pv) pv.innerHTML='<span style="color:#b45309;">⚠ 居住費控除が入っていません。控除しない場合、この説明は要りません。控除する場合は「徴収する額」を入れてください（説明文に入れると居住費控除にも入ります）。</span>'; }
+}
+function _hcRead(key){ var g=function(s){ var e=document.getElementById('hcb_'+key+'_'+s); return e?e.value:''; };
+  return _hcBuild({type:g('type'), rent:g('rent'), n:g('n'), fee:g('fee'), note:g('note'), cost:g('cost'), years:g('years')}); }
+function _hcPreview(key){
+  var ty=document.getElementById('hcb_'+key+'_type'), own=!!(ty && ty.value==='自己所有'), sw=function(s,v){ var e=document.getElementById('hcb_'+key+'_'+s); if(e) e.style.display=v?'':'none'; };
+  sw('rentW',!own); sw('costW',own); sw('yrsW',own);   // 自己所有は「建築・購入費用」と「耐用年数」から月額を出す
+  var r=_hcRead(key), pv=document.getElementById('hcb_'+key+'_pv'); if(!pv) return;
+  var per = (own && r.rent ? '<b>月額費用：'+_hcYenJa(r.rent)+'</b>（費用÷耐用年数÷12か月）　' : '') + ((r.per!=null) ? '<b>1人当たり：'+_hcYenJa(r.per)+'</b>　' : '');
+  pv.innerHTML = r.err ? per+'<span style="color:#b45309;">⚠ '+r.err+'</span>' : per+'<br>📝 '+r.text.replace(/</g,'&lt;');
+}
+function _hcApply(key){
+  var c=_HC_CFG[key], r=_hcRead(key); if(!c) return;
+  if(r.err){ alert(r.err); return; }
+  var d=_hcEl(c.desc);
+  if(d && d.value.trim() && d.value.trim()!==r.text && !_hcParse(d.value) && !confirm('今の説明文を、テンプレートの文に置き換えます。よろしいですか？\n\n今：'+d.value.trim())) return;
+  var fire=function(el){ if(!el) return; ['input','change'].forEach(function(ev){ try{ el.dispatchEvent(new Event(ev,{bubbles:true})); }catch(e){} }); };
+  if(d){ d.value=r.text; fire(d); if(d.tagName==='TEXTAREA'){ try{ d.style.height='auto'; d.style.height=(d.scrollHeight+4)+'px'; }catch(e){} } }   // 文が全部見えるように高さを合わせる
+  var t=_hcEl(c.type), tval = (c.typeFmt==='mark') ? (r.type==='自己所有'?'■自己所有物件　□借り上げ物件':'□自己所有物件　■借り上げ物件') : r.type;
+  if(t){ if(t.tagName==='SELECT'){ var ok=[].some.call(t.options,function(o){return o.value===tval;}); if(ok) t.value=tval; } else t.value=tval; fire(t); }
+  var n=_hcEl(c.n); if(n){ n.value=r.n; fire(n); }
+  var f=_hcEl(c.fee), want=r.fee;
+  if(f && !_hcNum(f.value)){ f.value = c.feeFmt ? Number(want).toLocaleString('ja-JP') : want; fire(f); }
+  else if(f && _hcNum(f.value)!==want){ alert('居住費控除の月額（'+_hcYenJa(_hcNum(f.value))+'）と、この文の徴収額（'+_hcYenJa(want)+'）が違います。どちらかを直してください。'); }
+  if(c.after) try{ c.after(r); }catch(e){}
+}
+function _p17HcMount(){
+  var w=document.getElementById('hcbWrap17'); if(!w || w.firstChild) return;
+  w.innerHTML=_hcBuilderHtml('p17',{desc:'es_actualCostDesc', n:'es_cohabitants', fee:'es_housingFee', feeFmt:true,
+    getType:function(){ return (window._p17Check && window._p17Check.f139) ? '自己所有' : '借上'; },
+    after:function(r){
+      var C=window._p17Check=window._p17Check||{}, T=window._p17Text=window._p17Text||{}, own=(r.type==='自己所有');
+      C.f139=own; C.f140=!own; C.f141=own; C.f142=!own;   // 提供する宿泊施設の具体的な内容（自己所有物件／借上物件）
+      T.f131=String(r.n);                                  // 同居人数計
+      var hf=document.getElementById('es_housingFee'), fee=_hcNum(hf&&hf.value);
+      if(fee>0){ C.f133=true; C.f134=false; C.f135=true; C.f136=false; T.f138=fee.toLocaleString('ja-JP'); }
+      if(typeof p==='function') p();
+      _p17HcSaveBack(r);
+    }});
+  w.insertAdjacentHTML('beforeend','<div id="hcb_p17_trst" style="font-size:11px;margin-top:4px;"></div><div id="hcbTr17"></div>');   // ver.20261120.03: 訳の確認状態と、訳の確認・修正
+  _p17HcBadge(); _p17HcTrPanel(); _p17HcLoadTr();
+}
+/* 案シスの雇用条件セット（この案件で使っているセット）にも同じ内容を入れる。RPC set_empset_housing（実費相当説明・住居形態・同居人数、居住費控除は空のときだけ） */
+async function _p17HcSaveBack(r){
+  var ref=window._p17EsRef; if(!ref || !ref.co || !(ref.idx>=0)) return;
+  if(!confirm('案シスの雇用条件セットにも、この内容（実費相当説明・住居形態・同居人数）を保存しますか？\n同じ会社の別の人の1-17でも、そのまま使えるようになります。')) return;
+  try{
+    var res=await sb('rpc/set_empset_housing',{method:'POST',body:JSON.stringify({p_company_id:String(ref.co), p_idx:ref.idx, p_uid:ref.uid||'',
+      p_desc:r.text, p_owner:(r.type==='自己所有'?'■自己所有物件　□借り上げ物件':'□自己所有物件　■借り上げ物件'), p_cohab:String(r.n), p_fee:String(r.fee||'')})});
+    var st=String(Array.isArray(res)?res[0]:res).replace(/"/g,'');
+    if(/^ok/.test(st)) alert('案シスの雇用条件セットに保存しました。'+(st==='ok_fee_kept'?'\n（居住費控除は案シスにすでに別の金額が入っていたので、変えていません）':''));
+    else alert('案シスに保存できませんでした（'+st+'）。案シスの雇用条件セットで入れてください。');
+  }catch(e){ alert('案シスに保存できませんでした：'+(e&&e.message||e)); }
+}
+/* ver.20261120.03: 決まった訳文を画面で確かめて直せるようにする（通訳さんの確認用）。直した訳と「確認済み」は settings の p17_hc_tr に言語ごとに入り、全員の1-17（15-10号も）に効く */
+var P17_HC_JA = {own2:'自己所有の物件で、建築・購入費用{C}円を耐用年数{Y}年で割った月額費用は{R}円。', rent:'月額{R}円の家賃で借上げの物件。', own:'自己所有の物件で、建築・購入費用と耐用年数から算出した月額費用は{R}円。', eq:'{N}名入居のため、1人当たり{P}円は適正。', lt:'{N}名入居で1人当たり{P}円のところ、{F}円を徴収し、差額は会社負担のため適正。'};
+var P17_HC_NEED = {own2:['C','Y','R'], rent:['R'], own:['R'], eq:['N','P'], lt:['N','P','F']};
+var P17_HC_LN = {en:'英語',id:'インドネシア語',vi:'ベトナム語',th:'タイ語',ne:'ネパール語',my:'ミャンマー語',km:'クメール語',zh:'中国語',tl:'タガログ語',mn:'モンゴル語',si:'シンハラ語',ko:'韓国語'};
+window._p17HcSt = window._p17HcSt || {};
+function _p17HcLang(){ return (typeof P17_LANG!=='undefined') ? P17_LANG : 'en'; }
+function _p17HcEsc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+async function _p17HcLoadTr(){
+  try{
+    var r=await sb('settings?select=value&key=eq.p17_hc_tr'); var all={};
+    if(r && r[0] && r[0].value){ try{ all=JSON.parse(r[0].value)||{}; }catch(e){} }
+    window._p17HcSt=all;
+    Object.keys(all).forEach(function(L){ var o=all[L]&&all[L].tr; if(o && P17_HC_TR[L]) Object.keys(o).forEach(function(k){ if(o[k]) P17_HC_TR[L][k]=o[k]; }); });
+    _p17HcTrPanel(); _p17HcBadge();
+    var d=document.getElementById('es_actualCostDesc'); if(d && _hcParse(d.value) && typeof p==='function') p();
+  }catch(e){ console.warn('[p17] 住居の説明の訳を読み込めませんでした', e); }
+}
+function _p17HcStatusHtml(){
+  var L=_p17HcLang(), st=window._p17HcSt[L]||{}, nm=P17_HC_LN[L]||L;
+  return st.ok ? '<span style="color:#15803d;font-weight:700;">✅ '+nm+'の訳：確認済み</span>'+(st.by||st.at?'<span style="color:#6b7280;">（'+_p17HcEsc([st.by,String(st.at||'').slice(0,10)].filter(Boolean).join('・'))+'）</span>':'')
+               : '<span style="color:#b45309;font-weight:700;">⚠ '+nm+'の訳：まだネイティブの確認をしていません</span><span style="color:#6b7280;">（下の「訳の確認・修正」で確かめられます）</span>';
+}
+function _p17HcBadge(){ var b=document.getElementById('hcb_p17_trst'); if(b) b.innerHTML=_p17HcStatusHtml(); var s=document.getElementById('hcb_p17_trst2'); if(s) s.innerHTML=_p17HcStatusHtml(); }
+function _p17HcTrPanel(){
+  var w=document.getElementById('hcbTr17'); if(!w) return;
+  var L=_p17HcLang(), T=P17_HC_TR[L]; if(!T){ w.innerHTML=''; return; }
+  var st=window._p17HcSt[L]||{}, ta='width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;';
+  var rows=['rent','own2','own','eq','lt'].map(function(k){
+    return '<div style="margin-top:8px;"><div style="font-size:11px;color:#374151;">🇯🇵 '+_p17HcEsc(P17_HC_JA[k])+(k==='own'?'<span style="color:#9ca3af;">（前の書き方）</span>':'')+'</div><textarea id="hcbTr17_'+k+'" rows="2" style="'+ta+'">'+_p17HcEsc(T[k])+'</textarea></div>';
+  }).join('');
+  w.innerHTML='<details style="margin-top:6px;border:1px dashed #86efac;border-radius:8px;background:#f0fdf4;padding:6px 10px;">'+
+    '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:#15803d;">🌐 訳の確認・修正（'+_p17HcEsc(P17_HC_LN[L]||L)+'）</summary>'+
+    '<div id="hcb_p17_trst2" style="font-size:11px;margin-top:6px;">'+_p17HcStatusHtml()+'</div>'+
+    '<div style="font-size:10px;color:#6b7280;margin-top:4px;">{R}=月額　{C}=建築・購入費用　{Y}=耐用年数　{N}=人数　{P}=1人当たり　{F}=徴収額（数字が入る場所です。消さずに残してください）。直すと、この言語のすべての1-17・15-10号に効きます。</div>'+
+    rows+
+    '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">'+
+      '<label style="font-size:12px;"><input type="checkbox" id="hcbTr17_ok"'+(st.ok?' checked':'')+'> ネイティブ（通訳さん）が確認した</label>'+
+      '<input id="hcbTr17_by" placeholder="確認した人" value="'+_p17HcEsc(st.by||'')+'" style="padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;width:140px;">'+
+      '<button type="button" onclick="_p17HcTrSave()" style="padding:6px 12px;background:#16a34a;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">保存</button>'+
+      '<button type="button" onclick="_p17HcTrCopy()" style="padding:6px 12px;background:#fff;color:#15803d;border:1px solid #16a34a;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📋 確認依頼用にコピー</button>'+
+    '</div></details>';
+}
+async function _p17HcTrSave(){
+  var L=_p17HcLang(), T=P17_HC_TR[L]; if(!T) return;
+  var tr={}, bad=[];
+  ['rent','own2','own','eq','lt'].forEach(function(k){
+    var e=document.getElementById('hcbTr17_'+k), t=String(e&&e.value||'').trim(); tr[k]=t;
+    var miss=P17_HC_NEED[k].filter(function(x){ return t.indexOf('{'+x+'}')<0; });
+    if(!t) bad.push(P17_HC_JA[k]+' → 空欄です'); else if(miss.length) bad.push(P17_HC_JA[k]+' → {'+miss.join('}・{')+'} がありません');
+  });
+  if(bad.length){ alert('保存できません：\n'+bad.join('\n')); return; }
+  var ok=!!(document.getElementById('hcbTr17_ok')||{}).checked, by=String((document.getElementById('hcbTr17_by')||{}).value||'').trim();
+  if(ok && !by){ alert('確認済みにするときは「確認した人」を入れてください'); return; }
+  try{
+    var cur={}; var r=await sb('settings?select=value&key=eq.p17_hc_tr');
+    if(r && r[0] && r[0].value){ try{ cur=JSON.parse(r[0].value)||{}; }catch(e){} }
+    cur[L]={tr:tr, ok:ok, by:by, at:new Date().toISOString()};
+    await sb('settings?on_conflict=key', {method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body: JSON.stringify([{key:'p17_hc_tr', value: JSON.stringify(cur), updated_at: new Date().toISOString()}])});
+    window._p17HcSt=cur; Object.assign(T,tr); _p17HcBadge();
+    if(typeof p==='function') p();
+    alert('保存しました（'+(P17_HC_LN[L]||L)+'）');
+  }catch(e){ alert('保存できませんでした：'+(e&&e.message||e)); }
+}
+function _p17HcTrCopy(){
+  var L=_p17HcLang(), T=P17_HC_TR[L]; if(!T) return;
+  var txt='【確認のお願い】支援計画書（1-17号）「居住費の説明」の'+(P17_HC_LN[L]||L)+'訳です。意味が合っているか確認し、直すところがあれば教えてください。\n（{R}{N}{P}{F} には数字が入ります）\n\n'+
+    ['rent','own2','own','eq','lt'].map(function(k,i){ return (i+1)+'. '+P17_HC_JA[k]+'\n→ '+T[k]; }).join('\n\n');
+  var done=function(){ alert('コピーしました。LINEなどに貼って通訳さんに送ってください。'); };
+  try{ navigator.clipboard.writeText(txt).then(done,function(){ prompt('コピーしてください', txt); }); }catch(e){ prompt('コピーしてください', txt); }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_p17HcMount); else setTimeout(_p17HcMount,0);
+var _p17FxLine0=_p17FxLine;
+_p17FxLine=function(id){ var h=_p17HousingTr(String(v(id)||'').trim()); return h ? '<p class="vi">'+_p17EscMark(h)+'</p>' : _p17FxLine0(id); };
 function _p17Post(){
   var area=document.getElementById('pageArea'); if(!area) return;
   // 対訳チェックの連動
@@ -2379,6 +2616,7 @@ async function loadFromDB(passedInfo){
           try{ _esIdx = await window.resolveEmpSetIdx(co, cas, info); }catch(_e){ _esIdx = -1; }
         }
         var _es = (Array.isArray(co.emp_sets) ? co.emp_sets : [])[_esIdx] || {};
+        window._p17EsRef = (_esIdx>=0) ? {co:co.id, idx:_esIdx, uid:String(_es._uid||'')} : null;   // ver.20261120.02: テンプレートで作った住居の説明を案シスに書き戻す先
         /* ver.20261105.06: 作成日は雇用条件書（1-6号）と同じ順番で決める：案件の作成日 → 雇用条件セットの作成日 → 今日 */
         (function(){
           var g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
@@ -2432,7 +2670,7 @@ async function loadFromDB(passedInfo){
           if(!hasInfo) window._p17HouseDef.push('住居の概要');
           var nintei = /認定/.test((cas&&cas.app_type)||'');
           C.f125 = !nintei; C.f126 = nintei;
-          C.f129 = true;
+          C.f129 = !/未/.test(String(_es.roomArea75||'')); C.f132 = !/未/.test(String(_es.bedroomArea45||''));   // ver.20261120.04: 居室7.5㎡・寝室4.5㎡（雇用条件セットで「未確保」のときだけ外す）
           if(String(_es.cohabitants||'')!=='') T.f131 = String(_es.cohabitants);
           if(/^\d+$/.test(fee)){
             var yes = parseInt(fee,10) > 0;
@@ -2444,8 +2682,8 @@ async function loadFromDB(passedInfo){
             C.f133 = false; C.f134 = true; C.f135 = false; C.f136 = true;
             var _hf1=document.getElementById('es_housingFee'); if(_hf1) _hf1.value='';
           }
-          if(/■\s*自己所有/.test(own)){ C.f139 = true; C.f140 = false; C.f141 = true; C.f142 = false; }
-          else if(/■\s*借/.test(own)){ C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; }
+          if(/■\s*自己所有/.test(own) || /^\s*自己所有/.test(own)){ C.f139 = true; C.f140 = false; C.f141 = true; C.f142 = false; }
+          else if(/■\s*借/.test(own) || /^\s*借/.test(own)){ C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; }
           else { C.f139 = false; C.f140 = true; C.f141 = false; C.f142 = true; window._p17HouseDef.push('物件の種類（借上げ）'); }   // 未記入は借上げ（3-ア b と同じ扱い）
         })();
         /* ver.20261029.06: 英語の都道府県・市区町村は読込処理が無く常に空だった。
@@ -2826,6 +3064,16 @@ async function _p17Hearing(so, _s){
       if(C[r[0]] && !String(T[r[1]]||'').trim()) T[r[1]] = (k==='a' && main) ? main+'での入居に合意しなかった場合に実施' : '適宜実施';
       if(C[r[2]] && !String(T[r[3]]||'').trim()) T[r[3]] = (k==='a') ? (main ? main+'で実施' : '') : ((C.f094 && main) ? 'a,'+main+'で実施' : (main && main!==k ? main+'で実施' : ''));
     });
+  })();
+  /* ver.20261120.04: 3-ア の b（自ら借りて提供＝借上物件）と c（所有する社宅＝自己所有物件）を、d の物件の種類（雇用条件セットの住居形態）にそろえる。
+       登録支援機関の方針が「b 有・c 無」でも、この案件が自己所有なら c 有・b 無（cで実施）にする。b も c も有のとき・どちらも無のときはさわらない */
+  (function(){
+    var want=C.f139?'c':'b', other=C.f139?'b':'c', id={b:['f102','f103','f104','f105'], c:['f109','f110','f111','f112']}, w=id[want], o=id[other];
+    if(C[w[0]] || !C[o[0]]) return;
+    C[w[0]]=true; C[w[2]]=false; T[w[1]]=String(T[o[1]]||'').trim()||'適宜実施'; T[w[3]]='';
+    C[o[0]]=false; C[o[2]]=true; T[o[1]]=''; T[o[3]]=(C.f094?'a,':'')+want+'で実施';
+    if(C.f094 && T.f095) T.f095=String(T.f095).replace(new RegExp('^'+other+'での入居'), want+'での入居');
+    if(C.f096 && T.f097) T.f097=String(T.f097).replace(new RegExp('^'+other+'で実施'), want+'で実施');
   })();
   if(apply(IS.procedures,  [['f143','f144','f145','f146'],['f154','f155','f156','f157'],['f165','f166','f167','f168']])) sch++;
   else if(Object.keys(IS).length){
