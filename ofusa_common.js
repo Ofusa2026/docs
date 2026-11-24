@@ -8447,10 +8447,11 @@ window._histRecord=async function(o){
 (function(){
   function wrap(){
     if(typeof showToast!=='function' || showToast.__sw) return false;
-    var o=showToast; var w=function(msg){ try{ var m=String(msg||''); if(/保存しました|保存完了/.test(m) && !/失敗|できません|エラー/.test(m) && window._markSaved) window._markSaved(); }catch(e){} return o.apply(this,arguments); };
+    var o=showToast; var w=function(msg){ try{ var m=String(msg||''); if(/保存しました|保存完了/.test(m) && !/失敗|できません|エラー|注記/.test(m) && window._markSaved) window._markSaved(); }catch(e){} return o.apply(this,arguments); };
     w.__sw=true; showToast=w; window.showToast=w; return true;
   }
-  if(!wrap()){ var n=0, t=setInterval(function(){ if(wrap() || ++n>20) clearInterval(t); },300); }
+  // 書類によっては、あとから自分の showToast を作り直すので、しばらく見張って付け直す（ver.20261124.13）
+  wrap(); var n=0, t=setInterval(function(){ wrap(); if(++n>40) clearInterval(t); },500);
 })();
 
 /* ============================================================
@@ -9503,4 +9504,53 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   function tip(){ try{ [].slice.call(document.querySelectorAll('.fp .fid')).forEach(function(f){ var l=f.closest('label')||f.parentNode; if(l && !l.title) l.title=f.textContent.trim(); }); }catch(e){} }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tip); else tip();
   window.addEventListener('load', function(){ setTimeout(tip, 500); });
+})();
+
+/* ============================================================
+   ver.20261124.13: 保存し忘れを防ぐ（全書類共通・画面だけ）
+   手で変えた欄の名前に「● 未保存」、［💾 DB保存］に「未保存 N」。DB保存できたら消える
+   ============================================================ */
+(function(){
+  if(window.__ofUx13) return; window.__ofUx13=true;
+  var st=document.createElement('style'); st.id='_ofUx13';
+  st.textContent='@media screen{'
+    +'.fg.fo-dirty > label::after,.fg.fo-dirty label:first-of-type::after{content:" ● 未保存";color:#7c3aed;font-size:9px;font-weight:700;}'
+    +'.tb-save[data-unsaved]{position:relative;}'
+    +'.tb-save[data-unsaved]::after{content:attr(data-unsaved);position:absolute;top:-8px;right:-6px;background:#f97316;color:#fff;font-size:9.5px;font-weight:800;line-height:1;padding:3px 6px;border-radius:9px;box-shadow:0 0 0 2px #1a2e4a;white-space:nowrap;}'
+    +'}';
+  (document.head||document.documentElement).appendChild(st);
+
+  /* 保存し忘れ */
+  var dirty={};
+  function fgOf(el){ return el && el.closest ? el.closest('.fg') : null; }
+  function count(){ return Object.keys(dirty).length; }
+  function badge(){
+    var n=count(), d=!!(window._sDirty || window._editedDirty);
+    [].slice.call(document.querySelectorAll('.app-bar .tb-save')).forEach(function(b){
+      if(n || d){ b.setAttribute('data-unsaved', n?('未保存 '+n):'未保存'); b.title='保存していない変更があります（Ctrl+S でも保存できます）'; }
+      else b.removeAttribute('data-unsaved');
+    });
+  }
+  function isField(t){
+    if(!t || !t.id || !/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return false;
+    if(!(t.closest && t.closest('.fp')) || t.closest('#_fpOrg')) return false;
+    if(t.id==='caseSelect' || /Select$/.test(t.id) || /^sp_/.test(t.id)) return false;
+    return true;
+  }
+  ['input','change'].forEach(function(ev){
+    document.addEventListener(ev, function(e){
+      if(!e.isTrusted || !isField(e.target)) return;
+      dirty[e.target.id]=true; var g=fgOf(e.target); if(g) g.classList.add('fo-dirty'); badge();
+    }, true);
+  });
+  function clearAll(){ dirty={}; [].slice.call(document.querySelectorAll('.fg.fo-dirty')).forEach(function(g){ g.classList.remove('fo-dirty'); }); badge(); }
+  function wrap(){
+    if(typeof window._markSaved!=='function' || window._markSaved.__ux13) return !!window._markSaved;
+    var o=window._markSaved; var w=function(){ var r=o.apply(this, arguments); try{ clearAll(); }catch(e){} return r; };
+    w.__ux13=true; window._markSaved=w; return true;
+  }
+  if(!wrap()){ var n=0, t=setInterval(function(){ if(wrap() || ++n>20) clearInterval(t); }, 300); }
+  // 案件を選び直したら、前の案件の印は消す
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') setTimeout(clearAll, 50); }catch(_e){} });
+  setInterval(badge, 2000);   // 直接編集の未保存など、ほかの所で変わった分も拾う
 })();
