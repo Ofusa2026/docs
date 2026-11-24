@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.04</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.05</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -595,8 +595,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611241237';
-window.__DOCS_CACHE_BUSTER__ = '2611241237';
+window.__DOCS_CACHE_BUSTER__ = '2611241250';
+window.__DOCS_CACHE_BUSTER__ = '2611241250';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2246,6 +2246,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261124.05',
+    date: '2026-11-24',
+    notify: true,
+    items: [
+      '🪄 1-17号「支援を行っている１号特定技能外国人数」が0人・空欄・不明のときは、<b>この計画で支援する人数</b>（同じ案件名で同時に申請する人数）を入れます（黄色）。入管から「支援予定の人も含める」と追完が来ていた所です。',
+      '☑ 1-6号「契約の更新の有無」は1つだけ選べるようにしました（1つ押すとほかは外れ、訳の行も同じになります）。2つ以上に■があると⛔で知らせます。',
+      '⛔ 直接編集で固めた書類の氏名が、今の案件の申請人と違うとき（ほかの人の書類を使い回したとき）、開いたときと印刷前に知らせます。まとめPDF・全書類チェックにも出ます。'
+    ]
+  },
   {
     version: 'ver.20261124.04',
     date: '2026-11-24',

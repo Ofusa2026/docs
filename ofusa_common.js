@@ -5786,6 +5786,11 @@ function _p16Tsuikan(probs){
     var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
     var cr=[]; if(_p16CbOn('change_none_direct')===false) cr.push('Ⅱ 就業の場所'); if(_p16CbOn('change_none_disp')===false) cr.push('Ⅲ 従事すべき業務の内容');
     if(cr.length) probs.push('⚠ 「変更の範囲」の「変更の可能性なし」が外れています（'+cr.join('・')+'）。変更があるときは、その下に変更の範囲を書いてください（直接編集）。変更が無いなら、書類の□を押して■に戻し、💾保存してください。入管から追完が来ている所です');   // ver.20261124.03: はじめから■にしたので、外したときだけ知らせる
+    var rn=['renewal_auto','renewal_pos','renewal_none'].filter(function(k){ return _p16CbOn(k)===true; });
+    if(document.querySelector('#pageArea [data-cbid="renewal_auto"]')){
+      if(rn.length>1) probs.push('⛔ 「契約の更新の有無」に■が '+rn.length+'つ付いています。1つだけにしてください（入管から「両方にチェックがある」と追完が来た所です）');
+      else if(!rn.length) probs.push('⚠ 「契約の更新の有無」が選ばれていません（左の「更新の有無」か、書類の□を押してください）');
+    }
     if(has('es_healthCheckY2')){
       var hc=[];
       if(!g('es_healthCheckY2') || !g('es_healthCheckM2')) hc.push('雇入れ時の健康診断');
@@ -5912,6 +5917,16 @@ function _p16PrintCheck(){
     if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
     var _tcb=window.toggleCb; if(typeof _tcb!=='function' || _tcb.__p16cr) return;
     var w2=function(id){
+      // ver.20261124.05: 「契約の更新の有無」（自動的に更新する／更新する場合があり得る／更新しない）は1つだけ選べるようにする（両方に■で追完2件）
+      var RG=['renewal_auto','renewal_pos','renewal_none'], base=String(id||'').replace(/_id$/,'');
+      if(RG.indexOf(base)>=0){
+        try{
+          var on=[].some.call(document.querySelectorAll('#pageArea [data-cbid="'+id+'"]'), function(el){ return String(el.textContent).indexOf('■')>=0; });
+          var nv=!on;
+          RG.forEach(function(k){ var val=(k===base)?nv:(nv?false:undefined); [k,k+'_id'].forEach(function(kk){ if(val===undefined) return; window.cbState[kk]=val; document.querySelectorAll('[data-cbid="'+kk+'"]').forEach(function(el){ el.textContent=val?'■':'□'; }); }); });
+        }catch(e){ _tcb(id); }
+        return;
+      }
       _tcb(id);
       try{
         var pr=_P16_CRPAIR[id]; if(!pr || !document.querySelector('[data-cbid="'+pr+'"]')) return;
@@ -6081,6 +6096,7 @@ window._batchCheck=function(){
     // ver.20261124.02: 1-17号の支援対象者（生年月日・性別）・居住費の説明／名簿（複数人）の空欄・ありえない生年月日
     if(typeof window._p17TsuikanList==='function' && /(^|\/)(1_17|15_10)_[a-z]+\.html/.test(location.pathname)) window._p17TsuikanList().forEach(function(x){ out.push((x.sev==='out'?'⛔ ':'⚠ ')+x.t); });
     if(typeof window._mbTsuikanList==='function' && /(^|\/)meibo\.html/.test(location.pathname)) window._mbTsuikanList().forEach(function(x){ out.push((x.sev==='out'?'⛔ ':'⚠ ')+x.t); });
+    try{ if(typeof window._ofFrozenNameIssue==='function'){ var _fz=window._ofFrozenNameIssue(); if(_fz) out.push('⛔ '+_fz); } }catch(_fze){}   // ver.20261124.05
     if(!/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)){
       var R=_srcRedItems(); if(R.n) out.push('⬜ 案シスで埋めてください（'+R.n+'欄）：'+R.items.slice(0,4).join('、')+(R.items.length>4?' ほか':''));
     }
@@ -9094,7 +9110,7 @@ window._mbTsuikanList=_mbTsuikanList;
         var a=window._p17PrePrintList;
         if(typeof a==='function' && !a.__ts){ var wa=function(){ var o=a.apply(this, arguments)||[]; _p17TsuikanList().forEach(function(x){ o.push('・'+mark(x)); }); return o; }; wa.__ts=true; window._p17PrePrintList=wa; }
         var b=window._p17TodoItems;
-        if(typeof b==='function' && !b.__ts){ var wb=function(){ var o=b.apply(this, arguments)||[]; _p17TsuikanList().reverse().forEach(function(x){ o.unshift({t:mark(x), go:"_p17GoField('"+x.id+"')"}); }); return o; }; wb.__ts=true; window._p17TodoItems=wb; }
+        if(typeof b==='function' && !b.__ts){ var wb=function(){ var o=b.apply(this, arguments)||[]; _p17TsuikanList().reverse().forEach(function(x){ o.unshift({t:mark(x), go:"_p17GoField('"+x.id+"')"}); }); if(window._p17CntNote) o.push({t:window._p17CntNote, go:"_p17GoField('es_soSupporterCount')", info:1}); return o; }; wb.__ts=true; window._p17TodoItems=wb; }
       }
       if(isMb){
         var pr=window.doPrint;
@@ -9115,3 +9131,73 @@ window._mbTsuikanList=_mbTsuikanList;
   window.addEventListener('load', hook); setTimeout(hook, 1500); setTimeout(hook, 4000);
 })();
 /* ===== /1-17号・名簿のチェック ===== */
+
+/* ===== ver.20261124.05: 追完の多い所（その3） =====
+   ① 直接編集で固めた書類に、ほかの人の名前が残っている（1-25号・分野の誓約書で「申請人氏名が別人」と追完6件）
+      → 固めた書類の氏名の欄が、今の案件の申請人と違えば、印刷前に⛔。まとめPDF・全書類チェックにも出す
+   ② 1-17号「支援を行っている１号特定技能外国人数」が0人・空欄・不明（「本計画で支援する予定の人も含める」と追完約8件）
+      → 0・空欄・数字でないときだけ、同じ案件名で同時に申請する人数（1人なら1）を入れる（黄色） */
+function _ofNameKey(s){ return String(s||'').normalize('NFKC').toUpperCase().replace(/[\s　・,，.。]/g,''); }
+function _ofFrozenNameIssue(){
+  try{
+    if(!window._htmlFrozen) return '';
+    var A=document.getElementById('pageArea'); if(!A) return '';
+    var ids=['f_applicant','applicantName','es_applicantName'], bad='';
+    ids.forEach(function(id){
+      if(bad) return;
+      var cur=(document.getElementById(id)||{}).value||''; if(!cur && window._lastCaseInfo) cur=window._lastCaseInfo.applicant||'';
+      var C=_ofNameKey(cur); if(C.length<3) return;
+      [].forEach.call(A.querySelectorAll('[data-bind="'+id+'"]'), function(sp){
+        if(bad) return; var T=_ofNameKey(sp.textContent); if(T.length<3 || T===C || T.indexOf(C)>=0 || C.indexOf(T)>=0) return;
+        bad='直接編集で固めたこの書類の氏名が「'+String(sp.textContent).trim()+'」で、今の案件の申請人「'+String(cur).trim()+'」と違います。別の人の書類を使っていませんか（入管から「申請人氏名が別人」と追完が来た所です）';
+      });
+    });
+    return bad;
+  }catch(e){ return ''; }
+}
+window._ofFrozenNameIssue=_ofFrozenNameIssue;
+(function(){
+  if(/(^|\/)(index|meibo|customer_flow)\.html/.test(location.pathname)) return;
+  var done=false;
+  function hook(){
+    if(done || typeof window.doPrint!=='function') return; done=true;
+    var o=window.doPrint;
+    var w=function(){
+      try{ var m=_ofFrozenNameIssue(); if(m && !confirm('⛔ '+m+'\n\nこのまま印刷しますか？')) return; }catch(e){}
+      return o.apply(this, arguments);
+    };
+    try{ Object.keys(o).forEach(function(k){ w[k]=o[k]; }); }catch(_e){}
+    w.__fz=true; window.doPrint=w;
+  }
+  window.addEventListener('load', function(){ setTimeout(hook, 3000); });
+  // 固めた書類を開いたときにも知らせる
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(function(){ var m=_ofFrozenNameIssue(); if(m && !window._docCheckMode && typeof showToast==='function') showToast('⛔ '+m, 9000); }, 5000); } }catch(_e){} });
+})();
+// 1-17号：支援を行っている人数の既定
+async function _p17SupportCountDefault(){
+  try{
+    if(!/(^|\/)(1_17|15_10)_[a-z]+\.html/.test(location.pathname)) return;
+    if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return;
+    var info=window._lastCaseInfo||{}; if(!info.caseId || typeof sb!=='function') return;
+    var self=!!window._p17SelfWhy;
+    var el=document.getElementById('es_soSupporterCount');
+    var T=window._p17Text=window._p17Text||{};
+    var cur=self ? String(T.f023n||((document.getElementById('f023n')||{}).value)||'') : String(el?el.value:'');
+    if(/^\s*[1-9]\d*\s*名?\s*$/.test(cur.normalize('NFKC'))) return;   // 1以上の数が入っていれば変えない
+    if(!self && !el) return;
+    var n=1;
+    try{
+      var r=await sb('cases?select=name&id=eq.'+encodeURIComponent(info.caseId)), nm=r&&r[0]&&String(r[0].name||'').trim();
+      if(nm){ var rs=await sb('cases?select=id&name=eq.'+encodeURIComponent(nm)); if(rs && rs.length) n=rs.length; }
+    }catch(_e){}
+    var why='「'+(cur||'空欄')+'」だったので、この計画で支援する人数（同じ案件名で同時に申請する '+n+'人）を入れました。入管から「支援予定の人も含める」と追完が来た所です';
+    if(self){ T.f023n=String(n); }
+    else { el.value=String(n); el.dataset.autofill='1'; el.style.background='#fef3c7'; el.title=why; }
+    window._p17CntNote=why;
+    if(typeof p==='function') p();
+    if(self){ var x=document.getElementById('f023n'); if(x){ x.value=String(n); x.style.background='#fef3c7'; x.title=why; } }
+  }catch(e){ console.warn('[1-17 支援人数]', e); }
+}
+window._p17SupportCountDefault=_p17SupportCountDefault;
+window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p17SupportCountDefault, 4500); setTimeout(_p17SupportCountDefault, 8000); } }catch(_e){} });
+/* ===== /その3 ===== */
