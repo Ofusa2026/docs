@@ -8473,11 +8473,15 @@ window._histRecord=async function(o){
     red:'押した文字を赤字にします（直してほしい所の指示用）',
     blank:'空欄の所に色を付けて、書き忘れを探します',
     printx:'',
-    hist:'DB保存したときに変わった欄を見て、前の値に戻せます'
+    hist:'DB保存したときに変わった欄を見て、前の値に戻せます',
+    src:'空欄の欄ごとに、案シスのどこ（雇用条件・会社・案件・人材など）が空かを左の入力欄に出します',
+    tr:'日本語が入っていて訳が空の欄だけを、まとめて翻訳します（訳が入っている欄は変えません）'
   };
   function kind(b){
     var oc=b.getAttribute('onclick')||'', id=b.id||'', t=(b.textContent||'').trim();
     if(id==='_histBtn') return 'hist';
+    if(id==='_srcBtn') return 'check:src';
+    if(id==='_trBulkBtn') return 'check:tr';
     if(/saveForm(Generic)?\(/.test(oc)) return 'save';
     if(/(^|[^a-zA-Z_])doPrint\(/.test(oc)) return 'print';
     if(id==='editModeBtn') return 'edit:editModeBtn';
@@ -8492,7 +8496,7 @@ window._histRecord=async function(o){
     if(/print/i.test(oc) || /印刷/.test(t) || b.classList.contains('btn-print')) return 'printx';
     return 'other';
   }
-  function isActive(b){ var t=(b.textContent||'').trim(); return b.classList.contains('edit-mode-on') || /中$/.test(t) || /完了して保存/.test(t); }
+  function isActive(b){ var t=(b.textContent||'').trim(); return b.classList.contains('edit-mode-on') || /中$/.test(t) || /完了して保存/.test(t) || /を消す$/.test(t); }
   var css=document.createElement('style'); css.id='_tbCss';
   css.textContent=[
     '.app-bar{gap:10px;}',
@@ -8515,7 +8519,9 @@ window._histRecord=async function(o){
     '.tb-pop .tb-item > button{all:unset;display:block;font-family:sans-serif;font-size:12.5px !important;font-weight:700 !important;color:#1f2937 !important;background:none !important;border:none !important;padding:0 !important;margin:0 !important;box-shadow:none !important;cursor:pointer;}',
     '.tb-item .tb-desc{font-family:sans-serif;font-size:10.5px;color:#64748b;line-height:1.45;margin-top:1px;}',
     '.tb-pop .tb-sep{height:1px;background:#e2e8f0;margin:4px 6px;}',
-    '.bar-btns .tb-act{border-radius:6px !important;padding:6px 12px !important;font-size:12px !important;font-weight:800 !important;box-shadow:0 0 0 2px #fde68a;}'
+    '.bar-btns .tb-act{border-radius:6px !important;padding:6px 12px !important;font-size:12px !important;font-weight:800 !important;box-shadow:0 0 0 2px #fde68a;}',
+    '.bar-btns .tb-act.tb-moved{background:#7c3aed !important;color:#fff !important;border:none !important;cursor:pointer;font-family:sans-serif;}',
+    '.bar-btns .tb-act.tb-moved#_srcBtn{background:#dc2626 !important;}'
   ].join('\n');
   (document.head||document.documentElement).appendChild(css);
 
@@ -8561,11 +8567,13 @@ window._histRecord=async function(o){
       var act=document.createElement('span'); act.className='tb-actslot'; act.style.cssText='display:inline-flex;gap:6px;'; bar.appendChild(act);
       function menuOf(list, label, descKey){
         if(!list.length) return null;
-        if(list.length===1 && label.indexOf('編集')<0){ var b0=list[0].b; b0.classList.add('tb-sec'); b0.title=b0.title||DESC[list[0].sub]||''; bar.appendChild(b0); b0._tbDone=true; return null; }
+        if(list.length===1 && label.indexOf('編集')<0 && label.indexOf('チェック')<0){ var b0=list[0].b; b0.classList.add('tb-sec'); b0.title=b0.title||DESC[list[0].sub]||''; bar.appendChild(b0); b0._tbDone=true; return null; }
         var m=mkMenu(label); var pop=m.querySelector('.tb-pop');
         list.forEach(function(x){ x.b._tbDone=true; pop.appendChild(item(x.b, DESC[x.sub] || x.b.title || '')); });
         bar.appendChild(m); return m;
       }
+      var corder=['ai','src','blank','red','tr'];
+      G.check.sort(function(a,b){ return corder.indexOf(a.sub)-corder.indexOf(b.sub); });
       menuOf(G.check,'🔍 チェック ▾');
       if(G.edit.length){
         var order=['editModeBtn','styleModeBtn','saveEditedHTML','loadEditedHTML','discard','editHowtoBtn'];
@@ -8605,10 +8613,27 @@ window._histRecord=async function(o){
     if(added){ setTimeout(organize,0); return; }
     hoist();
   });
+  /* ver.20261124.10: 書類の上の「✏️ 直接編集」「❓ 使い方」（ページ番号の横）と、左の入力欄の上にあった
+     「🔍 空欄チェック（案シスのどこが空か）」「🌐 訳が空いている欄をまとめて翻訳」も、上のボタン列のメニューにまとめる */
+  var PULL=['editModeBtn','editHowtoBtn','_srcBtn','_trBulkBtn'];
+  function pull(){
+    var b=document.querySelector('.app-bar .bar-btns'); if(!b) return;
+    PULL.forEach(function(id){
+      var x=document.getElementById(id); if(!x || b.contains(x)) return;
+      if(id==='editModeBtn' || id==='editHowtoBtn'){ if(!(x.parentNode && x.parentNode.id==='pageNav')) return; }
+      else if(!(x.closest && x.closest('.fp'))) return;
+      x.style.cssText=''; x.classList.add('tb-moved'); b.appendChild(x);
+    });
+  }
   function start(){
+    pull();
     organize();
     var b=document.querySelector('.app-bar .bar-btns');
     if(b) mo.observe(b,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+    var mo2=new MutationObserver(function(){ setTimeout(pull,0); });
+    ['pageNav'].forEach(function(id){ var e=document.getElementById(id); if(e) mo2.observe(e,{childList:true}); });
+    var fi=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(fi) mo2.observe(fi,{childList:true});
+    var n=0, t=setInterval(function(){ pull(); if(++n>30) clearInterval(t); },700);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(start,0); }); else setTimeout(start,0);
   window.addEventListener('load', function(){ setTimeout(organize,50); });
@@ -9204,3 +9229,193 @@ window._p17SupportCountDefault=_p17SupportCountDefault;
 window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p17SupportCountDefault, 4500); setTimeout(_p17SupportCountDefault, 8000); } }catch(_e){} });
 /* ===== /その3 ===== */
 
+
+/* ============================================================
+   ver.20261124.10: 左の入力欄を整理（全書類共通）
+   ・見出し（黒い帯）を押すと、その項目をたたむ／ひらく。見出しの右に「空欄N」「✓」を出す
+   ・案件を読み込んだら、全部入っている項目（案シスから入った所）はたたみ、空欄がある項目だけ開いておく
+   ・いちばん上に「📝 今入れるところ」：空欄がある項目を並べ、押すとそこへ飛ぶ
+   ・［空欄だけ］にすると、入っている欄を隠して空欄だけを並べる（この選択はこのパソコンで覚える）
+   ・たたむ／隠すのは高さを0にするだけ（欄そのものは残るので、チェック・保存・自動入力はいつもどおり）
+   ============================================================ */
+(function(){
+  if(window.__fpOrgOn) return; window.__fpOrgOn=true;
+  var LS='ofFpOnlyBlank';
+  function lsGet(){ try{ return localStorage.getItem(LS)==='1'; }catch(e){ return false; } }
+  function lsSet(v){ try{ localStorage.setItem(LS, v?'1':'0'); }catch(e){} }
+  var onlyBlank=lsGet(), touched=false, host=null, bar=null, timer=null;
+  var css=document.createElement('style'); css.id='_fpOrgCss';
+  css.textContent=[
+    '.fs.fs-col > :not(.fs-title),.fg.fg-hide{height:0 !important;min-height:0 !important;margin:0 !important;padding:0 !important;border:0 !important;overflow:hidden !important;opacity:0;}',
+    '.fs.fs-col{margin-bottom:4px !important;}',
+    '.fs-title.fs-tg{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px;}',
+    '.fs-title.fs-tg:hover{filter:brightness(1.25);}',
+    '.fs-title .fs-car{display:inline-block;width:9px;font-size:8px;opacity:.8;}',
+    '.fs-title .fs-cnt{margin-left:auto;font-size:8.5px;font-weight:700;padding:0 5px;border-radius:7px;background:#f59e0b;color:#1f2937;white-space:nowrap;}',
+    '.fs-title .fs-cnt.ok{background:transparent;color:#86efac;}',
+    '#_fpOrg{position:sticky;top:0;z-index:20;margin:-8px -8px 8px;padding:6px 8px;background:#f8fafc;border-bottom:1px solid #cbd5e1;font-family:sans-serif;}',
+    '#_fpOrg .fo-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}',
+    '#_fpOrg .fo-h{font-size:11px;font-weight:800;color:#0f172a;margin-right:auto;}',
+    '#_fpOrg .fo-h b{color:#c2410c;}',
+    '#_fpOrg .fo-h.ok b{color:#15803d;}',
+    '#_fpOrg button{font-family:sans-serif;font-size:10px;padding:2px 7px;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:5px;cursor:pointer;}',
+    '#_fpOrg button.on{background:#0f172a;color:#fff;border-color:#0f172a;}',
+    '#_fpOrg .fo-seg{display:inline-flex;}',
+    '#_fpOrg .fo-seg button:first-child{border-radius:5px 0 0 5px;}',
+    '#_fpOrg .fo-seg button:last-child{border-radius:0 5px 5px 0;border-left:none;}',
+    '#_fpOrg .fo-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;max-height:64px;overflow-y:auto;}',
+    '#_fpOrg .fo-chip{font-size:9.5px;padding:1px 6px;border:1px solid #fdba74;background:#fff7ed;color:#9a3412;border-radius:9px;}',
+    '#_fpOrg .fo-chip:hover{background:#ffedd5;}',
+    '#_fpOrgSep{font-family:sans-serif;font-size:10px;font-weight:700;color:#15803d;margin:6px 0 6px;padding-top:6px;border-top:2px dashed #bbf7d0;}',
+    '@media print{#_fpOrg,#_fpOrgSep{display:none !important;}}'
+  ].join('\n');
+  (document.head||document.documentElement).appendChild(css);
+
+  function sections(){ return host ? [].slice.call(host.querySelectorAll('.fs')).filter(function(s){ return s.querySelector(':scope > .fs-title'); }) : []; }
+  function titleOf(s){ return s.querySelector(':scope > .fs-title'); }
+  function nameOf(s){ var t=titleOf(s); if(!t) return ''; var c=t.cloneNode(true); [].slice.call(c.querySelectorAll('.fs-car,.fs-cnt')).forEach(function(x){ x.remove(); }); return c.textContent.replace(/\s+/g,' ').trim(); }
+  function shown(e){ return e.offsetParent!==null; }   // 書類の条件で隠れている欄（display:none）は数えない
+  function fieldsOf(root){
+    return [].slice.call(root.querySelectorAll('input[id],select[id],textarea[id]')).filter(function(el){
+      if(el.type==='hidden'||el.type==='checkbox'||el.type==='radio'||el.type==='button'||el.type==='file'||el.disabled) return false;
+      if(el.id==='caseSelect'||/Select$/.test(el.id)||/^sp_/.test(el.id)) return false;
+      return shown(el);
+    });
+  }
+  function blank(el){ return !String(el.value==null?'':el.value).trim(); }
+  function stat(s){ var f=fieldsOf(s); var b=f.filter(blank); return {n:f.length, b:b.length, first:b[0]||null}; }
+  function setCol(s, col){
+    s.classList.toggle('fs-col', !!col);
+    var car=s.querySelector(':scope > .fs-title .fs-car'); if(car) car.textContent=col?'▶':'▼';
+  }
+  function decorate(){
+    sections().forEach(function(s){
+      var t=titleOf(s); if(!t) return;
+      if(!t.classList.contains('fs-tg')){
+        t.classList.add('fs-tg'); t.title='押すと、この項目をたたむ／ひらく';
+        t.addEventListener('click', function(e){ if(e.target.closest('input,select,textarea,button,a')) return; touched=true; setCol(s, !s.classList.contains('fs-col')); });
+      }
+      if(!t.querySelector('.fs-car')){ var c=document.createElement('span'); c.className='fs-car'; c.textContent=s.classList.contains('fs-col')?'▶':'▼'; t.insertBefore(c, t.firstChild); }
+      if(!t.querySelector('.fs-cnt')){ var k=document.createElement('span'); k.className='fs-cnt'; t.appendChild(k); }
+    });
+  }
+  function applyOnlyBlank(){
+    if(!host) return;
+    [].slice.call(host.querySelectorAll('.fg')).forEach(function(g){
+      if(!onlyBlank){ g.classList.remove('fg-hide'); return; }
+      var f=fieldsOf(g);
+      // 入る欄がない（チェックだけ等）まとまりは隠さない。入る欄がすべて埋まっていれば隠す
+      g.classList.toggle('fg-hide', f.length>0 && !f.some(blank) && !g.contains(document.activeElement));
+    });
+  }
+  function refresh(){
+    if(!host || !bar) return;
+    decorate();
+    var total=0, list=[];
+    sections().forEach(function(s){
+      if(!shown(s)) return;
+      var st=stat(s), k=s.querySelector(':scope > .fs-title .fs-cnt');
+      if(k){ if(!st.n){ k.textContent=''; k.className='fs-cnt'; } else if(st.b){ k.textContent='空欄'+st.b; k.className='fs-cnt'; } else { k.textContent='✓'; k.className='fs-cnt ok'; } }
+      if(st.b){ total+=st.b; list.push({s:s, b:st.b, first:st.first}); }
+    });
+    var h=bar.querySelector('.fo-h');
+    h.className='fo-h'+(total?'':' ok');
+    h.innerHTML=total?('📝 今入れるところ <b>'+total+'</b>か所'):'✅ 空欄はありません';
+    var ch=bar.querySelector('.fo-chips'); ch.innerHTML='';
+    list.forEach(function(x){
+      var b=document.createElement('button'); b.type='button'; b.className='fo-chip';
+      b.textContent=nameOf(x.s).replace(/^[▶▼]\s*/,'').slice(0,16)+' '+x.b;
+      b.title=nameOf(x.s)+'：空欄'+x.b+'か所（押すとそこへ移動）';
+      b.onclick=function(e){ e.preventDefault(); jump(x.s); };
+      ch.appendChild(b);
+    });
+    ch.style.display=list.length?'':'none';
+  }
+  function jump(s){
+    touched=true; setCol(s,false);
+    var st=stat(s);
+    if(onlyBlank) applyOnlyBlank();
+    try{ (st.first||s).scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+    if(st.first) setTimeout(function(){ try{ st.first.focus({preventScroll:true}); }catch(e){} }, 350);
+  }
+  /* 空欄がある項目を上に、全部入っている項目を下に並べる（並びを見た目だけ入れ替える。欄の中身・順番の情報は変えない）
+     項目のあいだにある小さな部品は、その直前の項目といっしょに動く */
+  function reorder(){
+    if(!host) return;
+    var kids=[].slice.call(host.children), seen=false, cur=0, nb=0, nf=0;
+    kids.forEach(function(k){
+      if(k.id==='_fpOrg'){ k.style.order='-1'; return; }
+      if(k.id==='_fpOrgSep') return;
+      if(k.classList.contains('fs') && k.querySelector(':scope > .fs-title')){
+        seen=true; var st=stat(k);
+        if(!shown(k) || !st.n){ cur=cur||10; } else if(st.b){ cur=10; nb++; } else { cur=20; nf++; }
+        k.style.order=String(cur); return;
+      }
+      k.style.order=seen?String(cur):'0';
+    });
+    var sep=document.getElementById('_fpOrgSep');
+    if(nb && nf){
+      if(!sep){ sep=document.createElement('div'); sep.id='_fpOrgSep'; sep.textContent='▼ ここから下は、全部入っている項目（案シスから入った所）'; host.appendChild(sep); }
+      sep.style.order='15'; sep.style.display='';
+    }else if(sep) sep.style.display='none';
+    host.style.display='flex'; host.style.flexDirection='column';
+  }
+  function autoCollapse(){
+    if(!host || touched) return;
+    var any=false;
+    sections().forEach(function(s){ var st=stat(s); if(st.n && st.n>st.b) any=true; });
+    if(!any) return;   // まだ何も入っていない（案件を選ぶ前）ときはたたまない
+    sections().forEach(function(s){ var st=stat(s); if(st.n) setCol(s, st.b===0); });
+    reorder(); applyOnlyBlank(); refresh();
+  }
+  function setMode(v){
+    onlyBlank=!!v; lsSet(onlyBlank);
+    bar.querySelector('[data-m="all"]').classList.toggle('on', !onlyBlank);
+    bar.querySelector('[data-m="blank"]').classList.toggle('on', onlyBlank);
+    if(onlyBlank){ sections().forEach(function(s){ var st=stat(s); if(st.b) setCol(s,false); }); }
+    applyOnlyBlank(); refresh();
+  }
+  function build(){
+    host=document.querySelector('.fp .fp-inner')||document.querySelector('.fp-inner');
+    if(!host || !document.getElementById('pageArea')) return false;
+    if(sections().length<2) return false;
+    if(document.getElementById('_fpOrg')) return true;
+    bar=document.createElement('div'); bar.id='_fpOrg';
+    bar.innerHTML='<div class="fo-row"><span class="fo-h"></span>'
+      +'<span class="fo-seg"><button type="button" data-m="all" title="全部の欄を出します">すべて</button><button type="button" data-m="blank" title="入っている欄を隠して、空欄だけを出します">空欄だけ</button></span>'
+      +'<button type="button" data-a="open" title="全部の項目をひらく">ひらく</button><button type="button" data-a="close" title="全部の項目をたたむ">たたむ</button></div>'
+      +'<div class="fo-chips"></div>';
+    host.insertBefore(bar, host.firstChild);
+    bar.querySelector('[data-m="all"]').onclick=function(e){ e.preventDefault(); touched=true; setMode(false); };
+    bar.querySelector('[data-m="blank"]').onclick=function(e){ e.preventDefault(); touched=true; setMode(true); };
+    bar.querySelector('[data-a="open"]').onclick=function(e){ e.preventDefault(); touched=true; sections().forEach(function(s){ setCol(s,false); }); };
+    bar.querySelector('[data-a="close"]').onclick=function(e){ e.preventDefault(); touched=true; sections().forEach(function(s){ setCol(s,true); }); };
+    // たたんだ所・隠した所の欄に移ったら（チェックの「ここへ移動」など）、ひらいて見せる
+    host.addEventListener('focusin', function(e){
+      var el=e.target; if(!el || !el.closest) return;
+      var s=el.closest('.fs.fs-col'), g=el.closest('.fg.fg-hide');
+      if(s){ setCol(s,false); }
+      if(g){ g.classList.remove('fg-hide'); }
+      if(s||g) setTimeout(function(){ try{ el.scrollIntoView({block:'center'}); }catch(_e){} }, 30);
+    });
+    host.addEventListener('pointerdown', function(){ touched=true; }, true);   // 人が触ったあとは、自動でたたみ直さない
+    host.addEventListener('input', function(e){ if(e.isTrusted) touched=true; clearTimeout(timer); timer=setTimeout(refresh, 300); });
+    host.addEventListener('change', function(){ clearTimeout(timer); timer=setTimeout(refresh, 300); });
+    setMode(onlyBlank);
+    return true;
+  }
+  // 空欄チェック（案シスのどこが空か）を出したら、印が付いた項目はひらく
+  function hookSrc(){
+    if(typeof window.srcToggle!=='function' || window.srcToggle.__fpo) return;
+    var o=window.srcToggle; var w=function(){ var r=o.apply(this, arguments); try{ sections().forEach(function(s){ if(s.querySelector('.src-badge')) setCol(s,false); }); }catch(e){} return r; };
+    w.__fpo=true; window.srcToggle=w;
+  }
+  function boot(){
+    var n=0, t=setInterval(function(){ if(build() || ++n>20){ clearInterval(t); if(bar){ hookSrc(); refresh(); setTimeout(autoCollapse, 6000); setInterval(function(){ if(!document.hidden) refresh(); }, 2500); } } }, 300);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ touched=false; setTimeout(autoCollapse, 5000); setTimeout(autoCollapse, 9000); setTimeout(autoCollapse, 14000); } }catch(_e){} });
+  window._fpOrgRefresh=function(){ refresh(); };
+  window._fpOrgAuto=function(){ touched=false; autoCollapse(); };
+  window._fpOrgReorder=function(){ reorder(); };
+})();

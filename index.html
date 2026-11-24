@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.09</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.10</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -595,8 +595,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611241546';
-window.__DOCS_CACHE_BUSTER__ = '2611241546';
+window.__DOCS_CACHE_BUSTER__ = '2611241607';
+window.__DOCS_CACHE_BUSTER__ = '2611241607';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2246,6 +2246,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261124.10',
+    date: '2026-11-24',
+    notify: true,
+    items: [
+      '🧰 書類の上のボタンをまとめました：「✏️ 直接編集」「❓ 使い方」は［✏️ 編集 ▾］に、「🔍 空欄チェック（案シスのどこが空か）」「🌐 訳が空いている欄をまとめて翻訳」は［🔍 チェック ▾］に入りました（使っている間は、ボタンが外に出て目立ちます）。',
+      '📝 左の入力欄を整理しました：案件を読み込むと、空欄がある項目を上に並べて開き、全部入っている項目（案シスから入った所）は下にまとめてたたみます。いちばん上の「今入れるところ」を押すと、その空欄へ移動します。',
+      '👀 ［空欄だけ］を押すと、入っている欄を隠して空欄だけを並べます。黒い見出しを押すと、その項目をたたむ／ひらくこともできます。'
+    ]
+  },
   {
     version: 'ver.20261124.09',
     date: '2026-11-24',
