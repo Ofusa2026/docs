@@ -419,6 +419,8 @@ function _aiCheck16Local(rules){
     if(hourly<mw) add('out','最低賃金','最低賃金割れ（'+pref+'）','時給換算 '+hourly+'円 < 最低賃金 '+mw+'円（'+_mwo.label+'）。（月給'+(_mwAllow?'＋算入手当［'+_mwAllowNames.join('・')+'］':'')+'）÷月所定労働時間で判定。','P5');
     else add('ok','最低賃金','最低賃金クリア（'+pref+'）','時給換算 '+hourly+'円 ≥ '+mw+'円（'+_mwo.label+'）。','P5');
     if(_mwo.next && hourly>=mw && hourly<_mwo.next.v) add('warn','最低賃金','もうすぐ最低賃金を下回ります（'+pref+'）','時給換算 '+hourly+'円。'+_mwo.next.eff+'から最低賃金が '+_mwo.next.v+'円'+(_mwo.next.fy?'（'+_mw16_fyLabel(_mwo.next.fy)+'）':'')+'に上がるため、それ以降は下回ります。','P5');   // ver.20261112.08
+    // ver.20261124.02: 換算時給が最低賃金と同じか数円上だけのとき、入管から「説明書と求人票」を求められた例がある（追完6件）
+    else if(hourly>=mw && hourly-mw<=4) add('warn','最低賃金','最低賃金とほぼ同じです（'+pref+'）','時給換算 '+hourly+'円・最低賃金 '+mw+'円（差 '+(hourly-mw)+'円）。入管から「日本人と同等以上であることの説明書」と求人票（近くの同じ仕事でも可）を求められた例があります。説明できるか確認してください。','P5');
     if(isKensetsu){
       // ver.20261109.07: 建設は「所定内賃金÷月所定労働時間」が、地域別最低賃金×1.1 と 全国加重平均×1.1 のどちらも下回らないこと（国交省 受入計画の認定基準）
       var stn=_mw16_shoteinai(), _avo=_mw16_avg(), avg=_avo.v;
@@ -4214,6 +4216,7 @@ window._syncCaseContract=async function(caseId){
     var snap={};
     document.querySelectorAll('[id^="es_"]').forEach(function(el){ snap[el.id]=el.value; });
     window._empBaseline=snap;
+    try{ window._p16CbBase=Object.assign({}, window.cbState||{}); }catch(_cb){}   // ver.20261124.02: 1-6号「変更の範囲」の□の読込時の状態
     window._empUserTouched={};   // ver.20261120.02: 読込・保存のときだけ「手で直した欄」の記録を消す
   };
   // ver.20261120.02: 自動で直す処理（訳の自動修正・空の訳の自動入力・言語ごとの訳・金額合わせ）が
@@ -5731,6 +5734,8 @@ function _p16ChangedFields(){
     var lb=''; try{ lb=(typeof _miLabel==='function')?_miLabel(el):el.id; }catch(e){ lb=el.id; }
     out.push({id:el.id, label:lb, from:b, to:v});
   });
+  // ver.20261124.02: 「変更の範囲」の□を押したときも、保存するか聞く（雇用条件セットに残せば、同じセットのほかの人にも入る）
+  try{ var cb0=window._p16CbBase, cs=window.cbState||{}; if(cb0) [['change_none_direct','Ⅱ 就業の場所の変更の範囲'],['change_none_disp','Ⅲ 業務の変更の範囲']].forEach(function(k){ if(!!cs[k[0]]!==!!cb0[k[0]] && document.querySelector('[data-cbid="'+k[0]+'"]')) out.push({id:'cb:'+k[0], label:k[1], from:cb0[k[0]]?'■ 変更の可能性なし':'□', to:cs[k[0]]?'■ 変更の可能性なし':'□'}); }); }catch(_c){}
   if(window._p16SkipSig && window._p16SkipSig===JSON.stringify(out)) return [];   // 「保存しないで印刷」を選んだあと、さらに直していなければ聞かない
   return out;
 }
@@ -5765,6 +5770,33 @@ function _p16BothPay(probs){ try{ var m=_mw16_num('es_salaryMonthly'), h=_mw16_n
 function _p16WrongLang(probs){ try{ if(typeof window._wlSummary==='function'){ var s=window._wlSummary(); if(s) probs.push('⛔ 訳が別の言語になっています（'+s+'）。左の「消して入れ直す」で直してください'); } }catch(e){} }
 // ver.20261116.12: 1-6号も、訳が空の欄が残っていたら印刷前に知らせる
 function _p16EmptyTr(probs){ try{ if(typeof window._efPairs==='function'){ var l=window._efPairs(); if(l.length) probs.push('⚠ 訳が空の欄が '+l.length+' か所あります（その行は日本語だけになります）。左の「🌐 訳が空いている欄をまとめて翻訳」で入れられます'); } }catch(e){} }
+/* ver.20261124.02: 入管の追完で多かった所を、印刷前に知らせる
+   ① Ⅱ就業の場所・Ⅲ業務の「変更の範囲」が選ばれていない（「変更の可能性なしの場合はチェックを」と追完7件）→ ⛔
+   ② 雇入れ時の健康診断・初回の定期健康診断の年月が空欄（追完約20件）→ ⚠
+   ③ 手当があるのに「計算方法」が空欄（「計算方法によっては最低賃金を下回る可能性」と追完11件）→ ⚠
+   「変更の範囲」の□は、日本語の行と訳の行が別のチェックなので、片方を押したらもう片方も同じにする */
+var _P16_CRPAIR={change_none_direct:'change_none_direct_id', change_none_direct_id:'change_none_direct', change_none_disp:'cb_auto_001', cb_auto_001:'change_none_disp'};
+function _p16CbOn(id){
+  var els=document.querySelectorAll('#pageArea [data-cbid="'+id+'"]'); if(!els.length) return null;
+  for(var i=0;i<els.length;i++){ if(String(els[i].textContent||'').indexOf('■')>=0) return true; }
+  return false;
+}
+function _p16Tsuikan(probs){
+  try{
+    var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
+    var cr=[]; if(_p16CbOn('change_none_direct')===false) cr.push('Ⅱ 就業の場所'); if(_p16CbOn('change_none_disp')===false) cr.push('Ⅲ 従事すべき業務の内容');
+    if(cr.length) probs.push('⛔ 「変更の範囲」が選ばれていません（'+cr.join('・')+'）。変更の可能性がなければ、書類の「□ 変更の可能性なし」を押して■にし、💾保存してください（変更があるときは、その下に範囲を書きます）。入管から追完が来ている所です');
+    if(has('es_healthCheckY2')){
+      var hc=[];
+      if(!g('es_healthCheckY2') || !g('es_healthCheckM2')) hc.push('雇入れ時の健康診断');
+      if(!(g('es_healthCheckY')||g('es_healthCheckY2')) || !(g('es_healthCheckM')||g('es_healthCheckM2'))) hc.push('初回の定期健康診断');
+      if(hc.length) probs.push('⚠ '+hc.join('・')+'の年月が空欄です（左の「雇入時健診」「初回定期健診」）。入管から「年月を記載してください」と追完が来ている所です');
+    }
+    var nc=[];
+    for(var i=1;i<=6;i++){ if(!has('es_a'+i+'Calc')) continue; var nm=g('es_a'+i+'Name'), am=g('es_a'+i+'Amt'); if((nm||am) && !g('es_a'+i+'Calc')) nc.push(nm||('手当'+i)); }
+    if(nc.length) probs.push('⚠ 手当の「計算方法」が空欄です（'+nc.join('・')+'）。入管から「手当によっては最低賃金を下回る可能性があるので、計算方法を記載」と追完が来ています。毎月決まった額なら「月額固定」などと書いてください');
+  }catch(e){ console.warn('[1-6 追完の多い所]', e); }
+}
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
@@ -5799,6 +5831,7 @@ function _p16PrintCheck(){
   _p16WrongLang(probs);   // ver.20261111.04
   _p16EmptyTr(probs);
   _p16BothPay(probs);     // ver.20261111.08
+  _p16Tsuikan(probs);     // ver.20261124.02
   return {miss:miss, probs:probs};
 }
 (function(){
@@ -5826,6 +5859,20 @@ function _p16PrintCheck(){
     w.__p16=true; window.doPrint=w;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
+  // ver.20261124.02: 「変更の範囲」の□は、日本語の行を押したら訳の行も同じにする（逆も同じ）
+  (function(){
+    if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
+    var _tcb=window.toggleCb; if(typeof _tcb!=='function' || _tcb.__p16cr) return;
+    var w2=function(id){
+      _tcb(id);
+      try{
+        var pr=_P16_CRPAIR[id]; if(!pr || !document.querySelector('[data-cbid="'+pr+'"]')) return;
+        window.cbState[pr]=!!window.cbState[id];
+        document.querySelectorAll('[data-cbid="'+pr+'"]').forEach(function(el){ el.textContent=window.cbState[pr]?'■':'□'; });
+      }catch(e){}
+    };
+    w2.__p16cr=true; window.toggleCb=w2;
+  })();
   try{ if(typeof _check16LoadRules==='function') _check16LoadRules(); }catch(e){}
   document.addEventListener('input', function(ev){ var id=ev.target&&ev.target.id; if(ev.isTrusted && /^es_(salaryHourly|salaryDaily|salaryMonthly|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|yearlyDays)$/.test(id||'')) _p16AutoCalcMonthly(true); if(id==='es_calcMonthly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; if(ev.isTrusted && /^es_(salaryMonthly|salaryDaily|monthlyH|monthlyMin|monthlyDays|yearlyH|yearlyMin|dailyHours|dailyMins|a\d(Name|Amt))$/.test(id||'')) _p16AutoCalcHourly(true); if(id==='es_calcHourly' && ev.isTrusted) ev.target.dataset.manualCalc='1'; }, true);
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ var c=document.getElementById('es_calcMonthly'); if(c) delete c.dataset.manualCalc; var c2=document.getElementById('es_calcHourly'); if(c2) delete c2.dataset.manualCalc; } }catch(_e){} });
@@ -5983,6 +6030,9 @@ window._batchCheck=function(){
       if((j.miss||[]).length) out.push('空欄：'+j.miss.join('、'));
       if((j.tr||[]).length) out.push('🌐 訳がない欄 '+j.tr.length+'か所');
     }
+    // ver.20261124.02: 1-17号の支援対象者（生年月日・性別）・居住費の説明／名簿（複数人）の空欄・ありえない生年月日
+    if(typeof window._p17TsuikanList==='function' && /(^|\/)(1_17|15_10)_[a-z]+\.html/.test(location.pathname)) window._p17TsuikanList().forEach(function(x){ out.push((x.sev==='out'?'⛔ ':'⚠ ')+x.t); });
+    if(typeof window._mbTsuikanList==='function' && /(^|\/)meibo\.html/.test(location.pathname)) window._mbTsuikanList().forEach(function(x){ out.push((x.sev==='out'?'⛔ ':'⚠ ')+x.t); });
     if(!/(^|\/)(1_17|15_10)(_[a-z]+)?\.html/.test(location.pathname)){
       var R=_srcRedItems(); if(R.n) out.push('⬜ 案シスで埋めてください（'+R.n+'欄）：'+R.items.slice(0,4).join('、')+(R.items.length>4?' ほか':''));
     }
@@ -8916,3 +8966,104 @@ function _fhBuild(es){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', hookAll); else hookAll();
   window.addEventListener('load', hookAll);
 })();
+
+/* ===== ver.20261124.02: 1-17号（支援対象者）と名簿（複数人）の生年月日・性別・空欄チェック =====
+   入管の追完で多かった所（2026年3〜11月）：
+   ・申請人名簿／支援計画書の支援対象者の氏名・生年月日・性別が空欄、生年月日が「2025年1月21日」などありえない日付（約40件）
+   ・居住費を取るのに「実費に相当する額であることの説明」が空欄（約35件）
+   印刷前の確認・左上の「確認してほしいところ」・まとめPDF／全書類チェックに出す。 */
+function _ofBirthParse(s){
+  s=String(s||'').normalize('NFKC').trim(); if(!s) return null;
+  var m=s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/); return m ? [m[1], m[2], m[3]] : [s,'',''];
+}
+// 生年月日のおかしい所 → {sev:'out'|'warn', msg} / 問題なしは null
+function _ofBirthIssue(y, m, d, base){
+  var n=function(x){ x=String(x==null?'':x).normalize('NFKC').replace(/[年月日\s]/g,''); return /^\d+$/.test(x) ? parseInt(x,10) : NaN; };
+  var Y=n(y), M=n(m), D=n(d);
+  if(!String(y||'').trim() && !String(m||'').trim() && !String(d||'').trim()) return {sev:'out', msg:'生年月日が空欄です'};
+  if(isNaN(Y) || isNaN(M) || isNaN(D)) return {sev:'out', msg:'生年月日の年・月・日のどれかが空欄か、数字ではありません（'+[y,m,d].join('/')+'）'};
+  if(Y<1900 || M<1 || M>12 || D<1 || D>new Date(Y, M, 0).getDate()) return {sev:'out', msg:'生年月日が日付として正しくありません（'+Y+'/'+M+'/'+D+'）'};
+  var b=base||new Date(), bd=new Date(Y, M-1, D);
+  if(bd>b) return {sev:'out', msg:'生年月日が未来の日付です（'+Y+'年'+M+'月'+D+'日）'};
+  var age=b.getFullYear()-Y-((b.getMonth()<M-1 || (b.getMonth()===M-1 && b.getDate()<D))?1:0);
+  if(age<15) return {sev:'out', msg:'生年月日が '+Y+'年'+M+'月'+D+'日（'+age+'歳）です。ありえない日付なので確かめてください（入管から「正しい生年月日を」と追完が来た例があります）'};
+  if(age<18) return {sev:'warn', msg:'生年月日が '+Y+'年'+M+'月'+D+'日（'+age+'歳・18歳未満）です。合っているか確かめてください'};
+  if(age>70) return {sev:'warn', msg:'生年月日が '+Y+'年'+M+'月'+D+'日（'+age+'歳）です。合っているか確かめてください'};
+  return null;
+}
+window._ofBirthIssue=_ofBirthIssue; window._ofBirthParse=_ofBirthParse;
+function _ofGenderOk(g){ return /^(男|女)/.test(String(g||'').normalize('NFKC').trim()); }
+
+// 1-17号：追加で見る所 [{sev, t, id}]
+function _p17TsuikanList(){
+  var out=[], g=function(id){ var e=document.getElementById(id); return e ? String(e.value||'').trim() : ''; };
+  try{
+    if(document.getElementById('f_birthY') && (g('f_birthY')||g('f_birthM')||g('f_birthD'))){
+      var cy=parseInt(g('es_createY'),10), cm=parseInt(g('es_createM'),10), cd=parseInt(g('es_createD'),10); if(cy && cy<1000) cy+=2018;
+      var bi=_ofBirthIssue(g('f_birthY'), g('f_birthM'), g('f_birthD'), (cy&&cm&&cd)?new Date(cy,cm-1,cd):null);
+      if(bi) out.push({sev:bi.sev, t:'Ⅰ 支援対象者：'+bi.msg, id:'f_birthY'});
+    }
+    var gd=g('f_gender');
+    if(document.getElementById('f_gender') && gd && !_ofGenderOk(gd)) out.push({sev:'warn', t:'Ⅰ 支援対象者：性別が「'+gd+'」です。「男」か「女」で入れてください（訳の行が正しく出ません）', id:'f_gender'});
+    var fee=String(g('es_housingFee')).normalize('NFKC').replace(/[,，円\s]/g,'');
+    if(document.getElementById('es_actualCostDesc') && /^\d+$/.test(fee) && Number(fee)>0 && !g('es_actualCostDesc'))
+      out.push({sev:'out', t:'居住費（月 '+Number(fee).toLocaleString('ja-JP')+'円）を取るのに「実費に相当する額であることの説明」が空欄です。入管から追完が多い所です（左の「実費相当の説明」）', id:'es_actualCostDesc'});
+  }catch(e){ console.warn('[1-17 追完の多い所]', e); }
+  return out;
+}
+window._p17TsuikanList=_p17TsuikanList;
+// 名簿（複数人）：対象者名簿の行 [{sev, t}]
+function _mbTsuikanList(){
+  var out=[];
+  try{
+    var rows=window._mbRows||[], kind=(typeof v==='function' && v('f_kind'))||'both';
+    rows.forEach(function(r, i){
+      var nm=String(r&&r.name||'').trim(), who=(i+1)+'人目'+(nm?'（'+nm+'）':'');
+      if(!nm && !String(r&&r.nat||'').trim() && !String(r&&r.birth||'').trim()) return;   // 空の行
+      var miss=[]; if(!nm) miss.push('氏名'); if(!String(r.nat||'').trim()) miss.push('国籍・地域');
+      if(kind!=='shinsei'){
+        if(!String(r.birth||'').trim()) miss.push('生年月日'); if(!String(r.gender||'').trim()) miss.push('性別');
+      }
+      if(miss.length) out.push({sev:'out', t:who+'：'+miss.join('・')+'が空欄です'});
+      if(kind!=='shinsei'){
+        if(String(r.birth||'').trim()){ var p=_ofBirthParse(r.birth), bi=p && _ofBirthIssue(p[0], p[1], p[2]); if(bi && !/空欄です$/.test(bi.msg)) out.push({sev:bi.sev, t:who+'：'+bi.msg}); }
+        if(String(r.gender||'').trim() && !_ofGenderOk(r.gender)) out.push({sev:'warn', t:who+'：性別が「'+r.gender+'」です。「男」か「女」で入れてください'});
+      }
+    });
+    var seen={}; rows.forEach(function(r){ var k=String(r&&r.name||'').replace(/\s+/g,' ').trim().toUpperCase(); if(!k) return; seen[k]=(seen[k]||0)+1; });
+    Object.keys(seen).forEach(function(k){ if(seen[k]>1) out.push({sev:'warn', t:'「'+k+'」が '+seen[k]+'回入っています'}); });
+  }catch(e){ console.warn('[名簿 チェック]', e); }
+  return out;
+}
+window._mbTsuikanList=_mbTsuikanList;
+(function(){
+  var is17=/(^|\/)(1_17|15_10)_[a-z]+\.html/.test(location.pathname), isMb=/(^|\/)meibo\.html/.test(location.pathname);
+  if(!is17 && !isMb) return;
+  var mark=function(x){ return (x.sev==='out'?'⛔ ':'⚠ ')+x.t; };
+  function hook(){
+    try{
+      if(is17){
+        var a=window._p17PrePrintList;
+        if(typeof a==='function' && !a.__ts){ var wa=function(){ var o=a.apply(this, arguments)||[]; _p17TsuikanList().forEach(function(x){ o.push('・'+mark(x)); }); return o; }; wa.__ts=true; window._p17PrePrintList=wa; }
+        var b=window._p17TodoItems;
+        if(typeof b==='function' && !b.__ts){ var wb=function(){ var o=b.apply(this, arguments)||[]; _p17TsuikanList().reverse().forEach(function(x){ o.unshift({t:mark(x), go:"_p17GoField('"+x.id+"')"}); }); return o; }; wb.__ts=true; window._p17TodoItems=wb; }
+      }
+      if(isMb){
+        var pr=window.doPrint;
+        if(typeof pr==='function' && !pr.__ts){
+          var wp=function(){
+            if(!((typeof _editMode!=='undefined')&&_editMode)){
+              var l=_mbTsuikanList();
+              if(l.length && !confirm('印刷・PDFの前に確認してください（入管から追完が多い所です）。\n\n'+l.map(function(x){ return '・'+mark(x); }).join('\n')+'\n\n左の「名簿の中身」で直せます。このまま印刷しますか？')) return;
+            }
+            return pr.apply(this, arguments);
+          };
+          wp.__ts=true; window.doPrint=wp;
+        }
+      }
+    }catch(e){ console.warn('[追完チェックの組み込み]', e); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hook, 0); }); else setTimeout(hook, 0);
+  window.addEventListener('load', hook); setTimeout(hook, 1500); setTimeout(hook, 4000);
+})();
+/* ===== /1-17号・名簿のチェック ===== */
