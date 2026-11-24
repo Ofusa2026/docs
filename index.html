@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.13</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.14</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -168,16 +168,14 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
   <div id="dgjBar" style="display:none;align-items:center;gap:8px;padding:4px 12px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
     <span style="font-size:14px;">📋</span>
     <span id="dgjBarName" style="font-weight:700;color:#93c5fd;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-    <button onclick="dgjOpenPanel()" style="background:#3b82f6;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
-      履歴 <span id="dgjBarCount" style="background:rgba(255,255,255,.25);padding:1px 6px;border-radius:99px;font-size:10px;">0</span>
+    <button onclick="dgjOpenPanel()" title="この案件で開いた・印刷した・保存した書類の記録" style="background:#3b82f6;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;">
+      書類の記録 <span id="dgjBarCount" style="background:rgba(255,255,255,.25);padding:1px 6px;border-radius:99px;font-size:10px;">0</span>
     </button>
   </div>
   <button class="notif-btn" onclick="openDocsWhatsNew()" title="アップデート履歴">
     🔔<span id="docsNotifBadge" class="notif-badge" style="display:none;"></span>
   </button>
-  <button class="notif-btn" onclick="openPriorityDocsSettings()" title="優先書類の設定" style="margin-left:4px;">
-    ⚙️
-  </button>
+  <!-- ver.20261124.14: ⚙️（優先書類の設定）は外した。優先書類の欄は 11/18 に外していて、設定しても画面に出なかったため。よく使う書類は ☆ で入れる -->
 </div>
 
 <!-- ver.20260808.04: 書類ジャーナルパネル（右スライドイン） -->
@@ -235,11 +233,11 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
     <!-- ver.20261118.06: 書類の検索（名前・様式番号・分野で絞り込み、Enter で一番上を開く） -->
     <div id="navSearchWrap" style="padding:8px 12px 6px;border-bottom:1px solid rgba(148,163,184,.15);">
       <div style="position:relative;">
-        <input id="navSearch" type="search" autocomplete="off" placeholder="🔍 書類をさがす（例：1-6、誓約書、じゅうせつ、gaishoku）" oninput="_navSearch(this.value)" onkeydown="_navSearchKey(event)" style="width:100%;box-sizing:border-box;padding:6px 26px 6px 9px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:12px;outline:none;">
+        <input id="navSearch" type="search" autocomplete="off" title="書類を開いているときのキー：Ctrl+P 印刷 ／ Ctrl+S DB保存 ／ Alt+←→ 前・次の書類 ／ / さがす" placeholder="🔍 書類をさがす（例：1-6、誓約書、じゅうせつ、gaishoku）" oninput="_navSearch(this.value)" onkeydown="_navSearchKey(event)" style="width:100%;box-sizing:border-box;padding:6px 26px 6px 9px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:12px;outline:none;">
         <span id="navSearchCount" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#64748b;pointer-events:none;"></span>
       </div>
       <div id="navSearchNone" style="display:none;font-size:11px;color:#94a3b8;padding:8px 2px 2px;">見つかりませんでした</div>
-      <div style="font-size:9.5px;color:#64748b;padding:4px 2px 0;line-height:1.5;" title="書類を開いているときに使えます">⌨ Ctrl+P 印刷 ／ Ctrl+S DB保存 ／ Alt+←→ 前・次の書類 ／ / さがす</div>
+      <!-- ver.20261124.14: キーの案内（Ctrl+P 印刷 ／ Ctrl+S DB保存 ／ Alt+←→ 前・次の書類 ／ / さがす）は、さがす欄にマウスを乗せると出す -->
     </div>
     <!-- 全書類（優先以外）を「その他の書類 ▼」で折りたためるように包む -->
     <div id="otherDocsToggle" style="display:none;padding:8px 12px;background:#f3f4f6;cursor:pointer;font-size:11px;font-weight:600;color:#6b7280;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;user-select:none;" onclick="toggleOtherDocs()">
@@ -250,7 +248,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
     <div id="favDocsSec">
       <div class="section">⭐ よく使う書類</div>
       <div id="favDocsList"></div>
-      <div id="favDocsHint" style="padding:2px 16px 8px;font-size:10px;color:#64748b;line-height:1.5;">書類の右の ☆ を押すと、ここに出せます（自分だけの設定）</div>
+      <div id="favDocsHint" style="padding:2px 16px 8px;font-size:10px;color:#64748b;line-height:1.5;">書類の右の ☆ で、ここに出せます</div>
     </div>
     <div class="divider"></div>
     <!-- ver.20261118.05: 分類ごとに並べ直した（申請人ごと／会社・支援機関／場合によって／特定活動／入管に出す書類／分野別誓約書／その他／設定） -->
@@ -595,8 +593,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611241704';
-window.__DOCS_CACHE_BUSTER__ = '2611241704';
+window.__DOCS_CACHE_BUSTER__ = '2611241749';
+window.__DOCS_CACHE_BUSTER__ = '2611241749';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2246,6 +2244,17 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261124.14',
+    date: '2026-11-24',
+    notify: true,
+    items: [
+      '🧹 使っていない・重なっている所を整理しました：右上の ⚙️（優先書類の設定）は、設定しても画面に出なくなっていたので外しました。よく使う書類は、書類の右の ☆ で入れてください。',
+      '⌨ 左の「書類をさがす」の下にあったキーの案内は、さがす欄にマウスを乗せると出るようにしました。',
+      '🏷 「履歴」が2つあって紛らわしかったので、上の帯の方は「書類の記録」（開いた・印刷した・保存した書類）に名前を変えました。書類の上の［🕘 履歴］は、DB保存で変わった欄の記録です。',
+      '🟡 ［チェック ▾］の中の「空欄チェック」が2つあって紛らわしかったので、黄色にする方を「空欄を黄色で印刷（お客さま確認用）」に名前を変えました。'
+    ]
+  },
   {
     version: 'ver.20261124.13',
     date: '2026-11-24',

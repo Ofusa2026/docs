@@ -5378,7 +5378,7 @@ function toggleBlankMode(){
   var b=document.getElementById('blankModeBtn');
   if(b){
     b.style.background=window._blankMode?'#a16207':'#eab308';
-    b.textContent=window._blankMode?'🟡 空欄チェック中':'🟡 空欄チェック';
+    b.textContent=window._blankMode?'🟡 空欄の黄色を消す':'🟡 空欄を黄色で印刷（お客さま確認用）';   // ver.20261124.14: もう1つの「空欄チェック」と区別
   }
   applyBlankMarks();
   if(typeof showToast==='function') showToast(window._blankMode
@@ -8472,7 +8472,7 @@ window._histRecord=async function(o){
     editHowtoBtn:'直接編集の正しい手順と、やってはいけないこと',
     ai:'AIが書類の中身（金額・日付・整合）をチェックします',
     red:'押した文字を赤字にします（直してほしい所の指示用）',
-    blank:'空欄の所に色を付けて、書き忘れを探します',
+    blank:'書類の空欄を黄色にして「ここを記入してください」の一文を付けます。お客さまに確認してもらう用（印刷・PDFにも黄色が出ます）',
     printx:'',
     hist:'DB保存したときに変わった欄を見て、前の値に戻せます',
     adj:'申請書の文字や写真の枠の位置を、ドラッグで調整します（もう一度押すと終わり）',
@@ -8597,6 +8597,7 @@ window._histRecord=async function(o){
       }
       menuOf(G.other,'⋯ その他 ▾');
       G.hist.forEach(function(x){ x.b.classList.add('tb-sec'); x.b.style.background=''; x.b.title=DESC.hist; x.b._tbDone=true; bar.appendChild(x.b); });
+      G.check.forEach(function(x){ if(x.sub==='blank' && /^🟡\s*空欄チェック$/.test((x.b.textContent||'').trim())) x.b.textContent='🟡 空欄を黄色で印刷（お客さま確認用）'; });
       G.save.forEach(function(x){ unifySave(x.b); x.b.classList.add('tb-pri','tb-save'); x.b.title=x.b.title||'入力欄の内容を案シス（DB）に保存します（Ctrl+S）'; x.b._tbDone=true; bar.appendChild(x.b); });
       if(G.print.length){
         var pb=G.print[0].b; pb.classList.add('tb-pri','tb-print'); pb.title=pb.title||'印刷・PDFにします（Ctrl+P）'; pb._tbDone=true;
