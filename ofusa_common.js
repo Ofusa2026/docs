@@ -8474,6 +8474,7 @@ window._histRecord=async function(o){
     blank:'空欄の所に色を付けて、書き忘れを探します',
     printx:'',
     hist:'DB保存したときに変わった欄を見て、前の値に戻せます',
+    adj:'申請書の文字や写真の枠の位置を、ドラッグで調整します（もう一度押すと終わり）',
     src:'空欄の欄ごとに、案シスのどこ（雇用条件・会社・案件・人材など）が空かを左の入力欄に出します',
     tr:'日本語が入っていて訳が空の欄だけを、まとめて翻訳します（訳が入っている欄は変えません）'
   };
@@ -8486,6 +8487,7 @@ window._histRecord=async function(o){
     if(/(^|[^a-zA-Z_])doPrint\(/.test(oc)) return 'print';
     if(id==='editModeBtn') return 'edit:editModeBtn';
     if(id==='styleModeBtn') return 'edit:styleModeBtn';
+    if(id==='adjModeBtn') return 'edit:adj';
     if(id==='editHowtoBtn') return 'edit:editHowtoBtn';
     if(id==='discardEditedBtn' || /discardEdited/.test(oc) || /編集版破棄/.test(t)) return 'edit:discard';
     if(/saveEditedHTML\(/.test(oc)) return 'edit:saveEditedHTML';
@@ -8496,7 +8498,9 @@ window._histRecord=async function(o){
     if(/print/i.test(oc) || /印刷/.test(t) || b.classList.contains('btn-print')) return 'printx';
     return 'other';
   }
-  function isActive(b){ var t=(b.textContent||'').trim(); return b.classList.contains('edit-mode-on') || /中$/.test(t) || /完了して保存/.test(t) || /を消す$/.test(t); }
+  function isActive(b){ var t=(b.textContent||'').trim(); return b.classList.contains('edit-mode-on') || /中$/.test(t) || /完了して保存/.test(t) || /を消す$/.test(t) || (b.id==='adjModeBtn' && /f59e0b|245, 158, 11/i.test(b.style.background||'')); }
+  // ver.20261124.11: DB保存のボタンの絵を、どの書類でも［💾 DB保存］にそろえる
+  function unifySave(b){ try{ [].slice.call(b.childNodes).forEach(function(n){ if(n.nodeType===3 && /🛢\uFE0F?/.test(n.nodeValue)) n.nodeValue=n.nodeValue.replace(/🛢\uFE0F?/,'💾'); }); }catch(e){} }
   var css=document.createElement('style'); css.id='_tbCss';
   css.textContent=[
     '.app-bar{gap:10px;}',
@@ -8519,6 +8523,7 @@ window._histRecord=async function(o){
     '.tb-pop .tb-item > button{all:unset;display:block;font-family:sans-serif;font-size:12.5px !important;font-weight:700 !important;color:#1f2937 !important;background:none !important;border:none !important;padding:0 !important;margin:0 !important;box-shadow:none !important;cursor:pointer;}',
     '.tb-item .tb-desc{font-family:sans-serif;font-size:10.5px;color:#64748b;line-height:1.45;margin-top:1px;}',
     '.tb-pop .tb-sep{height:1px;background:#e2e8f0;margin:4px 6px;}',
+    '.tb-pop .tb-item:has(> button[style*="display: none"]),.tb-pop .tb-item:has(> button[style*="display:none"]){display:none;}',
     '.bar-btns .tb-act{border-radius:6px !important;padding:6px 12px !important;font-size:12px !important;font-weight:800 !important;box-shadow:0 0 0 2px #fde68a;}',
     '.bar-btns .tb-act.tb-moved{background:#7c3aed !important;color:#fff !important;border:none !important;cursor:pointer;font-family:sans-serif;}',
     '.bar-btns .tb-act.tb-moved#_srcBtn{background:#dc2626 !important;}'
@@ -8560,6 +8565,15 @@ window._histRecord=async function(o){
         var k=kind(b), g=k.split(':')[0], sub=k.split(':')[1]||''; b._tbKind=k;
         (G[g]||G.other).push({b:b,sub:sub});
       });
+      // 同じ働きのボタンが2つあるとき（書類にもともとある分と、あとから足した分）は1つにする（idのある方を残す）
+      ['edit','check'].forEach(function(g){
+        var seen={};
+        G[g].slice().sort(function(a,b){ return (b.b.id?1:0)-(a.b.id?1:0); }).forEach(function(x){
+          if(!x.sub) return;
+          if(seen[x.sub]){ x.b._tbDone=true; x.b.style.display='none'; G[g].splice(G[g].indexOf(x),1); if(x.b.parentNode) x.b.parentNode.removeChild(x.b); }
+          else seen[x.sub]=true;
+        });
+      });
       // いったん全部はずして並べ直す
       var keep=[].slice.call(bar.childNodes).filter(function(n){ return n.nodeType===1 && n.tagName!=='BUTTON' && !n.classList.contains('tb-menu') && !n.classList.contains('tb-split') && !n.classList.contains('tb-actslot'); });
       bar.innerHTML='';
@@ -8576,13 +8590,13 @@ window._histRecord=async function(o){
       G.check.sort(function(a,b){ return corder.indexOf(a.sub)-corder.indexOf(b.sub); });
       menuOf(G.check,'🔍 チェック ▾');
       if(G.edit.length){
-        var order=['editModeBtn','styleModeBtn','saveEditedHTML','loadEditedHTML','discard','editHowtoBtn'];
+        var order=['editModeBtn','styleModeBtn','adj','saveEditedHTML','loadEditedHTML','discard','editHowtoBtn'];
         G.edit.sort(function(a,b){ return order.indexOf(a.sub)-order.indexOf(b.sub); });
         menuOf(G.edit,'✏️ 編集 ▾');
       }
       menuOf(G.other,'⋯ その他 ▾');
       G.hist.forEach(function(x){ x.b.classList.add('tb-sec'); x.b.style.background=''; x.b.title=DESC.hist; x.b._tbDone=true; bar.appendChild(x.b); });
-      G.save.forEach(function(x){ x.b.classList.add('tb-pri','tb-save'); x.b.title=x.b.title||'入力欄の内容を案シス（DB）に保存します（Ctrl+S）'; x.b._tbDone=true; bar.appendChild(x.b); });
+      G.save.forEach(function(x){ unifySave(x.b); x.b.classList.add('tb-pri','tb-save'); x.b.title=x.b.title||'入力欄の内容を案シス（DB）に保存します（Ctrl+S）'; x.b._tbDone=true; bar.appendChild(x.b); });
       if(G.print.length){
         var pb=G.print[0].b; pb.classList.add('tb-pri','tb-print'); pb.title=pb.title||'印刷・PDFにします（Ctrl+P）'; pb._tbDone=true;
         if(G.printx.length){
@@ -8600,6 +8614,7 @@ window._histRecord=async function(o){
   // 「〜中」のボタンはメニューの外に出す
   function hoist(){
     if(!bar) return; var slot=bar.querySelector('.tb-actslot'); if(!slot) return;
+    [].slice.call(bar.querySelectorAll('.tb-save')).forEach(unifySave);
     [].slice.call(document.querySelectorAll('.app-bar .bar-btns button')).forEach(function(b){
       if(!b._tbHome) return;
       var a=isActive(b);
@@ -8629,7 +8644,7 @@ window._histRecord=async function(o){
     pull();
     organize();
     var b=document.querySelector('.app-bar .bar-btns');
-    if(b) mo.observe(b,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']});
+    if(b) mo.observe(b,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style']});
     var mo2=new MutationObserver(function(){ setTimeout(pull,0); });
     ['pageNav'].forEach(function(id){ var e=document.getElementById(id); if(e) mo2.observe(e,{childList:true}); });
     var fi=document.querySelector('.fp-inner')||document.querySelector('.fp'); if(fi) mo2.observe(fi,{childList:true});
@@ -9418,4 +9433,33 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   window._fpOrgRefresh=function(){ refresh(); };
   window._fpOrgAuto=function(){ touched=false; autoCollapse(); };
   window._fpOrgReorder=function(){ reorder(); };
+})();
+
+/* ver.20261124.11: 書類の上の「ページ：P1 P2…／文字：A- A+」が無い書類（1-5号など）にも同じ列を付けて、どの書類でもそろえる */
+(function(){
+  function build(){
+    try{
+      if(document.querySelector('.page-nav')) return true;
+      var area=document.getElementById('pageArea'); if(!area || !document.querySelector('.app-bar')) return false;
+      if(!area.querySelector('.doc')) return false;
+      var nav=document.createElement('div'); nav.className='page-nav'; nav.id='pageNav';
+      nav.style.cssText='position:sticky;top:0;z-index:5;';
+      nav.innerHTML='<span class="page-nav-label">ページ:</span><span id="_pnPages" style="display:inline-flex;gap:5px;"></span>'
+        +(typeof changeFontSize==='function'?'<span style="margin-left:8px;font-size:10px;color:#aaa;font-family:sans-serif;">文字:</span>'
+        +'<button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(-0.5)" style="padding:2px 7px;">A-</button>'
+        +'<button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0)" style="padding:2px 7px;" id="fontSizeLabel">'+(typeof _fontSize!=='undefined'?_fontSize:8.5)+'pt</button>'
+        +'<button class="pn-btn" onmousedown="event.preventDefault();changeFontSize(0.5)" style="padding:2px 7px;">A+</button>':'');
+      area.parentNode.insertBefore(nav, area);
+      var pages=nav.querySelector('#_pnPages');
+      var sync=function(){
+        var n=area.querySelectorAll('.doc').length;
+        if(pages.children.length===n) return;
+        pages.innerHTML='';
+        for(var i=1;i<=n;i++){ var b=document.createElement('button'); b.className='pn-btn pn-btn-page'+(i===1?' active':''); b.textContent='P'+i; (function(k){ b.onclick=function(){ if(typeof scrollToPage==='function') scrollToPage(k); else { var d=area.querySelectorAll('.doc')[k-1]; if(d) d.scrollIntoView({behavior:'smooth',block:'start'}); } }; })(i); pages.appendChild(b); }
+      };
+      sync(); new MutationObserver(function(){ sync(); }).observe(area,{childList:true});
+      return true;
+    }catch(e){ return true; }
+  }
+  var n=0, t=setInterval(function(){ if(build() || ++n>30) clearInterval(t); },500);
 })();
