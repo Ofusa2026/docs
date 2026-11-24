@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.08</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.09</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -595,8 +595,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611241301';
-window.__DOCS_CACHE_BUSTER__ = '2611241301';
+window.__DOCS_CACHE_BUSTER__ = '2611241546';
+window.__DOCS_CACHE_BUSTER__ = '2611241546';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2247,6 +2247,14 @@ _docsAuthGateInit();
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
   {
+    version: 'ver.20261124.09',
+    date: '2026-11-24',
+    notify: true,
+    items: [
+      '↩️ スキャン申請前チェックの「仮想審査官」と、［💾 DB保存］の前の確認（追完の指摘・🪄直して保存）を、いったん元に戻しました。'
+    ]
+  },
+  {
     version: 'ver.20261124.08',
     date: '2026-11-24',
     notify: true,
@@ -2256,22 +2264,10 @@ var DOCS_WHATS_NEW = [
     ]
   },
   {
-    version: 'ver.20261124.07',
-    date: '2026-11-24',
-    notify: true,
-    items: [
-      '🧑‍⚖️ 申請前チェックに<b>仮想審査官</b>を入れました。出す局（受付番号／同じ会社の過去の申請／会社の所在地から決めます）で、同じ申請の種類・分野の申請に実際に来た追完を、申請件数あたりの％で出します（全国より多いものは赤）。「見るところ」を一式で確かめてください。',
-      '🧑‍⚖️ 局ごとに架空の審査官の呼び名を付けました（例：名古屋局＝金鯱審査官、大阪局＝浪花審査官、福岡局＝博多審査官）。実在の人ではありません。',
-      '🧑‍⚖️ AIの申請前チェックも、この局の傾向を見て「○○局で多い追完：…」を ⚡ で知らせます（傾向だけで⛔にはしません）。'
-    ]
-  },
-  {
     version: 'ver.20261124.06',
     date: '2026-11-24',
-    notify: true,
+    notify: false,
     items: [
-      '💾 書類の［💾 DB保存］を押したとき、<b>この案件に来ている追完（この書類に関係する行）</b>と、印刷前と同じ ⛔/⚠ を先に出すようにしました。🪄 の付いた所は［直して保存］でその場で直ってから保存されます。問題が無ければ今までどおりすぐ保存されます。',
-      '💾 追完が来ている書類は、保存のあとに「追完書類提出のご案内（入管宛レター）」を開くか聞きます。',
       '🛠 1-6号：雇入れ時の健康診断の年月を契約開始から自動で入れた値は、雇用条件セットには保存しないようにしました（同じセットのほかの人は契約開始が違うため）。'
     ]
   },
@@ -5396,7 +5392,6 @@ async function _isaSetStart(targets){
     _isaSt={info:info, c:c, co:co, K:K, tables:tables, restDocs:restDocs, restFiles:restFiles, restOn:{}, restSign:restSign, sg:SG, note:drv.note, folder:drv.folder||'', links:{up:drv.upFolder||'', co:drv.coFolders||[], sign:drv.signFolder||''}, pid:drv.pid||'', scanDir:drv.scan||null, appDir:drv.appDir||null, treeOk:!!drv.treeOk, t0:_isaT0,
       build:{K:K, R:R, targets:targets, files:files, coFiles:drv.co, ctx:ctx0, allFiles:drv.up.concat(drv.sign)}};
     restFiles.forEach(function(f){ _isaSt.restOn[f.id]=true; });
-    try{ _isaSt.bureauP=_isaBureauFetch(_isaSt); }catch(_bp){}   // ver.20261124.07: 仮想審査官（局ごとの追完の傾向）
     try{ (await _isaESignStale(_isaSt)).reverse().forEach(function(w){ K.warn.unshift(w); }); }catch(e){ console.warn('[esignStale]', e); }   // ver.20261118.20
     // ver.20261117.06: 案シスの［📑 申請書類一式を作る］（scanset=auto）なら、止める理由が無ければ確認画面を飛ばして作成に進む
     _isaSt.auto=!!st.isaAuto; st.isaAuto=false;
@@ -6143,8 +6138,7 @@ async function _isaPrecheck(S, allFiles, fileHtml, docHtml, prog, docsP){
   var unsigned=[]; S.tables.forEach(function(t){ t.lines.forEach(function(L){ if(L.val==='有' && L._signDoc && !(L.files||[]).length && !(L.signPages||[]).length) unsigned.push(_pmDocLabel(L._signDoc).name||L._signDoc); }); });
   // ver.20261117.19: Saysay で作った1-17号の中身（チェック欄は☑/☐、日本語の部分）と別紙の名簿も判定に渡す（名簿・通訳者の言語・実施方法の抜けを見る）
   var p17=null; Object.keys(docHtml||{}).forEach(function(d){ if(!p17 && /^1_17/.test(d) && docHtml[d]){ try{ p17=_isaP17Text(docHtml[d]); p17.doc=_pmDocLabel(d).name||d; }catch(e){ console.warn(e); } } });
-  var bureau=null; try{ bureau=_isaBureauForAi(await _isaBureauWait(S)); }catch(_bw){}   // ver.20261124.07: 局ごとの追完の傾向を判定に渡す（仮想審査官）
-  var r=await _isaFnAt('isa-precheck',{action:'judge', today:new Date().toISOString().slice(0,10), meta:_isaPcMeta(S), rows:rows, saysay:{made:made, unsigned:unsigned, p17:p17, bureau:bureau}, pages:ext});
+  var r=await _isaFnAt('isa-precheck',{action:'judge', today:new Date().toISOString().slice(0,10), meta:_isaPcMeta(S), rows:rows, saysay:{made:made, unsigned:unsigned, p17:p17}, pages:ext});
   var res=r.result||{meta:{},attachments:[],checks:[]};
   var notes=[]; if(cut) notes.push('ページが多いため先頭'+MAX+'ページだけ読みました'); if(errs.length) notes.push('読み取りに失敗したページがあります（'+errs.length+'回）');
   if(notes.length) res.meta.note=(res.meta.note?res.meta.note+'／':'')+notes.join('／');
@@ -6174,42 +6168,6 @@ function _isaPcMerge(S, res){
   return res;
 }
 // 結果の画面
-// ver.20261124.07: 🧑‍⚖️ 仮想審査官 … この局（受付番号の頭の字。無ければ同じ会社の過去の申請→会社の所在地）で、
-//   似た申請（同じ申請の種類・分野。30件に満たなければ広げる）に来た追完を、申請件数あたりの割合で出す（DB：rpc/isa_bureau_profile）
-async function _isaBureauFetch(S){
-  if(typeof _idxFreshToken==='function') try{ await _idxFreshToken(); }catch(e){}
-  var r=await fetch(IDX_URL+'rpc/isa_bureau_profile',{method:'POST',headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({p_case_id:String(S.info.caseId||'')})});
-  var j=null; try{ j=await r.json(); }catch(e){}
-  S.bureau=(r.ok && j && j.ok) ? j : {ok:false, why:(j&&(j.why||j.message))||('HTTP '+r.status)};
-  return S.bureau;
-}
-function _isaBureauWait(S){ if(!S || !S.bureauP) return Promise.resolve(null); return Promise.race([S.bureauP.catch(function(){ return null; }), new Promise(function(res){ setTimeout(function(){ res(S.bureau||null); }, 8000); })]); }
-function _isaBureauForAi(b){
-  if(!b || !b.ok) return null;
-  return {bureau:b.bureau_name, examiner:_isaPersona(b).name, level:b.level, app_type:b.app_type, field:b.field, apps:b.apps,
-    top:(b.cats||[]).slice(0,8).map(function(c){ return {label:c.label, rate:c.rate, national:c.nat, look:c.check, example:(c.ex||[])[0]||''}; })};
-}
-// ver.20261124.08: 局ごとの架空の審査官（実在の人ではありません。画面で覚えやすくするための呼び名）
-var ISA_BUREAU_PERSONA={'札':['🐻','雪原（ゆきはら）審査官'],'仙':['🌳','青葉（あおば）審査官'],'東':['🗼','隅田（すみだ）審査官'],'横':['⚓','港野（みなとの）審査官'],
-  '名':['🏯','金鯱（きんしゃち）審査官'],'阪':['🐙','浪花（なにわ）審査官'],'神':['🌉','六甲（ろっこう）審査官'],'広':['🍁','紅葉（もみじ）審査官'],
-  '高':['🍜','讃岐（さぬき）審査官'],'福':['🍥','博多（はかた）審査官'],'那':['🌺','珊瑚（さんご）審査官'],'*':['🗾','全国（ぜんこく）審査官']};
-function _isaPersona(b){ var p=ISA_BUREAU_PERSONA[(b&&b.bureau)||'*']||ISA_BUREAU_PERSONA['*']; return {icon:p[0], name:p[1]}; }
-function _isaBureauHtml(S){
-  var b=S && S.bureau, E=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-  if(!b) return (S && S.bureauP) ? '<div style="font-size:11.5px;color:#64748b;margin:4px 0 8px;">🧑‍⚖️ 仮想審査官：この局の追完の傾向を読み込んでいます…</div>' : '';
-  if(!b.ok || !(b.cats||[]).length) return '';
-  var lv={field:'同じ申請の種類・分野', app:'同じ申請の種類', bureau:'この局の全部の申請'}[b.level]||'';
-  var top=(b.cats||[]).filter(function(c){ return c.rate>=1; }).slice(0,6); if(!top.length) return '';
-  return '<details open style="border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;padding:8px 11px;margin-bottom:10px;">'
-    +'<summary style="cursor:pointer;font-weight:800;font-size:13px;color:#3730a3;">'+_isaPersona(b).icon+' 仮想審査官「'+E(_isaPersona(b).name)+'」（'+E(b.bureau_name)+'）がよく出す追完</summary>'
-    +'<div style="font-size:10.5px;color:#6366f1;margin-top:2px;">※ 局ごとの傾向に付けた架空の呼び名です（実在の審査官ではありません）</div>'
-    +'<div style="font-size:11px;color:#4338ca;margin:3px 0 5px;">'+E(lv)+'（'+E(b.app_type||'')+(b.level==='field'&&b.field?'・'+E(b.field):'')+'）の申請 '+b.apps+'件に、追完メールが '+(b.mails||0)+'通来ています（'+E(b.since||'')+'から）。％は申請件数あたり。局は'+E(b.source)+'から決めました。提出前に、下の「見るところ」を一式で確かめてください</div>'
-    +top.map(function(c){ var hi=c.nat>0 && c.rate>=c.nat*1.3;
-      return '<div style="padding:5px 0;border-top:1px solid #e0e7ff;"><div style="font-size:12.5px;font-weight:700;color:#1e1b4b;">'+E(c.label)+'　<span style="color:'+(hi?'#dc2626':'#4338ca')+';">'+c.rate+'%</span><span style="font-size:11px;color:#64748b;font-weight:400;">（全国 '+c.nat+'%'+(hi?'・この局は多め':'')+'）</span></div>'
-        +'<div style="font-size:11.5px;color:#334155;">見るところ：'+E(c.check)+'</div>'
-        +((c.ex||[])[0]?'<div style="font-size:11px;color:#64748b;">例：「'+E(String(c.ex[0]).slice(0,80))+'」</div>':'')+'</div>'; }).join('')
-    +'</details>';
-}
 function _isaPcShow(S, res, collected, failed){
   var basic=!res; if(!res) res=_isaBasicResult(S);
   var base=_isaPcMeta(S); Object.keys(res.meta||{}).forEach(function(k){ if(res.meta[k]) base[k]=res.meta[k]; }); res.meta=base;   // 空の値で申請人名などを消さない
@@ -6220,7 +6178,6 @@ function _isaPcShow(S, res, collected, failed){
   if(_isaGrpOn()){ _isaGrpNotify('done', S); return; }   // ver.20261117.11
   if(_isaGrp) _isaGrp.list.forEach(function(it){ if(it.S===S){ it.st='done'; it.msg=''; } });
   _isaPcRender();
-  try{ if(S.bureauP && !S.bureau) _isaBureauWait(S).then(function(){ if(S.bureau && document.getElementById('isaPcModal') && _isaSt===S){ var m=document.getElementById('isaPcModal'); if(m) m.remove(); _isaPcRender(); } }); }catch(_br){}
   if(S.lite){ S.pc.attach=false; S.pc.logged=1; try{ _bpPostLogs(collected.filter(function(x){ return x.dk!=='drive' && x.dk!=='isa_ichiran'; })); }catch(e){} _isaPostSetLog(S, S.pc); _isaPcSave(null); }   // ver.20261118.18: 印刷を待たずに 03 スキャンへ保存
 }
 function _isaPcRender(){
@@ -6252,7 +6209,6 @@ function _isaPcRender(){
     +'<div style="display:flex;gap:8px;margin-bottom:8px;">'+box('out','⛔ 完全アウト','#c62828','#fdecea')+box('warn','⚡ 注意','#b26a00','#fff6e6')+box('ok','✅ OK','#2e7d32','#eaf6eb')+'</div>'
     +(P.res.meta.note?'<div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">メモ：'+E(P.res.meta.note)+'</div>':'')
     +((P.review||[]).length?'<div style="font-size:12px;color:#7c2d12;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:7px 10px;margin-bottom:8px;"><b>🧐 確かめてほしいところ</b>（直すときは下の［↩ 確認画面で直す］）<div style="margin-top:3px;">・'+P.review.map(E).join('<br>・')+'</div></div>':'')
-    +_isaBureauHtml(S)   // ver.20261124.07: 🧑‍⚖️ 仮想審査官
     +(cnt.out?'<div style="font-weight:800;font-size:13px;margin-top:8px;color:#c62828;">⛔ 提出前に直すもの</div>'+list('out','#c62828'):'')
     +(cnt.warn?'<div style="font-weight:800;font-size:13px;margin-top:10px;color:#b26a00;">⚡ 目で確認するもの</div>'+list('warn','#b26a00'):'')
     +'<div style="font-weight:800;font-size:13px;margin-top:14px;color:#4c1d95;">📎 不足書類のお知らせ</div>'+notice
