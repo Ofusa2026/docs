@@ -9270,7 +9270,7 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
     '.fs-title .fs-cnt.ok{background:transparent;color:#86efac;}',
     '#_fpOrg{position:sticky;top:0;z-index:20;margin:-8px -8px 8px;padding:6px 8px;background:#f8fafc;border-bottom:1px solid #cbd5e1;font-family:sans-serif;}',
     '#_fpOrg .fo-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}',
-    '#_fpOrg .fo-h{font-size:11px;font-weight:800;color:#0f172a;margin-right:auto;}',
+    '#_fpOrg .fo-h{font-size:11.5px;font-weight:800;color:#0f172a;flex-basis:100%;margin-bottom:3px;}',
     '#_fpOrg .fo-h b{color:#c2410c;}',
     '#_fpOrg .fo-h.ok b{color:#15803d;}',
     '#_fpOrg button{font-family:sans-serif;font-size:10px;padding:2px 7px;border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:5px;cursor:pointer;}',
@@ -9327,6 +9327,7 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
     if(!host || !bar) return;
     decorate();
     var total=0, list=[];
+    try{ fieldsOf(host).forEach(function(el){ el.classList.toggle('fo-blank', blank(el)); }); }catch(e){}
     sections().forEach(function(s){
       if(!shown(s)) return;
       var st=stat(s), k=s.querySelector(':scope > .fs-title .fs-cnt');
@@ -9462,4 +9463,44 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
     }catch(e){ return true; }
   }
   var n=0, t=setInterval(function(){ if(build() || ++n>30) clearInterval(t); },500);
+})();
+
+/* ============================================================
+   ver.20261124.12: Saysay の見た目（色・文字の大きさ）を見やすく（全書類共通・画面だけ。印刷は変えない）
+   ・左の入力欄：文字を大きく、見出しは上の帯と同じ紺色、入れている欄は青く光る、空欄は左にオレンジの線
+   ・欄の下の小さな英字（es.〇〇）は隠す（欄の名前にマウスを乗せると出る）
+   ・書類まわりの背景を明るい灰色に、ページの列も上の帯と同じ色に
+   書類ごとに独自の見た目を決めている所はそちらを優先する（共通のスタイルのすぐ後ろに入れる）
+   ============================================================ */
+(function(){
+  if(window.__ofThemeOn) return; window.__ofThemeOn=true;
+  var st=document.createElement('style'); st.id='_ofTheme';
+  st.textContent='@media screen{'+[
+    '.pp{background:#cfd6df;}',
+    '.doc{box-shadow:0 2px 14px rgba(15,23,42,.22);}',
+    '.page-nav{background:#243b5a;border-bottom:1px solid #13243c;padding:6px 12px;}',
+    '.page-nav-label{color:#b6c3d4;}',
+    '.pn-btn{background:#30496b;border-color:#45608a;color:#e2e8f0;border-radius:5px;}',
+    '.pn-btn:hover{background:#3d5a82;color:#fff;}',
+    '.pn-btn.active{background:#2563eb;border-color:#60a5fa;color:#fff;}',
+    '.fp{width:320px;background:#f8fafc;border-right:1px solid #cbd5e1;}',
+    '.fp-inner{padding:10px;}',
+    '.fs{margin-bottom:12px;}',
+    '.fs-title{background:#1f3a5f;color:#fff;font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:5px;margin-bottom:7px;letter-spacing:.02em;}',
+    '.fg{margin-bottom:6px;border-radius:6px;transition:background .12s;}',
+    '.fg:focus-within{background:#eaf2ff;box-shadow:0 0 0 4px #eaf2ff;}',
+    '.fg label{font-size:10px;color:#475569;font-weight:600;margin-bottom:2px;}',
+    '.fg input,.fg select,.fg textarea{font-size:12px;padding:5px 7px;border:1px solid #cbd5e1;border-radius:5px;background-color:#fff;color:#0f172a;}',
+    '.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2);}',
+    '.fg input[type=checkbox],.fg input[type=radio]{width:auto;padding:0;box-shadow:none;}',
+    '.fg .fo-blank{border-left:3px solid #fb923c;}',
+    '.fg2,.fg3{gap:6px;}',
+    '.fp .fid{display:none;}'
+  ].join('')+'}';
+  var link=document.querySelector('link[href*="ofusa_common.css"]');
+  if(link && link.parentNode) link.parentNode.insertBefore(st, link.nextSibling); else (document.head||document.documentElement).insertBefore(st, (document.head||document.documentElement).firstChild);
+  // 隠した英字（es.〇〇）は、欄の名前にマウスを乗せると出す
+  function tip(){ try{ [].slice.call(document.querySelectorAll('.fp .fid')).forEach(function(f){ var l=f.closest('label')||f.parentNode; if(l && !l.title) l.title=f.textContent.trim(); }); }catch(e){} }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tip); else tip();
+  window.addEventListener('load', function(){ setTimeout(tip, 500); });
 })();
