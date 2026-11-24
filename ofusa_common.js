@@ -5735,7 +5735,7 @@ function _p16ChangedFields(){
     out.push({id:el.id, label:lb, from:b, to:v});
   });
   // ver.20261124.02: 「変更の範囲」の□を押したときも、保存するか聞く（雇用条件セットに残せば、同じセットのほかの人にも入る）
-  try{ var cb0=window._p16CbBase, cs=window.cbState||{}; if(cb0) [['change_none_direct','Ⅱ 就業の場所の変更の範囲'],['change_none_disp','Ⅲ 業務の変更の範囲']].forEach(function(k){ if(!!cs[k[0]]!==!!cb0[k[0]] && document.querySelector('[data-cbid="'+k[0]+'"]')) out.push({id:'cb:'+k[0], label:k[1], from:cb0[k[0]]?'■ 変更の可能性なし':'□', to:cs[k[0]]?'■ 変更の可能性なし':'□'}); }); }catch(_c){}
+  try{ var cb0=window._p16CbBase, cs=window.cbState||{}; if(cb0) [['change_none_direct','Ⅱ 就業の場所の変更の範囲'],['change_none_disp','Ⅲ 業務の変更の範囲']].forEach(function(k){ var _b0=(cb0[k[0]]===undefined)?true:!!cb0[k[0]], _c0=(cs[k[0]]===undefined)?true:!!cs[k[0]]; if(_c0!==_b0 && document.querySelector('[data-cbid="'+k[0]+'"]')) out.push({id:'cb:'+k[0], label:k[1], from:_b0?'■ 変更の可能性なし':'□', to:_c0?'■ 変更の可能性なし':'□'}); }); }catch(_c){}
   if(window._p16SkipSig && window._p16SkipSig===JSON.stringify(out)) return [];   // 「保存しないで印刷」を選んだあと、さらに直していなければ聞かない
   return out;
 }
@@ -5785,7 +5785,7 @@ function _p16Tsuikan(probs){
   try{
     var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
     var cr=[]; if(_p16CbOn('change_none_direct')===false) cr.push('Ⅱ 就業の場所'); if(_p16CbOn('change_none_disp')===false) cr.push('Ⅲ 従事すべき業務の内容');
-    if(cr.length) probs.push('⛔ 「変更の範囲」が選ばれていません（'+cr.join('・')+'）。変更の可能性がなければ、書類の「□ 変更の可能性なし」を押して■にし、💾保存してください（変更があるときは、その下に範囲を書きます）。入管から追完が来ている所です');
+    if(cr.length) probs.push('⚠ 「変更の範囲」の「変更の可能性なし」が外れています（'+cr.join('・')+'）。変更があるときは、その下に変更の範囲を書いてください（直接編集）。変更が無いなら、書類の□を押して■に戻し、💾保存してください。入管から追完が来ている所です');   // ver.20261124.03: はじめから■にしたので、外したときだけ知らせる
     if(has('es_healthCheckY2')){
       var hc=[];
       if(!g('es_healthCheckY2') || !g('es_healthCheckM2')) hc.push('雇入れ時の健康診断');
@@ -5859,6 +5859,22 @@ function _p16PrintCheck(){
     w.__p16=true; window.doPrint=w;
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wrap,500); }); else setTimeout(wrap,500);
+  // ver.20261124.03: 「変更の範囲」の「変更の可能性なし」は、はじめから■にする（ほとんどの会社は変更なし。追完が来ていたため）。
+  //   外して保存した雇用条件（cbState に false）はそのまま。描画（p）の前に、まだ決まっていない□だけ■にする
+  (function(){
+    if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
+    var KEYS=['change_none_direct','change_none_direct_id','change_none_disp','cb_auto_001'];
+    var def=function(){ try{ if(!window.cbState) return false; var ch=false; KEYS.forEach(function(k){ if(window.cbState[k]===undefined){ window.cbState[k]=true; ch=true; } }); return ch; }catch(e){ return false; } };
+    function hookP(){
+      var op=window.p; if(typeof op!=='function' || op.__p16def) return;
+      var w=function(){ def(); return op.apply(this, arguments); }; w.__p16def=true;
+      try{ Object.keys(op).forEach(function(k){ if(!(k in w)) w[k]=op[k]; }); }catch(_e){}
+      window.p=w;
+      if(def()) KEYS.forEach(function(k){ document.querySelectorAll('#pageArea [data-cbid="'+k+'"]').forEach(function(el){ el.textContent=window.cbState[k]?'■':'□'; }); });
+    }
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(hookP,0); }); else setTimeout(hookP,0);
+    window.addEventListener('load', hookP); setTimeout(hookP, 1500);
+  })();
   // ver.20261124.02: 「変更の範囲」の□は、日本語の行を押したら訳の行も同じにする（逆も同じ）
   (function(){
     if(!/(^|\/)1_6(_[a-z]+)?\.html/.test(location.pathname)) return;
