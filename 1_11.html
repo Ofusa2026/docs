@@ -26,7 +26,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 参考様式第１－１１号　特定技能所属機関概要書</div>
-    <div class="ver">ver.20261116.01</div>
+    <div class="ver">ver.20261124.04</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -184,7 +184,7 @@
   <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=2611241231"></script>
+<script src="ofusa_common.js?v=2611241237"></script>
 <script>
 const MAX_OFF=5;      // 本体表に載せる最大役員数（これを超えたら別紙）
 const MAX_OFF_ALL=20; // 別紙に載せられる最大役員数（11名以上のレアケースにも対応）
@@ -338,13 +338,13 @@ function p(){
   </tr>
   <tr style="height:2.5em;">
     <td>日本人労働者</td>
-    <td colspan="2">${f('f_jpVQ')||'0'}　名</td>
-    <td colspan="2">${f('f_jpIQ')||'0'}　名</td>
+    <td colspan="2">${String(v('f_jpVQ')||'').trim()?f('f_jpVQ'):'<span class="f" data-bind="f_jpVQ">0</span>'}　名</td>
+    <td colspan="2">${String(v('f_jpIQ')||'').trim()?f('f_jpIQ'):'<span class="f" data-bind="f_jpIQ">0</span>'}　名</td>
   </tr>
   <tr style="height:2.5em;">
     <td>外国人労働者</td>
-    <td colspan="2">${f('f_fgnVQ')||'0'}　名</td>
-    <td colspan="2">${f('f_fgnIQ')||'0'}　名</td>
+    <td colspan="2">${String(v('f_fgnVQ')||'').trim()?f('f_fgnVQ'):'<span class="f" data-bind="f_fgnVQ">0</span>'}　名</td>
+    <td colspan="2">${String(v('f_fgnIQ')||'').trim()?f('f_fgnIQ'):'<span class="f" data-bind="f_fgnIQ">0</span>'}　名</td>
   </tr>
   <tr>
     <td rowspan="2">（２）前１年間の行方不明者数</td>

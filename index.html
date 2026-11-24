@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.03</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261124.04</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -595,8 +595,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611241231';
-window.__DOCS_CACHE_BUSTER__ = '2611241231';
+window.__DOCS_CACHE_BUSTER__ = '2611241237';
+window.__DOCS_CACHE_BUSTER__ = '2611241237';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -627,7 +627,7 @@ const docs={
   '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1794393342'},
   '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1794393342'},
   '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1794393342'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1794393342'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1795491413'},
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1794393342'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1794393342'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1794393342'},
@@ -699,7 +699,7 @@ const docs={
   '1_11_3':{navId:'nav-1_11_3',frameId:'frame-1_11_3',file:'1_11_3.html?v=1794393342'},
   '1_20':{navId:'nav-1_20',frameId:'frame-1_20',file:'1_20.html?v=1794393342'},
   '1_22':{navId:'nav-1_22',frameId:'frame-1_22',file:'1_22.html?v=1794393342'},
-  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1794393342'},
+  '1_11':{navId:'nav-1_11',frameId:'frame-1_11',file:'1_11.html?v=1795491413'},
   'ininjou':{navId:'nav-ininjou',frameId:'frame-ininjou',file:'ininjou.html?v=1794393342'},
   'irai':{navId:'nav-irai',frameId:'frame-irai',file:'irai.html?v=1794393342'},
   'torisage':{navId:'nav-torisage',frameId:'frame-torisage',file:'torisage.html?v=1794393342'},
@@ -2246,6 +2246,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261124.04',
+    date: '2026-11-24',
+    notify: true,
+    items: [
+      '🪄 追完が多い所を、空欄なら自動で埋めるようにしました（入っている値は変えません）：1-6号の<b>雇入れ時の健康診断の年月</b>は契約開始の年月を入れます（黄色の欄）。',
+      '🪄 1-6号：換算時給のパネルで「毎月決まって払う手当」（または通勤・住宅などを「決まった額」）と選んだ手当は、計算方法に<b>「毎月定額で支給」</b>（訳つき）を入れます。',
+      '🛠 1-11号（所属機関概要書）：３の離職者数が空欄のとき「0」と出るはずが空欄になっていたのを直しました。入管から「0名の場合は0と記載」と追完が来ていた所です。'
+    ]
+  },
   {
     version: 'ver.20261124.03',
     date: '2026-11-24',

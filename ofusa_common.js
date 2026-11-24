@@ -5794,11 +5794,43 @@ function _p16Tsuikan(probs){
     }
     var nc=[];
     for(var i=1;i<=6;i++){ if(!has('es_a'+i+'Calc')) continue; var nm=g('es_a'+i+'Name'), am=g('es_a'+i+'Amt'); if((nm||am) && !g('es_a'+i+'Calc')) nc.push(nm||('手当'+i)); }
-    if(nc.length) probs.push('⚠ 手当の「計算方法」が空欄です（'+nc.join('・')+'）。入管から「手当によっては最低賃金を下回る可能性があるので、計算方法を記載」と追完が来ています。毎月決まった額なら「月額固定」などと書いてください');
+    if(nc.length) probs.push('⚠ 手当の「計算方法」が空欄です（'+nc.join('・')+'）。入管から「手当によっては最低賃金を下回る可能性があるので、計算方法を記載」と追完が来ています。毎月決まった額なら、左の換算時給のパネルで「毎月決まって払う手当」を選ぶと「毎月定額で支給」が自動で入ります。条件で変わる手当（精皆勤など）は、条件と額を書いてください');
   }catch(e){ console.warn('[1-6 追完の多い所]', e); }
 }
+/* ver.20261124.04: 追完の多い所を、人が入れなくても埋まるようにする（空欄のときだけ。入っている値は変えない）
+   ① 雇入れ時の健康診断の年月 … 案シスの雇用条件には「健康診断 受診年・月」が1つだけで、1-6号では初回の定期健診に使っている。
+      雇入れ時の欄はほぼ全員空欄だったので、契約開始（＝雇入れ）の年月を入れる（安衛則43条：雇入れの際に行う）
+   ② 手当の「計算方法」… 換算時給のパネルで「毎月決まって払う手当」か、①〜⑤を「決まった額（一律）」と選んだ手当は「毎月定額で支給」
+      （名前からの推測だけのものは入れない：精皆勤のように条件で変わる手当があるため） */
+var _P16_TEIGAKU={ja:'毎月定額で支給', id:'Dibayar dengan jumlah tetap setiap bulan', en:'Paid as a fixed amount every month', vi:'Trả cố định hằng tháng', th:'จ่ายเป็นจำนวนคงที่ทุกเดือน', ne:'हरेक महिना निश्चित रकम भुक्तानी', my:'လစဉ် ပုံသေပမာဏဖြင့် ပေးသည်', km:'បើកជាចំនួនថេររៀងរាល់ខែ', zh:'每月定额支付', tl:'Binabayaran bilang nakapirming halaga buwan-buwan', mn:'Сар бүр тогтмол дүнгээр олгоно', si:'සෑම මසකම ස්ථාවර මුදලක් ලෙස ගෙවනු ලැබේ', ko:'매월 정액 지급'};
+function _p16Defaults(){
+  try{
+    if((typeof _editMode!=='undefined' && _editMode) || window._htmlFrozen) return false;
+    var el=function(id){ return document.getElementById(id); }, g=function(id){ var e=el(id); return e?String(e.value||'').trim():''; };
+    var mk=function(e, why){ e.dataset.autofill='1'; e.style.background='#fef3c7'; e.title=why; };
+    var ch=false;
+    var y2=el('es_healthCheckY2'), m2=el('es_healthCheckM2');
+    if(y2 && m2 && !g('es_healthCheckY2') && !g('es_healthCheckM2')){
+      var cy=String(g('es_contractStartY')).normalize('NFKC').replace(/年$/,''), cm=String(g('es_contractStartM')).normalize('NFKC').replace(/月$/,'');
+      if(/^\d{4}$/.test(cy) && /^\d{1,2}$/.test(cm)){ y2.value=cy; m2.value=String(parseInt(cm,10)); mk(y2,'契約開始（雇入れ）の年月を入れました'); mk(m2,'契約開始（雇入れ）の年月を入れました'); ch=true; }
+    }
+    var sel=(typeof _p16SelGet==='function')?_p16SelGet():{}, L=(typeof _rcpLang==='function')?_rcpLang():'id';
+    for(var i=1;i<=6;i++){
+      var c=el('es_a'+i+'Calc'), nm=g('es_a'+i+'Name'); if(!c || !nm || g('es_a'+i+'Calc')) continue;
+      var s=sel[nm]; if(!s) continue;
+      var K=(typeof _P16_HKIND!=='undefined' && _P16_HKIND[s.k])||{};
+      if(!(s.k==='reg' || (K.q && s.h==='ichiritsu'))) continue;
+      c.value=_P16_TEIGAKU.ja; mk(c,'換算時給のパネルで「決まった額」と選んだ手当なので「毎月定額で支給」を入れました');
+      var ce=el('es_a'+i+'CalcEn'); if(ce && !g('es_a'+i+'CalcEn') && _P16_TEIGAKU[L]){ ce.value=_P16_TEIGAKU[L]; ce.dataset.autofill='1'; }
+      ch=true;
+    }
+    return ch;
+  }catch(e){ console.warn('[1-6 空欄の自動入力]', e); return false; }
+}
+window._p16Defaults=_p16Defaults;
 function _p16PrintCheck(){
   var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; }, has=function(id){ return !!document.getElementById(id); };
+  if(_p16Defaults() && typeof p==='function') p();   // ver.20261124.04
   var req=[['es_createY','作成日（年）'],['es_createM','作成日（月）'],['es_createD','作成日（日）'],['applicantName','宛先氏名'],['es_orgName','所属機関名'],['es_orgAddress','所属機関の所在地'],['es_orgTel','所属機関の電話番号'],['es_repName','代表者名'],
     ['es_contractStartY','契約開始（年）'],['es_contractEndY','契約終了（年）'],['es_officeAddress','就業場所の所在地'],['es_category','業務区分'],['es_monthlyH','月所定労働時間'],
     ['es_payCutoff','賃金締切日'],['es_payDay','賃金支払日'],['es_salaryTotal','支払概算総額'],['es_deductTotal','控除合計'],['es_netPay','手取り']];
@@ -5900,7 +5932,7 @@ function _p16PrintCheck(){
       if(e.textContent!==(_payCash()?'■':'□') || b.textContent!==(_payBank()?'■':'□')){ if(typeof p==='function') p(); }
     }catch(err){}
   }
-  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(function(){ _p16HourlyOnLoad(); }, 3200); setTimeout(function(){ _p16HourlyOnLoad(); }, 6200); setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
+  window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE'){ setTimeout(_p16AutoCalcMonthly, 3000); setTimeout(_p16AutoCalcMonthly, 6000); setTimeout(function(){ _p16HourlyOnLoad(); }, 3200); setTimeout(function(){ _p16HourlyOnLoad(); }, 6200); setTimeout(function(){ if(_p16Defaults() && typeof p==='function') p(); }, 3400); setTimeout(function(){ if(_p16Defaults() && typeof p==='function') p(); }, 6400);   /* ver.20261124.04 */ setTimeout(_payRefresh, 2500); setTimeout(_payRefresh, 5000); } }catch(_e){} });
 })();
 /* ===== /1-6号 印刷前チェック ===== */
 /* ===== ver.20261109.09: 🔍 空欄の参照先（案シスのどこが空か） =====
