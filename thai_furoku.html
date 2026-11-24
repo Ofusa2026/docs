@@ -38,7 +38,7 @@
 <div class="app-bar">
   <div>
     <div class="app-bar-title">📄 雇用契約書の付録（タイ大使館）</div>
-    <div class="ver">ver.20261120.03</div>
+    <div class="ver">ver.20261124.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" id="editModeBtn" onclick="toggleEditMode()" style="background:#7c3aed;color:white;">✏️ 直接編集</button>
@@ -118,6 +118,15 @@ function _titleEn(jp){
   if(/理事長|組合長/.test(t)) return 'Chairman';
   if(/代表/.test(t)) return 'Representative';
   if(/取締役/.test(t)) return 'Director';
+  return '';
+}
+// 登録支援機関（証人）の役職の英訳：1-17号（1_17_en.html の _P17_TITLE_EN・_p17TitleEn）と同じ表・同じ引き方
+const _P17_TITLE_EN=[['代表取締役社長','President and CEO'],['代表取締役会長','Chairman and CEO'],['代表取締役','Representative Director'],['取締役社長','President'],['専務取締役','Senior Managing Director'],['常務取締役','Managing Director'],['取締役','Director'],['代表理事','Representative Director'],['理事長','Chairperson'],['専務理事','Executive Director'],['常務理事','Managing Director'],['理事','Director'],['代表社員','Representative Partner'],['事務局長','Secretary General'],['統括事務長','Chief Administrator'],['事務長','Administrator'],['管理本部長','General Manager, Administration'],['本部長','General Manager'],['事業部長','Division Manager'],['部長','General Manager'],['次長','Deputy General Manager'],['課長','Section Manager'],['係長','Chief'],['主任','Chief'],['室長','Office Manager'],['支店長','Branch Manager'],['所長','Office Manager'],['シニアマネージャー','Senior Manager'],['マネージャー','Manager'],['マネジャー','Manager'],['リーダー','Leader'],['社長','President'],['会長','Chairman'],['代表','Representative'],['一般社員','Staff'],['社員','Staff'],['職員','Staff'],['スタッフ','Staff'],['総務','General Affairs'],['職業紹介責任者','Employment Placement Manager'],['支援責任者','Support Manager'],['支援担当者','Support Staff'],['役職なし','None'],['なし','None'],['無','None']];
+function _p17TitleEn(t){
+  t=String(t||'').replace(/\s/g,'');
+  if(!t) return '';
+  for(var i=0;i<_P17_TITLE_EN.length;i++) if(t===_P17_TITLE_EN[i][0]) return _P17_TITLE_EN[i][1];
+  for(var j=0;j<_P17_TITLE_EN.length;j++){ var k=_P17_TITLE_EN[j][0]; if(k.length>=2 && !/なし|^無$/.test(k) && t.slice(-k.length)===k) return _P17_TITLE_EN[j][1]; }
   return '';
 }
 // ふりがな → ローマ字（ヘボン式・大文字）
@@ -234,9 +243,19 @@ async function loadFromDB(passedInfo){
     // 証人＝案件の登録支援機関（自社支援のときは入れない）
     const orgName=String((cas&&cas.org)||info.orgName||'').trim();
     if(orgName && !/自社/.test(orgName) && typeof findSupportOrg==='function'){
-      const so=await findSupportOrg(orgName,'name,name_en,rep_name,rep_name_en,rep_name_kana');
+      // ver.20261124.01: 1-17号の登録支援機関欄と同じ列（support_orgs の rep_name / rep_name_en / rep_name_kana）から取る。
+      //   役職は support_orgs.rep_title（無ければ「代表者」）。英語は rep_title_en → 1-17号と同じ英訳表 → Representative の順
+      const so=await findSupportOrg(orgName,'name,name_en,rep_title,rep_title_en,rep_name,rep_name_en,rep_name_kana');
       s('f_soName',(so&&so.name)||orgName);
-      if(so){ s('f_soNameEn',_sp(so.name_en)); s('f_soRep',_sp(so.rep_name).replace(/ /g,'　')); s('f_soRepEn',_sp(so.rep_name_en)||_kanaRoma(so.rep_name_kana)); if(so.rep_name){ const t=document.getElementById('f_soTitle'); if(t&&!t.value) t.value='代表者'; const te=document.getElementById('f_soTitleEn'); if(te&&!te.value) te.value='Representative'; } }
+      if(so){
+        s('f_soNameEn',_sp(so.name_en)); s('f_soRep',_sp(so.rep_name).replace(/ /g,'　')); s('f_soRepEn',_sp(so.rep_name_en)||_kanaRoma(so.rep_name_kana));
+        if(so.rep_name){
+          const tj=_sp(so.rep_title)||'代表者';
+          const tn=_sp(so.rep_title_en)||_p17TitleEn(tj)||'Representative';
+          const t=document.getElementById('f_soTitle'); if(t&&!t.value) t.value=tj;
+          const te=document.getElementById('f_soTitleEn'); if(te&&!te.value) te.value=tn;
+        }
+      }
     }
     p(); showToast('✅ データを読み込みました');
   }catch(e){showToast('⚠️ 読込エラー: '+e.message);console.error(e);}
