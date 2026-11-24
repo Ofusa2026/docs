@@ -9481,7 +9481,11 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
     '.pp{background:#cfd6df;}',
     '.doc{box-shadow:0 2px 14px rgba(15,23,42,.22);}',
     '.page-nav{background:#243b5a;border-bottom:1px solid #13243c;padding:6px 12px;}',
-    '.page-nav-label{color:#b6c3d4;}',
+    '.page-nav-label{color:#b6c3d4;white-space:nowrap;}',
+    '.page-nav{flex-wrap:wrap;row-gap:4px;}',   /* ページが多い書類（1-17号など）で「ページ:」「文字:」が縦に割れないように */
+    '.page-nav > span{white-space:nowrap;}',
+    '.pn-btn.pn-btn-page{padding:2px 7px;}',
+    'html body .pp,html body #ppOuter,html body #pageArea{background:#cfd6df !important;}',   /* 1-17号などで書類まわりだけ濃い灰色だったのをそろえる */
     '.pn-btn{background:#30496b;border-color:#45608a;color:#e2e8f0;border-radius:5px;}',
     '.pn-btn:hover{background:#3d5a82;color:#fff;}',
     '.pn-btn.active{background:#2563eb;border-color:#60a5fa;color:#fff;}',
@@ -9554,4 +9558,42 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   // 案件を選び直したら、前の案件の印は消す
   window.addEventListener('message', function(e){ try{ if(e.data && e.data.type==='SELECT_CASE') setTimeout(clearAll, 50); }catch(_e){} });
   setInterval(badge, 2000);   // 直接編集の未保存など、ほかの所で変わった分も拾う
+})();
+
+/* ============================================================
+   ver.20261124.15: ボタンがどれくらい使われているかを数える（使っていないボタンを見つけて整理するため）
+   ・上のボタン列（メニューの中も）・左の入力欄のボタンを押したら、利用ログ（saysay_logs）に event='ui_click' で残す
+   ・残すのはボタンの名前と場所だけ（入力した中身は残さない）
+   あわせて、書類ごとにバラバラだった見た目をそろえる
+   ・書類名の頭の絵（🪪 🏢 📋）を 📄 に
+   ============================================================ */
+(function(){
+  if(window.__ofUx15) return; window.__ofUx15=true;
+  function label(b){
+    var t=(b.textContent||'').replace(/\s+/g,' ').trim();
+    t=t.replace(/^[▶▼]\s*/,'').replace(/\s*(空欄[0-9]+|✓)$/,'').replace(/[0-9０-９]+/g,'#').slice(0,40);   // 件数などの数字はまとめる
+    return t || b.title || b.id || '';
+  }
+  document.addEventListener('click', function(e){
+    try{
+      if(!e.isTrusted) return;
+      var b=e.target && e.target.closest && e.target.closest('button,.tb-item,.fo-chip,.fs-title.fs-tg');
+      if(!b) return;
+      if(b.classList.contains('tb-item')){ var ib=b.querySelector('button'); if(ib) b=ib; }
+      var area=b.closest('.app-bar')?'bar':(b.closest('#_fpOrg')?'fporg':(b.closest('.fs-title')?'fstitle':(b.closest('.fp')?'left':(b.closest('.page-nav')?'pagenav':''))));
+      if(!area) return;
+      if(area==='pagenav' && /^P#$/.test(label(b))) return;   // ページ番号は数えない
+      if(typeof slog==='function') slog('ui_click', {meta:{label:label(b), id:b.id||'', area:area}});
+    }catch(_e){}
+  }, true);
+
+  function unifyTitle(){
+    try{
+      var t=document.querySelector('.app-bar-title'); if(!t) return;
+      var w=document.createTreeWalker(t, NodeFilter.SHOW_TEXT), n;
+      while((n=w.nextNode())){ if(n.nodeValue.trim()){ n.nodeValue=n.nodeValue.replace(/^(\s*)(🪪|🏢|📋)️?\s*/, '$1📄 '); break; } }
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', unifyTitle); else unifyTitle();
+  window.addEventListener('load', function(){ setTimeout(unifyTitle, 300); });
 })();
