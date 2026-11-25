@@ -574,7 +574,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611251130"></script>
+<script src="ofusa_common.js?v=2611251202"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1498,16 +1498,66 @@ function _oaList(){
   if(!Array.isArray(L)) return [];
   return L.filter(function(o){ return o && (String(o.name||'').trim()||String(o.addr||'').trim()); });
 }
+// 書類の中の「※詳細は別紙のとおり　*（訳）」から訳だけを取る（言語版ごとに入管庁の訳が入っている）
+function _oaBesshiWord(area){
+  try{
+    const els=area.querySelectorAll('div,td');
+    for(let i=0;i<els.length;i++){
+      const t=els[i].textContent||''; const k=t.indexOf('※詳細は別紙のとおり'); if(k<0 || els[i].children.length>2) continue;
+      const r=(t.slice(k+'※詳細は別紙のとおり'.length).replace(/^[\s\u2003*＊]+/,'').split(/\n/)[0]||'').trim();
+      if(r) return r;
+    }
+  }catch(e){}
+  return '';
+}
+function _oaMissing(){
+  if(window._oaStandalone) return false;
+  const says=['es_officeName','es_officeAddress','es_officeTel','es_subOfficeName','es_subOfficeAddress','es_subOfficeTel'].some(function(id){ return /別紙/.test(v(id)); });
+  return says && !_oaList().length;
+}
+function _oaWarnText(){
+  const src=window._esAnnexSrc||{};
+  return src.missing
+    ? '⚠️ 就業先が「別紙」になっていますが、雇用条件セットで選んでいる就業先セットが案シスに見つかりません（消されたか、別の会社のセットです）。このまま印刷すると、就業の場所一覧が付きません。'
+    : '⚠️ 就業先が「別紙」になっていますが、就業先の一覧（案シスの就業先セット）が選ばれていません。このまま印刷すると、就業の場所一覧が付きません。';
+}
+function _oaWarn(on){
+  let el=document.getElementById('oaWarn');
+  if(!on){ if(el) el.remove(); return; }
+  const area=document.getElementById('pageArea'); if(!area || !area.parentNode) return;
+  if(!el){
+    el=document.createElement('div'); el.id='oaWarn';
+    el.style.cssText='margin:8px auto;max-width:794px;background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;font-family:sans-serif;';
+    area.parentNode.insertBefore(el, area);
+  }
+  el.innerHTML=esc(_oaWarnText())+'<br><span style="font-size:11px;">案シス：所属機関 → 雇用条件セットの「編集 ›」→ 就業場所で就業先セットを選んで保存し、この書類を開き直してください。</span>';
+}
+// 印刷の前にも確かめる（「印刷・PDF」「1-5+1-6まとめ印刷」）
+(function(){
+  ['doPrint','printBoth'].forEach(function(fn){
+    const orig=window[fn]; if(typeof orig!=='function' || orig._oaWrapped) return;
+    const w=function(){ try{ if(_oaMissing() && !confirm(_oaWarnText()+'\n\nこのまま印刷しますか？')) return; }catch(e){} return orig.apply(this, arguments); };
+    w._oaWrapped=true; window[fn]=w;
+  });
+})();
 function _officeAnnex(){
   const area=document.getElementById('pageArea'); if(!area) return;
   const old=area.querySelectorAll('.doc[data-oa="1"]'); old.forEach(function(x){ x.remove(); });
   const refs=['es_officeName','es_officeAddress','es_officeTel','es_subOfficeName','es_subOfficeAddress','es_subOfficeTel'];
   const says=refs.some(function(id){ return /別紙/.test(v(id)); });
   const list=_oaList();
-  if(!says || !list.length){
-    if(says && !list.length && !window._oaWarned){ window._oaWarned=1; console.warn('[就業先の別紙] 就業先に「別紙」とありますが、案シスの雇用条件セットに就業先の別紙が入っていません'); }
-    return;
+  // ver.20261125.03 ① 日本語が「別紙」で訳が空の欄には、訳の行に「別紙のとおり」の訳を書類にだけ出す（入力欄・保存には入れない）。
+  //   訳の言葉は自分で作らず、この書類にもともとある入管庁の訳（「※詳細は別紙のとおり」の訳）をそのまま使う
+  if(says){
+    const w=_oaBesshiWord(area);
+    if(w) [['es_officeName','es_officeNameEn'],['es_officeAddress','es_officeAddressEn'],['es_subOfficeName','es_subOfficeNameEn'],['es_subOfficeAddress','es_subOfficeAddressEn']].forEach(function(pr){
+      if(!/別紙/.test(v(pr[0])) || String(v(pr[1])||'').trim()) return;
+      area.querySelectorAll('span.f[data-bind="'+pr[1]+'"]').forEach(function(sp){ sp.textContent=w; sp.removeAttribute('style'); sp.classList.remove('f-blank'); sp.setAttribute('data-oa-w','1'); });
+    });
   }
+  // ver.20261125.03 ② 「別紙」とあるのに就業先の一覧がないときは、書類の上に注意を出す（印刷・保存される書類には入れない）
+  _oaWarn(says && !list.length && !window._oaStandalone);
+  if(!says || !list.length) return;
   const lang=((location.pathname.split('/').pop()||'').match(/^(?:1_6|15_7)_([a-z]{2})\.html$/i)||[0,'id'])[1].toLowerCase();
   const T=(lang==='th'?_OA_TR.th:_OA_TR.en), nm=(window._oaStandalone?(window._oaHeadName||''):v('applicantName'))||'', H=1124;
   const th='border:1px solid #000;padding:3px 4px;font-weight:bold;background:#f3f3f3;vertical-align:top;';
@@ -1545,7 +1595,7 @@ function _officeAnnex(){
 }
 /* ver.20261125.01: 就業先の別紙だけを印刷・PDFにする（署名済みの1-6号に、あとから別紙を付けるときなど） */
 (function(){ try{ const st=document.createElement('style');
-  st.textContent='@media print{ body.oa-print-only #pageArea .doc:not([data-oa="1"]){ display:none !important; } } body.oa-only #pageArea .doc:not([data-oa="1"]){ display:none !important; }';
+  st.textContent='@media print{ #oaWarn{ display:none !important; } } @media print{ body.oa-print-only #pageArea .doc:not([data-oa="1"]){ display:none !important; } } body.oa-only #pageArea .doc:not([data-oa="1"]){ display:none !important; }';
   (document.head||document.documentElement).appendChild(st); }catch(e){} })();
 function printOfficeAnnex(){
   const pgs=document.querySelectorAll('#pageArea .doc[data-oa="1"]');
