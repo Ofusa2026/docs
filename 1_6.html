@@ -170,7 +170,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
       <div class="fg2" style="display:flex;gap:6px"><div class="fg" style="flex:1"><label>更新上限 回数<span class="fid">es.renewLimitTimes</span></label><input id="es_renewLimitTimes" oninput="_rlInput()" placeholder="例 4"></div><div class="fg" style="flex:1"><label>通算契約期間 年<span class="fid">es.renewLimitYears</span></label><input id="es_renewLimitYears" oninput="_rlInput()" placeholder="例 5"></div></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅱ 就業の場所（直接雇用）</div>
-      <div id="oaBox" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 8px;margin:2px 0 6px;font-size:11px;"><button type="button" onclick="oaMakeBesshi()" style="font-size:11px;padding:3px 10px;border:1px solid #2563eb;background:#fff;color:#2563eb;border-radius:5px;cursor:pointer;font-weight:700;">📎 別紙にする</button> <span style="color:#64748b;">事業所名を「別紙のとおり」にして、就業の場所別紙を付けます</span><select id="oaSetSelect" onchange="oaPickSet(this.value)" style="display:none;width:100%;margin-top:5px;font-size:11px;padding:3px;"></select><div id="oaBoxMsg" style="margin-top:4px;"></div></div>
+      <div id="oaBox" style="margin:0 0 4px;font-size:10.5px;"><div style="text-align:right;"><button type="button" onclick="oaOpenBesshi()" title="就業先を「別紙」にして、就業の場所別紙を付けます" style="font-size:10.5px;padding:1px 8px;border:1px solid #cbd5e1;background:#fff;color:#64748b;border-radius:4px;cursor:pointer;">📎 別紙にする</button></div><div id="oaOpts" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:5px 7px;margin-top:4px;color:#334155;line-height:1.7;"><label style="cursor:pointer;"><input type="checkbox" id="oaOptName" checked> 事業所名を「別紙のとおり」にする</label><br><label style="cursor:pointer;"><input type="checkbox" id="oaOptClear"> 所在地・連絡先を空にする</label><div style="margin-top:3px;"><button type="button" onclick="oaMakeBesshi()" style="font-size:10.5px;padding:1px 10px;border:1px solid #2563eb;background:#2563eb;color:#fff;border-radius:4px;cursor:pointer;">書き換える</button> <button type="button" onclick="oaCloseBesshi()" style="font-size:10.5px;padding:1px 8px;border:1px solid #cbd5e1;background:#fff;color:#64748b;border-radius:4px;cursor:pointer;">やめる</button></div></div><select id="oaSetSelect" onchange="oaPickSet(this.value)" style="display:none;width:100%;margin-top:4px;font-size:10.5px;padding:2px;"></select><div id="oaBoxMsg" style="margin-top:3px;"></div></div>
       <div class="fg"><label>事業所名（日）<span class="fid">es.officeName</span></label><input id="es_officeName" oninput="p()"></div>
       <div class="fg"><label>事業所名（ID）<span class="fid">es.officeNameEn</span></label><input id="es_officeNameEn" oninput="p()"></div>
       <div class="fg"><label>所在地（日）<span class="fid">es.officeAddress</span></label><textarea id="es_officeAddress" oninput="p()" rows="2"></textarea></div>
@@ -575,7 +575,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611251517"></script>
+<script src="ofusa_common.js?v=2611251522"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1546,14 +1546,18 @@ function _oaWarn(on){
 /* ver.20261125.04: 「📎 別紙にする」（Saysayの入力欄）。事業所名を「別紙のとおり」にして、所在地・連絡先は空にする（訳も空にして、書類には入管庁の訳が出る）。
    会社に就業先セットがあれば、その場で選べる（DB保存で雇用条件セットの workplaceSetId に入る） */
 function _oaSets(){ const co=window._p16Co||{}; return (co.extra&&Array.isArray(co.extra.workplaceSets))?co.extra.workplaceSets.filter(function(x){ return x&&x.id; }):[]; }
+function oaOpenBesshi(){ const o=document.getElementById('oaOpts'); if(o) o.style.display=(o.style.display==='none'?'block':'none'); }
+function oaCloseBesshi(){ const o=document.getElementById('oaOpts'); if(o) o.style.display='none'; }
+// ver.20261125.07: 書き換えるかは選ぶ（事業所名を「別紙のとおり」に／所在地・連絡先を空に）。押す前の値は「↩ 元に戻す」で戻せる
 function oaMakeBesshi(){
   const g=function(id){ return document.getElementById(id); };
-  const has=['es_officeAddress','es_officeAddressEn','es_officeTel'].some(function(id){ return g(id) && String(g(id).value||'').trim(); });
-  if(has && !confirm('事業所名を「別紙のとおり」にして、所在地と連絡先を空にします。よろしいですか？\n（「💾 DB保存」を押すまで、案シスには入りません）')) return;
+  const doName=!!(g('oaOptName')&&g('oaOptName').checked), doClear=!!(g('oaOptClear')&&g('oaOptClear').checked);
+  oaCloseBesshi();
+  if(!doName && !doClear) return;
   const set=function(id,val){ const e=g(id); if(e) e.value=val; };
-  // ver.20261125.06: 押す前の値を覚えておく（「↩ 元に戻す」で戻せる）
   window._oaPrev={}; ['es_officeName','es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].forEach(function(id){ const e=g(id); window._oaPrev[id]=e?e.value:''; });
-  set('es_officeName','別紙のとおり'); ['es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].forEach(function(id){ set(id,''); });
+  if(doName){ set('es_officeName','別紙のとおり'); set('es_officeNameEn',''); }
+  if(doClear){ ['es_officeAddress','es_officeAddressEn','es_officeTel'].forEach(function(id){ set(id,''); }); }
   const sets=_oaSets(), src=window._esAnnexSrc||{};
   if(sets.length===1 && !src.setId && !_oaList().length){ oaPickSet(String(sets[0].id)); return; }
   p();
@@ -1579,15 +1583,15 @@ function _oaBoxUpdate(says, list){
   }
   sel.value=src.setId && sets.some(function(x){ return String(x.id)===String(src.setId); }) ? String(src.setId) : '';
   sel.style.display=(says && sets.length)?'block':'none';
-  const undo=window._oaPrev ? ' <button type="button" onclick="oaUndoBesshi()" style="font-size:11px;padding:2px 8px;border:1px solid #64748b;background:#fff;color:#334155;border-radius:5px;cursor:pointer;">↩ 元に戻す</button>' : '';
+  const undo=window._oaPrev ? ' <button type="button" onclick="oaUndoBesshi()" style="font-size:10.5px;padding:0 7px;border:1px solid #cbd5e1;background:#fff;color:#64748b;border-radius:4px;cursor:pointer;">↩ 元に戻す</button>' : '';
   if(!says){ msg.innerHTML=undo; return; }
   if(list.length){
     const n=document.querySelectorAll('#pageArea .doc[data-oa="1"]').length;
-    msg.innerHTML='<span style="color:#15803d;font-weight:700;">✅ 就業の場所別紙：'+list.length+'か所（'+n+'ページ）を付けます</span>'+undo;
+    msg.innerHTML='<span style="color:#15803d;">✅ 就業の場所別紙：'+list.length+'か所（'+n+'ページ）を付けます</span>'+undo;
   }else if(!sets.length){
-    msg.innerHTML='<span style="color:#b45309;font-weight:700;">⚠️ 就業先の一覧がありません。このまま印刷できます（別紙のページは付きません）。一覧は案シスの所属機関で作ります</span>'+undo;
+    msg.innerHTML='<span style="color:#b45309;">⚠️ 就業先の一覧がありません。このまま印刷できます（別紙のページは付きません）。一覧は案シスの所属機関で作ります</span>'+undo;
   }else{
-    msg.innerHTML='<span style="color:#b45309;font-weight:700;">⚠️ 就業先セットを選んでください。選ばなくても印刷できます（別紙のページは付きません）</span>'+undo;
+    msg.innerHTML='<span style="color:#b45309;">⚠️ 就業先セットを選んでください。選ばなくても印刷できます（別紙のページは付きません）</span>'+undo;
   }
 }
 // ver.20261125.04: 事業所名が「別紙」のときは、所在地・連絡先・事業所名の訳は空でよい（空欄の数・色付けに入れない）
