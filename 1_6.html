@@ -95,7 +95,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
     <button class="btn" onclick="loadEditedHTML()" style="background:#0369a1;color:white;">📂 編集呼出</button><button class="btn" onclick="discardEditedFromDB()" title="保存済みの直接編集版を破棄して初期表示に戻す">♻️ 編集版破棄</button>
     <button class="btn btn-print" onclick="doPrint()">🖨️ 印刷・PDF</button>
     <button class="btn btn-print" onclick="printBoth()" style="background:#7c3aed;color:#fff;">🖨️ 1-5+1-6まとめ印刷</button>
-    <button class="btn btn-print" onclick="printOfficeAnnex()" style="background:#2563eb;color:#fff;" title="「別紙　就業の場所」のページだけを印刷・PDFにします">🖨️ 就業先の別紙だけ</button>
+    <button class="btn btn-print" onclick="printOfficeAnnex()" style="background:#2563eb;color:#fff;" title="「就業の場所一覧」のページだけを印刷・PDFにします">🖨️ 就業先の別紙だけ</button>
   </div>
 </div>
 <div class="main">
@@ -574,7 +574,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611251045"></script>
+<script src="ofusa_common.js?v=2611251130"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1465,20 +1465,15 @@ function _shiftOverflow(){
    案シスの雇用条件セットに「就業先 別紙」（es.annexOffices＝[{name,addr,tel,nameEn,addrEn}]）があり、
    この書類の「Ⅱ．就業の場所」の事業所名・所在地・連絡先のどれかに「別紙」と書いてあるとき、最後に「別紙　就業の場所」を付けて一覧を載せる。
    訳は英語1つ（会社名・所在地と同じで、どの言語版でも英語のまま）。行が多いときは次のページに続ける。
-   ⚠️ キー名 annexOffices と name/addr/tel/nameEn/addrEn は案シス（anken の雇用条件セットの「就業先 別紙」）と同じ名前。変えないこと */
+   ver.20261125.02: タイトルは「就業の場所一覧」、見出しは 1-6号の「Ⅱ．就業の場所」と同じ「事業所名・所在地・連絡先」。
+   見出し・タイトルの訳は【タイ語版だけタイ語、ほかの言語版はすべて英語】。訳の言葉は入管庁の参考様式第１－６号（英語版・タイ語版）にある言葉をそのまま使う
+   （事業所名＝Name of office／ชื่อสถานที่ปฏิบัติงาน、所在地＝Address／ที่อยู่、連絡先＝Contact information／หมายเลขติดต่อ、
+    雇用条件書＝WRITTEN EMPLOYMENT CONDITIONS／หนังสือเงื่อนไขการว่าจ้าง、Ⅱ．就業の場所＝II. Place of employment／II. สถานที่ปฏิบัติงาน）。
+   様式に無い言葉は「一覧」（List of／รายการ）と「続き」（Continued from／ต่อจาก）だけ
+   */
 const _OA_TR={
-  id:{t:'Lampiran: Tempat Kerja',c:'(Lanjutan dari "II. Tempat kerja")',n:'Nama kantor',a:'Lokasi',k:'Kontak'},
-  en:{t:'Attachment: Place of Work',c:'(Continued from "II. Place of work")',n:'Name of office',a:'Location',k:'Contact'},
-  vi:{t:'Phụ lục: Nơi làm việc',c:'(Tiếp theo mục "II. Nơi làm việc")',n:'Tên cơ sở',a:'Địa chỉ',k:'Liên hệ'},
-  km:{t:'ឯកសារភ្ជាប់៖ ទីកន្លែងធ្វើការ',c:'(តពីផ្នែក «II. ទីកន្លែងធ្វើការ»)',n:'ឈ្មោះការិយាល័យ',a:'ទីតាំង',k:'ទំនាក់ទំនង'},
-  ko:{t:'별지: 취업 장소',c:'(「Ⅱ. 취업 장소」에서 계속)',n:'사업소명',a:'소재지',k:'연락처'},
-  mn:{t:'Хавсралт: Ажлын байр',c:'(«II. Ажлын байр»-ын үргэлжлэл)',n:'Байгууллагын нэр',a:'Хаяг',k:'Холбоо барих'},
-  my:{t:'ပူးတွဲစာရွက် - အလုပ်လုပ်ရမည့်နေရာ',c:'(«II. အလုပ်လုပ်ရမည့်နေရာ» ၏ အဆက်)',n:'လုပ်ငန်းခွင်အမည်',a:'တည်နေရာ',k:'ဆက်သွယ်ရန်'},
-  ne:{t:'संलग्न: काम गर्ने स्थान',c:'(«II. काम गर्ने स्थान» को निरन्तरता)',n:'कार्यालयको नाम',a:'ठेगाना',k:'सम्पर्क'},
-  si:{t:'ඇමුණුම: සේවා ස්ථානය',c:'(«II. සේවා ස්ථානය» හි ඉතිරි කොටස)',n:'කාර්යාලයේ නම',a:'ස්ථානය',k:'සම්බන්ධතා'},
-  th:{t:'เอกสารแนบ: สถานที่ทำงาน',c:'(ต่อจาก "II. สถานที่ทำงาน")',n:'ชื่อสถานประกอบการ',a:'ที่ตั้ง',k:'ติดต่อ'},
-  tl:{t:'Kalakip: Lugar ng Trabaho',c:'(Karugtong ng "II. Lugar ng trabaho")',n:'Pangalan ng opisina',a:'Lokasyon',k:'Kontak'},
-  zh:{t:'附页：就业场所',c:'（接「II. 就业场所」）',n:'事业所名称',a:'所在地',k:'联系方式'}
+  en:{t:'List of places of employment',c:'(Continued from WRITTEN EMPLOYMENT CONDITIONS, II. Place of employment)',n:'Name of office',a:'Address',k:'Contact information'},
+  th:{t:'รายการสถานที่ปฏิบัติงาน',c:'(ต่อจาก หนังสือเงื่อนไขการว่าจ้าง II. สถานที่ปฏิบัติงาน)',n:'ชื่อสถานที่ปฏิบัติงาน',a:'ที่อยู่',k:'หมายเลขติดต่อ'}
 };
 /* 就業先の一覧をどこから取るか（ver.20261125.01）
    ① 雇用条件セットの workplaceSetId → 会社の就業先セット（companies.extra.workplaceSets＝[{id,name,offices:[…]}]）
@@ -1514,7 +1509,7 @@ function _officeAnnex(){
     return;
   }
   const lang=((location.pathname.split('/').pop()||'').match(/^(?:1_6|15_7)_([a-z]{2})\.html$/i)||[0,'id'])[1].toLowerCase();
-  const T=_OA_TR[lang]||_OA_TR.en, nm=(window._oaStandalone?(window._oaHeadName||''):v('applicantName'))||'', H=1124;
+  const T=(lang==='th'?_OA_TR.th:_OA_TR.en), nm=(window._oaStandalone?(window._oaHeadName||''):v('applicantName'))||'', H=1124;
   const th='border:1px solid #000;padding:3px 4px;font-weight:bold;background:#f3f3f3;vertical-align:top;';
   const td='border:1px solid #000;padding:3px 4px;vertical-align:top;';
   const head='<tr><th style="'+th+'width:26px;">No.</th><th style="'+th+'width:32%;">事業所名<br><span class="id" style="font-weight:normal;">'+esc(T.n)+'</span></th><th style="'+th+'">所在地<br><span class="id" style="font-weight:normal;">'+esc(T.a)+'</span></th><th style="'+th+'width:92px;">連絡先<br><span class="id" style="font-weight:normal;">'+esc(T.k)+'</span></th></tr>';
@@ -1533,7 +1528,7 @@ function _officeAnnex(){
   while(i<list.length){
     const pg=document.createElement('div'); pg.className='doc'; pg.setAttribute('data-oa','1'); if(first) pg.id='docOfficeAnnex';
     pageNo++;
-    pg.innerHTML='<div class="page-num-label">P'+pageNo+'</div><div style="font-size:9pt;font-weight:bold;">別紙　就業の場所'+(first?'':'（つづき）')+'<br><span class="id" style="font-size:8pt;font-weight:normal;">'+esc(T.t)+'</span></div>'
+    pg.innerHTML='<div class="page-num-label">P'+pageNo+'</div><div style="font-size:9pt;font-weight:bold;">就業の場所一覧'+(first?'':'（つづき）')+'<br><span class="id" style="font-size:8pt;font-weight:normal;">'+esc(T.t)+'</span></div>'
       +'<div style="font-size:7.5pt;margin-top:2px;">（雇用条件書　Ⅱ．就業の場所の続き）<br><span class="id" style="font-size:7pt;">'+esc(T.c)+'</span></div>'
       +(nm?'<div style="font-size:8.5pt;margin-top:6px;">'+esc(nm)+'</div>':'')
       +'<table style="width:100%;border-collapse:collapse;font-size:8pt;margin-top:6px;"><tbody>'+head+'</tbody></table>';
@@ -1580,7 +1575,7 @@ function printOfficeAnnex(){
       document.body.classList.add('oa-only','oa-print-only');
       setFormValues({officeName:'別紙のとおり',workplaceSetId:ws});
       p();
-      try{ document.title='別紙 就業の場所 '+(co.name||'')+(hit.name?'（'+hit.name+'）':''); }catch(e){}
+      try{ document.title='就業の場所一覧 '+(co.name||'')+(hit.name?'（'+hit.name+'）':''); }catch(e){}
     }catch(e){ console.warn('[就業先の別紙だけ]',e); alert('就業先の別紙を読み込めませんでした：'+(e&&e.message||e)); }
   };
   if(document.readyState==='complete') setTimeout(run,800); else window.addEventListener('load',function(){ setTimeout(run,800); });
