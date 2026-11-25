@@ -575,7 +575,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611251522"></script>
+<script src="ofusa_common.js?v=2611251533"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1524,8 +1524,15 @@ function _oaWarnText(){
     ? '⚠️ 就業先が「別紙」になっていますが、雇用条件セットで選んでいる就業先セットが案シスに見つかりません（消されたか、別の会社のセットです）。このまま印刷できますが、就業の場所別紙のページは付きません。'
     : '⚠️ 就業先が「別紙」になっていますが、就業先の一覧（案シスの就業先セット）が選ばれていません。このまま印刷できますが、就業の場所別紙のページは付きません。';
 }
+function oaShowAnnex(){ const a=document.getElementById('docOfficeAnnex'); if(a) a.scrollIntoView({behavior:'smooth',block:'start'}); }
+// ver.20261125.08: 注意の出すぎを防ぐ。書類の上の注意は「×」で閉じられ、閉じた案件では出さない（左の欄の小さな表示だけ）。
+//   印刷のときの注意も、閉じた案件では出さない。閉じていなくても、同じ案件では画面を開いているあいだ1回だけ
+function _oaCaseKey(){ try{ return 'oaWarnOff:'+String(window._caseLoadDone||document.getElementById('caseSelect')&&document.getElementById('caseSelect').value||location.search||'x'); }catch(e){ return 'oaWarnOff:x'; } }
+function _oaWarnOff(){ try{ return localStorage.getItem(_oaCaseKey())==='1'; }catch(e){ return false; } }
+function oaCloseWarn(){ try{ localStorage.setItem(_oaCaseKey(),'1'); }catch(e){} const el=document.getElementById('oaWarn'); if(el) el.remove(); }
 function _oaWarn(on){
   let el=document.getElementById('oaWarn');
+  if(on && _oaWarnOff()) on=false;
   if(!on){ if(el) el.remove(); return; }
   const area=document.getElementById('pageArea'); if(!area || !area.parentNode) return;
   if(!el){
@@ -1533,13 +1540,13 @@ function _oaWarn(on){
     el.style.cssText='margin:8px auto;max-width:794px;background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;font-family:sans-serif;';
     area.parentNode.insertBefore(el, area);
   }
-  el.innerHTML=esc(_oaWarnText())+'<br><span style="font-size:11px;">案シス：所属機関 → 雇用条件セットの「編集 ›」→ 就業場所で就業先セットを選んで保存し、この書類を開き直してください。</span>';
+  el.innerHTML='<button type="button" onclick="oaCloseWarn()" title="この案件では、もう出さない" style="float:right;margin:-2px -4px 0 8px;border:none;background:none;color:#92400e;font-size:15px;line-height:1;cursor:pointer;">×</button>'+esc(_oaWarnText())+'<br><span style="font-size:11px;">案シス：所属機関 → 雇用条件セットの「編集 ›」→ 就業場所で就業先セットを選んで保存し、この書類を開き直してください。</span>';
 }
 // 印刷の前にも確かめる（「印刷・PDF」「1-5+1-6まとめ印刷」）
 (function(){
   ['doPrint','printBoth'].forEach(function(fn){
     const orig=window[fn]; if(typeof orig!=='function' || orig._oaWrapped) return;
-    const w=function(){ try{ if(_oaMissing()) alert(_oaWarnText()); /* ver.20261125.06: 知らせるだけで、そのまま印刷する */ }catch(e){} return orig.apply(this, arguments); };
+    const w=function(){ try{ if(_oaMissing() && !_oaWarnOff() && window._oaAlerted!==_oaCaseKey()){ window._oaAlerted=_oaCaseKey(); alert(_oaWarnText()+'\n\n（OKでそのまま印刷します。この案件では、次からは出しません）'); } /* ver.20261125.08: 知らせるだけで印刷する・案件ごとに1回 */ }catch(e){} return orig.apply(this, arguments); };
     w._oaWrapped=true; window[fn]=w;
   });
 })();
@@ -1587,7 +1594,7 @@ function _oaBoxUpdate(says, list){
   if(!says){ msg.innerHTML=undo; return; }
   if(list.length){
     const n=document.querySelectorAll('#pageArea .doc[data-oa="1"]').length;
-    msg.innerHTML='<span style="color:#15803d;">✅ 就業の場所別紙：'+list.length+'か所（'+n+'ページ）を付けます</span>'+undo;
+    msg.innerHTML='<span style="color:#15803d;">✅ 就業の場所別紙：'+list.length+'か所（'+n+'ページ）を付けます</span> <button type="button" onclick="oaShowAnnex()" style="font-size:10.5px;padding:0 7px;border:1px solid #86efac;background:#fff;color:#15803d;border-radius:4px;cursor:pointer;">👁 別紙を見る</button>'+undo;
   }else if(!sets.length){
     msg.innerHTML='<span style="color:#b45309;">⚠️ 就業先の一覧がありません。このまま印刷できます（別紙のページは付きません）。一覧は案シスの所属機関で作ります</span>'+undo;
   }else{
@@ -1603,6 +1610,31 @@ function _oaBoxUpdate(says, list){
     return r.filter(function(id){ return ['es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].indexOf(id)<0; });
   };
   w._oa=1; window.BLANK_REQUIRED=w;
+})();
+/* ver.20261125.08: 最低賃金の都道府県。就業先が「別紙」のときは、就業の場所別紙の住所の都道府県のうち、最低賃金がいちばん高いところで比べる。
+   別紙の住所から読めなければ、所属機関の住所で比べる（「別紙参照」の字で判定できなくなっていたのを直す） */
+(function(){
+  if(typeof window._mw16_pref!=='function' || window._mw16_pref._oa) return;
+  const orig=window._mw16_pref;
+  const w=function(){
+    try{
+      const nmB=['es_officeName','es_officeAddress','es_officeTel'].some(function(id){ return /別紙/.test(String(v(id)||'')); });
+      if(nmB && typeof OFUSA_MIN_WAGE==='object'){
+        let best='', bestV=-1; const seen={};
+        _oaList().forEach(function(o){
+          const a=String(o.addr||'');
+          for(const k in OFUSA_MIN_WAGE){ if(a.indexOf(k)>=0){ seen[k]=1; break; } }
+        });
+        Object.keys(seen).forEach(function(k){ let mv=0; try{ mv=(_mw16_minWage(k)||{}).v||0; }catch(e){} if(mv>bestV){ bestV=mv; best=k; } });
+        window._oaPrefs=Object.keys(seen);
+        if(best) return best;
+        const org=String(v('es_orgAddress')||'');
+        for(const k in OFUSA_MIN_WAGE){ if(org.indexOf(k)>=0) return k; }
+      }
+    }catch(e){}
+    return orig.apply(this, arguments);
+  };
+  w._oa=1; window._mw16_pref=w;
 })();
 function _officeAnnex(){
   const area=document.getElementById('pageArea'); if(!area) return;

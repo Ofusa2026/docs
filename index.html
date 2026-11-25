@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261125.07</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261125.08</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -593,8 +593,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611251522';
-window.__DOCS_CACHE_BUSTER__ = '2611251522';
+window.__DOCS_CACHE_BUSTER__ = '2611251533';
+window.__DOCS_CACHE_BUSTER__ = '2611251533';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2244,6 +2244,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261125.08',
+    date: '2026-11-25',
+    notify: true,
+    items: [
+      '👁 雇用条件書（1-6号）：「就業の場所別紙：○か所」の横に「別紙を見る」ボタン。押すと別紙のページへ飛びます。',
+      '🔕 雇用条件書（1-6号）：就業先の一覧がないときの黄色い注意は「×」で閉じられます（閉じた案件ではもう出ません）。印刷のときの注意も、同じ案件では1回だけにしました。',
+      '💴 雇用条件書（1-6号）：就業先が「別紙」のときの最低賃金チェックは、別紙の住所の都道府県のうち最低賃金がいちばん高いところで比べます（読めなければ所属機関の住所）。「就業場所の都道府県を判定できません」が毎回出ていたのを直しました。'
+    ]
+  },
   {
     version: 'ver.20261125.07',
     date: '2026-11-25',
