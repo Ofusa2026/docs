@@ -170,6 +170,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
       <div class="fg2" style="display:flex;gap:6px"><div class="fg" style="flex:1"><label>更新上限 回数<span class="fid">es.renewLimitTimes</span></label><input id="es_renewLimitTimes" oninput="_rlInput()" placeholder="例 4"></div><div class="fg" style="flex:1"><label>通算契約期間 年<span class="fid">es.renewLimitYears</span></label><input id="es_renewLimitYears" oninput="_rlInput()" placeholder="例 5"></div></div>
     </div>
     <div class="fs"><div class="fs-title">Ⅱ 就業の場所（直接雇用）</div>
+      <div id="oaBox" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 8px;margin:2px 0 6px;font-size:11px;"><button type="button" onclick="oaMakeBesshi()" style="font-size:11px;padding:3px 10px;border:1px solid #2563eb;background:#fff;color:#2563eb;border-radius:5px;cursor:pointer;font-weight:700;">📎 別紙にする</button> <span style="color:#64748b;">事業所名を「別紙のとおり」にして、就業の場所一覧を付けます</span><select id="oaSetSelect" onchange="oaPickSet(this.value)" style="display:none;width:100%;margin-top:5px;font-size:11px;padding:3px;"></select><div id="oaBoxMsg" style="margin-top:4px;"></div></div>
       <div class="fg"><label>事業所名（日）<span class="fid">es.officeName</span></label><input id="es_officeName" oninput="p()"></div>
       <div class="fg"><label>事業所名（ID）<span class="fid">es.officeNameEn</span></label><input id="es_officeNameEn" oninput="p()"></div>
       <div class="fg"><label>所在地（日）<span class="fid">es.officeAddress</span></label><textarea id="es_officeAddress" oninput="p()" rows="2"></textarea></div>
@@ -574,7 +575,7 @@ document.addEventListener('focusout', function(e){ var t=e.target; if(t && t.id 
 </div>
 
 <script>window.OFUSA_DOC_KEY = '1_6';</script>
-<script src="ofusa_common.js?v=2611251202"></script>
+<script src="ofusa_common.js?v=2611251216"></script>
 <script>
 // ver.20261013.02: 空欄チェックの対象＝必須入力箇所のみ（任意欄は黄色にしない）
 window.BLANK_REQUIRED = function(){
@@ -1540,12 +1541,69 @@ function _oaWarn(on){
     w._oaWrapped=true; window[fn]=w;
   });
 })();
+/* ver.20261125.04: 「📎 別紙にする」（Saysayの入力欄）。事業所名を「別紙のとおり」にして、所在地・連絡先は空にする（訳も空にして、書類には入管庁の訳が出る）。
+   会社に就業先セットがあれば、その場で選べる（DB保存で雇用条件セットの workplaceSetId に入る） */
+function _oaSets(){ const co=window._p16Co||{}; return (co.extra&&Array.isArray(co.extra.workplaceSets))?co.extra.workplaceSets.filter(function(x){ return x&&x.id; }):[]; }
+function oaMakeBesshi(){
+  const g=function(id){ return document.getElementById(id); };
+  const has=['es_officeAddress','es_officeAddressEn','es_officeTel'].some(function(id){ return g(id) && String(g(id).value||'').trim(); });
+  if(has && !confirm('事業所名を「別紙のとおり」にして、所在地と連絡先を空にします。よろしいですか？\n（「💾 DB保存」を押すまで、案シスには入りません）')) return;
+  const set=function(id,val){ const e=g(id); if(e) e.value=val; };
+  set('es_officeName','別紙のとおり'); ['es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].forEach(function(id){ set(id,''); });
+  const sets=_oaSets(), src=window._esAnnexSrc||{};
+  if(sets.length===1 && !src.setId && !_oaList().length){ oaPickSet(String(sets[0].id)); return; }
+  p();
+  try{ const sel=g('oaSetSelect'); if(sel && sel.style.display!=='none' && !sel.value) sel.focus(); }catch(e){}
+}
+function oaPickSet(val){
+  const es=Object.assign({}, window._lastEmpSet||{}, {workplaceSetId:val||''});
+  _oaResolve(es); window._oaSetTouched=true;
+  p();
+}
+function _oaBoxUpdate(says, list){
+  const sel=document.getElementById('oaSetSelect'), msg=document.getElementById('oaBoxMsg'); if(!sel||!msg) return;
+  const sets=_oaSets(), src=window._esAnnexSrc||{};
+  const sig=sets.map(function(x){ return x.id+':'+(x.name||'')+':'+((x.offices||[]).length); }).join('|');
+  if(sel._sig!==sig){
+    sel.innerHTML='<option value="">就業先セットを選ぶ</option>'+sets.map(function(x){ return '<option value="'+esc(String(x.id))+'">'+esc(x.name||'（名前なし）')+'（'+((x.offices||[]).length)+'か所）</option>'; }).join('');
+    sel._sig=sig;
+  }
+  sel.value=src.setId && sets.some(function(x){ return String(x.id)===String(src.setId); }) ? String(src.setId) : '';
+  sel.style.display=(says && sets.length)?'block':'none';
+  if(!says){ msg.innerHTML=''; return; }
+  if(list.length){
+    const n=document.querySelectorAll('#pageArea .doc[data-oa="1"]').length;
+    msg.innerHTML='<span style="color:#15803d;font-weight:700;">✅ 就業の場所一覧：'+list.length+'か所（'+n+'ページ）を付けます</span>';
+  }else if(!sets.length){
+    msg.innerHTML='<span style="color:#b45309;font-weight:700;">⚠️ この会社には就業先セットがまだありません。案シスの所属機関で作ってください</span>';
+  }else{
+    msg.innerHTML='<span style="color:#b45309;font-weight:700;">⚠️ 就業先セットを選んでください（選ぶまで一覧は付きません）</span>';
+  }
+}
+// ver.20261125.04: 事業所名が「別紙」のときは、所在地・連絡先・事業所名の訳は空でよい（空欄の数・色付けに入れない）
+(function(){
+  const o=window.BLANK_REQUIRED; if(typeof o!=='function' || o._oa) return;
+  const w=function(){
+    const r=o.apply(this, arguments);
+    if(!Array.isArray(r) || !/別紙/.test(String(v('es_officeName')||''))) return r;
+    return r.filter(function(id){ return ['es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].indexOf(id)<0; });
+  };
+  w._oa=1; window.BLANK_REQUIRED=w;
+})();
 function _officeAnnex(){
   const area=document.getElementById('pageArea'); if(!area) return;
   const old=area.querySelectorAll('.doc[data-oa="1"]'); old.forEach(function(x){ x.remove(); });
   const refs=['es_officeName','es_officeAddress','es_officeTel','es_subOfficeName','es_subOfficeAddress','es_subOfficeTel'];
   const says=refs.some(function(id){ return /別紙/.test(v(id)); });
   const list=_oaList();
+  // ver.20261125.04: 事業所名が「別紙」のあいだは、事業所名の訳・所在地・連絡先を入力できなくする（空でよい欄。空欄の数にも入らない）
+  try{
+    const nmB=/別紙/.test(String(v('es_officeName')||''));
+    ['es_officeNameEn','es_officeAddress','es_officeAddressEn','es_officeTel'].forEach(function(id){ const e=document.getElementById(id); if(!e) return;
+      if(nmB){ e.classList.remove('fo-blank'); if(!e.disabled){ e.disabled=true; e.title='事業所名が「別紙」なので、ここは空でかまいません（事業所名を変えると入力できます）'; e.style.background='#f1f5f9'; } }
+      else if(e.disabled && e.title.indexOf('別紙')>=0){ e.disabled=false; e.title=''; e.style.background=''; }
+    });
+  }catch(e){}
   // ver.20261125.03 ① 日本語が「別紙」で訳が空の欄には、訳の行に「別紙のとおり」の訳を書類にだけ出す（入力欄・保存には入れない）。
   //   訳の言葉は自分で作らず、この書類にもともとある入管庁の訳（「※詳細は別紙のとおり」の訳）をそのまま使う
   if(says){
@@ -1557,7 +1615,8 @@ function _officeAnnex(){
   }
   // ver.20261125.03 ② 「別紙」とあるのに就業先の一覧がないときは、書類の上に注意を出す（印刷・保存される書類には入れない）
   _oaWarn(says && !list.length && !window._oaStandalone);
-  if(!says || !list.length) return;
+  if(!says || !list.length){ try{ _oaBoxUpdate(says, list); }catch(e){} return; }
+  setTimeout(function(){ try{ _oaBoxUpdate(says, _oaList()); }catch(e){} }, 0);   // ページを足し終わってから数える
   const lang=((location.pathname.split('/').pop()||'').match(/^(?:1_6|15_7)_([a-z]{2})\.html$/i)||[0,'id'])[1].toLowerCase();
   const T=(lang==='th'?_OA_TR.th:_OA_TR.en), nm=(window._oaStandalone?(window._oaHeadName||''):v('applicantName'))||'', H=1124;
   const th='border:1px solid #000;padding:3px 4px;font-weight:bold;background:#f3f3f3;vertical-align:top;';
@@ -1799,6 +1858,7 @@ function collectFormValues(){
   //   就業先セットを選んでいるときはセットのID（workplaceSetId）だけ。一覧は会社の就業先セットに1つだけ持つ
   const _oas=window._esAnnexSrc||{};
   if(_oas.setId) data.workplaceSetId=_oas.setId;
+  else if(window._oaSetTouched && (window._lastEmpSet||{}).workplaceSetId) data.workplaceSetId='';   // ver.20261125.04: Saysayで「選ばない」に戻したとき
   else if(_oas.direct && Array.isArray(window._esAnnexOffices) && window._esAnnexOffices.length) data.annexOffices = JSON.parse(JSON.stringify(window._esAnnexOffices));
   return data;
 }
