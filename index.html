@@ -156,7 +156,7 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <body>
 <div class="top-bar">
   <div class="logo">📁 O-Link Saysay</div>
-  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261126.02</span></div>
+  <div class="sub" style="cursor:pointer;" onclick="openDocsWhatsNew()">大房行政書士法人 <span style="margin-left:8px;font-size:13px;opacity:1;color:#fff;">ver.20261126.03</span></div>
   <div style="flex:1;"></div>
   <!-- ver.20261105.01: 1-17号 支援計画書の言語（1-17号を開いているときだけ出す。中身は p17RenderLangBar） -->
   <div id="p17LangBar" style="display:none;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:8px;margin-right:10px;font-size:11px;color:#e2e8f0;">
@@ -593,8 +593,8 @@ html[data-uihc="1"] #aiaPanel{font-size:13.5px;}
 <script>
 // ver.20260819.08: iframe内書類HTMLのグローバルキャッシュバスター
 //   index.htmlをリロードする度に変わり、案件変更や書類切替で毎回新しい版を要求
-window.__DOCS_CACHE_BUSTER__ = '2611261152';
-window.__DOCS_CACHE_BUSTER__ = '2611261152';
+window.__DOCS_CACHE_BUSTER__ = '2611261254';
+window.__DOCS_CACHE_BUSTER__ = '2611261254';
 // idx系グローバル変数を前置宣言（TDZ回避）
 // ※元の let 宣言は後段のidxInit周辺で行われるが、open_doc('1_4')がそれより先に
 //   実行されて idxSelectedCase / idxAllCases を参照するため、ここで var 宣言しておく
@@ -2244,6 +2244,16 @@ _docsAuthGateInit();
 // ===== What's New (docs) =====
 var DOCS_WN_KEY = 'docs_whats_new_seen';
 var DOCS_WHATS_NEW = [
+  {
+    version: 'ver.20261126.03',
+    date: '2026-11-26',
+    notify: true,
+    items: [
+      '🖨️ 印刷・PDFの前に、左の欄で変えた内容（● 未保存）が残っていたら「保存してから印刷しますか？」と聞くようにしました。［OK］で保存できたのを確かめてから印刷します。',
+      '🌐 AI翻訳の答えに余分な文が付いたときに、訳が全部入らず止まっていたのを直しました（読める所は入ります）。',
+      '📊 どの書類のどの操作で止まるかを調べるため、書類の中のエラー・画面がかたまったとき・案件の中身が出るのに時間がかかったときを記録するようにしました（入力した中身は残しません）。'
+    ]
+  },
   {
     version: 'ver.20261126.02',
     date: '2026-11-26',
@@ -6737,7 +6747,7 @@ async function _isaPostSetLog(S, P){
       case_id:String(S.info.caseId||''), company_id:String((S.co&&S.co.id)||S.info.companyId||''), applicant:String(S.info.applicant||''),
       session_id:'isa'+(S.t0||''), ms_since_load:S.t0?(Date.now()-S.t0):null,
       meta:{auto:!!S.auto, lite:!!S.lite, ai:!P.basic, out:cnt.out, warn:cnt.warn, ok:cnt.ok, missing:P.items.length, attach:!!(P.attach&&P.items.length),
-        review:(P.review||[]).length, failed:(P.failed||[]).length, ichiran:S.ichiranPath||'', stale:!!S.ichiranStale,
+        review:(P.review||[]).length, failed:(P.failed||[]).length, failedList:(P.failed||[]).slice(0,10).map(function(x){ return String(x).slice(0,90); }), /* ver.20261126.03: 何が作れなかったかも残す（あとで直すため） */ ichiran:S.ichiranPath||'', stale:!!S.ichiranStale,
         noIchiran:!S.tk && !P.collected.some(function(c){ return c.dk==='isa_ichiran'; }), tk:!!S.tk,
         links:{person:S.folder||'', sign:(S.links&&S.links.sign)||'', up:(S.links&&S.links.up)||'', scan:(S.scanDir&&S.scanDir.id)?('https://drive.google.com/drive/folders/'+S.scanDir.id):''},   /* ver.20261119.05: 案シスのタスクからすぐ開けるように */ parts:P.collected.length, docs:docs.slice(0,80), keys:(S.K&&S.K.keys)||[]}};
     await fetch(IDX_URL+'saysay_logs',{method:'POST',keepalive:true,headers:{'apikey':IDX_KEY,'Authorization':'Bearer '+IDX_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(row)});

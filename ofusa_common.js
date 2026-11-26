@@ -1792,14 +1792,21 @@ function doPrint(){
   // ver.20261120.02: 書類に直接打った内容（直接編集）がまだDB保存されていないまま印刷すると、
   //   紙（PDF）だけ直って、案シスには残らない（呼び戻すと元に戻る）。印刷の前に保存するか聞く。
   try{
-    if(window._editedDirty && !window._docCheckMode && !window._printDirtyAsked){
-      if(confirm('✏️ 書類に直接打った内容が、まだDB保存されていません。\n保存しないで印刷すると、次に開いたときは元の内容に戻ります。\n\n［OK］保存してから印刷する（おすすめ）\n［キャンセル］保存しないで印刷する')){
+    // ver.20261126.03: 左の欄で手で変えた内容（● 未保存）も同じように聞く。保存は［💾 DB保存］ボタンと同じ動きで行い、保存できたのを確かめてから印刷する
+    var _fdN=(typeof window._ofDirtyN==='function')?window._ofDirtyN():0;
+    if((window._editedDirty || _fdN>0) && !window._docCheckMode && !window._printDirtyAsked){
+      var _what=window._editedDirty ? (_fdN ? '✏️ 書類に直接打った内容と、📝 左の欄で変えた内容（'+_fdN+'か所）' : '✏️ 書類に直接打った内容') : '📝 左の欄で変えた内容（'+_fdN+'か所）';
+      if(confirm(_what+'が、まだDB保存されていません。\n保存しないで印刷すると、案シスには残らず、次に開いたときは元の内容に戻ります。\n\n［OK］保存してから印刷する（おすすめ）\n［キャンセル］保存しないで印刷する')){
         (async function(){
+          var _left=function(){ return !!window._editedDirty || ((typeof window._ofDirtyN==='function')?window._ofDirtyN():0)>0; };
           try{
-            if(typeof saveForm==='function'){ await saveForm(); }
+            var _sb=document.querySelector('.app-bar .tb-save');
+            if(_sb){ _sb.click(); }
+            else if(typeof saveForm==='function'){ await saveForm(); }
             else if(typeof saveFormGeneric==='function'){ var _dk=window._empDocKey || (typeof _dgjInferDocKey==='function'?_dgjInferDocKey():''); if(_dk) await saveFormGeneric(_dk); }
           }catch(_se){ console.warn('[印刷前の保存]', _se); }
-          if(window._editedDirty){ alert('保存されませんでした。「💾 DB保存」を押してから、もう一度印刷してください。'); return; }
+          for(var _w=0; _w<80 && _left(); _w++){ await new Promise(function(r){ setTimeout(r,250); }); }   // 保存が終わるのを最大20秒待つ
+          if(_left()){ alert('保存できたのを確かめられませんでした。「💾 DB保存」を押して保存できたのを見てから、もう一度印刷してください。'); return; }
           window._printDirtyAsked=true; try{ doPrint(); }finally{ window._printDirtyAsked=false; }
         })();
         return;
@@ -4764,6 +4771,31 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     return out;
   }
   // ver.20261106.05: 翻訳APIの呼び出し（1欄ずつの🌐と、まとめて翻訳の両方で使う）
+  /* ver.20261126.03: AIの答えから文字列の配列を取り出す。前後に説明が付いた・配列が2つ並んだ・最後が欠けた、でも読める所を使う
+       want：欲しい件数（その件数の配列を優先）。どうしても読めないときは空の配列（止めない） */
+  function _ofJsonArr(text, want){
+    var t=String(text||'').replace(/```(?:json)?/gi,'').trim();
+    try{ var a0=JSON.parse(t); if(Array.isArray(a0)) return a0; }catch(_e){}
+    var cands=[], i=0;
+    while(i<t.length){
+      var st=t.indexOf('[',i); if(st<0) break;
+      var dep=0, inS=false, esc=false, end=-1;
+      for(var k=st;k<t.length;k++){ var ch=t[k];
+        if(inS){ if(esc) esc=false; else if(ch==='\\') esc=true; else if(ch==='"') inS=false; continue; }
+        if(ch==='"') inS=true; else if(ch==='[') dep++; else if(ch===']'){ dep--; if(dep===0){ end=k; break; } } }
+      if(end<0){ // 最後が欠けている：閉じて読んでみる
+        var rest=t.slice(st).replace(/\s+$/,''), vs=[rest+']', rest.replace(/,\s*$/,'')+']', rest.replace(/,?\s*"[^"]*$/,'')+']'];
+        for(var v=0;v<vs.length;v++){ try{ var a1=JSON.parse(vs[v]); if(Array.isArray(a1)){ cands.push(a1); break; } }catch(_e){} }
+        break; }
+      try{ var a2=JSON.parse(t.slice(st,end+1)); if(Array.isArray(a2)) cands.push(a2); }catch(_e){}
+      i=end+1;
+    }
+    if(!cands.length) return [];
+    if(want){ for(var c=0;c<cands.length;c++){ if(cands[c].length===want) return cands[c]; } }
+    cands.sort(function(x,y){ return y.length-x.length; });
+    return cands[0];
+  }
+  window._ofJsonArr=_ofJsonArr;
   async function _callTranslate(pairs, lang, key, gl){
     // ver.20261116.01: 1-6号の事業所名・所在地は、どの言語版でも英語で書く（案シスの会社名・住所の英語と同じ扱い）
     if(lang!=='en' && pairs.some(function(x){ return x && x.en && /^es_(officeName|officeAddress|dispatchOfficeName|dispatchOfficeAddress)En$/.test(x.en.id); })){
@@ -4799,7 +4831,7 @@ else document.addEventListener('DOMContentLoaded', ofusaMasterGate);
     var text=(j.content&&j.content[0]&&j.content[0].text)||'';
     var cleaned=text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
     var arr;
-    try{ arr=JSON.parse(cleaned); }catch(e){ var m=cleaned.match(/\[[\s\S]*\]/); arr=m?JSON.parse(m[0]):[]; }
+    arr=_ofJsonArr(cleaned, pairs.length);   // ver.20261126.03: AIの答えに余分な文が付いても、読める配列を使う（以前は全部捨てて止まっていた）
     if(!Array.isArray(arr)) arr=[];
     return arr;
   }
@@ -9529,6 +9561,7 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   var dirty={};
   function fgOf(el){ return el && el.closest ? el.closest('.fg') : null; }
   function count(){ return Object.keys(dirty).length; }
+  window._ofDirtyN=count;   // ver.20261126.03: 印刷の前に「保存してから印刷しますか」と聞くのに使う
   function badge(){
     var n=count(), d=!!(window._sDirty || window._editedDirty);
     [].slice.call(document.querySelectorAll('.app-bar .tb-save')).forEach(function(b){
@@ -9596,4 +9629,54 @@ window.addEventListener('message', function(e){ try{ if(e.data && e.data.type===
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', unifyTitle); else unifyTitle();
   window.addEventListener('load', function(){ setTimeout(unifyTitle, 300); });
+})();
+
+/* ============================================================
+   ver.20261126.03: 止まった記録（どの書類のどの操作で止まるかを知るため）
+   ・書類の中のエラー → event='js_error'（同じものは1回だけ・1回の表示で最大5件）
+   ・画面が2秒以上かたまった → event='ui_freeze'（かたまった長さ・直前に押したボタン）
+   ・開いてから案件の中身が出るまで10秒以上 → event='slow_load'
+   残すのは場所と長さだけ（入力した中身は残さない）。全書類チェックで開いただけのときは残さない（slog と同じ）
+   ============================================================ */
+(function(){
+  if(window.__ofStallLog) return; window.__ofStallLog=true;
+  var sent={}, nErr=0, nFrz=0, lastClick='', lastClickAt=0;
+  function log(ev, meta){ try{ if(typeof slog==='function') slog(ev, {meta:meta}); }catch(e){} }
+  document.addEventListener('click', function(e){
+    try{ var b=e.target&&e.target.closest&&e.target.closest('button,.tb-item,a'); if(b){ lastClick=(b.textContent||b.title||b.id||'').replace(/\s+/g,' ').trim().slice(0,30); lastClickAt=Date.now(); } }catch(_e){}
+  }, true);
+  function onErr(msg, src, line){
+    try{
+      msg=String(msg||'').slice(0,200); if(!msg || /ResizeObserver loop|Script error\.?$/.test(msg)) return;
+      var k=msg+'|'+line; if(sent[k] || nErr>=5) return; sent[k]=1; nErr++;
+      log('js_error', {msg:msg, src:String(src||'').split('/').pop().split('?')[0].slice(0,60), line:line||0,
+        after:(Date.now()-lastClickAt<5000)?lastClick:''});
+    }catch(_e){}
+  }
+  window.addEventListener('error', function(e){ onErr(e.message, e.filename, e.lineno); });
+  window.addEventListener('unhandledrejection', function(e){ var r=e.reason; onErr('(promise) '+((r&&r.message)||String(r||'')), (r&&r.stack&&(r.stack.match(/\/([^\/\s:]+\.(?:js|html))/)||[])[1])||'', 0); });
+  try{
+    if(window.PerformanceObserver && PerformanceObserver.supportedEntryTypes && PerformanceObserver.supportedEntryTypes.indexOf('longtask')>=0){
+      new PerformanceObserver(function(list){
+        list.getEntries().forEach(function(en){
+          if(en.duration<2000 || nFrz>=5) return; nFrz++;
+          log('ui_freeze', {ms:Math.round(en.duration), at_ms:Math.round(en.startTime), after:(Date.now()-lastClickAt<8000)?lastClick:'', hidden:!!document.hidden});
+        });
+      }).observe({entryTypes:['longtask']});
+    }
+  }catch(_e){}
+  // 案件を選んでから中身が出そろうまで（左の入力欄の中身が変わらなくなるまで）を測る
+  function snap(){ try{ return [].slice.call(document.querySelectorAll('.fp input[id],.fp select[id],.fp textarea[id]')).map(function(x){ return x.type==='checkbox'?(x.checked?1:0):String(x.value||''); }).join('\u0001'); }catch(e){ return ''; } }
+  window.addEventListener('message', function(e){
+    try{
+      if(!(e.data && e.data.type==='SELECT_CASE')) return;
+      var t0=Date.now(), prev=snap(), lastChg=0, ticks=0;
+      var chk=setInterval(function(){
+        ticks++; var cur=snap(), now=Date.now();
+        if(cur!==prev){ prev=cur; lastChg=now; }
+        if(lastChg && now-lastChg>=3000){ clearInterval(chk); var el=lastChg-t0; if(el>=10000) log('slow_load', {ms:el}); return; }
+        if(now-t0>60000){ clearInterval(chk); if(lastChg && lastChg-t0>=10000) log('slow_load', {ms:lastChg-t0, still:true}); }
+      }, 500);
+    }catch(_e){}
+  });
 })();
