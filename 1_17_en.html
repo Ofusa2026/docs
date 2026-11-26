@@ -558,7 +558,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div class="app-bar">
   <div>
     <div class="app-bar-title" id="docTitle">📄 参考様式第１－１７号　支援計画書（英語版・変更）</div>
-    <div class="ver">ver.20261120.04</div>
+    <div class="ver">ver.20261126.01</div>
   </div>
   <div class="bar-btns">
     <button class="btn" onclick="aiCheck17()" style="background:#b45309;color:white;">🧬 AI判定</button>
@@ -685,7 +685,7 @@ input.bl:focus{ background: #e8f0fe; outline: 1px solid #4285f4; outline-offset:
 <div id="pageArea"></div>
 </div>
 </div>
-<script src="ofusa_common.js?v=2611251533"></script>
+<script src="ofusa_common.js?v=2611261103"></script>
 <script>
 
 /* ver.20261020.06: 本文チェックボックスの既定値と、利用者が変えた状態の保持。
@@ -2998,7 +2998,7 @@ async function _p17Hearing(so, _s){
     if(_olHP){ HP = Object.assign({ note: HP.note||'' }, _olHP); IS.housing = ''; }
     else { HP = { a:'', b:'', c:'', note: HP.note||'' }; IS.housing = ''; }
     IS.orientation = _olOri;   // O-Link の回答が無ければ空 → 下で「有（適宜実施）」にする
-    window._p17OlOri = _olOri;
+    window._p17OlOri = _olOri;   /* ver.20261126.01: 公的手続・日本語学習・日本人との交流・相談苦情も、O-Link の回答が「有」だけなら、案シス側に入っている書き方（例「有（2027年4月）」）は使わず「有（適宜実施）」にする */ try{ if(typeof _rr!=='undefined' && _rr && _rr.implSchedules && !(typeof _useStd!=='undefined' && _useStd)){ ['procedures','japanese','exchange','consultation'].forEach(function(k){ if(String(_rr.implSchedules[k]||'').trim()==='有') IS[k]='有（適宜実施）'; }); } }catch(_k){}
   }
   // 言語別の設定の住居確保：自社支援（登録支援機関なし）は従来どおり。登録支援機関は O-Link で保存したもの（上で反映済み）だけ使う
   if(!_olStd){
@@ -3016,7 +3016,7 @@ async function _p17Hearing(so, _s){
     if(_e(IS.exchange)){ IS.exchange = '有（適宜実施）'; _defUsed.push('日本人との交流'); }
     if(_e(IS.jobchange)){ IS.jobchange = '有（非自発的離職時に実施）'; _defUsed.push('転職支援'); }
     if(_e(IS.consultation)){ IS.consultation = '適宜実施'; _defUsed.push('相談・苦情'); }
-    if(_e(IS.procedures)){ IS.procedures = '有（適宜実施）'; _defUsed.push('公的手続'); }
+    if(_e(IS.procedures)){ IS.procedures = '有（適宜実施）'; _defUsed.push('公的手続'); }   /* ver.20261126.01: 案シス側も「有」だけなら同じく「有（適宜実施）」（（　）が空のまま出ないように） */ ['procedures','japanese','exchange','consultation'].forEach(function(k){ if(String(IS[k]||'').trim()==='有') IS[k]='有（適宜実施）'; });
     if(_e(IS.guidance)){ IS.guidance = '有'; }
     var _g = function(id){ var el=document.getElementById(id); return el ? String(el.value||'').trim() : ''; };
     if(!sched){ _s('es_meetSchedule', '3か月に1回以上'); C.f353 = true; C.f355 = false; _defUsed.push('定期面談の時期'); }
